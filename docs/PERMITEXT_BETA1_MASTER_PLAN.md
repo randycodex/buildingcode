@@ -108,6 +108,7 @@ Detailed configuration: [BETA1_COMMERCIAL_CONFIGURATION.md](./BETA1_COMMERCIAL_C
 - [x] Clerk account flows support passwordless email, Apple, Google, and Microsoft in the product contract.
 - [x] The iOS Apple flow no longer requires the user to re-enter an email in the verified build path previously tested by the owner.
 - [x] Account deletion explains the destructive scope and distinguishes Permitext deletion from Apple subscription cancellation and external identity providers.
+- [x] Prepare a fail-closed Production account export/deletion acceptance checklist using only a dedicated disposable account, redacted evidence, explicit partial-failure stop conditions, and separate Apple-billing handling.
 - [ ] Reverify fresh-account and existing-account sign-in for Apple, Google, Microsoft, and email in production after the final deployment.
 - [ ] Complete one production-configured account export/deletion lifecycle and confirm provider/local cleanup results are reported accurately.
 - [x] Record OAuth credential ownership and activate the Microsoft secret's 30-, 14-, and 7-day rotation reminders.

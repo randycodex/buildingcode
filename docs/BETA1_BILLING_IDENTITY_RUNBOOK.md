@@ -203,6 +203,60 @@ PERMITEXT_SUBSCRIPTION_POLICY_VERSION=<approved version>
 
 Do not populate these variables with the current working drafts merely to pass readiness. The authenticated acceptance endpoint rejects stale versions, timestamps acceptance on the server, and preserves the accepted set in the Permitext account export. Final web/iOS consent presentation and activation remain release-stage work after counsel approval.
 
+## Production account export/deletion acceptance
+
+This section prepares the final manual acceptance exercise; it does not authorize account deletion. Run it only after the final Production deployment is serving the exact intended Git commit and only after the owner explicitly authorizes that destructive exercise.
+
+### Safety boundary
+
+- Use a dedicated disposable Production acceptance account controlled by the operator. Never use the owner's primary account, an administrator account, a Lifetime Pro account, or a real customer account.
+- Prefer a free account with no provider-managed billing. A linked Stripe subscription may be included only as part of the separately authorized controlled Production Stripe exercise. Do not combine this exercise with an App Store production purchase: deleting Permitext does not cancel an App Store subscription.
+- Record the serving release ID, exact serving Git commit, deployment URL, platform/build, operator, timestamp, and a redacted or one-way-hashed test-account identifier before starting.
+- Confirm `/health`, `/release`, the strict Production readiness checks, and the final authentication checks all refer to that same serving deployment. Stop on any mismatch.
+- Keep the deletion progress window open until every stage finishes. Type `DELETE` only after reviewing the displayed scope. Deletion is permanent and cannot be rolled back.
+
+### Before deletion
+
+1. Create the disposable account through the customer-facing Production sign-in flow. Add only a small representative dataset: one saved passage, one note, one Project, one Research-history record that does not require a paid model call, and one private test image that contains no personal information.
+2. Finish sync and verify the representative records on the second supported client. Do not continue while either client reports a waiting change or sync conflict.
+3. Through the authenticated operator process, capture an aggregate baseline from `POST /admin/accounts/restore-checklist` and a complete pre-deletion export from `POST /admin/accounts/export`. The export contains account data, entitlement details, session state, passkey identifiers, and mutations; treat it as sensitive.
+4. Compare the export with the visible account state. Retain only the redacted counts and hashes needed for the acceptance record. Never commit an admin token, session token, raw account export, provider credential, email address, private image, or customer content. Securely remove the temporary raw export after the comparison is recorded.
+5. Record the expected billing result:
+   - Free account: Stripe stage `notApplicable`.
+   - Authorized linked Stripe account: Stripe cancellation must be confirmed before Permitext deletes data.
+   - Apple-managed account: stop and use a different disposable account. Permitext deletion reports Apple billing as `userManaged`; it does not cancel Apple billing.
+   - Lifetime Pro: stop and use a different disposable account because deletion permanently removes the grant.
+
+### Execute through the customer interface
+
+1. Open Account settings on the selected client and choose Delete Account. Do not call `DELETE /account/delete` manually for the acceptance exercise; the customer interface must prove the complete flow.
+2. Confirm that the warning distinguishes Permitext data deletion from Apple, Stripe, Clerk, Google/Gmail, and Microsoft records. If Apple-managed billing is detected, the interface must require the separate Apple-billing acknowledgment.
+3. Type `DELETE`, start deletion once, and retain the redacted stage result. The server performs Stripe handling first, then private-asset deletion, then deletion of the Permitext account and remaining data. Device cleanup and Clerk-identity deletion happen afterward on the client.
+4. A successful server result must report `deleted: true`, `partial: false`, `permitextData: deleted`, `privateAssets: deleted`, and either `stripeBilling: canceled` or `stripeBilling: notApplicable`. The client must then report the device stage complete and the Clerk identity stage complete or legitimately skipped.
+
+### Stop conditions and partial results
+
+Do not improvise, recreate the account, or repeatedly restart the full deletion after a partial result. Preserve the redacted stage response and investigate the exact boundary first:
+
+- `STRIPE_CANCELLATION_FAILED`: billing cancellation was not confirmed and no Permitext account data was deleted.
+- `PRIVATE_ASSET_DELETION_FAILED`: applicable Stripe cancellation may already be complete, while the Permitext account and remaining data still exist.
+- `ACCOUNT_DATA_DELETION_FAILED`: applicable Stripe cancellation and private-image deletion may already be complete, while deletion of the remaining account data was not confirmed.
+- Server success followed by device or Clerk failure: do not repeat server deletion. Use only the client's **Retry cleanup** action for the unfinished local or identity stage.
+
+Escalate a partial result using the support process before any new charge, new account, manual database write, repeated destructive request, or provider-side change.
+
+### Required post-deletion evidence
+
+1. Confirm the deleted session receives HTTP `401` on an authenticated Permitext request and cannot sync or recover the prior data.
+2. Capture a post-deletion `POST /admin/accounts/restore-checklist` result showing no active account, entitlement, session, passkey credential, mutation, Research history, artifact, Project link, or organization-owned record for the test account. A post-deletion `POST /admin/accounts/export` must return a null account and entitlement with empty session, credential, and mutation state.
+3. Confirm the private test image is unavailable, the client is signed out, and the representative local records are cleared from the tested device/browser.
+4. For a Clerk-backed account, confirm the Permitext Clerk identity was removed. Do not claim that Permitext deleted the external Apple, Google/Gmail, or Microsoft identity; it does not.
+5. Sign in again with the same external identity only after the deletion result is complete. It must create an empty Free Permitext account: no prior content, Pro entitlement, organization, or usable old session may return.
+6. If the exercise included an authorized Stripe subscription, confirm the subscription is canceled in Stripe and that delayed or duplicate provider events do not restore access. If a purchase existed, retain only redacted aggregate evidence that the minimal purchase-ownership tombstone remains to prevent replay; it is not active customer content or an entitlement.
+7. Record the cleanup of the recreated disposable account as a separate authorized destructive action. Do not leave a test account, test content, live subscription, or raw export behind.
+
+The gate passes only when the complete redacted evidence record identifies the exact serving release and every applicable server, billing, private-asset, device, identity, recreation, and cleanup result. Source tests or a staging exercise do not substitute for this Production-configured acceptance.
+
 ## Release evidence record
 
 For every exercise, record:
