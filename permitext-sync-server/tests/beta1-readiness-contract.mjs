@@ -21,6 +21,8 @@ const completeEnvironment = {
   STRIPE_SECRET_KEY: "sk_live_contract",
   STRIPE_PRO_PRICE_ID: "price_contract",
   STRIPE_WEBHOOK_SECRET: "whsec_contract",
+  PERMITEXT_STRIPE_TAX_MODE: "automatic",
+  PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR: "exclusive",
   APPLE_BUNDLE_ID: "com.randycodex.permitext",
   STOREKIT_PRO_PRODUCT_ID: "com.randycodex.permitext.pro.monthly",
   APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS: "AABBCC",
@@ -83,6 +85,21 @@ assert(
   "Beta 1 readiness accepted missing private asset storage."
 );
 assert(
+  !beta1ConfigurationReadiness({
+    ...completeEnvironment,
+    PERMITEXT_STRIPE_TAX_MODE: "",
+    PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR: ""
+  }).ready,
+  "Beta 1 readiness accepted an unconfigured Stripe tax decision."
+);
+assert(
+  !beta1ConfigurationReadiness({
+    ...completeEnvironment,
+    PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR: "unspecified"
+  }).ready,
+  "Beta 1 readiness accepted an unspecified Stripe Price tax behavior."
+);
+assert(
   !beta1ConfigurationReadiness({ ...completeEnvironment, PERMITEXT_TERMS_VERSION: "" }).ready,
   "Beta 1 readiness accepted missing approved policy-version configuration."
 );
@@ -126,7 +143,8 @@ const liveStripe = await verifyLiveStripeReadiness(completeEnvironment, {
         type: "recurring",
         currency: expectedStripeProPrice.currency,
         unit_amount: expectedStripeProPrice.unitAmount,
-        recurring: { interval: expectedStripeProPrice.interval }
+        recurring: { interval: expectedStripeProPrice.interval },
+        tax_behavior: "exclusive"
       }), { status: 200 });
     }
     return new Response(JSON.stringify({
@@ -140,8 +158,10 @@ const liveStripe = await verifyLiveStripeReadiness(completeEnvironment, {
 });
 assert(liveStripe.ready, "Valid live Stripe price and webhook configuration was rejected.");
 assert(
-  liveStripe.price.currency === "usd" && liveStripe.price.unitAmount === 2_000,
-  "Live Stripe readiness did not preserve the expected USD $20 price evidence."
+  liveStripe.price.currency === "usd" &&
+    liveStripe.price.unitAmount === 2_000 &&
+    liveStripe.tax.ready,
+  "Live Stripe readiness did not preserve the expected USD $20 price and tax evidence."
 );
 
 const wrongAmountStripe = await verifyLiveStripeReadiness(completeEnvironment, {
@@ -154,7 +174,8 @@ const wrongAmountStripe = await verifyLiveStripeReadiness(completeEnvironment, {
         type: "recurring",
         currency: "usd",
         unit_amount: 1_499,
-        recurring: { interval: "month" }
+        recurring: { interval: "month" },
+        tax_behavior: "exclusive"
       }), { status: 200 });
     }
     return new Response(JSON.stringify({
@@ -167,6 +188,34 @@ const wrongAmountStripe = await verifyLiveStripeReadiness(completeEnvironment, {
   }
 });
 assert(!wrongAmountStripe.ready, "Live Stripe readiness accepted a non-$20 Pro price.");
+
+const mismatchedTaxStripe = await verifyLiveStripeReadiness(completeEnvironment, {
+  fetchImplementation: async (url) => {
+    if (url.includes("/v1/prices/")) {
+      return new Response(JSON.stringify({
+        id: "price_contract",
+        livemode: true,
+        active: true,
+        type: "recurring",
+        currency: "usd",
+        unit_amount: 2_000,
+        recurring: { interval: "month" },
+        tax_behavior: "inclusive"
+      }), { status: 200 });
+    }
+    return new Response(JSON.stringify({
+      data: [{
+        url: "https://permitext.com/billing/stripe/webhook",
+        status: "enabled",
+        enabled_events: [...requiredStripeWebhookEvents]
+      }]
+    }), { status: 200 });
+  }
+});
+assert(
+  !mismatchedTaxStripe.ready && !mismatchedTaxStripe.tax.ready,
+  "Live Stripe readiness accepted a Price tax behavior that differed from the explicit decision."
+);
 
 const vercelConfiguration = JSON.parse(
   await readFile(new URL("../vercel.json", import.meta.url), "utf8")

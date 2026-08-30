@@ -115,7 +115,9 @@ async function main() {
       PERMITEXT_TEST_STRIPE_API_BASE_URL: `http://127.0.0.1:${stripePort}`,
       STRIPE_SECRET_KEY: "sk_test_permitext_no_charge_lifecycle",
       STRIPE_PRO_PRICE_ID: testPriceID,
-      STRIPE_WEBHOOK_SECRET: webhookSecret
+      STRIPE_WEBHOOK_SECRET: webhookSecret,
+      PERMITEXT_STRIPE_TAX_MODE: "automatic",
+      PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR: "exclusive"
     },
     stdio: ["ignore", "pipe", "pipe"]
   });
@@ -229,6 +231,8 @@ async function main() {
     assert.equal(checkoutBody.get("mode"), "subscription");
     assert.equal(checkoutBody.get("client_reference_id"), ownerUserID);
     assert.equal(checkoutBody.get("line_items[0][price]"), testPriceID);
+    assert.equal(checkoutBody.get("automatic_tax[enabled]"), "true");
+    assert.equal(checkoutBody.get("billing_address_collection"), "required");
     assert.equal(checkoutBody.get("metadata[permitextPackage]"), "pro");
     assert.equal(
       checkoutBody.get("success_url"),

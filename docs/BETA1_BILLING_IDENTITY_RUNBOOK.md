@@ -65,7 +65,7 @@ For iOS, set the target build setting `CLERK_PUBLISHABLE_KEY` to the production 
 
 - In App Store Connect, make Beta 1 available only in the United States territory.
 - State the United States-only service boundary in the customer-facing Terms and purchase copy.
-- Review Stripe tax, business-address, and customer-location settings for US sales before enabling the live Price.
+- Review Stripe tax, Product tax code, active registrations, business address, and customer-location settings for US sales before enabling the live Price. Configure `PERMITEXT_STRIPE_TAX_MODE=automatic` only after that review, explicitly choose `PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=inclusive` or `exclusive`, and confirm the provider Price reports the same behavior. Do not treat these environment values as proof that the New York Certificate or Stripe registration is active.
 - Confirm marketing and support do not invite customers in other countries during Beta 1. If the public web app must technically block non-US access rather than state a commercial restriction, add and test a separate geolocation enforcement layer before launch.
 
 ## Identity migration evidence

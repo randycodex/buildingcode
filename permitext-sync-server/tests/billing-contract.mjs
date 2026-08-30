@@ -24,6 +24,10 @@ import {
   appleBillingAccountTokens,
   mergedAppleBillingAccountTokens
 } from "../postgres-account-repository.mjs";
+import {
+  stripeCheckoutTaxParameters,
+  stripeTaxConfiguration
+} from "../stripe-tax.mjs";
 import { readFile } from "node:fs/promises";
 
 function assert(condition, message) {
@@ -333,6 +337,34 @@ assert(stripeSecretKeyMode("sk_test_contract") === "test", "Stripe test key was 
 assert(stripeSecretKeyMode("sk_live_contract") === "live", "Stripe live key was not detected.");
 assert(stripeSecretKeyMode("rk_live_contract") === "live", "Stripe restricted live key was not detected.");
 assert(stripeSecretKeyMode("unexpected_contract") === "unknown", "Unexpected Stripe key format was accepted.");
+const automaticTaxEnvironment = {
+  PERMITEXT_STRIPE_TAX_MODE: "automatic",
+  PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR: "exclusive"
+};
+assert(
+  stripeTaxConfiguration(automaticTaxEnvironment).ready,
+  "An explicit automatic Stripe Tax configuration was rejected."
+);
+assert(
+  !stripeTaxConfiguration({}).ready,
+  "Missing Stripe Tax decisions were treated as configured."
+);
+assert(
+  !stripeTaxConfiguration({
+    ...automaticTaxEnvironment,
+    PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR: "unspecified"
+  }).ready,
+  "An unspecified Stripe Price tax behavior was accepted."
+);
+assert(
+  stripeCheckoutTaxParameters(automaticTaxEnvironment)?.automatic_tax?.enabled === true &&
+    stripeCheckoutTaxParameters(automaticTaxEnvironment)?.billing_address_collection === "required",
+  "Automatic tax did not require Stripe Checkout tax calculation and a billing address."
+);
+assert(
+  stripeCheckoutTaxParameters({}) === null,
+  "Unconfigured Stripe Tax produced Checkout parameters."
+);
 assert(
   stripeEventIsCurrent(
     { stripeEventCreatedAt: "2026-08-21T12:00:00.000Z" },

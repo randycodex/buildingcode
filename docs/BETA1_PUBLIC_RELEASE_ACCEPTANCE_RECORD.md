@@ -109,6 +109,8 @@ Release-bound: **no**
 - No taxable New York sale accepted before authorization:
 - Stripe customer-location and billing-address behavior reviewed:
 - Stripe automatic/manual tax decision and inclusive/exclusive behavior recorded:
+- Source guard confirmed: Production Checkout rejects an unconfigured tax mode, configured automatic mode requests Stripe automatic tax and a billing address, and live readiness verifies the Price tax behavior:
+- Stripe Product tax code and active provider registration reviewed after the Certificate arrives:
 - Apple tax-handling boundary recorded separately:
 - First sales-tax filing deadline and persistent reminder verified:
 - Redacted evidence and timestamp:

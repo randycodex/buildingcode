@@ -338,7 +338,9 @@ The owner elected not to retain an attorney and to operate Permitext as a sole p
 
 Web and iOS purchase copy now states how and when to cancel to stop the next charge. Web Checkout returns to a printable Permitext subscription acknowledgment containing the amount, monthly renewal, no-trial rule, 100-turn allowance, cancellation mechanism, 72-hour refund rule, and policy links before the user continues into the app. The no-charge provider simulation verifies that Stripe receives this confirmation URL. OpenAI retention language remains matched to the current official API data-controls page, and the existing first-Research acknowledgment provides an affirmative choice before Research data is sent.
 
-Sole-proprietor income treatment and transactional sales tax remain separate. The conservative no-professional path is to treat New York web subscriptions as taxable remotely accessed prewritten software, obtain the New York Certificate of Authority before the first taxable New York web sale, and then configure Stripe's tax code, customer location, registrations, and tax presentation. No tax configuration, policy version, deployment, price, or paid call changed in this step.
+Sole-proprietor income treatment and transactional sales tax remain separate. The conservative no-professional path is to treat New York web subscriptions as taxable remotely accessed prewritten software, obtain the New York Certificate of Authority before the first taxable New York web sale, and then configure Stripe's tax code, customer location, registrations, and tax presentation.
+
+The server now has a dormant, fail-closed Stripe automatic-tax path. Explicit configuration adds Stripe automatic tax and required billing-address collection to subscription Checkout; Production readiness also requires an explicit inclusive/exclusive Price decision and verifies that the live Price reports the same behavior. This closes only the source-preparation item. No Production environment variable, Stripe registration, Product tax code, Price, deployment, or charge changed, and the Certificate/provider/owner acceptance gate remains open. The inclusive-versus-exclusive choice is deliberately deferred until the owner returns because it determines whether tax is added above $20 or absorbed inside it.
 
 ## Commercial decision gate
 
@@ -350,6 +352,7 @@ Proceed toward paid Research only if all of the following are true:
 - [x] Subscriber-level aggregation is complete: 100 fully used turns cost $5.74 p50 and $6.06 p90 in the V6 empirical model.
 - [x] Owner-approved Beta economics retain 100 turns with a $2 minimum p90 contribution; the modeled result is $4.16 on web and $2.14 on iOS at the confirmed 15% commission.
 - [x] Complete the no-cost tax/refund/infrastructure input audit and launch-volume/refund sensitivities; low-volume p90 allocation is explicit and the missing Stripe Tax configuration is recorded.
+- [x] Prepare a dormant Stripe automatic-tax Checkout path and fail-closed Production readiness guard without selecting tax presentation or changing the live provider.
 - [x] Complete the local no-charge Stripe Pro lifecycle exercise and retain the delayed-event/refund regression in the billing suite.
 - [x] Complete the provider-backed Stripe sandbox lifecycle and retain the current PaymentIntent-to-Invoice-Payment refund regression in the billing suite.
 - [x] Complete the local signed-payload Apple Pro lifecycle exercise and retain the failed-renewal and notification-ordering regressions in the billing suite.

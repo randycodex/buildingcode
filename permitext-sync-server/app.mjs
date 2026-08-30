@@ -29,6 +29,10 @@ import {
 } from "./lifetime-grant-admin.mjs";
 import { beta1ConfigurationReadiness } from "./beta1-readiness.mjs";
 import {
+  stripeCheckoutTaxParameters,
+  stripeTaxConfiguration
+} from "./stripe-tax.mjs";
+import {
   PolicyAcceptanceError,
   accountWithPolicyAcceptance,
   currentPolicyAcceptance,
@@ -24688,6 +24692,14 @@ async function handleWebCheckout(request, response) {
     sendError(response, 503, stripeStatus.message);
     return;
   }
+  const stripeTax = stripeTaxConfiguration();
+  if (liveStripeRequired() && !stripeTax.ready) {
+    sendJSON(response, 503, {
+      error: "Stripe tax collection is not configured for Production Checkout.",
+      code: "STRIPE_TAX_NOT_CONFIGURED"
+    });
+    return;
+  }
 
   const userID = body.auth?.accountUserID;
   if (!userID) {
@@ -24743,6 +24755,7 @@ async function handleWebCheckout(request, response) {
     sendError(response, 400, "Checkout return URLs must use the Permitext origin.");
     return;
   }
+  const taxParameters = stripeCheckoutTaxParameters();
   const formBody = encodedFormBody({
     mode: "subscription",
     client_reference_id: userID,
@@ -24753,7 +24766,8 @@ async function handleWebCheckout(request, response) {
     metadata: { accountUserID: userID, permitextPackage: packageID },
     subscription_data: {
       metadata: { accountUserID: userID, permitextPackage: packageID }
-    }
+    },
+    ...(taxParameters || {})
   });
 
   const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {

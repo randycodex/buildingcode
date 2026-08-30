@@ -2,6 +2,7 @@ import { clerkConfigurationStatus } from "./clerk-auth.mjs";
 import { policyVersionConfiguration } from "./policy-acceptance.mjs";
 import { researchSpendGuardrails } from "./research-config.mjs";
 import { paidResearchTurnsEnabled } from "./research-turns.mjs";
+import { stripeTaxConfiguration } from "./stripe-tax.mjs";
 
 export const requiredStripeWebhookEvents = Object.freeze([
   "checkout.session.completed",
@@ -52,6 +53,7 @@ export function beta1ConfigurationReadiness(environment = process.env) {
   const policies = policyVersionConfiguration(environment);
   const research = researchSpendGuardrails(environment);
   const paidTurnsEnabled = paidResearchTurnsEnabled(environment);
+  const stripeTax = stripeTaxConfiguration(environment);
   const stripeResearchPackPriceIDs = [
     environment.STRIPE_RESEARCH_TURNS_25_PRICE_ID,
     environment.STRIPE_RESEARCH_TURNS_100_PRICE_ID
@@ -66,6 +68,13 @@ export function beta1ConfigurationReadiness(environment = process.env) {
     check("stripe-live-secret", liveKey(environment.STRIPE_SECRET_KEY, "sk") || liveKey(environment.STRIPE_SECRET_KEY, "rk"), "Use a live Stripe secret or restricted key."),
     check("stripe-pro-price", String(environment.STRIPE_PRO_PRICE_ID || "").startsWith("price_"), "Configure the live recurring Pro Price ID."),
     check("stripe-webhook-secret", String(environment.STRIPE_WEBHOOK_SECRET || "").startsWith("whsec_"), "Configure the live endpoint signing secret."),
+    check(
+      "stripe-tax",
+      stripeTax.ready,
+      stripeTax.ready
+        ? `Stripe automatic tax is enabled with ${stripeTax.taxBehavior} Price behavior.`
+        : stripeTax.problems.join(" ")
+    ),
     check("public-base-url", publicBaseURL.startsWith("https://"), "Set the canonical HTTPS Permitext production URL."),
     check(
       "approved-policy-versions",
@@ -138,6 +147,7 @@ export async function verifyLiveStripeReadiness(
   const secretKey = String(environment.STRIPE_SECRET_KEY || "").trim();
   const priceID = String(environment.STRIPE_PRO_PRICE_ID || "").trim();
   const baseURL = String(environment.PERMITEXT_PUBLIC_BASE_URL || "").trim().replace(/\/+$/, "");
+  const stripeTax = stripeTaxConfiguration(environment);
   if (!liveKey(secretKey, "sk") && !liveKey(secretKey, "rk")) {
     throw new Error("Live Stripe verification requires a live secret or restricted key.");
   }
@@ -160,6 +170,8 @@ export async function verifyLiveStripeReadiness(
       price.currency === expectedStripeProPrice.currency &&
       price.unit_amount === expectedStripeProPrice.unitAmount &&
       price.recurring?.interval === expectedStripeProPrice.interval &&
+      stripeTax.ready &&
+      price.tax_behavior === stripeTax.taxBehavior &&
       endpoint?.status === "enabled" &&
       missingEvents.length === 0
     ),
@@ -170,7 +182,14 @@ export async function verifyLiveStripeReadiness(
       recurring: price.type === "recurring",
       interval: price.recurring?.interval || null,
       currency: price.currency || null,
-      unitAmount: Number.isSafeInteger(price.unit_amount) ? price.unit_amount : null
+      unitAmount: Number.isSafeInteger(price.unit_amount) ? price.unit_amount : null,
+      taxBehavior: price.tax_behavior || null
+    },
+    tax: {
+      ready: stripeTax.ready && price.tax_behavior === stripeTax.taxBehavior,
+      mode: stripeTax.mode,
+      configuredPriceBehavior: stripeTax.taxBehavior,
+      providerPriceBehavior: price.tax_behavior || null
     },
     webhook: {
       configured: Boolean(endpoint),
