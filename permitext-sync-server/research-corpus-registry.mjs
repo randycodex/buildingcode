@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20260824-routed-authorized-corpora-v2";
+export const researchCorpusRegistryVersion = "20260830-zoning-edition-boundary-v3";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -69,7 +69,7 @@ export function createResearchCorpusRegistry({
     immutableCorpus({
       id: "nyc-zoning-resolution",
       label: "NYC Zoning Resolution",
-      codeEdition: "NYC Zoning Resolution — text through 2026-07-16",
+      codeEdition: "NYC Zoning Resolution — text through 2026-08-13",
       codeVersion: zoningCodeVersion,
       codeYear: null,
       codePrefixes: ["ZR"],

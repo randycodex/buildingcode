@@ -10,9 +10,19 @@ import {
   enactedSection,
   enactedSectionCatalog
 } from "../enacted-code-content.mjs";
+import { zoningContentMetadata } from "../zoning-content.mjs";
 import { discoverRelevantEvidence } from "../evidence-discovery.mjs";
 
 const registry = createResearchCorpusRegistry();
+const zoningMetadata = await zoningContentMetadata();
+const registeredZoningCorpus = researchCorpusByPrefix(registry, "ZR");
+assert.equal(
+  registeredZoningCorpus.codeEdition,
+  zoningMetadata.codeVersion,
+  "The routed Zoning edition must match the current imported official corpus metadata."
+);
+assert.equal(registeredZoningCorpus.codeVersion, zoningMetadata.syncCodeVersion);
+assert.equal(registeredZoningCorpus.automaticResearchEligible, false);
 
 const ordinary = routeResearchCorpora({
   question: "What is the maximum common path of egress travel?",

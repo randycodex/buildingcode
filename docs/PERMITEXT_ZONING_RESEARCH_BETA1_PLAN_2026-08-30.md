@@ -31,7 +31,7 @@ Official source: [NYC Zoning Resolution](https://zr.planning.nyc.gov/)
 3. **Corpus contracts — complete** — section completeness, stable identity, citation, table, map/asset, amendment-history, Reader, Search, prepared-content, and compressed native Reader checks pass against the refreshed corpus.
 4. **Evaluation refresh — complete** — selected evidence and the review packet were regenerated from the refreshed corpus after current official-source review. No draft case was promoted by automation.
 5. **Owner review — complete** — the owner approved all six revised cases for Terra answer-key testing only on August 30. This is not professional zoning sign-off, paid-test authorization, or public enablement.
-6. **No-cost Research contracts** — add and pass Zoning-specific evidence-boundary, missing-location, mapped-applicability, special-district, table, arithmetic, amendment, and effective-date tests while public Zoning Research remains off.
+6. **No-cost Research contracts — complete** — the Research request, verifier, and deterministic answer gate now enforce exact Zoning passage/hash binding, missing-location and mapped-applicability boundaries, map limits, exact special-district scope, structured-table/symbol fidelity, explicit arithmetic inputs and units, amendment-history limits, and effective-date/transition facts. Public Zoning Research remains off.
 7. **Paid validation** — only after separate owner authorization and a written spend cap, run a frozen Zoning hybrid benchmark and review its answers manually.
 8. **Economics** — incorporate the measured Zoning routing/cost distribution into the existing 100-turn subscriber model. Do not change the $20 price or 100-turn allowance from assumptions alone.
 9. **Enablement** — enable public Zoning Research only after the exact refreshed corpus, evaluation evidence, cost result, web/iOS presentation, release commit, and manual acceptance are bound together and approved.
@@ -58,4 +58,4 @@ The permanent no-cost command `npm run audit:zoning-freshness` compares the offi
 - status: `current`
 - public Research: disabled
 
-The next implementation task is to finish the Zoning-specific no-cost Research contracts. Paid validation remains separate and will use a written cap before any API call.
+The no-cost Zoning safety gate passed the complete repository check on August 30 without an API key or paid model call. It also corrected the routed Zoning edition label from July 16 to August 13 and added a permanent contract binding that label to the imported corpus metadata. The next task is to propose and obtain approval for a written spend cap for the frozen paid Zoning benchmark. Public Zoning Research remains disabled.

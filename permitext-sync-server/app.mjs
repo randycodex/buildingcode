@@ -248,6 +248,12 @@ import {
   unapprovedZoningDiagnosticEnabled
 } from "./research-corpus-registry.mjs";
 import {
+  evaluateZoningResearchSafety,
+  zoningResearchSafetyInstruction,
+  zoningResearchSafetyPromptContext,
+  zoningResearchSafetyRevisionIssues
+} from "./research-zoning-safety.mjs";
+import {
   evaluateResearchRequiredClaimCoverage,
   requiredResearchClaimsFromEvidence,
   researchRequiredClaimCoverageVersion,
@@ -7969,6 +7975,7 @@ function researchPrompt(question, evidence, options = {}) {
       `APPLICABILITY_STATUS: ${section.applicabilityStatus || "current"}`,
       `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
       `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
+      `PASSAGE_TEXT_SHA256: ${section.sectionTextHash || "unavailable"}`,
       `EVIDENCE_ORIGIN: ${section.origin || "user_pinned"}`,
       `EVIDENCE_FUNCTION: ${section.evidencePriority?.primaryFunction || "candidate"}`,
       `EVIDENCE_ROLE: ${section.evidencePriority?.evidenceRole || "supporting"}`,
@@ -8075,6 +8082,12 @@ function researchPrompt(question, evidence, options = {}) {
   const requiredClaimChecklist = Array.isArray(options.requiredClaims) && options.requiredClaims.length
     ? `DETERMINISTIC REQUIRED CLAIM CHECKLIST\n${JSON.stringify(options.requiredClaims)}`
     : "";
+  const zoningSafetyContext = zoningResearchSafetyPromptContext({
+    question,
+    evidence,
+    projectFacts: options.projectContextFacts,
+    conversationFactContext: options.conversationFactContext
+  });
   const codeBasis = options.codeBasis
     ? [
         "RESEARCH CODE BASIS",
@@ -8121,6 +8134,7 @@ function researchPrompt(question, evidence, options = {}) {
     history ? `UNTRUSTED CONVERSATION HISTORY FOR CONTEXT ONLY — NOT AUTHORITY\n${history}` : "",
     `AUTHORIZED ENACTED EVIDENCE\n${sources}`,
     requiredClaimChecklist,
+    zoningSafetyContext,
     structuredEvidenceAnalysis,
     supportingWebContext,
     revisionFeedback
@@ -9106,11 +9120,13 @@ function combinedResearchClaimRevisionIssues(...results) {
 function combinedResearchAnswerRevisionIssues({
   requiredClaimCoverage = null,
   answerQuality = null,
+  zoningSafety = null,
   webAttribution = null
 } = {}) {
   const issues = [
     ...combinedResearchClaimRevisionIssues(requiredClaimCoverage),
     ...researchAnswerQualityRevisionIssues(answerQuality),
+    ...zoningResearchSafetyRevisionIssues(zoningSafety),
     ...researchWebAttributionRevisionIssues(webAttribution)
   ];
   const seen = new Set();
@@ -9641,6 +9657,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
       safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
       instructions: [
         "You are a building-code research assistant, not an authority having jurisdiction.",
+        zoningResearchSafetyInstruction(passageEvidence),
         options.structuredResponseRetry
           ? "A prior response could not be parsed or bound to the supplied evidence. Return one complete schema-valid answer using only the exact supplied identifiers; do not add commentary outside the JSON object."
           : "",
@@ -9910,6 +9927,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
+      zoningResearchSafetyInstruction(evidence),
       "Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs.",
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
       options.allowOfficialGuidanceOnly
@@ -9977,6 +9995,12 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       options.requiredClaims?.length
         ? `DETERMINISTIC REQUIRED CLAIM CHECKLIST\n${JSON.stringify(options.requiredClaims)}`
         : "",
+      zoningResearchSafetyPromptContext({
+        question,
+        evidence,
+        projectFacts: options.projectContextFacts,
+        conversationFactContext: options.conversationFactContext
+      }),
       options.webSupport?.sources?.length || options.webSupport?.limitation
         ? `NONCONTROLLING SUPPORTING WEB MATERIAL\n${JSON.stringify({
             limitation: options.webSupport.limitation || null,
@@ -18586,6 +18610,13 @@ async function handleResearchConversationMessage(request, response) {
       evidence: assembledEvidence,
       answer: result.interpretation
     });
+    let zoningSafety = evaluateZoningResearchSafety({
+      question,
+      evidence: assembledEvidence,
+      answer: result.interpretation,
+      projectFacts: combinedProjectFacts,
+      conversationFactContext
+    });
     let webAttribution = evaluateResearchWebAttribution({
       question,
       answer: result.interpretation,
@@ -18623,6 +18654,13 @@ async function handleResearchConversationMessage(request, response) {
         evidence: assembledEvidence,
         answer: result.interpretation
       });
+      zoningSafety = evaluateZoningResearchSafety({
+        question,
+        evidence: assembledEvidence,
+        answer: result.interpretation,
+        projectFacts: combinedProjectFacts,
+        conversationFactContext
+      });
       webAttribution = evaluateResearchWebAttribution({
         question,
         answer: result.interpretation,
@@ -18659,7 +18697,7 @@ async function handleResearchConversationMessage(request, response) {
       }
     } else if (mockMode) {
       const deterministicPass =
-        requiredClaimCoverage.pass && answerQuality.pass && webAttribution.pass;
+        requiredClaimCoverage.pass && answerQuality.pass && zoningSafety.pass && webAttribution.pass;
       verificationAttempts = [{
         pass: deterministicPass,
         issues: deterministicPass
@@ -18667,6 +18705,7 @@ async function handleResearchConversationMessage(request, response) {
           : combinedResearchAnswerRevisionIssues({
               requiredClaimCoverage,
               answerQuality,
+              zoningSafety,
               webAttribution
             }),
         model: deterministicPass
@@ -18739,6 +18778,13 @@ async function handleResearchConversationMessage(request, response) {
           evidence: assembledEvidence,
           answer: result.interpretation
         });
+        zoningSafety = evaluateZoningResearchSafety({
+          question,
+          evidence: assembledEvidence,
+          answer: result.interpretation,
+          projectFacts: combinedProjectFacts,
+          conversationFactContext
+        });
         webAttribution = evaluateResearchWebAttribution({
           question,
           answer: result.interpretation,
@@ -18748,6 +18794,7 @@ async function handleResearchConversationMessage(request, response) {
         if (
           !requiredClaimCoverage.pass ||
           !answerQuality.pass ||
+          !zoningSafety.pass ||
           !webAttribution.pass
         ) {
           verificationAttempts.push({
@@ -18755,6 +18802,7 @@ async function handleResearchConversationMessage(request, response) {
             issues: combinedResearchAnswerRevisionIssues({
               requiredClaimCoverage,
               answerQuality,
+              zoningSafety,
               webAttribution
             }),
             model: "permitext-deterministic-answer-quality-gate"
@@ -18921,6 +18969,7 @@ async function handleResearchConversationMessage(request, response) {
         requiredClaimCoverage,
         claimMateriality,
         answerQuality,
+        zoningSafety,
         retrieval: {
           schemaVersion: evidencePackage.schemaVersion,
           assemblyVersion: evidencePackage.assemblyVersion,
