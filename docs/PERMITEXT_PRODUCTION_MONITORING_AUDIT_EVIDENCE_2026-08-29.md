@@ -34,6 +34,8 @@ No Log Drain is configured. Vercel currently documents Log Drains as metered at 
 
 The Production build gate now treats this boundary as fail-closed. Its aggregate `deployment` result requires commercial configuration, live Stripe readiness, release identity, and `externalAlertsConfigured` to all pass. A missing `PERMITEXT_MONITORING_PROVIDER` is no longer a warning that still allows the build; it blocks Production readiness. The value must remain unset until the required delivery evidence or documented operating acceptance exists.
 
+On August 30, the existing active Codex heartbeat `permitext-microsoft-rotation-30-days` was expanded into the **Permitext Annual Tax, Capacity, and Monitoring Guard**. At 9:00 AM America/New_York it runs this aggregate-only 24-hour audit when the local repository and authorized Vercel session are available. Clean runs remain quiet; actionable category counts trigger a notification without raw logs or identifiers. Missing log health coverage requires a direct public-health check before notification. The guard cannot deploy, pause Production, change provider configuration, upgrade a plan, buy credit, change a spending cap, or make a payment. This improves periodic detection but does not count as anomaly-specific external-delivery evidence.
+
 Official provider references checked for this follow-up:
 
 - [Vercel Notifications](https://vercel.com/docs/notifications)
