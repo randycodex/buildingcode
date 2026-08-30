@@ -1,0 +1,60 @@
+{
+  "schema": "permitext-public-beta-release-gate-record-v1",
+  "expectedGitCommit": null,
+  "gates": {
+    "productionDeployment": {
+      "complete": false,
+      "observedAt": null,
+      "reference": null,
+      "gitCommit": null
+    },
+    "controlledProductionBilling": {
+      "complete": false,
+      "observedAt": null,
+      "reference": null,
+      "gitCommit": null
+    },
+    "productionAuthentication": {
+      "complete": false,
+      "observedAt": null,
+      "reference": null,
+      "gitCommit": null
+    },
+    "policyPublication": {
+      "complete": false,
+      "observedAt": null,
+      "reference": null,
+      "gitCommit": null
+    },
+    "newYorkTax": {
+      "complete": false,
+      "observedAt": null,
+      "reference": null,
+      "gitCommit": null
+    },
+    "monitoringDelivery": {
+      "complete": false,
+      "observedAt": null,
+      "reference": null,
+      "gitCommit": null
+    },
+    "spendControl": {
+      "complete": false,
+      "observedAt": null,
+      "reference": null,
+      "gitCommit": null
+    },
+    "productionClients": {
+      "complete": false,
+      "observedAt": null,
+      "reference": null,
+      "gitCommit": null
+    },
+    "ownerGoNoGo": {
+      "complete": false,
+      "observedAt": null,
+      "reference": null,
+      "gitCommit": null
+    }
+  }
+}

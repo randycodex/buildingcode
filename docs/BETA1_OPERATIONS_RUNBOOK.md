@@ -92,6 +92,16 @@ Use [BETA1_SPEND_CONTROL_ACCEPTANCE_RECORD.md](./BETA1_SPEND_CONTROL_ACCEPTANCE_
 
 For each production release, record the branch, Git commit, Vercel deployment URL, release ID from `/release`, iOS version/build when applicable, operator, and timestamp.
 
+Deployment readiness and public-Beta activation are separate. After the final deployment and manual evidence exercises, update only the redacted references in `docs/BETA1_PUBLIC_RELEASE_GATE_RECORD.json`, then run:
+
+```sh
+cd permitext-sync-server
+npm run audit:public-beta-readiness
+npm run audit:public-beta-readiness -- --require-ready
+```
+
+The first command always emits the current secret-free gate report. The strict command exits nonzero until the exact release commit and every Production billing, authentication/account-lifecycle, policy-publication, New York tax, monitoring, spend-control, web/TestFlight/iPhone, and owner go/no-go record is complete. It is a post-deployment activation gate; it must not be added to the build step because several required checks can only happen against the final deployed release.
+
 1. Run the local server checks and iOS Release build.
 2. Run `npm run verify:beta1-readiness` with production configuration.
 3. Do not use a Vercel Preview as an isolated account or billing test while Preview shares the Production database. Use a truly isolated database/provider configuration or a controlled Production exercise.
