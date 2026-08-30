@@ -82,6 +82,40 @@ export function operationalMonitoringReadiness(environment = process.env) {
   };
 }
 
+export function productionDeploymentReadiness({
+  configuration,
+  liveStripe,
+  release,
+  monitoring
+} = {}) {
+  const checks = {
+    commercialConfiguration: configuration?.ready === true,
+    liveStripe: liveStripe?.ready === true,
+    releaseIdentity: release?.ready === true,
+    externalMonitoring: monitoring?.externalAlertsConfigured === true
+  };
+  const errors = [];
+  if (!checks.commercialConfiguration) {
+    errors.push("Production commercial configuration is not ready.");
+  }
+  if (!checks.liveStripe) {
+    errors.push("Production live Stripe configuration is not ready.");
+  }
+  if (!checks.releaseIdentity) {
+    errors.push("Production release identity is not ready.");
+  }
+  if (!checks.externalMonitoring) {
+    errors.push(
+      "Production external monitoring is not marked configured; retain delivery evidence before setting PERMITEXT_MONITORING_PROVIDER."
+    );
+  }
+  return {
+    ready: Object.values(checks).every(Boolean),
+    checks,
+    errors
+  };
+}
+
 export function sanitizedClientErrorReport(input, environment = process.env) {
   const release = releaseIdentity(environment);
   const kind = ["error", "unhandledrejection", "startup"].includes(input?.kind)

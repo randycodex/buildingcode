@@ -142,7 +142,7 @@ Tax and optional professional reference: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PA
 - [x] A named support and urgent-alert owner and support address are documented.
 - [x] Upgrade the commercial production service from Vercel Hobby to Vercel Pro.
 - [x] Configure and live-verify the included Permitext-scoped Vercel 5xx-anomaly and infrastructure-usage-anomaly rules with owner email/web subscriptions.
-- [ ] Complete the remaining monitoring delivery gate for health, 5xx/client failures, billing webhooks, database failures, Research spend, and p95 latency. The permanent no-cost Production-log auditor now covers observed instances of every category; anomaly-specific or immediate external delivery remains open.
+- [ ] Complete the remaining monitoring delivery gate for health, 5xx/client failures, billing webhooks, database failures, Research spend, and p95 latency. The permanent no-cost Production-log auditor now covers observed instances of every category; anomaly-specific or immediate external delivery remains open, and the Production build now fails closed while external monitoring is not truthfully marked configured.
 - [x] Configure a $20 Vercel on-demand spend amount, standard spend notifications, and automatic Production pause for all projects on the team.
 - [x] Complete a read-only [backend provider capacity and upgrade audit](./PERMITEXT_BACKEND_PROVIDER_CAPACITY_AUDIT_2026-08-29.md); no additional upgrade is currently required, and conservative Neon, Clerk, Vercel/Blob, OpenAI, Stripe, and Apple review thresholds are recorded.
 - [ ] Exercise a delivered spend notification and actual hard-stop behavior without exposing customers or incurring an uncontrolled overage.

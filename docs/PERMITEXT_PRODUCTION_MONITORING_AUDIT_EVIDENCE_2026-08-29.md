@@ -30,6 +30,8 @@ The live dashboard confirmed owner web/email subscriptions for both Permitext an
 
 No Log Drain is configured. Vercel currently documents Log Drains as metered at $0.50/GB with no included allowance. No Drain, third-party monitoring endpoint, plan change, deployment, environment change, Production write, paid model call, or billing-provider call was made.
 
+The Production build gate now treats this boundary as fail-closed. Its aggregate `deployment` result requires commercial configuration, live Stripe readiness, release identity, and `externalAlertsConfigured` to all pass. A missing `PERMITEXT_MONITORING_PROVIDER` is no longer a warning that still allows the build; it blocks Production readiness. The value must remain unset until the required delivery evidence or documented operating acceptance exists.
+
 Official provider references checked for this follow-up:
 
 - [Vercel Notifications](https://vercel.com/docs/notifications)
@@ -65,4 +67,4 @@ Invalid input takes precedence over other exit states. The report remains aggreg
 
 ## Remaining gate
 
-Before public paid Beta, retain an actual anomaly-specific delivered event or explicitly accept documented daily review for warning-level signals, and safely exercise the configured spend notification/automatic-pause behavior. Do not set `PERMITEXT_MONITORING_PROVIDER` merely because the audit exists.
+Before public paid Beta, retain an actual anomaly-specific delivered event or explicitly accept documented daily review for warning-level signals, and safely exercise the configured spend notification/automatic-pause behavior. Do not set `PERMITEXT_MONITORING_PROVIDER` merely because the audit or deploy guard exists; the guard intentionally remains red until that evidence is complete.

@@ -4,6 +4,7 @@ import {
 } from "../beta1-readiness.mjs";
 import {
   operationalMonitoringReadiness,
+  productionDeploymentReadiness,
   productionReleaseReadiness
 } from "../operational-readiness.mjs";
 
@@ -16,14 +17,17 @@ if (process.env.VERCEL_ENV !== "production") {
   const liveStripe = configuration.ready
     ? await verifyLiveStripeReadiness()
     : { ready: false, skipped: true };
+  const deployment = productionDeploymentReadiness({
+    configuration,
+    liveStripe,
+    release,
+    monitoring
+  });
 
-  console.log(JSON.stringify({ configuration, liveStripe, release, monitoring }, null, 2));
-  if (!monitoring.externalAlertsConfigured) {
-    console.warn(
-      "Permitext Production monitoring is not marked configured. Set PERMITEXT_MONITORING_PROVIDER after dashboard alerts or a log drain are active."
+  console.log(JSON.stringify({ configuration, liveStripe, release, monitoring, deployment }, null, 2));
+  if (!deployment.ready) {
+    throw new Error(
+      `Permitext Production deployment failed its readiness gate: ${deployment.errors.join(" ")}`
     );
-  }
-  if (!configuration.ready || !liveStripe.ready || !release.ready) {
-    throw new Error("Permitext Production deployment failed its commercial readiness gate.");
   }
 }

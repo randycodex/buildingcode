@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   operationalMonitoringReadiness,
+  productionDeploymentReadiness,
   productionReleaseReadiness,
   releaseIdentity,
   sanitizedClientErrorReport,
@@ -46,6 +47,34 @@ const monitoring = operationalMonitoringReadiness({
 });
 assert.equal(monitoring.externalAlertsConfigured, true);
 assert.equal(monitoring.slowRequestThresholdMilliseconds, 3500);
+
+const deploymentReady = productionDeploymentReadiness({
+  configuration: { ready: true },
+  liveStripe: { ready: true },
+  release: { ready: true },
+  monitoring
+});
+assert.equal(deploymentReady.ready, true);
+assert.deepEqual(deploymentReady.errors, []);
+
+const missingMonitoring = productionDeploymentReadiness({
+  configuration: { ready: true },
+  liveStripe: { ready: true },
+  release: { ready: true },
+  monitoring: operationalMonitoringReadiness({})
+});
+assert.equal(missingMonitoring.ready, false);
+assert.equal(missingMonitoring.checks.externalMonitoring, false);
+assert.match(missingMonitoring.errors.join(" "), /PERMITEXT_MONITORING_PROVIDER/);
+
+const incompleteDeployment = productionDeploymentReadiness();
+assert.equal(incompleteDeployment.ready, false);
+assert.deepEqual(incompleteDeployment.checks, {
+  commercialConfiguration: false,
+  liveStripe: false,
+  releaseIdentity: false,
+  externalMonitoring: false
+});
 
 const report = sanitizedClientErrorReport({
   kind: "unhandledrejection",

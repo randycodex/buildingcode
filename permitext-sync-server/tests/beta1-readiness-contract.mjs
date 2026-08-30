@@ -182,8 +182,9 @@ const deployGate = await readFile(
 assert(
   deployGate.includes('process.env.VERCEL_ENV !== "production"') &&
     deployGate.includes("beta1ConfigurationReadiness()") &&
-    deployGate.includes("verifyLiveStripeReadiness()"),
-  "The Production deploy gate no longer verifies configuration and live Stripe state."
+    deployGate.includes("verifyLiveStripeReadiness()") &&
+    deployGate.includes("productionDeploymentReadiness({"),
+  "The Production deploy gate no longer verifies configuration, live Stripe, release identity, and external monitoring."
 );
 
 console.log("permitext Beta 1 readiness contract passed");
