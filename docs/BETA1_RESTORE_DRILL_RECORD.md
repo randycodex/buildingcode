@@ -1,6 +1,6 @@
 # Permitext Beta 1 restore drill record
 
-Completed for the August 28, 2026 prelaunch provider recovery exercise. A dashboard claim that backups exist is not a successful drill.
+Completed for the August 28–29, 2026 prelaunch provider recovery exercise and isolated acceptance follow-up. A dashboard claim that backups exist is not a successful drill.
 
 A local file-copy rehearsal or a passing verifier contract is preparation only. Mark this record **Pass** only for an isolated provider restore with the actual Neon recovery point, private-asset inventory and retrieval, non-production deployment, and retained cleanup evidence.
 
@@ -8,12 +8,12 @@ A local file-copy rehearsal or a passing verifier contract is preparation only. 
 
 - Operator: Codex-assisted Permitext owner session
 - Approver: Permitext owner
-- Drill start/end (UTC): `2026-08-28T15:52:03.312Z` / `2026-08-28T16:13:55Z`
+- Drill start/end (UTC): `2026-08-28T15:52:03.312Z` / `2026-08-30T03:08:48Z`
 - Production writes affected: **No**
 - Billing, email, Apple notifications, Stripe webhooks, and Research generation disabled in the drill environment: **Yes**
-- Isolated Vercel deployment: Not created; retained no-deploy constraint
-- Isolated Neon branch/compute: `permitext-restore-drill-20260828` / `br-cool-dawn-aq1esvjo`, local exact-commit client
-- Isolated private Blob namespace: Not created; source private inventory and authenticated class retrieval were read-only
+- Isolated Vercel deployment: SSO-protected Preview `dpl_D8NYCyGxfLVjVpBDi666HZ79udXg` in project `permitext-restore-acceptance`
+- Isolated Neon branch/compute: initial `permitext-restore-drill-20260828` / `br-cool-dawn-aq1esvjo`; follow-up `permitext-restore-acceptance-20260829` / `br-spring-dawn-aqpcccb1`
+- Isolated private Blob namespace: `permitext-restore-acceptance` / `store_JqmlrUeYX0abaH3m`, private `iad1`
 
 ## Recovery point
 
@@ -37,13 +37,13 @@ Record source and restored counts. Use aggregate counts only; do not paste custo
 | Research conversations and answers | 39 / 43 | 39 / 43 | Pass |
 | Notebook cards | 19 | 19 | Pass |
 | Report drafts and files | 2 / 4 | 2 / 4 | Pass |
-| Private assets | 124 | 124 | Inventory/retrieval pass; no isolated Blob copy |
+| Private assets | 124 | 124 | Pass; separate private restore matched all 124 objects / 5,248,939 bytes byte-for-byte |
 
-- Representative test account sign-in and sync read: Read-only restored-account checklist and exact content digest passed; interactive sign-in was not exercised without a deployment
+- Representative test account sign-in and sync read: Protected deployed restore checklist passed for an account with an active session, public profile, saved items, annotations, Projects, Project memberships, Workboards, and continuity data; no new provider sign-in was performed
 - Stripe entitlement read without provider mutation: One web-subscription entitlement restored with aggregate and content-digest parity
 - Apple entitlement read without provider mutation: No active Apple-sourced entitlement; the single Apple transaction-ownership record restored with content-digest parity
 - Private asset retrieval by authenticated endpoint: Private provider retrieval passed for PNG, JPG, and PDF representatives
-- `/health` and `/release` result: HTTP 200 from the exact Production commit against the isolated branch; target environment `preview`
+- `/health` and `/release` result: HTTP 200 from the exact Production commit against the isolated branch; target environment `preview`, SSO protected
 - `npm run verify:restore-drill` result and evidence path: Pass, zero mismatches; [PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md](./PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md)
 - Missing or corrupt records: None detected across 38 tables / 3,611 rows
 - Recovery time objective observed: Neon branch fork 0.39 seconds; end-to-end operator verification completed in under 10 minutes after branch creation
@@ -54,6 +54,7 @@ Record source and restored counts. Use aggregate counts only; do not paste custo
 - Exact isolated targets approved for deletion: Neon branch `br-cool-dawn-aq1esvjo`; local worktree and mode-`0600` temporary directory after provider deletion confirmation
 - Cleanup completed at: `2026-08-28T16:13:55Z`; branch list returned to `main` only, local servers stopped, worktree unregistered, and temporary credentials removed
 - Evidence location: [PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md](./PERMITEXT_NEON_BLOB_RESTORE_DRILL_EVIDENCE_2026-08-28.md)
-- Drill result: **Fail — full acceptance incomplete; provider recovery checks passed**
-- Corrective actions, owner, and due date: Permitext owner to authorize an isolated Vercel deployment and isolated private Blob namespace or explicitly accept the residual risk before public Beta
-- Public Beta restore gate: **Still blocked**
+- Follow-up retained resources: the new Neon branch auto-expires after one day; the isolated Vercel project, protected Preview, and private Blob copy remain temporarily available as provider-verifiable evidence and are not connected to Production
+- Drill result: **Pass**
+- Corrective actions: None for the restore gate; Production authentication, billing, monitoring, tax, and release checks remain separate
+- Public Beta restore gate: **Pass**

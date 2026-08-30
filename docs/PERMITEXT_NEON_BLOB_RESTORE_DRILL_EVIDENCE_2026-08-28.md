@@ -2,7 +2,7 @@
 
 ## Result
 
-The owner authorized an isolated, no-paid-add-on provider recovery exercise while retaining the standing prohibitions on merge, push, deployment, pricing changes, paid model calls, real billing actions, and Production application-data writes.
+The owner authorized an isolated, no-paid-add-on provider recovery exercise while retaining the standing prohibitions on merge, push, Production deployment, pricing changes, paid model calls, real billing actions, and Production application-data writes.
 
 The provider recovery work passed:
 
@@ -13,9 +13,9 @@ The provider recovery work passed:
 - the exact serving Production commit successfully opened the restored database through an isolated local server; and
 - the permanent fail-closed restore verifier passed with zero mismatches across 27 durable summary families, release identity, sync cursor, representative-account state, and the supplied 124-object private-asset inventory.
 
-This is not marked as the complete public-Beta restore gate. The retained no-deploy constraint prevented an isolated Vercel deployment, and the no-paid/provider-write boundary prevented creation of a duplicate private Blob store. The Neon recovery and real private-asset retrieval are verified; deployment-level behavior and an isolated provider Blob namespace remain open.
+The initial August 28 exercise left deployment-level behavior and a separate provider Blob namespace open. The owner subsequently authorized that isolated no-cost follow-up. On August 29, the exact serving Production commit ran successfully as an SSO-protected Vercel Preview against a new time-limited Neon recovery branch, and all 124 private source objects were restored into a separate private Blob store with byte-for-byte equality. The full public-Beta restore gate therefore passes without a Production deployment, Production-data write, real charge, or provider-plan upgrade.
 
-## Authorization and isolation
+## Initial exercise authorization and isolation
 
 - Operator: Codex-assisted Permitext owner session
 - Approver: Permitext owner
@@ -29,6 +29,19 @@ This is not marked as the complete public-Beta restore gate. The retained no-dep
 - Paid add-on or plan change: **None**
 
 Connection strings and temporary administrator credentials were held only in a mode-`0600` temporary directory. They were not printed into evidence, added to the repository, or placed in a deployment environment.
+
+### Follow-up acceptance authorization and isolation
+
+- Follow-up recovery point: `2026-08-29T22:49:29.409-04:00`
+- Verification completed by: `2026-08-30T03:08:48Z`
+- Production application-data writes: **None**
+- Isolated Vercel project: `permitext-restore-acceptance` (`prj_PdvOBsTg3D9LH7TqZuldBj2CpG3O`)
+- Ready target: SSO-protected Preview deployment `dpl_D8NYCyGxfLVjVpBDi666HZ79udXg`
+- Provider-write configuration: only the isolated recovered Neon connection and the isolated private Blob credential were present
+- Billing, email, Apple, Stripe, OpenAI, and paid Research configuration: **Absent or explicitly disabled**
+- Paid add-on or provider-plan change: **None**
+
+The first isolated-project deploy command selected Vercel's Production target by default. Permitext's production-readiness guard rejected that build because commercial billing configuration was intentionally absent, so it never became a ready deployment. The same committed bundle was then deployed explicitly as Preview and passed. Neither attempt changed Permitext Production or any production alias.
 
 ## Neon recovery point
 
@@ -45,6 +58,17 @@ Connection strings and temporary administrator credentials were held only in a m
 - Serving Production Git commit: `dbbb6ab40d40d1d3d947303aa45b01fbd9cebce3`
 
 Neon `main` was never restored, reset, renamed, disconnected, or pointed at the child branch.
+
+### Follow-up Neon recovery branch
+
+- Recovery point selected in `America/New_York`: `2026-08-29T22:49:29.409-04:00`
+- Isolated branch: `permitext-restore-acceptance-20260829` (`br-spring-dawn-aqpcccb1`)
+- Parent: `main` (`br-fancy-grass-aq73byy8`)
+- Fork time reported by Neon: **2.23 seconds**
+- Automatic expiry: **one day after creation**
+- Plan and capacity result: the branch remained within the existing Neon Free allowance; no upgrade was requested
+
+The follow-up branch is a separate point-in-time child. Production `main` remained the serving branch and was not modified.
 
 ## Database verification
 
@@ -104,6 +128,19 @@ source/target privateAssetCount: 124
 
 The proxy queried Production Neon only with `SELECT` statements. The target used loopback HTTP and the isolated provider branch, not a Vercel deployment.
 
+### Protected deployment acceptance
+
+The follow-up deployed a committed-only archive of exact serving Production commit `dbbb6ab40d40d1d3d947303aa45b01fbd9cebce3` to the isolated `permitext-restore-acceptance` project. The successful target is Preview deployment `dpl_D8NYCyGxfLVjVpBDi666HZ79udXg` at `permitext-restore-acceptance-ij6no9i7x.vercel.app`. Vercel SSO protection applies to all non-custom-domain deployments for this project, and authenticated CLI access generated a temporary bypass without making the host public.
+
+Fresh application checks returned:
+
+- `/health`: HTTP 200, `postgres`, `normalized-v4`, environment `preview`, release `restore-dbbb6ab40d40`, and the exact Production commit;
+- `/release`: HTTP 200 with the same Preview environment and exact Production commit;
+- `/admin/storage/summary`: HTTP 200 with 30 application summary families, 3,622 rows, and latest event ID 10,546; and
+- `/admin/accounts/restore-checklist`: HTTP 200 for representative account fingerprint `b3145748fa9d75d5`, with the account, public profile, active session, two passkey credentials, 47 saved items, 26 annotations, 23 Projects, 47 Project memberships, two Workboards, four continuity records, and 11 code-version-clear records present.
+
+The representative account identifier, public username, credential identifiers, and customer content are not retained. Vercel reported zero runtime error logs and zero 5xx requests for the successful deployment during acceptance. The team usage report continued to round billed cost to `$0.00`; no upgrade, add-on, or on-demand spend was required.
+
 ## Private Blob evidence
 
 The private `permitext-workboards` Blob store (`store_b7Lpyr2Ub2GDcHEb`) was inventoried from `2026-08-28T15:52:03.312Z` through `2026-08-28T15:52:03.760Z`:
@@ -123,14 +160,31 @@ One private object from each class was authenticated, downloaded to memory, and 
 
 All three size checks passed. No path, user identifier, asset contents, or signed URL is retained. No Blob was uploaded, copied, overwritten, or deleted.
 
+### Separate private Blob restore
+
+The follow-up created private store `permitext-restore-acceptance` (`store_JqmlrUeYX0abaH3m`) in `iad1` and connected it only to the isolated recovery project. The source `permitext-workboards` store remained private and unchanged.
+
+- source objects: **124**;
+- restored objects: **124**;
+- source bytes: **5,248,939**;
+- restored bytes: **5,248,939**;
+- exact content matches: **124**;
+- mismatches: **0**; and
+- restored namespace access: **private**.
+
+Objects were read and written in memory through the provider SDK; no customer path, user identifier, object body, or signed URL was printed or retained. The separate namespace proves actual restore, not only source inventory and representative retrieval.
+
 ## Acceptance boundary
 
-The provider recovery evidence is a pass for Neon point-in-time branching, durable database parity, Production-code compatibility on an isolated local host, and authenticated private-asset inventory/retrieval. It is not the full runbook pass because:
+The provider recovery evidence now passes the full runbook gate:
 
-1. no non-production Vercel deployment was created; and
-2. no isolated private Blob provider namespace was created or restored.
+1. real Neon point-in-time recovery and durable-content parity passed;
+2. the exact Production commit served the recovered state from an isolated protected Preview;
+3. a representative restored account and its durable working data were readable through the application contract;
+4. every private source object was restored into a separate private Blob namespace and matched byte-for-byte; and
+5. Production hosting, the Production Neon branch, the source Blob store, billing providers, pricing, and paid Research remained unchanged.
 
-The public Beta restore gate therefore remains **blocked** until those two acceptance items are completed under separate authorization or the owner explicitly accepts the residual recovery risk.
+The public Beta restore gate is **Pass**. This does not authorize Production deployment and does not replace the separately open Production authentication, billing, monitoring, tax, and release checks.
 
 ## Cleanup
 
@@ -140,3 +194,5 @@ The public Beta restore gate therefore remains **blocked** until those two accep
 - The detached exact-commit worktree was removed from Git's worktree registry.
 - The exact mode-`0600` connection, administrator-token, and representative-account temporary files were deleted, and their temporary directory was removed.
 - Production branch or Blob deletion: **not authorized and not performed**
+
+The follow-up Neon branch is configured to expire automatically after one day. The isolated Vercel project, successful protected Preview, and private restored Blob store are retained temporarily as provider-verifiable evidence; they are not connected to Permitext Production. The owner-only temporary directory containing the exact-commit bundle and mode-`0600` credentials was moved from `/tmp` to Trash after verification and is recoverable until Trash is emptied. Production branch or Blob deletion remains unauthorized and was not performed.
