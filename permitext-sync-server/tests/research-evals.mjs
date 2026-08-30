@@ -7,7 +7,10 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { approvedEvaluationCases, validateEvaluationDataset } from "../evals/evaluation-schema.mjs";
-import { adaptZoningEvaluationDataset } from "../evals/zoning-evaluation-adapter.mjs";
+import {
+  adaptZoningEvaluationDataset,
+  zoningAnswerKeySectionNumbers
+} from "../evals/zoning-evaluation-adapter.mjs";
 import {
   normalizeResearchInterpretationEvidenceBindings,
   researchInputForEvidence,
@@ -51,6 +54,30 @@ const zoningExpandedMode = process.argv.includes("--zoning-expanded-batch-1");
 const zoningSuccessorMode = process.argv.includes("--zoning-successor");
 const zoningMode = process.argv.includes("--zoning") || zoningExpandedMode || zoningSuccessorMode;
 const zoningEvidenceBudgetPrototypeMode = process.argv.includes("--zoning-evidence-budget-prototype");
+const zoningSuccessorEvidenceBudgetAdvisoryMode = process.argv.includes("--zoning-successor-evidence-budget-advisory");
+const zoningEvidenceBudgetMode = zoningEvidenceBudgetPrototypeMode || zoningSuccessorEvidenceBudgetAdvisoryMode;
+const zoningSuccessorAdvisoryBlockedCases = new Map([
+  ["zr-special-district-demolition", ["101-70"]],
+  ["zr-narrow-attached-rear-yard", ["23-34"]],
+  ["zr-candidate-b1-deep-through-lot-vertical-yard", ["24-382"]]
+]);
+const zoningSuccessorAdvisoryImplementationPaths = [
+  "app.mjs",
+  "evidence-discovery.mjs",
+  "project-foundation-contract.mjs",
+  "research-evidence-assembly.mjs",
+  "zoning-content.mjs",
+  "evals/zoning-evaluation-adapter.mjs",
+  "package.json",
+  "tests/research-evals.mjs"
+];
+if (zoningSuccessorEvidenceBudgetAdvisoryMode) {
+  for (const key of [
+    "OPENAI_API_KEY",
+    "PERMITEXT_RUN_PAID_RESEARCH_EVALS",
+    "PERMITEXT_RESEARCH_EVAL_MAX_USD"
+  ]) delete process.env[key];
+}
 const execFileAsync = promisify(execFile);
 const judgePromptVersion =
   process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION || "20260826-established-facts-v3";
@@ -1729,6 +1756,431 @@ async function runMockConversationCases(baseURL, checkedCases, workflowFixtureCa
     : `Verified legacy pinned-evidence compatibility, automatic enacted-corpus assembly, current Project context, and ${checkedCases.length}/${checkedCases.length} cases through Permitext's conversation flow in mock mode.`);
 }
 
+function requiredCitationSectionNumbers(testCase) {
+  return Array.from(new Set(
+    (testCase.requiredCitations || [])
+      .map((reference) => String(reference || "").match(/^ZR\s+(.+)$/i)?.[1]?.trim())
+      .filter(Boolean)
+  ));
+}
+
+function evidenceBudgetSnapshot(snapshot) {
+  return {
+    origin: String(snapshot.provenance?.origin || ""),
+    sourceID: String(snapshot.sourceID || ""),
+    passageID: String(snapshot.passageID || ""),
+    sectionID: String(snapshot.sectionID || ""),
+    sectionNumber: String(snapshot.sectionNumber || ""),
+    passageCharacterCount: String(snapshot.passageText || "").length,
+    passageTextHash: String(snapshot.passageTextHash || ""),
+    sourceLibraryVersion: String(snapshot.sourceLibraryVersion || ""),
+    userSelectedTextHash: String(snapshot.provenance?.userSelectedTextHash || ""),
+    structuredSourceID: String(snapshot.structuredSource?.id || ""),
+    structuredSourceContentHash: String(snapshot.structuredSource?.contentHash || ""),
+    visualSourceIdentities: (snapshot.visualSources || [])
+      .map((source) => ({ id: String(source.id || ""), contentHash: String(source.contentHash || "") }))
+      .sort((left, right) => `${left.id}\u0000${left.contentHash}`.localeCompare(`${right.id}\u0000${right.contentHash}`))
+  };
+}
+
+function evidenceBudgetIdentity(snapshot) {
+  return `${snapshot.origin}\u0000${snapshot.sectionID}\u0000${snapshot.sourceID}`;
+}
+
+function sha256JSON(value) {
+  return createHash("sha256").update(JSON.stringify(value)).digest("hex");
+}
+
+function evidenceBudgetDigestSnapshot(snapshot) {
+  return {
+    origin: snapshot.origin,
+    sectionID: snapshot.sectionID,
+    sectionNumber: snapshot.sectionNumber,
+    passageCharacterCount: snapshot.passageCharacterCount,
+    passageTextHash: snapshot.passageTextHash,
+    sourceLibraryVersion: snapshot.sourceLibraryVersion,
+    userSelectedTextHash: snapshot.userSelectedTextHash,
+    structuredSourceID: snapshot.structuredSourceID,
+    structuredSourceContentHash: snapshot.structuredSourceContentHash,
+    visualSourceIdentities: snapshot.visualSourceIdentities
+  };
+}
+
+async function collectZoningEvidenceBudgetAdvisory(baseURL, account, checkedCases, maximumSupplementalCharacters) {
+  process.env.PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS =
+    String(maximumSupplementalCharacters);
+  const results = [];
+  for (const testCase of checkedCases) {
+    const conversationID = await createEvaluationConversation(baseURL, account, testCase);
+    const { answer, answerID, conversation } = await askEvaluationQuestion(
+      baseURL,
+      account,
+      conversationID,
+      testCase.question
+    );
+    assert(
+      answer.mode === "mock" && answer.model === "permitext-mock",
+      `${testCase.id} unexpectedly called a live model during the evidence-budget advisory.`
+    );
+    assert(
+      Number(answer.usage?.inputTokens || 0) === 0 &&
+        Number(answer.usage?.outputTokens || 0) === 0 &&
+        Number(answer.usage?.totalTokens || 0) === 0 &&
+        answer.estimatedCost == null,
+      `${testCase.id} recorded provider usage or cost during the no-cost evidence-budget advisory.`
+    );
+    assert(
+      answer.retrieval?.limits?.maximumSupplementalCharacters === maximumSupplementalCharacters,
+      `${testCase.id} did not apply the ${maximumSupplementalCharacters}-character advisory budget.`
+    );
+    assert(
+      answer.retrieval?.usage?.pinnedSelectionTruncatedCount === 0 &&
+        answer.retrieval?.usage?.pinnedSelectionExactCount === answer.retrieval?.usage?.pinnedCount,
+      `${testCase.id} did not preserve every exact selected passage and reviewed structured source.`
+    );
+    assert(
+      answer.retrieval?.usage?.characterCount <= answer.retrieval?.usage?.supplementalCharacterCeiling,
+      `${testCase.id} exceeded the pin-preserving ${maximumSupplementalCharacters}-character supplemental ceiling.`
+    );
+    const stored = await jsonRequest(baseURL, "/research/answers/get", {
+      method: "POST",
+      token: account.backendSessionToken,
+      body: {
+        auth: { accountUserID: account.appUserID },
+        answerID
+      }
+    });
+    const snapshots = stored.answer?.evidence || [];
+    assert(
+      snapshots.every((snapshot) =>
+        createHash("sha256").update(String(snapshot.passageText || "")).digest("hex") ===
+          snapshot.passageTextHash
+      ),
+      `${testCase.id} stored an evidence passage whose content does not match its hash.`
+    );
+    const evidencePackage = snapshots.map(evidenceBudgetSnapshot);
+    assert(
+      evidencePackage.every((snapshot) =>
+        snapshot.origin &&
+        snapshot.sourceID &&
+        snapshot.passageID &&
+        snapshot.sectionID &&
+        /^[a-f0-9]{64}$/.test(snapshot.passageTextHash) &&
+        snapshot.sourceLibraryVersion
+      ),
+      `${testCase.id} produced an evidence snapshot without a canonical identity, source identity, passage hash, or library version.`
+    );
+    assert(
+      new Set(evidencePackage.map(evidenceBudgetIdentity)).size === evidencePackage.length,
+      `${testCase.id} produced duplicate origin-section-source identities in its stored evidence package.`
+    );
+    const evidenceSourceIDs = new Set(snapshots.map((snapshot) => String(snapshot.sourceID || "")));
+    const selectedSourceIDs = (conversation.sources || [])
+      .filter((source) => source.kind === "selection")
+      .map((source) => String(source.id || ""));
+    assert(
+      selectedSourceIDs.every((sourceID) => evidenceSourceIDs.has(sourceID)),
+      `${testCase.id} lost selected evidence from the ${maximumSupplementalCharacters}-character package.`
+    );
+    const evidenceSectionNumbers = new Set(
+      snapshots.map((snapshot) => String(snapshot.sectionNumber || "")).filter(Boolean)
+    );
+    const requiredSectionNumbers = Array.from(new Set([
+      ...requiredCitationSectionNumbers(testCase),
+      ...zoningAnswerKeySectionNumbers(testCase)
+    ]));
+    const missingRequiredSectionNumbers = requiredSectionNumbers.filter(
+      (sectionNumber) => !evidenceSectionNumbers.has(sectionNumber)
+    );
+    assert(
+      missingRequiredSectionNumbers.length === 0,
+      `${testCase.id} lost required or answer-key-controlling ZR ${missingRequiredSectionNumbers.join(", ZR ")} from the ${maximumSupplementalCharacters}-character package.`
+    );
+    const crossReferences = evidencePackage
+      .filter((snapshot) => snapshot.origin === "permitext_cross_reference");
+    assert(
+      crossReferences.length === answer.retrieval?.usage?.crossReferenceCount,
+      `${testCase.id} cross-reference snapshots do not match aggregate retrieval usage.`
+    );
+    const storedPassageCharacterCount = evidencePackage.reduce(
+      (sum, snapshot) => sum + snapshot.passageCharacterCount,
+      0
+    );
+    const storedPinnedPassageCharacterCount = evidencePackage
+      .filter((snapshot) => snapshot.origin === "user_pinned")
+      .reduce((sum, snapshot) => sum + snapshot.passageCharacterCount, 0);
+    const storedSupplementalPassageCharacterCount =
+      storedPassageCharacterCount - storedPinnedPassageCharacterCount;
+    assert(
+      storedPassageCharacterCount === answer.retrieval?.usage?.characterCount &&
+        storedPinnedPassageCharacterCount === answer.retrieval?.usage?.pinnedCharacterCount &&
+        storedSupplementalPassageCharacterCount === answer.retrieval?.usage?.supplementalCharacterCount,
+      `${testCase.id} retrieval character accounting does not match the stored, hash-bound evidence passages.`
+    );
+    results.push({
+      caseID: testCase.id,
+      assemblyVersion: String(answer.retrieval?.assemblyVersion || ""),
+      characterCount: answer.retrieval.usage.characterCount,
+      pinnedCharacterCount: answer.retrieval.usage.pinnedCharacterCount,
+      supplementalCharacterCount: answer.retrieval.usage.supplementalCharacterCount,
+      excludedCanonicalContextCharacterCount:
+        answer.retrieval.usage.pinnedCanonicalContextCharacterCount,
+      pinnedCount: answer.retrieval.usage.pinnedCount,
+      structuredPinnedCount: answer.retrieval.usage.structuredPinnedCount,
+      discoveredCount: answer.retrieval.usage.discoveredCount,
+      crossReferences,
+      evidencePackage,
+      evidencePackageSHA256: sha256JSON({
+        caseID: testCase.id,
+        evidencePackage: evidencePackage.map(evidenceBudgetDigestSnapshot)
+      }),
+      evidenceSectionNumbers: [...evidenceSectionNumbers],
+      evidenceSectionIDs: Array.from(new Set(evidencePackage.map((snapshot) => snapshot.sectionID))),
+      requiredSectionNumbers
+    });
+  }
+  return results;
+}
+
+function summarizeZoningEvidenceBudgetAdvisory(results, maximumSupplementalCharacters) {
+  const total = (key) => results.reduce((sum, item) => sum + Number(item[key] || 0), 0);
+  const assemblyVersions = Array.from(new Set(results.map((item) => item.assemblyVersion)));
+  assert(
+    assemblyVersions.length === 1 && assemblyVersions[0],
+    "The evidence-budget advisory did not use one non-empty evidence-assembly version."
+  );
+  return {
+    cases: results.length,
+    maximumSupplementalCharacters,
+    evidenceAssemblyVersion: assemblyVersions[0],
+    orderedEvidencePackagesSHA256: sha256JSON(
+      results.map((item) => ({ caseID: item.caseID, evidencePackageSHA256: item.evidencePackageSHA256 }))
+    ),
+    averageCharacterCount: Math.round(total("characterCount") / results.length),
+    maximumCharacterCount: Math.max(...results.map((item) => item.characterCount)),
+    averagePinnedCharacterCount: Math.round(total("pinnedCharacterCount") / results.length),
+    averageSupplementalCharacterCount: Math.round(total("supplementalCharacterCount") / results.length),
+    averageExcludedCanonicalContextCharacterCount: Math.round(
+      total("excludedCanonicalContextCharacterCount") / results.length
+    ),
+    totalPinnedSources: total("pinnedCount"),
+    totalStructuredPinnedSources: total("structuredPinnedCount"),
+    totalDiscoveredSources: total("discoveredCount"),
+    totalCrossReferences: results.reduce((sum, item) => sum + item.crossReferences.length, 0),
+    exactPinnedSourcesPreserved: true
+  };
+}
+
+async function runZoningSuccessorEvidenceBudgetAdvisory(
+  baseURL,
+  checkedCases,
+  blockedCases,
+  sourceZoningDataset,
+  sourceDatasetSHA256
+) {
+  assert(
+    blockedCases.length === zoningSuccessorAdvisoryBlockedCases.size &&
+      blockedCases.every((testCase) =>
+        JSON.stringify(testCase.answerKeyEvidenceMismatches || []) ===
+          JSON.stringify(zoningSuccessorAdvisoryBlockedCases.get(testCase.id)) &&
+        testCase.selectedEvidence.every((source) => source.ready)
+      ),
+    "The evidence-budget advisory may exclude only the exact reviewed unselected-answer-key blockers."
+  );
+  const candidateBudget = Number(
+    sourceZoningDataset?.governance?.evidenceBudgetCandidate?.maximumSupplementalCharacters
+  );
+  assert(
+    candidateBudget === 24_000 &&
+      sourceZoningDataset?.governance?.evidenceBudgetCandidate?.enabledByDefault === false &&
+      sourceZoningDataset?.governance?.evidenceBudgetCandidate?.productionConfigurationChanged === false,
+    "The successor evidence-budget candidate must remain the disabled 24,000-character prototype."
+  );
+  const readyCases = checkedCases.filter((testCase) => testCase.ready);
+  assert(
+    Number(sourceZoningDataset?.governance?.frozenCaseCount) === 30 &&
+      checkedCases.length === 30 &&
+      readyCases.length === 27 &&
+      readyCases.length === checkedCases.length - blockedCases.length,
+    "The evidence-budget advisory requires the exact 27-of-30 ready-case scope."
+  );
+  console.log(
+    `Zoning successor evidence-budget advisory scope: ${readyCases.length}/${checkedCases.length} cases; blocked ${blockedCases.map((testCase) => `${testCase.id} (${(testCase.answerKeyEvidenceMismatches || []).map((sectionNumber) => `unselected ZR ${sectionNumber}`).join(", ")})`).join("; ")}.`
+  );
+  const account = await signInEvalUser(baseURL);
+  const baselineBudget = 48_000;
+  const baselineResults = await collectZoningEvidenceBudgetAdvisory(
+    baseURL,
+    account,
+    readyCases,
+    baselineBudget
+  );
+  const candidateResults = await collectZoningEvidenceBudgetAdvisory(
+    baseURL,
+    account,
+    readyCases,
+    candidateBudget
+  );
+  const baselineByCase = new Map(baselineResults.map((item) => [item.caseID, item]));
+  const candidateByCase = new Map(candidateResults.map((item) => [item.caseID, item]));
+  assert(
+    JSON.stringify([...baselineByCase.keys()]) === JSON.stringify([...candidateByCase.keys()]),
+    "The 48,000- and 24,000-character advisories did not evaluate identical ordered cases."
+  );
+  const droppedCrossReferences = [];
+  const addedCrossReferences = [];
+  const retainedSamePassageCrossReferences = [];
+  const retainedChangedPassageCrossReferences = [];
+  let retainedAutomaticEvidenceIdentityCount = 0;
+  let retainedAutomaticEvidenceSamePassageCount = 0;
+  let retainedAutomaticEvidenceChangedPassageCount = 0;
+  const materialRequiredSectionsLost = [];
+  for (const [caseID, baseline] of baselineByCase) {
+    const candidate = candidateByCase.get(caseID);
+    const candidateCrossReferencesByID = new Map(
+      candidate.crossReferences.map((reference) => [reference.sectionID, reference])
+    );
+    const baselineCrossReferencesByID = new Map(
+      baseline.crossReferences.map((reference) => [reference.sectionID, reference])
+    );
+    assert(
+      candidateCrossReferencesByID.size === candidate.crossReferences.length &&
+        baselineCrossReferencesByID.size === baseline.crossReferences.length,
+      `${caseID} has duplicate cross-reference section identities in the advisory comparison.`
+    );
+    const candidateEvidenceByIdentity = new Map(
+      candidate.evidencePackage.map((snapshot) => [evidenceBudgetIdentity(snapshot), snapshot])
+    );
+    for (const baselineSnapshot of baseline.evidencePackage) {
+      if (baselineSnapshot.origin === "user_pinned") continue;
+      const candidateSnapshot = candidateEvidenceByIdentity.get(evidenceBudgetIdentity(baselineSnapshot));
+      if (!candidateSnapshot) continue;
+      retainedAutomaticEvidenceIdentityCount += 1;
+      if (
+        baselineSnapshot.passageTextHash === candidateSnapshot.passageTextHash &&
+        baselineSnapshot.sourceLibraryVersion === candidateSnapshot.sourceLibraryVersion
+      ) retainedAutomaticEvidenceSamePassageCount += 1;
+      else retainedAutomaticEvidenceChangedPassageCount += 1;
+    }
+    const candidateSections = new Set(candidate.evidenceSectionNumbers);
+    const candidateSectionIDs = new Set(candidate.evidenceSectionIDs);
+    const baselineSectionIDs = new Set(baseline.evidenceSectionIDs);
+    for (const reference of baseline.crossReferences) {
+      const candidateReference = candidateCrossReferencesByID.get(reference.sectionID);
+      if (!candidateReference) {
+        droppedCrossReferences.push({
+          caseID,
+          ...reference,
+          omittedFromCandidatePackage: !candidateSectionIDs.has(reference.sectionID)
+        });
+      } else if (
+        reference.passageTextHash === candidateReference.passageTextHash &&
+        reference.sourceLibraryVersion === candidateReference.sourceLibraryVersion
+      ) {
+        retainedSamePassageCrossReferences.push({ caseID, ...reference });
+      } else {
+        retainedChangedPassageCrossReferences.push({
+          caseID,
+          sectionID: reference.sectionID,
+          sectionNumber: reference.sectionNumber,
+          sourceLibraryVersion: reference.sourceLibraryVersion,
+          baselinePassageTextHash: reference.passageTextHash,
+          candidatePassageTextHash: candidateReference.passageTextHash,
+          candidateSourceLibraryVersion: candidateReference.sourceLibraryVersion
+        });
+      }
+    }
+    for (const reference of candidate.crossReferences) {
+      if (!baselineCrossReferencesByID.has(reference.sectionID)) {
+        addedCrossReferences.push({
+          caseID,
+          ...reference,
+          absentFromBaselinePackage: !baselineSectionIDs.has(reference.sectionID)
+        });
+      }
+    }
+    for (const sectionNumber of baseline.requiredSectionNumbers) {
+      if (!candidateSections.has(sectionNumber)) {
+        materialRequiredSectionsLost.push({ caseID, sectionNumber });
+      }
+    }
+  }
+  assert(
+    materialRequiredSectionsLost.length === 0,
+    `The 24,000-character candidate lost required provisions: ${JSON.stringify(materialRequiredSectionsLost)}`
+  );
+  const baseline = summarizeZoningEvidenceBudgetAdvisory(baselineResults, baselineBudget);
+  const candidate = summarizeZoningEvidenceBudgetAdvisory(candidateResults, candidateBudget);
+  assert(
+    baseline.evidenceAssemblyVersion === candidate.evidenceAssemblyVersion,
+    "The baseline and candidate used different evidence-assembly versions."
+  );
+  const trulyOmittedSections = droppedCrossReferences.filter((item) => item.omittedFromCandidatePackage);
+  const originOnlyCrossReferenceRemovals = droppedCrossReferences.filter((item) => !item.omittedFromCandidatePackage);
+  const candidateOnlySections = addedCrossReferences.filter((item) => item.absentFromBaselinePackage);
+  const originOnlyCrossReferenceAdditions = addedCrossReferences.filter((item) => !item.absentFromBaselinePackage);
+  const gitBaseCommit = await currentGitCommit();
+  const evidenceBinding = {
+    sourceDatasetSHA256,
+    implementationSourcesSHA256: await zoningSuccessorAdvisoryImplementationSHA256(),
+    evidenceAssemblyVersion: baseline.evidenceAssemblyVersion,
+    baselineOrderedEvidencePackagesSHA256: baseline.orderedEvidencePackagesSHA256,
+    candidateOrderedEvidencePackagesSHA256: candidate.orderedEvidencePackagesSHA256
+  };
+  const comparison = {
+    advisoryOnly: true,
+    publicResearchEnabled: false,
+    productionConfigurationChanged: false,
+    semanticAcceptanceClaimed: false,
+    costAcceptanceClaimed: false,
+    scope: {
+      readyCases: readyCases.length,
+      totalCases: checkedCases.length,
+      identicalOrderedCaseSet: true,
+      orderedReadyCaseIDsSHA256: createHash("sha256")
+        .update(JSON.stringify(readyCases.map((testCase) => testCase.id)))
+        .digest("hex"),
+      blockedCases: blockedCases.map((testCase) => ({
+        caseID: testCase.id,
+        answerKeyEvidenceMismatches: testCase.answerKeyEvidenceMismatches || []
+      }))
+    },
+    evidenceBinding: {
+      gitBaseCommit,
+      ...evidenceBinding,
+      advisoryEvidenceSHA256: sha256JSON(evidenceBinding)
+    },
+    baseline,
+    candidate,
+    averageCharacterReduction: baseline.averageCharacterCount - candidate.averageCharacterCount,
+    averageCharacterReductionPercent: Number(
+      (((baseline.averageCharacterCount - candidate.averageCharacterCount) / baseline.averageCharacterCount) * 100).toFixed(1)
+    ),
+    netCrossReferenceReduction: baseline.totalCrossReferences - candidate.totalCrossReferences,
+    droppedCrossReferences,
+    addedCrossReferences,
+    crossReferenceIdentityClassification: {
+      retainedCount: retainedSamePassageCrossReferences.length + retainedChangedPassageCrossReferences.length,
+      retainedSamePassageCount: retainedSamePassageCrossReferences.length,
+      retainedChangedPassageCrossReferences,
+      trulyOmittedSections,
+      originOnlyCrossReferenceRemovals,
+      candidateOnlySections,
+      originOnlyCrossReferenceAdditions
+    },
+    retainedAutomaticEvidencePassageClassification: {
+      retainedIdentityCount: retainedAutomaticEvidenceIdentityCount,
+      retainedSamePassageCount: retainedAutomaticEvidenceSamePassageCount,
+      retainedChangedPassageCount: retainedAutomaticEvidenceChangedPassageCount
+    },
+    materialRequiredSectionsLost
+  };
+  console.log(`Zoning successor evidence-budget advisory ${JSON.stringify(comparison)}`);
+  console.log(
+    "Advisory complete for ready cases only. The full successor remains blocked, the 24,000-character candidate remains disabled, and no paid model calls were made."
+  );
+}
+
 async function currentGitCommit() {
   try {
     const { stdout } = await execFileAsync("git", ["rev-parse", "HEAD"], { cwd: resolve(serverRoot, "..") });
@@ -1736,6 +2188,18 @@ async function currentGitCommit() {
   } catch {
     return "unavailable";
   }
+}
+
+async function zoningSuccessorAdvisoryImplementationSHA256() {
+  const sources = [];
+  for (const path of zoningSuccessorAdvisoryImplementationPaths) {
+    const content = await readFile(join(serverRoot, path));
+    sources.push({
+      path,
+      sha256: createHash("sha256").update(content).digest("hex")
+    });
+  }
+  return sha256JSON(sources);
 }
 
 async function latestBaseline() {
@@ -3527,6 +3991,7 @@ async function main() {
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
     console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
+    console.log("No-cost successor advisory: --zoning-successor --zoning-successor-evidence-budget-advisory (compares disabled 24000 candidate with 48000 across only the canonically ready cases while the full gate stays blocked)");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error]");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
     console.log("Compare: --compare CURRENT_RUN_JSON --against BASELINE_RUN_OR_BASELINE_JSON");
@@ -3654,6 +4119,18 @@ async function main() {
     );
     assert(!liveMode, "The evidence-budget prototype is no-cost and cannot run with --run-live.");
   }
+  if (zoningSuccessorEvidenceBudgetAdvisoryMode) {
+    assert(zoningSuccessorMode, "The evidence-budget advisory requires the frozen Zoning successor.");
+    assert(
+      !zoningEvidenceBudgetPrototypeMode,
+      "The evidence-budget advisory and single-budget prototype flags cannot be combined."
+    );
+    assert(!liveMode, "The evidence-budget advisory is no-cost and cannot run with --run-live.");
+    assert(
+      !requestedCaseID && !filtered && !includeDrafts && repeat === 1,
+      "The evidence-budget advisory requires the complete unfiltered successor with one repetition."
+    );
+  }
   if (selfTestMode) {
     await runSelfTest(selectedDataset, datasetText);
     return;
@@ -3708,9 +4185,9 @@ async function main() {
     process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN = "research-eval-local-grant";
     process.env.NODE_ENV = liveMode ? (originalEnvironment.NODE_ENV || "") : "test";
     process.env.PERMITEXT_TEST_RESEARCH_MOCK = liveMode ? "" : "1";
-    if (zoningEvidenceBudgetPrototypeMode) {
+    if (zoningEvidenceBudgetMode) {
       process.env.PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS =
-        String(maximumSupplementalCharacters);
+        String(zoningSuccessorEvidenceBudgetAdvisoryMode ? 48_000 : maximumSupplementalCharacters);
       process.env.PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY = "1";
       rateLimitPolicies.set("research/conversations/message", {
         ...originalResearchMessageRateLimit,
@@ -3719,7 +4196,9 @@ async function main() {
     }
     process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(
       selectedCases.length * repeat +
-        (liveMode ? 0 : zoningEvidenceBudgetPrototypeMode ? 20 : 1)
+        (liveMode ? 0 : zoningSuccessorEvidenceBudgetAdvisoryMode
+          ? selectedCases.length + 20
+          : zoningEvidenceBudgetPrototypeMode ? 20 : 1)
     );
     const { handleRequest } = await import(`../app.mjs?research-evals=${Date.now()}`);
     server = createServer(handleRequest);
@@ -3733,6 +4212,16 @@ async function main() {
     const checkedCases = await preflightCases(baseURL, selectedDataset);
     printPreflight(checkedCases);
     const blockedCases = checkedCases.filter((testCase) => !testCase.ready);
+    if (zoningSuccessorEvidenceBudgetAdvisoryMode) {
+      await runZoningSuccessorEvidenceBudgetAdvisory(
+        baseURL,
+        checkedCases,
+        blockedCases,
+        sourceZoningDataset,
+        createHash("sha256").update(datasetText).digest("hex")
+      );
+      return;
+    }
     if (blockedCases.length) {
       if (liveMode) console.error("Paid evals stopped before the first model request because canonical evidence is incomplete.");
       process.exitCode = 2;
@@ -3760,7 +4249,7 @@ async function main() {
         }
       );
       console.log(zoningMode
-        ? "All frozen Zoning cases are ready. Public Zoning Research remains disabled."
+        ? `${checkedCases.length}/${selectedDataset.cases.length} selected frozen Zoning cases are ready. Public Zoning Research remains disabled.`
         : "All cases are ready. Paid evals remain locked until explicitly approved.");
     }
   } finally {

@@ -240,6 +240,16 @@ assert.equal(assembled.sources[0].canonicalContextResolved, true);
 assert.equal(assembled.sources[0].canonicalContextComplete, true);
 assert.equal(assembled.sources[0].pinnedSelectionExact, true);
 assert.equal(assembled.sources[0].evidencePriority.claimCoverageRequired, true);
+assert.equal(
+  assembled.usage.pinnedCharacterCount,
+  assembled.sources[0].text.length,
+  "Only passage text sent and persisted as evidence may consume the pinned passage budget."
+);
+assert.equal(
+  assembled.usage.pinnedCanonicalContextCharacterCount,
+  assembled.sources[0].canonicalContextText.length,
+  "Unsent canonical context must be reported separately from the evidence budget."
+);
 
 const discovered = assembled.sources.filter((source) => source.origin === "permitext_discovered");
 assert.equal(discovered.length, 2, "Automatically discovered enacted sources must be bounded.");
@@ -271,6 +281,11 @@ assert(
 assert(
   assembled.usage.characterCount <= assembled.limits.maximumCharacters,
   "The per-answer evidence package must stay within the aggregate character limit."
+);
+assert.equal(
+  assembled.usage.characterCount,
+  assembled.sources.reduce((sum, source) => sum + source.text.length, 0),
+  "Aggregate character accounting must equal the stored passage text supplied to Research."
 );
 assert(
   assembled.sources.every((source) => !Object.hasOwn(source, "visualSources")),

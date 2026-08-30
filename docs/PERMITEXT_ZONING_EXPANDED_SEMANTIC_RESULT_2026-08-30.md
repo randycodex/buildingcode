@@ -66,9 +66,9 @@ These repairs do not retroactively change the retained result.
 ### Answer keys requiring owner re-review
 
 - `zr-candidate-b1-r6a-uap-insufficient-affordable-area`: the model correctly refused to invent a one-for-one UAP FAR increment rule that is absent from the selected enacted evidence. The existing required concepts penalize that safe refusal and therefore cannot remain as written.
-- `zr-candidate-b1-deep-through-lot-vertical-yard`: the model correctly applied the R7A-specific rule in ZR 24-382 for a through lot at least 180 feet deep. The existing key instead applies a general 190-foot/40-foot/60-foot height-tier analysis and conflicts with the selected controlling provision.
+- `zr-candidate-b1-deep-through-lot-vertical-yard`: this initial finding was later superseded. Current applicability text confirms selected ZR 23-343 as the residential branch, but the frozen question does not state whether the zoning lot also contains a community-facility use that could make ZR 24-31 and the Chapter 4 path material. See [PERMITEXT_ZONING_CASE23_APPLICABILITY_AUDIT_2026-08-30.md](./PERMITEXT_ZONING_CASE23_APPLICABILITY_AUDIT_2026-08-30.md).
 
-The proposed revisions are isolated for owner disposition in [PERMITEXT_ZONING_BATCH1_RUBRIC_REVIEW_2026-08-30.md](./PERMITEXT_ZONING_BATCH1_RUBRIC_REVIEW_2026-08-30.md). The frozen cohort has not been silently changed.
+The historical proposed revisions are isolated in the immutable [PERMITEXT_ZONING_BATCH1_RUBRIC_REVIEW_2026-08-30.md](./PERMITEXT_ZONING_BATCH1_RUBRIC_REVIEW_2026-08-30.md). Its Case 23 ZR 24-382 recommendation is superseded by the later applicability re-audit and is not a current disposition. The frozen cohort has not been silently changed.
 
 ### Real or mixed answer omissions
 
@@ -84,4 +84,4 @@ The general no-cost Zoning material-completeness contract is also upgraded. It n
 - The $20 price and 100-turn allowance remain unchanged.
 - No second paid run is authorized.
 - No merge, push, deployment, Production configuration, or provider-plan change is authorized by this result.
-- Next: complete owner review of the two invalid answer keys, pass the 24,000-character supplemental candidate through the full no-cost gate, then decide whether a newly capped clean semantic run is justified.
+- Next: obtain owner dispositions for the three current answer-key/evidence blockers, freeze a separately versioned corrected successor, and keep the 24,000-character supplemental candidate disabled until that full successor passes no-cost and newly authorized semantic comparison gates.

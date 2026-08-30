@@ -9,7 +9,7 @@ import {
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260827-pinned-evidence-budget-v20";
+export const researchEvidenceAssemblyVersion = "20260830-pinned-passage-budget-v21";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -718,6 +718,7 @@ export async function assembleResearchEvidence({
   const includedSectionIdentities = new Set();
   const limitations = [];
   let characterCount = 0;
+  let pinnedCanonicalContextCharacterCount = 0;
   let resolverFailureCount = 0;
   let targetedDefinitionCount = 0;
   const retrievedAt = new Date().toISOString();
@@ -829,7 +830,8 @@ export async function assembleResearchEvidence({
     }
     sources.push(record);
     if (targeted.excerpt) targetedDefinitionCount += 1;
-    characterCount += record.text.length + String(record.canonicalContextText || "").length;
+    characterCount += record.text.length;
+    pinnedCanonicalContextCharacterCount += String(record.canonicalContextText || "").length;
     const identity = sectionIdentity(record);
     if (identity) includedSectionIdentities.add(identity);
     if (entry.resolved) {
@@ -1155,6 +1157,7 @@ export async function assembleResearchEvidence({
     usage: {
       pinnedCount: pinnedEvidence.length,
       pinnedCharacterCount,
+      pinnedCanonicalContextCharacterCount,
       pinnedSelectionExactCount,
       pinnedSelectionTruncatedCount,
       structuredPinnedCount,

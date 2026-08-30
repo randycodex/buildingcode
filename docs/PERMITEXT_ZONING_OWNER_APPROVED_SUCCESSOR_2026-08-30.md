@@ -4,7 +4,9 @@ Date: August 30, 2026
 
 Working branch: `codex/zoning-research-beta1`
 
-Status: **SEPARATELY FROZEN; NO-COST GATE PASSED; PAID RESULT PARTIAL; PUBLIC USE LOCKED**
+Status: **HISTORICALLY FROZEN; GATE PASSED AT FREEZE; CURRENT PREFLIGHT 27/30; PAID RESULT PARTIAL; PUBLIC USE LOCKED**
+
+Post-freeze correction: stronger bare-section parsing now finds unselected ZR 101-70 and ZR 23-34 in two additional answer keys. A later official-source applicability re-audit also found that approved change 2 imports unselected Chapter 4 rule ZR 24-382 without resolving whether the zoning lot contains a community-facility use. The selected ZR 23-343 text supports the residential branch, but the frozen question does not uniquely establish the applicability branch. The frozen successor and its paid result remain immutable historical evidence, but the three blocked keys are not eligible for reuse. Current preflight blocks them at 27/30. See [PERMITEXT_ZONING_CASE23_APPLICABILITY_AUDIT_2026-08-30.md](./PERMITEXT_ZONING_CASE23_APPLICABILITY_AUDIT_2026-08-30.md) and [PERMITEXT_ZONING_SUCCESSOR_FAILURE_TRIAGE_2026-08-30.md](./PERMITEXT_ZONING_SUCCESSOR_FAILURE_TRIAGE_2026-08-30.md).
 
 ## Owner decision
 
@@ -33,7 +35,7 @@ The successor generator refuses to run if the parent cohort or either bound revi
 The successor contains only these eight dispositions:
 
 1. Replace the unsupported R6A/UAP increment key with the approved evidence-insufficiency conclusion.
-2. Replace the conflicting deep-through-lot height-tier key with the selected R7A-specific ZR 24-382 conclusion.
+2. Historically applied: replace the deep-through-lot height-tier key with a ZR 24-382 conclusion. This disposition was later found insufficiently source-bound because the frozen question does not resolve the ZR 23/24 applicability branch; it is superseded pending a new owner decision.
 3. Remove the collateral `particular controls the general` concept from the text-versus-illustration case.
 4. Retain the warehouse 25 percent calculation and remove only the duplicate unused-area margin.
 5. Retain the weighted-FAR calculation and proposed 5.50 FAR, while removing the equivalent direct-area proof.
@@ -43,15 +45,15 @@ The successor contains only these eight dispositions:
 
 The adapter now permits an explicit `expectedConclusion` for the two corrected keys while preserving the existing required-concept fallback for every earlier cohort.
 
-## No-cost verification
+## Historical no-cost verification at freeze
 
-The following gates passed with mock/evidence-package execution only:
+The following gates passed with mock/evidence-package execution only when this successor was frozen:
 
 - `npm run test:zoning-successor-governance`
 - `npm run eval:zoning:successor`
 - `npm run test:zoning-successor-evidence-budget`
 
-Results:
+Recorded freeze-time results:
 
 - 8/8 approved dispositions reproduced exactly.
 - 30/30 cases passed canonical-evidence preflight.
@@ -60,6 +62,8 @@ Results:
 - Average assembled evidence was 34,821 characters; maximum was 48,000.
 - Average pinned evidence was 13,941 characters and average supplemental evidence was 20,879 characters.
 - No paid model calls were made.
+
+These are historical freeze results, not the current gate state. The unchanged successor now fails the strengthened answer-key/evidence preflight at 27/30 on three cases before any provider request.
 
 ## Paid semantic result
 

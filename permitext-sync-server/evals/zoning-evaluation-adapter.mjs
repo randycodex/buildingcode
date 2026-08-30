@@ -128,17 +128,48 @@ function caseTitle(testCase) {
     .join(" ");
 }
 
+export function zoningAnswerKeySectionNumbers(testCase) {
+  const keyText = [
+    testCase.question,
+    testCase.expectedConclusion,
+    ...(testCase.requiredConcepts || []),
+    ...(testCase.missingFacts || []),
+    ...(testCase.forbiddenClaims || []),
+    ...(testCase.forbiddenPhrases || [])
+  ].join(" ");
+  const referenceToken = String.raw`(?:\d{1,3}(?:-[A-Z0-9]+)+(?:\.\d+)?|APPENDIX\s+[A-Z0-9]+(?:-[A-Z0-9]+)?)`;
+  const connector = String.raw`(?:\s*(?:,\s*(?:(?:and|or)\s+)?|\b(?:and|or|through|to)\s+|[–—])(?:ZR\s+)?(?:(?:§{1,2}|Sections?)\s*)?)`;
+  const referenceList = String.raw`${referenceToken}(?:${connector}${referenceToken})*`;
+  const referencePatterns = [
+    new RegExp(String.raw`\bZR\s+(?:(?:§{1,2}|Sections?)\s*)?(${referenceList})`, "gi"),
+    new RegExp(String.raw`\b(?:§{1,2}\s*)?Sections?\s+(${referenceList})\s+of\s+(?:the\s+)?ZR\b`, "gi"),
+    new RegExp(String.raw`\b(APPENDIX\s+[A-Z0-9]+(?:-[A-Z0-9]+)?)\s+of\s+(?:the\s+)?ZR\b`, "gi"),
+    new RegExp(String.raw`\bSections?\s+(${referenceList})`, "gi"),
+    new RegExp(String.raw`§{1,2}\s*(${referenceList})(?:\s+of\s+(?:the\s+)?ZR\b)?`, "gi")
+  ];
+  const sectionNumbers = [];
+  const seen = new Set();
+  for (const pattern of referencePatterns) {
+    for (const match of keyText.matchAll(pattern)) {
+      const references = match[1].match(new RegExp(referenceToken, "gi")) || [];
+      for (const reference of references) {
+        const normalized = reference.replace(/\s+/g, " ").trim();
+        const sectionNumber = /^APPENDIX\b/i.test(normalized)
+          ? normalized.toUpperCase()
+          : normalized;
+        if (seen.has(sectionNumber)) continue;
+        seen.add(sectionNumber);
+        sectionNumbers.push(sectionNumber);
+      }
+    }
+  }
+  return sectionNumbers;
+}
+
 function answerKeyEvidenceMismatches(testCase, selectedEvidence) {
   const selectedSectionNumbers = new Set(selectedEvidence.map((source) => source.sectionNumber));
-  const keyText = [
-    testCase.expectedConclusion,
-    ...(testCase.requiredConcepts || [])
-  ].join(" ");
-  return Array.from(new Set(
-    Array.from(keyText.matchAll(/\bZR\s+(\d{1,3}(?:-[A-Z0-9]+)+(?:\.\d+)?)\b/gi))
-      .map((match) => match[1])
-      .filter((sectionNumber) => !selectedSectionNumbers.has(sectionNumber))
-  ));
+  return zoningAnswerKeySectionNumbers(testCase)
+    .filter((sectionNumber) => !selectedSectionNumbers.has(sectionNumber));
 }
 
 export async function adaptZoningEvaluationDataset({

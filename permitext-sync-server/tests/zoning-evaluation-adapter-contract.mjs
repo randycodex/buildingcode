@@ -1,11 +1,56 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { adaptZoningEvaluationDataset } from "../evals/zoning-evaluation-adapter.mjs";
+import {
+  adaptZoningEvaluationDataset,
+  zoningAnswerKeySectionNumbers
+} from "../evals/zoning-evaluation-adapter.mjs";
 import { structuredRichSources } from "../evidence-discovery.mjs";
 import { immutableEvidenceSnapshot } from "../project-foundation-contract.mjs";
 import { zoningSection, zoningSectionSummary } from "../zoning-content.mjs";
 
 const maximumSelectedPassageCharacters = 11_800;
+assert.deepEqual(
+  zoningAnswerKeySectionNumbers({
+    question: "Do ZR Sections 23-154 and 23-155 apply?",
+    expectedConclusion: "Compare Sections 24-01 through 24-03 of the ZR, ZR §11-331, and ZR §§52-42, 52-43, and 52-44.",
+    requiredConcepts: ["Preserve ZR Appendix F and ZR Section 77-22."],
+    missingFacts: ["Check Appendix J of the ZR and ZR 24-382."],
+    forbiddenClaims: ["Do not invent ZR §99-99 or ZR 88-10–88-12."],
+    forbiddenPhrases: ["ZR Sections 73-53 and 73-54"]
+  }),
+  [
+    "23-154",
+    "23-155",
+    "11-331",
+    "52-42",
+    "52-43",
+    "52-44",
+    "APPENDIX F",
+    "77-22",
+    "24-382",
+    "99-99",
+    "88-10",
+    "88-12",
+    "73-53",
+    "73-54",
+    "24-01",
+    "24-03",
+    "APPENDIX J"
+  ],
+  "Answer-key source extraction must recognize grouped, ranged, symbol, worded, suffix, and Appendix ZR references."
+);
+assert.deepEqual(
+  zoningAnswerKeySectionNumbers({
+    question: "Do Sections 23-362 and 23-363 apply?",
+    expectedConclusion: "Section 24-382 is not selected.",
+    requiredConcepts: ["Compare §23-343 of the ZR and §§24-31, 24-382."],
+    missingFacts: [],
+    forbiddenClaims: [],
+    forbiddenPhrases: []
+  }),
+  ["23-362", "23-363", "24-382", "23-343", "24-31"],
+  "Answer-key source extraction must fail closed on bare Section and section-symbol references."
+);
 const zoningDataset = JSON.parse(await readFile(
   new URL("../evals/zoning-cases.json", import.meta.url),
   "utf8"
@@ -153,18 +198,28 @@ const successorAdapted = await adaptZoningEvaluationDataset({
   sectionReader: zoningSection,
   sectionSummaryReader: zoningSectionSummary
 });
-const deepThroughLotCase = successorAdapted.cases.find((testCase) =>
-  testCase.id === "zr-candidate-b1-deep-through-lot-vertical-yard"
-);
 assert.deepEqual(
-  deepThroughLotCase.answerKeyEvidenceMismatches,
-  ["24-382"],
-  "The current successor must remain fail-closed while its answer key names unselected ZR 24-382."
-);
-assert(
-  successorAdapted.cases.filter((testCase) => testCase.id !== deepThroughLotCase.id)
-    .every((testCase) => testCase.answerKeyEvidenceMismatches.length === 0),
-  "No other successor answer key may name an unselected Zoning provision."
+  successorAdapted.cases
+    .filter((testCase) => testCase.answerKeyEvidenceMismatches.length)
+    .map((testCase) => ({
+      id: testCase.id,
+      answerKeyEvidenceMismatches: testCase.answerKeyEvidenceMismatches
+    })),
+  [
+    {
+      id: "zr-special-district-demolition",
+      answerKeyEvidenceMismatches: ["101-70"]
+    },
+    {
+      id: "zr-narrow-attached-rear-yard",
+      answerKeyEvidenceMismatches: ["23-34"]
+    },
+    {
+      id: "zr-candidate-b1-deep-through-lot-vertical-yard",
+      answerKeyEvidenceMismatches: ["24-382"]
+    }
+  ],
+  "The current successor must fail closed on every bare or prefixed answer-key provision absent from selected evidence."
 );
 
 console.log("zoning evaluation adapter contract passed");

@@ -58,15 +58,15 @@ The one authorized expanded run completed under its $5 cap and is retained separ
 - table-category Zoning cases now explicitly select their structured table evidence; and
 - the answer prompt now preserves unusual enacted legal wording before paraphrase instead of silently normalizing it.
 
-The result also showed that source Cases 2 and 4 from the candidate batch have invalid answer keys: one requires a UAP increment rule absent from the selected evidence, and the other ignores the controlling R7A-specific through-lot rule. Those keys remain unchanged pending owner disposition in [PERMITEXT_ZONING_BATCH1_RUBRIC_REVIEW_2026-08-30.md](./PERMITEXT_ZONING_BATCH1_RUBRIC_REVIEW_2026-08-30.md).
+The result initially suggested that source Cases 2 and 4 had invalid answer keys. Case 2 requires a UAP increment rule absent from the selected evidence. The initial Case 4 follow-up treated ZR 24-382 as unconditionally controlling, but the later official-source re-audit confirms selected ZR 23-343 as the residential branch and identifies community-facility status as an unresolved applicability fact. The frozen records remain unchanged; the superseding source audit is [PERMITEXT_ZONING_CASE23_APPLICABILITY_AUDIT_2026-08-30.md](./PERMITEXT_ZONING_CASE23_APPLICABILITY_AUDIT_2026-08-30.md).
 
 The expanded result, including its $8.87-per-100 all-Zoning operating projection and updated subscriber sensitivity, is retained in [PERMITEXT_ZONING_EXPANDED_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_SEMANTIC_RESULT_2026-08-30.md).
 
 ## Remaining gate
 
 1. **Complete:** the owner approved nine source-checked candidate cases for evaluation testing only; Cases 1, 3, and 11 remain outside the cohort pending narrowing, duplication review, and incorporated-map evidence respectively.
-2. **Complete:** the unchanged original 21 cases and the nine approvals are frozen as a separate 30-case successor; 30/30 no-cost conversation creation passes. See [PERMITEXT_ZONING_EXPANDED_COHORT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_COHORT_2026-08-30.md).
+2. **Complete historical freeze:** the unchanged original 21 cases and the nine approvals were frozen as a separate 30-case expanded parent; 30/30 no-cost conversation creation passed at that checkpoint. Stronger later bare-section parsing now makes the unchanged expanded parent fail closed at 28/30 on unselected ZR 101-70 and 23-34. See [PERMITEXT_ZONING_EXPANDED_COHORT_2026-08-30.md](./PERMITEXT_ZONING_EXPANDED_COHORT_2026-08-30.md).
 3. **Complete:** the exact expanded cohort and its one-run $5 authorization were committed before execution; the run is retained and the authorization is consumed.
-4. Obtain owner disposition on the two proposed answer-key corrections and complete the remaining no-cost scope/cost work.
+4. **Superseded current gate:** the historical two-key disposition was completed, but stronger preflight now exposes three answer-key/evidence blockers requiring new owner case dispositions. See [PERMITEXT_ZONING_SUCCESSOR_FAILURE_TRIAGE_2026-08-30.md](./PERMITEXT_ZONING_SUCCESSOR_FAILURE_TRIAGE_2026-08-30.md).
 5. Only with a new explicit owner authorization and cumulative spend cap, run one clean paid semantic confirmation.
 6. Keep public Zoning Research disabled until that run passes, the updated cost distribution is accepted, and web/iOS release acceptance is complete.
