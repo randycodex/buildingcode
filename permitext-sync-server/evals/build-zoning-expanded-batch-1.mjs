@@ -220,15 +220,25 @@ const expanded = {
     automaticApprovalAllowed: false,
     professionalZoningSignoff: false,
     publicResearchReleaseAuthorized: false,
-    paidEvaluationAllowed: false,
+    paidEvaluationAllowed: true,
     paidEvaluationAuthorization: {
-      status: "locked",
-      authorizedCaseCount: null,
-      repetitions: null,
-      maximumCumulativeSpendUSD: null,
-      requiresNewExplicitOwnerAuthorization: true,
-      requiresNewExplicitCumulativeSpendCap: true,
-      notes: "No paid call is authorized by candidate approval or no-cost cohort validation."
+      status: "authorized",
+      authorizedAt: "2026-08-30T17:52:41.000Z",
+      authorizedBy: "Permitext owner",
+      caseCount: 30,
+      repetitions: 1,
+      maximumCumulativeSpendUSD: 5,
+      scope: "One complete local diagnostic run of all 30 frozen Zoning cases through the production Research answer path and separate evaluator.",
+      doesNotAuthorize: [
+        "a second paid run",
+        "spend above the $5 cumulative cap",
+        "public Zoning Research",
+        "professional Zoning sign-off",
+        "deployment",
+        "merging or pushing",
+        "customer pricing changes"
+      ],
+      notes: "Authorized by the owner's August 30 instruction to proceed after the exact one-run, one-repetition, $5 recommendation."
     },
     notes: "The first 21 cases are byte-for-byte logical copies of the immutable parent cohort. Nine owner-approved Batch 1 cases are appended. Cases 1, 3, and 11 remain held outside this cohort."
   },

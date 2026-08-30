@@ -33,11 +33,22 @@ assert.equal(expanded.libraryID, "nyc-zoning-resolution");
 assert.equal(expanded.researchEligibility, false);
 assert.equal(expanded.governance.status, "frozen");
 assert.equal(expanded.governance.frozenCaseCount, 30);
-assert.equal(expanded.governance.paidEvaluationAllowed, false);
-assert.equal(expanded.governance.paidEvaluationAuthorization.status, "locked");
-assert.equal(expanded.governance.paidEvaluationAuthorization.maximumCumulativeSpendUSD, null);
-assert.equal(expanded.governance.paidEvaluationAuthorization.requiresNewExplicitOwnerAuthorization, true);
-assert.equal(expanded.governance.paidEvaluationAuthorization.requiresNewExplicitCumulativeSpendCap, true);
+const paidAuthorization = expanded.governance.paidEvaluationAuthorization;
+if (paidAuthorization.status === "authorized") {
+  assert.equal(expanded.governance.paidEvaluationAllowed, true);
+  assert.equal(paidAuthorization.authorizedBy, "Permitext owner");
+  assert.equal(paidAuthorization.caseCount, 30);
+  assert.equal(paidAuthorization.repetitions, 1);
+  assert.equal(paidAuthorization.maximumCumulativeSpendUSD, 5);
+} else {
+  assert(["locked", "consumed"].includes(paidAuthorization.status));
+  assert.equal(expanded.governance.paidEvaluationAllowed, false);
+  if (paidAuthorization.status === "locked") {
+    assert.equal(paidAuthorization.maximumCumulativeSpendUSD, null);
+    assert.equal(paidAuthorization.requiresNewExplicitOwnerAuthorization, true);
+    assert.equal(paidAuthorization.requiresNewExplicitCumulativeSpendCap, true);
+  }
+}
 assert.equal(expanded.governance.professionalZoningSignoff, false);
 assert.equal(expanded.governance.publicResearchReleaseAuthorized, false);
 assert.equal(expanded.governance.parentCohort.caseCount, 21);
@@ -84,7 +95,8 @@ const adapted = await adaptZoningEvaluationDataset({
   zoningDataset: expanded,
   automaticScoring: {},
   sectionReader: zoningSection,
-  sectionSummaryReader: zoningSectionSummary
+  sectionSummaryReader: zoningSectionSummary,
+  paidExecution: paidAuthorization.status === "authorized"
 });
 assert.equal(adapted.cases.length, 30);
 assert.match(adapted.description, /30-case/);
@@ -122,6 +134,7 @@ console.log("zoning expanded Batch 1 contract passed", {
   appendedOwnerApprovedCases: appended.length,
   heldCases: heldIntakeCases.length,
   frozenCases: expanded.cases.length,
+  paidAuthorizationStatus: paidAuthorization.status,
   paidEvaluationAllowed: expanded.governance.paidEvaluationAllowed,
   publicResearchReleaseAuthorized: expanded.governance.publicResearchReleaseAuthorized
 });

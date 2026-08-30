@@ -63,6 +63,7 @@
     "eval:research:live": "node tests/research-evals.mjs --run-live",
     "eval:zoning": "npm run test:zoning-adapter && node tests/research-evals.mjs --zoning",
     "eval:zoning:expanded-batch-1": "node evals/build-zoning-expanded-batch-1.mjs && npm run test:zoning-expanded-batch-1 && node tests/research-evals.mjs --zoning-expanded-batch-1",
+    "eval:zoning:expanded-batch-1:live": "node --env-file=.env.local scripts/run-zoning-expanded-batch-1.mjs",
     "eval:zoning:live": "node tests/research-evals.mjs --zoning --run-live",
     "test:zoning-adapter": "node --check tests/zoning-evaluation-adapter-contract.mjs && node tests/zoning-evaluation-adapter-contract.mjs",
     "test:zoning-candidate-batch": "node --check tests/zoning-candidate-batch-1-contract.mjs && node tests/zoning-candidate-batch-1-contract.mjs",

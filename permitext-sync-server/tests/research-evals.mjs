@@ -3423,7 +3423,8 @@ async function main() {
       zoningDataset: sourceZoningDataset,
       automaticScoring: baseDataset.automaticScoring,
       sectionReader: zoningSection,
-      sectionSummaryReader: zoningSectionSummary
+      sectionSummaryReader: zoningSectionSummary,
+      paidExecution: liveMode
     });
   }
   validateDataset(dataset);

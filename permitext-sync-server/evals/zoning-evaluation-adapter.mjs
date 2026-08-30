@@ -132,16 +132,25 @@ export async function adaptZoningEvaluationDataset({
   zoningDataset,
   automaticScoring,
   sectionReader,
-  sectionSummaryReader
+  sectionSummaryReader,
+  paidExecution = false
 }) {
   assert(zoningDataset?.schemaVersion === 1, "Zoning evaluation dataset must use schemaVersion 1.");
   assert(zoningDataset.libraryID === "nyc-zoning-resolution", "Unexpected Zoning evaluation library.");
   assert(zoningDataset.researchEligibility === false, "Zoning public Research eligibility must remain disabled.");
-  assert(zoningDataset.governance?.paidEvaluationAllowed === false, "Paid Zoning evaluation must be locked before no-cost reuse.");
-  assert(
-    ["consumed", "locked"].includes(zoningDataset.governance?.paidEvaluationAuthorization?.status),
-    "Zoning paid authorization must be consumed or explicitly locked."
-  );
+  if (paidExecution) {
+    assert(zoningDataset.governance?.paidEvaluationAllowed === true, "Paid Zoning execution is not authorized.");
+    assert(
+      zoningDataset.governance?.paidEvaluationAuthorization?.status === "authorized",
+      "Paid Zoning authorization is not active."
+    );
+  } else {
+    assert(zoningDataset.governance?.paidEvaluationAllowed === false, "Paid Zoning evaluation must be locked before no-cost reuse.");
+    assert(
+      ["consumed", "locked"].includes(zoningDataset.governance?.paidEvaluationAuthorization?.status),
+      "Zoning paid authorization must be consumed or explicitly locked."
+    );
+  }
   assert(zoningDataset.governance?.professionalZoningSignoff === false, "This benchmark cannot represent professional Zoning sign-off.");
   assert(zoningDataset.governance?.publicResearchReleaseAuthorized === false, "This benchmark cannot authorize public Zoning Research.");
   const expectedCaseCount = zoningDataset.governance?.frozenCaseCount || 21;
