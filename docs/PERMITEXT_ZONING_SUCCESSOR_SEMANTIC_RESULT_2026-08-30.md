@@ -52,6 +52,8 @@ This sample is adequate to show that the current all-Zoning path is above the ac
 
 ## Required next gate
 
+The complete no-cost post-run classification is retained in [PERMITEXT_ZONING_SUCCESSOR_FAILURE_TRIAGE_2026-08-30.md](./PERMITEXT_ZONING_SUCCESSOR_FAILURE_TRIAGE_2026-08-30.md). It identifies three evaluator defects, five product-completeness defects now covered by new deterministic regressions, one answer-key/evidence mismatch requiring owner disposition, and the three execution-failure paths. The immutable paid result remains unchanged. Current successor preflight is intentionally fail-closed at 29/30 because its deep-through-lot key names unselected ZR 24-382.
+
 1. Diagnose and repair the three execution failures and nine graded fatal-gate failures without weakening citation, missing-fact, evidence, or unofficial-aid boundaries.
 2. Reduce evidence/model cost; the retained 24,000-character supplemental candidate remains disabled until its complete no-cost and semantic gates pass.
 3. Freeze any remediation as a new exact successor with preserved lineage and owner-reviewed answer-key/rubric changes.

@@ -248,6 +248,7 @@ import {
   unapprovedZoningDiagnosticEnabled
 } from "./research-corpus-registry.mjs";
 import {
+  applyZoningResearchDeterministicRepairs,
   evaluateZoningResearchSafety,
   zoningResearchSafetyInstruction,
   zoningResearchSafetyPromptContext,
@@ -9659,7 +9660,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "You are a building-code research assistant, not an authority having jurisdiction.",
         zoningResearchSafetyInstruction(passageEvidence),
         options.structuredResponseRetry
-          ? "A prior response could not be parsed or bound to the supplied evidence. Return one complete schema-valid answer using only the exact supplied identifiers; do not add commentary outside the JSON object."
+          ? "A prior response could not be parsed or bound to the supplied evidence. Return one complete schema-valid answer using only the exact supplied identifiers; do not add commentary outside the JSON object. Keep every explanation, citation relevance, limitation, missing fact, and follow-up concise; combine overlapping points and do not repeat the same rule so the complete JSON fits within the response limit."
           : "",
         "Make governing code conclusions only from the authorized enacted evidence supplied in the request.",
         "Evidence marked user_pinned must be considered, but Permitext-discovered enacted evidence may identify a different controlling provision.",
@@ -9772,6 +9773,11 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     if (error.code === "RESEARCH_REFUSAL") throw error;
     const invalidResponse = new Error("The model returned invalid structured output.");
     invalidResponse.code = "INVALID_RESEARCH_RESPONSE";
+    invalidResponse.failureStage = payload?.status === "incomplete"
+      ? "provider_incomplete"
+      : "structured_output_parse";
+    invalidResponse.providerStatus = payload?.status || null;
+    invalidResponse.incompleteReason = payload?.incomplete_details?.reason || null;
     invalidResponse.providerUsage = researchUsageFromProviderPayload(payload, model);
     throw invalidResponse;
   }
@@ -9787,6 +9793,16 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
       { allowOfficialGuidanceOnly: options.allowOfficialGuidanceOnly === true }
     );
   } catch (error) {
+    if (!error.failureStage) {
+      error.failureStage = ["INVALID_RESEARCH_CITATION", "INVALID_RESEARCH_WEB_CITATION"]
+        .includes(error.code)
+        ? "evidence_binding_validation"
+        : "interpretation_validation";
+    }
+    if (!error.providerStatus) error.providerStatus = payload?.status || null;
+    if (!error.incompleteReason) {
+      error.incompleteReason = payload?.incomplete_details?.reason || null;
+    }
     if (!error.providerUsage) {
       error.providerUsage = researchUsageFromProviderPayload(payload, model);
     }
@@ -18609,8 +18625,12 @@ async function handleResearchConversationMessage(request, response) {
         ? candidate
         : {
             ...candidate,
-            interpretation: applyResearchDeterministicAnswerRepairs(
-              candidate.interpretation,
+            interpretation: applyZoningResearchDeterministicRepairs(
+              applyResearchDeterministicAnswerRepairs(
+                candidate.interpretation,
+                assembledEvidence,
+                { question }
+              ),
               assembledEvidence,
               { question }
             )
@@ -19271,7 +19291,8 @@ async function handleResearchConversationMessage(request, response) {
         ? Array.from(new Set(error.verificationAttempts.flatMap((attempt) =>
             (attempt.issues || []).map((issue) => issue?.type).filter(Boolean)
           )))
-        : researchOperation.verificationIssueTypes
+        : researchOperation.verificationIssueTypes,
+      failureStage: error.failureStage || null
     });
     if (["RESEARCH_EVAL_SPEND_CAP", "RESEARCH_SPEND_CAP"].includes(error.code)) {
       console.warn(JSON.stringify(sanitizedResearchSpendGuardrailReport({
@@ -19340,6 +19361,7 @@ async function handleResearchConversationMessage(request, response) {
         user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
         conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
         code: failureCode,
+        failureStage: error.failureStage || null,
         message: String(error.message || "").slice(0, 500),
         verificationAttempts: Array.isArray(error.verificationAttempts)
           ? error.verificationAttempts.map((attempt) => ({ pass: attempt.pass, issues: attempt.issues }))

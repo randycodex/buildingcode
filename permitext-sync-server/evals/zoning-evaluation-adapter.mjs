@@ -128,6 +128,19 @@ function caseTitle(testCase) {
     .join(" ");
 }
 
+function answerKeyEvidenceMismatches(testCase, selectedEvidence) {
+  const selectedSectionNumbers = new Set(selectedEvidence.map((source) => source.sectionNumber));
+  const keyText = [
+    testCase.expectedConclusion,
+    ...(testCase.requiredConcepts || [])
+  ].join(" ");
+  return Array.from(new Set(
+    Array.from(keyText.matchAll(/\bZR\s+(\d{1,3}(?:-[A-Z0-9]+)+(?:\.\d+)?)\b/gi))
+      .map((match) => match[1])
+      .filter((sectionNumber) => !selectedSectionNumbers.has(sectionNumber))
+  ));
+}
+
 export async function adaptZoningEvaluationDataset({
   zoningDataset,
   automaticScoring,
@@ -188,10 +201,13 @@ export async function adaptZoningEvaluationDataset({
           `${testCase.id} cannot use a visual-bearing section without reviewed structured text evidence.`
         );
       }
-      const richSourceIDs = [
-        ...(amendmentHistorySource ? [amendmentHistorySource.id] : []),
-        ...reviewedTableSourceIDs
-      ];
+      const reviewedStructuredSources = Array.from(new Map([
+        ...(amendmentHistorySource ? [[amendmentHistorySource.id, amendmentHistorySource]] : []),
+        ...richSources
+          .filter((source) => reviewedTableSourceIDs.includes(source.id))
+          .map((source) => [source.id, source])
+      ]).values());
+      const richSourceIDs = reviewedStructuredSources.map((source) => source.id);
       selectedEvidence.push({
         sectionID: String(sectionID),
         reference: `ZR ${summary.sectionNumber}`,
@@ -202,10 +218,14 @@ export async function adaptZoningEvaluationDataset({
         ...(visualReferencesPresent
           ? { visualReviewDisposition: "diagnostic-structured-text-only" }
           : {}),
-        ...(richSourceIDs.length ? { richSourceIDs } : {})
+        ...(richSourceIDs.length ? {
+          richSourceIDs,
+          reviewedStructuredPassages: reviewedStructuredSources.map((source) => source.text)
+        } : {})
       });
     }
     const requiredCitations = selectedEvidence.map((source) => source.reference);
+    const keyEvidenceMismatches = answerKeyEvidenceMismatches(testCase, selectedEvidence);
     cases.push({
       id: testCase.id,
       title: testCase.title || caseTitle(testCase),
@@ -216,6 +236,7 @@ export async function adaptZoningEvaluationDataset({
       jurisdiction: "New York City, New York",
       projectContext: {},
       selectedEvidence,
+      answerKeyEvidenceMismatches: keyEvidenceMismatches,
       question: testCase.question,
       expectedConclusion: testCase.expectedConclusion || testCase.requiredConcepts.join(" "),
       expectedUncertainty: expectedUncertainty(testCase),

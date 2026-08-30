@@ -93,7 +93,8 @@ function normalizedOperation(operation = {}) {
         .map((issue) => String(issue || "").trim())
         .filter(Boolean)
     )),
-    failureCode: String(operation.failureCode || "").trim() || null
+    failureCode: String(operation.failureCode || "").trim() || null,
+    failureStage: String(operation.failureStage || "").trim() || null
   };
 }
 
@@ -147,6 +148,7 @@ export function createResearchOperationMetric(operation = {}) {
     conservativeProviderCostUSD: normalized.conservativeProviderCostUSD,
     durationMilliseconds: normalized.durationMilliseconds,
     failureCode: normalized.failureCode,
+    failureStage: normalizedString(normalized.failureStage, 120),
     webSupportRequested: operation.webSupportRequested === true,
     webSupportSearched: operation.webSupportSearched === true,
     pricingVersion: normalizedString(operation.pricingVersion, 240)

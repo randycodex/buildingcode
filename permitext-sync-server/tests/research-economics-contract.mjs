@@ -13,12 +13,14 @@ const privacySafeMetric = createResearchOperationMetric({
   status: "completed",
   charged: true,
   model: "gpt-5.6-luna",
+  failureStage: "structured_output_parse",
   question: "Private question",
   answer: "Private answer",
   projectFacts: ["Private address"]
 });
 assert.equal(privacySafeMetric.id, "operation-1");
 assert.equal(privacySafeMetric.model, "gpt-5.6-luna");
+assert.equal(privacySafeMetric.failureStage, "structured_output_parse");
 assert.equal("question" in privacySafeMetric, false);
 assert.equal("answer" in privacySafeMetric, false);
 assert.equal("projectFacts" in privacySafeMetric, false);

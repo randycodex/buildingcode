@@ -175,7 +175,8 @@ async function preflightCases(baseURL, dataset) {
     checkedCases.push({
       ...testCase,
       selectedEvidence,
-      ready: selectedEvidence.every((source) => source.ready)
+      ready: selectedEvidence.every((source) => source.ready) &&
+        !(testCase.answerKeyEvidenceMismatches || []).length
     });
   }
   return checkedCases;
@@ -187,6 +188,9 @@ function printPreflight(checkedCases) {
     console.log(`${testCase.ready ? "READY" : "BLOCKED"} ${index + 1}. ${testCase.title}`);
     for (const source of testCase.selectedEvidence.filter((item) => !item.ready)) {
       console.log(`  ${source.reference}: ${source.error || `missing exact passage(s): ${source.missingPassages.map((value) => `“${value}”`).join(", ")}`}`);
+    }
+    for (const sectionNumber of testCase.answerKeyEvidenceMismatches || []) {
+      console.log(`  ZR ${sectionNumber}: answer key names a provision absent from the selected evidence.`);
     }
   }
   const readyCount = checkedCases.filter((testCase) => testCase.ready).length;
@@ -454,7 +458,10 @@ function evaluationEvidenceForAnswer(testCase, answer) {
     {
       sectionID: String(source.sectionID),
       reference: source.reference,
-      passages: [...source.exactPassages],
+      passages: Array.from(new Set([
+        ...source.exactPassages,
+        ...(source.reviewedStructuredPassages || [])
+      ])),
       origin: "user_selected"
     }
   ]));
@@ -2558,6 +2565,64 @@ async function runSelfTest(dataset, datasetText) {
   }
   const scoring = scoreCase(dataset, testCase, answer, 15_000, judge);
   assert(scoring.passed && scoring.overallScore === 4, "Research eval self-test did not produce a perfect passing score.");
+  const structuredCase = dataset.cases.find((candidate) =>
+    candidate.selectedEvidence.some((source) => source.reviewedStructuredPassages?.length)
+  );
+  if (structuredCase) {
+    const structuredSource = structuredCase.selectedEvidence.find((source) =>
+      source.reviewedStructuredPassages?.length
+    );
+    const structuredPassage = structuredSource.reviewedStructuredPassages[0];
+    const structuredSourceID = `self-test-structured-${structuredSource.sectionID}`;
+    const structuredAnswer = selfTestAnswer(structuredCase);
+    const structuredCitationIndex = structuredAnswer.citations.findIndex((citation) =>
+      String(citation.sectionID) === String(structuredSource.sectionID)
+    );
+    const structuredCitation = structuredAnswer.citations[structuredCitationIndex];
+    structuredAnswer.citations[structuredCitationIndex] = {
+      ...structuredCitation,
+      sourceIDs: [...structuredCitation.sourceIDs, structuredSourceID],
+      supportingPassages: [
+        ...structuredCitation.supportingPassages,
+        { sourceID: structuredSourceID, selectedText: structuredPassage }
+      ]
+    };
+    structuredAnswer.evidenceSourceIDs.push(structuredSourceID);
+    const structuredEvaluationEvidence = evaluationEvidenceForAnswer(structuredCase, structuredAnswer)
+      .find((source) => String(source.sectionID) === String(structuredSource.sectionID));
+    assert(
+      structuredEvaluationEvidence?.passages.includes(structuredPassage),
+      "Research eval judge evidence omitted independently reviewed structured text."
+    );
+    const structuredScoring = scoreCase(
+      dataset,
+      structuredCase,
+      structuredAnswer,
+      15_000,
+      selfTestJudge(structuredCase)
+    );
+    assert(
+      structuredScoring.deterministic.citationValidation.passed && structuredScoring.passed,
+      "Research eval self-test rejected canonical reviewed structured evidence."
+    );
+    const forgedStructuredAnswer = structuredClone(structuredAnswer);
+    forgedStructuredAnswer.citations[structuredCitationIndex].supportingPassages
+      .find((passage) => passage.sourceID === structuredSourceID).selectedText =
+        "Fabricated structured passage not present in the reviewed source.";
+    const forgedStructuredScoring = scoreCase(
+      dataset,
+      structuredCase,
+      forgedStructuredAnswer,
+      15_000,
+      selfTestJudge(structuredCase)
+    );
+    assert(
+      forgedStructuredScoring.deterministic.citationValidation.invalidCitationPassageCombinations
+        .some((item) => item.sourceID === structuredSourceID) &&
+        !forgedStructuredScoring.passed,
+      "Research eval self-test accepted fabricated structured evidence text."
+    );
+  }
   const conciseScoring = scoreCase(dataset, testCase, { ...answer, explanation: "" }, 15_000, judge);
   assert(
     conciseScoring.deterministic.structuralValidity.passed && conciseScoring.passed,

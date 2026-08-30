@@ -1,5 +1,5 @@
 export const zoningResearchSafetyVersion =
-  "20260830-zoning-material-completeness-v2";
+  "20260830-zoning-material-completeness-v4";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -51,6 +51,7 @@ function hasConcreteMappedLocation(value) {
     /\b(?:Zoning District|mapped district)\s*[:—-]\s*(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)(?:\b|\s)/i.test(value) ||
     /\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i.test(value) ||
     /\b(?:within|in)\s+(?:the\s+)?(?:Inner|Outer)\s+Transit\s+Zone\b/i.test(value) ||
+    /\b(?:property|site|lot|project)\s+(?:is\s+)?(?:confirmed|verified|established)\s+to\s+be\s+(?:within|in)\s+(?:an?\s+|the\s+)?(?:MIH|Mandatory Inclusionary Housing)\s+area\b/i.test(value) ||
     /\b(?:within|in)\s+(?:the\s+)?(?:[A-Z][A-Za-z' -]+\s+)?(?:Special\s+[A-Z][A-Za-z' -]+\s+District|[A-Z][A-Za-z' -]+\s+Subdistrict)\b/i.test(value);
 }
 
@@ -109,7 +110,7 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     /\d/.test(questionText);
   const definition = /\b(?:definition|defined|means|zoning lot|floor area|cellar)\b/i.test(questionText) &&
     sources.some((source) =>
-      /\b(?:definition|defined terms?)\b/i.test(compactText(`${source?.title} ${source?.text}`)) ||
+      /\b(?:definitions?|defined terms?)\b/i.test(compactText(`${source?.title} ${source?.text}`)) ||
       source?.evidencePriority?.primaryFunction === "definition" ||
       (Array.isArray(source?.evidencePriority?.functions) &&
         source.evidencePriority.functions.includes("definition"))
@@ -121,6 +122,23 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     /\b(?:old|prior|previous|pre[- ](?:amendment|city of yes|december))\b[^.]{0,100}\b(?:zoning|rules?|text|provisions?)\b/i.test(questionText);
   const map = /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea)\b/i.test(`${questionText} ${sourceText}`) ||
     sources.some((source) => Array.isArray(source?.visualSources) && source.visualSources.length > 0);
+  const basicLotCoverage = /\bbasic\b[^?]{0,100}\blot[- ]coverage\b|\blot[- ]coverage\b[^?]{0,100}\bbasic\b/i.test(questionText);
+  const parkingGeography = /\bparking\b/i.test(questionText) &&
+    /\b(?:transit zone|Greater Transit Zone|special parking areas?|special district)\b/i.test(`${questionText} ${sourceText}`);
+  const definitionBranchReview = definition && /\bzoning lot\b/i.test(questionText) &&
+    /\(a\)[\s\S]*\(b\)[\s\S]*\(c\)[\s\S]*\(d\)/i.test(sourceText);
+  const loweredYardClause = definition &&
+    /\bDecember\s+5,\s+1990\b/i.test(sourceText) &&
+    /\byard\b[^.]{0,220}\blowered\b|\blowered\b[^.]{0,220}\byard\b/i.test(sourceText) &&
+    !/\b(?:yard\b[^?]{0,160}\blowered|lowered\b[^?]{0,160}\byard)\b/i.test(questionText);
+  const missingExistingCondition =
+    /\b(?:existing|existed|existence)[- ]?(?:facility|building|use)?\b[^?]{0,180}\b(?:not (?:been )?(?:provided|established|identified|verified)|missing|unknown)\b/i.test(questionText) ||
+    /\b(?:not (?:been )?(?:provided|established|identified|verified)|missing|unknown)\b[^?]{0,180}\b(?:existing|existed|existence)[- ]?(?:facility|building|use)?\b/i.test(questionText);
+  const mihHistoricalZoningLotException =
+    /\b(?:Mandatory Inclusionary Housing|MIH)\b/i.test(`${questionText} ${sourceText}`) &&
+    /\bnot more than 10 dwelling units\b/i.test(sourceText) &&
+    /\b12,500 square feet\b/i.test(sourceText) &&
+    /\bzoning lot that existed on the date of establishment\b/i.test(sourceText);
   const categories = [
     "citation-boundary",
     "stable-passage",
@@ -132,6 +150,12 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     ...(tableSymbols ? ["table-symbols"] : []),
     ...(arithmetic ? ["arithmetic"] : []),
     ...(definition ? ["definition"] : []),
+    ...(definitionBranchReview ? ["definition-branches"] : []),
+    ...(loweredYardClause ? ["definition-lowered-yard"] : []),
+    ...(basicLotCoverage ? ["basic-lot-coverage"] : []),
+    ...(parkingGeography ? ["parking-geography"] : []),
+    ...(missingExistingCondition ? ["missing-existing-condition"] : []),
+    ...(mihHistoricalZoningLotException ? ["mih-historical-zoning-lot"] : []),
     ...(amendment ? ["amendment"] : []),
     ...(effectiveDate ? ["effective-date"] : []),
     ...(historicalSubstantiveText ? ["historical-substantive-text"] : [])
@@ -142,6 +166,13 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     zoningSourceIDs: unique(sources.map((source) => source?.sourceID)),
     missingMappedLocation,
     specialDistrictLabels,
+    basicLotCoverage,
+    parkingGeography,
+    definitionBranchReview,
+    loweredYardClause,
+    missingExistingCondition,
+    mihHistoricalZoningLotException,
+    sourceText,
     tableSourceIDs: table ? unique(sources.filter((source) =>
       Array.isArray(source?.richSourceGrids) && source.richSourceGrids.length > 0
     ).map((source) => source?.sourceID)) : [],
@@ -172,6 +203,24 @@ export function zoningResearchSafetyPromptContext(options = {}) {
       : "",
     profile.categories.includes("definition")
       ? "When applying a Zoning definition, preserve every supplied special measurement clause that could change the classification and every expressly limited downstream consequence that the question implicates. Do not generalize a consequence listed only for parking, loading, or another named calculation into the definition for all purposes."
+      : "",
+    profile.definitionBranchReview
+      ? "The supplied definition contains alternative branches. Address every branch that could decide the stated facts separately; do not treat one historical or current branch as a substitute for another."
+      : "",
+    profile.loweredYardClause
+      ? "The supplied definition contains a post-December 5, 1990 lowered-yard measurement clause that the scenario does not resolve. Identify that fact as unresolved before giving a conclusive classification."
+      : "",
+    profile.basicLotCoverage
+      ? "A basic lot-coverage percentage is only that numerical cap. Do not call the calculated area an entitled or permitted footprint; state that independently applicable yard, open-area, or other bulk rules may be more restrictive."
+      : "",
+    profile.parkingGeography
+      ? "For parking geography, analyze the supplied Inner, Outer, and Greater Transit Zone paths separately and preserve any supplied special-parking-area or special-district alternative. General proximity to transit is not mapped status."
+      : "",
+    profile.missingExistingCondition
+      ? "The question expressly leaves an existing facility, building, or use condition unresolved. Name that dated existence/status fact separately from lot size, filing date, or other historical facts."
+      : "",
+    profile.mihHistoricalZoningLotException
+      ? "For the MIH small-development exception, satisfying the unit and residential-floor-area thresholds is not enough. Separately establish that the relevant zoning lot existed on the official MIH-area establishment date. Distinguish tax lots from the Zoning Resolution's zoning-lot definition, do not treat a later tax-lot combination or a current Appendix F map as proof of the historical zoning lot, and require official evidence of both the establishment date and the lot's historical configuration."
       : "",
     profile.categories.includes("amendment")
       ? "Distinguish current amendment metadata from the enacted text actually in force on a requested historical date; metadata alone cannot reconstruct historical text."
@@ -210,10 +259,27 @@ export function evaluateZoningResearchSafety({
     };
   }
   const narrative = answerText(answer);
+  const questionText = compactText(question);
+  const conclusion = compactText(answer?.conclusion);
   const citations = citedSourceIDs(answer);
   const citationSet = new Set(citations);
   const missingFacts = compactText(Array.isArray(answer?.missingFacts) ? answer.missingFacts.join(" ") : "");
+  const evidenceNeeded = compactText([
+    ...(Array.isArray(answer?.missingFacts) ? answer.missingFacts : []),
+    ...(Array.isArray(answer?.additionalEvidenceNeeded) ? answer.additionalEvidenceNeeded : [])
+  ].join(" "));
   const issues = [];
+  const countPredicate = questionText.match(/\bDoes\b[^?]*?\b(count(?:\s+as\s+[^?]+)?)\?$/i)?.[1];
+  if (
+    countPredicate &&
+    /^yes\b/i.test(conclusion) &&
+    new RegExp(`\\bdoes not ${countPredicate.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(narrative)
+  ) {
+    issues.push({
+      type: "zoning_answer_polarity_conflict",
+      detail: "The leading yes/no answer contradicts the answer's own stated result. Make the direct answer agree with the supported conclusion."
+    });
+  }
   if (categoricalProjectConclusion(narrative) && !citations.some((sourceID) => profile.zoningSourceIDs.includes(sourceID))) {
     issues.push({
       type: "zoning_unbound_conclusion",
@@ -281,6 +347,96 @@ export function evaluateZoningResearchSafety({
     });
   }
   if (
+    profile.basicLotCoverage &&
+    !/\b(?:yard|open[- ]area|other (?:bulk|zoning|applicable) (?:rule|requirement|provision))s?\b[^.]{0,180}\b(?:restrict|limit|control|more restrictive|independently appl)/i.test(narrative)
+  ) {
+    issues.push({
+      type: "zoning_basic_lot_coverage_boundary",
+      detail: "Treat the basic lot-coverage calculation as a numerical cap, not an entitled footprint, and preserve independently applicable yard, open-area, or other bulk constraints."
+    });
+  }
+  if (
+    profile.definitionBranchReview &&
+    !(
+      /\blot of record\b[^.]{0,180}\b(?:December\s+15,\s+1961|applicable subsequent amendment date|historical date)\b/i.test(narrative) ||
+      /\b(?:December\s+15,\s+1961|applicable subsequent amendment date|historical date)\b[^.]{0,180}\blot of record\b/i.test(narrative)
+    )
+  ) {
+    issues.push({
+      type: "zoning_definition_branch_omission",
+      detail: "The Zoning Lot definition has a separate historical lot-of-record branch. Address it independently from the historical single-ownership and current filing or declaration branches."
+    });
+  }
+  if (
+    profile.loweredYardClause &&
+    !/\b(?:lowered yard|yard (?:was|is|had been) lowered)\b[^.]{0,180}\b(?:unknown|not (?:provided|established|verified)|missing|unresolved|must be (?:confirmed|verified|established))\b/i.test(missingFacts)
+  ) {
+    issues.push({
+      type: "zoning_definition_lowered_yard_fact",
+      detail: "The supplied definition's post-December 5, 1990 lowered-yard condition is unresolved. Name that measurement fact in missingFacts before treating the classification as conclusive."
+    });
+  }
+  if (
+    profile.parkingGeography &&
+    /\b(?:special parking areas?|special district)\b/i.test(profile.sourceText || "") &&
+    !(
+      /\b(?:special parking areas?|special district)\b[^.]{0,180}\b(?:may|could|can)\b[^.]{0,100}\b(?:differ|apply|produce|supply|control|modify|change)\b/i.test(narrative) ||
+      /\b(?:different|separate|alternative)\b[^.]{0,120}\b(?:special parking areas?|special district)\b/i.test(narrative)
+    )
+  ) {
+    issues.push({
+      type: "zoning_parking_geography_omission",
+      detail: "Preserve the supplied special-parking-area or special-district path as a possible alternative to the ordinary transit-zone calculation."
+    });
+  }
+  if (
+    profile.missingExistingCondition &&
+    !/\b(?:existing|existed|existence)\b[^.]{0,120}\b(?:facility|building|use)\b|\b(?:facility|building|use)\b[^.]{0,120}\b(?:existing|existed|existence)\b/i.test(missingFacts)
+  ) {
+    issues.push({
+      type: "zoning_missing_existing_condition",
+      detail: "Name the unresolved dated existence/status of the facility, building, or use separately from the lot-area or filing-date facts."
+    });
+  }
+  if (profile.mihHistoricalZoningLotException) {
+    const categoricalException =
+      /\b(?:project|development|property|it)\b[^.]{0,100}\b(?:qualifies|is exempt|meets the exception)\b/i.test(narrative) ||
+      /\b(?:the )?exception (?:applies|is satisfied)\b/i.test(narrative);
+    const numericalOnlyBoundary =
+      /\b(?:numerical|unit|dwelling[- ]unit|floor[- ]area)\b[^.]{0,160}\b(?:not enough|not sufficient|does not (?:establish|prove)|alone (?:does not|cannot))\b/i.test(narrative) ||
+      /\b(?:not enough|not sufficient|does not (?:establish|prove)|alone (?:does not|cannot))\b[^.]{0,160}\b(?:numerical|unit|dwelling[- ]unit|floor[- ]area|threshold)\b/i.test(narrative);
+    if (categoricalException && !numericalOnlyBoundary) {
+      issues.push({
+        type: "zoning_mih_numerical_only_conclusion",
+        detail: "Do not grant the MIH small-development exception from the unit and floor-area thresholds alone; the historical zoning-lot element must also be established."
+      });
+    }
+    const historicalLotRequirement =
+      /\bzoning lot\b[^.]{0,220}\b(?:existed|existence)\b[^.]{0,160}\b(?:MIH|Mandatory Inclusionary Housing|area)\b[^.]{0,120}\b(?:establish|establishment|effective date)\b/i.test(narrative) ||
+      /\b(?:MIH|Mandatory Inclusionary Housing|area)\b[^.]{0,160}\b(?:establish|establishment|effective date)\b[^.]{0,220}\bzoning lot\b[^.]{0,100}\b(?:existed|existence)\b/i.test(narrative);
+    const taxLotDistinction =
+      /\btax lots?\b[^.]{0,180}\b(?:not (?:the )?same|may differ|does not (?:establish|prove)|not proof|distinct)\b[^.]{0,120}\bzoning lot\b/i.test(narrative) ||
+      /\bzoning lot\b[^.]{0,180}\b(?:not (?:the )?same|may differ|does not (?:necessarily )?(?:match|coincide)|distinct)\b[^.]{0,120}\btax lots?\b/i.test(narrative);
+    if (!historicalLotRequirement || !taxLotDistinction) {
+      issues.push({
+        type: "zoning_mih_historical_lot_requirement",
+        detail: "State the separate requirement that the zoning lot existed on the applicable MIH-area establishment date, and distinguish that zoning lot from current tax lots or a later tax-lot combination."
+      });
+    }
+    const officialEstablishmentDate =
+      /\b(?:official|verify|verified|record|historical)\b[^.]{0,180}\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,120}\b(?:establishment|effective) date\b/i.test(evidenceNeeded) ||
+      /\b(?:MIH|Mandatory Inclusionary Housing)\b[^.]{0,180}\b(?:establishment|effective) date\b[^.]{0,120}\b(?:official|verify|verified|record|historical)\b/i.test(evidenceNeeded);
+    const officialHistoricalLot =
+      /\b(?:official|recorded|historical)\b[^.]{0,180}\bzoning[- ]lot\b[^.]{0,160}\b(?:record|configuration|declaration|legal description|ownership|evidence)\b/i.test(evidenceNeeded) ||
+      /\bzoning[- ]lot\b[^.]{0,180}\b(?:record|configuration|declaration|legal description|ownership|evidence)\b[^.]{0,120}\b(?:official|recorded|historical|verify)\b/i.test(evidenceNeeded);
+    if (!officialEstablishmentDate || !officialHistoricalLot) {
+      issues.push({
+        type: "zoning_mih_historical_records",
+        detail: "Identify official evidence for the applicable MIH establishment date and separate official historical zoning-lot evidence, such as a relevant recorded declaration, legal description, or equivalent ownership/configuration record."
+      });
+    }
+  }
+  if (
     profile.categories.includes("amendment") &&
     /\b(?:text in force|reconstruct|particular date|historical)\b/i.test(compactText(question)) &&
     !/\b(?:cannot|does not|not enough|insufficient|must|need to|requires?)\b[^.]{0,180}\b(?:historical|archived|enacted text|text in force|effective date|amendment)\b/i.test(narrative)
@@ -319,6 +475,31 @@ export function evaluateZoningResearchSafety({
     categories: profile.categories,
     zoningSourceIDs: profile.zoningSourceIDs,
     issues
+  };
+}
+
+export function applyZoningResearchDeterministicRepairs(answer, evidence = [], { question = "" } = {}) {
+  if (!answer || typeof answer !== "object") return answer;
+  const profile = riskProfile({ question, evidence });
+  const narrative = answerText(answer);
+  const historicalTextVerification =
+    /\b(?:verify|review|retrieve|obtain|need|require|must)\b[^.]{0,220}\b(?:historical|archived|prior|pre[- ](?:amendment|city of yes|december))\b[^.]{0,120}\b(?:zoning|text|rules?|provisions?)\b/i.test(narrative) ||
+    /\b(?:historical|archived|prior|pre[- ](?:amendment|city of yes|december))\b[^.]{0,120}\b(?:zoning|text|rules?|provisions?)\b[^.]{0,180}\b(?:verify|review|retrieve|obtain|need|required?|must)\b/i.test(narrative);
+  if (!profile.categories.includes("historical-substantive-text") || historicalTextVerification) return answer;
+  const limitation = "The current transition provision may preserve prior rules but does not reproduce their substantive requirements.";
+  const needed = "Verify the dated enacted or official archived pre-amendment Zoning text to determine the substantive rules preserved for the project.";
+  const appendParagraph = (value, paragraph) => {
+    const text = String(value || "").trim();
+    return text ? `${text}\n\n${paragraph}` : paragraph;
+  };
+  return {
+    ...answer,
+    answerText: appendParagraph(answer.answerText, `${limitation} ${needed}`),
+    ...(typeof answer.explanation === "string"
+      ? { explanation: appendParagraph(answer.explanation, `${limitation} ${needed}`) }
+      : {}),
+    evidenceLimitations: unique([...(answer.evidenceLimitations || []), limitation]),
+    additionalEvidenceNeeded: unique([...(answer.additionalEvidenceNeeded || []), needed])
   };
 }
 

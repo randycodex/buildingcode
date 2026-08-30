@@ -122,6 +122,13 @@ export function validateEvaluationDataset(dataset) {
       assert(testCase.reviewer && testCase.reviewedAt, `${testCase.id} must identify the reviewer and review date for status ${testCase.status}.`);
     }
     assert(Array.isArray(testCase.selectedEvidence) && testCase.selectedEvidence.length > 0, `${testCase.id} needs selected evidence.`);
+    if (testCase.answerKeyEvidenceMismatches !== undefined) {
+      nonemptyStrings(
+        testCase.answerKeyEvidenceMismatches,
+        `${testCase.id} has invalid answer-key/evidence mismatch records.`,
+        { allowEmpty: true }
+      );
+    }
     nonemptyStrings(testCase.requiredConcepts, `${testCase.id} needs required concepts.`);
     nonemptyStrings(testCase.missingFacts, `${testCase.id} needs missing facts.`, { allowEmpty: true });
     nonemptyStrings(testCase.forbiddenClaims, `${testCase.id} needs forbidden claims.`);
@@ -165,6 +172,12 @@ export function validateEvaluationDataset(dataset) {
       references.add(source.reference);
       assert(source.reference === `${source.codePrefix} ${source.sectionNumber}`, `${testCase.id} has an inconsistent source reference.`);
       nonemptyStrings(source.exactPassages, `${source.reference} needs exact selected passages.`);
+      if (source.reviewedStructuredPassages !== undefined) {
+        nonemptyStrings(
+          source.reviewedStructuredPassages,
+          `${source.reference} has invalid reviewed structured passages.`
+        );
+      }
     }
     for (const reference of testCase.requiredCitations) {
       assert(references.has(reference), `${testCase.id} requires citation ${reference}, but it is not selected evidence.`);

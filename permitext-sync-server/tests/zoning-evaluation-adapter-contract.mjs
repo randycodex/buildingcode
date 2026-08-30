@@ -93,6 +93,13 @@ assert(
   standardHeightCase.selectedEvidence.every((source) => source.richSourceIDs?.length === 1),
   "Reviewed table cases must carry their exact structured official grids into the diagnostic."
 );
+assert(
+  standardHeightCase.selectedEvidence.every((source) =>
+    source.reviewedStructuredPassages?.length === source.richSourceIDs.length &&
+      source.reviewedStructuredPassages.every((passage) => passage.trim())
+  ),
+  "Reviewed table cases must expose their canonical structured text to independent scoring."
+);
 
 const historyCase = adapted.cases.find((testCase) => testCase.id === "zr-amendment-history");
 const historyEvidence = historyCase.selectedEvidence[0];
@@ -103,6 +110,7 @@ const historySource = structuredRichSources(historySection).find((source) =>
 );
 assert(historySource, "The selected amendment-history source must resolve from current official metadata.");
 assert.equal(historySource.kind, "amendment-history");
+assert.deepEqual(historyEvidence.reviewedStructuredPassages, [historySource.text]);
 assert.match(historySource.text, /N240290ZRY/);
 assert.match(historySource.text, /N240011ZRY/);
 assert.match(historySource.text, /N240010ZRY/);
@@ -134,5 +142,29 @@ const historySnapshot = immutableEvidenceSnapshot({
   }
 });
 assert.equal(historySnapshot.structuredSource.rowCount, historySource.rowCount);
+
+const successorDataset = JSON.parse(await readFile(
+  new URL("../evals/zoning-cases-expanded-batch-1-successor.json", import.meta.url),
+  "utf8"
+));
+const successorAdapted = await adaptZoningEvaluationDataset({
+  zoningDataset: successorDataset,
+  automaticScoring: {},
+  sectionReader: zoningSection,
+  sectionSummaryReader: zoningSectionSummary
+});
+const deepThroughLotCase = successorAdapted.cases.find((testCase) =>
+  testCase.id === "zr-candidate-b1-deep-through-lot-vertical-yard"
+);
+assert.deepEqual(
+  deepThroughLotCase.answerKeyEvidenceMismatches,
+  ["24-382"],
+  "The current successor must remain fail-closed while its answer key names unselected ZR 24-382."
+);
+assert(
+  successorAdapted.cases.filter((testCase) => testCase.id !== deepThroughLotCase.id)
+    .every((testCase) => testCase.answerKeyEvidenceMismatches.length === 0),
+  "No other successor answer key may name an unselected Zoning provision."
+);
 
 console.log("zoning evaluation adapter contract passed");
