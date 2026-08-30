@@ -63,15 +63,23 @@ const paidContinuation = publicBetaReleaseReadiness({
 assert.equal(paidContinuation.ready, false);
 assert(paidContinuation.openGateIDs.includes("additional-research-turns-disabled"));
 
-const defaultRecord = JSON.parse(await readFile(
-  new URL("../../docs/BETA1_PUBLIC_RELEASE_GATE_RECORD.json", import.meta.url),
-  "utf8"
-));
+const [defaultRecord, acceptanceRecord] = await Promise.all([
+  readFile(new URL("../../docs/BETA1_PUBLIC_RELEASE_GATE_RECORD.json", import.meta.url), "utf8")
+    .then(JSON.parse),
+  readFile(new URL("../../docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md", import.meta.url), "utf8")
+]);
 const current = publicBetaReleaseReadiness({ record: defaultRecord });
 assert.equal(current.ready, false, "The prepared but unexecuted release record must fail closed.");
 for (const definition of publicBetaReleaseGateDefinitions) {
   assert(current.openGateIDs.includes(definition.id), `${definition.id} was not retained as open.`);
+  assert.match(defaultRecord.gates[definition.key].reference, /^docs\/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD\.md#/);
+  assert(acceptanceRecord.includes(`Gate ID: \`${definition.id}\``));
 }
+assert.match(acceptanceRecord, /Overall status: \*\*OPEN — not authorized for public paid Beta\*\*/);
+assert.match(acceptanceRecord, /Never paste or commit passwords, verification codes, session\/admin tokens/);
+assert.match(acceptanceRecord, /does not authorize a merge, push, deployment, charge, refund, account deletion/);
+assert.match(acceptanceRecord, /Do not spend or lower the team budget merely to force this gate/);
+assert.match(acceptanceRecord, /Public paid Beta authorized: \*\*no\*\*/);
 
 const master = await readFile(
   new URL("../../docs/PERMITEXT_BETA1_MASTER_PLAN.md", import.meta.url),

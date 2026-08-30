@@ -5,55 +5,55 @@
     "productionDeployment": {
       "complete": false,
       "observedAt": null,
-      "reference": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#production-deployment",
       "gitCommit": null
     },
     "controlledProductionBilling": {
       "complete": false,
       "observedAt": null,
-      "reference": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#controlled-production-billing",
       "gitCommit": null
     },
     "productionAuthentication": {
       "complete": false,
       "observedAt": null,
-      "reference": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#production-authentication-and-account-lifecycle",
       "gitCommit": null
     },
     "policyPublication": {
       "complete": false,
       "observedAt": null,
-      "reference": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#exact-policy-publication",
       "gitCommit": null
     },
     "newYorkTax": {
       "complete": false,
       "observedAt": null,
-      "reference": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#new-york-certificate-and-stripe-tax",
       "gitCommit": null
     },
     "monitoringDelivery": {
       "complete": false,
       "observedAt": null,
-      "reference": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#monitoring-delivery",
       "gitCommit": null
     },
     "spendControl": {
       "complete": false,
       "observedAt": null,
-      "reference": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#spend-notification-and-hard-stop",
       "gitCommit": null
     },
     "productionClients": {
       "complete": false,
       "observedAt": null,
-      "reference": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#production-web-testflight-and-physical-iphone",
       "gitCommit": null
     },
     "ownerGoNoGo": {
       "complete": false,
       "observedAt": null,
-      "reference": null,
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#owner-gono-go",
       "gitCommit": null
     }
   }

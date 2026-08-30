@@ -23,7 +23,7 @@ Current development branch: `codex/research-commercialization`
 
 ## Status dashboard
 
-Checklist snapshot: **70 completed, 23 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
+Checklist snapshot: **71 completed, 23 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -159,6 +159,7 @@ Operations runbook: [BETA1_OPERATIONS_RUNBOOK.md](./BETA1_OPERATIONS_RUNBOOK.md)
 ## 7. Merge, deploy, and release sequence
 
 - [x] Add a fail-closed, secret-free post-deployment public-Beta activation audit that binds every manual evidence record to the exact selected Git commit and keeps additional-turn sales disabled.
+- [x] Prepare the corresponding redacted [operator acceptance record](./BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md) with every launch gate explicitly open and its destructive, paid, privacy, and evidence boundaries stated.
 
 This sequence begins only after the remaining pre-release gates are acceptable and the owner separately authorizes release work.
 

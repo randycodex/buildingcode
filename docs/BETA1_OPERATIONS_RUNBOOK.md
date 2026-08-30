@@ -92,7 +92,7 @@ Use [BETA1_SPEND_CONTROL_ACCEPTANCE_RECORD.md](./BETA1_SPEND_CONTROL_ACCEPTANCE_
 
 For each production release, record the branch, Git commit, Vercel deployment URL, release ID from `/release`, iOS version/build when applicable, operator, and timestamp.
 
-Deployment readiness and public-Beta activation are separate. After the final deployment and manual evidence exercises, update only the redacted references in `docs/BETA1_PUBLIC_RELEASE_GATE_RECORD.json`, then run:
+Deployment readiness and public-Beta activation are separate. Capture every manual result in [BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md](./BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md). After the final deployment and manual evidence exercises, update the matching status, timestamp, evidence reference, and exact Git commit in `docs/BETA1_PUBLIC_RELEASE_GATE_RECORD.json`, then run:
 
 ```sh
 cd permitext-sync-server
