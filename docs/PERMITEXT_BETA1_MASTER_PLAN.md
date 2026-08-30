@@ -23,7 +23,7 @@ Current development branch: `codex/research-commercialization`
 
 ## Status dashboard
 
-Checklist snapshot: **66 completed, 23 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
+Checklist snapshot: **67 completed, 23 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -122,6 +122,7 @@ Detailed configuration: [BETA1_COMMERCIAL_CONFIGURATION.md](./BETA1_COMMERCIAL_C
 - [x] Wire explicit web/iOS purchase consent to the exact displayed policy versions and require current acceptance at web checkout; fail closed while approved current versions are unconfigured.
 - [x] Complete an official-source owner legal self-review after the owner elected not to retain counsel; record sole-proprietor exposure and the residual no-attorney risk without claiming legal approval.
 - [x] Complete final owner approval of the exact customer documents and record dormant identifiers `terms-2026-08-28`, `privacy-2026-08-28`, and `subscriptions-2026-08-28` with their approved-file hashes.
+- [x] Retain a machine-readable [approved-policy route and artifact-integrity guard](./PERMITEXT_POLICY_ROUTE_READINESS_EVIDENCE_2026-08-29.md) so an edited file cannot silently reuse an approved identifier; all three stable local routes and exact hashes pass.
 - [x] Record explicit owner acceptance of all documented residual Beta risks without treating that acceptance as legal approval or release authorization.
 - [ ] Publish stable owner-approved URLs and ensure web/iOS purchase screens match them.
 - [ ] Configure and activate the owner-approved current policy versions after the final documents and stable URLs are approved.

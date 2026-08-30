@@ -318,6 +318,8 @@ Web and iOS purchase entry points now require an explicit consent choice tied to
 
 This is technical readiness, not policy activation. The purchase flow fails closed while owner-approved current versions are unconfigured. Stable public URLs, production environment configuration, deployment, and live purchase verification remain open; no price, deployment, or paid-provider behavior changed in this step.
 
+The exact approved artifact hashes have now been reverified against the current files. A permanent machine-readable manifest and contract bind each approved identifier to its source path, canonical public route, and SHA-256 digest, and the existing route/acceptance contracts pass. This completes local publication readiness while leaving the Production URLs and version variables untouched. Evidence: [PERMITEXT_POLICY_ROUTE_READINESS_EVIDENCE_2026-08-29.md](./PERMITEXT_POLICY_ROUTE_READINESS_EVIDENCE_2026-08-29.md).
+
 ### Owner legal self-review and web subscription acknowledgment
 
 The owner elected not to retain an attorney and to operate Permitext as a sole proprietor. An official-source self-review now records the recurring-payment, privacy, AI-provider, cancellation, refund, account-deletion, governing-law, dispute, and personal-liability boundaries without calling the result legal approval. The customer Terms and subscription/refund policy no longer describe themselves as drafts awaiting counsel, unresolved dispute text was replaced with a plain 30-day informal-notice and court-jurisdiction process, and present-tense additional-turn promises were removed while those sales remain disabled.
