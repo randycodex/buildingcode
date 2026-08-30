@@ -89,6 +89,8 @@ const [evidence, master, currentPlan, operations, readme] = await Promise.all([
 assert.match(evidence, /23 present/);
 assert.match(evidence, /5 missing/);
 assert.match(evidence, /55 Secret values cannot be pulled/);
+assert.match(evidence, /53 Production Secret values cannot be pulled/);
+assert.match(evidence, /is not a substitute for server-side or provider-console verification/);
 assert.match(evidence, /Key presence can be checked without secrets\. It cannot prove value correctness/);
 assert.match(evidence, /dbbb6ab40d40d1d3d947303aa45b01fbd9cebce3/);
 assert.match(master, /PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30\.md/);

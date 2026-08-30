@@ -37,9 +37,11 @@ Production metadata does contain the required groups for durable PostgreSQL, pri
 
 `vercel env pull` reported that 55 Secret values cannot be pulled from Production and wrote `[SENSITIVE]` placeholders. Running the value-level readiness verifier against those placeholders correctly returned not ready, but those placeholder failures must not be misrepresented as evidence that the corresponding live Production values are invalid.
 
+`vercel env run -e production` was also tested as a possible protected local execution path. It reported that 53 Production Secret values cannot be pulled, loaded only the pre-existing ignored local `.env.local`, and therefore could not supply the live values to the verifier. It made no provider change and did not modify the existing local file. This command is not a substitute for server-side or provider-console verification of Vercel Secret values.
+
 The exact value-level gate still requires one of these evidence paths immediately before deployment:
 
-- execute the verifier in a protected environment containing the real approved values without printing them; or
+- execute the verifier server-side or in another protected environment that actually contains the real approved values without printing them; or
 - compare each hidden value through the provider's protected configuration workflow, then retain only pass/fail and non-secret fingerprints.
 
 The value-level gate must confirm at least:
