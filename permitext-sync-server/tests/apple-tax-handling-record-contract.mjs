@@ -9,15 +9,17 @@ const [record, acceptance, master, commercial] = await Promise.all([
 ]);
 
 for (const requiredBoundary of [
-  /Status: \*\*Prepared; live tax-category verification and real financial evidence remain open\*\*/,
+  /Status: \*\*Live tax-category state verified read-only; owner classification and real financial evidence remain open\*\*/,
   /Stripe automatic tax applies only to a Stripe web Checkout/,
   /must not be applied to an App Store purchase, renewal, or refund/,
   /customer price includes applicable taxes Apple collects and remits/,
   /customer price minus applicable taxes and Apple's commission/,
-  /live app category and subscription override therefore were \*\*not observed and are not claimed\*\*/,
+  /Category: App Store software/,
+  /Match to parent app/,
+  /does not independently establish that the category is legally or tax-professionally correct/,
   /official App Store Connect OpenAPI specification/,
   /supported public API therefore cannot replace the dashboard observation/,
-  /Approve any proposed category change separately before it is saved/,
+  /Any proposed category change requires separate approval before it is saved/,
   /5% tax downside reserve/
 ]) {
   assert.match(record, requiredBoundary);

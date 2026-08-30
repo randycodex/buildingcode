@@ -115,7 +115,7 @@ Release-bound: **no**
 - Stripe automatic/manual tax decision and inclusive/exclusive behavior recorded:
 - Source guard confirmed: Production Checkout rejects an unconfigured tax mode, configured automatic mode requests Stripe automatic tax and a billing address, and live readiness verifies the resolved Price tax behavior:
 - Stripe Product tax code and active provider registration reviewed after the Certificate arrives:
-- Apple tax-handling boundary recorded separately: [BETA1_APPLE_TAX_HANDLING_RECORD.md](./BETA1_APPLE_TAX_HANDLING_RECORD.md). Stripe automatic tax is web-only; live Apple app/subscription category verification and first real financial-report evidence remain open.
+- Apple tax-handling boundary recorded separately: [BETA1_APPLE_TAX_HANDLING_RECORD.md](./BETA1_APPLE_TAX_HANDLING_RECORD.md). Stripe automatic tax is web-only. Read-only App Store Connect evidence shows parent category `App Store software` and subscription `Match to parent app`; owner classification confirmation and first real financial-report evidence remain open.
 - First sales-tax filing deadline and persistent reminder verified:
 - Redacted evidence and timestamp:
 
