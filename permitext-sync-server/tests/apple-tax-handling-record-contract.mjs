@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [record, acceptance, master, commercial] = await Promise.all([
+const [record, acceptance, master, commercial, economics, semanticReview] = await Promise.all([
   readFile(new URL("../../docs/BETA1_APPLE_TAX_HANDLING_RECORD.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/PERMITEXT_BETA1_MASTER_PLAN.md", import.meta.url), "utf8"),
-  readFile(new URL("../../docs/BETA1_COMMERCIAL_CONFIGURATION.md", import.meta.url), "utf8")
+  readFile(new URL("../../docs/BETA1_COMMERCIAL_CONFIGURATION.md", import.meta.url), "utf8"),
+  readFile(new URL("../../docs/PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md", import.meta.url), "utf8"),
+  readFile(new URL("../../docs/PERMITEXT_RESEARCH_COMMERCIALIZATION_SEMANTIC_REVIEW_2026-08-30.md", import.meta.url), "utf8")
 ]);
 
 for (const requiredBoundary of [
@@ -28,5 +30,10 @@ for (const requiredBoundary of [
 assert.match(acceptance, /BETA1_APPLE_TAX_HANDLING_RECORD\.md/);
 assert.match(master, /BETA1_APPLE_TAX_HANDLING_RECORD\.md/);
 assert.match(commercial, /BETA1_APPLE_TAX_HANDLING_RECORD\.md/);
+
+for (const synchronizedRecord of [acceptance, master, commercial, economics, semanticReview]) {
+  assert.match(synchronizedRecord, /App Store software/);
+  assert.match(synchronizedRecord, /Match to parent app/);
+}
 
 console.log("Permitext Apple tax-handling record contract passed.");

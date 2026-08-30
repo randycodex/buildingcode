@@ -35,7 +35,7 @@ Official sources:
 - Stripe automatic tax applies only to a Stripe web Checkout. It must not be applied to an App Store purchase, renewal, or refund.
 - Permitext's Apple server path verifies entitlement and processes Apple-signed lifecycle events; it does not create a second Stripe transaction or separately collect customer tax.
 - New York Certificate and Stripe Tax activation remain a web-sales gate. They do not by themselves prove the App Store category or Apple's transaction treatment.
-- The V6 iOS economics model keeps its 5% tax downside reserve until the category is verified and a real Apple financial report provides actual proceeds and tax evidence. The current $17.86 p90 iOS cost and $2.14 contribution remain planning figures, not a guaranteed payout.
+- The V6 iOS economics model keeps its 5% tax downside reserve until the owner confirms the observed category and a real Apple financial report provides actual proceeds and tax evidence. The current $17.86 p90 iOS cost and $2.14 contribution remain planning figures, not a guaranteed payout.
 
 ## August 30 read-only provider observations
 
