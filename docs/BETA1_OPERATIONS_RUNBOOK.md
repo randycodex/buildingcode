@@ -72,6 +72,7 @@ Exit `0` means the parsed window contained a health request and no covered actio
 - The owner selected **$20 of on-demand infrastructure spend beyond the included Pro credit per billing cycle**. Web/email spend notifications and automatic Production pause at 100% are on; SMS remains off. Vercel evaluates the threshold periodically, so treat approximately $40 plus tax and a possible small metering overrun—not an exact $40 ceiling—as the initial total monthly hosting exposure.
 - The Vercel platform fee, seats, integrations, and add-ons are outside that on-demand spend amount. Record them separately in the monthly operating-cost review.
 - A hard pause limits cost but produces a public 503. The incident checklist must include a deliberate resume decision and confirmation that the root cause is contained before unpausing.
+- The August 29 [backend provider capacity audit](./PERMITEXT_BACKEND_PROVIDER_CAPACITY_AUDIT_2026-08-29.md) found no additional upgrade required today. Review Neon Free capacity/recovery and the OpenAI credit/spend controls before the first paid public customer; all plan, recharge, add-on, and limit increases still require explicit owner approval.
 
 ## Identity credential rotation
 
