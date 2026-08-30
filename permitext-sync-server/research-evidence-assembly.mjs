@@ -17,6 +17,7 @@ export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumTargetedDefinitions: 2,
   maximumCrossReferences: 6,
   maximumCharacters: 48_000,
+  maximumSupplementalCharacters: 48_000,
   maximumCharactersPerSource: 12_000
 });
 
@@ -128,6 +129,11 @@ function appliedLimits(value = {}) {
     maximumCharacters: positiveInteger(
       value.maximumCharacters,
       researchEvidenceAssemblyLimits.maximumCharacters,
+      researchEvidenceAssemblyLimits.maximumCharacters
+    ),
+    maximumSupplementalCharacters: positiveInteger(
+      value.maximumSupplementalCharacters,
+      researchEvidenceAssemblyLimits.maximumSupplementalCharacters,
       researchEvidenceAssemblyLimits.maximumCharacters
     ),
     maximumCharactersPerSource: positiveInteger(
@@ -815,6 +821,9 @@ export async function assembleResearchEvidence({
         }
       });
     }
+    if (record.userSelectedText && record.pinnedSelectionExact === undefined) {
+      record.pinnedSelectionExact = compactText(record.text) === record.userSelectedText;
+    }
     if (Array.isArray(entry.pinned.visualSources) && entry.pinned.visualSources.length) {
       record.visualSources = structuredClone(entry.pinned.visualSources);
     }
@@ -830,12 +839,26 @@ export async function assembleResearchEvidence({
     }
   }
 
+  const pinnedCharacterCount = characterCount;
+  const pinnedSelectionExactCount = sources.filter((source) =>
+    source.origin === sourceOrigins.pinned && source.pinnedSelectionExact === true
+  ).length;
+  const pinnedSelectionTruncatedCount = sources.filter((source) =>
+    source.origin === sourceOrigins.pinned && source.pinnedSelectionExact === false
+  ).length;
+  const structuredPinnedCount = sources.filter((source) =>
+    source.origin === sourceOrigins.pinned && source.richSourceID
+  ).length;
+  const supplementalCharacterCeiling = pinnedEvidence.length
+    ? Math.min(limits.maximumCharacters, pinnedCharacterCount + limits.maximumSupplementalCharacters)
+    : limits.maximumCharacters;
+
   let discoveredCount = 0;
   for (const [index, candidate] of candidates.entries()) {
     if (discoveredCount >= limits.maximumDiscovered) break;
     const identity = sectionIdentity(candidate);
     if (!identity || includedSectionIdentities.has(identity)) continue;
-    const remainingCharacters = limits.maximumCharacters - characterCount;
+    const remainingCharacters = supplementalCharacterCeiling - characterCount;
     if (remainingCharacters < 1) break;
     let resolved;
     try {
@@ -908,7 +931,7 @@ export async function assembleResearchEvidence({
     if (!isDefinitionCandidate(candidate)) continue;
     const candidateIdentity = sectionIdentity(candidate);
     if (!candidateIdentity || includedSectionIdentities.has(candidateIdentity)) continue;
-    const remainingCharacters = limits.maximumCharacters - characterCount;
+    const remainingCharacters = supplementalCharacterCeiling - characterCount;
     if (remainingCharacters < 1) break;
     let resolved;
     try {
@@ -1001,7 +1024,7 @@ export async function assembleResearchEvidence({
   let crossReferenceCount = 0;
   for (const [index, reference] of crossReferenceQueue.entries()) {
     if (crossReferenceCount >= limits.maximumCrossReferences) break;
-    const remainingCharacters = limits.maximumCharacters - characterCount;
+    const remainingCharacters = supplementalCharacterCeiling - characterCount;
     if (remainingCharacters < 1) break;
     let resolved;
     try {
@@ -1131,6 +1154,12 @@ export async function assembleResearchEvidence({
     sources,
     usage: {
       pinnedCount: pinnedEvidence.length,
+      pinnedCharacterCount,
+      pinnedSelectionExactCount,
+      pinnedSelectionTruncatedCount,
+      structuredPinnedCount,
+      supplementalCharacterCeiling,
+      supplementalCharacterCount: Math.max(0, characterCount - pinnedCharacterCount),
       candidateCount: candidates.length,
       discoveredCount,
       targetedDefinitionCount,

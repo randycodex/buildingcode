@@ -50,7 +50,7 @@ The all-Zoning iOS p90 scenario is negative under the current planning reserves.
 
 The permanent no-cost command `npm run audit:zoning-evidence-cost` measures the retained expanded result without a provider call. Across 28 completed cases, owner-reviewed exact passages averaged 6,262 characters while the final assembled evidence packages averaged 42,033 characters. Eleven cases reached at least 47,000 of the 48,000-character ceiling, and 17 of 28 answers required a verifier-driven revision.
 
-This identifies supplemental discovery, canonical context, cross-references, and structured sources as a measured cost-reduction target. It does not authorize lowering the evidence ceiling. Any prototype must preserve every exact pin, reviewed structured source, controlling discovered provision, and no-cost recall contract before another paid run.
+This identifies supplemental discovery, canonical context, cross-references, and structured sources as a measured cost-reduction target. The subsequent no-cost prototype preserved all 87 exact selected sources and eight reviewed structured sources across all 30 cases. Its retained 24,000-character supplemental candidate averaged 34,821 assembled characters and kept 31 cross-references. It is not enabled and does not authorize lowering the evidence ceiling. Evidence: [PERMITEXT_ZONING_EVIDENCE_BUDGET_PROTOTYPE_2026-08-30.md](./PERMITEXT_ZONING_EVIDENCE_BUDGET_PROTOTYPE_2026-08-30.md).
 
 ## Failure classification
 
@@ -80,4 +80,4 @@ The remaining failed answers identify useful engineering targets. They include o
 - The $20 price and 100-turn allowance remain unchanged.
 - No second paid run is authorized.
 - No merge, push, deployment, Production configuration, or provider-plan change is authorized by this result.
-- Next: complete owner review of the two invalid answer keys, prototype a safe supplemental-evidence budget under no-cost recall contracts, then decide whether a newly capped clean semantic run is justified.
+- Next: complete owner review of the two invalid answer keys, pass the 24,000-character supplemental candidate through the full no-cost gate, then decide whether a newly capped clean semantic run is justified.

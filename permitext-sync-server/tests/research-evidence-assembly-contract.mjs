@@ -468,6 +468,7 @@ assert.equal(researchEvidenceAssemblyLimits.maximumCandidates, 12);
 assert.equal(researchEvidenceAssemblyLimits.maximumDiscovered, 10);
 assert.equal(researchEvidenceAssemblyLimits.maximumCrossReferences, 6);
 assert.equal(researchEvidenceAssemblyLimits.maximumCharacters, 48_000);
+assert.equal(researchEvidenceAssemblyLimits.maximumSupplementalCharacters, 48_000);
 assert.deepEqual(researchPinnedEvidenceAssemblyLimits, {
   maximumDiscovered: 4,
   maximumTargetedDefinitions: 1,
@@ -488,6 +489,37 @@ const defaultPinnedBudget = await assembleResearchEvidence({
 assert.equal(defaultPinnedBudget.limits.maximumDiscovered, 4);
 assert.equal(defaultPinnedBudget.limits.maximumTargetedDefinitions, 1);
 assert.equal(defaultPinnedBudget.limits.maximumCrossReferences, 3);
+assert.equal(defaultPinnedBudget.limits.maximumSupplementalCharacters, 48_000);
+assert.equal(defaultPinnedBudget.usage.pinnedSelectionExactCount, 1);
+assert.equal(defaultPinnedBudget.usage.pinnedSelectionTruncatedCount, 0);
+
+const supplementalBudgetPrototype = await assembleResearchEvidence({
+  question: "What else applies to the selected passage?",
+  pinnedEvidence: [{
+    id: "supplemental-budget-pin",
+    sectionID: "pinned",
+    codePrefix: "BC",
+    sectionNumber: "1019.3",
+    selectedText: "Interior exit access stairways shall be enclosed."
+  }],
+  discover,
+  resolveSection,
+  limits: {
+    maximumDiscovered: 2,
+    maximumCrossReferences: 2,
+    maximumCharacters: 2_000,
+    maximumSupplementalCharacters: 80
+  }
+});
+assert.equal(supplementalBudgetPrototype.sources[0].pinnedSelectionExact, true);
+assert.equal(supplementalBudgetPrototype.usage.pinnedSelectionTruncatedCount, 0);
+assert.equal(supplementalBudgetPrototype.usage.supplementalCharacterCeiling,
+  supplementalBudgetPrototype.usage.pinnedCharacterCount + 80);
+assert(
+  supplementalBudgetPrototype.usage.characterCount <=
+    supplementalBudgetPrototype.usage.pinnedCharacterCount + 80,
+  "The supplemental prototype budget must constrain only evidence added after exact pinned evidence."
+);
 
 const pinnedDiscoveryDoesNotExpandCrossReferences = await assembleResearchEvidence({
   question: "What else applies to the selected passage?",

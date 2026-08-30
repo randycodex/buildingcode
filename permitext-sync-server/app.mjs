@@ -10888,6 +10888,16 @@ async function assembledResearchEvidenceForTurn({
     pinnedEvidence,
     originSurface
   });
+  const testSupplementalCharacterBudget = process.env.NODE_ENV === "test"
+    ? Number(process.env.PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS)
+    : Number.NaN;
+  const assemblyLimits = Number.isSafeInteger(testSupplementalCharacterBudget) &&
+    testSupplementalCharacterBudget > 0
+    ? {
+        ...researchEvidenceAssemblyLimits,
+        maximumSupplementalCharacters: testSupplementalCharacterBudget
+      }
+    : researchEvidenceAssemblyLimits;
   const assembled = await assembleResearchEvidence({
     question,
     previousMessages: messages,
@@ -10896,7 +10906,7 @@ async function assembledResearchEvidenceForTurn({
     strategy,
     topicContext,
     onStage,
-    limits: researchEvidenceAssemblyLimits,
+    limits: assemblyLimits,
     discover: ({ question: retrievalQuestion, limit, retrievalContext }) => discoverRelevantEvidence({
       question: retrievalQuestion,
       retrievalContext,
@@ -17148,6 +17158,11 @@ function researchMockMode() {
     process.env.PERMITEXT_TEST_RESEARCH_MOCK === "1";
 }
 
+function researchEvidencePackagePrototypeMode() {
+  return researchMockMode() &&
+    process.env.PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY === "1";
+}
+
 function nextMonthStart() {
   const now = new Date();
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
@@ -18707,8 +18722,10 @@ async function handleResearchConversationMessage(request, response) {
         throw error;
       }
     } else if (mockMode) {
+      const evidencePackagePrototype = researchEvidencePackagePrototypeMode();
       const deterministicPass =
-        requiredClaimCoverage.pass && answerQuality.pass && zoningSafety.pass && webAttribution.pass;
+        evidencePackagePrototype ||
+        (requiredClaimCoverage.pass && answerQuality.pass && zoningSafety.pass && webAttribution.pass);
       verificationAttempts = [{
         pass: deterministicPass,
         issues: deterministicPass
@@ -18720,7 +18737,9 @@ async function handleResearchConversationMessage(request, response) {
               webAttribution
             }),
         model: deterministicPass
-          ? "permitext-mock"
+          ? evidencePackagePrototype
+            ? "permitext-evidence-package-prototype"
+            : "permitext-mock"
           : "permitext-deterministic-answer-quality-gate"
       }];
       if (!deterministicPass) {

@@ -28,6 +28,7 @@ import {
   validatePaidResearchEvaluationEnvironment
 } from "../research-config.mjs";
 import { requestResearchProvider } from "../research-provider-client.mjs";
+import { rateLimitPolicies } from "../rate-limit.mjs";
 import { zoningSection, zoningSectionSummary } from "../zoning-content.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
@@ -43,6 +44,7 @@ const liveMode = process.argv.includes("--run-live");
 const selfTestMode = process.argv.includes("--self-test");
 const zoningExpandedMode = process.argv.includes("--zoning-expanded-batch-1");
 const zoningMode = process.argv.includes("--zoning") || zoningExpandedMode;
+const zoningEvidenceBudgetPrototypeMode = process.argv.includes("--zoning-evidence-budget-prototype");
 const execFileAsync = promisify(execFile);
 const judgePromptVersion =
   process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION || "20260826-established-facts-v3";
@@ -1640,6 +1642,7 @@ async function runMockConversationCases(baseURL, checkedCases, workflowFixtureCa
       ?.find((fact) => fact.key === "use")?.value === "a small architectural office",
     "The immutable answer did not preserve the active-topic fact snapshot."
   );
+  const evidenceBudgetResults = [];
   for (const testCase of checkedCases) {
     const conversationID = await createEvaluationConversation(baseURL, account, testCase);
     if (options.createOnly === true) continue;
@@ -1661,6 +1664,52 @@ async function runMockConversationCases(baseURL, checkedCases, workflowFixtureCa
         answer.sourceSummary?.enactedProvisionCount >= 1,
       `${testCase.id} did not preserve pinned evidence inside the verified automatic evidence package.`
     );
+    if (options.evidenceBudgetPrototype === true) {
+      assert(
+        answer.retrieval?.limits?.maximumSupplementalCharacters ===
+          options.maximumSupplementalCharacters,
+        `${testCase.id} did not apply the requested supplemental evidence prototype budget.`
+      );
+      assert(
+        answer.retrieval?.usage?.pinnedSelectionTruncatedCount === 0,
+        `${testCase.id} truncated an exact selected passage or reviewed structured source.`
+      );
+      assert(
+        answer.retrieval?.usage?.pinnedSelectionExactCount ===
+          answer.retrieval?.usage?.pinnedCount,
+        `${testCase.id} did not preserve every exact selected passage and reviewed structured source.`
+      );
+      assert(
+        answer.retrieval.usage.characterCount <= answer.retrieval.usage.supplementalCharacterCeiling,
+        `${testCase.id} exceeded the pin-preserving supplemental evidence ceiling.`
+      );
+      evidenceBudgetResults.push({
+        caseID: testCase.id,
+        characterCount: answer.retrieval.usage.characterCount,
+        pinnedCharacterCount: answer.retrieval.usage.pinnedCharacterCount,
+        supplementalCharacterCount: answer.retrieval.usage.supplementalCharacterCount,
+        pinnedCount: answer.retrieval.usage.pinnedCount,
+        discoveredCount: answer.retrieval.usage.discoveredCount,
+        crossReferenceCount: answer.retrieval.usage.crossReferenceCount,
+        structuredPinnedCount: answer.retrieval.usage.structuredPinnedCount
+      });
+    }
+  }
+  if (options.evidenceBudgetPrototype === true) {
+    const total = (key) => evidenceBudgetResults.reduce((sum, item) => sum + item[key], 0);
+    console.log(`Zoning evidence budget prototype ${JSON.stringify({
+      cases: evidenceBudgetResults.length,
+      maximumSupplementalCharacters: options.maximumSupplementalCharacters,
+      averageCharacterCount: Math.round(total("characterCount") / evidenceBudgetResults.length),
+      maximumCharacterCount: Math.max(...evidenceBudgetResults.map((item) => item.characterCount)),
+      averagePinnedCharacterCount: Math.round(total("pinnedCharacterCount") / evidenceBudgetResults.length),
+      averageSupplementalCharacterCount: Math.round(total("supplementalCharacterCount") / evidenceBudgetResults.length),
+      totalPinnedSources: total("pinnedCount"),
+      totalStructuredPinnedSources: total("structuredPinnedCount"),
+      totalDiscoveredSources: total("discoveredCount"),
+      totalCrossReferences: total("crossReferenceCount"),
+      exactPinnedSourcesPreserved: true
+    })}`);
   }
   console.log(options.createOnly === true
     ? `Verified legacy pinned-evidence compatibility, automatic enacted-corpus assembly, current Project context, and ${checkedCases.length}/${checkedCases.length} Zoning evidence sets through Permitext's conversation-creation flow without semantic mock scoring.`
@@ -3406,6 +3455,7 @@ async function main() {
     console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses its separately frozen 30-case successor. Neither is baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
+    console.log("No-cost Zoning prototype: --zoning-expanded-batch-1 --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error]");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
     console.log("Compare: --compare CURRENT_RUN_JSON --against BASELINE_RUN_OR_BASELINE_JSON");
@@ -3474,6 +3524,9 @@ async function main() {
   const requestedModel = argumentValue("--model");
   const requestedPromptVersion = argumentValue("--prompt-version");
   const repeat = positiveIntegerArgument("--repeat");
+  const maximumSupplementalCharacters = zoningEvidenceBudgetPrototypeMode
+    ? positiveIntegerArgument("--max-supplemental-characters", 18_000, 48_000)
+    : null;
   const stopOnError = process.argv.includes("--stop-on-error");
   if (requestedModel) process.env.PERMITEXT_RESEARCH_MODEL = requestedModel;
   if (requestedPromptVersion) {
@@ -3521,6 +3574,10 @@ async function main() {
     ? "diagnostic"
     : includeDrafts ? "diagnostic" : requestedCaseID ? "targeted" : filtered ? "filtered" : "full";
   const selectedDataset = { ...dataset, cases: selectedCases };
+  if (zoningEvidenceBudgetPrototypeMode) {
+    assert(zoningExpandedMode, "The evidence-budget prototype requires the frozen expanded Zoning cohort.");
+    assert(!liveMode, "The evidence-budget prototype is no-cost and cannot run with --run-live.");
+  }
   if (selfTestMode) {
     await runSelfTest(selectedDataset, datasetText);
     return;
@@ -3553,6 +3610,7 @@ async function main() {
 
   const tempDirectory = await mkdtemp(join(tmpdir(), "permitext-research-evals-"));
   const originalEnvironment = { ...process.env };
+  const originalResearchMessageRateLimit = rateLimitPolicies.get("research/conversations/message");
   let server;
   try {
     process.env.PERMITEXT_SYNC_DATA_PATH = join(tempDirectory, "sync-store.json");
@@ -3568,8 +3626,18 @@ async function main() {
     process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN = "research-eval-local-grant";
     process.env.NODE_ENV = liveMode ? (originalEnvironment.NODE_ENV || "") : "test";
     process.env.PERMITEXT_TEST_RESEARCH_MOCK = liveMode ? "" : "1";
+    if (zoningEvidenceBudgetPrototypeMode) {
+      process.env.PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS =
+        String(maximumSupplementalCharacters);
+      process.env.PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY = "1";
+      rateLimitPolicies.set("research/conversations/message", {
+        ...originalResearchMessageRateLimit,
+        limit: 100
+      });
+    }
     process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(
-      selectedCases.length * repeat + (liveMode ? 0 : 1)
+      selectedCases.length * repeat +
+        (liveMode ? 0 : zoningEvidenceBudgetPrototypeMode ? 20 : 1)
     );
     const { handleRequest } = await import(`../app.mjs?research-evals=${Date.now()}`);
     server = createServer(handleRequest);
@@ -3603,7 +3671,11 @@ async function main() {
         baseURL,
         checkedCases,
         approvedEvaluationCases(baseDataset).find((testCase) => testCase.id === "scissor-stair-two-exits"),
-        { createOnly: zoningMode }
+        {
+          createOnly: zoningMode && !zoningEvidenceBudgetPrototypeMode,
+          evidenceBudgetPrototype: zoningEvidenceBudgetPrototypeMode,
+          maximumSupplementalCharacters
+        }
       );
       console.log(zoningMode
         ? "All frozen Zoning cases are ready. Public Zoning Research remains disabled."
@@ -3615,6 +3687,9 @@ async function main() {
       if (!(key in originalEnvironment)) delete process.env[key];
     }
     Object.assign(process.env, originalEnvironment);
+    if (originalResearchMessageRateLimit) {
+      rateLimitPolicies.set("research/conversations/message", originalResearchMessageRateLimit);
+    }
     await rm(tempDirectory, { recursive: true, force: true });
   }
 }
