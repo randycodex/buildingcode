@@ -187,6 +187,72 @@
       "notes": "I accept this case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the correct provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
       "reviewer": "Permitext owner",
       "reviewedAt": "2026-08-17T21:17:41.000Z"
+    },
+    {
+      "id": "3fb4c1be-c51f-4d00-b052-3d9e87ec1e1b",
+      "kind": "zoning-case",
+      "caseID": "zr-special-district-demolition",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this revised case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the current official provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
+    },
+    {
+      "id": "e577d091-5f4b-4580-ab3a-09afc46915a7",
+      "kind": "zoning-case",
+      "caseID": "zr-amendment-history",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this revised case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the current official provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
+    },
+    {
+      "id": "12dc86cb-3dbe-4852-a79e-d37d2af3d987",
+      "kind": "zoning-case",
+      "caseID": "zr-missing-location-facts",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this revised case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the current official provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
+    },
+    {
+      "id": "7b503fe6-1e08-4c77-b6fa-9b8938f14995",
+      "kind": "zoning-case",
+      "caseID": "zr-r7a-standard-far",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this revised case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the current official provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
+    },
+    {
+      "id": "9d7f56e5-d9b9-49ec-a6ca-375f6e54cd3e",
+      "kind": "zoning-case",
+      "caseID": "zr-r7a-affordable-far-qualification",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this revised case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the current official provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
+    },
+    {
+      "id": "5fd57016-cfba-4158-86f9-e176e3773c3f",
+      "kind": "zoning-case",
+      "caseID": "zr-inner-transit-zone-new-unit-parking",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "I accept this revised case as a high-confidence, human-quality answer-key candidate for testing Terra because it is anchored to the current official provisions, the expected reasoning follows from the selected evidence, and the material exceptions and limitations are explicitly preserved. Scope: Terra evaluation testing only; not professional zoning sign-off or authorization to enable public Zoning Research.",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
     }
   ]
 }

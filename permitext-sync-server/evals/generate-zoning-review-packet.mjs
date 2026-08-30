@@ -29,19 +29,21 @@ const output = [
   "",
   `Content edition: ${dataset.codeVersion}`,
   "",
-  "Status: PARTIALLY APPROVED FOR TERRA ANSWER-KEY TESTING",
+  `Status: ${draftCaseCount === 0 && rejectedCaseCount === 0
+    ? "APPROVED FOR TERRA ANSWER-KEY TESTING"
+    : "PARTIALLY APPROVED FOR TERRA ANSWER-KEY TESTING"}`,
   "",
   `Case readiness: ${dataset.cases.length - blockedCaseCount} evidence-ready · ${blockedCaseCount} blocked by known content gaps`,
   "",
   `Review status: ${approvedCaseCount} approved for Terra answer-key testing · ${draftCaseCount} draft/revised and awaiting review · ${rejectedCaseCount} rejected`,
   "",
   "Approval in this packet is limited to Terra answer-key testing. It is not professional zoning sign-off, " +
-    "does not enable Zoning in public AI Research, and does not authorize paid evaluation. Draft cases still " +
-    "require explicit human approval after their revisions are reviewed.",
+    "does not enable Zoning in public AI Research, and does not authorize paid evaluation. Any future new or " +
+    "revised case requires explicit human approval after review.",
   "",
   "## Reviewer checklist",
   "",
-  "For each draft or revised case awaiting approval:",
+  "For each future draft or revised case awaiting approval:",
   "",
   "1. Confirm that the selected evidence is the correct official authority for the question.",
   "2. Confirm that every required concept is supportable from the selected evidence.",

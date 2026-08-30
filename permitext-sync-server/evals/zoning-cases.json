@@ -87,7 +87,7 @@
     {
       "id": "zr-special-district-demolition",
       "category": "special-purpose-district",
-      "status": "draft",
+      "status": "approved",
       "question": "Within the Atlantic Avenue Subdistrict of the Special Downtown Brooklyn District, what two prerequisites does Section 101-75 state before a demolition permit may be issued, and what unsafe-building exception does it recognize?",
       "selectedEvidenceSectionIDs": [20020818, 20020889],
       "evidenceReviewTermsBySection": {
@@ -111,13 +111,13 @@
       ],
       "revisionNotes": "Re-reviewed Sections 101-04 and 101-75 against the current official NYC Planning pages; named the Atlantic Avenue Subdistrict in the question and made both prerequisites, the source's exact letter-trust wording, and the narrow unsafe-building exception explicit.",
       "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
     },
     {
       "id": "zr-amendment-history",
       "category": "amendment-history",
-      "status": "draft",
+      "status": "approved",
       "question": "What does NYC Planning's official amendment-history metadata currently identify for Section 42-00, and what must a professional still verify before reconstructing the text in force on a particular date?",
       "selectedEvidenceSectionIDs": [20017271],
       "evidenceReviewAmendmentEvents": [
@@ -149,13 +149,13 @@
       ],
       "revisionNotes": "Rechecked the live NYC Planning amendment-history endpoint; retained the three explicit current events and revised the question and rubric to require official CPC-report and archived-text verification rather than treating metadata as a historical-text reconstruction.",
       "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
     },
     {
       "id": "zr-missing-location-facts",
       "category": "explicit-uncertainty",
-      "status": "draft",
+      "status": "approved",
       "question": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
       "selectedEvidenceSectionIDs": [20022472, 20022473, 20022474, 20019206, 20021237],
       "evidenceReviewTermsBySection": {
@@ -189,8 +189,8 @@
       ],
       "revisionNotes": "Re-reviewed Sections 42-191 through 42-193, 74-192, and Appendix J against the current official pages; added lot-area and December 19, 2017 facility facts, distinguished Subarea 1 conditions from the Subarea 2 special-permit path, and kept the parcel conclusion fail-closed without the governing map.",
       "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
     },
     {
       "id": "zr-mapped-district-missing",
@@ -214,7 +214,7 @@
     {
       "id": "zr-r7a-standard-far",
       "category": "arithmetic",
-      "status": "draft",
+      "status": "approved",
       "question": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
       "selectedEvidenceSectionIDs": [20018017, 20018523],
       "evidenceReviewTermsBySection": {
@@ -236,13 +236,13 @@
       ],
       "revisionNotes": "Rechecked the current official Section 23-22 R7A row and Section 12-10 FAR definition; retained the 4.00 calculation and added an explicit boundary against turning a basic-table arithmetic result into complete zoning compliance.",
       "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
     },
     {
       "id": "zr-r7a-affordable-far-qualification",
       "category": "conditional-qualification",
-      "status": "draft",
+      "status": "approved",
       "question": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area and is merely described as containing qualifying affordable housing. What does the Section 23-22 table establish numerically, and what qualification and affordable-floor-area facts are still needed before concluding that the higher FAR is available?",
       "selectedEvidenceSectionIDs": [20018017, 20022699, 20022711, 20018523],
       "evidenceReviewTermsBySection": {
@@ -273,8 +273,8 @@
       ],
       "revisionNotes": "Re-reviewed current Sections 23-22, 12-10, 27-111, and 27-16; reframed the question so 5.01 is only a numerical ceiling and added the UAP rule that any FAR increase above the standard-residence limit is limited by the amount of affordable housing actually provided.",
       "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
     },
     {
       "id": "zr-r7a-standard-height",
@@ -409,7 +409,7 @@
     {
       "id": "zr-inner-transit-zone-new-unit-parking",
       "category": "effective-date",
-      "status": "draft",
+      "status": "approved",
       "question": "An 80-unit R7A residential development is within the Inner Transit Zone; every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333. How many accessory off-street residential parking spaces does Section 25-211 require for those units?",
       "selectedEvidenceSectionIDs": [20018444, 20017540, 20017541],
       "evidenceReviewTermsBySection": {
@@ -438,8 +438,8 @@
       ],
       "revisionNotes": "Re-reviewed current Sections 11-333, 25-20, and 25-211; replaced the ambiguous word created with the section's temporary/final certificate-of-occupancy test and tied the transition assumption to the actual Section 11-333 filing-and-approval path.",
       "revisionAppliedAt": "2026-08-30T14:48:22.000Z",
-      "reviewer": null,
-      "reviewedAt": null
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-08-30T15:26:45.000Z"
     },
     {
       "id": "zr-new-divided-zoning-lot",

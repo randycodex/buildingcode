@@ -19,7 +19,7 @@ Zoning Resolution Research is now a planned Beta 1 capability. This changes the 
   - `N 250254 ZRQ`, 50-20 108 Street, Queens CD 4, Map 3, MIH area 4 (Option 1).
 - A full staged import retained 4,068 stable sections and 313 structured tables, increased map references from 209 to 211, amendment events from 13,141 to 13,152, and local assets from 433 to 435.
 - The exact substantive text change is in Appendix F/Queens; no selected operative provision for the six revised cases changed. All six were nevertheless re-reviewed and revised from the current live official sections and amendment-history endpoint.
-- The local evaluation set contains 21 evidence-ready cases: 15 are owner-approved for Terra answer-key testing only and six externally revised cases remain draft pending explicit owner review.
+- The local evaluation set contains 21 evidence-ready cases, all owner-approved for Terra answer-key testing only. The six externally revised cases received explicit owner approval on August 30 after current-source review.
 - The current contract intentionally has `researchEligibility: false`; no public Research path is enabled.
 
 Official source: [NYC Zoning Resolution](https://zr.planning.nyc.gov/)
@@ -30,15 +30,15 @@ Official source: [NYC Zoning Resolution](https://zr.planning.nyc.gov/)
 2. **Diff review — complete** — the two official August 13 Appendix F adoption records, two new assets, stable identifiers, table grids, amendment-history additions, source hashes, and search-index effects were reviewed.
 3. **Corpus contracts — complete** — section completeness, stable identity, citation, table, map/asset, amendment-history, Reader, Search, prepared-content, and compressed native Reader checks pass against the refreshed corpus.
 4. **Evaluation refresh — complete** — selected evidence and the review packet were regenerated from the refreshed corpus after current official-source review. No draft case was promoted by automation.
-5. **Owner review** — obtain explicit disposition for the six draft/revised cases. Automated preparation may recommend a disposition, but it may not record the owner's approval.
+5. **Owner review — complete** — the owner approved all six revised cases for Terra answer-key testing only on August 30. This is not professional zoning sign-off, paid-test authorization, or public enablement.
 6. **No-cost Research contracts** — add and pass Zoning-specific evidence-boundary, missing-location, mapped-applicability, special-district, table, arithmetic, amendment, and effective-date tests while public Zoning Research remains off.
 7. **Paid validation** — only after separate owner authorization and a written spend cap, run a frozen Zoning hybrid benchmark and review its answers manually.
 8. **Economics** — incorporate the measured Zoning routing/cost distribution into the existing 100-turn subscriber model. Do not change the $20 price or 100-turn allowance from assumptions alone.
 9. **Enablement** — enable public Zoning Research only after the exact refreshed corpus, evaluation evidence, cost result, web/iOS presentation, release commit, and manual acceptance are bound together and approved.
 
-## Six cases awaiting owner disposition
+## Six revised cases approved for evaluation testing
 
-The current official-source revisions materially improve all six cases, and the refreshed corpus retrieves every selected section. Their safe current disposition is **ready for owner review**, not approved.
+The current official-source revisions materially improve all six cases, and the refreshed corpus retrieves every selected section. Their recorded disposition is **approved for Terra answer-key testing only**.
 
 | Case | What the owner will confirm after refresh |
 | --- | --- |
@@ -58,4 +58,4 @@ The permanent no-cost command `npm run audit:zoning-freshness` compares the offi
 - status: `current`
 - public Research: disabled
 
-The next implementation task is to finish the Zoning-specific no-cost Research contracts and present the six revised cases for explicit owner disposition. Paid validation remains separate and will use a written cap before any API call.
+The next implementation task is to finish the Zoning-specific no-cost Research contracts. Paid validation remains separate and will use a written cap before any API call.

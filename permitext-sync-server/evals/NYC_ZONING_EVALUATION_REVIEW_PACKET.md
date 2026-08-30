@@ -2,17 +2,17 @@
 
 Content edition: NYC Zoning Resolution — text through 2026-08-13
 
-Status: PARTIALLY APPROVED FOR TERRA ANSWER-KEY TESTING
+Status: APPROVED FOR TERRA ANSWER-KEY TESTING
 
 Case readiness: 21 evidence-ready · 0 blocked by known content gaps
 
-Review status: 15 approved for Terra answer-key testing · 6 draft/revised and awaiting review · 0 rejected
+Review status: 21 approved for Terra answer-key testing · 0 draft/revised and awaiting review · 0 rejected
 
-Approval in this packet is limited to Terra answer-key testing. It is not professional zoning sign-off, does not enable Zoning in public AI Research, and does not authorize paid evaluation. Draft cases still require explicit human approval after their revisions are reviewed.
+Approval in this packet is limited to Terra answer-key testing. It is not professional zoning sign-off, does not enable Zoning in public AI Research, and does not authorize paid evaluation. Any future new or revised case requires explicit human approval after review.
 
 ## Reviewer checklist
 
-For each draft or revised case awaiting approval:
+For each future draft or revised case awaiting approval:
 
 1. Confirm that the selected evidence is the correct official authority for the question.
 2. Confirm that every required concept is supportable from the selected evidence.
@@ -139,7 +139,7 @@ Question: What can the selected Appendix J material establish about designated a
 
 Category: special-purpose-district
 
-Case status: DRAFT
+Case status: APPROVED
 
 Question: Within the Atlantic Avenue Subdistrict of the Special Downtown Brooklyn District, what two prerequisites does Section 101-75 state before a demolition permit may be issued, and what unsafe-building exception does it recognize?
 
@@ -178,13 +178,13 @@ Question: Within the Atlantic Avenue Subdistrict of the Special Downtown Brookly
 - [ ] The rule is described as citywide.
 - [ ] The answer invents a demolition prerequisite not present in the selected evidence.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-30T15:26:45.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
@@ -192,7 +192,7 @@ Question: Within the Atlantic Avenue Subdistrict of the Special Downtown Brookly
 
 Category: amendment-history
 
-Case status: DRAFT
+Case status: APPROVED
 
 Question: What does NYC Planning's official amendment-history metadata currently identify for Section 42-00, and what must a professional still verify before reconstructing the text in force on a particular date?
 
@@ -234,13 +234,13 @@ Question: What does NYC Planning's official amendment-history metadata currently
 - [ ] The current text is represented as unchanged since 1961.
 - [ ] An amendment note is treated as a complete historical reconstruction of prior enacted text.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-30T15:26:45.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
@@ -248,7 +248,7 @@ Question: What does NYC Planning's official amendment-history metadata currently
 
 Category: explicit-uncertainty
 
-Case status: DRAFT
+Case status: APPROVED
 
 Question: Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?
 
@@ -309,13 +309,13 @@ Question: Can a proposed self-service storage facility be found permitted as-of-
 - [ ] The proposed use is approved or prohibited for the unidentified property.
 - [ ] The answer silently retrieves evidence outside the selected sections.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-30T15:26:45.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
@@ -362,7 +362,7 @@ Question: A 10,000-square-foot site in the Bronx is proposed for a 40,000-square
 
 Category: arithmetic
 
-Case status: DRAFT
+Case status: APPROVED
 
 Question: Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?
 
@@ -401,13 +401,13 @@ Question: Using only the basic Section 23-22 table and the Section 12-10 FAR def
 - [ ] The 42,000-square-foot proposal complies with the basic 4.00 FAR limit.
 - [ ] The answer states that the building can contain exactly 40,000 gross square feet.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-30T15:26:45.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
@@ -415,7 +415,7 @@ Question: Using only the basic Section 23-22 table and the Section 12-10 FAR def
 
 Category: conditional-qualification
 
-Case status: DRAFT
+Case status: APPROVED
 
 Question: A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area and is merely described as containing qualifying affordable housing. What does the Section 23-22 table establish numerically, and what qualification and affordable-floor-area facts are still needed before concluding that the higher FAR is available?
 
@@ -469,13 +469,13 @@ Question: A 10,000-square-foot R7A zoning lot is proposed with 48,000 square fee
 - [ ] Any project containing affordable units automatically receives 5.01 FAR.
 - [ ] The answer gives an unconditional compliance conclusion without establishing the qualifying-affordable-housing path.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-30T15:26:45.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 
@@ -783,7 +783,7 @@ Question: A C4-4 zoning lot is proposed with retail on the ground floor and apar
 
 Category: effective-date
 
-Case status: DRAFT
+Case status: APPROVED
 
 Question: An 80-unit R7A residential development is within the Inner Transit Zone; every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333. How many accessory off-street residential parking spaces does Section 25-211 require for those units?
 
@@ -831,13 +831,13 @@ Question: An 80-unit R7A residential development is within the Inner Transit Zon
 - [ ] Existing required parking is said to be removable automatically.
 - [ ] The December 5, 2024 transition and Section 11-333 vesting path are ignored.
 
-### Reviewer decision
+### Recorded decision
 
-- Reviewer:
-- Qualification / role:
-- Review date:
-- Disposition: Approve / Revise / Reject
-- Notes:
+- Reviewer: Permitext owner
+- Role: Permitext owner
+- Review date: 2026-08-30T15:26:45.000Z
+- Disposition: Approved for Terra answer-key testing only
+- Boundary: Not professional zoning sign-off; public Zoning Research remains disabled.
 
 ---
 

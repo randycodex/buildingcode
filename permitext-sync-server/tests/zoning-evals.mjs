@@ -66,8 +66,13 @@ for (const testCase of dataset.cases) {
     assert.equal(testCase.reviewer, "Permitext owner");
   }
   if (testCase.revisionNotes) {
-    assert.equal(testCase.status, "draft", `${testCase.id} must be reviewed again after revision.`);
     assert(Number.isFinite(Date.parse(testCase.revisionAppliedAt || "")));
+    if (testCase.status !== "draft") {
+      assert(
+        Date.parse(testCase.reviewedAt) >= Date.parse(testCase.revisionAppliedAt),
+        `${testCase.id} must be reviewed again after revision.`
+      );
+    }
   }
   assert(testCase.question.trim().length >= 40);
   assert(testCase.requiredConcepts.length >= 3);
@@ -111,7 +116,7 @@ for (const testCase of dataset.cases) {
 
 assert.equal(requiredCategories.size, 0, `Missing zoning evaluation categories: ${[...requiredCategories].join(", ")}`);
 assert.deepEqual(blockedEvidenceCaseIDs, new Set());
-assert.deepEqual(statusCounts, { draft: 6, reviewed: 0, approved: 15, rejected: 0 });
+assert.deepEqual(statusCounts, { draft: 0, reviewed: 0, approved: 21, rejected: 0 });
 const latestZoningReviews = new Map();
 for (const review of reviewStore.reviews) {
   if (review.kind === "zoning-case") latestZoningReviews.set(review.caseID, review);
