@@ -258,6 +258,14 @@ Stripe Checkout creates the web subscription session, and the successful return 
 
 Production web Checkout also fails closed until Stripe tax presentation is explicit. Set `PERMITEXT_STRIPE_TAX_MODE=automatic` only after the required registrations and Product tax code have been reviewed, then set `PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=inclusive` or `exclusive` to match the resolved live Stripe Price behavior. A configured Checkout requests Stripe automatic tax and requires a billing address. The build-time live audit treats Stripe's documented USD `Default (inferred by currency)` behavior as exclusive; the environment variables do not create or prove a tax registration.
 
+Before pulling protected values or deploying, compare the Vercel Production variable-name inventory with the current source contract:
+
+```sh
+vercel env ls production --json | npm run --silent audit:production-env-keys
+```
+
+This audit reads names and Production targets only. It exits nonzero when a required key group is absent, but it cannot prove that a hidden value is correct. Follow it with `npm run verify:beta1-readiness` in a protected environment containing the real approved values. Do not treat Vercel's `[SENSITIVE]` pull placeholders as the live values.
+
 ## Deploy To Vercel
 
 This folder is Vercel-ready.

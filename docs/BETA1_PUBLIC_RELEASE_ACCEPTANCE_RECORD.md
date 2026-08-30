@@ -95,6 +95,8 @@ Release-bound: **yes**
 - Canonical URLs are direct HTTPS 200 responses without redirect or fallback bytes:
 - Redacted evidence and timestamp:
 
+Read-only Production environment-key evidence: [PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md](./PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md). Key presence is not value verification; the three policy-version and two Stripe-tax activation keys remain absent.
+
 Do not mark this complete from route availability alone; the exact published bytes must match.
 
 ## New York Certificate and Stripe tax
@@ -114,6 +116,8 @@ Release-bound: **no**
 - Apple tax-handling boundary recorded separately: [BETA1_APPLE_TAX_HANDLING_RECORD.md](./BETA1_APPLE_TAX_HANDLING_RECORD.md). Stripe automatic tax is web-only; live Apple app/subscription category verification and first real financial-report evidence remain open.
 - First sales-tax filing deadline and persistent reminder verified:
 - Redacted evidence and timestamp:
+
+Read-only Production environment-key evidence: [PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md](./PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md). The two Stripe-tax activation keys remain absent; no provider field was changed.
 
 Do not include the taxpayer identification number, residential address, or certificate image in source control.
 

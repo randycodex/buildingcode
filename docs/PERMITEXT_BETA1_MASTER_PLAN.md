@@ -23,7 +23,7 @@ Current development branch: `codex/research-commercialization`
 
 ## Status dashboard
 
-Checklist snapshot: **73 completed, 23 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
+Checklist snapshot: **74 completed, 23 open**. Eleven of the open items are the final merge, deployment, TestFlight, and release sequence, which has not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -149,6 +149,7 @@ Tax and optional professional reference: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PA
 - [x] Configure a $20 Vercel on-demand spend amount, standard spend notifications, and automatic Production pause for all projects on the team.
 - [x] Complete a read-only [backend provider capacity and upgrade audit](./PERMITEXT_BACKEND_PROVIDER_CAPACITY_AUDIT_2026-08-29.md); no additional upgrade is currently required, and conservative Neon, Clerk, Vercel/Blob, OpenAI, Stripe, and Apple review thresholds are recorded.
 - [x] Prepare a fail-closed [spend-control acceptance record](./BETA1_SPEND_CONTROL_ACCEPTANCE_RECORD.md) that separates delivered notification, isolated 503/recovery, and automatic-threshold evidence and forbids spending or lowering the budget merely to trigger the gate.
+- [x] Add a fail-closed, secret-free [Production environment key-presence audit](./PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md) and run it against live Vercel metadata. Twenty-three of 28 groups are present; the two Stripe tax and three policy-version activation keys correctly remain missing, and hidden values still require protected verification.
 - [ ] Exercise a delivered spend notification and actual hard-stop behavior without exposing customers or incurring an uncontrolled overage.
 - [x] Add a fail-closed read-only restore comparator and complete its no-provider local end-to-end rehearsal, including deliberate missing-record detection.
 - [x] Complete a real point-in-time Neon child-branch recovery, exact durable-content comparison, Production-commit local compatibility check, and authenticated private Blob inventory/retrieval under the retained no-deploy/no-paid constraints.

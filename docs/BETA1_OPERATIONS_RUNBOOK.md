@@ -103,7 +103,7 @@ npm run audit:public-beta-readiness -- --require-ready
 The first command always emits the current secret-free gate report. The strict command exits nonzero until the exact release commit and every Production billing, authentication/account-lifecycle, policy-publication, New York tax, monitoring, spend-control, web/TestFlight/iPhone, and owner go/no-go record is complete. It is a post-deployment activation gate; it must not be added to the build step because several required checks can only happen against the final deployed release.
 
 1. Run the local server checks and iOS Release build.
-2. Run `npm run verify:beta1-readiness` with production configuration.
+2. Run `vercel env ls production --json | npm run --silent audit:production-env-keys` to fail closed on missing Production variable names without exposing values, then run `npm run verify:beta1-readiness` with the real protected production configuration. A successful name-presence audit does not prove value correctness.
 3. Do not use a Vercel Preview as an isolated account or billing test while Preview shares the Production database. Use a truly isolated database/provider configuration or a controlled Production exercise.
 4. Verify `/health`, `/release`, sign-in, one read-only code path, and one authenticated sync read.
 5. Confirm the deployment build log passed both commercial readiness and production release-identity readiness. A missing Git SHA must block promotion.

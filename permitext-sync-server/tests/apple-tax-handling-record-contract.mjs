@@ -15,6 +15,8 @@ for (const requiredBoundary of [
   /customer price includes applicable taxes Apple collects and remits/,
   /customer price minus applicable taxes and Apple's commission/,
   /live app category and subscription override therefore were \*\*not observed and are not claimed\*\*/,
+  /official App Store Connect OpenAPI specification/,
+  /supported public API therefore cannot replace the dashboard observation/,
   /Approve any proposed category change separately before it is saved/,
   /5% tax downside reserve/
 ]) {

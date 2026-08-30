@@ -41,6 +41,8 @@ Official sources:
 
 The authenticated App Store Connect account opened the correct Permitext app route. The app-detail module did not render because an installed Chrome extension caused App Store Connect's JavaScript loader to report `Cannot redefine property: ethereum`. The live app category and subscription override therefore were **not observed and are not claimed**. No extension, Apple field, price, territory, agreement, tax record, or app-submission state was changed.
 
+The current official App Store Connect OpenAPI specification was also downloaded read-only from Apple's published specification archive and searched for a tax-category resource or field. It exposes app, subscription, In-App Purchase, and price/proceeds resources, but it does not expose the selected app or subscription tax category. Price points can reflect the economic effect of a category without identifying which category is selected. The supported public API therefore cannot replace the dashboard observation, and Permitext must not infer the category from price or proceeds alone.
+
 The previous no-charge Sandbox/TestFlight purchase and refund lifecycle proves StoreKit entitlement behavior only. Sandbox displays and zero-charge test transactions are not evidence of real tax collection, remittance, proceeds, or a Production customer price.
 
 ## Working recommendation for owner confirmation
