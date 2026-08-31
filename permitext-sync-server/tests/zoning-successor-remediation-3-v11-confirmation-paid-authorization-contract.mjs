@@ -352,7 +352,7 @@ for (const requiredGuard of [
   "zoningRemediationSuccessor3V11ConfirmationAppSHA256",
   "zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256",
   handoffRelativePath,
-  "assertPinnedV11RuntimeInputsAtCommit",
+  "assertPinnedAuthenticatedRuntimeInputsAtCommit",
   "zoningRemediationSuccessor3V11PaidRunEnvironment",
   "NODE_ENV: \"production\"",
   "NODE_OPTIONS: \"\"",
@@ -375,7 +375,7 @@ for (const requiredGuard of [
     `The v11 confirmation runner is missing guard: ${requiredGuard}`);
 }
 assert.match(runnerSource,
-  /if \(runnerInvokedDirectly && !remediationSuccessor3V11ConfirmationMode\)[\s\S]{0,120}retiredPaidPathMessage/,
+  /if \(runnerInvokedDirectly && !remediationSuccessor3AuthenticatedConfirmationMode\)[\s\S]{0,120}retiredPaidPathMessage/,
   "Every historical paid runner mode must remain retired.");
 
 const evaluatorSource = await readFile(evaluatorPath, "utf8");
@@ -387,12 +387,12 @@ for (const requiredGuard of [
   "zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit",
   ".paid-evaluation-run.lock",
   "PERMITEXT_ZONING_PAID_RUNNER_NONCE",
-  "Paid v11 confirmation requires the exact clean execution commit",
+  "Paid ${authenticatedConfirmation.version} confirmation requires the exact clean execution commit",
   "Only the durable running authorization may differ in the child",
   "globalRunnerLock?.nonce === runnerLock?.nonce",
   "globalRunnerLock?.executionCommit === runnerLock?.executionCommit",
   "server changes other than the authorization",
-  "The paid v11 child must run with a non-test NODE_ENV",
+  "The paid ${authenticatedConfirmation.version} child must run with a non-test NODE_ENV",
   "PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS",
   "requireAuthenticatedZoningV11RunnerHandoff",
   "PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS",

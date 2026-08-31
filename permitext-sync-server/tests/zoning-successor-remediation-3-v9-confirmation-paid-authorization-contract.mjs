@@ -97,7 +97,7 @@ for (const requiredGuard of [
     `The v9 confirmation runner is missing guard: ${requiredGuard}`);
 }
 assert.match(runnerSource,
-  /if \(runnerInvokedDirectly && !remediationSuccessor3V11ConfirmationMode\)[\s\S]{0,120}retiredPaidPathMessage/,
+  /if \(runnerInvokedDirectly && !remediationSuccessor3AuthenticatedConfirmationMode\)[\s\S]{0,120}retiredPaidPathMessage/,
   "Historical runner modes, including v8 and consumed v9, must remain retired.");
 
 const evaluatorSource = await readFile(evaluatorPath, "utf8");

@@ -41,6 +41,16 @@ import {
   zoningRemediationSuccessor3V11ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v11-confirmation-paid-authorization.mjs";
 import {
+  requireActiveZoningRemediationSuccessor3V12ConfirmationPaidAuthorization,
+  validateZoningRemediationSuccessor3V12ConfirmationPaidAuthorization,
+  zoningRemediationSuccessor3V12ConfirmationAppSHA256,
+  zoningRemediationSuccessor3V12ConfirmationEconomicsSHA256,
+  zoningRemediationSuccessor3V12ConfirmationLockedAuthorizationSHA256,
+  zoningRemediationSuccessor3V12ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V12ConfirmationRunnerHandoffSHA256,
+  zoningRemediationSuccessor3V12ConfirmationSafetySHA256
+} from "../evals/zoning-successor-remediation-3-v12-confirmation-paid-authorization.mjs";
+import {
   respondToZoningV11RunnerChallenge,
   zoningV11RunnerPrivateKey
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
@@ -70,7 +80,8 @@ assert(
         "--remediation-3",
         "--remediation-3-v8-confirmation",
         "--remediation-3-v9-confirmation",
-        "--remediation-3-v11-confirmation"
+        "--remediation-3-v11-confirmation",
+        "--remediation-3-v12-confirmation"
       ].includes(argument)),
   "Unsupported Zoning successor paid-run argument."
 );
@@ -82,21 +93,63 @@ const remediationSuccessor3V9ConfirmationMode =
   process.argv.includes("--remediation-3-v9-confirmation");
 const remediationSuccessor3V11ConfirmationMode =
   process.argv.includes("--remediation-3-v11-confirmation");
+const remediationSuccessor3V12ConfirmationMode =
+  process.argv.includes("--remediation-3-v12-confirmation");
+const remediationSuccessor3AuthenticatedConfirmationMode =
+  remediationSuccessor3V11ConfirmationMode ||
+  remediationSuccessor3V12ConfirmationMode;
 const retiredPaidPathMessage =
   "Historical Zoning successor paid runner modes are retired. Each must run through " +
   "its consuming runner and active run lock, and each now requires a new explicit owner " +
   "authorization and cumulative spend cap in a new distinct package; this historical " +
   "path cannot dispatch.";
-if (runnerInvokedDirectly && !remediationSuccessor3V11ConfirmationMode) {
+if (runnerInvokedDirectly && !remediationSuccessor3AuthenticatedConfirmationMode) {
   throw new Error(retiredPaidPathMessage);
 }
 const remediationSuccessor3FamilyMode = remediationSuccessor3Mode ||
   remediationSuccessor3V8ConfirmationMode || remediationSuccessor3V9ConfirmationMode ||
-  remediationSuccessor3V11ConfirmationMode;
+  remediationSuccessor3AuthenticatedConfirmationMode;
+const authenticatedConfirmation = remediationSuccessor3V12ConfirmationMode
+  ? {
+      version: "v12",
+      validate:
+        validateZoningRemediationSuccessor3V12ConfirmationPaidAuthorization,
+      requireActive:
+        requireActiveZoningRemediationSuccessor3V12ConfirmationPaidAuthorization,
+      appSHA256: zoningRemediationSuccessor3V12ConfirmationAppSHA256,
+      economicsSHA256:
+        zoningRemediationSuccessor3V12ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningRemediationSuccessor3V12ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit:
+        zoningRemediationSuccessor3V12ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningRemediationSuccessor3V12ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningRemediationSuccessor3V12ConfirmationSafetySHA256
+    }
+  : {
+      version: "v11",
+      validate:
+        validateZoningRemediationSuccessor3V11ConfirmationPaidAuthorization,
+      requireActive:
+        requireActiveZoningRemediationSuccessor3V11ConfirmationPaidAuthorization,
+      appSHA256: zoningRemediationSuccessor3V11ConfirmationAppSHA256,
+      economicsSHA256:
+        zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit:
+        zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningRemediationSuccessor3V11ConfirmationSafetySHA256
+    };
 const authorizationPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3V11ConfirmationMode
+  remediationSuccessor3V12ConfirmationMode
+    ? "zoning-successor-remediation-3-v12-confirmation-paid-authorization.json"
+    : remediationSuccessor3V11ConfirmationMode
     ? "zoning-successor-remediation-3-v11-confirmation-paid-authorization.json"
     : remediationSuccessor3V9ConfirmationMode
     ? "zoning-successor-remediation-3-v9-confirmation-paid-authorization.json"
@@ -111,7 +164,9 @@ const authorizationPath = resolve(
 const authorizationModulePath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3V11ConfirmationMode
+  remediationSuccessor3V12ConfirmationMode
+    ? "zoning-successor-remediation-3-v12-confirmation-paid-authorization.mjs"
+    : remediationSuccessor3V11ConfirmationMode
     ? "zoning-successor-remediation-3-v11-confirmation-paid-authorization.mjs"
     : remediationSuccessor3V9ConfirmationMode
     ? "zoning-successor-remediation-3-v9-confirmation-paid-authorization.mjs"
@@ -126,7 +181,9 @@ const authorizationModulePath = resolve(
 const runLockPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3V11ConfirmationMode
+  remediationSuccessor3V12ConfirmationMode
+    ? ".zoning-successor-remediation-3-v12-confirmation-paid-run.lock"
+    : remediationSuccessor3V11ConfirmationMode
     ? ".zoning-successor-remediation-3-v11-confirmation-paid-run.lock"
     : remediationSuccessor3V9ConfirmationMode
     ? ".zoning-successor-remediation-3-v9-confirmation-paid-run.lock"
@@ -189,41 +246,44 @@ function changedServerFiles(arguments_) {
     .filter(Boolean);
 }
 
-function assertPinnedV11RuntimeInputsAtCommit(
+function assertPinnedAuthenticatedRuntimeInputsAtCommit(
   commit,
   label,
   { includeRunnerHandoff = false } = {}
 ) {
   const inputs = [
     ["permitext-sync-server/research-zoning-safety.mjs",
-      zoningRemediationSuccessor3V11ConfirmationSafetySHA256, "Zoning safety"],
+      authenticatedConfirmation.safetySHA256, "Zoning safety"],
     ["permitext-sync-server/research-economics.mjs",
-      zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
+      authenticatedConfirmation.economicsSHA256,
       "Research economics"],
     ["permitext-sync-server/app.mjs",
-      zoningRemediationSuccessor3V11ConfirmationAppSHA256, "application"]
+      authenticatedConfirmation.appSHA256, "application"]
   ];
   if (includeRunnerHandoff) {
     inputs.push([
       "permitext-sync-server/evals/zoning-v11-paid-runner-handoff.mjs",
-      zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+      authenticatedConfirmation.runnerHandoffSHA256,
       "signed runner handoff"
     ]);
   }
   for (const [path, expectedHash, inputLabel] of inputs) {
     const reviewedText = gitOutput(
       ["show", `${commit}:${path}`],
-      `Could not read the ${label} v11 ${inputLabel} bytes.`
+      `Could not read the ${label} ${authenticatedConfirmation.version} ${inputLabel} bytes.`
     );
     assert.equal(
       sha256(reviewedText),
       expectedHash,
-      `The ${label} commit does not contain the pinned v11 ${inputLabel} bytes.`
+      `The ${label} commit does not contain the pinned ${authenticatedConfirmation.version} ${inputLabel} bytes.`
     );
   }
 }
 
-async function assertV11ExecutionInputs({ expectedStatus, executionCommit = null }) {
+async function assertAuthenticatedExecutionInputs({
+  expectedStatus,
+  executionCommit = null
+}) {
   const expectedChanges = expectedStatus === "running"
     ? [relative(repositoryRoot, authorizationPath)]
     : [];
@@ -232,20 +292,19 @@ async function assertV11ExecutionInputs({ expectedStatus, executionCommit = null
     expectedChanges,
     expectedStatus === "running"
       ? "Only the durable running authorization may differ immediately before provider dispatch."
-      : "The authorized v11 confirmation execution inputs must be clean."
+      : `The authorized ${authenticatedConfirmation.version} confirmation execution inputs must be clean.`
   );
   assert.deepEqual(
     changedServerFiles(["diff", "--cached", "--name-only", "--", "permitext-sync-server"]),
     [],
     "No staged server change may exist immediately before provider dispatch."
   );
-  const validation =
-    await validateZoningRemediationSuccessor3V11ConfirmationPaidAuthorization();
+  const validation = await authenticatedConfirmation.validate();
   assert.equal(validation.authorization.status, expectedStatus,
-    `The v11 confirmation authorization must be ${expectedStatus} at this checkpoint.`);
+    `The ${authenticatedConfirmation.version} confirmation authorization must be ${expectedStatus} at this checkpoint.`);
   if (expectedStatus === "running") {
     assert.equal(validation.authorization.execution.executionCommit, executionCommit,
-      "The running v11 confirmation authorization changed before provider dispatch.");
+      `The running ${authenticatedConfirmation.version} confirmation authorization changed before provider dispatch.`);
   }
   return validation;
 }
@@ -258,7 +317,7 @@ function assertExactLockedAuthorizationPackage(authorizationPackageCommit) {
   );
   assert.equal(
     sha256(lockedAuthorizationText),
-    zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
+    authenticatedConfirmation.lockedAuthorizationSHA256,
     "The authorized package commit does not contain the exact reviewed locked authorization record."
   );
   const lockedAuthorization = JSON.parse(lockedAuthorizationText);
@@ -313,7 +372,7 @@ async function beginAuthorizationAttempt(runID, executionCommit = null) {
     runID: null,
     consumedAt: null
   };
-  if (remediationSuccessor3V11ConfirmationMode) {
+  if (remediationSuccessor3AuthenticatedConfirmationMode) {
     authorization.execution.executionCommit = executionCommit;
   }
   authorization.notes =
@@ -346,43 +405,43 @@ async function consumeAuthorization({
     "The new result does not contain the exact authorized case order.");
   assert.match(result.configuration?.runID || "", /^[0-9a-f-]{36}$/i,
     "The new result has no valid run ID.");
-  if (remediationSuccessor3V11ConfirmationMode) {
+  if (remediationSuccessor3AuthenticatedConfirmationMode) {
     assert(["completed", "partial"].includes(result.status),
-      "The v11 confirmation result is not a completed or paid partial terminal snapshot.");
+      `The ${authenticatedConfirmation.version} confirmation result is not a completed or paid partial terminal snapshot.`);
     assert(Array.isArray(result.results) && result.results.length > 0,
-      "The v11 confirmation result contains no completed paid case operation.");
+      `The ${authenticatedConfirmation.version} confirmation result contains no completed paid case operation.`);
     assert(Number.isInteger(result.configuration?.paidRequestCount) &&
       result.configuration.paidRequestCount > 0,
-    "The v11 confirmation result records no paid provider request.");
+    `The ${authenticatedConfirmation.version} confirmation result records no paid provider request.`);
     assert.equal(result.configuration?.gitCommit, executionCommit,
-      "The v11 confirmation result is not bound to the clean execution commit.");
+      `The ${authenticatedConfirmation.version} confirmation result is not bound to the clean execution commit.`);
     assert.equal(
       result.configuration?.approvedSpendCapUSD,
       authorization.scope.maximumCumulativeSpendUSD,
-      "The v11 confirmation result does not retain its authorized spend cap."
+      `The ${authenticatedConfirmation.version} confirmation result does not retain its authorized spend cap.`
     );
     assert(Number.isFinite(result.configuration?.conservativeReservedUSD) &&
       result.configuration.conservativeReservedUSD <=
         result.configuration.approvedSpendCapUSD,
-    "The v11 confirmation result exceeded its conservative spend reservation cap.");
+    `The ${authenticatedConfirmation.version} confirmation result exceeded its conservative spend reservation cap.`);
     assert(Number.isFinite(result.configuration?.actualUSD) &&
       result.configuration.actualUSD <= result.configuration.approvedSpendCapUSD,
-    "The v11 confirmation result exceeded its actual spend cap.");
+    `The ${authenticatedConfirmation.version} confirmation result exceeded its actual spend cap.`);
     assert.equal(result.configuration?.pendingPaidRequestCount, 0,
-      "The v11 confirmation result retained unresolved paid requests.");
+      `The ${authenticatedConfirmation.version} confirmation result retained unresolved paid requests.`);
     const observedCaseIDs = result.results.map((item) => item.testCase?.id);
     assert.equal(new Set(observedCaseIDs).size, observedCaseIDs.length,
-      "The v11 confirmation result contains a duplicate case operation.");
+      `The ${authenticatedConfirmation.version} confirmation result contains a duplicate case operation.`);
     assert.deepEqual(
       observedCaseIDs,
       cohort.cases.slice(0, observedCaseIDs.length).map((item) => item.id),
-      "The v11 confirmation result operations are not an ordered cohort prefix."
+      `The ${authenticatedConfirmation.version} confirmation result operations are not an ordered cohort prefix.`
     );
     for (const item of result.results) {
       assert.equal(item.operationMetric?.webSupportRequested, false,
-        "A v11 confirmation operation requested unbudgeted web support.");
+        `A ${authenticatedConfirmation.version} confirmation operation requested unbudgeted web support.`);
       assert.equal(item.operationMetric?.webSupportSearched, false,
-        "A v11 confirmation operation used unbudgeted web support.");
+        `A ${authenticatedConfirmation.version} confirmation operation used unbudgeted web support.`);
     }
   }
   if (remediationSuccessor3FamilyMode) {
@@ -420,7 +479,9 @@ function runEvaluation({
   return new Promise((resolveRun, rejectRun) => {
     const childArguments = [
       "tests/research-evals.mjs",
-      remediationSuccessor3V11ConfirmationMode
+      remediationSuccessor3V12ConfirmationMode
+        ? "--zoning-successor-remediation-3-v12-confirmation"
+        : remediationSuccessor3V11ConfirmationMode
         ? "--zoning-successor-remediation-3-v11-confirmation"
         : remediationSuccessor3Mode
         ? "--zoning-successor-remediation-3"
@@ -437,11 +498,11 @@ function runEvaluation({
     const child = spawn(process.execPath, childArguments, {
       cwd: serverRoot,
       env: environment,
-      stdio: remediationSuccessor3V11ConfirmationMode
+      stdio: remediationSuccessor3AuthenticatedConfirmationMode
         ? ["inherit", "inherit", "inherit", "ipc"]
         : "inherit"
     });
-    if (remediationSuccessor3V11ConfirmationMode) {
+    if (remediationSuccessor3AuthenticatedConfirmationMode) {
       child.once("message", (message) => {
         try {
           const response = respondToZoningV11RunnerChallenge({
@@ -512,9 +573,9 @@ export function zoningRemediationSuccessor3V11PaidRunEnvironment(
 }
 
 async function main() {
-  const validation = remediationSuccessor3V11ConfirmationMode
-    ? requireActiveZoningRemediationSuccessor3V11ConfirmationPaidAuthorization(
-        await validateZoningRemediationSuccessor3V11ConfirmationPaidAuthorization()
+  const validation = remediationSuccessor3AuthenticatedConfirmationMode
+    ? authenticatedConfirmation.requireActive(
+        await authenticatedConfirmation.validate()
       )
     : remediationSuccessor3Mode
     ? requireActiveZoningRemediationSuccessor3PaidAuthorization(
@@ -564,7 +625,7 @@ async function main() {
 
   let executionCommit = null;
   let v11RunnerPrivateKey = null;
-  if (remediationSuccessor3V11ConfirmationMode) {
+  if (remediationSuccessor3AuthenticatedConfirmationMode) {
     const authorizationPackageCommit =
       authorization.execution.authorizationPackageCommit;
     const repairAncestry = spawnSync(
@@ -572,19 +633,19 @@ async function main() {
       [
         "merge-base",
         "--is-ancestor",
-        zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+        authenticatedConfirmation.preparedFromCommit,
         authorizationPackageCommit
       ],
       { cwd: repositoryRoot, stdio: "ignore" }
     );
     assert.equal(repairAncestry.status, 0,
-      "The independently reviewed v11 repair is not an ancestor of the authorized package commit.");
-    assertPinnedV11RuntimeInputsAtCommit(
-      zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+      `The independently reviewed ${authenticatedConfirmation.version} repair is not an ancestor of the authorized package commit.`);
+    assertPinnedAuthenticatedRuntimeInputsAtCommit(
+      authenticatedConfirmation.preparedFromCommit,
       "reviewed repair"
     );
     assertExactLockedAuthorizationPackage(authorizationPackageCommit);
-    assertPinnedV11RuntimeInputsAtCommit(
+    assertPinnedAuthenticatedRuntimeInputsAtCommit(
       authorizationPackageCommit,
       "owner-selected package",
       { includeRunnerHandoff: true }
@@ -595,7 +656,7 @@ async function main() {
       { cwd: repositoryRoot, stdio: "ignore" }
     );
     assert.equal(ancestry.status, 0,
-      "The authorized v11 confirmation package commit is not an ancestor of HEAD.");
+      `The authorized ${authenticatedConfirmation.version} confirmation package commit is not an ancestor of HEAD.`);
     const changedServerFiles = spawnSync(
       "git",
       [
@@ -608,11 +669,11 @@ async function main() {
       { cwd: repositoryRoot, encoding: "utf8" }
     );
     assert.equal(changedServerFiles.status, 0,
-      "Could not verify the exact authorized v11 confirmation package.");
+      `Could not verify the exact authorized ${authenticatedConfirmation.version} confirmation package.`);
     assert.deepEqual(
       changedServerFiles.stdout.trim().split("\n").filter(Boolean),
       [relative(repositoryRoot, authorizationPath)],
-      "Only the locked authorization record may change after the exact v11 confirmation package commit."
+      `Only the locked authorization record may change after the exact ${authenticatedConfirmation.version} confirmation package commit.`
     );
     const executionHead = spawnSync(
       "git",
@@ -620,11 +681,11 @@ async function main() {
       { cwd: repositoryRoot, encoding: "utf8" }
     );
     assert.equal(executionHead.status, 0,
-      "Could not resolve the clean v11 confirmation execution commit.");
+      `Could not resolve the clean ${authenticatedConfirmation.version} confirmation execution commit.`);
     executionCommit = executionHead.stdout.trim();
     assert.match(executionCommit, /^[0-9a-f]{40}$/i,
-      "The clean v11 confirmation execution commit is invalid.");
-    await assertV11ExecutionInputs({ expectedStatus: "authorized" });
+      `The clean ${authenticatedConfirmation.version} confirmation execution commit is invalid.`);
+    await assertAuthenticatedExecutionInputs({ expectedStatus: "authorized" });
     const commonGitDirectory = gitOutput(
       ["rev-parse", "--git-common-dir"],
       "Could not resolve the common Git directory for the local v11 runner handoff key."
@@ -653,7 +714,7 @@ async function main() {
   );
   const runID = randomUUID();
   const runnerNonce = randomUUID();
-  if (!remediationSuccessor3V11ConfirmationMode) {
+  if (!remediationSuccessor3AuthenticatedConfirmationMode) {
     environment.PERMITEXT_ZONING_PAID_RUNNER_NONCE = runnerNonce;
   }
   const lockEvidence = {
@@ -679,14 +740,14 @@ async function main() {
     await beginAuthorizationAttempt(runID, executionCommit);
     console.log(
       `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning ` +
-      `${remediationSuccessor3V11ConfirmationMode
-        ? "remediation successor 3 v11 confirmation"
+      `${remediationSuccessor3AuthenticatedConfirmationMode
+        ? `remediation successor 3 ${authenticatedConfirmation.version} confirmation`
         : remediationSuccessor3Mode ? "remediation successor 3"
         : remediationSuccessor2Mode ? "remediation successor 2" : "successor"} ` +
       `once with a $${paidEnvironment.approvedSpendCapUSD.toFixed(2)} maximum cumulative cap. ` +
       "The 24,000-character candidate remains disabled."
     );
-    await assertV11ExecutionInputs({
+    await assertAuthenticatedExecutionInputs({
       expectedStatus: "running",
       executionCommit
     });

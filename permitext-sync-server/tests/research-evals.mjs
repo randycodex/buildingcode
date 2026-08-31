@@ -61,6 +61,15 @@ import {
   zoningRemediationSuccessor3V11ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v11-confirmation-paid-authorization.mjs";
 import {
+  validateZoningRemediationSuccessor3V12ConfirmationPaidAuthorization,
+  zoningRemediationSuccessor3V12ConfirmationAppSHA256,
+  zoningRemediationSuccessor3V12ConfirmationEconomicsSHA256,
+  zoningRemediationSuccessor3V12ConfirmationLockedAuthorizationSHA256,
+  zoningRemediationSuccessor3V12ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V12ConfirmationRunnerHandoffSHA256,
+  zoningRemediationSuccessor3V12ConfirmationSafetySHA256
+} from "../evals/zoning-successor-remediation-3-v12-confirmation-paid-authorization.mjs";
+import {
   requireAuthenticatedZoningV11RunnerHandoff
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
 
@@ -98,11 +107,55 @@ const zoningRemediationSuccessor3V9ConfirmationMode =
   process.argv.includes("--zoning-successor-remediation-3-v9-confirmation");
 const zoningRemediationSuccessor3V11ConfirmationMode =
   process.argv.includes("--zoning-successor-remediation-3-v11-confirmation");
+const zoningRemediationSuccessor3V12ConfirmationMode =
+  process.argv.includes("--zoning-successor-remediation-3-v12-confirmation");
+const zoningRemediationSuccessor3AuthenticatedConfirmationMode =
+  zoningRemediationSuccessor3V11ConfirmationMode ||
+  zoningRemediationSuccessor3V12ConfirmationMode;
+const authenticatedConfirmation = zoningRemediationSuccessor3V12ConfirmationMode
+  ? {
+      version: "v12",
+      validate:
+        validateZoningRemediationSuccessor3V12ConfirmationPaidAuthorization,
+      appSHA256: zoningRemediationSuccessor3V12ConfirmationAppSHA256,
+      economicsSHA256:
+        zoningRemediationSuccessor3V12ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningRemediationSuccessor3V12ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit:
+        zoningRemediationSuccessor3V12ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningRemediationSuccessor3V12ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningRemediationSuccessor3V12ConfirmationSafetySHA256,
+      authorizationFile:
+        "zoning-successor-remediation-3-v12-confirmation-paid-authorization.json",
+      runLockFile:
+        ".zoning-successor-remediation-3-v12-confirmation-paid-run.lock"
+    }
+  : {
+      version: "v11",
+      validate:
+        validateZoningRemediationSuccessor3V11ConfirmationPaidAuthorization,
+      appSHA256: zoningRemediationSuccessor3V11ConfirmationAppSHA256,
+      economicsSHA256:
+        zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit:
+        zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningRemediationSuccessor3V11ConfirmationSafetySHA256,
+      authorizationFile:
+        "zoning-successor-remediation-3-v11-confirmation-paid-authorization.json",
+      runLockFile:
+        ".zoning-successor-remediation-3-v11-confirmation-paid-run.lock"
+    };
 const zoningSuccessorFamilyMode = zoningSuccessorMode ||
   zoningRemediationSuccessor2Mode || zoningRemediationSuccessor3Mode ||
   zoningRemediationSuccessor3V8ConfirmationMode ||
   zoningRemediationSuccessor3V9ConfirmationMode ||
-  zoningRemediationSuccessor3V11ConfirmationMode;
+  zoningRemediationSuccessor3AuthenticatedConfirmationMode;
 const zoningMode = process.argv.includes("--zoning") || zoningExpandedMode ||
   zoningSuccessorFamilyMode;
 const zoningEvidenceBudgetPrototypeMode = process.argv.includes("--zoning-evidence-budget-prototype");
@@ -131,7 +184,8 @@ const zoningDatasetModeCount = [
   zoningRemediationSuccessor3Mode,
   zoningRemediationSuccessor3V8ConfirmationMode,
   zoningRemediationSuccessor3V9ConfirmationMode,
-  zoningRemediationSuccessor3V11ConfirmationMode
+  zoningRemediationSuccessor3V11ConfirmationMode,
+  zoningRemediationSuccessor3V12ConfirmationMode
 ].filter(Boolean).length;
 if (zoningDatasetModeCount > 1) {
   throw new Error("Choose exactly one Zoning evaluation dataset mode.");
@@ -2293,7 +2347,7 @@ async function assertV9ConfirmationChildExecutionInputs({
   );
 }
 
-async function assertV11ConfirmationChildExecutionInputs({
+async function assertAuthenticatedConfirmationChildExecutionInputs({
   authorization,
   datasetText,
   executionCommit
@@ -2310,19 +2364,18 @@ async function assertV11ConfirmationChildExecutionInputs({
     return (await gitText(arguments_)).trim().split("\n").filter(Boolean);
   };
   const expectedAuthorizationPath =
-    "permitext-sync-server/evals/" +
-    "zoning-successor-remediation-3-v11-confirmation-paid-authorization.json";
+    `permitext-sync-server/evals/${authenticatedConfirmation.authorizationFile}`;
   const authorizationPackageCommit =
     authorization.execution?.authorizationPackageCommit;
   try {
     await gitText([
       "merge-base", "--is-ancestor",
-      zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+      authenticatedConfirmation.preparedFromCommit,
       authorizationPackageCommit
     ]);
   } catch {
     throw new Error(
-      "The child could not prove that the reviewed v11 repair is an ancestor of the owner-selected package."
+      `The child could not prove that the reviewed ${authenticatedConfirmation.version} repair is an ancestor of the owner-selected package.`
     );
   }
   try {
@@ -2339,19 +2392,19 @@ async function assertV11ConfirmationChildExecutionInputs({
   ]);
   assert(
     createHash("sha256").update(lockedAuthorizationText).digest("hex") ===
-      zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
-    "The child loaded a package without the exact reviewed locked v11 authorization."
+      authenticatedConfirmation.lockedAuthorizationSHA256,
+    `The child loaded a package without the exact reviewed locked ${authenticatedConfirmation.version} authorization.`
   );
   for (const [path, expectedHash, label] of [
     ["permitext-sync-server/research-zoning-safety.mjs",
-      zoningRemediationSuccessor3V11ConfirmationSafetySHA256, "Zoning safety"],
+      authenticatedConfirmation.safetySHA256, "Zoning safety"],
     ["permitext-sync-server/research-economics.mjs",
-      zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
+      authenticatedConfirmation.economicsSHA256,
       "Research economics"],
     ["permitext-sync-server/app.mjs",
-      zoningRemediationSuccessor3V11ConfirmationAppSHA256, "application"],
+      authenticatedConfirmation.appSHA256, "application"],
     ["permitext-sync-server/evals/zoning-v11-paid-runner-handoff.mjs",
-      zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+      authenticatedConfirmation.runnerHandoffSHA256,
       "signed runner handoff"]
   ]) {
     const content = await gitText([
@@ -2359,7 +2412,7 @@ async function assertV11ConfirmationChildExecutionInputs({
     ]);
     assert(
       createHash("sha256").update(content).digest("hex") === expectedHash,
-      `The child found different ${label} bytes in the owner-selected v11 package.`
+      `The child found different ${label} bytes in the owner-selected ${authenticatedConfirmation.version} package.`
     );
   }
   assert(
@@ -2384,14 +2437,14 @@ async function assertV11ConfirmationChildExecutionInputs({
   assert(
     createHash("sha256").update(datasetText).digest("hex") ===
       authorization.cohort.sha256,
-    "The child loaded different cohort bytes from the exact authorized v11 confirmation cohort."
+    `The child loaded different cohort bytes from the exact authorized ${authenticatedConfirmation.version} confirmation cohort.`
   );
   assert(
     await currentGitCommit() === executionCommit,
     "The child execution commit changed immediately before provider dispatch."
   );
   assert(process.env.NODE_ENV === "production",
-    "The paid v11 child must run with a non-test NODE_ENV.");
+    `The paid ${authenticatedConfirmation.version} child must run with a non-test NODE_ENV.`);
   for (const key of [
     "NODE_OPTIONS",
     "NODE_PATH",
@@ -2409,12 +2462,12 @@ async function assertV11ConfirmationChildExecutionInputs({
     "VERCEL_ENV"
   ]) {
     assert(!process.env[key],
-      `The paid v11 child inherited forbidden runtime configuration: ${key}.`);
+      `The paid ${authenticatedConfirmation.version} child inherited forbidden runtime configuration: ${key}.`);
   }
   assert(process.env.NODE_USE_ENV_PROXY === "0",
-    "The paid v11 child may not use inherited proxy configuration.");
+    `The paid ${authenticatedConfirmation.version} child may not use inherited proxy configuration.`);
   assert(process.env.NODE_TLS_REJECT_UNAUTHORIZED === "1",
-    "The paid v11 child must retain TLS certificate verification.");
+    `The paid ${authenticatedConfirmation.version} child must retain TLS certificate verification.`);
   for (const key of [
     "PERMITEXT_TEST_RESEARCH_MOCK",
     "PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE",
@@ -2423,7 +2476,7 @@ async function assertV11ConfirmationChildExecutionInputs({
     "PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY"
   ]) {
     assert(!process.env[key],
-      `The paid v11 child inherited forbidden test configuration: ${key}.`);
+      `The paid ${authenticatedConfirmation.version} child inherited forbidden test configuration: ${key}.`);
   }
 }
 
@@ -4231,10 +4284,10 @@ async function runSelfTest(dataset, datasetText) {
 async function main() {
   if (process.argv.includes("--help")) {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
-    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; --zoning-successor-remediation-3-v8-confirmation, --zoning-successor-remediation-3-v9-confirmation, and --zoning-successor-remediation-3-v11-confirmation use that same frozen cohort through distinct confirmation authorizations. None is baseline-eligible.");
+    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; --zoning-successor-remediation-3-v8-confirmation, --zoning-successor-remediation-3-v9-confirmation, --zoning-successor-remediation-3-v11-confirmation, and --zoning-successor-remediation-3-v12-confirmation use that same frozen cohort through distinct confirmation authorizations. None is baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
-    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3 | --zoning-successor-remediation-3-v8-confirmation | --zoning-successor-remediation-3-v9-confirmation | --zoning-successor-remediation-3-v11-confirmation) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
+    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3 | --zoning-successor-remediation-3-v8-confirmation | --zoning-successor-remediation-3-v9-confirmation | --zoning-successor-remediation-3-v11-confirmation | --zoning-successor-remediation-3-v12-confirmation) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
     console.log("No-cost successor advisory: --zoning-successor --zoning-successor-evidence-budget-advisory (compares disabled 24000 candidate with 48000 across only the canonically ready cases while the full gate stays blocked)");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error | --stop-on-execution-error] [--run-id UUID]");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
@@ -4247,7 +4300,7 @@ async function main() {
   }
   if (
     liveMode && zoningSuccessorFamilyMode &&
-    !zoningRemediationSuccessor3V11ConfirmationMode
+    !zoningRemediationSuccessor3AuthenticatedConfirmationMode
   ) {
     throw new Error(
       "Historical Zoning successor paid runner modes are retired. Each must run " +
@@ -4281,7 +4334,7 @@ async function main() {
       zoningRemediationSuccessor3Mode ||
       zoningRemediationSuccessor3V8ConfirmationMode ||
       zoningRemediationSuccessor3V9ConfirmationMode ||
-      zoningRemediationSuccessor3V11ConfirmationMode
+      zoningRemediationSuccessor3AuthenticatedConfirmationMode
     )
       ? zoningRemediationSuccessor3CasesPath
       : zoningRemediationSuccessor2Mode ? zoningRemediationSuccessor2CasesPath
@@ -4414,21 +4467,21 @@ async function main() {
         zoningRemediationSuccessor3Mode ||
         zoningRemediationSuccessor3V8ConfirmationMode ||
         zoningRemediationSuccessor3V9ConfirmationMode ||
-        zoningRemediationSuccessor3V11ConfirmationMode
+        zoningRemediationSuccessor3AuthenticatedConfirmationMode
       ) {
-        let v11ExecutionCommit = null;
-        if (zoningRemediationSuccessor3V11ConfirmationMode) {
-          v11ExecutionCommit = await currentGitCommit();
+        let authenticatedExecutionCommit = null;
+        if (zoningRemediationSuccessor3AuthenticatedConfirmationMode) {
+          authenticatedExecutionCommit = await currentGitCommit();
           await requireAuthenticatedZoningV11RunnerHandoff({
             runID: requestedRunID,
-            executionCommit: v11ExecutionCommit
+            executionCommit: authenticatedExecutionCommit
           });
         }
         const runLockPath = join(
           serverRoot,
           "evals",
-          zoningRemediationSuccessor3V11ConfirmationMode
-            ? ".zoning-successor-remediation-3-v11-confirmation-paid-run.lock"
+          zoningRemediationSuccessor3AuthenticatedConfirmationMode
+            ? authenticatedConfirmation.runLockFile
             : zoningRemediationSuccessor3V9ConfirmationMode
             ? ".zoning-successor-remediation-3-v9-confirmation-paid-run.lock"
             : zoningRemediationSuccessor3V8ConfirmationMode
@@ -4447,7 +4500,7 @@ async function main() {
             typeof runnerLock?.nonce === "string" &&
             runnerLock.nonce.length > 0 &&
             (
-              zoningRemediationSuccessor3V11ConfirmationMode ||
+              zoningRemediationSuccessor3AuthenticatedConfirmationMode ||
               runnerLock.nonce === process.env.PERMITEXT_ZONING_PAID_RUNNER_NONCE
             ),
           "Paid remediation successor 3 must run through its consuming runner and active run lock."
@@ -4469,8 +4522,8 @@ async function main() {
           "Paid remediation successor 3 must retain the matching global evaluation lock."
         );
         remediationSuccessor3Execution =
-          zoningRemediationSuccessor3V11ConfirmationMode
-            ? await validateZoningRemediationSuccessor3V11ConfirmationPaidAuthorization()
+          zoningRemediationSuccessor3AuthenticatedConfirmationMode
+            ? await authenticatedConfirmation.validate()
             : zoningRemediationSuccessor3V9ConfirmationMode
             ? await validateZoningRemediationSuccessor3V9ConfirmationPaidAuthorization()
             : zoningRemediationSuccessor3V8ConfirmationMode
@@ -4481,28 +4534,28 @@ async function main() {
             remediationSuccessor3Execution.authorization.consumption?.attemptID === requestedRunID,
           "Paid remediation successor 3 requires the runner's exact durable running authorization."
         );
-        if (zoningRemediationSuccessor3V11ConfirmationMode) {
+        if (zoningRemediationSuccessor3AuthenticatedConfirmationMode) {
           assert(stopOnExecutionError === true && stopOnError === false,
-            "Paid v11 confirmation must use the authorized stop-on-execution-error policy.");
+            `Paid ${authenticatedConfirmation.version} confirmation must use the authorized stop-on-execution-error policy.`);
           assert(zoningEvidenceBudgetMode === false,
-            "Paid v11 confirmation may not enable an evidence-budget prototype mode.");
+            `Paid ${authenticatedConfirmation.version} confirmation may not enable an evidence-budget prototype mode.`);
           assert(process.env.PERMITEXT_RESEARCH_WEB_SUPPORT === "off",
-            "Paid v11 confirmation must keep provider web support disabled.");
+            `Paid ${authenticatedConfirmation.version} confirmation must keep provider web support disabled.`);
           assert(process.env.PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS === "0",
-            "Paid v11 confirmation must keep model evidence analysis disabled.");
+            `Paid ${authenticatedConfirmation.version} confirmation must keep model evidence analysis disabled.`);
           assert(process.env.PERMITEXT_RESEARCH_REASONING_EFFORT === "medium",
-            "Paid v11 confirmation must use the locked answer reasoning effort.");
+            `Paid ${authenticatedConfirmation.version} confirmation must use the locked answer reasoning effort.`);
           assert(!process.env.PERMITEXT_ZONING_PAID_RUNNER_NONCE,
-            "Paid v11 confirmation may not expose its runner authentication in the environment.");
-          const executionCommit = v11ExecutionCommit;
+            `Paid ${authenticatedConfirmation.version} confirmation may not expose its runner authentication in the environment.`);
+          const executionCommit = authenticatedExecutionCommit;
           assert(
             runnerLock.executionCommit === executionCommit &&
               globalRunnerLock.executionCommit === executionCommit &&
               remediationSuccessor3Execution.authorization.execution?.executionCommit ===
                 executionCommit,
-            "Paid v11 confirmation requires the exact clean execution commit in its lock and running authorization."
+            `Paid ${authenticatedConfirmation.version} confirmation requires the exact clean execution commit in its lock and running authorization.`
           );
-          await assertV11ConfirmationChildExecutionInputs({
+          await assertAuthenticatedConfirmationChildExecutionInputs({
             authorization: remediationSuccessor3Execution.authorization,
             datasetText,
             executionCommit
@@ -4513,7 +4566,7 @@ async function main() {
         zoningRemediationSuccessor3Mode ||
         zoningRemediationSuccessor3V8ConfirmationMode ||
         zoningRemediationSuccessor3V9ConfirmationMode ||
-        zoningRemediationSuccessor3V11ConfirmationMode
+        zoningRemediationSuccessor3AuthenticatedConfirmationMode
       )
         ? remediationSuccessor3Execution.authorization.scope
         : zoningRemediationSuccessor2Mode
