@@ -79,7 +79,7 @@
     "@blocknote/react": "^0.52.1",
     "@clerk/backend": "^3.16.10",
     "@mantine/core": "^9.5.0",
-    "@mantine/hooks": "^9.5.0",
+    "@mantine/hooks": "^9.5.2",
     "@neondatabase/serverless": "^1.0.0",
     "@vercel/blob": "^2.6.1",
     "pdfkit": "^0.17.1",
