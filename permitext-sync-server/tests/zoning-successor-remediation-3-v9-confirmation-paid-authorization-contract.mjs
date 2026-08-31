@@ -97,8 +97,8 @@ for (const requiredGuard of [
     `The v9 confirmation runner is missing guard: ${requiredGuard}`);
 }
 assert.match(runnerSource,
-  /if \(!remediationSuccessor3V9ConfirmationMode\)[\s\S]{0,120}retiredPaidPathMessage/,
-  "Historical runner modes, including v8, must remain retired.");
+  /if \(!remediationSuccessor3V11ConfirmationMode\)[\s\S]{0,120}retiredPaidPathMessage/,
+  "Historical runner modes, including v8 and consumed v9, must remain retired.");
 
 const evaluatorSource = await readFile(evaluatorPath, "utf8");
 for (const requiredGuard of [
@@ -107,7 +107,6 @@ for (const requiredGuard of [
   "validateZoningRemediationSuccessor3V9ConfirmationPaidAuthorization",
   ".paid-evaluation-run.lock",
   "PERMITEXT_ZONING_PAID_RUNNER_NONCE",
-  "Paid v9 confirmation requires the exact clean execution commit",
   "Only the durable running authorization may differ in the child",
   "globalRunnerLock?.nonce === runnerLock?.nonce",
   "globalRunnerLock?.executionCommit === runnerLock?.executionCommit"

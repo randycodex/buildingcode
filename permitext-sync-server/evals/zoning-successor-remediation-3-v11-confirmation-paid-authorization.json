@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "authorizationID": "ee72ca2f-5410-4ce9-a6d6-30deb8ff5169",
+  "status": "locked",
+  "cohort": {
+    "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
+    "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
+    "caseCount": 30
+  },
+  "scope": {
+    "purpose": "one complete 30-case owner-approved remediation successor 3 semantic run",
+    "caseCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
+  },
+  "ownerDecision": {
+    "required": true,
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
+  },
+  "consumption": {
+    "status": "not_started",
+    "attemptID": null,
+    "startedAt": null,
+    "runID": null,
+    "consumedAt": null
+  },
+  "lineage": {
+    "preparedFromCommit": "cd1f3a99f32a3648dd8f0d7a8b1d540e5db29bf5",
+    "zoningSafetyVersion": "20260831-zoning-material-completeness-v11",
+    "zoningSafetySHA256": "8003374fb8302a69bdcb924e2e6fe66855c11f52444f045dfb6e75bff1b476f7",
+    "researchEconomicsSHA256": "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0",
+    "appSHA256": "1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797",
+    "priorAuthorizationFile": "zoning-successor-remediation-3-v9-confirmation-paid-authorization.json",
+    "priorAuthorizationSHA256": "ffa134fc6f2855264ff54c8b285ba49f3bb16ab908b712072854d61bc2eb39e4",
+    "priorAuthorizationPackageCommit": "571367800030d49a103a999090eaa615baa361ec",
+    "priorExecutionCommit": "17fea6186d35a43348c5b73f419ccc9014dfb374",
+    "priorRunID": "00570309-e1f2-441b-9f09-8df4f0603253",
+    "priorResultJSONFile": "results/2026-08-31T17-22-10-000Z-00570309-e1f2-441b-9f09-8df4f0603253.json",
+    "priorResultJSONSHA256": "ad43aee5d7d9038eef1de09f1b9595b779abe4bcb7199421e5a905807380c9d6",
+    "priorResultMarkdownFile": "results/2026-08-31T17-22-10-000Z-00570309-e1f2-441b-9f09-8df4f0603253.md",
+    "priorResultMarkdownSHA256": "46a1f7c0b299ac1e1b6234f19e34a557389dcde2381f89c253802ef2152f30ad"
+  },
+  "execution": {
+    "authorizationPackageCommit": null,
+    "executionCommit": null,
+    "webSupportEnabled": false,
+    "stopOnExecutionError": true
+  },
+  "publicResearchReleaseAuthorized": false,
+  "professionalZoningSignoff": false,
+  "deploymentAuthorized": false,
+  "pricingOrAllowanceChangeAuthorized": false,
+  "evidenceBudgetCandidateEnabled": false,
+  "notes": "Prepared and locked for independent no-cost review of Zoning safety v11. This record is not authorization to run. A future owner decision must name the committed authorization package, all 30 ordered cases, one repetition, and a new cumulative spend cap no higher than $5."
+}
