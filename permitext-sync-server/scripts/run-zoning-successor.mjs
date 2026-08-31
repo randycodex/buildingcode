@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 import { spawn, spawnSync } from "node:child_process";
 import { open, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   requireActiveZoningSuccessorPaidAuthorization,
@@ -11,6 +12,10 @@ import {
   requireActiveZoningRemediationSuccessor2PaidAuthorization,
   validateZoningRemediationSuccessor2PaidAuthorization
 } from "../evals/zoning-successor-remediation-2-paid-authorization.mjs";
+import {
+  requireActiveZoningRemediationSuccessor3PaidAuthorization,
+  validateZoningRemediationSuccessor3PaidAuthorization
+} from "../evals/zoning-successor-remediation-3-paid-authorization.mjs";
 import {
   researchCommercializationBenchmark,
   researchCommercializationBenchmarkEnvironment
@@ -23,61 +28,97 @@ import {
 const serverRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const repositoryRoot = resolve(serverRoot, "..");
 const resultsDirectory = resolve(serverRoot, "evals", "results");
+const globalRunLockPath = resolve(serverRoot, "evals", ".paid-evaluation-run.lock");
 const runnerArguments = process.argv.slice(2);
 assert(
   runnerArguments.length <= 1 &&
-    runnerArguments.every((argument) => argument === "--remediation-2"),
-  "Unsupported Zoning successor paid-run argument. Remediation successor 3 has no live runner or paid authorization."
+    runnerArguments.every((argument) =>
+      ["--remediation-2", "--remediation-3"].includes(argument)),
+  "Unsupported Zoning successor paid-run argument."
 );
 const remediationSuccessor2Mode = process.argv.includes("--remediation-2");
+const remediationSuccessor3Mode = process.argv.includes("--remediation-3");
 const authorizationPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor2Mode
+  remediationSuccessor3Mode
+    ? "zoning-successor-remediation-3-paid-authorization.json"
+    : remediationSuccessor2Mode
     ? "zoning-successor-remediation-2-paid-authorization.json"
     : "zoning-successor-paid-authorization.json"
+);
+const authorizationModulePath = resolve(
+  serverRoot,
+  "evals",
+  remediationSuccessor3Mode
+    ? "zoning-successor-remediation-3-paid-authorization.mjs"
+    : remediationSuccessor2Mode
+    ? "zoning-successor-remediation-2-paid-authorization.mjs"
+    : "zoning-successor-paid-authorization.mjs"
 );
 const runLockPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor2Mode
+  remediationSuccessor3Mode
+    ? ".zoning-successor-remediation-3-paid-run.lock"
+    : remediationSuccessor2Mode
     ? ".zoning-successor-remediation-2-paid-run.lock"
     : ".zoning-successor-paid-run.lock"
 );
 
-async function acquireRunLock() {
+async function acquireRunLock(lockPath, label, evidence) {
   let handle;
   try {
-    handle = await open(runLockPath, "wx");
+    handle = await open(lockPath, "wx");
   } catch (error) {
     if (error.code === "EEXIST") {
       throw new Error(
-        "A Zoning successor paid run is already active or its fail-closed lock requires review."
+        `A ${label} paid run is already active or its fail-closed lock requires review.`
       );
     }
     throw error;
   }
-  await handle.writeFile(`${process.pid}\n`, "utf8");
+  await handle.writeFile(`${JSON.stringify(evidence)}\n`, "utf8");
   return async () => {
     await handle.close();
-    await rm(runLockPath, { force: true });
+    await rm(lockPath, { force: true });
   };
 }
 
-async function resultFiles() {
-  return new Set(
-    (await readdir(resultsDirectory))
-      .filter((name) => name.endsWith(".json"))
-  );
+async function writeAuthorizationAtomically(authorization) {
+  const temporaryPath = `${authorizationPath}.tmp-${process.pid}`;
+  await writeFile(temporaryPath, `${JSON.stringify(authorization, null, 2)}\n`, "utf8");
+  await rename(temporaryPath, authorizationPath);
 }
 
-async function consumeAuthorization({ beforeResults, cohort, cohortSHA256 }) {
-  const afterResults = await resultFiles();
-  const newFiles = [...afterResults].filter((name) => !beforeResults.has(name));
-  assert.equal(newFiles.length, 1,
-    "The paid run did not produce exactly one new machine-result file; authorization remains active for manual review.");
-  const resultFile = resolve(resultsDirectory, newFiles[0]);
+async function beginAuthorizationAttempt(runID) {
+  const authorization = JSON.parse(await readFile(authorizationPath, "utf8"));
+  assert.equal(authorization.status, "authorized",
+    "The one-time authorization was not active before provider dispatch.");
+  authorization.status = "running";
+  authorization.consumption = {
+    status: "running",
+    attemptID: runID,
+    startedAt: new Date().toISOString(),
+    runID: null,
+    consumedAt: null
+  };
+  authorization.notes =
+    `One-time authorization entered fail-closed running state for attempt ${runID}. ` +
+    "A crash or missing result requires manual review and may not be retried automatically.";
+  await writeAuthorizationAtomically(authorization);
+  return authorization;
+}
+
+async function consumeAuthorization({ runID, cohort, cohortSHA256 }) {
+  const resultNames = (await readdir(resultsDirectory))
+    .filter((name) => name.endsWith(`-${runID}.json`));
+  assert.equal(resultNames.length, 1,
+    "The paid run did not produce exactly one result bound to its durable attempt ID; authorization remains fail-closed for manual review.");
+  const resultFile = resolve(resultsDirectory, resultNames[0]);
   const result = JSON.parse(await readFile(resultFile, "utf8"));
+  assert.equal(result.configuration?.runID, runID,
+    "The new result is not bound to the pre-dispatch attempt ID.");
   assert.equal(result.configuration?.datasetSHA256, cohortSHA256,
     "The new result is not bound to the authorized successor SHA.");
   assert.equal(result.configuration?.repeat, 1,
@@ -86,36 +127,49 @@ async function consumeAuthorization({ beforeResults, cohort, cohortSHA256 }) {
     "The new result does not contain the exact authorized case order.");
   assert.match(result.configuration?.runID || "", /^[0-9a-f-]{36}$/i,
     "The new result has no valid run ID.");
+  if (remediationSuccessor3Mode) {
+    assert.equal(result.configuration?.webSupportEnabled, false,
+      "The capped remediation-successor-3 result unexpectedly enabled unbudgeted web-search fees.");
+    assert.equal(result.configuration?.stopOnExecutionError, true,
+      "The remediation-successor-3 result did not retain its fail-fast execution policy.");
+  }
 
   const authorization = JSON.parse(await readFile(authorizationPath, "utf8"));
-  assert.equal(authorization.status, "authorized",
-    "The one-time authorization was not active when the run completed.");
+  assert.equal(authorization.status, "running",
+    "The one-time authorization was not in its fail-closed running state when the run completed.");
+  assert.equal(authorization.consumption?.attemptID, runID,
+    "The running authorization does not match the completed attempt.");
   authorization.status = "consumed";
   authorization.consumption = {
+    ...authorization.consumption,
     status: "consumed",
     runID: result.configuration.runID,
     consumedAt: new Date().toISOString()
   };
   authorization.notes =
-    `One-time authorization consumed by ${newFiles[0]}. ` +
+    `One-time authorization consumed by ${resultNames[0]}. ` +
     "The result still requires quality, cost, and release-gate review.";
-  const temporaryPath = `${authorizationPath}.tmp-${process.pid}`;
-  await writeFile(temporaryPath, `${JSON.stringify(authorization, null, 2)}\n`, "utf8");
-  await rename(temporaryPath, authorizationPath);
+  await writeAuthorizationAtomically(authorization);
   return { resultFile, result };
 }
 
-function runEvaluation(environment, repetitions) {
+function runEvaluation(environment, repetitions, runID) {
   return new Promise((resolveRun, rejectRun) => {
-    const child = spawn(process.execPath, [
+    const childArguments = [
       "tests/research-evals.mjs",
-      remediationSuccessor2Mode
+      remediationSuccessor3Mode
+        ? "--zoning-successor-remediation-3"
+        : remediationSuccessor2Mode
         ? "--zoning-successor-remediation-2"
         : "--zoning-successor",
       "--run-live",
       "--repeat",
-      String(repetitions)
-    ], {
+      String(repetitions),
+      "--run-id",
+      runID,
+      ...(remediationSuccessor3Mode ? ["--stop-on-execution-error"] : [])
+    ];
+    const child = spawn(process.execPath, childArguments, {
       cwd: serverRoot,
       env: environment,
       stdio: "inherit"
@@ -126,7 +180,11 @@ function runEvaluation(environment, repetitions) {
 }
 
 async function main() {
-  const validation = remediationSuccessor2Mode
+  const validation = remediationSuccessor3Mode
+    ? requireActiveZoningRemediationSuccessor3PaidAuthorization(
+        await validateZoningRemediationSuccessor3PaidAuthorization()
+      )
+    : remediationSuccessor2Mode
     ? requireActiveZoningRemediationSuccessor2PaidAuthorization(
         await validateZoningRemediationSuccessor2PaidAuthorization()
       )
@@ -138,6 +196,22 @@ async function main() {
     "Frozen successor case count does not match the authorization.");
   assert(process.env.OPENAI_API_KEY,
     "Set OPENAI_API_KEY before running the paid Zoning successor diagnostic.");
+
+  const requiredTrackedPaths = [
+    resolve(serverRoot, "scripts", "run-zoning-successor.mjs"),
+    resolve(serverRoot, "tests", "research-evals.mjs"),
+    resolve(serverRoot, "evals", "zoning-successor-paid-authorization.mjs"),
+    authorizationModulePath,
+    authorizationPath,
+    validation.cohortPath
+  ].map((path) => relative(repositoryRoot, path));
+  const trackedStatus = spawnSync(
+    "git",
+    ["ls-files", "--error-unmatch", "--", ...requiredTrackedPaths],
+    { cwd: repositoryRoot, stdio: "ignore" }
+  );
+  assert.equal(trackedStatus.status, 0,
+    "Every paid-run input, authorization, and guard must be tracked at HEAD before dispatch.");
 
   for (const args of [
     ["diff", "--quiet", "--", "permitext-sync-server"],
@@ -162,27 +236,49 @@ async function main() {
       researchCommercializationBenchmark.accurateModel,
     PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT: "medium",
     PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION:
-      "20260826-established-facts-v3"
+      "20260826-established-facts-v3",
+    ...(remediationSuccessor3Mode
+      ? { PERMITEXT_RESEARCH_WEB_SUPPORT: "off" }
+      : {})
   };
   const paidEnvironment = validatePaidResearchEvaluationEnvironment(environment);
   assert.equal(
     paidEnvironment.approvedSpendCapUSD,
     authorization.scope.maximumCumulativeSpendUSD
   );
-  const releaseRunLock = await acquireRunLock();
+  const runID = randomUUID();
+  const runnerNonce = randomUUID();
+  environment.PERMITEXT_ZONING_PAID_RUNNER_NONCE = runnerNonce;
+  const releaseGlobalRunLock = await acquireRunLock(
+    globalRunLockPath,
+    "global Permitext evaluation",
+    { pid: process.pid, runID }
+  );
+  let releaseRunLock;
   let result;
   let consumed;
   try {
-    const beforeResults = await resultFiles();
+    releaseRunLock = await acquireRunLock(
+      runLockPath,
+      "Zoning successor",
+      { pid: process.pid, runID, nonce: runnerNonce }
+    );
+    await beginAuthorizationAttempt(runID);
     console.log(
       `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning ` +
-      `${remediationSuccessor2Mode ? "remediation successor 2" : "successor"} ` +
+      `${remediationSuccessor3Mode
+        ? "remediation successor 3"
+        : remediationSuccessor2Mode ? "remediation successor 2" : "successor"} ` +
       `once with a $${paidEnvironment.approvedSpendCapUSD.toFixed(2)} maximum cumulative cap. ` +
       "The 24,000-character candidate remains disabled."
     );
-    result = await runEvaluation(environment, authorization.scope.repetitions);
+    result = await runEvaluation(
+      environment,
+      authorization.scope.repetitions,
+      runID
+    );
     consumed = await consumeAuthorization({
-      beforeResults,
+      runID,
       cohort,
       cohortSHA256: authorization.cohort.sha256
     });
@@ -190,7 +286,8 @@ async function main() {
       `Consumed the one-time authorization for run ${consumed.result.configuration.runID}.`
     );
   } finally {
-    await releaseRunLock();
+    if (releaseRunLock) await releaseRunLock();
+    await releaseGlobalRunLock();
   }
   if (result.signal) throw new Error(`Zoning successor diagnostic stopped by ${result.signal}.`);
   if (![0, 3].includes(result.code)) {

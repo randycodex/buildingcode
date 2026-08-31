@@ -34,6 +34,10 @@ const paidPurposeByCohortFile = new Map([
   [
     "zoning-cases-expanded-batch-1-successor-remediation-2.json",
     "one complete 30-case owner-approved remediation successor 2 semantic run"
+  ],
+  [
+    "zoning-cases-expanded-batch-1-successor-remediation-3.json",
+    "one complete 30-case owner-approved remediation successor 3 semantic run"
   ]
 ]);
 
@@ -59,6 +63,8 @@ function validateLockedState(record) {
     "Locked authorization must remain not started.");
   assert(record.consumption?.runID === null && record.consumption?.consumedAt === null,
     "Locked authorization may not contain run-consumption evidence.");
+  assert(record.consumption?.attemptID == null && record.consumption?.startedAt == null,
+    "Locked authorization may not contain run-attempt evidence.");
 }
 
 function validateAuthorizedScope(record) {
@@ -81,7 +87,7 @@ export async function validateZoningSuccessorPaidAuthorization({
   const authorization = JSON.parse(authorizationText);
   assert(authorization.schemaVersion === 1,
     "Unsupported Zoning successor paid-authorization schema.");
-  assert(["locked", "authorized", "consumed"].includes(authorization.status),
+  assert(["locked", "authorized", "running", "consumed"].includes(authorization.status),
     "Invalid Zoning successor paid-authorization status.");
   assert(authorization.cohort?.caseCount === 30,
     "The authorization must remain bound to the 30-case successor.");
@@ -116,6 +122,20 @@ export async function validateZoningSuccessorPaidAuthorization({
     assert(authorization.consumption?.runID === null &&
       authorization.consumption?.consumedAt === null,
       "An active authorization may not contain completed-run evidence.");
+    assert(authorization.consumption?.attemptID == null &&
+      authorization.consumption?.startedAt == null,
+    "An active authorization may not contain started-run evidence.");
+  }
+  if (authorization.status === "running") {
+    validateAuthorizedScope(authorization);
+    assert(authorization.consumption?.status === "running" &&
+      typeof authorization.consumption?.attemptID === "string" &&
+      /^[0-9a-f-]{36}$/i.test(authorization.consumption.attemptID) &&
+      typeof authorization.consumption?.startedAt === "string" &&
+      authorization.consumption.startedAt.length > 0 &&
+      authorization.consumption?.runID === null &&
+      authorization.consumption?.consumedAt === null,
+    "A running authorization requires durable attempt evidence and may not be reusable.");
   }
   if (authorization.status === "consumed") {
     validateAuthorizedScope(authorization);

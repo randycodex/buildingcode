@@ -12,7 +12,7 @@ Frozen successor SHA-256: `852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce6
 
 The owner approved the two narrow case/evidence corrections identified by the retained remediation-successor-2 result and independent no-cost review. This record freezes those corrections in a new 30-case successor without mutating or rescoring the parent or any paid result.
 
-No paid evaluation is authorized. No paid-authorization file or live package command exists for remediation successor 3. Public Zoning Research, the disabled 24,000-character candidate, Production configuration, pricing, and the 100-turn allowance remain unchanged.
+No paid evaluation is authorized at this preparation checkpoint. A dedicated exact-SHA authorization record and live package command now exist, but the authorization is locked and the direct evaluator cannot bypass the consuming runner. Before dispatch, that runner must bind a unique run ID to a durable non-reusable `running` state and both global and cohort locks. The bounded run disables provider web search because its tool-call and retrieved-content fees are not represented by the token-only evaluation ledger, and it stops after the first execution error without treating a semantic quality failure as an infrastructure stop. Public Zoning Research, the disabled 24,000-character candidate, Production configuration, pricing, and the 100-turn allowance remain unchanged.
 
 ## Exact corrections
 
@@ -39,7 +39,7 @@ No paid evaluation is authorized. No paid-authorization file or live package com
 - Zoning safety v7 and the complete Zoning adapter contract pass.
 - Complete repository `npm run check`: pass with paid-evaluation variables removed; PostgreSQL integration was skipped because no database URL was configured.
 - The consumed remediation-successor-2 authorization remains byte-identical at SHA `671a88a1445f2c8c818fdf8746795cab95121fed425d916953cc8f4fa93511e0`, bound to retained run `f35eed33-cb4e-4b7b-a719-86b072271660`.
-- A direct remediation-successor-3 live attempt fails before provider dispatch, and the paid runner rejects `--remediation-3` as unsupported. Paid requests made: zero.
+- A direct remediation-successor-3 live attempt fails before provider dispatch unless its parent, unique run ID, and random runner nonce match the dedicated consuming runner's cohort lock. The runner requires all paid inputs to be committed, takes a global paid-evaluation lock, atomically moves the authorization to a fail-closed `running` state before dispatch, binds the result filename and configuration to that run ID, and consumes the authorization after verifying the exact cohort/order/repetition and disabled web-search policy. Paid requests made at this checkpoint: zero.
 
 ## Remaining gate
 

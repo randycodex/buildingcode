@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { createHash, randomUUID } from "node:crypto";
 import { execFile } from "node:child_process";
-import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,6 +32,7 @@ import {
 } from "../research-config.mjs";
 import { requestResearchProvider } from "../research-provider-client.mjs";
 import { rateLimitPolicies } from "../rate-limit.mjs";
+import { researchSourcePolicyConfiguration } from "../research-source-policy.mjs";
 import { zoningSection, zoningSectionSummary } from "../zoning-content.mjs";
 import {
   requireActiveZoningSuccessorPaidAuthorization,
@@ -41,6 +42,10 @@ import {
   requireActiveZoningRemediationSuccessor2PaidAuthorization,
   validateZoningRemediationSuccessor2PaidAuthorization
 } from "../evals/zoning-successor-remediation-2-paid-authorization.mjs";
+import {
+  requireActiveZoningRemediationSuccessor3PaidAuthorization,
+  validateZoningRemediationSuccessor3PaidAuthorization
+} from "../evals/zoning-successor-remediation-3-paid-authorization.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
@@ -2685,7 +2690,9 @@ function evaluationErrorRecord(error) {
 }
 
 async function persistEvaluationRunSnapshot(jsonPath, snapshot) {
-  await writeFile(jsonPath, `${JSON.stringify(snapshot, null, 2)}\n`);
+  const temporaryPath = `${jsonPath}.tmp-${process.pid}`;
+  await writeFile(temporaryPath, `${JSON.stringify(snapshot, null, 2)}\n`);
+  await rename(temporaryPath, jsonPath);
 }
 
 async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options = {}) {
@@ -2698,7 +2705,7 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
   const stamp = createdAt.replace(/[:.]/g, "-");
   const answerConfiguration = researchModelConfiguration();
   const baseConfiguration = {
-    runID: randomUUID(),
+    runID: options.runID || randomUUID(),
     datasetSHA256: createHash("sha256").update(datasetText).digest("hex"),
     datasetKind: options.datasetKind || "construction-code",
     codeEditions: Array.from(new Set(checkedCases.map((testCase) => testCase.codeEdition))),
@@ -2715,6 +2722,9 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
     judgeModel: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL || process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra",
     judgeReasoningEffort: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT || "medium",
     judgePromptVersion,
+    webSupportEnabled:
+      researchSourcePolicyConfiguration(process.env).webSupportEnabled,
+    stopOnExecutionError: options.stopOnExecutionError === true,
     pricingVersion: estimatedResearchCost({ inputTokens: 0, outputTokens: 0 }).pricingVersion,
     gitCommit: await currentGitCommit()
   };
@@ -2774,7 +2784,9 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
   console.log(
     `${runLabel}: ${checkedCases.length} cases × ${repeat} repetition(s). ` +
     "Each case runs one production Research turn and one separate grader; internal verification or revision can add provider requests. " +
-    `The approved spend cap is checked before every paid request.${options.stopOnError ? " This run stops after the first case error or quality failure." : ""}`
+    `The approved spend cap is checked before every paid request.${options.stopOnError
+      ? " This run stops after the first case error or quality failure."
+      : options.stopOnExecutionError ? " This run stops after the first execution error." : ""}`
   );
   await saveSnapshot("running");
   let haltedFailure = null;
@@ -2852,7 +2864,7 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
             code: error.code || null,
             message: error.message
           };
-        } else if (options.stopOnError) {
+        } else if (options.stopOnError || options.stopOnExecutionError) {
           haltedFailure = {
             caseID: testCase.id,
             code: error.code || error.name || null,
@@ -4023,7 +4035,7 @@ async function main() {
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
     console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
     console.log("No-cost successor advisory: --zoning-successor --zoning-successor-evidence-budget-advisory (compares disabled 24000 candidate with 48000 across only the canonically ready cases while the full gate stays blocked)");
-    console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error]");
+    console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error | --stop-on-execution-error] [--run-id UUID]");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
     console.log("Compare: --compare CURRENT_RUN_JSON --against BASELINE_RUN_OR_BASELINE_JSON");
     console.log("Default/--dry-run mode validates the dataset and canonical evidence without calling OpenAI.");
@@ -4094,11 +4106,20 @@ async function main() {
   const requestedCodeEdition = argumentValue("--code-edition");
   const requestedModel = argumentValue("--model");
   const requestedPromptVersion = argumentValue("--prompt-version");
+  const requestedRunID = argumentValue("--run-id");
   const repeat = positiveIntegerArgument("--repeat");
   const maximumSupplementalCharacters = zoningEvidenceBudgetPrototypeMode
     ? positiveIntegerArgument("--max-supplemental-characters", 18_000, 48_000)
     : null;
   const stopOnError = process.argv.includes("--stop-on-error");
+  const stopOnExecutionError = process.argv.includes("--stop-on-execution-error");
+  assert(!(stopOnError && stopOnExecutionError),
+    "Choose only one evaluation stop policy.");
+  if (requestedRunID) {
+    assert(liveMode, "--run-id is supported only for live evaluation execution.");
+    assert(/^[0-9a-f-]{36}$/i.test(requestedRunID),
+      "--run-id must be a UUID supplied by the consuming runner.");
+  }
   if (requestedModel) process.env.PERMITEXT_RESEARCH_MODEL = requestedModel;
   if (requestedPromptVersion) {
     assert(
@@ -4171,9 +4192,32 @@ async function main() {
 
   if (liveMode) {
     if (zoningMode) {
-      assert(!zoningRemediationSuccessor3Mode,
-        "Remediation successor 3 has no paid authorization. A paid run requires a new exact-cohort owner authorization and cumulative spend cap.");
-      const authorized = zoningRemediationSuccessor2Mode
+      if (zoningRemediationSuccessor3Mode) {
+        const runLockPath = join(
+          serverRoot,
+          "evals",
+          ".zoning-successor-remediation-3-paid-run.lock"
+        );
+        let runnerLock = null;
+        try {
+          runnerLock = JSON.parse(await readFile(runLockPath, "utf8"));
+        } catch {
+          runnerLock = null;
+        }
+        assert(
+          runnerLock?.pid === process.ppid &&
+            runnerLock?.runID === requestedRunID &&
+            typeof runnerLock?.nonce === "string" &&
+            runnerLock.nonce.length > 0 &&
+            runnerLock.nonce === process.env.PERMITEXT_ZONING_PAID_RUNNER_NONCE,
+          "Paid remediation successor 3 must run through its consuming runner and active run lock."
+        );
+      }
+      const authorized = zoningRemediationSuccessor3Mode
+        ? requireActiveZoningRemediationSuccessor3PaidAuthorization(
+            await validateZoningRemediationSuccessor3PaidAuthorization()
+          ).authorization.scope
+        : zoningRemediationSuccessor2Mode
         ? requireActiveZoningRemediationSuccessor2PaidAuthorization(
             await validateZoningRemediationSuccessor2PaidAuthorization()
           ).authorization.scope
@@ -4271,6 +4315,8 @@ async function main() {
         suiteScope,
         repeat,
         stopOnError,
+        stopOnExecutionError,
+        runID: requestedRunID,
         datasetKind: zoningMode ? "zoning-resolution" : "construction-code",
         retrievalVersion: zoningMode
           ? "owner-reviewed-zoning-pinned-evidence-diagnostic"
