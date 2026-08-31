@@ -1,5 +1,5 @@
 export const zoningResearchSafetyVersion =
-  "20260830-zoning-material-completeness-v7";
+  "20260830-zoning-material-completeness-v8";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -188,17 +188,72 @@ function citedSourceIDs(answer) {
     .flatMap((citation) => citation?.sourceIDs));
 }
 
+function hasProjectHeadReference(value) {
+  const text = compactText(value);
+  if (!text) return false;
+  return /\b(?:it|this|that|these|those|they|both|one)\b/i.test(text) ||
+    /\b(?:sites?|propert(?:y|ies)|parcels?|(?:tax|zoning) lots?|lots?|projects?|developments?|buildings?|proposals?|uses?|facilit(?:y|ies)|premises|tracts?|structures?)\b/i.test(text);
+}
+
+const zoningSectionReferencePattern = String.raw`Section\s+[0-9A-Za-z.-]+`;
+const zoningCommissionPattern = String.raw`(?:CPC|City Planning Commission)`;
+const zoningPermitObjectPattern = String.raw`(?:(?:a\s+)?(?:${zoningCommissionPattern}\s+)?special permit(?:\s+of\s+(?:the\s+)?City Planning Commission)?(?:\s+(?:under|pursuant to)\s+${zoningSectionReferencePattern})?|(?:(?:the\s+)?${zoningCommissionPattern}(?:['’]s)?\s+approval|(?:the\s+)?approval\s+(?:of|from|by)\s+(?:the\s+)?${zoningCommissionPattern})|(?:an?\s+)?(?:${zoningCommissionPattern}\s+)?authorization(?:\s+(?:under|pursuant to)\s+${zoningSectionReferencePattern})?)`;
+const zoningSpecialPermitPredicatePattern = String.raw`(?:(?:requires?|need(?:s)?)\s+${zoningPermitObjectPattern}|need(?:s)?\s+to\s+(?:obtain|secure|have)\s+${zoningPermitObjectPattern}|(?:has|have)\s+to\s+(?:(?:obtain|secure|have)\s+${zoningPermitObjectPattern}|be\s+(?:subject to|contingent on)\s+${zoningPermitObjectPattern})|must\s+(?:obtain|secure|have)\s+${zoningPermitObjectPattern}|(?:cannot|may|can)\s+proceed\s+(?:without|subject to|only\s+(?:by|with))\s+${zoningPermitObjectPattern}|(?:may|shall|must|can)\s+not\s+proceed\s+without\s+${zoningPermitObjectPattern}|(?:is|are|shall be|must be)\s+(?:subject to|contingent on)\s+${zoningPermitObjectPattern})`;
+
+function hasSpecialPermitOrAuthorizationPredicate(value) {
+  return new RegExp(String.raw`\b${zoningSpecialPermitPredicatePattern}\b`, "i")
+    .test(compactText(value));
+}
+
+function hasMappedOrRegulatoryPredicate(value) {
+  const text = compactText(value);
+  return /\b(?:is|are|will be|would be|can be|may be|shall be|must be)\b[^.]{0,160}\b(?:permitted|allowed|authorized|compliant|lawful|as[- ]of[- ]right|within|outside|subject to|required|special permit)\b/i.test(text) ||
+    /\b(?:is|are|falls|lies)\s+(?:within|outside|in|on)\b/i.test(text) ||
+    hasSpecialPermitOrAuthorizationPredicate(text) ||
+    /^(?:permitted|allowed|authorized)\s+as[- ]of[- ]right\b[^.]{0,140}\b(?:Subarea\s*[12]|Appendix\s+[A-Z]|mapped area|designated area)\b/i.test(text) ||
+    /^(?:within|in|outside)\s+(?:the\s+)?(?:Subarea\s*[12]|Appendix\s+[A-Z]|mapped area|designated area)\b[^.]{0,140}\b(?:permitted|allowed|authorized|as[- ]of[- ]right|special permit)\b/i.test(text) ||
+    /\b(?:falls|lies|qualifies|complies|satisfies|is permitted)\b/i.test(text);
+}
+
 function categoricalProjectConclusion(value) {
-  return /\b(?:it|the (?:site|property|lot|project|development|building|use)|this (?:site|property|lot|project|development|building|use))\b[^.]{0,140}\b(?:is|are|will be|would be|can be|may be)\s+(?:permitted|allowed|compliant|lawful|as[- ]of[- ]right|within|outside|subject to|required)\b/i.test(value) ||
-    /\b(?:the (?:site|property|lot|project|development)|this (?:site|property|lot|project|development))\b[^.]{0,140}\b(?:falls|lies|qualifies|complies|satisfies|is permitted)\b/i.test(value) ||
+  const directProjectConclusion =
+    hasProjectHeadReference(value) && hasMappedOrRegulatoryPredicate(value);
+  return directProjectConclusion ||
     /\b(?:(?:the|this|that|a|an)\s+)?(?:proposed\s+)?(?:residential|commercial|manufacturing|community[- ]facility|self[- ]service storage|office|parking|use|building|development|project|proposal)\b[^.]{0,100}\b(?:is|are|will be|would be|can be|may be)\s+(?:permitted|allowed|authorized|compliant|lawful|as[- ]of[- ]right|within|outside|subject to)\b/i.test(value) ||
     /\b(?:(?:the|this|that|a|an)\s+)?(?:proposed\s+)?(?:residential|commercial|manufacturing|community[- ]facility|self[- ]service storage|office|parking|use|building|development|project|proposal)\b[^.]{0,100}\b(?:qualifies|may proceed|can proceed|would proceed|may go forward|can go forward|would go forward)\b[^.]{0,50}\bas[- ]of[- ]right\b/i.test(value);
 }
 
 function statesLocationBoundary(value) {
   return /\b(?:cannot|could not|does not|not enough|insufficient|unable to)\b[^.]{0,180}\b(?:determine|establish|conclude|confirm|place|locate|map|apply)\b/i.test(value) ||
+    /\bno\s+(?:site-specific|property-specific|parcel-specific)\s+(?:conclusion|determination)\s+(?:can|may)\s+be\s+(?:made|reached|given)\b/i.test(value) ||
     /\b(?:site-specific|property-specific|parcel-specific)\b[^.]{0,140}\b(?:cannot|not|unknown|unresolved|requires?)\b/i.test(value) ||
     /\b(?:address|BBL|block(?: and |\/)lot|property location|mapped district|zoning district|official map|mapped status)\b[^.]{0,140}\b(?:is|are)\s+(?:required|needed)\b[^.]{0,120}\bbefore\b[^.]{0,100}\b(?:determin|calculat|conclud|confirm|apply)\w*/i.test(value);
+}
+
+function statesSourceLevelMappedAreaRule(value) {
+  const text = compactText(value);
+  if (!text || hasConcretePropertyIdentifier(text)) return false;
+  const sourceLeadPattern = String.raw`(?:(?:(?:under|in|according to)\s+(?:the\s+)?Appendix\s+J,\s+)|(?:(?:the\s+)?Appendix\s+J\s+(?:[A-Za-z-]+\s+){1,3}that\s+))?`;
+  const asOfRightObjectPattern = String.raw`(?:the\s+)?as[- ]of[- ]right provisions(?:\s+of\s+${zoningSectionReferencePattern})?`;
+  const sourceTreatmentPattern = String.raw`(?:(?:is|are|shall be|must be)\s+(?:subject to\s+(?:${asOfRightObjectPattern}|${zoningSectionReferencePattern})|(?:permitted|allowed|authorized)\s+as[- ]of[- ]right)|${zoningSpecialPermitPredicatePattern})`;
+  const mapReferencePattern = String.raw`(?:(?:the\s+)?Subarea\s*[12](?:\s+maps?)?|(?:the\s+)?maps?\s+in\s+(?:the\s+)?Subarea\s*[12]|(?:the\s+)?Appendix\s+[A-Z](?:\s+maps?)?)`;
+  const facilityLocationPattern = String.raw`(?:in|within)\s+(?:(?:the\s+)?Subarea\s*[12]|(?:the\s+)?(?:designated\s+)?areas?\s+(?:shown|located)\s+(?:on|in|within)\s+${mapReferencePattern})`;
+  const areaMapRelationPattern = String.raw`(?:(?:shown|located)\s+(?:on|in|within)\s+${mapReferencePattern}|(?:in|within)\s+(?:the\s+)?(?:Subarea\s*[12]|Appendix\s+[A-Z]|(?:Manufacturing|Residence|Commercial)\s+Districts?))`;
+  const terminalPattern = String.raw`[.!?]?`;
+  const facilityRule = new RegExp(
+    String.raw`^${sourceLeadPattern}(?:the\s+)?self[- ]service storage facilities\s+${facilityLocationPattern}\s+${sourceTreatmentPattern}(?:,\s*(?:while|and)\s+those(?:\s+facilities)?\s+${facilityLocationPattern}\s+${sourceTreatmentPattern})?${terminalPattern}$`,
+    "i"
+  );
+  const areaDirectRule = new RegExp(
+    String.raw`^${sourceLeadPattern}(?:for\s+(?:the\s+)?self[- ]service storage facilities,\s+)?(?:the\s+)?(?:designated\s+)?areas?\s+${areaMapRelationPattern}\s+${sourceTreatmentPattern}(?:\s+for\s+(?:the\s+)?self[- ]service storage facilities)?(?:,\s*(?:while|and)\s+those\s+${areaMapRelationPattern}\s+${sourceTreatmentPattern})?${terminalPattern}$`,
+    "i"
+  );
+  const relativeSecondAreaPattern = String.raw`(?:in which\s+(?:such|those) uses\s+${sourceTreatmentPattern}|(?:subject to\s+${zoningPermitObjectPattern}))`;
+  const areaRelativeRule = new RegExp(
+    String.raw`^${sourceLeadPattern}(?:the\s+)?(?:designated\s+)?areas?\s+in which\s+(?:the\s+)?self[- ]service storage facilities\s+${sourceTreatmentPattern}\s+(?:is|are)\s+${areaMapRelationPattern}(?:,\s*(?:while|and)\s+those\s+${relativeSecondAreaPattern}\s+(?:is|are)\s+${areaMapRelationPattern})?${terminalPattern}$`,
+    "i"
+  );
+  return facilityRule.test(text) || areaDirectRule.test(text) || areaRelativeRule.test(text);
 }
 
 function statesLoweredYardBoundary(value) {
@@ -488,9 +543,68 @@ export function evaluateZoningResearchSafety({
   ].map(compactText).filter(Boolean);
   const evidenceNeeded = compactText(evidenceNeededItems.join(" "));
   const issues = [];
-  const unboundedMappedConclusion = compactText(narrative)
-    .split(/(?:[.!?;]\s+|,\s+(?:but|however|yet|although|whereas)\s+)/i)
-    .some((sentence) => categoricalProjectConclusion(sentence) && !statesLocationBoundary(sentence));
+  const mappedConclusionNarrative = compactText([
+    answer?.answerText,
+    answer?.conclusion,
+    answer?.explanation,
+    ...(Array.isArray(answer?.supportedPoints)
+      ? answer.supportedPoints.map((point) => point?.explanation)
+      : [])
+  ].filter(Boolean).join(" "));
+  const mappedLocationBoundaryPresent = statesLocationBoundary(mappedConclusionNarrative);
+  const unboundedMappedHeading = (Array.isArray(answer?.supportedPoints)
+    ? answer.supportedPoints.map((point) => compactText(point?.heading)).filter(Boolean)
+    : [])
+    .some((heading) => {
+      const sourceLevelMappedAreaRule = statesSourceLevelMappedAreaRule(heading);
+      if (sourceLevelMappedAreaRule) return !mappedLocationBoundaryPresent;
+      return categoricalProjectConclusion(heading) || hasMappedOrRegulatoryPredicate(heading);
+    });
+  const mappedConclusionClauses = mappedConclusionNarrative
+    .split(/[.!?;]\s+/)
+    .flatMap((sentence) => {
+      const compactSentence = compactText(sentence);
+      if (!compactSentence) return [];
+      if (statesSourceLevelMappedAreaRule(compactSentence)) return [compactSentence];
+      const commaBoundaryConclusion = compactSentence.match(/^(.+),\s+([^,]+)$/);
+      if (
+        commaBoundaryConclusion &&
+        (
+          (
+            statesLocationBoundary(commaBoundaryConclusion[1]) &&
+            (
+              categoricalProjectConclusion(commaBoundaryConclusion[2]) ||
+              hasMappedOrRegulatoryPredicate(commaBoundaryConclusion[2])
+            )
+          ) ||
+          (
+            statesLocationBoundary(commaBoundaryConclusion[2]) &&
+            (
+              categoricalProjectConclusion(commaBoundaryConclusion[1]) ||
+              hasMappedOrRegulatoryPredicate(commaBoundaryConclusion[1])
+            )
+          )
+        )
+      ) {
+        return [commaBoundaryConclusion[1], commaBoundaryConclusion[2]];
+      }
+      const leadingAdversative = compactSentence.match(
+        /^(?:even though|although|though|while)\s+(.+?),\s+(.+)$/i
+      );
+      if (leadingAdversative) return [leadingAdversative[1], leadingAdversative[2]];
+      return compactSentence.split(
+        /,?\s+(?:but|however|yet|although|whereas|even though|though|nevertheless|nonetheless|while)\s+/i
+      );
+    });
+  const unboundedMappedConclusion = unboundedMappedHeading || mappedConclusionClauses
+    .some((sentence) => {
+      const sourceLevelMappedAreaRule = statesSourceLevelMappedAreaRule(sentence);
+      const mappedOrRegulatoryConclusion =
+        categoricalProjectConclusion(sentence) || hasMappedOrRegulatoryPredicate(sentence);
+      if (!mappedOrRegulatoryConclusion && !sourceLevelMappedAreaRule) return false;
+      if (statesLocationBoundary(sentence)) return false;
+      return !(mappedLocationBoundaryPresent && sourceLevelMappedAreaRule);
+    });
   const countPredicate = questionText.match(/\bDoes\b[^?]*?\b(count(?:\s+as\s+[^?]+)?)\?$/i)?.[1];
   if (
     countPredicate &&
@@ -530,7 +644,7 @@ export function evaluateZoningResearchSafety({
   if (
     profile.categories.includes("map") &&
     profile.missingMappedLocation &&
-    /\b(?:the (?:site|property|lot)|this (?:site|property|lot))\b[^.]{0,160}\b(?:is within|is outside|falls within|lies within|is shown in)\b/i.test(narrative)
+    /\b(?:the (?:site|property|lot|facility)|this (?:site|property|lot|facility))\b[^.]{0,160}\b(?:is within|is outside|falls within|lies within|is shown in)\b/i.test(narrative)
   ) {
     issues.push({
       type: "zoning_map_inference",

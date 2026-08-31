@@ -140,6 +140,8 @@ try {
   fixture.ownerDecision.exactAuthorizationPhrase = "I authorize it";
   fixture.ownerDecision.exactSpendingCapPhrase = "Use a $5 maximum";
   fixture.consumption.status = "not_started";
+  fixture.consumption.attemptID = null;
+  fixture.consumption.startedAt = null;
   fixture.consumption.runID = null;
   fixture.consumption.consumedAt = null;
   await writeFile(fixturePath, `${JSON.stringify(fixture, null, 2)}\n`, "utf8");

@@ -116,6 +116,291 @@ const safeMapBoundary = evaluateZoningResearchSafety({
 });
 assert.equal(safeMapBoundary.pass, true, JSON.stringify(safeMapBoundary.issues));
 
+const appendixGeneralRuleWithSeparateBoundary = evaluateZoningResearchSafety({
+  question: "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+  evidence: mapEvidence,
+  answer: answer(
+    "For self-service storage facilities, areas shown on Subarea 1 maps are subject to the as-of-right provisions of Section 42-19; areas shown on Subarea 2 maps are subject to a City Planning Commission special permit under Section 74-192. No site-specific conclusion can be made without the property's address or BBL and the applicable official Appendix J map.",
+    ["zr-map"],
+    ["The property's address or BBL and location on the applicable Appendix J map are not established."]
+  )
+});
+assert.equal(
+  appendixGeneralRuleWithSeparateBoundary.pass,
+  true,
+  JSON.stringify(appendixGeneralRuleWithSeparateBoundary.issues)
+);
+
+for (const sourceLevelAppendixRule of [
+  "Self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19.",
+  "Self-service storage facilities in Subarea 2 require a special permit.",
+  "Self-service storage facilities in Subarea 2 are subject to special permit of the City Planning Commission pursuant to Section 74-192.",
+  "Self-service storage facilities in Subarea 2 are subject to a special permit pursuant to Section 74-192.",
+  "Self-service storage facilities in Subarea 2 require the approval of the City Planning Commission.",
+  "Self-service storage facilities in Subarea 2 shall be subject to City Planning Commission approval.",
+  "Self-service storage facilities in designated areas shown on Subarea 1 maps are subject to the as-of-right provisions of Section 42-19.",
+  "Under Appendix J, self-service storage facilities in designated areas shown on Subarea 2 maps require a special permit.",
+  "Designated areas shown on Subarea 2 maps require a special permit for self-service storage facilities.",
+  "The self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19.",
+  "For self-service storage facilities, the areas shown on Subarea 1 maps are subject to the as-of-right provisions of Section 42-19.",
+  "Designated areas in which self-service storage facilities are subject to the as-of-right provisions of Section 42-19 are shown on the maps in Subarea 1.",
+  "Designated areas shown on the maps in Subarea 1 are subject to the as-of-right provisions of Section 42-19.",
+  "The designated areas shown on the maps in Subarea 1 are subject to the as-of-right provisions of Section 42-19."
+]) {
+  const sourceLevelAppendixResult = evaluateZoningResearchSafety({
+    question: "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+    evidence: mapEvidence,
+    answer: answer(
+      `${sourceLevelAppendixRule} No site-specific conclusion can be made without the property's address or BBL and the applicable official Appendix J map.`,
+      ["zr-map"],
+      ["The property's address or BBL and location on the applicable Appendix J map are not established."]
+    )
+  });
+  assert.equal(
+    sourceLevelAppendixResult.pass,
+    true,
+    `${sourceLevelAppendixRule}: ${JSON.stringify(sourceLevelAppendixResult.issues)}`
+  );
+
+  const sourceLevelAppendixWithoutBoundary = evaluateZoningResearchSafety({
+    question: "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+    evidence: mapEvidence,
+    answer: answer(
+      sourceLevelAppendixRule,
+      ["zr-map"],
+      ["The property's address or BBL and location on the applicable Appendix J map are not established."]
+    )
+  });
+  assert(sourceLevelAppendixWithoutBoundary.issues.some((issue) =>
+    issue.type === "zoning_missing_mapped_location"));
+}
+
+for (const completeSubareaTreatment of [
+  "Self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19, while those in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192.",
+  "Self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19, while those facilities in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192.",
+  "Designated areas in which self-service storage facilities are subject to the as-of-right provisions of Section 42-19 are shown on the maps in Subarea 1, and those subject to a City Planning Commission special permit under Section 74-192 are shown on the maps in Subarea 2.",
+  "Designated areas in which self-service storage facilities are subject to the as-of-right provisions of Section 42-19 are shown on the maps in Subarea 1, and those in which such uses are subject to a City Planning Commission special permit under Section 74-192 are shown on the maps in Subarea 2.",
+  "Designated areas in which self-service storage facilities are subject to the as-of-right provisions of Section 42-19 are shown on the maps in Subarea 1, and those in which such uses are subject to special permit of the City Planning Commission pursuant to Section 74-192 are shown on the maps in Subarea 2.",
+  "The designated areas shown on the maps in Subarea 1 are subject to the as-of-right provisions of Section 42-19, and those shown on the maps in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192."
+]) {
+  const completeSubareaResult = evaluateZoningResearchSafety({
+    question: "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+    evidence: mapEvidence,
+    answer: answer(
+      `${completeSubareaTreatment} No site-specific conclusion can be made without the property's address or BBL and the applicable official Appendix J map.`,
+      ["zr-map"],
+      ["The property's address or BBL and location on the applicable Appendix J map are not established."]
+    )
+  });
+  assert.equal(
+    completeSubareaResult.pass,
+    true,
+    `${completeSubareaTreatment}: ${JSON.stringify(completeSubareaResult.issues)}`
+  );
+
+  const completeSubareaWithoutBoundary = evaluateZoningResearchSafety({
+    question: "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+    evidence: mapEvidence,
+    answer: answer(
+      completeSubareaTreatment,
+      ["zr-map"],
+      ["The property's address or BBL and location on the applicable Appendix J map are not established."]
+    )
+  });
+  assert(completeSubareaWithoutBoundary.issues.some((issue) =>
+    issue.type === "zoning_missing_mapped_location"));
+}
+
+for (const citationLedAppendixTreatment of [
+  "Appendix J establishes that self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19, while those in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192.",
+  "Under Appendix J, self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19, while those in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192.",
+  "In Appendix J, self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19, while those in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192.",
+  "According to Appendix J, self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19, while those in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192.",
+  "Appendix J indicates that self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19, while those in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192."
+]) {
+  const citationLedAppendixResult = evaluateZoningResearchSafety({
+    question: "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+    evidence: mapEvidence,
+    answer: answer(
+      `${citationLedAppendixTreatment} No site-specific conclusion can be made without the property's address or BBL and the applicable official Appendix J map.`,
+      ["zr-map"],
+      ["The property's address or BBL and location on the applicable Appendix J map are not established."]
+    )
+  });
+  assert.equal(
+    citationLedAppendixResult.pass,
+    true,
+    `${citationLedAppendixTreatment}: ${JSON.stringify(citationLedAppendixResult.issues)}`
+  );
+}
+
+const appendixGeneralRuleWithoutBoundary = evaluateZoningResearchSafety({
+  question: "What can Appendix J establish, and what site-specific conclusion requires the applicable map and location?",
+  evidence: mapEvidence,
+  answer: answer(
+    "For self-service storage facilities, areas shown on Subarea 1 maps are subject to the as-of-right provisions of Section 42-19.",
+    ["zr-map"],
+    ["The property's address or BBL and location on the applicable Appendix J map are not established."]
+  )
+});
+assert(appendixGeneralRuleWithoutBoundary.issues.some((issue) =>
+  issue.type === "zoning_missing_mapped_location"));
+
+const appendixSpecificSiteContradiction = evaluateZoningResearchSafety({
+  question: mapQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    "This site is within Subarea 1 and is subject to the as-of-right provisions of Section 42-19. No site-specific conclusion can be made without the applicable official map.",
+    ["zr-map"],
+    ["The property's address or BBL and mapped location are not established."]
+  )
+});
+assert(appendixSpecificSiteContradiction.issues.some((issue) =>
+  issue.type === "zoning_missing_mapped_location"));
+
+for (const unsafeAppendixClaim of [
+  "It is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "The facility is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "This site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "That site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "This facility is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "This project is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "This parcel is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "A site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "An existing site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "Any site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "One site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "Site A is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "The existing site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "The current property is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "The referenced parcel is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "Our site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "The applicant's property is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "The applicant’s facility is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "Our project is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "Acme's site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "The company's site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "The developer's property is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "The tenant’s property is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "Randy's site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "Randy's existing site is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "Higinio’s property is in an area shown on the Subarea 1 map and is permitted as-of-right.",
+  "Proposed self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19.",
+  "These self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19.",
+  "Those self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19.",
+  "The self-service storage facilities here are in areas shown on Subarea 1 maps and are permitted as-of-right.",
+  "The self-service storage facilities in this application are in areas shown on Subarea 1 maps and are permitted as-of-right.",
+  "The self-service storage facilities under review are in areas shown on Subarea 1 maps and are permitted as-of-right.",
+  "The self-service storage facilities in Subarea 1 here are subject to Section 42-19 and permitted as-of-right.",
+  "The self-service storage facilities in Subarea 1 in this application are subject to Section 42-19 and permitted as-of-right.",
+  "The self-service storage facilities in Subarea 1 under review are subject to Section 42-19 and permitted as-of-right.",
+  "These sites are in areas shown on the Subarea 1 map and are permitted as-of-right.",
+  "Those properties are in areas shown on the Subarea 1 map and are permitted as-of-right.",
+  "Our projects are in areas shown on the Subarea 1 map and are permitted as-of-right.",
+  "The parcels are in areas shown on the Subarea 1 map and are permitted as-of-right.",
+  "The buildings are in areas shown on the Subarea 1 map and are permitted as-of-right.",
+  "These uses are in areas shown on the Subarea 1 map and are permitted as-of-right.",
+  "Areas shown on Subarea 1 maps are areas where these self-service storage facilities are permitted as-of-right.",
+  "Areas shown on Subarea 1 maps are areas where those self-service storage facilities are permitted as-of-right.",
+  "This site requires a special permit.",
+  "The project needs a special permit.",
+  "This property requires authorization.",
+  "The facility must obtain a special permit.",
+  "The site may proceed only by special permit.",
+  "This site has to obtain a special permit.",
+  "This property must secure a special permit.",
+  "The project cannot proceed without a special permit.",
+  "The facility may proceed subject to a special permit.",
+  "This use is contingent on CPC authorization.",
+  "This site requires City Planning Commission approval.",
+  "This site requires approval from the City Planning Commission.",
+  "This site requires the approval of the City Planning Commission.",
+  "This site requires the City Planning Commission's approval.",
+  "This site shall be permitted only by special permit of the City Planning Commission pursuant to Section 74-192.",
+  "This site shall be allowed only by special permit of the City Planning Commission pursuant to Section 74-192.",
+  "This site shall be subject to City Planning Commission approval.",
+  "This site must be subject to a special permit.",
+  "This site must be permitted only by a special permit.",
+  "This site must have City Planning Commission approval.",
+  "This site may not proceed without a special permit.",
+  "This site shall not proceed without a special permit.",
+  "These are in an area shown on the Subarea 1 map and are permitted as-of-right.",
+  "They are within Subarea 1 and are permitted as-of-right.",
+  "Those are in an area shown on the Subarea 1 map and are permitted as-of-right.",
+  "Both are in an area shown on the Subarea 1 map and are permitted as-of-right.",
+  "This is within Subarea 1 and is permitted as-of-right.",
+  "We are within Subarea 1 and are permitted as-of-right.",
+  "Ours is within Subarea 1 and is permitted as-of-right.",
+  "Each is within Subarea 1 and is permitted as-of-right.",
+  "Permitted as-of-right in Subarea 1.",
+  "Within Subarea 1 and permitted as-of-right.",
+  "Residential use is permitted as-of-right but the mapped district is required before a final determination can be made.",
+  "This facility is permitted as-of-right although no property-specific determination can be made without the map.",
+  "The project is within Subarea 1 whereas the mapped district is required before a final determination can be made.",
+  "This facility is permitted as-of-right though no property-specific determination can be made without the map.",
+  "This facility is permitted as-of-right even though no property-specific determination can be made without the map.",
+  "Even though no property-specific determination can be made without the map, this facility is permitted as-of-right.",
+  "This project is within Subarea 1, nevertheless no site-specific conclusion can be made without the map.",
+  "Despite the fact that no property-specific determination can be made without the map, this facility is permitted as-of-right.",
+  "Notwithstanding that no property-specific determination can be made without the map, this facility is permitted as-of-right.",
+  "Even with no property-specific determination available without the map, this facility is permitted as-of-right.",
+  "This facility is permitted as-of-right, despite the fact that no property-specific determination can be made without the map.",
+  "This project is within Subarea 1, notwithstanding that no site-specific conclusion can be made without the map.",
+  "This site needs to obtain a special permit.",
+  "This site needs to secure City Planning Commission approval.",
+  "This site has to have City Planning Commission approval.",
+  "This site has to be subject to a special permit."
+]) {
+  const unsafeAppendixResult = evaluateZoningResearchSafety({
+    question: mapQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${unsafeAppendixClaim} No site-specific conclusion can be made without the applicable official map.`,
+      ["zr-map"],
+      ["The property's address or BBL and mapped location are not established."]
+    )
+  });
+  assert(unsafeAppendixResult.issues.some((issue) =>
+    issue.type === "zoning_missing_mapped_location"));
+}
+
+const unsafeMappedHeadingAnswer = answer(
+  "No site-specific conclusion can be made without the property's address or BBL and the applicable official Appendix J map.",
+  ["zr-map"],
+  ["The property's address or BBL and location on the applicable Appendix J map are not established."]
+);
+unsafeMappedHeadingAnswer.supportedPoints[0].heading =
+  "This site is permitted as-of-right in Subarea 1";
+unsafeMappedHeadingAnswer.supportedPoints[0].explanation =
+  "The selected Appendix J passage describes designated-area treatment.";
+const unsafeMappedHeading = evaluateZoningResearchSafety({
+  question: mapQuestion,
+  evidence: mapEvidence,
+  answer: unsafeMappedHeadingAnswer
+});
+assert(unsafeMappedHeading.issues.some((issue) =>
+  issue.type === "zoning_missing_mapped_location"));
+
+const safeSourceLevelHeadingAnswer = answer(
+  "No site-specific conclusion can be made without the property's address or BBL and the applicable official Appendix J map.",
+  ["zr-map"],
+  ["The property's address or BBL and location on the applicable Appendix J map are not established."]
+);
+safeSourceLevelHeadingAnswer.supportedPoints[0].heading =
+  "Self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19";
+safeSourceLevelHeadingAnswer.supportedPoints[0].explanation =
+  "No site-specific conclusion can be made without the property's address or BBL and the applicable official Appendix J map.";
+const safeSourceLevelHeading = evaluateZoningResearchSafety({
+  question: mapQuestion,
+  evidence: mapEvidence,
+  answer: safeSourceLevelHeadingAnswer
+});
+assert.equal(
+  safeSourceLevelHeading.pass,
+  true,
+  JSON.stringify(safeSourceLevelHeading.issues)
+);
+
 const positiveFormMapBoundary = evaluateZoningResearchSafety({
   question: "What FAR applies to this property in the mapped district?",
   evidence: mapEvidence,
