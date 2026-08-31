@@ -201,6 +201,18 @@ const zoningSectionReferencePattern = String.raw`Section\s+[0-9A-Za-z.-]+`;
 const zoningCommissionPattern = String.raw`(?:CPC|City Planning Commission)`;
 const zoningPermitObjectPattern = String.raw`(?:(?:a\s+)?(?:${zoningCommissionPattern}\s+)?special permit(?:\s+of\s+(?:the\s+)?City Planning Commission)?(?:\s+(?:under|pursuant to)\s+${zoningSectionReferencePattern})?|(?:(?:the\s+)?${zoningCommissionPattern}(?:['’]s)?\s+approval|(?:the\s+)?approval\s+(?:of|from|by)\s+(?:the\s+)?${zoningCommissionPattern})|(?:an?\s+)?(?:${zoningCommissionPattern}\s+)?authorization(?:\s+(?:under|pursuant to)\s+${zoningSectionReferencePattern})?)`;
 const zoningSpecialPermitPredicatePattern = String.raw`(?:(?:requires?|need(?:s)?)\s+${zoningPermitObjectPattern}|need(?:s)?\s+to\s+(?:obtain|secure|have)\s+${zoningPermitObjectPattern}|(?:has|have)\s+to\s+(?:(?:obtain|secure|have)\s+${zoningPermitObjectPattern}|be\s+(?:subject to|contingent on)\s+${zoningPermitObjectPattern})|must\s+(?:obtain|secure|have)\s+${zoningPermitObjectPattern}|(?:cannot|may|can)\s+proceed\s+(?:without|subject to|only\s+(?:by|with))\s+${zoningPermitObjectPattern}|(?:may|shall|must|can)\s+not\s+proceed\s+without\s+${zoningPermitObjectPattern}|(?:is|are|shall be|must be)\s+(?:subject to|contingent on)\s+${zoningPermitObjectPattern})`;
+const zoningTreatmentModalPattern = String.raw`(?:is|are|will be|would be|can be|could be|may be|shall be|must be)`;
+const zoningProgressModalPattern = String.raw`(?:may|can|could|would|will|shall|must)`;
+const zoningPlacementPrepositionPattern = String.raw`(?:within|outside|in|on)`;
+const zoningTreatmentOutcomePattern = String.raw`(?:permitted|allowed|authorized|compliant|lawful|as[- ]of[- ]right|subject to|required|special permit)`;
+const zoningAsOfRightProgressPredicatePattern = String.raw`(?:qualifies|${zoningProgressModalPattern}\s+(?:proceed|go\s+forward))\b[^.]{0,50}\bas[- ]of[- ]right`;
+const zoningContinuativeLeadPattern = String.raw`(?:${zoningProgressModalPattern}\s+(?:remain|stay)|remains?|stays?|${zoningProgressModalPattern}\s+continue\s+to\s+be|continues?\s+to\s+be)`;
+const zoningContinuativePredicatePattern = String.raw`${zoningContinuativeLeadPattern}\b[^.]{0,80}\b(?:${zoningTreatmentOutcomePattern}|${zoningPlacementPrepositionPattern})`;
+const zoningPlacementBridgePattern = String.raw`(?:\s+|\s*,\s*[^,.;]{1,80},\s*)`;
+const zoningMappedPlacementPredicatePattern = String.raw`(?:(?:${zoningTreatmentModalPattern}|falls?|lies?)${zoningPlacementBridgePattern}${zoningPlacementPrepositionPattern}|${zoningTreatmentModalPattern}\s+(?:located|situated)${zoningPlacementBridgePattern}${zoningPlacementPrepositionPattern}|${zoningContinuativeLeadPattern}\b[^.]{0,80}\b${zoningPlacementPrepositionPattern})`;
+const zoningCompleteMappedPredicatePattern = String.raw`(?:${zoningTreatmentModalPattern}\b[^.]{0,160}\b${zoningTreatmentOutcomePattern}|${zoningMappedPlacementPredicatePattern}|${zoningAsOfRightProgressPredicatePattern}|${zoningContinuativePredicatePattern})`;
+const zoningAdversativeClauseConnectorPattern = String.raw`(?:even\s+though|nevertheless|nonetheless|although|whereas|however|though|while|but|yet)`;
+const zoningFallbackClauseConnectorPattern = String.raw`(?:which\s+means|and|${zoningAdversativeClauseConnectorPattern})`;
 
 function hasSpecialPermitOrAuthorizationPredicate(value) {
   return new RegExp(String.raw`\b${zoningSpecialPermitPredicatePattern}\b`, "i")
@@ -209,20 +221,24 @@ function hasSpecialPermitOrAuthorizationPredicate(value) {
 
 function hasMappedOrRegulatoryPredicate(value) {
   const text = compactText(value);
-  return /\b(?:is|are|will be|would be|can be|may be|shall be|must be)\b[^.]{0,160}\b(?:permitted|allowed|authorized|compliant|lawful|as[- ]of[- ]right|within|outside|subject to|required|special permit)\b/i.test(text) ||
-    /\b(?:is|are|falls|lies)\s+(?:within|outside|in|on)\b/i.test(text) ||
+  return new RegExp(
+    String.raw`\b${zoningCompleteMappedPredicatePattern}\b`,
+    "i"
+  ).test(text) ||
     hasSpecialPermitOrAuthorizationPredicate(text) ||
     /^(?:permitted|allowed|authorized)\s+as[- ]of[- ]right\b[^.]{0,140}\b(?:Subarea\s*[12]|Appendix\s+[A-Z]|mapped area|designated area)\b/i.test(text) ||
     /^(?:within|in|outside)\s+(?:the\s+)?(?:Subarea\s*[12]|Appendix\s+[A-Z]|mapped area|designated area)\b[^.]{0,140}\b(?:permitted|allowed|authorized|as[- ]of[- ]right|special permit)\b/i.test(text) ||
-    /\b(?:falls|lies|qualifies|complies|satisfies|is permitted)\b/i.test(text);
+    /\b(?:complies|satisfies)\b/i.test(text);
 }
 
 function categoricalProjectConclusion(value) {
   const directProjectConclusion =
     hasProjectHeadReference(value) && hasMappedOrRegulatoryPredicate(value);
   return directProjectConclusion ||
-    /\b(?:(?:the|this|that|a|an)\s+)?(?:proposed\s+)?(?:residential|commercial|manufacturing|community[- ]facility|self[- ]service storage|office|parking|use|building|development|project|proposal)\b[^.]{0,100}\b(?:is|are|will be|would be|can be|may be)\s+(?:permitted|allowed|authorized|compliant|lawful|as[- ]of[- ]right|within|outside|subject to)\b/i.test(value) ||
-    /\b(?:(?:the|this|that|a|an)\s+)?(?:proposed\s+)?(?:residential|commercial|manufacturing|community[- ]facility|self[- ]service storage|office|parking|use|building|development|project|proposal)\b[^.]{0,100}\b(?:qualifies|may proceed|can proceed|would proceed|may go forward|can go forward|would go forward)\b[^.]{0,50}\bas[- ]of[- ]right\b/i.test(value);
+    new RegExp(
+      String.raw`\b(?:(?:the|this|that|a|an)\s+)?(?:proposed\s+)?(?:residential|commercial|manufacturing|community[- ]facility|self[- ]service storage|office|parking|use|building|development|project|proposal)\b[^.]{0,100}\b${zoningCompleteMappedPredicatePattern}\b`,
+      "i"
+    ).test(value);
 }
 
 function statesLocationBoundary(value) {
@@ -230,6 +246,31 @@ function statesLocationBoundary(value) {
     /\bno\s+(?:site-specific|property-specific|parcel-specific)\s+(?:conclusion|determination)\s+(?:can|may)\s+be\s+(?:made|reached|given)\b/i.test(value) ||
     /\b(?:site-specific|property-specific|parcel-specific)\b[^.]{0,140}\b(?:cannot|not|unknown|unresolved|requires?)\b/i.test(value) ||
     /\b(?:address|BBL|block(?: and |\/)lot|property location|mapped district|zoning district|official map|mapped status)\b[^.]{0,140}\b(?:is|are)\s+(?:required|needed)\b[^.]{0,120}\bbefore\b[^.]{0,100}\b(?:determin|calculat|conclud|confirm|apply)\w*/i.test(value);
+}
+
+function hasNonGenericMappedClaimSubject(value) {
+  const text = compactText(value);
+  if (!text || statesLocationBoundary(text)) return false;
+  const mappedCategoryOrTreatment =
+    /\b(?:Subarea\s*[12]|Appendix\s+J|mapped area|designated area|as[- ]of[- ]right|special permit|Section\s+(?:42-19|74-192)|permitted|allowed|authorized|within|outside)\b/i.test(text);
+  if (!mappedCategoryOrTreatment) return false;
+  const specificNominalSubject =
+    /\b(?:this|that|said|such|our|your|their|the\s+subject|the)\s+(?!self[- ]service storage\b)(?:(?:existing|current|referenced|specific|proposed|storage|commercial|residential)\s+){0,4}(?:project|site|property|facilit(?:y|ies)|premises|building|warehouse|parcel|lot)\b/i.test(text);
+  const regulatorySourceAuthority = /^(?:the\s+)?(?:Appendix\s+J|Zoning Resolution|City Planning Commission|New York City(?:\s+rules?)?|Department of City Planning|Board of Standards(?:\s+and\s+Appeals)?|City Council)\b/i;
+  const properNameSubject = text.split(new RegExp(
+    String.raw`[,;]|\b${zoningFallbackClauseConnectorPattern}\b`,
+    "i"
+  )).some((clauseLead) => {
+    const normalizedLead = compactText(clauseLead).replace(
+      /^(?:(?:which\s+means|as\s+a\s+result|and|or|but|yet|so|therefore|thus|accordingly|consequently|hence|however|nevertheless|nonetheless)\b[\s,]*)+/i,
+      ""
+    );
+    if (!normalizedLead || regulatorySourceAuthority.test(normalizedLead)) return false;
+    return /^(?:the\s+)?(?:(?:proposed|existing|current|referenced|subject|specific)\s+){0,2}(?:[A-Z][A-Za-z0-9&.'’()-]*\s+){1,3}[A-Z][A-Za-z0-9&.'’()-]*\b/.test(
+      normalizedLead
+    );
+  });
+  return specificNominalSubject || properNameSubject;
 }
 
 function statesSourceLevelMappedAreaRule(value) {
@@ -267,32 +308,139 @@ function isAppendixJSourceBoundaryQuestion(value) {
     /\blocation\b/i.test(text);
 }
 
-function hasUnsafeMappedSubjectReference(value) {
+function mappedPredicateSubjectContext(text, predicateIndex) {
+  let context = compactText(
+    text.slice(0, predicateIndex).split(/[;.!?]/).at(-1)
+  );
+  let normalized = context.replace(/,\s*[^,;.!?]{1,120},\s*$/, "");
+  while (normalized !== context) {
+    context = compactText(normalized);
+    normalized = context.replace(/,\s*[^,;.!?]{1,120},\s*$/, "");
+  }
+  return context;
+}
+
+function genericMappedPredicateSubject({
+  text,
+  predicateIndex,
+  predicateTail,
+  genericAntecedentEstablished
+}) {
+  const subjectContext = mappedPredicateSubjectContext(text, predicateIndex);
+  const appendixJSourceLead = String.raw`(?:(?:(?:under|in|according to)\s+(?:the\s+)?Appendix\s+J,\s*)|(?:(?:the\s+)?Appendix\s+J\s+(?:[A-Za-z-]+\s+){1,3}that\s+))`;
+  const discourseLead = String.raw`(?:(?:however|nevertheless|nonetheless),\s*)?`;
+  const facilityLocation = String.raw`(?:\s+(?:in|within)\s+(?:the\s+)?Subarea\s*[12])?`;
+  const genericFacilitySubject = new RegExp(
+    String.raw`^${discourseLead}(?:${appendixJSourceLead}(?:a\s+|the\s+)?self[- ]service storage facilit(?:y|ies)|(?:the\s+)?self[- ]service storage facilities|if\s+(?:a\s+|the\s+)?self[- ]service storage facilit(?:y|ies))${facilityLocation}$`,
+    "i"
+  );
+  const genericAreaSubject = new RegExp(
+    String.raw`^${discourseLead}(?:${appendixJSourceLead}|if\s+)?(?:the\s+)?(?:designated\s+)?areas?(?:\s+(?:in|within|shown on)\s+(?:the\s+)?(?:Subarea\s*[12]|Appendix\s+J))?$`,
+    "i"
+  );
+  const genericSubareaSubject = new RegExp(
+    String.raw`^${discourseLead}(?:${appendixJSourceLead}|if\s+)?(?:the\s+)?Subarea\s*[12]$`,
+    "i"
+  );
+  if (
+    genericFacilitySubject.test(subjectContext) ||
+    genericAreaSubject.test(subjectContext) ||
+    genericSubareaSubject.test(subjectContext)
+  ) {
+    return { generic: true, establishesAntecedent: true };
+  }
+  if (/^if\s+(?:it|they|such\s+(?:a\s+)?facilit(?:y|ies))$/i.test(subjectContext)) {
+    return { generic: true, establishesAntecedent: true };
+  }
+  const genericCoreference = subjectContext.match(/\b(it|they)\s*$/i);
+  if (!genericCoreference || !genericAntecedentEstablished) {
+    return { generic: false, establishesAntecedent: false };
+  }
+  const antecedent = subjectContext.slice(0, genericCoreference.index);
+  const directPlacement = new RegExp(
+    String.raw`^${zoningMappedPlacementPredicatePattern}\b`,
+    "i"
+  ).test(predicateTail);
+  const genericTreatment =
+    new RegExp(
+      String.raw`^(?:${zoningCompleteMappedPredicatePattern}|requires?|needs?)\b`,
+      "i"
+    ).test(predicateTail);
+  const generic = !directPlacement && genericTreatment &&
+    /\bSubarea\s*[12]\b/i.test(`${antecedent} ${predicateTail}`);
+  return { generic, establishesAntecedent: false };
+}
+
+function hasUnsafeMappedPredicateSubject(value) {
   const text = compactText(value);
   if (!text) return false;
   if (hasConcretePropertyIdentifier(text)) return true;
-  const projectNoun = String.raw`(?:sites?|propert(?:y|ies)|parcels?|(?:tax|zoning)\s+lots?|lots?|projects?|developments?|buildings?|proposals?|uses?|facilit(?:y|ies)|premises|tracts?|structures?)`;
-  const possessiveLead = String.raw`(?:our|your|their|the\s+applicant['’]s|the\s+developer['’]s|the\s+tenant['’]s|the\s+company['’]s|[A-Z][A-Za-z'’.-]{1,40}['’]s)`;
-  if (new RegExp(String.raw`\b${possessiveLead}\s+(?:(?:existing|current|referenced|subject|specific)\s+)?${projectNoun}\b`, "i").test(text)) return true;
-  if (new RegExp(String.raw`\b(?:this|these|those)\s+(?:[A-Za-z-]+\s+){0,4}${projectNoun}\b`, "i").test(text)) return true;
-  if (new RegExp(String.raw`\bthat\s+(?:(?:existing|current|referenced|subject|specific)\s+)?${projectNoun}\b`, "i").test(text)) return true;
-  if (new RegExp(String.raw`\bproposed\s+(?:[A-Za-z-]+\s+){0,4}${projectNoun}\b`, "i").test(text)) return true;
-  if (new RegExp(String.raw`\bthe\s+(?:(?:existing|current|referenced|subject|specific)\s+)?${projectNoun}\b`, "i").test(text)) return true;
-  if (/\b(?:a|an|any|one)\s+(?:existing\s+)?(?:site|property|parcel|lot|project|development|building|proposal|premises|tract|structure)\b/i.test(text)) return true;
-  if (/\b(?:here|in\s+this\s+application|under\s+review)\b/i.test(text)) return true;
-  if (/\bSite\s+[A-Z0-9]+\b/.test(text)) return true;
-  if (/^(?:it|this|that|these|those|they|both|one|we|ours|each)\b/i.test(text)) return true;
+  const predicateLeadPattern = /\b(?:will\s+be|would\s+be|can\s+be|could\s+be|may\s+be|shall\s+be|must\s+be|is|are|falls?|lies?|remains?|stays?|continues?|qualifies|complies|satisfies|requires?|needs?|has\s+to|have\s+to|cannot|must|may|can|could|shall|would|will)\b/gi;
+  const predicateMatches = [...text.matchAll(predicateLeadPattern)];
+  const completedPredicateTails = Array(predicateMatches.length).fill("");
+  for (let index = predicateMatches.length - 1; index >= 0; index -= 1) {
+    const subjectContext = mappedPredicateSubjectContext(
+      text,
+      predicateMatches[index].index
+    );
+    const subjectLead = compactText(subjectContext.split(",").at(-1));
+    const modalGovernedContinuation = /^(?:remain|remains|stay|stays|continue|continues)$/i.test(
+      predicateMatches[index][0]
+    ) && new RegExp(String.raw`\b${zoningProgressModalPattern}\s*$`, "i").test(
+      subjectContext
+    );
+    const independentlySubjected = !modalGovernedContinuation && subjectLead &&
+      !/^(?:(?:and|or|but|nor|yet|so|while|whereas|although|though|however|nevertheless|nonetheless)\s*)+$/i.test(subjectLead);
+    let nextCompleteIndex = index + 1;
+    while (
+      nextCompleteIndex < predicateMatches.length &&
+      !completedPredicateTails[nextCompleteIndex]
+    ) {
+      nextCompleteIndex += 1;
+    }
+    const predicateEnd = nextCompleteIndex < predicateMatches.length
+      ? predicateMatches[nextCompleteIndex].index
+      : text.length;
+    const candidateTail = compactText(
+      text.slice(predicateMatches[index].index, predicateEnd).split(/[.;!?]/, 1)[0]
+    ).slice(0, 360);
+    if (independentlySubjected && hasMappedOrRegulatoryPredicate(candidateTail)) {
+      completedPredicateTails[index] = candidateTail;
+    }
+  }
+  let genericAntecedentEstablished = false;
+  for (const [predicateIndex, predicateMatch] of predicateMatches.entries()) {
+    const predicateTail = completedPredicateTails[predicateIndex];
+    if (!predicateTail) continue;
+    const subject = genericMappedPredicateSubject({
+      text,
+      predicateIndex: predicateMatch.index,
+      predicateTail,
+      genericAntecedentEstablished
+    });
+    if (!subject.generic) return true;
+    genericAntecedentEstablished ||= subject.establishesAntecedent;
+  }
   return false;
 }
 
 function statesGenericAppendixJTreatment(value) {
   const text = compactText(value);
-  if (!text || hasUnsafeMappedSubjectReference(text)) return false;
+  const genericConditionalCoreference =
+    /^if\s+(?:it|they|such\s+(?:a\s+)?facilit(?:y|ies))\b/i.test(text);
+  if (
+    !text ||
+    hasUnsafeMappedPredicateSubject(text) ||
+    hasNonGenericMappedClaimSubject(text)
+  ) {
+    return false;
+  }
   const genericSubject =
     /\bself[- ]service storage facilit(?:y|ies)\b/i.test(text) ||
     /\bdesignated areas?\b/i.test(text) ||
     /\bAppendix\s+J\b/i.test(text) ||
-    (/\bSubarea\s*1\b/i.test(text) && /\bSubarea\s*2\b/i.test(text));
+    /^Subarea\s*[12]\b/i.test(text) ||
+    genericConditionalCoreference;
   const mappedCategory =
     /\bSubarea\s*[12]\b/i.test(text) ||
     /\bAppendix\s+J\b/i.test(text);
@@ -320,16 +468,14 @@ function mappedAnswerFields(answer) {
 
 function splitMappedConclusionClauses(value) {
   const fieldText = compactText(value);
-  if (statesGenericAppendixJTreatment(fieldText)) return [fieldText];
   return fieldText
     .split(/[.!?]\s+/)
-    .flatMap((sentence) => {
-      const compactSentence = compactText(sentence);
-      if (!compactSentence) return [];
-      if (statesSourceLevelMappedAreaRule(compactSentence) ||
-        statesGenericAppendixJTreatment(compactSentence)) return [compactSentence];
-      return compactSentence.split(/;\s+/).flatMap((clause) => {
+    .flatMap((sentence) => compactText(sentence).split(/;\s+/))
+    .flatMap((clause) => {
         const compactClause = compactText(clause);
+        if (!compactClause) return [];
+        if (statesSourceLevelMappedAreaRule(compactClause) ||
+          statesGenericAppendixJTreatment(compactClause)) return [compactClause];
         const commaBoundaryConclusion = compactClause.match(/^(.+),\s+([^,]+)$/);
         if (
           commaBoundaryConclusion &&
@@ -352,14 +498,15 @@ function splitMappedConclusionClauses(value) {
         ) {
           return [commaBoundaryConclusion[1], commaBoundaryConclusion[2]];
         }
-        const leadingAdversative = compactClause.match(
-          /^(?:even though|although|though|while)\s+(.+?),\s+(.+)$/i
-        );
+        const leadingAdversative = compactClause.match(new RegExp(
+          String.raw`^${zoningAdversativeClauseConnectorPattern}\s+(.+?),\s+(.+)$`,
+          "i"
+        ));
         if (leadingAdversative) return [leadingAdversative[1], leadingAdversative[2]];
-        return compactClause.split(
-          /,?\s+(?:but|however|yet|although|whereas|even though|though|nevertheless|nonetheless|while)\s+/i
-        );
-      });
+        return compactClause.split(new RegExp(
+          String.raw`,?\s+${zoningAdversativeClauseConnectorPattern}\s+`,
+          "i"
+        ));
     })
     .map(compactText)
     .filter(Boolean);
@@ -377,7 +524,9 @@ function mappedClauseAnalysis(answer) {
         sourceRule: establishedSourceRule || genericAppendixJTreatment,
         genericAppendixJTreatment,
         directConclusion:
-          categoricalProjectConclusion(clause) || hasMappedOrRegulatoryPredicate(clause)
+          categoricalProjectConclusion(clause) ||
+          hasMappedOrRegulatoryPredicate(clause) ||
+          hasNonGenericMappedClaimSubject(clause)
       };
     })
   );

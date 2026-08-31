@@ -280,6 +280,416 @@ assert.equal(
   JSON.stringify(safeGenericAppendixJHeading.issues)
 );
 
+const genericAppendixJTreatmentPrefix =
+  "Appendix J provides that self-service storage facilities are subject to the as-of-right provisions of Section 42-19 in Subarea 1, while they are subject to City Planning Commission special permit under Section 74-192 in Subarea 2";
+for (const unsafeCompoundTreatment of [
+  `${genericAppendixJTreatmentPrefix}; It is in Subarea 1 and is permitted as-of-right. ${globalAppendixJBoundary}`,
+  `${genericAppendixJTreatmentPrefix}; Acme Warehouse is in Subarea 1 and is permitted as-of-right. ${globalAppendixJBoundary}`,
+  `${genericAppendixJTreatmentPrefix}, and it is in Subarea 1 and is permitted as-of-right. ${globalAppendixJBoundary}`
+]) {
+  const unsafeCompoundResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeCompoundTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeCompoundResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeCompoundTreatment
+  );
+}
+
+const genericFirstSubareaTreatment =
+  "Appendix J provides that self-service storage facilities in Subarea 1 are subject to Section 42-19";
+for (const inferentialMappedConclusion of [
+  "and therefore it is in Subarea 1 and is permitted as-of-right",
+  "and thus it is in Subarea 1 and is permitted as-of-right",
+  "and so it is in Subarea 1 and is permitted as-of-right",
+  "which means it is in Subarea 1 and is permitted as-of-right",
+  "meaning it is in Subarea 1 and is permitted as-of-right"
+]) {
+  const unsafeInferentialTreatment =
+    `${genericFirstSubareaTreatment}, ${inferentialMappedConclusion}. ${globalAppendixJBoundary}`;
+  const unsafeInferentialResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeInferentialTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeInferentialResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeInferentialTreatment
+  );
+}
+
+for (const nominalMappedConclusion of [
+  "and therefore Acme Center is in Subarea 1",
+  "Harbor Storage is permitted as-of-right",
+  "the latter is in Subarea 1",
+  "said facility requires a special permit",
+  "such facility is in Subarea 1"
+]) {
+  const unsafeNominalTreatment =
+    `${genericFirstSubareaTreatment}, ${nominalMappedConclusion}. ${globalAppendixJBoundary}`;
+  const unsafeNominalResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeNominalTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeNominalResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeNominalTreatment
+  );
+}
+
+for (const alignedCategoricalConclusion of [
+  "Acme Center may proceed as-of-right",
+  "Acme Center may go forward as-of-right",
+  "the subject premises lie within Subarea 1"
+]) {
+  const unsafeAlignedCategoricalTreatment =
+    `${genericFirstSubareaTreatment}, ${alignedCategoricalConclusion}. ${globalAppendixJBoundary}`;
+  const unsafeAlignedCategoricalResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeAlignedCategoricalTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeAlignedCategoricalResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeAlignedCategoricalTreatment
+  );
+}
+
+for (const completeModalMappedConclusion of [
+  "Acme Center will be in Subarea 1",
+  "Acme Center may be on the Appendix J map",
+  "Acme Center will proceed as-of-right",
+  "Acme Center shall go forward as-of-right",
+  "Acme Center must proceed as-of-right",
+  "Acme Center will remain permitted as-of-right",
+  "Acme Center may remain within Subarea 1",
+  "and they will be in Subarea 1"
+]) {
+  const unsafeCompleteModalTreatment =
+    `${genericFirstSubareaTreatment}, ${completeModalMappedConclusion}. ${globalAppendixJBoundary}`;
+  const unsafeCompleteModalResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeCompleteModalTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeCompleteModalResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeCompleteModalTreatment
+  );
+}
+
+for (const parentheticalSubjectMappedConclusion of [
+  "Acme Center, under this reading, is in Subarea 1",
+  "Acme Center, therefore, will be on the Appendix J map",
+  "the project, based on the map, may proceed as-of-right",
+  "said facility, as a result, will remain permitted as-of-right"
+]) {
+  const unsafeParentheticalSubjectTreatment =
+    `${genericFirstSubareaTreatment}, ${parentheticalSubjectMappedConclusion}. ${globalAppendixJBoundary}`;
+  const unsafeParentheticalSubjectResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeParentheticalSubjectTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeParentheticalSubjectResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeParentheticalSubjectTreatment
+  );
+}
+
+for (const futureProofMappedConclusion of [
+  "Acme Center is located in Subarea 1",
+  "Acme Center is situated within Subarea 1",
+  "Acme Center remains permitted as-of-right",
+  "Acme Center stays within Subarea 1",
+  "Acme Center will continue to be permitted as-of-right",
+  "Acme Center occupies Subarea 1",
+  "Acme Center will occupy Subarea 1",
+  "Acme Center may occupy Subarea 1",
+  "Acme Center can occupy Subarea 1",
+  "Acme Center currently occupies Subarea 1",
+  "Acme Center likely occupies Subarea 1",
+  "and Acme Center occupies Subarea 1",
+  "and therefore Acme Center occupies Subarea 1",
+  "therefore Acme Center occupies Subarea 1",
+  "which means Acme Center occupies Subarea 1"
+]) {
+  const unsafeFutureProofTreatment =
+    `${genericFirstSubareaTreatment}, ${futureProofMappedConclusion}. ${globalAppendixJBoundary}`;
+  const unsafeFutureProofResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeFutureProofTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeFutureProofResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeFutureProofTreatment
+  );
+}
+
+for (const noCommaConnectorMappedConclusion of [
+  "and Acme Center occupies Subarea 1",
+  "while Acme Center occupies Subarea 1",
+  "but Acme Center occupies Subarea 1",
+  "which means Acme Center occupies Subarea 1",
+  "and the Acme Center occupies Subarea 1",
+  "but the One Vanderbilt occupies Subarea 1",
+  "while the Harbor Storage facility occupies Subarea 1",
+  "yet Acme Center occupies Subarea 1",
+  "whereas Acme Center occupies Subarea 1",
+  "although Acme Center occupies Subarea 1",
+  "and the proposed Acme Center occupies Subarea 1",
+  "and the existing Harbor Storage building occupies Subarea 1"
+]) {
+  const unsafeNoCommaConnectorTreatment =
+    `${genericFirstSubareaTreatment} ${noCommaConnectorMappedConclusion}. ${globalAppendixJBoundary}`;
+  const unsafeNoCommaConnectorResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeNoCommaConnectorTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeNoCommaConnectorResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeNoCommaConnectorTreatment
+  );
+}
+
+const safeGenericProgressTreatment = evaluateZoningResearchSafety({
+  question: sourceBoundaryQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    `Appendix J provides that self-service storage facilities in Subarea 1 may proceed as-of-right. ${globalAppendixJBoundary}`,
+    ["zr-map"],
+    appendixJMissingFacts
+  )
+});
+assert.equal(
+  safeGenericProgressTreatment.pass,
+  true,
+  JSON.stringify(safeGenericProgressTreatment.issues)
+);
+
+const safeGenericDiscourseTreatment = evaluateZoningResearchSafety({
+  question: sourceBoundaryQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    `Appendix J provides that self-service storage facilities in Subarea 1 are subject to Section 42-19; however, self-service storage facilities in Subarea 2 would be subject to a CPC special permit. ${globalAppendixJBoundary}`,
+    ["zr-map"],
+    appendixJMissingFacts
+  )
+});
+assert.equal(
+  safeGenericDiscourseTreatment.pass,
+  true,
+  JSON.stringify(safeGenericDiscourseTreatment.issues)
+);
+
+const safeGenericSubjectParentheticalTreatment = evaluateZoningResearchSafety({
+  question: sourceBoundaryQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    `Appendix J provides that self-service storage facilities in Subarea 1, under the selected text, would be permitted as-of-right. ${globalAppendixJBoundary}`,
+    ["zr-map"],
+    appendixJMissingFacts
+  )
+});
+assert.equal(
+  safeGenericSubjectParentheticalTreatment.pass,
+  true,
+  JSON.stringify(safeGenericSubjectParentheticalTreatment.issues)
+);
+
+const safeGenericContinuativeTreatment = evaluateZoningResearchSafety({
+  question: sourceBoundaryQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    `Appendix J provides that self-service storage facilities in Subarea 1 will continue to be permitted as-of-right. ${globalAppendixJBoundary}`,
+    ["zr-map"],
+    appendixJMissingFacts
+  )
+});
+assert.equal(
+  safeGenericContinuativeTreatment.pass,
+  true,
+  JSON.stringify(safeGenericContinuativeTreatment.issues)
+);
+
+const safeSpecificSubjectBoundaryTreatment = evaluateZoningResearchSafety({
+  question: sourceBoundaryQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    "Appendix J provides that self-service storage facilities in Subarea 1 are subject to Section 42-19, but no site-specific conclusion can be made for Acme Center without the map and location.",
+    ["zr-map"],
+    appendixJMissingFacts
+  )
+});
+assert.equal(
+  safeSpecificSubjectBoundaryTreatment.pass,
+  true,
+  JSON.stringify(safeSpecificSubjectBoundaryTreatment.issues)
+);
+
+for (const safeRegulatoryAuthorityTreatment of [
+  "City Planning Commission special permits govern self-service storage facilities in Subarea 2 under Section 74-192.",
+  "New York City rules place self-service storage facilities in Subarea 1 under Section 42-19 as-of-right."
+]) {
+  const safeRegulatoryAuthorityResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${safeRegulatoryAuthorityTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    safeRegulatoryAuthorityResult.pass,
+    true,
+    `${safeRegulatoryAuthorityTreatment}: ${JSON.stringify(safeRegulatoryAuthorityResult.issues)}`
+  );
+}
+
+for (const parentheticalMappedConclusion of [
+  "the project is, under this reading, permitted as-of-right",
+  "Acme Center is, therefore, within Subarea 1"
+]) {
+  const unsafeParentheticalTreatment =
+    `${genericFirstSubareaTreatment}, ${parentheticalMappedConclusion}. ${globalAppendixJBoundary}`;
+  const unsafeParentheticalResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeParentheticalTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeParentheticalResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeParentheticalTreatment
+  );
+}
+
+const safeGenericParentheticalTreatment = evaluateZoningResearchSafety({
+  question: sourceBoundaryQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    `Appendix J provides that self-service storage facilities in Subarea 1 are, under the selected text, permitted as-of-right. ${globalAppendixJBoundary}`,
+    ["zr-map"],
+    appendixJMissingFacts
+  )
+});
+assert.equal(
+  safeGenericParentheticalTreatment.pass,
+  true,
+  JSON.stringify(safeGenericParentheticalTreatment.issues)
+);
+
+for (const multiAuxiliaryMappedConclusion of [
+  "the project is, and will remain, permitted as-of-right",
+  "Acme Center is, and may remain, within Subarea 1",
+  "the project is, and can remain, allowed as-of-right"
+]) {
+  const unsafeMultiAuxiliaryTreatment =
+    `${genericFirstSubareaTreatment}, ${multiAuxiliaryMappedConclusion}. ${globalAppendixJBoundary}`;
+  const unsafeMultiAuxiliaryResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      unsafeMultiAuxiliaryTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafeMultiAuxiliaryResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafeMultiAuxiliaryTreatment
+  );
+}
+
+const safeGenericMultiAuxiliaryTreatment = evaluateZoningResearchSafety({
+  question: sourceBoundaryQuestion,
+  evidence: mapEvidence,
+  answer: answer(
+    `Appendix J provides that self-service storage facilities in Subarea 1 are, and will remain, permitted as-of-right. ${globalAppendixJBoundary}`,
+    ["zr-map"],
+    appendixJMissingFacts
+  )
+});
+assert.equal(
+  safeGenericMultiAuxiliaryTreatment.pass,
+  true,
+  JSON.stringify(safeGenericMultiAuxiliaryTreatment.issues)
+);
+
+for (const safeGenericCoreferenceTreatment of [
+  "Appendix J provides that self-service storage facilities in Subarea 1 are subject to Section 42-19, and they require a City Planning Commission special permit under Section 74-192 in Subarea 2. No site-specific conclusion can be made without the map and location.",
+  "Appendix J provides that self-service storage facilities in Subarea 1 are subject to Section 42-19, and it requires a City Planning Commission special permit under Section 74-192 in Subarea 2. No site-specific conclusion can be made without the map and location.",
+  "Appendix J provides that self-service storage facilities in Subarea 1 are subject to Section 42-19, and they will be subject to a CPC special permit under Section 74-192 in Subarea 2. No site-specific conclusion can be made without the map and location.",
+  "Appendix J provides that self-service storage facilities in Subarea 1 are subject to Section 42-19, and they may be permitted as-of-right in Subarea 2. No site-specific conclusion can be made without the map and location.",
+  "Appendix J provides that self-service storage facilities in Subarea 1 are subject to Section 42-19, and they can proceed as-of-right in Subarea 2. No site-specific conclusion can be made without the map and location."
+]) {
+  const safeGenericCoreferenceResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      safeGenericCoreferenceTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    safeGenericCoreferenceResult.pass,
+    true,
+    `${safeGenericCoreferenceTreatment}: ${JSON.stringify(safeGenericCoreferenceResult.issues)}`
+  );
+}
+
 for (const independentlyReproducedUnboundedTreatment of [
   "Appendix J places designated areas subject to Section 42-19 in Subarea 1 and designated areas requiring a City Planning Commission special permit under Section 74-192 in Subarea 2.",
   "Under Appendix J, the as-of-right provisions of Section 42-19 apply to self-service storage facilities in Subarea 1, and the City Planning Commission special-permit requirement under Section 74-192 applies in Subarea 2."
