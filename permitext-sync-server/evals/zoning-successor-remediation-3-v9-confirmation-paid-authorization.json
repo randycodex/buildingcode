@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "0a6a0e77-49a2-4e5a-8542-97dcb8e7fc0e",
-  "status": "locked",
+  "status": "authorized",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -9,16 +9,16 @@
   },
   "scope": {
     "purpose": "one complete 30-case owner-approved remediation successor 3 semantic run",
-    "caseCount": null,
-    "repetitions": null,
-    "maximumCumulativeSpendUSD": null
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": null,
-    "authorizedBy": null,
-    "exactAuthorizationPhrase": null,
-    "exactSpendingCapPhrase": null
+    "authorizedAt": "2026-08-31T16:14:13Z",
+    "authorizedBy": "Permitext owner",
+    "exactAuthorizationPhrase": "i authorize it, go ahead",
+    "exactSpendingCapPhrase": "i authorize it, go ahead"
   },
   "consumption": {
     "status": "not_started",
@@ -44,7 +44,7 @@
     "priorResultMarkdownSHA256": "ef7e1d2eaaef2847fc5b0abfa81d1755980a5683e1eeae58cdb18a992325506e"
   },
   "execution": {
-    "authorizationPackageCommit": null,
+    "authorizationPackageCommit": "c838b4d2c21554489eaad50b0e354cc6b6bc57f2",
     "executionCommit": null,
     "webSupportEnabled": false,
     "stopOnExecutionError": true
@@ -54,5 +54,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "Prepared and locked after independent no-cost review of Zoning safety v9. This record is not authorization to run. A future owner decision must name the committed authorization package, all 30 ordered cases, one repetition, and a new cumulative spend cap no higher than $5."
+  "notes": "The Permitext owner authorized the immediately preceding exact package decision: package c838b4d2c21554489eaad50b0e354cc6b6bc57f2, all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. This authorization permits one guarded run only and does not authorize deployment, public release, pricing, allowance, or evidence-budget changes."
 }
