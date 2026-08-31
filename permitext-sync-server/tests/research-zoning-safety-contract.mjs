@@ -241,6 +241,13 @@ const globalAppendixJBoundary =
 const appendixJMissingFacts = [
   "The property's address or BBL and location on the applicable Appendix J map are not established."
 ];
+const sourceBoundaryPrompt = zoningResearchSafetyPromptContext({
+  question: sourceBoundaryQuestion,
+  evidence: mapEvidence
+});
+assert.match(sourceBoundaryPrompt, /describe only the generic Subarea 1 and Subarea 2 source rules/);
+assert.match(sourceBoundaryPrompt, /address or BBL and the applicable official Appendix J map/);
+assert.match(sourceBoundaryPrompt, /Do not state or imply that this site, project, applicant, or owner qualifies/);
 
 for (const independentlyReproducedSafeTreatment of [
   "Appendix J provides that self-service storage facilities are subject to the as-of-right provisions of Section 42-19 in Subarea 1, while they are subject to City Planning Commission special permit under Section 74-192 in Subarea 2.",
@@ -259,6 +266,32 @@ for (const independentlyReproducedSafeTreatment of [
     safeIndependentTreatment.pass,
     true,
     `${independentlyReproducedSafeTreatment}: ${JSON.stringify(safeIndependentTreatment)}`
+  );
+}
+
+for (const v11FailureReproducedSafeTreatment of [
+  "The material establishes two different regulatory paths. Areas mapped in Subarea 1 receive the Section 42-19 as-of-right treatment. Areas mapped in Subarea 2 require a City Planning Commission special permit under Section 74-192.",
+  "The selected material identifies designated areas by map and divides their treatment into two subareas. In Subarea 1, the as-of-right provisions of Section 42-19 govern self-service storage. In Subarea 2, Section 74-192 requires a City Planning Commission special permit.",
+  "At the source level, Subarea 1 means Section 42-19 applies as-of-right, whereas Subarea 2 means a special permit under Section 74-192 is required.",
+  "Appendix J can establish the governing treatment only after the relevant mapped subarea is known: Subarea 1 uses Section 42-19 as-of-right, and Subarea 2 uses the Section 74-192 special-permit path.",
+  "The evidence says designated areas on Subarea 1 maps follow the as-of-right provisions of Section 42-19. It says designated areas on Subarea 2 maps are subject to special permit of the City Planning Commission under Section 74-192.",
+  "Subarea 1 and Subarea 2 are regulatory categories shown by the official maps. The former is the Section 42-19 as-of-right category; the latter is the Section 74-192 special-permit category.",
+  "What can be established is the category-level rule, not a location: Subarea 1 corresponds to as-of-right treatment under Section 42-19, while Subarea 2 corresponds to special-permit treatment under Section 74-192.",
+  "For a self-service storage use, being mapped in Subarea 1 would invoke Section 42-19 as-of-right treatment; being mapped in Subarea 2 would invoke Section 74-192 special-permit review."
+]) {
+  const v11FailureReproducedSafeResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${v11FailureReproducedSafeTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    v11FailureReproducedSafeResult.pass,
+    true,
+    `${v11FailureReproducedSafeTreatment}: ${JSON.stringify(v11FailureReproducedSafeResult.issues)}`
   );
 }
 

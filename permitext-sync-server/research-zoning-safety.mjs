@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 export const zoningResearchSafetyVersion =
-  "20260831-zoning-material-completeness-v11";
+  "20260831-zoning-material-completeness-v12";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -673,6 +673,12 @@ function hasUnsafeMappedPredicateSubject(value) {
 
 function statesGenericAppendixJTreatment(value) {
   const text = compactText(value);
+  const reviewedGenericSurface =
+    /^(?:the\s+)?(?:selected\s+)?material\s+(?:identifies?|shows?|establishes?)\s+designated areas?\s+by\s+map\s+and\s+divides?\s+their\s+treatment\s+into\s+two\s+subareas\b/i.test(text) ||
+    /^(?:in|within)\s+(?:the\s+)?Subarea\s*[12]\s*,\s*(?:(?:the\s+)?as[- ]of[- ]right provisions?\s+of\s+Section\s+42-19\s+govern(?:s)?\s+self[- ]service storage|Section\s+74-192\s+requires?\s+(?:a\s+)?(?:City Planning Commission|CPC)\s+special permit)\b/i.test(text) ||
+    /^(?:(?:the\s+)?(?:selected\s+)?(?:evidence|material|source)|it)\s+(?:says?|states?|shows?|provides?|identifies?|establishes?)\b[^.]{0,240}\bdesignated areas?\b[^.]{0,240}\b(?:Subarea\s*[12]|Section\s+(?:42-19|74-192)|as[- ]of[- ]right|special permit)\b/i.test(text) ||
+    /^(?:the\s+former|the\s+latter)\s+is\s+(?:the\s+)?(?:Section\s+(?:42-19|74-192)\s+)?(?:as[- ]of[- ]right|special[- ]permit)\s+category\b/i.test(text);
+  if (reviewedGenericSurface) return true;
   const genericConditionalCoreference =
     /^if\s+(?:it|they|such\s+(?:a\s+)?facilit(?:y|ies))\b/i.test(text);
   const specificTargetLead = /^(?:(?:the|this|that|our|your|their)\s+)?(?:applicant|owner|tenant|client|customer|developer|operator|lessee|landlord)\b/i.test(text) ||
@@ -700,6 +706,56 @@ function statesGenericAppendixJTreatment(value) {
     /\bspecial[- ]?permit\b/i.test(text) ||
     /\bSection\s+74-192\b/i.test(text);
   return genericSubject && mappedCategory && regulatoryTreatment;
+}
+
+function hasSpecificMappedActorConclusion(value) {
+  const text = compactText(value).replace(
+    /^(?:(?:however|nevertheless|nonetheless|but|yet|therefore|thus|accordingly|consequently|hence)\b[\s,]*)+/i,
+    ""
+  );
+  if (!text || /^if\b/i.test(text) || statesMappedEvidenceGatheringInstruction(text)) {
+    return false;
+  }
+  const specificActor = /^(?:it|this|that|they|he|she|we|you|the\s+same|the\s+former|the\s+latter|(?:(?:the|this|that|our|your|their|said)\s+)?(?:applicant|owner|tenant|client|customer|developer|operator|lessee|landlord|application|proposal|project|site|property|facility|premises|building|warehouse|parcel|lot))\b/i.test(text);
+  const positiveProgressConclusion =
+    /\b(?:may|can|could|would|will|shall|must)\s+(?!not\b)(?:proceed|go\s+forward|move\s+forward|operate|qualify)\b/i.test(
+      text
+    );
+  return specificActor && (
+    hasMappedOrRegulatoryPredicate(text) ||
+    positiveProgressConclusion
+  );
+}
+
+function hasEmbeddedSpecificMappedActorConclusion(value) {
+  const text = compactText(value);
+  const coreferenceAfterComma = text.match(
+    /,\s*((?:the\s+former|the\s+latter)\b[^.!?;]*)/i
+  );
+  if (
+    coreferenceAfterComma &&
+    hasSpecificMappedActorConclusion(coreferenceAfterComma[1])
+  ) {
+    return true;
+  }
+  const modalCoreferenceAfterComma = text.match(
+    /,\s*and\s+((?:it|they|this|that)\b[^.!?;]*)/i
+  );
+  if (
+    modalCoreferenceAfterComma &&
+    /\b(?:may|can|could|would|will|shall|must)\s+(?:(?:continue\s+to|remain)\s+)?(?:be\s+)?(?:in|within|on)\b/i.test(
+      modalCoreferenceAfterComma[1]
+    )
+  ) {
+    return true;
+  }
+  const segments = text
+    .split(
+      /\b(?:and\s+therefore|and\s+thus|and\s+so|therefore|thus|accordingly|consequently|hence|so|which\s+means|meaning|but|yet)\b[\s,]*/i
+    )
+    .map(compactText)
+    .filter(Boolean);
+  return segments.slice(1).some(hasSpecificMappedActorConclusion);
 }
 
 function mappedAnswerFields(answer) {
@@ -768,15 +824,29 @@ function mappedClauseAnalysis(answer) {
     return splitMappedConclusionClauses(field.value).map((clause) => {
       const establishedSourceRule = statesSourceLevelMappedAreaRule(clause);
       const genericAppendixJTreatment = statesGenericAppendixJTreatment(clause);
+      const sourceRule = establishedSourceRule || genericAppendixJTreatment;
+      const clauseHasMappedOrRegulatoryPredicate =
+        hasMappedOrRegulatoryPredicate(clause);
+      const parcelSpecificConclusion =
+        hasEmbeddedSpecificMappedActorConclusion(clause) ||
+        hasAppendedMappedActorConclusion(clause) ||
+        (!sourceRule && (
+          fieldSpecificMappedExample ||
+          hasConcretePropertyIdentifier(clause) ||
+          hasMappedSpecificExample(clause) ||
+          hasSpecificMappedActorConclusion(clause) ||
+          hasNonGenericMappedClaimSubject(clause)
+        ));
       return {
         fieldKind: field.fieldKind,
         clause,
         locationBoundary: statesLocationBoundary(clause),
-        sourceRule: establishedSourceRule || genericAppendixJTreatment,
+        sourceRule,
         genericAppendixJTreatment,
+        parcelSpecificConclusion,
         directConclusion: !statesMappedEvidenceGatheringInstruction(clause) && (
           categoricalProjectConclusion(clause) ||
-          hasMappedOrRegulatoryPredicate(clause) ||
+          clauseHasMappedOrRegulatoryPredicate ||
           hasNonGenericMappedClaimSubject(clause) ||
           fieldSpecificMappedExample
         )
@@ -798,6 +868,7 @@ function mappedLocationAttemptDiagnostic({
     clauseLength: clause.clause.length,
     locationBoundary: clause.locationBoundary,
     sourceRule: clause.sourceRule,
+    parcelSpecificConclusion: clause.parcelSpecificConclusion,
     directConclusion: clause.directConclusion
   }));
   return {
@@ -1011,6 +1082,9 @@ export function zoningResearchSafetyPromptContext(options = {}) {
         ? "The supplied address or property identifier does not itself establish mapped status. State that boundary, request the controlling official map or mapped-district evidence, and keep the result conditional."
         : "The supplied facts do not establish the mapped location needed for a parcel-specific conclusion. State that boundary, separately request a usable property identifier such as the address or BBL and the controlling official map or mapped-district evidence, and keep the result conditional."
       : "Use only mapped-location facts expressly supplied for this question; do not broaden them.",
+    isAppendixJSourceBoundaryQuestion(options.question)
+      ? "For this Appendix J source-boundary question, describe only the generic Subarea 1 and Subarea 2 source rules. Separately state that no site, property, or parcel conclusion can be made without its address or BBL and the applicable official Appendix J map, and list both items in missingFacts. Do not state or imply that this site, project, applicant, or owner qualifies, is permitted, receives a benefit, or may proceed."
+      : "",
     profile.specialDistrictLabels.length
       ? `Preserve the exact special-purpose scope named in the evidence: ${profile.specialDistrictLabels.join("; ")}.`
       : "",
@@ -1122,7 +1196,7 @@ export function evaluateZoningResearchSafety({
       if (!mappedLocationBoundaryPresent) {
         return clause.sourceRule || clause.directConclusion;
       }
-      return clause.directConclusion && !clause.sourceRule;
+      return clause.parcelSpecificConclusion;
     }
     if (!clause.directConclusion && !clause.sourceRule) return false;
     return !(mappedLocationBoundaryPresent && clause.sourceRule);
