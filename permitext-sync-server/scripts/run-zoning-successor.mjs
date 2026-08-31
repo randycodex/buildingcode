@@ -51,6 +51,16 @@ import {
   zoningRemediationSuccessor3V12ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v12-confirmation-paid-authorization.mjs";
 import {
+  requireActiveZoningRemediationSuccessor3V13ConfirmationPaidAuthorization,
+  validateZoningRemediationSuccessor3V13ConfirmationPaidAuthorization,
+  zoningRemediationSuccessor3V13ConfirmationAppSHA256,
+  zoningRemediationSuccessor3V13ConfirmationEconomicsSHA256,
+  zoningRemediationSuccessor3V13ConfirmationLockedAuthorizationSHA256,
+  zoningRemediationSuccessor3V13ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V13ConfirmationRunnerHandoffSHA256,
+  zoningRemediationSuccessor3V13ConfirmationSafetySHA256
+} from "../evals/zoning-successor-remediation-3-v13-confirmation-paid-authorization.mjs";
+import {
   respondToZoningV11RunnerChallenge,
   zoningV11RunnerPrivateKey
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
@@ -81,7 +91,8 @@ assert(
         "--remediation-3-v8-confirmation",
         "--remediation-3-v9-confirmation",
         "--remediation-3-v11-confirmation",
-        "--remediation-3-v12-confirmation"
+        "--remediation-3-v12-confirmation",
+        "--remediation-3-v13-confirmation"
       ].includes(argument)),
   "Unsupported Zoning successor paid-run argument."
 );
@@ -95,9 +106,12 @@ const remediationSuccessor3V11ConfirmationMode =
   process.argv.includes("--remediation-3-v11-confirmation");
 const remediationSuccessor3V12ConfirmationMode =
   process.argv.includes("--remediation-3-v12-confirmation");
+const remediationSuccessor3V13ConfirmationMode =
+  process.argv.includes("--remediation-3-v13-confirmation");
 const remediationSuccessor3AuthenticatedConfirmationMode =
   remediationSuccessor3V11ConfirmationMode ||
-  remediationSuccessor3V12ConfirmationMode;
+  remediationSuccessor3V12ConfirmationMode ||
+  remediationSuccessor3V13ConfirmationMode;
 const retiredPaidPathMessage =
   "Historical Zoning successor paid runner modes are retired. Each must run through " +
   "its consuming runner and active run lock, and each now requires a new explicit owner " +
@@ -109,7 +123,25 @@ if (runnerInvokedDirectly && !remediationSuccessor3AuthenticatedConfirmationMode
 const remediationSuccessor3FamilyMode = remediationSuccessor3Mode ||
   remediationSuccessor3V8ConfirmationMode || remediationSuccessor3V9ConfirmationMode ||
   remediationSuccessor3AuthenticatedConfirmationMode;
-const authenticatedConfirmation = remediationSuccessor3V12ConfirmationMode
+const authenticatedConfirmation = remediationSuccessor3V13ConfirmationMode
+  ? {
+      version: "v13",
+      validate:
+        validateZoningRemediationSuccessor3V13ConfirmationPaidAuthorization,
+      requireActive:
+        requireActiveZoningRemediationSuccessor3V13ConfirmationPaidAuthorization,
+      appSHA256: zoningRemediationSuccessor3V13ConfirmationAppSHA256,
+      economicsSHA256:
+        zoningRemediationSuccessor3V13ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningRemediationSuccessor3V13ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit:
+        zoningRemediationSuccessor3V13ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningRemediationSuccessor3V13ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningRemediationSuccessor3V13ConfirmationSafetySHA256
+    }
+  : remediationSuccessor3V12ConfirmationMode
   ? {
       version: "v12",
       validate:
@@ -147,7 +179,9 @@ const authenticatedConfirmation = remediationSuccessor3V12ConfirmationMode
 const authorizationPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3V12ConfirmationMode
+  remediationSuccessor3V13ConfirmationMode
+    ? "zoning-successor-remediation-3-v13-confirmation-paid-authorization.json"
+    : remediationSuccessor3V12ConfirmationMode
     ? "zoning-successor-remediation-3-v12-confirmation-paid-authorization.json"
     : remediationSuccessor3V11ConfirmationMode
     ? "zoning-successor-remediation-3-v11-confirmation-paid-authorization.json"
@@ -164,7 +198,9 @@ const authorizationPath = resolve(
 const authorizationModulePath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3V12ConfirmationMode
+  remediationSuccessor3V13ConfirmationMode
+    ? "zoning-successor-remediation-3-v13-confirmation-paid-authorization.mjs"
+    : remediationSuccessor3V12ConfirmationMode
     ? "zoning-successor-remediation-3-v12-confirmation-paid-authorization.mjs"
     : remediationSuccessor3V11ConfirmationMode
     ? "zoning-successor-remediation-3-v11-confirmation-paid-authorization.mjs"
@@ -181,7 +217,9 @@ const authorizationModulePath = resolve(
 const runLockPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3V12ConfirmationMode
+  remediationSuccessor3V13ConfirmationMode
+    ? ".zoning-successor-remediation-3-v13-confirmation-paid-run.lock"
+    : remediationSuccessor3V12ConfirmationMode
     ? ".zoning-successor-remediation-3-v12-confirmation-paid-run.lock"
     : remediationSuccessor3V11ConfirmationMode
     ? ".zoning-successor-remediation-3-v11-confirmation-paid-run.lock"
@@ -479,7 +517,9 @@ function runEvaluation({
   return new Promise((resolveRun, rejectRun) => {
     const childArguments = [
       "tests/research-evals.mjs",
-      remediationSuccessor3V12ConfirmationMode
+      remediationSuccessor3V13ConfirmationMode
+        ? "--zoning-successor-remediation-3-v13-confirmation"
+        : remediationSuccessor3V12ConfirmationMode
         ? "--zoning-successor-remediation-3-v12-confirmation"
         : remediationSuccessor3V11ConfirmationMode
         ? "--zoning-successor-remediation-3-v11-confirmation"
