@@ -74,6 +74,30 @@ assert.match(mapPrompt, /mapped-applicability/);
 assert.match(mapPrompt, /Do not infer a parcel's mapped district/);
 assert.match(mapPrompt, /property identifier such as the address or BBL/);
 
+const appendixJStructuredEvidence = [{
+  ...mapEvidence[0],
+  origin: "user_pinned",
+  richSourceID: "zr-map-table",
+  richSourceGrids: [{
+    rows: [
+      ["SUBAREA 1", "Bathgate", "Map 1"],
+      ["SUBAREA 2", "Port Morris", "Maps 1-3"]
+    ]
+  }]
+}];
+const appendixJSourceBoundaryPrompt = zoningResearchSafetyPromptContext({
+  question: "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+  evidence: appendixJStructuredEvidence
+});
+assert.match(
+  appendixJSourceBoundaryPrompt,
+  /Do not enumerate or summarize named designated areas, boroughs, community districts, map numbers, or table rows/
+);
+assert.doesNotMatch(
+  appendixJSourceBoundaryPrompt,
+  /Read structured table cells together with their headings/
+);
+
 const modelInput = researchInputForEvidence(mapQuestion, [{ ...mapEvidence[0], visualSources: [] }]);
 assert.match(modelInput, /ZONING RESEARCH SAFETY CONTRACT/);
 assert.match(modelInput, new RegExp(`PASSAGE_TEXT_SHA256: ${mapEvidence[0].sectionTextHash}`));
@@ -246,6 +270,7 @@ const sourceBoundaryPrompt = zoningResearchSafetyPromptContext({
   evidence: mapEvidence
 });
 assert.match(sourceBoundaryPrompt, /describe only the generic Subarea 1 and Subarea 2 source rules/);
+assert.match(sourceBoundaryPrompt, /Do not enumerate or summarize named designated areas/);
 assert.match(sourceBoundaryPrompt, /address or BBL and the applicable official Appendix J map/);
 assert.match(sourceBoundaryPrompt, /Do not state or imply that this site, project, applicant, or owner qualifies/);
 
@@ -268,6 +293,24 @@ for (const independentlyReproducedSafeTreatment of [
     `${independentlyReproducedSafeTreatment}: ${JSON.stringify(safeIndependentTreatment)}`
   );
 }
+
+const namedAppendixJInventory = evaluateZoningResearchSafety({
+  question: sourceBoundaryQuestion,
+  evidence: appendixJStructuredEvidence,
+  answer: answer(
+    `Appendix J lists Bathgate in Subarea 1 and Port Morris in Subarea 2. Appendix J provides that self-service storage facilities in Subarea 1 are subject to Section 42-19, while those in Subarea 2 require a City Planning Commission special permit under Section 74-192. ${globalAppendixJBoundary}`,
+    ["zr-map"],
+    appendixJMissingFacts
+  )
+});
+const namedAppendixJInventoryIssue = namedAppendixJInventory.issues.find((issue) =>
+  issue.type === "zoning_missing_mapped_location"
+);
+assert(namedAppendixJInventoryIssue);
+assert.match(
+  namedAppendixJInventoryIssue.detail,
+  /remove named designated-area, borough, community-district, map-number, and table-row inventory/
+);
 
 for (const v11FailureReproducedSafeTreatment of [
   "The material establishes two different regulatory paths. Areas mapped in Subarea 1 receive the Section 42-19 as-of-right treatment. Areas mapped in Subarea 2 require a City Planning Commission special permit under Section 74-192.",

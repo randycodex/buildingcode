@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 export const zoningResearchSafetyVersion =
-  "20260831-zoning-mapped-boundary-context-v13";
+  "20260831-zoning-appendix-j-source-boundary-prompt-v14";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -1078,6 +1078,9 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
 export function zoningResearchSafetyPromptContext(options = {}) {
   const profile = riskProfile(options);
   if (!profile.applies) return "";
+  const appendixJSourceBoundaryQuestion = isAppendixJSourceBoundaryQuestion(
+    options.question
+  );
   return [
     "ZONING RESEARCH SAFETY CONTRACT — SERVER GENERATED",
     `VERSION: ${zoningResearchSafetyVersion}`,
@@ -1089,13 +1092,13 @@ export function zoningResearchSafetyPromptContext(options = {}) {
         ? "The supplied address or property identifier does not itself establish mapped status. State that boundary, request the controlling official map or mapped-district evidence, and keep the result conditional."
         : "The supplied facts do not establish the mapped location needed for a parcel-specific conclusion. State that boundary, separately request a usable property identifier such as the address or BBL and the controlling official map or mapped-district evidence, and keep the result conditional."
       : "Use only mapped-location facts expressly supplied for this question; do not broaden them.",
-    isAppendixJSourceBoundaryQuestion(options.question)
-      ? "For this Appendix J source-boundary question, describe only the generic Subarea 1 and Subarea 2 source rules. Separately state that no site, property, or parcel conclusion can be made without its address or BBL and the applicable official Appendix J map, and list both items in missingFacts. Do not state or imply that this site, project, applicant, or owner qualifies, is permitted, receives a benefit, or may proceed."
+    appendixJSourceBoundaryQuestion
+      ? "For this Appendix J source-boundary question, describe only the generic Subarea 1 and Subarea 2 source rules. Do not enumerate or summarize named designated areas, boroughs, community districts, map numbers, or table rows. Separately state that no site, property, or parcel conclusion can be made without its address or BBL and the applicable official Appendix J map, and list both items in missingFacts. Do not state or imply that this site, project, applicant, or owner qualifies, is permitted, receives a benefit, or may proceed."
       : "",
     profile.specialDistrictLabels.length
       ? `Preserve the exact special-purpose scope named in the evidence: ${profile.specialDistrictLabels.join("; ")}.`
       : "",
-    profile.categories.includes("table")
+    profile.categories.includes("table") && !appendixJSourceBoundaryQuestion
       ? "Read structured table cells together with their headings, symbols, notes, and footnotes. Do not reconstruct a row from prose or silently ignore a conditional category."
       : "",
     profile.categories.includes("arithmetic")
@@ -1239,7 +1242,9 @@ export function evaluateZoningResearchSafety({
   ) {
     issues.push({
       type: "zoning_missing_mapped_location",
-      detail: "Do not make a parcel-specific Zoning conclusion while mapped applicability is unresolved. State the boundary, keep the conclusion conditional, and name the missing address/BBL, mapped district, map area, or special-district fact in missingFacts."
+      detail: structuralAppendixJBoundary
+        ? "For this Appendix J source-boundary answer, remove named designated-area, borough, community-district, map-number, and table-row inventory and remove every site, property, or parcel result. Restate only the generic Subarea 1 treatment, the generic Subarea 2 treatment, and a separate boundary requiring the address or BBL plus the applicable official Appendix J map; list both missing items in missingFacts."
+        : "Do not make a parcel-specific Zoning conclusion while mapped applicability is unresolved. State the boundary, keep the conclusion conditional, and name the missing address/BBL, mapped district, map area, or special-district fact in missingFacts."
     });
   }
   if (
