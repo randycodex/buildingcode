@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "locked",
+  "status": "authorized",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -8,16 +8,16 @@
   },
   "scope": {
     "purpose": "one complete 30-case owner-approved remediation successor 3 semantic run",
-    "caseCount": null,
-    "repetitions": null,
-    "maximumCumulativeSpendUSD": null
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": null,
-    "authorizedBy": null,
-    "exactAuthorizationPhrase": null,
-    "exactSpendingCapPhrase": null
+    "authorizedAt": "2026-08-31T00:29:41Z",
+    "authorizedBy": "Permitext owner",
+    "exactAuthorizationPhrase": "I authorize it",
+    "exactSpendingCapPhrase": "Use a $5 maximum"
   },
   "consumption": {
     "status": "not_started",
@@ -31,5 +31,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "Locked pending a new explicit owner authorization for this exact remediation-successor-3 cohort and a cumulative cap no higher than $5."
+  "notes": "Authorized once for this exact remediation-successor-3 cohort. The authorization becomes non-reusable before provider dispatch and is consumed by one run result or retained fail-closed for manual review."
 }
