@@ -147,7 +147,8 @@ function sha256(value) {
 function gitOutput(arguments_, message) {
   const result = spawnSync("git", arguments_, {
     cwd: repositoryRoot,
-    encoding: "utf8"
+    encoding: "utf8",
+    maxBuffer: 4 * 1024 * 1024
   });
   assert.equal(result.status, 0, message);
   return result.stdout;

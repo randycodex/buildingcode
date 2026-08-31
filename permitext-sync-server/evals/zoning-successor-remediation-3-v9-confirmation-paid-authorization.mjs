@@ -23,7 +23,7 @@ const defaultAuthorizationPath = fileURLToPath(new URL(
   import.meta.url
 ));
 export const zoningRemediationSuccessor3V9ConfirmationLockedAuthorizationSHA256 =
-  "f526d0c7b6d1a0aa3f537d4357cf8331c0b078a1a20bc1c8872ad56a45578aa0";
+  "f8176550c79a3e7caddfc903760123d07467201ba8b83a260c105bd831e53b7c";
 export const zoningRemediationSuccessor3V9ConfirmationPreparedFromCommit =
   "1fae244d775192f55f0fd6ee17d90cb82648ba01";
 export const zoningRemediationSuccessor3V9ConfirmationSafetySHA256 =
@@ -33,7 +33,7 @@ export const zoningRemediationSuccessor3V9ConfirmationEconomicsSHA256 =
 export const zoningRemediationSuccessor3V9ConfirmationAppSHA256 =
   "1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797";
 
-const expectedAuthorizationID = "0a6a0e77-49a2-4e5a-8542-97dcb8e7fc0e";
+const expectedAuthorizationID = "9aaade99-759b-41d6-ad73-3ef9b4a168f9";
 const expectedCohortFile =
   "zoning-cases-expanded-batch-1-successor-remediation-3.json";
 const expectedCohortSHA256 =

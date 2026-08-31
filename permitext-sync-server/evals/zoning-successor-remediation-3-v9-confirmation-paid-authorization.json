@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "authorizationID": "0a6a0e77-49a2-4e5a-8542-97dcb8e7fc0e",
-  "status": "authorized",
+  "authorizationID": "9aaade99-759b-41d6-ad73-3ef9b4a168f9",
+  "status": "locked",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -9,16 +9,16 @@
   },
   "scope": {
     "purpose": "one complete 30-case owner-approved remediation successor 3 semantic run",
-    "caseCount": 30,
-    "repetitions": 1,
-    "maximumCumulativeSpendUSD": 5
+    "caseCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": "2026-08-31T16:14:13Z",
-    "authorizedBy": "Permitext owner",
-    "exactAuthorizationPhrase": "i authorize it, go ahead",
-    "exactSpendingCapPhrase": "i authorize it, go ahead"
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
   },
   "consumption": {
     "status": "not_started",
@@ -44,7 +44,7 @@
     "priorResultMarkdownSHA256": "ef7e1d2eaaef2847fc5b0abfa81d1755980a5683e1eeae58cdb18a992325506e"
   },
   "execution": {
-    "authorizationPackageCommit": "c838b4d2c21554489eaad50b0e354cc6b6bc57f2",
+    "authorizationPackageCommit": null,
     "executionCommit": null,
     "webSupportEnabled": false,
     "stopOnExecutionError": true
@@ -54,5 +54,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "The Permitext owner authorized the immediately preceding exact package decision: package c838b4d2c21554489eaad50b0e354cc6b6bc57f2, all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. This authorization permits one guarded run only and does not authorize deployment, public release, pricing, allowance, or evidence-budget changes."
+  "notes": "Replacement package preparation after the authorized c838b4d2c21554489eaad50b0e354cc6b6bc57f2 runner stopped before provider dispatch because Node's default spawnSync output buffer could not hold the pinned 1,216,521-byte application blob. The failed handoff spent $0 and left authorization commit 94f8ec013f3f9021fa59d691b81a80468a2f9f74 unconsumed. This fresh record is locked and requires a new exact-package owner decision; it does not authorize deployment, public release, pricing, allowance, or evidence-budget changes."
 }
