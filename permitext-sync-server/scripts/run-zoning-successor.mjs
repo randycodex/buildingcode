@@ -52,9 +52,13 @@ const serverRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const repositoryRoot = resolve(serverRoot, "..");
 const resultsDirectory = resolve(serverRoot, "evals", "results");
 const globalRunLockPath = resolve(serverRoot, "evals", ".paid-evaluation-run.lock");
+const runnerInvokedDirectly = Boolean(
+  process.argv[1] &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+);
 const runnerArguments = process.argv.slice(2);
 assert(
-  runnerArguments.length <= 1 &&
+  !runnerInvokedDirectly || runnerArguments.length <= 1 &&
     runnerArguments.every((argument) =>
       [
         "--remediation-2",
@@ -78,7 +82,7 @@ const retiredPaidPathMessage =
   "its consuming runner and active run lock, and each now requires a new explicit owner " +
   "authorization and cumulative spend cap in a new distinct package; this historical " +
   "path cannot dispatch.";
-if (!remediationSuccessor3V11ConfirmationMode) {
+if (runnerInvokedDirectly && !remediationSuccessor3V11ConfirmationMode) {
   throw new Error(retiredPaidPathMessage);
 }
 const remediationSuccessor3FamilyMode = remediationSuccessor3Mode ||
@@ -178,6 +182,28 @@ function changedServerFiles(arguments_) {
     .trim()
     .split("\n")
     .filter(Boolean);
+}
+
+function assertPinnedV11RuntimeInputsAtCommit(commit, label) {
+  for (const [path, expectedHash, inputLabel] of [
+    ["permitext-sync-server/research-zoning-safety.mjs",
+      zoningRemediationSuccessor3V11ConfirmationSafetySHA256, "Zoning safety"],
+    ["permitext-sync-server/research-economics.mjs",
+      zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
+      "Research economics"],
+    ["permitext-sync-server/app.mjs",
+      zoningRemediationSuccessor3V11ConfirmationAppSHA256, "application"]
+  ]) {
+    const reviewedText = gitOutput(
+      ["show", `${commit}:${path}`],
+      `Could not read the ${label} v11 ${inputLabel} bytes.`
+    );
+    assert.equal(
+      sha256(reviewedText),
+      expectedHash,
+      `The ${label} commit does not contain the pinned v11 ${inputLabel} bytes.`
+    );
+  }
 }
 
 async function assertV11ExecutionInputs({ expectedStatus, executionCommit = null }) {
@@ -395,6 +421,31 @@ function runEvaluation(environment, repetitions, runID) {
   });
 }
 
+export function zoningRemediationSuccessor3V11PaidRunEnvironment(
+  sourceEnvironment,
+  maximumCumulativeSpendUSD
+) {
+  return {
+    ...researchCommercializationBenchmarkEnvironment(sourceEnvironment),
+    NODE_ENV: "production",
+    PERMITEXT_TEST_RESEARCH_MOCK: "",
+    PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE: "",
+    PERMITEXT_TEST_RESEARCH_MOCK_DELAY_MS: "",
+    PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS: "",
+    PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY: "",
+    PERMITEXT_RESEARCH_EVAL_MAX_USD: String(maximumCumulativeSpendUSD),
+    PERMITEXT_RESEARCH_PROMPT_VERSION: supportedResearchPromptVersions[0],
+    PERMITEXT_RESEARCH_PRICING_VERSION: "openai-gpt-5.6-terra-2026-08-30",
+    PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "openai-gpt-5.6-luna-2026-08-30",
+    PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL:
+      researchCommercializationBenchmark.accurateModel,
+    PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT: "medium",
+    PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION:
+      "20260826-established-facts-v3",
+    PERMITEXT_RESEARCH_WEB_SUPPORT: "off"
+  };
+}
+
 async function main() {
   const validation = remediationSuccessor3V11ConfirmationMode
     ? requireActiveZoningRemediationSuccessor3V11ConfirmationPaidAuthorization(
@@ -461,29 +512,15 @@ async function main() {
     );
     assert.equal(repairAncestry.status, 0,
       "The independently reviewed v11 repair is not an ancestor of the authorized package commit.");
-    for (const [path, expectedHash, label] of [
-      ["permitext-sync-server/research-zoning-safety.mjs",
-        zoningRemediationSuccessor3V11ConfirmationSafetySHA256, "Zoning safety"],
-      ["permitext-sync-server/research-economics.mjs",
-        zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
-        "Research economics"],
-      ["permitext-sync-server/app.mjs",
-        zoningRemediationSuccessor3V11ConfirmationAppSHA256, "application"]
-    ]) {
-      const reviewedText = gitOutput(
-        [
-          "show",
-          `${zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit}:${path}`
-        ],
-        `Could not read the reviewed v11 ${label} bytes.`
-      );
-      assert.equal(
-        sha256(reviewedText),
-        expectedHash,
-        `The reviewed repair commit does not contain the pinned v11 ${label} bytes.`
-      );
-    }
+    assertPinnedV11RuntimeInputsAtCommit(
+      zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+      "reviewed repair"
+    );
     assertExactLockedAuthorizationPackage(authorizationPackageCommit);
+    assertPinnedV11RuntimeInputsAtCommit(
+      authorizationPackageCommit,
+      "owner-selected package"
+    );
     const ancestry = spawnSync(
       "git",
       ["merge-base", "--is-ancestor", authorizationPackageCommit, "HEAD"],
@@ -522,22 +559,10 @@ async function main() {
     await assertV11ExecutionInputs({ expectedStatus: "authorized" });
   }
 
-  const environment = {
-    ...researchCommercializationBenchmarkEnvironment(process.env),
-    PERMITEXT_RESEARCH_EVAL_MAX_USD:
-      String(authorization.scope.maximumCumulativeSpendUSD),
-    PERMITEXT_RESEARCH_PROMPT_VERSION: supportedResearchPromptVersions[0],
-    PERMITEXT_RESEARCH_PRICING_VERSION: "openai-gpt-5.6-terra-2026-08-30",
-    PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "openai-gpt-5.6-luna-2026-08-30",
-    PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL:
-      researchCommercializationBenchmark.accurateModel,
-    PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT: "medium",
-    PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION:
-      "20260826-established-facts-v3",
-    ...(remediationSuccessor3FamilyMode
-      ? { PERMITEXT_RESEARCH_WEB_SUPPORT: "off" }
-      : {})
-  };
+  const environment = zoningRemediationSuccessor3V11PaidRunEnvironment(
+    process.env,
+    authorization.scope.maximumCumulativeSpendUSD
+  );
   const paidEnvironment = validatePaidResearchEvaluationEnvironment(environment);
   assert.equal(
     paidEnvironment.approvedSpendCapUSD,
@@ -629,7 +654,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error.stack || error.message);
-  process.exitCode = 1;
-});
+if (runnerInvokedDirectly) {
+  main().catch((error) => {
+    console.error(error.stack || error.message);
+    process.exitCode = 1;
+  });
+}

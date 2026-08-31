@@ -23,6 +23,9 @@ import {
   zoningRemediationSuccessor3V9ConfirmationResultMarkdownSHA256,
   zoningRemediationSuccessor3V9ConfirmationRunID
 } from "../evals/zoning-successor-remediation-3-v9-confirmation-paid-authorization.mjs";
+import {
+  zoningRemediationSuccessor3V11PaidRunEnvironment
+} from "../scripts/run-zoning-successor.mjs";
 
 const serverRoot = new URL("../", import.meta.url);
 const authorizationPath = new URL(
@@ -32,6 +35,11 @@ const authorizationPath = new URL(
 const runnerPath = new URL("../scripts/run-zoning-successor.mjs", import.meta.url);
 const evaluatorPath = new URL("./research-evals.mjs", import.meta.url);
 const resultsPath = new URL("../evals/results/", import.meta.url);
+const globalRunLockPath = new URL("../evals/.paid-evaluation-run.lock", import.meta.url);
+const v11RunLockPath = new URL(
+  "../evals/.zoning-successor-remediation-3-v11-confirmation-paid-run.lock",
+  import.meta.url
+);
 const exactAuthorizationID = "ee72ca2f-5410-4ce9-a6d6-30deb8ff5169";
 const exactCohortSHA256 =
   "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc";
@@ -52,6 +60,26 @@ const paidEnvironment = {
 };
 const combinedOutput = (result) => `${result.stdout || ""}\n${result.stderr || ""}`;
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+
+const hostileEnvironment = zoningRemediationSuccessor3V11PaidRunEnvironment({
+  ...process.env,
+  NODE_ENV: "test",
+  PERMITEXT_TEST_RESEARCH_MOCK: "1",
+  PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE: "bb-2022-013",
+  PERMITEXT_TEST_RESEARCH_MOCK_DELAY_MS: "100",
+  PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS: "24000",
+  PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY: "1",
+  PERMITEXT_RESEARCH_WEB_SUPPORT: "on"
+}, 5);
+assert.equal(hostileEnvironment.NODE_ENV, "production");
+assert.equal(hostileEnvironment.PERMITEXT_RESEARCH_WEB_SUPPORT, "off");
+for (const key of [
+  "PERMITEXT_TEST_RESEARCH_MOCK",
+  "PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE",
+  "PERMITEXT_TEST_RESEARCH_MOCK_DELAY_MS",
+  "PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS",
+  "PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY"
+]) assert.equal(hostileEnvironment[key], "", `${key} was not scrubbed.`);
 
 assert.equal(zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
   exactRepairCommit);
@@ -122,6 +150,10 @@ for (const requiredGuard of [
   "zoningRemediationSuccessor3V11ConfirmationSafetySHA256",
   "zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256",
   "zoningRemediationSuccessor3V11ConfirmationAppSHA256",
+  "assertPinnedV11RuntimeInputsAtCommit",
+  "zoningRemediationSuccessor3V11PaidRunEnvironment",
+  "NODE_ENV: \"production\"",
+  "PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS: \"\"",
   "assertExactLockedAuthorizationPackage",
   "Only the locked authorization record may change",
   "pendingPaidRequestCount",
@@ -136,7 +168,7 @@ for (const requiredGuard of [
     `The v11 confirmation runner is missing guard: ${requiredGuard}`);
 }
 assert.match(runnerSource,
-  /if \(!remediationSuccessor3V11ConfirmationMode\)[\s\S]{0,120}retiredPaidPathMessage/,
+  /if \(runnerInvokedDirectly && !remediationSuccessor3V11ConfirmationMode\)[\s\S]{0,120}retiredPaidPathMessage/,
   "Every historical paid runner mode must remain retired.");
 
 const evaluatorSource = await readFile(evaluatorPath, "utf8");
@@ -144,12 +176,17 @@ for (const requiredGuard of [
   "--zoning-successor-remediation-3-v11-confirmation",
   ".zoning-successor-remediation-3-v11-confirmation-paid-run.lock",
   "validateZoningRemediationSuccessor3V11ConfirmationPaidAuthorization",
+  "zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256",
+  "zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit",
   ".paid-evaluation-run.lock",
   "PERMITEXT_ZONING_PAID_RUNNER_NONCE",
   "Paid v11 confirmation requires the exact clean execution commit",
   "Only the durable running authorization may differ in the child",
   "globalRunnerLock?.nonce === runnerLock?.nonce",
-  "globalRunnerLock?.executionCommit === runnerLock?.executionCommit"
+  "globalRunnerLock?.executionCommit === runnerLock?.executionCommit",
+  "server changes other than the authorization",
+  "The paid v11 child must run with a non-test NODE_ENV",
+  "PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS"
 ]) {
   assert(evaluatorSource.includes(requiredGuard),
     `The v11 confirmation evaluator is missing guard: ${requiredGuard}`);
@@ -214,6 +251,84 @@ for (const args of [
 assert.deepEqual((await readdir(resultsPath)).sort(), resultsBefore,
   "A locked, malformed, or historical attempt created a result file.");
 
+const exactHead = spawnSync("git", ["rev-parse", "HEAD"], {
+  cwd: serverRoot,
+  encoding: "utf8"
+}).stdout.trim();
+const forgedRunID = "11111111-1111-4111-8111-111111111111";
+const forgedNonce = "22222222-2222-4222-8222-222222222222";
+const forgedOwnerPhrase =
+  `authorize exactly package commit ${exactHead} for all 30 ordered cases, one ` +
+  "repetition, with a maximum cumulative API spend of $5.";
+const forgedAuthorization = structuredClone(lockedAuthorization);
+forgedAuthorization.status = "running";
+forgedAuthorization.scope.caseCount = 30;
+forgedAuthorization.scope.repetitions = 1;
+forgedAuthorization.scope.maximumCumulativeSpendUSD = 5;
+forgedAuthorization.ownerDecision.authorizedAt = "2026-08-31T20:00:00.000Z";
+forgedAuthorization.ownerDecision.authorizedBy = "Permitext owner";
+forgedAuthorization.ownerDecision.exactAuthorizationPhrase = forgedOwnerPhrase;
+forgedAuthorization.ownerDecision.exactSpendingCapPhrase = forgedOwnerPhrase;
+forgedAuthorization.consumption = {
+  status: "running",
+  attemptID: forgedRunID,
+  startedAt: "2026-08-31T20:00:01.000Z",
+  runID: null,
+  consumedAt: null
+};
+forgedAuthorization.execution.authorizationPackageCommit = exactHead;
+forgedAuthorization.execution.executionCommit = exactHead;
+const forgedLock = `${JSON.stringify({
+  pid: process.pid,
+  runID: forgedRunID,
+  nonce: forgedNonce,
+  executionCommit: exactHead
+})}\n`;
+let globalLockCreated = false;
+let cohortLockCreated = false;
+try {
+  await writeFile(globalRunLockPath, forgedLock, { encoding: "utf8", flag: "wx" });
+  globalLockCreated = true;
+  await writeFile(v11RunLockPath, forgedLock, { encoding: "utf8", flag: "wx" });
+  cohortLockCreated = true;
+  await writeFile(
+    authorizationPath,
+    `${JSON.stringify(forgedAuthorization, null, 2)}\n`,
+    "utf8"
+  );
+  const forgedDirectAttempt = spawnSync(process.execPath, [
+    "tests/research-evals.mjs",
+    "--zoning-successor-remediation-3-v11-confirmation",
+    "--run-live",
+    "--repeat", "1",
+    "--stop-on-execution-error",
+    "--run-id", forgedRunID
+  ], {
+    cwd: serverRoot,
+    encoding: "utf8",
+    env: {
+      ...hostileEnvironment,
+      OPENAI_API_KEY: "forged-direct-attempt-must-not-dispatch",
+      PERMITEXT_RUN_PAID_RESEARCH_EVALS: "1",
+      PERMITEXT_ZONING_PAID_RUNNER_NONCE: forgedNonce
+    },
+    maxBuffer: 20 * 1024 * 1024
+  });
+  assert.equal(forgedDirectAttempt.status, 1,
+    "A forged direct-evaluator parent unexpectedly dispatched.");
+  assert.match(combinedOutput(forgedDirectAttempt),
+    /(?:server changes other than the authorization|Only the durable running authorization may differ)/i);
+} finally {
+  await writeFile(authorizationPath, lockedAuthorizationText, "utf8");
+  if (cohortLockCreated) await rm(v11RunLockPath, { force: true });
+  if (globalLockCreated) await rm(globalRunLockPath, { force: true });
+}
+assert.equal(sha256(await readFile(authorizationPath, "utf8")),
+  exactLockedAuthorizationSHA256,
+"The forged-lock regression did not restore the locked authorization.");
+assert.deepEqual((await readdir(resultsPath)).sort(), resultsBefore,
+  "The forged-lock regression created a paid result file.");
+
 const mockPreflight = spawnSync(process.execPath, [
   "tests/research-evals.mjs",
   "--zoning-successor-remediation-3-v11-confirmation"
@@ -241,11 +356,15 @@ try {
   authorizedFixture.scope.maximumCumulativeSpendUSD = 5;
   authorizedFixture.ownerDecision.authorizedAt = "2026-08-31T20:00:00.000Z";
   authorizedFixture.ownerDecision.authorizedBy = "Permitext owner";
+  const fixturePackageCommit = "1".repeat(40);
+  const fixtureOwnerPhrase =
+    `authorize exactly package commit ${fixturePackageCommit} for all 30 ordered ` +
+    "cases, one repetition, with a maximum cumulative API spend of $5.";
   authorizedFixture.ownerDecision.exactAuthorizationPhrase =
-    "Fixture authorization for the exact committed v11 confirmation package.";
+    fixtureOwnerPhrase;
   authorizedFixture.ownerDecision.exactSpendingCapPhrase =
-    "Fixture maximum cumulative API spend of $5.";
-  authorizedFixture.execution.authorizationPackageCommit = "1".repeat(40);
+    fixtureOwnerPhrase;
+  authorizedFixture.execution.authorizationPackageCommit = fixturePackageCommit;
   await writeFile(fixturePath, `${JSON.stringify(authorizedFixture, null, 2)}\n`, "utf8");
   const authorized =
     await validateZoningRemediationSuccessor3V11ConfirmationPaidAuthorization({
@@ -271,7 +390,18 @@ try {
     }, /24,000-character evidence candidate must remain disabled/],
     ["missing exact cap phrase", (fixture) => {
       fixture.ownerDecision.exactSpendingCapPhrase = null;
-    }, /exact spending-cap phrase/]
+    }, /same exact package-bound spending-cap phrase/],
+    ["mismatched phrase package", (fixture) => {
+      fixture.ownerDecision.exactAuthorizationPhrase =
+        fixture.ownerDecision.exactAuthorizationPhrase.replace("1".repeat(40), "2".repeat(40));
+    }, /bind the owner's exact phrase to the selected package and scope/],
+    ["mismatched phrase scope", (fixture) => {
+      fixture.ownerDecision.exactAuthorizationPhrase =
+        fixture.ownerDecision.exactAuthorizationPhrase.replace("all 30", "all 29");
+    }, /bind the owner's exact phrase to the selected package and scope/],
+    ["mismatched structured cap", (fixture) => {
+      fixture.scope.maximumCumulativeSpendUSD = 4;
+    }, /exact 30-case, one-repetition, \$5 scope/]
   ]) {
     const fixture = structuredClone(authorizedFixture);
     mutate(fixture);

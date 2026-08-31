@@ -173,11 +173,19 @@ export async function validateZoningRemediationSuccessor3V11ConfirmationPaidAuth
     assert(executionCommit === null,
       "Locked v11 confirmation authorization may not name an execution commit.");
   } else {
-    assert(typeof exactSpendingCapPhrase === "string" &&
-      exactSpendingCapPhrase.length > 0,
-    "V11 confirmation authorization must retain the owner's exact spending-cap phrase.");
     assert(/^[0-9a-f]{40}$/i.test(authorizationPackageCommit || ""),
       "V11 confirmation authorization must bind the exact committed locked package.");
+    assert(authorization.scope?.caseCount === 30 &&
+      authorization.scope?.repetitions === 1 &&
+      authorization.scope?.maximumCumulativeSpendUSD === 5,
+    "V11 confirmation authorization must retain the exact 30-case, one-repetition, $5 scope.");
+    const expectedOwnerPhrase =
+      `authorize exactly package commit ${authorizationPackageCommit} for all 30 ` +
+      "ordered cases, one repetition, with a maximum cumulative API spend of $5.";
+    assert(authorization.ownerDecision?.exactAuthorizationPhrase === expectedOwnerPhrase,
+      "V11 confirmation authorization must bind the owner's exact phrase to the selected package and scope.");
+    assert(exactSpendingCapPhrase === expectedOwnerPhrase,
+      "V11 confirmation authorization must retain the same exact package-bound spending-cap phrase.");
   }
   if (authorization.status === "authorized") {
     assert(executionCommit === null,

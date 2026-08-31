@@ -52,7 +52,12 @@ import {
   validateZoningRemediationSuccessor3V9ConfirmationPaidAuthorization
 } from "../evals/zoning-successor-remediation-3-v9-confirmation-paid-authorization.mjs";
 import {
-  validateZoningRemediationSuccessor3V11ConfirmationPaidAuthorization
+  validateZoningRemediationSuccessor3V11ConfirmationPaidAuthorization,
+  zoningRemediationSuccessor3V11ConfirmationAppSHA256,
+  zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
+  zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
+  zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V11ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v11-confirmation-paid-authorization.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
@@ -2290,15 +2295,73 @@ async function assertV11ConfirmationChildExecutionInputs({
   executionCommit
 }) {
   const repositoryRoot = resolve(serverRoot, "..");
-  const changedFiles = async (arguments_) => {
+  const gitText = async (arguments_) => {
     const { stdout } = await execFileAsync("git", arguments_, {
-      cwd: repositoryRoot
+      cwd: repositoryRoot,
+      maxBuffer: 4 * 1024 * 1024
     });
-    return stdout.trim().split("\n").filter(Boolean);
+    return stdout;
+  };
+  const changedFiles = async (arguments_) => {
+    return (await gitText(arguments_)).trim().split("\n").filter(Boolean);
   };
   const expectedAuthorizationPath =
     "permitext-sync-server/evals/" +
     "zoning-successor-remediation-3-v11-confirmation-paid-authorization.json";
+  const authorizationPackageCommit =
+    authorization.execution?.authorizationPackageCommit;
+  try {
+    await gitText([
+      "merge-base", "--is-ancestor",
+      zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+      authorizationPackageCommit
+    ]);
+  } catch {
+    throw new Error(
+      "The child could not prove that the reviewed v11 repair is an ancestor of the owner-selected package."
+    );
+  }
+  try {
+    await gitText([
+      "merge-base", "--is-ancestor", authorizationPackageCommit, executionCommit
+    ]);
+  } catch {
+    throw new Error(
+      "The child could not prove that the owner-selected package is an ancestor of the execution commit."
+    );
+  }
+  const lockedAuthorizationText = await gitText([
+    "show", `${authorizationPackageCommit}:${expectedAuthorizationPath}`
+  ]);
+  assert(
+    createHash("sha256").update(lockedAuthorizationText).digest("hex") ===
+      zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
+    "The child loaded a package without the exact reviewed locked v11 authorization."
+  );
+  for (const [path, expectedHash, label] of [
+    ["permitext-sync-server/research-zoning-safety.mjs",
+      zoningRemediationSuccessor3V11ConfirmationSafetySHA256, "Zoning safety"],
+    ["permitext-sync-server/research-economics.mjs",
+      zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
+      "Research economics"],
+    ["permitext-sync-server/app.mjs",
+      zoningRemediationSuccessor3V11ConfirmationAppSHA256, "application"]
+  ]) {
+    const content = await gitText([
+      "show", `${authorizationPackageCommit}:${path}`
+    ]);
+    assert(
+      createHash("sha256").update(content).digest("hex") === expectedHash,
+      `The child found different ${label} bytes in the owner-selected v11 package.`
+    );
+  }
+  assert(
+    JSON.stringify(await changedFiles([
+      "diff", "--name-only", `${authorizationPackageCommit}..${executionCommit}`,
+      "--", "permitext-sync-server"
+    ])) === JSON.stringify([expectedAuthorizationPath]),
+    "The child found server changes other than the authorization between the selected package and execution commit."
+  );
   assert(
     JSON.stringify(await changedFiles([
       "diff", "--name-only", "--", "permitext-sync-server"
@@ -2320,6 +2383,18 @@ async function assertV11ConfirmationChildExecutionInputs({
     await currentGitCommit() === executionCommit,
     "The child execution commit changed immediately before provider dispatch."
   );
+  assert(process.env.NODE_ENV === "production",
+    "The paid v11 child must run with a non-test NODE_ENV.");
+  for (const key of [
+    "PERMITEXT_TEST_RESEARCH_MOCK",
+    "PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE",
+    "PERMITEXT_TEST_RESEARCH_MOCK_DELAY_MS",
+    "PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS",
+    "PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY"
+  ]) {
+    assert(!process.env[key],
+      `The paid v11 child inherited forbidden test configuration: ${key}.`);
+  }
 }
 
 async function zoningSuccessorAdvisoryImplementationSHA256() {
@@ -4366,6 +4441,12 @@ async function main() {
           "Paid remediation successor 3 requires the runner's exact durable running authorization."
         );
         if (zoningRemediationSuccessor3V11ConfirmationMode) {
+          assert(stopOnExecutionError === true && stopOnError === false,
+            "Paid v11 confirmation must use the authorized stop-on-execution-error policy.");
+          assert(zoningEvidenceBudgetMode === false,
+            "Paid v11 confirmation may not enable an evidence-budget prototype mode.");
+          assert(process.env.PERMITEXT_RESEARCH_WEB_SUPPORT === "off",
+            "Paid v11 confirmation must keep provider web support disabled.");
           const executionCommit = await currentGitCommit();
           assert(
             runnerLock.executionCommit === executionCommit &&
