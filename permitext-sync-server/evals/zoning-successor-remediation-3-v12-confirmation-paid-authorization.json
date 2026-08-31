@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "31dd8aa9-3b2c-4fc8-8988-1b542735ac78",
-  "status": "locked",
+  "status": "authorized",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -9,16 +9,16 @@
   },
   "scope": {
     "purpose": "one complete 30-case owner-approved remediation successor 3 semantic run",
-    "caseCount": null,
-    "repetitions": null,
-    "maximumCumulativeSpendUSD": null
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": null,
-    "authorizedBy": null,
-    "exactAuthorizationPhrase": null,
-    "exactSpendingCapPhrase": null
+    "authorizedAt": "2026-08-31T22:36:05Z",
+    "authorizedBy": "Permitext owner",
+    "exactAuthorizationPhrase": "authorize exactly package commit 67fbd6ca25d69b9f59d07dfb3b556ca16d134b39 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.",
+    "exactSpendingCapPhrase": "authorize exactly package commit 67fbd6ca25d69b9f59d07dfb3b556ca16d134b39 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
     "status": "not_started",
@@ -47,7 +47,7 @@
     "priorResultMarkdownSHA256": "67abb7849f5f4d275131fd820f6e483cd351e3fe918c8c5cc02f9381f5d12c5b"
   },
   "execution": {
-    "authorizationPackageCommit": null,
+    "authorizationPackageCommit": "67fbd6ca25d69b9f59d07dfb3b556ca16d134b39",
     "executionCommit": null,
     "webSupportEnabled": false,
     "stopOnExecutionError": true
@@ -57,5 +57,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "Locked v12 confirmation package preparation only. No paid run is authorized. A future exact owner authorization must name the committed package, all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5."
+  "notes": "The Permitext owner authorized exactly package 67fbd6ca25d69b9f59d07dfb3b556ca16d134b39 for all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. No public release, deployment, pricing, allowance, or evidence-budget change is authorized."
 }
