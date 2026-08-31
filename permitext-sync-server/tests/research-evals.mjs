@@ -45,6 +45,9 @@ import {
 import {
   validateZoningRemediationSuccessor3PaidAuthorization
 } from "../evals/zoning-successor-remediation-3-paid-authorization.mjs";
+import {
+  validateZoningRemediationSuccessor3V8ConfirmationPaidAuthorization
+} from "../evals/zoning-successor-remediation-3-v8-confirmation-paid-authorization.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
@@ -74,8 +77,11 @@ const zoningRemediationSuccessor2Mode =
   process.argv.includes("--zoning-successor-remediation-2");
 const zoningRemediationSuccessor3Mode =
   process.argv.includes("--zoning-successor-remediation-3");
+const zoningRemediationSuccessor3V8ConfirmationMode =
+  process.argv.includes("--zoning-successor-remediation-3-v8-confirmation");
 const zoningSuccessorFamilyMode = zoningSuccessorMode ||
-  zoningRemediationSuccessor2Mode || zoningRemediationSuccessor3Mode;
+  zoningRemediationSuccessor2Mode || zoningRemediationSuccessor3Mode ||
+  zoningRemediationSuccessor3V8ConfirmationMode;
 const zoningMode = process.argv.includes("--zoning") || zoningExpandedMode ||
   zoningSuccessorFamilyMode;
 const zoningEvidenceBudgetPrototypeMode = process.argv.includes("--zoning-evidence-budget-prototype");
@@ -101,7 +107,8 @@ const zoningDatasetModeCount = [
   zoningExpandedMode,
   zoningSuccessorMode,
   zoningRemediationSuccessor2Mode,
-  zoningRemediationSuccessor3Mode
+  zoningRemediationSuccessor3Mode,
+  zoningRemediationSuccessor3V8ConfirmationMode
 ].filter(Boolean).length;
 if (zoningDatasetModeCount > 1) {
   throw new Error("Choose exactly one Zoning evaluation dataset mode.");
@@ -2225,6 +2232,44 @@ async function currentGitCommit() {
   }
 }
 
+async function assertV8ConfirmationChildExecutionInputs({
+  authorization,
+  datasetText,
+  executionCommit
+}) {
+  const repositoryRoot = resolve(serverRoot, "..");
+  const changedFiles = async (arguments_) => {
+    const { stdout } = await execFileAsync("git", arguments_, {
+      cwd: repositoryRoot
+    });
+    return stdout.trim().split("\n").filter(Boolean);
+  };
+  const expectedAuthorizationPath =
+    "permitext-sync-server/evals/" +
+    "zoning-successor-remediation-3-v8-confirmation-paid-authorization.json";
+  assert(
+    JSON.stringify(await changedFiles([
+      "diff", "--name-only", "--", "permitext-sync-server"
+    ])) === JSON.stringify([expectedAuthorizationPath]),
+    "Only the durable running authorization may differ in the child immediately before provider dispatch."
+  );
+  assert(
+    (await changedFiles([
+      "diff", "--cached", "--name-only", "--", "permitext-sync-server"
+    ])).length === 0,
+    "The child found a staged server change immediately before provider dispatch."
+  );
+  assert(
+    createHash("sha256").update(datasetText).digest("hex") ===
+      authorization.cohort.sha256,
+    "The child loaded different cohort bytes from the exact authorized v8 confirmation cohort."
+  );
+  assert(
+    await currentGitCommit() === executionCommit,
+    "The child execution commit changed immediately before provider dispatch."
+  );
+}
+
 async function zoningSuccessorAdvisoryImplementationSHA256() {
   const sources = [];
   for (const path of zoningSuccessorAdvisoryImplementationPaths) {
@@ -4029,10 +4074,10 @@ async function runSelfTest(dataset, datasetText) {
 async function main() {
   if (process.argv.includes("--help")) {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
-    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor. None is baseline-eligible.");
+    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; --zoning-successor-remediation-3-v8-confirmation uses that same frozen cohort through its distinct post-v8 confirmation authorization. None is baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
-    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
+    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3 | --zoning-successor-remediation-3-v8-confirmation) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
     console.log("No-cost successor advisory: --zoning-successor --zoning-successor-evidence-budget-advisory (compares disabled 24000 candidate with 48000 across only the canonically ready cases while the full gate stays blocked)");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error | --stop-on-execution-error] [--run-id UUID]");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
@@ -4042,6 +4087,17 @@ async function main() {
     console.log("Every paid request is conservatively reserved against PERMITEXT_RESEARCH_EVAL_MAX_USD before dispatch.");
     console.log("Use --case with an approved case ID for a targeted diagnostic run; targeted runs never replace the full baseline.");
     return;
+  }
+  if (
+    liveMode && zoningSuccessorFamilyMode &&
+    !zoningRemediationSuccessor3V8ConfirmationMode
+  ) {
+    throw new Error(
+      "Historical Zoning successor paid runner modes are retired. Each must run " +
+      "through its consuming runner and active run lock, and each now requires a new " +
+      "explicit owner authorization and cumulative spend cap in a new distinct " +
+      "package; this historical path cannot dispatch."
+    );
   }
   const comparisonPath = argumentValue("--compare");
   if (comparisonPath) {
@@ -4064,7 +4120,10 @@ async function main() {
   let sourceZoningDataset = null;
   let dataset = baseDataset;
   if (zoningMode) {
-    const selectedZoningCasesPath = zoningRemediationSuccessor3Mode
+    const selectedZoningCasesPath = (
+      zoningRemediationSuccessor3Mode ||
+      zoningRemediationSuccessor3V8ConfirmationMode
+    )
       ? zoningRemediationSuccessor3CasesPath
       : zoningRemediationSuccessor2Mode ? zoningRemediationSuccessor2CasesPath
       : zoningSuccessorMode ? zoningSuccessorCasesPath
@@ -4192,11 +4251,16 @@ async function main() {
   if (liveMode) {
     if (zoningMode) {
       let remediationSuccessor3Execution = null;
-      if (zoningRemediationSuccessor3Mode) {
+      if (
+        zoningRemediationSuccessor3Mode ||
+        zoningRemediationSuccessor3V8ConfirmationMode
+      ) {
         const runLockPath = join(
           serverRoot,
           "evals",
-          ".zoning-successor-remediation-3-paid-run.lock"
+          zoningRemediationSuccessor3V8ConfirmationMode
+            ? ".zoning-successor-remediation-3-v8-confirmation-paid-run.lock"
+            : ".zoning-successor-remediation-3-paid-run.lock"
         );
         let runnerLock = null;
         try {
@@ -4212,15 +4276,51 @@ async function main() {
             runnerLock.nonce === process.env.PERMITEXT_ZONING_PAID_RUNNER_NONCE,
           "Paid remediation successor 3 must run through its consuming runner and active run lock."
         );
+        let globalRunnerLock = null;
+        try {
+          globalRunnerLock = JSON.parse(await readFile(
+            join(serverRoot, "evals", ".paid-evaluation-run.lock"),
+            "utf8"
+          ));
+        } catch {
+          globalRunnerLock = null;
+        }
+        assert(
+          globalRunnerLock?.pid === process.ppid &&
+            globalRunnerLock?.runID === requestedRunID &&
+            globalRunnerLock?.nonce === runnerLock?.nonce &&
+            globalRunnerLock?.executionCommit === runnerLock?.executionCommit,
+          "Paid remediation successor 3 must retain the matching global evaluation lock."
+        );
         remediationSuccessor3Execution =
-          await validateZoningRemediationSuccessor3PaidAuthorization();
+          zoningRemediationSuccessor3V8ConfirmationMode
+            ? await validateZoningRemediationSuccessor3V8ConfirmationPaidAuthorization()
+            : await validateZoningRemediationSuccessor3PaidAuthorization();
         assert(
           remediationSuccessor3Execution.authorization.status === "running" &&
             remediationSuccessor3Execution.authorization.consumption?.attemptID === requestedRunID,
           "Paid remediation successor 3 requires the runner's exact durable running authorization."
         );
+        if (zoningRemediationSuccessor3V8ConfirmationMode) {
+          const executionCommit = await currentGitCommit();
+          assert(
+            runnerLock.executionCommit === executionCommit &&
+              globalRunnerLock.executionCommit === executionCommit &&
+              remediationSuccessor3Execution.authorization.execution?.executionCommit ===
+                executionCommit,
+            "Paid v8 confirmation requires the exact clean execution commit in its lock and running authorization."
+          );
+          await assertV8ConfirmationChildExecutionInputs({
+            authorization: remediationSuccessor3Execution.authorization,
+            datasetText,
+            executionCommit
+          });
+        }
       }
-      const authorized = zoningRemediationSuccessor3Mode
+      const authorized = (
+        zoningRemediationSuccessor3Mode ||
+        zoningRemediationSuccessor3V8ConfirmationMode
+      )
         ? remediationSuccessor3Execution.authorization.scope
         : zoningRemediationSuccessor2Mode
         ? requireActiveZoningRemediationSuccessor2PaidAuthorization(

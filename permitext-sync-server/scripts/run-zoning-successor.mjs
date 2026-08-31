@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { spawn, spawnSync } from "node:child_process";
-import { open, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { open, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -16,6 +16,13 @@ import {
   requireActiveZoningRemediationSuccessor3PaidAuthorization,
   validateZoningRemediationSuccessor3PaidAuthorization
 } from "../evals/zoning-successor-remediation-3-paid-authorization.mjs";
+import {
+  requireActiveZoningRemediationSuccessor3V8ConfirmationPaidAuthorization,
+  validateZoningRemediationSuccessor3V8ConfirmationPaidAuthorization,
+  zoningRemediationSuccessor3V8ConfirmationLockedAuthorizationSHA256,
+  zoningRemediationSuccessor3V8ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V8ConfirmationSafetySHA256
+} from "../evals/zoning-successor-remediation-3-v8-confirmation-paid-authorization.mjs";
 import {
   researchCommercializationBenchmark,
   researchCommercializationBenchmarkEnvironment
@@ -33,15 +40,33 @@ const runnerArguments = process.argv.slice(2);
 assert(
   runnerArguments.length <= 1 &&
     runnerArguments.every((argument) =>
-      ["--remediation-2", "--remediation-3"].includes(argument)),
+      [
+        "--remediation-2",
+        "--remediation-3",
+        "--remediation-3-v8-confirmation"
+      ].includes(argument)),
   "Unsupported Zoning successor paid-run argument."
 );
 const remediationSuccessor2Mode = process.argv.includes("--remediation-2");
 const remediationSuccessor3Mode = process.argv.includes("--remediation-3");
+const remediationSuccessor3V8ConfirmationMode =
+  process.argv.includes("--remediation-3-v8-confirmation");
+const retiredPaidPathMessage =
+  "Historical Zoning successor paid runner modes are retired. Each must run through " +
+  "its consuming runner and active run lock, and each now requires a new explicit owner " +
+  "authorization and cumulative spend cap in a new distinct package; this historical " +
+  "path cannot dispatch.";
+if (!remediationSuccessor3V8ConfirmationMode) {
+  throw new Error(retiredPaidPathMessage);
+}
+const remediationSuccessor3FamilyMode = remediationSuccessor3Mode ||
+  remediationSuccessor3V8ConfirmationMode;
 const authorizationPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3Mode
+  remediationSuccessor3V8ConfirmationMode
+    ? "zoning-successor-remediation-3-v8-confirmation-paid-authorization.json"
+    : remediationSuccessor3Mode
     ? "zoning-successor-remediation-3-paid-authorization.json"
     : remediationSuccessor2Mode
     ? "zoning-successor-remediation-2-paid-authorization.json"
@@ -50,7 +75,9 @@ const authorizationPath = resolve(
 const authorizationModulePath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3Mode
+  remediationSuccessor3V8ConfirmationMode
+    ? "zoning-successor-remediation-3-v8-confirmation-paid-authorization.mjs"
+    : remediationSuccessor3Mode
     ? "zoning-successor-remediation-3-paid-authorization.mjs"
     : remediationSuccessor2Mode
     ? "zoning-successor-remediation-2-paid-authorization.mjs"
@@ -59,7 +86,9 @@ const authorizationModulePath = resolve(
 const runLockPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3Mode
+  remediationSuccessor3V8ConfirmationMode
+    ? ".zoning-successor-remediation-3-v8-confirmation-paid-run.lock"
+    : remediationSuccessor3Mode
     ? ".zoning-successor-remediation-3-paid-run.lock"
     : remediationSuccessor2Mode
     ? ".zoning-successor-remediation-2-paid-run.lock"
@@ -78,11 +107,113 @@ async function acquireRunLock(lockPath, label, evidence) {
     }
     throw error;
   }
-  await handle.writeFile(`${JSON.stringify(evidence)}\n`, "utf8");
+  const serializedEvidence = `${JSON.stringify(evidence)}\n`;
+  await handle.writeFile(serializedEvidence, "utf8");
+  const acquiredIdentity = await handle.stat();
   return async () => {
+    const currentIdentity = await stat(lockPath);
+    const currentEvidence = await readFile(lockPath, "utf8");
+    assert.equal(currentIdentity.dev, acquiredIdentity.dev,
+      `The ${label} lock device changed; the runner will not remove it.`);
+    assert.equal(currentIdentity.ino, acquiredIdentity.ino,
+      `The ${label} lock instance changed; the runner will not remove it.`);
+    assert.equal(currentEvidence, serializedEvidence,
+      `The ${label} lock evidence changed; the runner will not remove it.`);
+    await rm(lockPath);
     await handle.close();
-    await rm(lockPath, { force: true });
   };
+}
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function gitOutput(arguments_, message) {
+  const result = spawnSync("git", arguments_, {
+    cwd: repositoryRoot,
+    encoding: "utf8"
+  });
+  assert.equal(result.status, 0, message);
+  return result.stdout;
+}
+
+function changedServerFiles(arguments_) {
+  return gitOutput(arguments_, "Could not verify committed Zoning execution inputs.")
+    .trim()
+    .split("\n")
+    .filter(Boolean);
+}
+
+async function assertV8ExecutionInputs({ expectedStatus, executionCommit = null }) {
+  const expectedChanges = expectedStatus === "running"
+    ? [relative(repositoryRoot, authorizationPath)]
+    : [];
+  assert.deepEqual(
+    changedServerFiles(["diff", "--name-only", "--", "permitext-sync-server"]),
+    expectedChanges,
+    expectedStatus === "running"
+      ? "Only the durable running authorization may differ immediately before provider dispatch."
+      : "The authorized v8 confirmation execution inputs must be clean."
+  );
+  assert.deepEqual(
+    changedServerFiles(["diff", "--cached", "--name-only", "--", "permitext-sync-server"]),
+    [],
+    "No staged server change may exist immediately before provider dispatch."
+  );
+  const validation =
+    await validateZoningRemediationSuccessor3V8ConfirmationPaidAuthorization();
+  assert.equal(validation.authorization.status, expectedStatus,
+    `The v8 confirmation authorization must be ${expectedStatus} at this checkpoint.`);
+  if (expectedStatus === "running") {
+    assert.equal(validation.authorization.execution.executionCommit, executionCommit,
+      "The running v8 confirmation authorization changed before provider dispatch.");
+  }
+  return validation;
+}
+
+function assertExactLockedAuthorizationPackage(authorizationPackageCommit) {
+  const authorizationRelativePath = relative(repositoryRoot, authorizationPath);
+  const lockedAuthorizationText = gitOutput(
+    ["show", `${authorizationPackageCommit}:${authorizationRelativePath}`],
+    "Could not read the locked authorization record from the authorized package commit."
+  );
+  assert.equal(
+    sha256(lockedAuthorizationText),
+    zoningRemediationSuccessor3V8ConfirmationLockedAuthorizationSHA256,
+    "The authorized package commit does not contain the exact reviewed locked authorization record."
+  );
+  const lockedAuthorization = JSON.parse(lockedAuthorizationText);
+  assert.equal(lockedAuthorization.status, "locked",
+    "The authorized package commit did not preserve the locked package state.");
+  assert.deepEqual(
+    {
+      caseCount: lockedAuthorization.scope?.caseCount,
+      repetitions: lockedAuthorization.scope?.repetitions,
+      maximumCumulativeSpendUSD:
+        lockedAuthorization.scope?.maximumCumulativeSpendUSD,
+      authorizedAt: lockedAuthorization.ownerDecision?.authorizedAt,
+      authorizedBy: lockedAuthorization.ownerDecision?.authorizedBy,
+      exactAuthorizationPhrase:
+        lockedAuthorization.ownerDecision?.exactAuthorizationPhrase,
+      exactSpendingCapPhrase:
+        lockedAuthorization.ownerDecision?.exactSpendingCapPhrase,
+      authorizationPackageCommit:
+        lockedAuthorization.execution?.authorizationPackageCommit,
+      executionCommit: lockedAuthorization.execution?.executionCommit
+    },
+    {
+      caseCount: null,
+      repetitions: null,
+      maximumCumulativeSpendUSD: null,
+      authorizedAt: null,
+      authorizedBy: null,
+      exactAuthorizationPhrase: null,
+      exactSpendingCapPhrase: null,
+      authorizationPackageCommit: null,
+      executionCommit: null
+    },
+    "The authorized package commit contains authorizing values instead of the reviewed locked record."
+  );
 }
 
 async function writeAuthorizationAtomically(authorization) {
@@ -91,7 +222,7 @@ async function writeAuthorizationAtomically(authorization) {
   await rename(temporaryPath, authorizationPath);
 }
 
-async function beginAuthorizationAttempt(runID) {
+async function beginAuthorizationAttempt(runID, executionCommit = null) {
   const authorization = JSON.parse(await readFile(authorizationPath, "utf8"));
   assert.equal(authorization.status, "authorized",
     "The one-time authorization was not active before provider dispatch.");
@@ -103,6 +234,9 @@ async function beginAuthorizationAttempt(runID) {
     runID: null,
     consumedAt: null
   };
+  if (remediationSuccessor3V8ConfirmationMode) {
+    authorization.execution.executionCommit = executionCommit;
+  }
   authorization.notes =
     `One-time authorization entered fail-closed running state for attempt ${runID}. ` +
     "A crash or missing result requires manual review and may not be retried automatically.";
@@ -110,13 +244,19 @@ async function beginAuthorizationAttempt(runID) {
   return authorization;
 }
 
-async function consumeAuthorization({ runID, cohort, cohortSHA256 }) {
+async function consumeAuthorization({
+  runID,
+  cohort,
+  cohortSHA256,
+  executionCommit = null
+}) {
   const resultNames = (await readdir(resultsDirectory))
     .filter((name) => name.endsWith(`-${runID}.json`));
   assert.equal(resultNames.length, 1,
     "The paid run did not produce exactly one result bound to its durable attempt ID; authorization remains fail-closed for manual review.");
   const resultFile = resolve(resultsDirectory, resultNames[0]);
   const result = JSON.parse(await readFile(resultFile, "utf8"));
+  const authorization = JSON.parse(await readFile(authorizationPath, "utf8"));
   assert.equal(result.configuration?.runID, runID,
     "The new result is not bound to the pre-dispatch attempt ID.");
   assert.equal(result.configuration?.datasetSHA256, cohortSHA256,
@@ -127,14 +267,52 @@ async function consumeAuthorization({ runID, cohort, cohortSHA256 }) {
     "The new result does not contain the exact authorized case order.");
   assert.match(result.configuration?.runID || "", /^[0-9a-f-]{36}$/i,
     "The new result has no valid run ID.");
-  if (remediationSuccessor3Mode) {
+  if (remediationSuccessor3V8ConfirmationMode) {
+    assert(["completed", "partial"].includes(result.status),
+      "The v8 confirmation result is not a completed or paid partial terminal snapshot.");
+    assert(Array.isArray(result.results) && result.results.length > 0,
+      "The v8 confirmation result contains no completed paid case operation.");
+    assert(Number.isInteger(result.configuration?.paidRequestCount) &&
+      result.configuration.paidRequestCount > 0,
+    "The v8 confirmation result records no paid provider request.");
+    assert.equal(result.configuration?.gitCommit, executionCommit,
+      "The v8 confirmation result is not bound to the clean execution commit.");
+    assert.equal(
+      result.configuration?.approvedSpendCapUSD,
+      authorization.scope.maximumCumulativeSpendUSD,
+      "The v8 confirmation result does not retain its authorized spend cap."
+    );
+    assert(Number.isFinite(result.configuration?.conservativeReservedUSD) &&
+      result.configuration.conservativeReservedUSD <=
+        result.configuration.approvedSpendCapUSD,
+    "The v8 confirmation result exceeded its conservative spend reservation cap.");
+    assert(Number.isFinite(result.configuration?.actualUSD) &&
+      result.configuration.actualUSD <= result.configuration.approvedSpendCapUSD,
+    "The v8 confirmation result exceeded its actual spend cap.");
+    assert.equal(result.configuration?.pendingPaidRequestCount, 0,
+      "The v8 confirmation result retained unresolved paid requests.");
+    const observedCaseIDs = result.results.map((item) => item.testCase?.id);
+    assert.equal(new Set(observedCaseIDs).size, observedCaseIDs.length,
+      "The v8 confirmation result contains a duplicate case operation.");
+    assert.deepEqual(
+      observedCaseIDs,
+      cohort.cases.slice(0, observedCaseIDs.length).map((item) => item.id),
+      "The v8 confirmation result operations are not an ordered cohort prefix."
+    );
+    for (const item of result.results) {
+      assert.equal(item.operationMetric?.webSupportRequested, false,
+        "A v8 confirmation operation requested unbudgeted web support.");
+      assert.equal(item.operationMetric?.webSupportSearched, false,
+        "A v8 confirmation operation used unbudgeted web support.");
+    }
+  }
+  if (remediationSuccessor3FamilyMode) {
     assert.equal(result.configuration?.webSupportEnabled, false,
       "The capped remediation-successor-3 result unexpectedly enabled unbudgeted web-search fees.");
     assert.equal(result.configuration?.stopOnExecutionError, true,
       "The remediation-successor-3 result did not retain its fail-fast execution policy.");
   }
 
-  const authorization = JSON.parse(await readFile(authorizationPath, "utf8"));
   assert.equal(authorization.status, "running",
     "The one-time authorization was not in its fail-closed running state when the run completed.");
   assert.equal(authorization.consumption?.attemptID, runID,
@@ -157,7 +335,9 @@ function runEvaluation(environment, repetitions, runID) {
   return new Promise((resolveRun, rejectRun) => {
     const childArguments = [
       "tests/research-evals.mjs",
-      remediationSuccessor3Mode
+      remediationSuccessor3V8ConfirmationMode
+        ? "--zoning-successor-remediation-3-v8-confirmation"
+        : remediationSuccessor3Mode
         ? "--zoning-successor-remediation-3"
         : remediationSuccessor2Mode
         ? "--zoning-successor-remediation-2"
@@ -167,7 +347,7 @@ function runEvaluation(environment, repetitions, runID) {
       String(repetitions),
       "--run-id",
       runID,
-      ...(remediationSuccessor3Mode ? ["--stop-on-execution-error"] : [])
+      ...(remediationSuccessor3FamilyMode ? ["--stop-on-execution-error"] : [])
     ];
     const child = spawn(process.execPath, childArguments, {
       cwd: serverRoot,
@@ -180,7 +360,11 @@ function runEvaluation(environment, repetitions, runID) {
 }
 
 async function main() {
-  const validation = remediationSuccessor3Mode
+  const validation = remediationSuccessor3V8ConfirmationMode
+    ? requireActiveZoningRemediationSuccessor3V8ConfirmationPaidAuthorization(
+        await validateZoningRemediationSuccessor3V8ConfirmationPaidAuthorization()
+      )
+    : remediationSuccessor3Mode
     ? requireActiveZoningRemediationSuccessor3PaidAuthorization(
         await validateZoningRemediationSuccessor3PaidAuthorization()
       )
@@ -225,6 +409,74 @@ async function main() {
       "Commit tracked server changes before running the Zoning successor diagnostic.");
   }
 
+  let executionCommit = null;
+  if (remediationSuccessor3V8ConfirmationMode) {
+    const authorizationPackageCommit =
+      authorization.execution.authorizationPackageCommit;
+    const repairAncestry = spawnSync(
+      "git",
+      [
+        "merge-base",
+        "--is-ancestor",
+        zoningRemediationSuccessor3V8ConfirmationPreparedFromCommit,
+        authorizationPackageCommit
+      ],
+      { cwd: repositoryRoot, stdio: "ignore" }
+    );
+    assert.equal(repairAncestry.status, 0,
+      "The reviewed v8 safety repair is not an ancestor of the authorized package commit.");
+    const repairedSafetyText = gitOutput(
+      [
+        "show",
+        `${zoningRemediationSuccessor3V8ConfirmationPreparedFromCommit}:` +
+          "permitext-sync-server/research-zoning-safety.mjs"
+      ],
+      "Could not read the reviewed v8 safety repair bytes."
+    );
+    assert.equal(
+      sha256(repairedSafetyText),
+      zoningRemediationSuccessor3V8ConfirmationSafetySHA256,
+      "The reviewed repair commit does not contain the pinned v8 safety bytes."
+    );
+    assertExactLockedAuthorizationPackage(authorizationPackageCommit);
+    const ancestry = spawnSync(
+      "git",
+      ["merge-base", "--is-ancestor", authorizationPackageCommit, "HEAD"],
+      { cwd: repositoryRoot, stdio: "ignore" }
+    );
+    assert.equal(ancestry.status, 0,
+      "The authorized v8 confirmation package commit is not an ancestor of HEAD.");
+    const changedServerFiles = spawnSync(
+      "git",
+      [
+        "diff",
+        "--name-only",
+        `${authorizationPackageCommit}..HEAD`,
+        "--",
+        "permitext-sync-server"
+      ],
+      { cwd: repositoryRoot, encoding: "utf8" }
+    );
+    assert.equal(changedServerFiles.status, 0,
+      "Could not verify the exact authorized v8 confirmation package.");
+    assert.deepEqual(
+      changedServerFiles.stdout.trim().split("\n").filter(Boolean),
+      [relative(repositoryRoot, authorizationPath)],
+      "Only the locked authorization record may change after the exact v8 confirmation package commit."
+    );
+    const executionHead = spawnSync(
+      "git",
+      ["rev-parse", "HEAD"],
+      { cwd: repositoryRoot, encoding: "utf8" }
+    );
+    assert.equal(executionHead.status, 0,
+      "Could not resolve the clean v8 confirmation execution commit.");
+    executionCommit = executionHead.stdout.trim();
+    assert.match(executionCommit, /^[0-9a-f]{40}$/i,
+      "The clean v8 confirmation execution commit is invalid.");
+    await assertV8ExecutionInputs({ expectedStatus: "authorized" });
+  }
+
   const environment = {
     ...researchCommercializationBenchmarkEnvironment(process.env),
     PERMITEXT_RESEARCH_EVAL_MAX_USD:
@@ -237,7 +489,7 @@ async function main() {
     PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT: "medium",
     PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION:
       "20260826-established-facts-v3",
-    ...(remediationSuccessor3Mode
+    ...(remediationSuccessor3FamilyMode
       ? { PERMITEXT_RESEARCH_WEB_SUPPORT: "off" }
       : {})
   };
@@ -249,10 +501,16 @@ async function main() {
   const runID = randomUUID();
   const runnerNonce = randomUUID();
   environment.PERMITEXT_ZONING_PAID_RUNNER_NONCE = runnerNonce;
+  const lockEvidence = {
+    pid: process.pid,
+    runID,
+    nonce: runnerNonce,
+    executionCommit
+  };
   const releaseGlobalRunLock = await acquireRunLock(
     globalRunLockPath,
     "global Permitext evaluation",
-    { pid: process.pid, runID }
+    lockEvidence
   );
   let releaseRunLock;
   let result;
@@ -261,37 +519,62 @@ async function main() {
     releaseRunLock = await acquireRunLock(
       runLockPath,
       "Zoning successor",
-      { pid: process.pid, runID, nonce: runnerNonce }
+      lockEvidence
     );
-    await beginAuthorizationAttempt(runID);
+    await beginAuthorizationAttempt(runID, executionCommit);
     console.log(
       `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning ` +
-      `${remediationSuccessor3Mode
-        ? "remediation successor 3"
+      `${remediationSuccessor3V8ConfirmationMode
+        ? "remediation successor 3 v8 confirmation"
+        : remediationSuccessor3Mode ? "remediation successor 3"
         : remediationSuccessor2Mode ? "remediation successor 2" : "successor"} ` +
       `once with a $${paidEnvironment.approvedSpendCapUSD.toFixed(2)} maximum cumulative cap. ` +
       "The 24,000-character candidate remains disabled."
     );
+    await assertV8ExecutionInputs({
+      expectedStatus: "running",
+      executionCommit
+    });
     result = await runEvaluation(
       environment,
       authorization.scope.repetitions,
       runID
     );
+    if (result.signal) {
+      throw new Error(`Zoning successor diagnostic stopped by ${result.signal}.`);
+    }
+    if (![0, 3].includes(result.code)) {
+      throw new Error(`Zoning successor diagnostic exited with status ${result.code}.`);
+    }
     consumed = await consumeAuthorization({
       runID,
       cohort,
-      cohortSHA256: authorization.cohort.sha256
+      cohortSHA256: authorization.cohort.sha256,
+      executionCommit
     });
     console.log(
       `Consumed the one-time authorization for run ${consumed.result.configuration.runID}.`
     );
   } finally {
-    if (releaseRunLock) await releaseRunLock();
-    await releaseGlobalRunLock();
-  }
-  if (result.signal) throw new Error(`Zoning successor diagnostic stopped by ${result.signal}.`);
-  if (![0, 3].includes(result.code)) {
-    throw new Error(`Zoning successor diagnostic exited with status ${result.code}.`);
+    const releaseErrors = [];
+    if (releaseRunLock) {
+      try {
+        await releaseRunLock();
+      } catch (error) {
+        releaseErrors.push(error);
+      }
+    }
+    try {
+      await releaseGlobalRunLock();
+    } catch (error) {
+      releaseErrors.push(error);
+    }
+    if (releaseErrors.length) {
+      throw new AggregateError(
+        releaseErrors,
+        "One or more paid-run locks changed and were retained for manual review."
+      );
+    }
   }
   if (result.code === 3) {
     console.error(
