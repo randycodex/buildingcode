@@ -26,10 +26,18 @@
     "runID": null,
     "consumedAt": null
   },
+  "recovery": {
+    "verifiedAt": "2026-08-31T00:41:21Z",
+    "failedAttemptID": "db5d601e-3127-4ae1-af1b-dd06146d65d0",
+    "failureStage": "child authorization-state handoff before provider dispatch",
+    "matchingResultFiles": 0,
+    "providerRequests": 0,
+    "disposition": "restore the original unspent one-run authorization after manual review"
+  },
   "publicResearchReleaseAuthorized": false,
   "professionalZoningSignoff": false,
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "Authorized once for this exact remediation-successor-3 cohort. The authorization becomes non-reusable before provider dispatch and is consumed by one run result or retained fail-closed for manual review."
+  "notes": "The first runner attempt stopped before provider dispatch because the child expected authorized instead of the runner's durable running state. Manual review verified no result and zero provider requests, so the original unspent one-run authorization was restored after repairing the state handoff."
 }

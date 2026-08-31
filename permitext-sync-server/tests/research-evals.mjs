@@ -43,7 +43,6 @@ import {
   validateZoningRemediationSuccessor2PaidAuthorization
 } from "../evals/zoning-successor-remediation-2-paid-authorization.mjs";
 import {
-  requireActiveZoningRemediationSuccessor3PaidAuthorization,
   validateZoningRemediationSuccessor3PaidAuthorization
 } from "../evals/zoning-successor-remediation-3-paid-authorization.mjs";
 
@@ -4192,6 +4191,7 @@ async function main() {
 
   if (liveMode) {
     if (zoningMode) {
+      let remediationSuccessor3Execution = null;
       if (zoningRemediationSuccessor3Mode) {
         const runLockPath = join(
           serverRoot,
@@ -4212,11 +4212,16 @@ async function main() {
             runnerLock.nonce === process.env.PERMITEXT_ZONING_PAID_RUNNER_NONCE,
           "Paid remediation successor 3 must run through its consuming runner and active run lock."
         );
+        remediationSuccessor3Execution =
+          await validateZoningRemediationSuccessor3PaidAuthorization();
+        assert(
+          remediationSuccessor3Execution.authorization.status === "running" &&
+            remediationSuccessor3Execution.authorization.consumption?.attemptID === requestedRunID,
+          "Paid remediation successor 3 requires the runner's exact durable running authorization."
+        );
       }
       const authorized = zoningRemediationSuccessor3Mode
-        ? requireActiveZoningRemediationSuccessor3PaidAuthorization(
-            await validateZoningRemediationSuccessor3PaidAuthorization()
-          ).authorization.scope
+        ? remediationSuccessor3Execution.authorization.scope
         : zoningRemediationSuccessor2Mode
         ? requireActiveZoningRemediationSuccessor2PaidAuthorization(
             await validateZoningRemediationSuccessor2PaidAuthorization()
