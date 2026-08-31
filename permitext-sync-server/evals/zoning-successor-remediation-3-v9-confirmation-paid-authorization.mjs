@@ -32,6 +32,22 @@ export const zoningRemediationSuccessor3V9ConfirmationEconomicsSHA256 =
   "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0";
 export const zoningRemediationSuccessor3V9ConfirmationAppSHA256 =
   "1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797";
+export const zoningRemediationSuccessor3V9ConfirmationAuthorizationPackageCommit =
+  "571367800030d49a103a999090eaa615baa361ec";
+export const zoningRemediationSuccessor3V9ConfirmationExecutionCommit =
+  "17fea6186d35a43348c5b73f419ccc9014dfb374";
+export const zoningRemediationSuccessor3V9ConfirmationRunID =
+  "00570309-e1f2-441b-9f09-8df4f0603253";
+export const zoningRemediationSuccessor3V9ConfirmationConsumedAuthorizationSHA256 =
+  "ffa134fc6f2855264ff54c8b285ba49f3bb16ab908b712072854d61bc2eb39e4";
+export const zoningRemediationSuccessor3V9ConfirmationResultJSONFile =
+  "results/2026-08-31T17-22-10-000Z-00570309-e1f2-441b-9f09-8df4f0603253.json";
+export const zoningRemediationSuccessor3V9ConfirmationResultJSONSHA256 =
+  "ad43aee5d7d9038eef1de09f1b9595b779abe4bcb7199421e5a905807380c9d6";
+export const zoningRemediationSuccessor3V9ConfirmationResultMarkdownFile =
+  "results/2026-08-31T17-22-10-000Z-00570309-e1f2-441b-9f09-8df4f0603253.md";
+export const zoningRemediationSuccessor3V9ConfirmationResultMarkdownSHA256 =
+  "46a1f7c0b299ac1e1b6234f19e34a557389dcde2381f89c253802ef2152f30ad";
 
 const expectedAuthorizationID = "9aaade99-759b-41d6-ad73-3ef9b4a168f9";
 const expectedCohortFile =
@@ -114,6 +130,97 @@ async function validateHistoricalV8Lineage(authorization) {
   }
 }
 
+async function validateConsumedEvidence(authorization) {
+  assert(authorization.execution?.authorizationPackageCommit ===
+    zoningRemediationSuccessor3V9ConfirmationAuthorizationPackageCommit,
+  "The consumed v9 confirmation names the wrong locked package commit.");
+  assert(authorization.execution?.executionCommit ===
+    zoningRemediationSuccessor3V9ConfirmationExecutionCommit,
+  "The consumed v9 confirmation names the wrong execution commit.");
+  assert(authorization.consumption?.attemptID ===
+    zoningRemediationSuccessor3V9ConfirmationRunID &&
+    authorization.consumption?.runID ===
+      zoningRemediationSuccessor3V9ConfirmationRunID,
+  "The consumed v9 confirmation names the wrong retained run.");
+
+  for (const [file, expectedHash, label] of [
+    [zoningRemediationSuccessor3V9ConfirmationResultJSONFile,
+      zoningRemediationSuccessor3V9ConfirmationResultJSONSHA256, "JSON"],
+    [zoningRemediationSuccessor3V9ConfirmationResultMarkdownFile,
+      zoningRemediationSuccessor3V9ConfirmationResultMarkdownSHA256, "Markdown"]
+  ]) {
+    await assertFileHash(
+      new URL(`./${file}`, import.meta.url),
+      expectedHash,
+      `The retained v9 confirmation ${label} result changed.`
+    );
+  }
+
+  const result = JSON.parse(await readFile(fileURLToPath(new URL(
+    `./${zoningRemediationSuccessor3V9ConfirmationResultJSONFile}`,
+    import.meta.url
+  )), "utf8"));
+  assert(result.status === "partial",
+    "The retained v9 confirmation must remain a terminal partial result.");
+  assert(result.configuration?.runID ===
+    zoningRemediationSuccessor3V9ConfirmationRunID &&
+    result.configuration?.gitCommit ===
+      zoningRemediationSuccessor3V9ConfirmationExecutionCommit &&
+    result.configuration?.datasetSHA256 === expectedCohortSHA256,
+  "The retained v9 confirmation result lineage changed.");
+  assert(result.configuration?.repeat === 1 &&
+    result.configuration?.caseIDs?.length === 30 &&
+    result.configuration?.approvedSpendCapUSD === 5,
+  "The retained v9 confirmation result scope changed.");
+  assert(result.configuration?.webSupportEnabled === false &&
+    result.configuration?.stopOnExecutionError === true,
+  "The retained v9 confirmation execution policy changed.");
+  assert(result.configuration?.actualUSD === 0.299904 &&
+    result.configuration?.conservativeReservedUSD === 0.299904 &&
+    result.configuration?.paidRequestCount === 10 &&
+    result.configuration?.pendingPaidRequestCount === 0,
+  "The retained v9 confirmation spend ledger changed.");
+  assert(result.results?.length === 3 &&
+    result.results[0]?.testCase?.id === "zr-rules-of-construction" &&
+    result.results[1]?.testCase?.id === "zr-use-group-table" &&
+    result.results[2]?.testCase?.id === "zr-appendix-map-boundaries" &&
+    result.results[0]?.scoring?.passed === true &&
+    result.results[1]?.scoring?.passed === true &&
+    result.results[2]?.operationMetric?.status === "failed" &&
+    result.results[2]?.operationMetric?.charged === false &&
+    result.results[2]?.operationMetric?.verificationIssueTypes?.includes(
+      "zoning_missing_mapped_location"
+    ),
+  "The retained v9 confirmation case outcomes changed.");
+
+  const diagnostics =
+    result.results[2]?.operationMetric?.verificationAttemptDiagnostics;
+  assert(Array.isArray(diagnostics) && diagnostics.length === 2,
+    "The retained v9 confirmation must preserve two bounded diagnostics.");
+  assert(diagnostics.every((item) =>
+    item?.zoningSafety?.kind === "zoning_mapped_location" &&
+    item.zoningSafety.sourceBoundaryQuestion === true &&
+    item.zoningSafety.citedAppendixJ === true &&
+    item.zoningSafety.mappedLocationBoundaryPresent === true &&
+    Array.isArray(item.zoningSafety.triggeringClauses) &&
+    item.zoningSafety.triggeringClauses.length > 0 &&
+    item.zoningSafety.triggeringClauses.every((clause) =>
+      clause.locationBoundary === false &&
+      clause.sourceRule === false &&
+      clause.directConclusion === true &&
+      typeof clause.clauseHash === "string" &&
+      /^[0-9a-f]{64}$/i.test(clause.clauseHash) &&
+      typeof clause.clauseLength === "number" &&
+      !("text" in clause)
+    )
+  ), "The retained v9 privacy-bounded diagnostic classification changed.");
+  assert(result.economics?.sample?.completed === 2 &&
+    result.economics?.sample?.sampleReady === false &&
+    result.economics?.economics?.projectedCostPer100TurnsUSD === 13.44 &&
+    result.economics?.readyForPricingDecision === false,
+  "The retained v9 confirmation economics changed.");
+}
+
 export async function validateZoningRemediationSuccessor3V9ConfirmationPaidAuthorization({
   authorizationPath = defaultAuthorizationPath
 } = {}) {
@@ -180,6 +287,7 @@ export async function validateZoningRemediationSuccessor3V9ConfirmationPaidAutho
   if (authorization.status === "consumed") {
     assert(authorization.consumption.attemptID === authorization.consumption.runID,
       "The consumed v9 confirmation result must match its pre-dispatch attempt identity.");
+    await validateConsumedEvidence(authorization);
   }
   return validation;
 }

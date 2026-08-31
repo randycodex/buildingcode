@@ -8,9 +8,17 @@ import {
   requireActiveZoningRemediationSuccessor3V9ConfirmationPaidAuthorization,
   validateZoningRemediationSuccessor3V9ConfirmationPaidAuthorization,
   zoningRemediationSuccessor3V9ConfirmationAppSHA256,
+  zoningRemediationSuccessor3V9ConfirmationAuthorizationPackageCommit,
+  zoningRemediationSuccessor3V9ConfirmationConsumedAuthorizationSHA256,
   zoningRemediationSuccessor3V9ConfirmationEconomicsSHA256,
+  zoningRemediationSuccessor3V9ConfirmationExecutionCommit,
   zoningRemediationSuccessor3V9ConfirmationLockedAuthorizationSHA256,
   zoningRemediationSuccessor3V9ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V9ConfirmationResultJSONFile,
+  zoningRemediationSuccessor3V9ConfirmationResultJSONSHA256,
+  zoningRemediationSuccessor3V9ConfirmationResultMarkdownFile,
+  zoningRemediationSuccessor3V9ConfirmationResultMarkdownSHA256,
+  zoningRemediationSuccessor3V9ConfirmationRunID,
   zoningRemediationSuccessor3V9ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v9-confirmation-paid-authorization.mjs";
 import {
@@ -44,6 +52,17 @@ const exactAppSHA256 =
   "1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797";
 const exactLockedAuthorizationSHA256 =
   "f8176550c79a3e7caddfc903760123d07467201ba8b83a260c105bd831e53b7c";
+const exactAuthorizationPackageCommit =
+  "571367800030d49a103a999090eaa615baa361ec";
+const exactExecutionCommit =
+  "17fea6186d35a43348c5b73f419ccc9014dfb374";
+const exactRunID = "00570309-e1f2-441b-9f09-8df4f0603253";
+const exactConsumedAuthorizationSHA256 =
+  "ffa134fc6f2855264ff54c8b285ba49f3bb16ab908b712072854d61bc2eb39e4";
+const exactResultJSONSHA256 =
+  "ad43aee5d7d9038eef1de09f1b9595b779abe4bcb7199421e5a905807380c9d6";
+const exactResultMarkdownSHA256 =
+  "46a1f7c0b299ac1e1b6234f19e34a557389dcde2381f89c253802ef2152f30ad";
 const paidEnvironment = {
   ...process.env,
   OPENAI_API_KEY: "",
@@ -107,31 +126,61 @@ assert.equal(zoningRemediationSuccessor3V9ConfirmationAppSHA256,
   exactAppSHA256);
 assert.equal(zoningRemediationSuccessor3V9ConfirmationLockedAuthorizationSHA256,
   exactLockedAuthorizationSHA256);
+assert.equal(zoningRemediationSuccessor3V9ConfirmationAuthorizationPackageCommit,
+  exactAuthorizationPackageCommit);
+assert.equal(zoningRemediationSuccessor3V9ConfirmationExecutionCommit,
+  exactExecutionCommit);
+assert.equal(zoningRemediationSuccessor3V9ConfirmationRunID, exactRunID);
+assert.equal(zoningRemediationSuccessor3V9ConfirmationConsumedAuthorizationSHA256,
+  exactConsumedAuthorizationSHA256);
+assert.equal(zoningRemediationSuccessor3V9ConfirmationResultJSONSHA256,
+  exactResultJSONSHA256);
+assert.equal(zoningRemediationSuccessor3V9ConfirmationResultMarkdownSHA256,
+  exactResultMarkdownSHA256);
 
-const lockedText = await readFile(authorizationPath, "utf8");
-assert.equal(sha256(lockedText), exactLockedAuthorizationSHA256);
-const lockedAuthorization = JSON.parse(lockedText);
+const lockedAuthorizationBlob = spawnSync("git", [
+  "show",
+  `${exactAuthorizationPackageCommit}:permitext-sync-server/evals/zoning-successor-remediation-3-v9-confirmation-paid-authorization.json`
+], {
+  cwd: serverRoot,
+  encoding: "utf8"
+});
+assert.equal(lockedAuthorizationBlob.status, 0,
+  combinedOutput(lockedAuthorizationBlob));
+assert.equal(sha256(lockedAuthorizationBlob.stdout),
+  exactLockedAuthorizationSHA256);
+const lockedAuthorization = JSON.parse(lockedAuthorizationBlob.stdout);
+assert.equal(lockedAuthorization.status, "locked");
+assert.equal(lockedAuthorization.authorizationID, exactAuthorizationID);
+assert.equal(lockedAuthorization.scope.caseCount, null);
+
 const current =
   await validateZoningRemediationSuccessor3V9ConfirmationPaidAuthorization();
+const consumedAuthorizationText = await readFile(authorizationPath, "utf8");
+assert.equal(sha256(consumedAuthorizationText), exactConsumedAuthorizationSHA256);
 assert.equal(current.authorization.authorizationID, exactAuthorizationID);
-assert.equal(current.authorization.status, "locked");
+assert.equal(current.authorization.status, "consumed");
 assert.equal(current.active, false);
 assert.equal(current.authorization.cohort.sha256, exactCohortSHA256);
 assert.equal(current.cohort.cases.length, 30);
-assert.equal(current.authorization.scope.caseCount, null);
-assert.equal(current.authorization.scope.repetitions, null);
-assert.equal(current.authorization.scope.maximumCumulativeSpendUSD, null);
-assert.equal(current.authorization.ownerDecision.authorizedAt, null);
-assert.equal(current.authorization.ownerDecision.authorizedBy, null);
-assert.equal(current.authorization.ownerDecision.exactAuthorizationPhrase, null);
-assert.equal(current.authorization.ownerDecision.exactSpendingCapPhrase, null);
-assert.equal(current.authorization.consumption.status, "not_started");
-assert.equal(current.authorization.consumption.attemptID, null);
-assert.equal(current.authorization.consumption.startedAt, null);
-assert.equal(current.authorization.consumption.runID, null);
-assert.equal(current.authorization.consumption.consumedAt, null);
-assert.equal(current.authorization.execution.authorizationPackageCommit, null);
-assert.equal(current.authorization.execution.executionCommit, null);
+assert.equal(current.authorization.scope.caseCount, 30);
+assert.equal(current.authorization.scope.repetitions, 1);
+assert.equal(current.authorization.scope.maximumCumulativeSpendUSD, 5);
+assert.equal(current.authorization.ownerDecision.authorizedBy, "Permitext owner");
+assert.equal(
+  current.authorization.ownerDecision.exactAuthorizationPhrase,
+  "authorize exactly package commit 571367800030d49a103a999090eaa615baa361ec for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
+);
+assert.equal(
+  current.authorization.ownerDecision.exactSpendingCapPhrase,
+  "authorize exactly package commit 571367800030d49a103a999090eaa615baa361ec for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
+);
+assert.equal(current.authorization.consumption.status, "consumed");
+assert.equal(current.authorization.consumption.attemptID, exactRunID);
+assert.equal(current.authorization.consumption.runID, exactRunID);
+assert.equal(current.authorization.execution.authorizationPackageCommit,
+  exactAuthorizationPackageCommit);
+assert.equal(current.authorization.execution.executionCommit, exactExecutionCommit);
 assert.equal(current.authorization.execution.webSupportEnabled, false);
 assert.equal(current.authorization.execution.stopOnExecutionError, true);
 assert.equal(current.authorization.publicResearchReleaseAuthorized, false);
@@ -143,6 +192,18 @@ assert.throws(
   () => requireActiveZoningRemediationSuccessor3V9ConfirmationPaidAuthorization(current),
   /requires a new explicit owner authorization and cumulative spend cap/
 );
+
+for (const [file, expectedHash] of [
+  [zoningRemediationSuccessor3V9ConfirmationResultJSONFile,
+    exactResultJSONSHA256],
+  [zoningRemediationSuccessor3V9ConfirmationResultMarkdownFile,
+    exactResultMarkdownSHA256]
+]) {
+  assert.equal(
+    sha256(await readFile(new URL(`../evals/${file}`, import.meta.url), "utf8")),
+    expectedHash
+  );
+}
 
 assert.equal(current.authorization.lineage.priorAuthorizationSHA256,
   zoningRemediationSuccessor3V8ConfirmationConsumedAuthorizationSHA256);
