@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 export const zoningResearchSafetyVersion =
-  "20260831-zoning-material-completeness-v12";
+  "20260831-zoning-mapped-boundary-context-v13";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -302,7 +302,7 @@ function statesLocationBoundary(value) {
     /\b(?:address|BBL|block(?: and |\/)lot|property location|mapped district|zoning district|official map|mapped status)\b[^.]{0,140}\b(?:is|are)\s+(?:required|needed)\b[^.]{0,120}\bbefore\b[^.]{0,100}\b(?:determin|calculat|conclud|confirm|apply)\w*/i.test(value) ||
     /\b(?:(?:the\s+)?(?:property|site|parcel)(?:['’]s)?\s+(?:address|location|mapped\s+status)|(?:the\s+)?(?:facility|use)\s+type|(?:the\s+)?(?:address|BBL|mapped\s+(?:district|area|status)|official\s+map))\b[^.]{0,100}\b(?:has\s+not\s+been\s+(?:supplied|provided|verified|established)|has\s+yet\s+to\s+be\s+(?:supplied|provided|verified|established)|(?:is|are)\s+(?:not\s+(?:supplied|provided|verified|established|known)|unknown|unverified|unresolved|unavailable)|remains?\s+(?:unknown|unverified|unresolved|unavailable))\b/i.test(value) ||
     /\b(?:the\s+)?location\s+of\s+(?:the\s+)?(?:site|property|parcel)\b[^.]{0,80}\b(?:is|remains?)\s+(?:unknown|unverified|unresolved|unavailable)\b/i.test(value) ||
-    /^it\s+is\s+(?:unknown|unverified|unresolved)\s+whether\s+(?:the\s+)?(?:site|property|parcel)\b[^.]{0,100}\b(?:lies?|falls?|is|sits?)\b/i.test(compactText(value)) ||
+    /^it\s+is\s+(?:unknown|unverified|unresolved)\s+whether\s+(?:(?:the|this|that)\s+)?(?:site|property|parcel|lot|facility)\b[^.]{0,100}\b(?:lies?|falls?|is|sits?)\b/i.test(compactText(value)) ||
     /^no\s+mapped\s+(?:district|area|status)\s+is\s+available\s+for\s+(?:the\s+)?(?:site|property|parcel)\b/i.test(compactText(value)) ||
     /^neither\s+(?:the\s+)?(?:site|property|parcel)\s+location\s+nor\s+(?:its|the\s+(?:site|property|parcel)['’]s)\s+mapped\s+(?:district|area|status)\s+(?:is|are)\s+(?:known|verified|established|available)\b/i.test(compactText(value));
   return boundaryPresent && !hasAppendedMappedActorConclusion(value);
@@ -818,6 +818,13 @@ function splitMappedConclusionClauses(value) {
     .filter(Boolean);
 }
 
+function hasUnboundedMappedParcelPlacement(value) {
+  const parcelPlacement = /\b(?:the (?:site|property|lot|facility)|this (?:site|property|lot|facility))\b[^.]{0,160}\b(?:is within|is outside|falls within|lies within|is shown in)\b/i;
+  return splitMappedConclusionClauses(value).some((clause) =>
+    parcelPlacement.test(clause) && !statesLocationBoundary(clause)
+  );
+}
+
 function mappedClauseAnalysis(answer) {
   return mappedAnswerFields(answer).flatMap((field) => {
     const fieldSpecificMappedExample = hasMappedSpecificExample(field.value);
@@ -1248,7 +1255,7 @@ export function evaluateZoningResearchSafety({
   if (
     profile.categories.includes("map") &&
     profile.missingMappedLocation &&
-    /\b(?:the (?:site|property|lot|facility)|this (?:site|property|lot|facility))\b[^.]{0,160}\b(?:is within|is outside|falls within|lies within|is shown in)\b/i.test(narrative)
+    hasUnboundedMappedParcelPlacement(mappedConclusionNarrative)
   ) {
     issues.push({
       type: "zoning_map_inference",

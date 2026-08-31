@@ -1360,6 +1360,69 @@ const inferredMap = evaluateZoningResearchSafety({
 });
 assert(inferredMap.issues.some((issue) => issue.type === "zoning_map_inference"));
 
+for (const explicitMappedLocationBoundary of [
+  "The selected evidence does not establish whether this property is within Subarea 1 or Subarea 2.",
+  "It is unknown whether this site falls within either Appendix J designated area.",
+  "No property-specific conclusion can be made about whether the lot lies within either designated area without the address or BBL and applicable official map.",
+  "The selected evidence cannot determine whether the lot is outside either Appendix J designated area.",
+  "It is unresolved whether the facility is shown in either Appendix J subarea."
+]) {
+  const safeMappedLocationBoundary = evaluateZoningResearchSafety({
+    question: mapQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      explicitMappedLocationBoundary,
+      ["zr-map"],
+      ["The property's address or BBL and location on the applicable official Appendix J map are not established."]
+    )
+  });
+  assert.equal(
+    safeMappedLocationBoundary.pass,
+    true,
+    `${explicitMappedLocationBoundary}: ${JSON.stringify(safeMappedLocationBoundary.issues)}`
+  );
+}
+
+for (const directMappedLocationInference of [
+  "This site falls within Subarea 2.",
+  "The lot lies within the designated area.",
+  "The facility is shown in Subarea 1.",
+  "The property is outside the Appendix J designated area."
+]) {
+  const unsafeDirectMappedLocationInference = evaluateZoningResearchSafety({
+    question: mapQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      directMappedLocationInference,
+      ["zr-map"],
+      ["The property's address or BBL and location on the applicable official Appendix J map are not established."]
+    )
+  });
+  assert(
+    unsafeDirectMappedLocationInference.issues.some((issue) => issue.type === "zoning_map_inference"),
+    directMappedLocationInference
+  );
+}
+
+for (const maskedMappedLocationInference of [
+  "It is unknown whether the mapped status can be determined, but this property is within Subarea 1.",
+  "The evidence does not establish the mapped location; however, this site falls within Subarea 2."
+]) {
+  const unsafeMaskedMappedLocationInference = evaluateZoningResearchSafety({
+    question: mapQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      maskedMappedLocationInference,
+      ["zr-map"],
+      ["The property's address or BBL and location on the applicable official Appendix J map are not established."]
+    )
+  });
+  assert(
+    unsafeMaskedMappedLocationInference.issues.some((issue) => issue.type === "zoning_map_inference"),
+    maskedMappedLocationInference
+  );
+}
+
 const specialEvidence = [source({
   sourceID: "zr-special",
   sectionNumber: "101-75",
