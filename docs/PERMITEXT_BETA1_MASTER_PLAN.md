@@ -27,7 +27,7 @@ Current development branch: `codex/zoning-research-beta1`
 
 ## Status dashboard
 
-Checklist snapshot: **112 completed, 14 open**, plus a separately tracked 11-step final merge, deployment, TestFlight, and release sequence. Those 11 substeps are not included in the 14 main open-checkbox count and have not been authorized on this branch.
+Checklist snapshot: **112 completed, 25 open** across the full file: 14 main open gates plus the separately tracked 11-step final merge, deployment, TestFlight, and release sequence. Those 11 release substeps remain outside the 14 main-gate count and have not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -179,8 +179,8 @@ Read-only configuration evidence: [PERMITEXT_PRODUCTION_AUTH_CONFIGURATION_EVIDE
 - [x] Complete final owner approval of the exact customer documents and record dormant identifiers `terms-2026-08-28`, `privacy-2026-08-28`, and `subscriptions-2026-08-28` with their approved-file hashes.
 - [x] Retain machine-readable approved-artifact and [live-publication guards](./PERMITEXT_POLICY_PUBLICATION_AUDIT_2026-08-30.md) so an edited file cannot silently reuse an approved identifier and stale Production pages cannot pass; all local hashes pass, while the August 30 live audit correctly remains red.
 - [x] Record explicit owner acceptance of all documented residual Beta risks without treating that acceptance as legal approval or release authorization.
-- [ ] Publish stable owner-approved URLs and ensure web/iOS purchase screens match them.
-- [ ] Configure and activate the owner-approved current policy versions after the final documents and stable URLs are approved.
+- [ ] Publish the exact owner-approved document bytes at the existing stable URLs and ensure web/iOS purchase screens match them.
+- [ ] After the strict live audit reports `publicationReady: true`, configure and activate the already owner-approved current policy versions.
 
 Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_CHECKLIST.md)
 

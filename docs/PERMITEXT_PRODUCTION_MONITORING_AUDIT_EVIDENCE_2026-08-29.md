@@ -24,6 +24,8 @@ This was a small quiet-period sample. It proves that the log stream can be read 
 
 An August 30 refresh parsed 12 valid Production entries with no invalid lines. It observed two successful `/health` requests, two structured dynamic-route observations, and zero health failures, server errors, billing endpoint failures, client/request/database errors, failed invoices, Research spend rejections, Research failures, or other actionable categories. No Research duration sample existed in that quiet window, so no live p95 latency claim is made. The strict command exited `0`.
 
+An August 31 refresh returned no Production log entries in the preceding 24-hour window. The strict aggregate audit therefore exited `2`, correctly treating missing log-based health coverage as incomplete rather than declaring an outage or a clean monitored window. The required direct fallback request to `https://permitext.com/health` then returned HTTP 200 with `ok: true`, PostgreSQL storage, normalized-v4 schema, and serving commit `dbbb6ab40d40d1d3d947303aa45b01fbd9cebce3`. The serving release still reports external alerts unconfigured. This is healthy direct endpoint evidence for a quiet log window; it is not anomaly-specific delivery evidence and does not close the monitoring gate.
+
 A separate key-presence-only environment check confirmed that `PERMITEXT_MONITORING_PROVIDER` remains unset. No environment value was read or printed.
 
 ## Delivery and provider boundary
@@ -31,6 +33,8 @@ A separate key-presence-only environment check confirmed that `PERMITEXT_MONITOR
 The live dashboard confirmed owner web/email subscriptions for both Permitext anomaly rules and for the relevant team usage/spend/deployment notifications. A failed isolated recovery deployment is present in Vercel's notification inbox, so generic Vercel web delivery is observed. Neither included anomaly rule has produced an event, and email receipt was not independently verified.
 
 An August 30 rule-detail reinspection resolved a potentially confusing dashboard label. The list says `no destinations configured` because neither rule has an optional Slack/team destination. Inside both the `Permitext production 5xx anomalies` and `Permitext production usage anomalies` drawers, automatic Team Owner subscription is on and the owner's personal Web and Email checkboxes are checked. Both rules remain scoped to `permitext-sync`; the 5xx rule matches Error Anomaly `statusGroup eq '5xx'`, and the usage rule matches all Usage Anomaly events. Neither the live dashboard nor the current Vercel alert CLI documentation exposes a test-send command, so this reinspection does not fabricate anomaly-specific delivery evidence.
+
+The official Vercel Alerts and Spend Management documentation was rechecked on August 31. Alerts still expose subscription destinations but no safe anomaly-rule test-send. Spend Management notifications and automatic pausing are tied to actual 50%, 75%, and 100% spend thresholds; lowering the amount below current spend can trigger configured actions, including pausing every Production project. Permitext therefore did not lower the `$20` amount, generate artificial metered usage, configure a webhook, or interrupt Production merely to manufacture acceptance evidence.
 
 No Log Drain is configured. Vercel currently documents Log Drains as metered at $0.50/GB with no included allowance. No Drain, third-party monitoring endpoint, plan change, deployment, environment change, Production write, paid model call, or billing-provider call was made.
 
