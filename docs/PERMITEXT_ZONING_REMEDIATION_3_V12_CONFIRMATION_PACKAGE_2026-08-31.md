@@ -6,13 +6,13 @@ Branch: `codex/zoning-research-beta1`
 
 Exact package commit: `67fbd6ca25d69b9f59d07dfb3b556ca16d134b39`
 
-Status: locked, no-cost verification complete, not authorized, not run
+Status: consumed by one authorized run; terminal partial result retained
 
 ## Outcome
 
-The distinct Zoning safety v12 confirmation package is committed and locked. No paid provider request was made, no semantic result was produced, and no retained result was edited or rescored.
+The distinct Zoning safety v12 confirmation package was committed and locked before execution. The owner then authorized this exact package for all 30 ordered cases, one repetition, and a maximum cumulative API spend of `$5`. Execution commit `bf13a7128edc0dc9d53c62611eaa660a35e0cf73` produced terminal partial run `6e370831-82c1-4480-9253-2ea8ceb908ec`.
 
-Authorization ID `31dd8aa9-3b2c-4fc8-8988-1b542735ac78` remains `locked`. Its owner authorization, case count, repetition count, spend cap, package commit, execution commit, attempt ID, and run ID are null/not started. Public Zoning Research, the disabled 24,000-character candidate, deployment, pricing or allowance changes, and professional Zoning signoff remain false.
+Authorization ID `31dd8aa9-3b2c-4fc8-8988-1b542735ac78` is consumed and cannot be reused. The run spent `$0.212014` across eight settled requests with zero pending, passed the first two cases at 4.00/4, and stopped fail-closed at `zr-appendix-map-boundaries`; 27 cases remained unattempted. Public Zoning Research, the disabled 24,000-character candidate, deployment, pricing or allowance changes, and professional Zoning signoff remain false.
 
 The owner's August 31 sentence naming package `8d075b442083db3536de0ff9e90372802ddeadaa` did not activate this package. That SHA identifies the already-consumed v11 package and cannot be reused. The guard rejected it before provider access; additional spend was `$0`.
 
@@ -27,6 +27,11 @@ The owner's August 31 sentence naming package `8d075b442083db3536de0ff9e90372802
 | Research economics | `d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0` |
 | Application | `1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797` |
 | Locked authorization JSON | `7b3344947a454ed8821ae6b5edacc3d62b664ec678bee368b516ec6a19418174` |
+| Consumed authorization JSON | `b6a7fdbb00f5a7b7f587cb3e9557fe2d673464df69962e4afd01a1df79c2af48` |
+| Execution commit | `bf13a7128edc0dc9d53c62611eaa660a35e0cf73` |
+| Terminal run | `6e370831-82c1-4480-9253-2ea8ceb908ec` |
+| Retained result JSON | `9491fb2c50cddabe0592359453721ec6036218538181132c5099ac0abeb34cbb` |
+| Retained result Markdown | `772b65bd26a291ee9ea649162a73c48262ac26b10f73ff97807958e0c8f85429` |
 | Signed runner-handoff module | `e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327` |
 | Runner public key, DER bytes | `7830127ce97437dcb85971faecfac4ad031288d4f98608837fa5c22aa2c64918` |
 | Historical consumed v11 authorization | `3625175f43ec9d0977183569e8809fa838ad4a19504ac1222b2a7cd845a8df0a` |
@@ -74,8 +79,8 @@ The following passed for the exact committed package bytes with API credentials 
 
 No provider call, merge, push, deployment, price change, allowance change, or public enablement occurred.
 
-## Decision gate
+## Executed result and next gate
 
-Package preparation is complete. The paid confirmation remains unauthorized. Only the exact sentence above can authorize this package, and its scope is limited to all 30 ordered remediation-successor-3 cases, one repetition, and a maximum cumulative API spend of `$5`.
+Package preparation and its single authorized execution are complete. The retained result and exact hashes are recorded in [PERMITEXT_ZONING_REMEDIATION_3_V12_CONFIRMATION_RESULT_2026-08-31.md](./PERMITEXT_ZONING_REMEDIATION_3_V12_CONFIRMATION_RESULT_2026-08-31.md). The consumed authorization cannot authorize a retry.
 
-Even a complete passing run would not by itself authorize public Zoning Research, the evidence-budget candidate, a pricing or 100-turn allowance change, merge, push, deployment, TestFlight release, or final public release. It would provide the missing semantic, reliability, and cost evidence for the next decision.
+The next step is no-cost diagnosis of the third-case `zoning_missing_mapped_location` plus revision-only `zoning_map_inference` combination. Any later paid confirmation requires a materially justified repair, a distinct locked package, and a new exact owner authorization and cumulative cap. This partial run does not authorize public Zoning Research, the evidence-budget candidate, a pricing or 100-turn allowance change, merge, push, deployment, TestFlight release, or final public release.

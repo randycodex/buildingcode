@@ -29,6 +29,22 @@ const defaultAuthorizationPath = fileURLToPath(new URL(
 ));
 export const zoningRemediationSuccessor3V12ConfirmationLockedAuthorizationSHA256 =
   "7b3344947a454ed8821ae6b5edacc3d62b664ec678bee368b516ec6a19418174";
+export const zoningRemediationSuccessor3V12ConfirmationAuthorizationPackageCommit =
+  "67fbd6ca25d69b9f59d07dfb3b556ca16d134b39";
+export const zoningRemediationSuccessor3V12ConfirmationExecutionCommit =
+  "bf13a7128edc0dc9d53c62611eaa660a35e0cf73";
+export const zoningRemediationSuccessor3V12ConfirmationConsumedAuthorizationSHA256 =
+  "b6a7fdbb00f5a7b7f587cb3e9557fe2d673464df69962e4afd01a1df79c2af48";
+export const zoningRemediationSuccessor3V12ConfirmationRunID =
+  "6e370831-82c1-4480-9253-2ea8ceb908ec";
+export const zoningRemediationSuccessor3V12ConfirmationResultJSONFile =
+  "results/2026-08-31T22-37-43-979Z-6e370831-82c1-4480-9253-2ea8ceb908ec.json";
+export const zoningRemediationSuccessor3V12ConfirmationResultJSONSHA256 =
+  "9491fb2c50cddabe0592359453721ec6036218538181132c5099ac0abeb34cbb";
+export const zoningRemediationSuccessor3V12ConfirmationResultMarkdownFile =
+  "results/2026-08-31T22-37-43-979Z-6e370831-82c1-4480-9253-2ea8ceb908ec.md";
+export const zoningRemediationSuccessor3V12ConfirmationResultMarkdownSHA256 =
+  "772b65bd26a291ee9ea649162a73c48262ac26b10f73ff97807958e0c8f85429";
 export const zoningRemediationSuccessor3V12ConfirmationPreparedFromCommit =
   "a96b922fadc2e8bea67decdd2b09cc9166dcc40a";
 export const zoningRemediationSuccessor3V12ConfirmationSafetySHA256 =
@@ -240,6 +256,28 @@ export async function validateZoningRemediationSuccessor3V12ConfirmationPaidAuth
   if (authorization.status === "consumed") {
     assert(authorization.consumption.attemptID === authorization.consumption.runID,
       "The consumed v12 confirmation result must match its pre-dispatch attempt identity.");
+    assert(authorizationPackageCommit ===
+      zoningRemediationSuccessor3V12ConfirmationAuthorizationPackageCommit,
+    "The consumed v12 confirmation must retain its exact locked package commit.");
+    assert(executionCommit ===
+      zoningRemediationSuccessor3V12ConfirmationExecutionCommit,
+    "The consumed v12 confirmation must retain its exact execution commit.");
+    assert(authorization.consumption.runID ===
+      zoningRemediationSuccessor3V12ConfirmationRunID,
+    "The consumed v12 confirmation must retain its exact run ID.");
+    for (const [file, expectedHash, label] of [
+      [zoningRemediationSuccessor3V12ConfirmationResultJSONFile,
+        zoningRemediationSuccessor3V12ConfirmationResultJSONSHA256, "JSON"],
+      [zoningRemediationSuccessor3V12ConfirmationResultMarkdownFile,
+        zoningRemediationSuccessor3V12ConfirmationResultMarkdownSHA256,
+        "Markdown"]
+    ]) {
+      await assertFileHash(
+        new URL(`./${file}`, import.meta.url),
+        expectedHash,
+        `The retained v12 ${label} result changed.`
+      );
+    }
   }
   return validation;
 }
