@@ -2,7 +2,6 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { zoningResearchSafetyVersion } from "../research-zoning-safety.mjs";
 import {
   requireActiveZoningSuccessorPaidAuthorization,
   validateZoningSuccessorPaidAuthorization
@@ -18,6 +17,22 @@ export const zoningRemediationSuccessor3V8ConfirmationPreparedFromCommit =
   "747887054e1bba16578a44477720f813a55fc357";
 export const zoningRemediationSuccessor3V8ConfirmationSafetySHA256 =
   "62bb5459c2ea22f981b4b2b0367d25b7086c7d86bf0d0cb92d582ae1d817dc94";
+export const zoningRemediationSuccessor3V8ConfirmationAuthorizationPackageCommit =
+  "7cc2af325dbb3c5c98e4e15e2c15196a4794cb76";
+export const zoningRemediationSuccessor3V8ConfirmationExecutionCommit =
+  "9d4af1b31762568caa5accf63b52e275f0e39bde";
+export const zoningRemediationSuccessor3V8ConfirmationRunID =
+  "1521497c-8df4-4ed9-98ce-79ef2805d1a6";
+export const zoningRemediationSuccessor3V8ConfirmationConsumedAuthorizationSHA256 =
+  "f9d01e8f94d96d3bc7e8e0a71fc43f183ed31b686a6e773e204fc0afc3872e58";
+export const zoningRemediationSuccessor3V8ConfirmationResultJSONFile =
+  "results/2026-08-31T01-59-26-104Z-1521497c-8df4-4ed9-98ce-79ef2805d1a6.json";
+export const zoningRemediationSuccessor3V8ConfirmationResultJSONSHA256 =
+  "1fc4dccc10791014baac9714f7c20fbe099084a4b7ae15d346c95939ab9a3c3e";
+export const zoningRemediationSuccessor3V8ConfirmationResultMarkdownFile =
+  "results/2026-08-31T01-59-26-104Z-1521497c-8df4-4ed9-98ce-79ef2805d1a6.md";
+export const zoningRemediationSuccessor3V8ConfirmationResultMarkdownSHA256 =
+  "ef7e1d2eaaef2847fc5b0abfa81d1755980a5683e1eeae58cdb18a992325506e";
 
 const expectedCohortFile =
   "zoning-cases-expanded-batch-1-successor-remediation-3.json";
@@ -45,8 +60,6 @@ const expectedPriorResultMarkdownFile =
   "results/2026-08-31T00-41-50-396Z-b4ef6990-5347-40d5-8654-611b893e8f1b.md";
 const expectedPriorResultMarkdownSHA256 =
   "73d5f34a043ecd948bd87837a2aeea4892fa29e69aafed6063308f42aa161c56";
-const safetyPath = fileURLToPath(new URL("../research-zoning-safety.mjs", import.meta.url));
-
 function sha256(text) {
   return createHash("sha256").update(text).digest("hex");
 }
@@ -63,11 +76,6 @@ async function validateRetainedLineage(authorization) {
     "The v8 confirmation package names the wrong Zoning safety version.");
   assert(lineage?.zoningSafetySHA256 === expectedSafetySHA256,
     "The v8 confirmation package names the wrong Zoning safety SHA.");
-  assert(zoningResearchSafetyVersion === expectedSafetyVersion,
-    "The current Zoning safety module version changed after package preparation.");
-  assert(sha256(await readFile(safetyPath, "utf8")) === expectedSafetySHA256,
-    "The current Zoning safety module bytes changed after package preparation.");
-
   assert(lineage?.priorAuthorizationFile === expectedPriorAuthorizationFile,
     "The v8 confirmation package names the wrong prior authorization.");
   assert(lineage?.priorAuthorizationSHA256 === expectedPriorAuthorizationSHA256,
@@ -101,6 +109,68 @@ async function validateRetainedLineage(authorization) {
     assert(sha256(await readFile(resultPath, "utf8")) === expectedHash,
       `The retained prior ${label} result changed.`);
   }
+}
+
+async function validateConsumedEvidence(authorization) {
+  assert(authorization.execution?.authorizationPackageCommit ===
+    zoningRemediationSuccessor3V8ConfirmationAuthorizationPackageCommit,
+  "The consumed v8 confirmation names the wrong locked package commit.");
+  assert(authorization.execution?.executionCommit ===
+    zoningRemediationSuccessor3V8ConfirmationExecutionCommit,
+  "The consumed v8 confirmation names the wrong execution commit.");
+  assert(authorization.consumption?.attemptID ===
+    zoningRemediationSuccessor3V8ConfirmationRunID &&
+    authorization.consumption?.runID ===
+      zoningRemediationSuccessor3V8ConfirmationRunID,
+  "The consumed v8 confirmation names the wrong retained run.");
+
+  for (const [file, expectedHash, label] of [
+    [zoningRemediationSuccessor3V8ConfirmationResultJSONFile,
+      zoningRemediationSuccessor3V8ConfirmationResultJSONSHA256, "JSON"],
+    [zoningRemediationSuccessor3V8ConfirmationResultMarkdownFile,
+      zoningRemediationSuccessor3V8ConfirmationResultMarkdownSHA256, "Markdown"]
+  ]) {
+    const resultPath = fileURLToPath(new URL(`./${file}`, import.meta.url));
+    assert(sha256(await readFile(resultPath, "utf8")) === expectedHash,
+      `The retained v8 confirmation ${label} result changed.`);
+  }
+
+  const result = JSON.parse(await readFile(fileURLToPath(new URL(
+    `./${zoningRemediationSuccessor3V8ConfirmationResultJSONFile}`,
+    import.meta.url
+  )), "utf8"));
+  assert(result.status === "partial",
+    "The retained v8 confirmation must remain a terminal partial result.");
+  assert(result.configuration?.runID ===
+    zoningRemediationSuccessor3V8ConfirmationRunID &&
+    result.configuration?.gitCommit ===
+      zoningRemediationSuccessor3V8ConfirmationExecutionCommit &&
+    result.configuration?.datasetSHA256 === expectedCohortSHA256,
+  "The retained v8 confirmation result lineage changed.");
+  assert(result.configuration?.repeat === 1 &&
+    result.configuration?.caseIDs?.length === 30 &&
+    result.configuration?.approvedSpendCapUSD === 5,
+  "The retained v8 confirmation result scope changed.");
+  assert(result.configuration?.webSupportEnabled === false &&
+    result.configuration?.stopOnExecutionError === true,
+  "The retained v8 confirmation execution policy changed.");
+  assert(result.configuration?.actualUSD === 0.297314 &&
+    result.configuration?.conservativeReservedUSD === 0.297314 &&
+    result.configuration?.paidRequestCount === 10 &&
+    result.configuration?.pendingPaidRequestCount === 0,
+  "The retained v8 confirmation spend ledger changed.");
+  assert(result.results?.length === 3 &&
+    result.results[0]?.testCase?.id === "zr-rules-of-construction" &&
+    result.results[1]?.testCase?.id === "zr-use-group-table" &&
+    result.results[2]?.testCase?.id === "zr-appendix-map-boundaries" &&
+    result.results[0]?.scoring?.passed === true &&
+    result.results[1]?.scoring?.passed === true &&
+    result.results[2]?.operationMetric?.status === "failed" &&
+    result.results[2]?.operationMetric?.charged === false &&
+    result.results[2]?.operationMetric?.verificationIssueTypes?.includes(
+      "zoning_missing_mapped_location"
+    ),
+  "The retained v8 confirmation case outcomes changed.");
 }
 
 export async function validateZoningRemediationSuccessor3V8ConfirmationPaidAuthorization({
@@ -158,6 +228,7 @@ export async function validateZoningRemediationSuccessor3V8ConfirmationPaidAutho
     assert(authorization.consumption.attemptID ===
       authorization.consumption.runID,
     "The consumed v8 confirmation result must match its pre-dispatch attempt identity.");
+    await validateConsumedEvidence(authorization);
   }
   return validation;
 }

@@ -90,6 +90,26 @@ assert.match(
 );
 assert.match(
   messageHandlerSlice,
+  /verificationAttempts\.push\(\{[\s\S]*?researchZoningAttemptDiagnostics\(zoningSafety\)/,
+  "A failed deterministic Zoning attempt does not retain privacy-safe clause diagnostics."
+);
+assert.match(
+  messageHandlerSlice,
+  /verificationAttemptDiagnostics: researchVerificationAttemptDiagnostics\([\s\S]*?verificationAttempts[\s\S]*?\)/,
+  "Completed Research operation telemetry drops per-attempt Zoning diagnostics."
+);
+assert.match(
+  messageHandlerSlice,
+  /verificationAttemptDiagnostics: Array\.isArray\(error\.verificationAttempts\)[\s\S]*?researchVerificationAttemptDiagnostics\(error\.verificationAttempts\)/,
+  "Failed Research operation telemetry drops per-attempt Zoning diagnostics."
+);
+assert.match(
+  messageHandlerSlice,
+  /const failureAttemptDiagnostics = researchVerificationAttemptDiagnostics\([\s\S]*?const failureDiagnosticsByAttempt = new Map\([\s\S]*?verificationAttempts: Array\.isArray\(error\.verificationAttempts\)[\s\S]*?failureDiagnosticsByAttempt\.get\(index \+ 1\)\.zoningSafety/,
+  "Research failure logs drop the privacy-safe per-attempt Zoning diagnostic."
+);
+assert.match(
+  messageHandlerSlice,
   /structuredResponseRetryCount: result\.structuredResponseRetryCount \|\| 0,[\s\S]*structuredAttemptFailureCount: result\.structuredAttemptFailureCount \|\| 0,[\s\S]*structuredAttemptFailureStages: result\.structuredAttemptFailureStages \|\| \[\],[\s\S]*providerIncompleteReason: result\.providerIncompleteReason \|\| null/,
   "Completed Research telemetry drops bounded structured-attempt diagnostics."
 );

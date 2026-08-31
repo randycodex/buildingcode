@@ -10,6 +10,13 @@ const providerIncompleteReasonValues = new Set([
   "max_output_tokens",
   "content_filter"
 ]);
+const zoningDiagnosticFieldKinds = new Set([
+  "answer_text",
+  "conclusion",
+  "explanation",
+  "supported_point_heading",
+  "supported_point_explanation"
+]);
 
 function nonnegativeNumber(value, fallback = 0) {
   const number = Number(value);
@@ -76,6 +83,41 @@ function normalizedStructuredAttemptFailureStages(value) {
     .map((stage) => allowlistedValue(stage, structuredAttemptFailureStageValues))
     .filter(Boolean)
     .slice(0, 2);
+}
+
+export function createResearchVerificationAttemptDiagnostics(value) {
+  return (Array.isArray(value) ? value : []).slice(0, 2).flatMap((attempt, index) => {
+    const zoning = attempt?.zoningSafety;
+    if (zoning?.kind !== "zoning_mapped_location") return [];
+    const triggeringClauses = (Array.isArray(zoning.triggeringClauses)
+      ? zoning.triggeringClauses
+      : []).slice(0, 24).flatMap((clause) => {
+      const fieldKind = allowlistedValue(clause?.fieldKind, zoningDiagnosticFieldKinds);
+      const clauseHash = /^[a-f0-9]{64}$/.test(String(clause?.clauseHash || ""))
+        ? String(clause.clauseHash)
+        : null;
+      if (!fieldKind || !clauseHash) return [];
+      return [{
+        fieldKind,
+        clauseHash,
+        clauseLength: Math.min(100_000, nonnegativeInteger(clause?.clauseLength)),
+        locationBoundary: clause?.locationBoundary === true,
+        sourceRule: clause?.sourceRule === true,
+        directConclusion: clause?.directConclusion === true
+      }];
+    });
+    return [{
+      attempt: index + 1,
+      zoningSafety: {
+        schemaVersion: 1,
+        kind: "zoning_mapped_location",
+        sourceBoundaryQuestion: zoning.sourceBoundaryQuestion === true,
+        citedAppendixJ: zoning.citedAppendixJ === true,
+        mappedLocationBoundaryPresent: zoning.mappedLocationBoundaryPresent === true,
+        triggeringClauses
+      }
+    }];
+  });
 }
 
 export function createResearchStructuredAttemptDiagnostics({
@@ -146,6 +188,9 @@ function normalizedOperation(operation = {}) {
         .map((issue) => String(issue || "").trim())
         .filter(Boolean)
     )),
+    verificationAttemptDiagnostics: createResearchVerificationAttemptDiagnostics(
+      operation.verificationAttemptDiagnostics
+    ),
     failureCode: String(operation.failureCode || "").trim() || null,
     failureStage: allowlistedValue(
       operation.failureStage,
@@ -200,6 +245,7 @@ export function createResearchOperationMetric(operation = {}) {
     structuredAttemptFailureCount: normalized.structuredAttemptFailureCount,
     structuredAttemptFailureStages: normalized.structuredAttemptFailureStages,
     verificationIssueTypes: normalized.verificationIssueTypes,
+    verificationAttemptDiagnostics: normalized.verificationAttemptDiagnostics,
     providerRequestCount: normalized.providerRequestCount,
     pendingProviderRequestCount: normalized.pendingProviderRequestCount,
     inputTokens: normalized.inputTokens,

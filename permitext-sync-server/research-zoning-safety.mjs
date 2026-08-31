@@ -1,5 +1,7 @@
+import { createHash } from "node:crypto";
+
 export const zoningResearchSafetyVersion =
-  "20260830-zoning-material-completeness-v8";
+  "20260830-zoning-material-completeness-v9";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -254,6 +256,156 @@ function statesSourceLevelMappedAreaRule(value) {
     "i"
   );
   return facilityRule.test(text) || areaDirectRule.test(text) || areaRelativeRule.test(text);
+}
+
+function isAppendixJSourceBoundaryQuestion(value) {
+  const text = compactText(value);
+  return /\bAppendix\s+J\b/i.test(text) &&
+    /\bwhat\b[^?]{0,180}\b(?:establish|show|provide)\b/i.test(text) &&
+    /\b(?:site|property|parcel)[- ]specific\s+(?:conclusion|determination)\b/i.test(text) &&
+    /\bmap\b/i.test(text) &&
+    /\blocation\b/i.test(text);
+}
+
+function hasUnsafeMappedSubjectReference(value) {
+  const text = compactText(value);
+  if (!text) return false;
+  if (hasConcretePropertyIdentifier(text)) return true;
+  const projectNoun = String.raw`(?:sites?|propert(?:y|ies)|parcels?|(?:tax|zoning)\s+lots?|lots?|projects?|developments?|buildings?|proposals?|uses?|facilit(?:y|ies)|premises|tracts?|structures?)`;
+  const possessiveLead = String.raw`(?:our|your|their|the\s+applicant['’]s|the\s+developer['’]s|the\s+tenant['’]s|the\s+company['’]s|[A-Z][A-Za-z'’.-]{1,40}['’]s)`;
+  if (new RegExp(String.raw`\b${possessiveLead}\s+(?:(?:existing|current|referenced|subject|specific)\s+)?${projectNoun}\b`, "i").test(text)) return true;
+  if (new RegExp(String.raw`\b(?:this|these|those)\s+(?:[A-Za-z-]+\s+){0,4}${projectNoun}\b`, "i").test(text)) return true;
+  if (new RegExp(String.raw`\bthat\s+(?:(?:existing|current|referenced|subject|specific)\s+)?${projectNoun}\b`, "i").test(text)) return true;
+  if (new RegExp(String.raw`\bproposed\s+(?:[A-Za-z-]+\s+){0,4}${projectNoun}\b`, "i").test(text)) return true;
+  if (new RegExp(String.raw`\bthe\s+(?:(?:existing|current|referenced|subject|specific)\s+)?${projectNoun}\b`, "i").test(text)) return true;
+  if (/\b(?:a|an|any|one)\s+(?:existing\s+)?(?:site|property|parcel|lot|project|development|building|proposal|premises|tract|structure)\b/i.test(text)) return true;
+  if (/\b(?:here|in\s+this\s+application|under\s+review)\b/i.test(text)) return true;
+  if (/\bSite\s+[A-Z0-9]+\b/.test(text)) return true;
+  if (/^(?:it|this|that|these|those|they|both|one|we|ours|each)\b/i.test(text)) return true;
+  return false;
+}
+
+function statesGenericAppendixJTreatment(value) {
+  const text = compactText(value);
+  if (!text || hasUnsafeMappedSubjectReference(text)) return false;
+  const genericSubject =
+    /\bself[- ]service storage facilit(?:y|ies)\b/i.test(text) ||
+    /\bdesignated areas?\b/i.test(text) ||
+    /\bAppendix\s+J\b/i.test(text) ||
+    (/\bSubarea\s*1\b/i.test(text) && /\bSubarea\s*2\b/i.test(text));
+  const mappedCategory =
+    /\bSubarea\s*[12]\b/i.test(text) ||
+    /\bAppendix\s+J\b/i.test(text);
+  const regulatoryTreatment =
+    /\bas[- ]of[- ]right\b/i.test(text) ||
+    /\bSection\s+42-19\b/i.test(text) ||
+    /\bspecial[- ]?permit\b/i.test(text) ||
+    /\bSection\s+74-192\b/i.test(text);
+  return genericSubject && mappedCategory && regulatoryTreatment;
+}
+
+function mappedAnswerFields(answer) {
+  return [
+    { fieldKind: "answer_text", value: answer?.answerText },
+    { fieldKind: "conclusion", value: answer?.conclusion },
+    { fieldKind: "explanation", value: answer?.explanation },
+    ...(Array.isArray(answer?.supportedPoints)
+      ? answer.supportedPoints.flatMap((point) => [
+          { fieldKind: "supported_point_heading", value: point?.heading },
+          { fieldKind: "supported_point_explanation", value: point?.explanation }
+        ])
+      : [])
+  ].map((entry) => ({ ...entry, value: compactText(entry.value) })).filter((entry) => entry.value);
+}
+
+function splitMappedConclusionClauses(value) {
+  const fieldText = compactText(value);
+  if (statesGenericAppendixJTreatment(fieldText)) return [fieldText];
+  return fieldText
+    .split(/[.!?]\s+/)
+    .flatMap((sentence) => {
+      const compactSentence = compactText(sentence);
+      if (!compactSentence) return [];
+      if (statesSourceLevelMappedAreaRule(compactSentence) ||
+        statesGenericAppendixJTreatment(compactSentence)) return [compactSentence];
+      return compactSentence.split(/;\s+/).flatMap((clause) => {
+        const compactClause = compactText(clause);
+        const commaBoundaryConclusion = compactClause.match(/^(.+),\s+([^,]+)$/);
+        if (
+          commaBoundaryConclusion &&
+          (
+            (
+              statesLocationBoundary(commaBoundaryConclusion[1]) &&
+              (
+                categoricalProjectConclusion(commaBoundaryConclusion[2]) ||
+                hasMappedOrRegulatoryPredicate(commaBoundaryConclusion[2])
+              )
+            ) ||
+            (
+              statesLocationBoundary(commaBoundaryConclusion[2]) &&
+              (
+                categoricalProjectConclusion(commaBoundaryConclusion[1]) ||
+                hasMappedOrRegulatoryPredicate(commaBoundaryConclusion[1])
+              )
+            )
+          )
+        ) {
+          return [commaBoundaryConclusion[1], commaBoundaryConclusion[2]];
+        }
+        const leadingAdversative = compactClause.match(
+          /^(?:even though|although|though|while)\s+(.+?),\s+(.+)$/i
+        );
+        if (leadingAdversative) return [leadingAdversative[1], leadingAdversative[2]];
+        return compactClause.split(
+          /,?\s+(?:but|however|yet|although|whereas|even though|though|nevertheless|nonetheless|while)\s+/i
+        );
+      });
+    })
+    .map(compactText)
+    .filter(Boolean);
+}
+
+function mappedClauseAnalysis(answer) {
+  return mappedAnswerFields(answer).flatMap((field) =>
+    splitMappedConclusionClauses(field.value).map((clause) => {
+      const establishedSourceRule = statesSourceLevelMappedAreaRule(clause);
+      const genericAppendixJTreatment = statesGenericAppendixJTreatment(clause);
+      return {
+        fieldKind: field.fieldKind,
+        clause,
+        locationBoundary: statesLocationBoundary(clause),
+        sourceRule: establishedSourceRule || genericAppendixJTreatment,
+        genericAppendixJTreatment,
+        directConclusion:
+          categoricalProjectConclusion(clause) || hasMappedOrRegulatoryPredicate(clause)
+      };
+    })
+  );
+}
+
+function mappedLocationAttemptDiagnostic({
+  sourceBoundaryQuestion,
+  citedAppendixJ,
+  mappedLocationBoundaryPresent,
+  clauses,
+  isTrigger
+}) {
+  const triggeringClauses = clauses.filter(isTrigger).slice(0, 24).map((clause) => ({
+    fieldKind: clause.fieldKind,
+    clauseHash: createHash("sha256").update(clause.clause).digest("hex"),
+    clauseLength: clause.clause.length,
+    locationBoundary: clause.locationBoundary,
+    sourceRule: clause.sourceRule,
+    directConclusion: clause.directConclusion
+  }));
+  return {
+    schemaVersion: 1,
+    kind: "zoning_mapped_location",
+    sourceBoundaryQuestion,
+    citedAppendixJ,
+    mappedLocationBoundaryPresent,
+    triggeringClauses
+  };
 }
 
 function statesLoweredYardBoundary(value) {
@@ -552,59 +704,35 @@ export function evaluateZoningResearchSafety({
       : [])
   ].filter(Boolean).join(" "));
   const mappedLocationBoundaryPresent = statesLocationBoundary(mappedConclusionNarrative);
-  const unboundedMappedHeading = (Array.isArray(answer?.supportedPoints)
-    ? answer.supportedPoints.map((point) => compactText(point?.heading)).filter(Boolean)
-    : [])
-    .some((heading) => {
-      const sourceLevelMappedAreaRule = statesSourceLevelMappedAreaRule(heading);
-      if (sourceLevelMappedAreaRule) return !mappedLocationBoundaryPresent;
-      return categoricalProjectConclusion(heading) || hasMappedOrRegulatoryPredicate(heading);
-    });
-  const mappedConclusionClauses = mappedConclusionNarrative
-    .split(/[.!?;]\s+/)
-    .flatMap((sentence) => {
-      const compactSentence = compactText(sentence);
-      if (!compactSentence) return [];
-      if (statesSourceLevelMappedAreaRule(compactSentence)) return [compactSentence];
-      const commaBoundaryConclusion = compactSentence.match(/^(.+),\s+([^,]+)$/);
-      if (
-        commaBoundaryConclusion &&
-        (
-          (
-            statesLocationBoundary(commaBoundaryConclusion[1]) &&
-            (
-              categoricalProjectConclusion(commaBoundaryConclusion[2]) ||
-              hasMappedOrRegulatoryPredicate(commaBoundaryConclusion[2])
-            )
-          ) ||
-          (
-            statesLocationBoundary(commaBoundaryConclusion[2]) &&
-            (
-              categoricalProjectConclusion(commaBoundaryConclusion[1]) ||
-              hasMappedOrRegulatoryPredicate(commaBoundaryConclusion[1])
-            )
-          )
-        )
-      ) {
-        return [commaBoundaryConclusion[1], commaBoundaryConclusion[2]];
+  const mappedClauses = mappedClauseAnalysis(answer);
+  const sourceBoundaryQuestion = isAppendixJSourceBoundaryQuestion(questionText);
+  const citedAppendixJ = zoningEvidence(evidence).some((source) =>
+    citationSet.has(compactText(source?.sourceID)) &&
+    (
+      /\bAppendix\s+J\b/i.test(compactText(source?.sectionNumber)) ||
+      /\bAppendix\s+J\b/i.test(compactText(source?.title))
+    )
+  );
+  const structuralAppendixJBoundary = sourceBoundaryQuestion && citedAppendixJ;
+  const mappedClauseTriggers = (clause) => {
+    if (clause.locationBoundary) return false;
+    if (structuralAppendixJBoundary) {
+      if (!mappedLocationBoundaryPresent) {
+        return clause.sourceRule || clause.directConclusion;
       }
-      const leadingAdversative = compactSentence.match(
-        /^(?:even though|although|though|while)\s+(.+?),\s+(.+)$/i
-      );
-      if (leadingAdversative) return [leadingAdversative[1], leadingAdversative[2]];
-      return compactSentence.split(
-        /,?\s+(?:but|however|yet|although|whereas|even though|though|nevertheless|nonetheless|while)\s+/i
-      );
-    });
-  const unboundedMappedConclusion = unboundedMappedHeading || mappedConclusionClauses
-    .some((sentence) => {
-      const sourceLevelMappedAreaRule = statesSourceLevelMappedAreaRule(sentence);
-      const mappedOrRegulatoryConclusion =
-        categoricalProjectConclusion(sentence) || hasMappedOrRegulatoryPredicate(sentence);
-      if (!mappedOrRegulatoryConclusion && !sourceLevelMappedAreaRule) return false;
-      if (statesLocationBoundary(sentence)) return false;
-      return !(mappedLocationBoundaryPresent && sourceLevelMappedAreaRule);
-    });
+      return clause.directConclusion && !clause.sourceRule;
+    }
+    if (!clause.directConclusion && !clause.sourceRule) return false;
+    return !(mappedLocationBoundaryPresent && clause.sourceRule);
+  };
+  const unboundedMappedConclusion = mappedClauses.some(mappedClauseTriggers);
+  const mappedLocationDiagnostic = mappedLocationAttemptDiagnostic({
+    sourceBoundaryQuestion,
+    citedAppendixJ,
+    mappedLocationBoundaryPresent,
+    clauses: mappedClauses,
+    isTrigger: mappedClauseTriggers
+  });
   const countPredicate = questionText.match(/\bDoes\b[^?]*?\b(count(?:\s+as\s+[^?]+)?)\?$/i)?.[1];
   if (
     countPredicate &&
@@ -931,6 +1059,9 @@ export function evaluateZoningResearchSafety({
     applies: true,
     categories: profile.categories,
     zoningSourceIDs: profile.zoningSourceIDs,
+    ...(issues.some((issue) => issue.type === "zoning_missing_mapped_location")
+      ? { attemptDiagnostic: mappedLocationDiagnostic }
+      : {}),
     issues
   };
 }

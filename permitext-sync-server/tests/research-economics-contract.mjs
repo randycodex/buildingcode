@@ -21,6 +21,31 @@ const privacySafeMetric = createResearchOperationMetric({
     "structured_output_parse",
     "provider_incomplete"
   ],
+  verificationAttemptDiagnostics: [{
+    attempt: 99,
+    zoningSafety: {
+      schemaVersion: 99,
+      kind: "zoning_mapped_location",
+      sourceBoundaryQuestion: true,
+      citedAppendixJ: true,
+      mappedLocationBoundaryPresent: false,
+      triggeringClauses: [{
+        fieldKind: "supported_point_heading",
+        clauseHash: "a".repeat(64),
+        clauseLength: 321,
+        locationBoundary: false,
+        sourceRule: true,
+        directConclusion: true,
+        rawText: "Private answer text"
+      }, {
+        fieldKind: "private-user-field",
+        clauseHash: "private address",
+        clauseLength: 999,
+        customerID: "private-customer"
+      }]
+    },
+    providerRequestID: "private-provider-request-id"
+  }],
   providerIncompleteReason: "max_output_tokens",
   question: "Private question",
   answer: "Private answer",
@@ -40,6 +65,26 @@ assert.deepEqual(privacySafeMetric.structuredAttemptFailureStages, [
   "provider_incomplete"
 ]);
 assert.equal(privacySafeMetric.providerIncompleteReason, "max_output_tokens");
+assert.deepEqual(privacySafeMetric.verificationAttemptDiagnostics, [{
+  attempt: 1,
+  zoningSafety: {
+    schemaVersion: 1,
+    kind: "zoning_mapped_location",
+    sourceBoundaryQuestion: true,
+    citedAppendixJ: true,
+    mappedLocationBoundaryPresent: false,
+    triggeringClauses: [{
+      fieldKind: "supported_point_heading",
+      clauseHash: "a".repeat(64),
+      clauseLength: 321,
+      locationBoundary: false,
+      sourceRule: true,
+      directConclusion: true
+    }]
+  }
+}]);
+assert.equal(JSON.stringify(privacySafeMetric).includes("Private answer text"), false);
+assert.equal(JSON.stringify(privacySafeMetric).includes("private-customer"), false);
 assert.equal("question" in privacySafeMetric, false);
 assert.equal("answer" in privacySafeMetric, false);
 assert.equal("projectFacts" in privacySafeMetric, false);

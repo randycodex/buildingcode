@@ -203,6 +203,7 @@ import {
 import {
   createResearchOperationMetric,
   createResearchStructuredAttemptDiagnostics,
+  createResearchVerificationAttemptDiagnostics,
   researchEconomicsReport
 } from "./research-economics.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
@@ -9140,6 +9141,21 @@ function combinedResearchAnswerRevisionIssues({
   });
 }
 
+function researchZoningAttemptDiagnostics(zoningSafety) {
+  return zoningSafety?.attemptDiagnostic
+    ? { zoningSafety: zoningSafety.attemptDiagnostic }
+    : null;
+}
+
+function researchVerificationAttemptDiagnostics(attempts = []) {
+  return createResearchVerificationAttemptDiagnostics(
+    (Array.isArray(attempts) ? attempts : []).map((attempt, index) => ({
+      attempt: index + 1,
+      ...(attempt?.diagnostics || {})
+    }))
+  );
+}
+
 export function accumulatedResearchVerificationIssues(attempts = []) {
   const seen = new Set();
   return attempts.flatMap((attempt) => Array.isArray(attempt?.issues) ? attempt.issues : [])
@@ -18060,6 +18076,7 @@ async function handleResearchConversationMessage(request, response) {
     modelUsage: [],
     escalationStages: [],
     verificationIssueTypes: [],
+    verificationAttemptDiagnostics: [],
     providerRequestCount: 0,
     pendingProviderRequestCount: 0,
     durationMilliseconds: 0
@@ -18775,7 +18792,10 @@ async function handleResearchConversationMessage(request, response) {
           ? evidencePackagePrototype
             ? "permitext-evidence-package-prototype"
             : "permitext-mock"
-          : "permitext-deterministic-answer-quality-gate"
+          : "permitext-deterministic-answer-quality-gate",
+        ...(!deterministicPass && researchZoningAttemptDiagnostics(zoningSafety)
+          ? { diagnostics: researchZoningAttemptDiagnostics(zoningSafety) }
+          : {})
       }];
       if (!deterministicPass) {
         const error = new Error("The mock Research answer failed deterministic materiality, evidence-economy, or source-attribution checks.");
@@ -18870,7 +18890,10 @@ async function handleResearchConversationMessage(request, response) {
               zoningSafety,
               webAttribution
             }),
-            model: "permitext-deterministic-answer-quality-gate"
+            model: "permitext-deterministic-answer-quality-gate",
+            ...(researchZoningAttemptDiagnostics(zoningSafety)
+              ? { diagnostics: researchZoningAttemptDiagnostics(zoningSafety) }
+              : {})
           });
           if (applyEvidenceBoundaryFallback()) break;
           if (attempt === maximumResearchVerificationAttempts - 1) {
@@ -19217,6 +19240,9 @@ async function handleResearchConversationMessage(request, response) {
       escalated: evidenceAnalysisEscalated || answerEscalated,
       escalationStages: modelEscalationStages,
       verificationAttemptCount: verificationAttempts.length,
+      verificationAttemptDiagnostics: researchVerificationAttemptDiagnostics(
+        verificationAttempts
+      ),
       structuredResponseRetryCount: result.structuredResponseRetryCount || 0,
       structuredAttemptFailureCount: result.structuredAttemptFailureCount || 0,
       structuredAttemptFailureStages: result.structuredAttemptFailureStages || [],
@@ -19311,6 +19337,9 @@ async function handleResearchConversationMessage(request, response) {
             (attempt.issues || []).map((issue) => issue?.type).filter(Boolean)
           )))
         : researchOperation.verificationIssueTypes,
+      verificationAttemptDiagnostics: Array.isArray(error.verificationAttempts)
+        ? researchVerificationAttemptDiagnostics(error.verificationAttempts)
+        : researchOperation.verificationAttemptDiagnostics,
       failureStage: error.failureStage || null,
       structuredResponseRetryCount: error.structuredResponseRetryCount || 0,
       structuredAttemptFailureCount: error.structuredAttemptFailureCount || 0,
@@ -19379,6 +19408,12 @@ async function handleResearchConversationMessage(request, response) {
       "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE",
       "TimeoutError"
     ].includes(failureCode)) {
+      const failureAttemptDiagnostics = researchVerificationAttemptDiagnostics(
+        error.verificationAttempts
+      );
+      const failureDiagnosticsByAttempt = new Map(
+        failureAttemptDiagnostics.map((diagnostic) => [diagnostic.attempt, diagnostic])
+      );
       console.warn(JSON.stringify({
         event: "research_conversation_failure",
         user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
@@ -19387,7 +19422,18 @@ async function handleResearchConversationMessage(request, response) {
         failureStage: error.failureStage || null,
         message: String(error.message || "").slice(0, 500),
         verificationAttempts: Array.isArray(error.verificationAttempts)
-          ? error.verificationAttempts.map((attempt) => ({ pass: attempt.pass, issues: attempt.issues }))
+          ? error.verificationAttempts.map((attempt, index) => ({
+              attempt: index + 1,
+              pass: attempt.pass,
+              issues: attempt.issues,
+              ...(failureDiagnosticsByAttempt.has(index + 1)
+                ? {
+                    diagnostics: {
+                      zoningSafety: failureDiagnosticsByAttempt.get(index + 1).zoningSafety
+                    }
+                  }
+                : {})
+            }))
           : [],
         providerStatus: error.providerStatus || error.status || null,
         incompleteReason: error.incompleteReason || null,

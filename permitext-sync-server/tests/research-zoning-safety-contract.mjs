@@ -234,6 +234,97 @@ for (const citationLedAppendixTreatment of [
   );
 }
 
+const sourceBoundaryQuestion =
+  "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?";
+const globalAppendixJBoundary =
+  "No parcel-specific conclusion can be made without the property's address or BBL and the applicable official Appendix J map.";
+const appendixJMissingFacts = [
+  "The property's address or BBL and location on the applicable Appendix J map are not established."
+];
+
+for (const independentlyReproducedSafeTreatment of [
+  "Appendix J provides that self-service storage facilities are subject to the as-of-right provisions of Section 42-19 in Subarea 1, while they are subject to City Planning Commission special permit under Section 74-192 in Subarea 2.",
+  "If a self-service storage facility is in Subarea 1, it is subject to the as-of-right provisions of Section 42-19; if it is in Subarea 2, it requires a City Planning Commission special permit under Section 74-192."
+]) {
+  const safeIndependentTreatment = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${independentlyReproducedSafeTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    safeIndependentTreatment.pass,
+    true,
+    `${independentlyReproducedSafeTreatment}: ${JSON.stringify(safeIndependentTreatment)}`
+  );
+}
+
+const genericAppendixJHeadingAnswer = answer(
+  `Self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19, while those in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192. ${globalAppendixJBoundary}`,
+  ["zr-map"],
+  appendixJMissingFacts
+);
+genericAppendixJHeadingAnswer.supportedPoints[0].heading =
+  "Subarea 1 is as-of-right; Subarea 2 requires a special permit";
+const safeGenericAppendixJHeading = evaluateZoningResearchSafety({
+  question: sourceBoundaryQuestion,
+  evidence: mapEvidence,
+  answer: genericAppendixJHeadingAnswer
+});
+assert.equal(
+  safeGenericAppendixJHeading.pass,
+  true,
+  JSON.stringify(safeGenericAppendixJHeading.issues)
+);
+
+for (const independentlyReproducedUnboundedTreatment of [
+  "Appendix J places designated areas subject to Section 42-19 in Subarea 1 and designated areas requiring a City Planning Commission special permit under Section 74-192 in Subarea 2.",
+  "Under Appendix J, the as-of-right provisions of Section 42-19 apply to self-service storage facilities in Subarea 1, and the City Planning Commission special-permit requirement under Section 74-192 applies in Subarea 2."
+]) {
+  const unboundedIndependentTreatment = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      independentlyReproducedUnboundedTreatment,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unboundedIndependentTreatment.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    independentlyReproducedUnboundedTreatment
+  );
+  const diagnostic = unboundedIndependentTreatment.attemptDiagnostic;
+  assert.equal(diagnostic?.kind, "zoning_mapped_location");
+  assert.equal(diagnostic?.sourceBoundaryQuestion, true);
+  assert.equal(diagnostic?.citedAppendixJ, true);
+  assert.equal(diagnostic?.mappedLocationBoundaryPresent, false);
+  assert(diagnostic?.triggeringClauses.length > 0);
+  assert(diagnostic.triggeringClauses.every((clause) =>
+    [
+      "answer_text",
+      "conclusion",
+      "explanation",
+      "supported_point_heading",
+      "supported_point_explanation"
+    ].includes(clause.fieldKind) &&
+    /^[a-f0-9]{64}$/.test(clause.clauseHash) &&
+    Number.isSafeInteger(clause.clauseLength) &&
+    typeof clause.locationBoundary === "boolean" &&
+    typeof clause.sourceRule === "boolean" &&
+    typeof clause.directConclusion === "boolean" &&
+    !("text" in clause)
+  ));
+  assert.equal(
+    JSON.stringify(diagnostic).includes(independentlyReproducedUnboundedTreatment),
+    false
+  );
+}
+
 const appendixGeneralRuleWithoutBoundary = evaluateZoningResearchSafety({
   question: "What can Appendix J establish, and what site-specific conclusion requires the applicable map and location?",
   evidence: mapEvidence,
@@ -361,7 +452,7 @@ for (const unsafeAppendixClaim of [
     )
   });
   assert(unsafeAppendixResult.issues.some((issue) =>
-    issue.type === "zoning_missing_mapped_location"));
+    issue.type === "zoning_missing_mapped_location"), unsafeAppendixClaim);
 }
 
 const unsafeMappedHeadingAnswer = answer(
