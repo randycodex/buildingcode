@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
-import { spawnSync } from "node:child_process";
+import { createHash, generateKeyPairSync } from "node:crypto";
+import { spawn, spawnSync } from "node:child_process";
 import { mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -11,6 +11,8 @@ import {
   zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
   zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
   zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+  zoningRemediationSuccessor3V11ConfirmationRunnerPublicKeySHA256,
   zoningRemediationSuccessor3V11ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v11-confirmation-paid-authorization.mjs";
 import {
@@ -26,6 +28,13 @@ import {
 import {
   zoningRemediationSuccessor3V11PaidRunEnvironment
 } from "../scripts/run-zoning-successor.mjs";
+import {
+  signZoningV11RunnerHandoff,
+  respondToZoningV11RunnerChallenge,
+  verifyZoningV11RunnerHandoff,
+  zoningV11RunnerHandoffPayload,
+  zoningV11RunnerHandoffProtocol
+} from "../evals/zoning-v11-paid-runner-handoff.mjs";
 
 const serverRoot = new URL("../", import.meta.url);
 const authorizationPath = new URL(
@@ -34,6 +43,7 @@ const authorizationPath = new URL(
 );
 const runnerPath = new URL("../scripts/run-zoning-successor.mjs", import.meta.url);
 const evaluatorPath = new URL("./research-evals.mjs", import.meta.url);
+const handoffRelativePath = "evals/zoning-v11-paid-runner-handoff.mjs";
 const resultsPath = new URL("../evals/results/", import.meta.url);
 const globalRunLockPath = new URL("../evals/.paid-evaluation-run.lock", import.meta.url);
 const v11RunLockPath = new URL(
@@ -51,7 +61,7 @@ const exactEconomicsSHA256 =
 const exactAppSHA256 =
   "1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797";
 const exactLockedAuthorizationSHA256 =
-  "91b712dcd50c75937253315f5d0af53862144a61e8d4e27879908d6830f10982";
+  "c5b89c1dd7dca9109e0be01ab78763e6da108cace19dc2fb92f4cc6aed56c024";
 const paidEnvironment = {
   ...process.env,
   OPENAI_API_KEY: "",
@@ -64,15 +74,55 @@ const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const hostileEnvironment = zoningRemediationSuccessor3V11PaidRunEnvironment({
   ...process.env,
   NODE_ENV: "test",
+  NODE_OPTIONS: "--import=/tmp/hostile-loader.mjs",
+  NODE_PATH: "/tmp/hostile-node-path",
+  NODE_EXTRA_CA_CERTS: "/tmp/hostile-ca.pem",
+  NODE_USE_ENV_PROXY: "1",
+  NODE_TLS_REJECT_UNAUTHORIZED: "0",
+  HTTP_PROXY: "http://127.0.0.1:9001",
+  HTTPS_PROXY: "http://127.0.0.1:9002",
+  ALL_PROXY: "socks5://127.0.0.1:9003",
+  NO_PROXY: "api.openai.com",
+  PERMITEXT_SYNC_DATABASE_URL: "postgres://production-must-not-be-used",
+  DATABASE_URL: "postgres://production-must-not-be-used",
+  STORAGE_URL: "postgres://production-must-not-be-used",
+  POSTGRES_URL: "postgres://production-must-not-be-used",
+  NEON_DATABASE_URL: "postgres://production-must-not-be-used",
+  VERCEL: "1",
+  VERCEL_ENV: "production",
   PERMITEXT_TEST_RESEARCH_MOCK: "1",
   PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE: "bb-2022-013",
   PERMITEXT_TEST_RESEARCH_MOCK_DELAY_MS: "100",
   PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS: "24000",
   PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY: "1",
+  PERMITEXT_ZONING_PAID_RUNNER_NONCE: "hostile-runner-nonce",
+  PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS: "1",
+  PERMITEXT_RESEARCH_REASONING_EFFORT: "xhigh",
   PERMITEXT_RESEARCH_WEB_SUPPORT: "on"
 }, 5);
 assert.equal(hostileEnvironment.NODE_ENV, "production");
 assert.equal(hostileEnvironment.PERMITEXT_RESEARCH_WEB_SUPPORT, "off");
+assert.equal(hostileEnvironment.PERMITEXT_ZONING_PAID_RUNNER_NONCE, "");
+assert.equal(hostileEnvironment.PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS, "0");
+assert.equal(hostileEnvironment.PERMITEXT_RESEARCH_REASONING_EFFORT, "medium");
+for (const key of [
+  "NODE_OPTIONS",
+  "NODE_PATH",
+  "NODE_EXTRA_CA_CERTS",
+  "HTTP_PROXY",
+  "HTTPS_PROXY",
+  "ALL_PROXY",
+  "NO_PROXY",
+  "PERMITEXT_SYNC_DATABASE_URL",
+  "DATABASE_URL",
+  "STORAGE_URL",
+  "POSTGRES_URL",
+  "NEON_DATABASE_URL",
+  "VERCEL",
+  "VERCEL_ENV"
+]) assert.equal(hostileEnvironment[key], "", `${key} was not scrubbed.`);
+assert.equal(hostileEnvironment.NODE_USE_ENV_PROXY, "0");
+assert.equal(hostileEnvironment.NODE_TLS_REJECT_UNAUTHORIZED, "1");
 for (const key of [
   "PERMITEXT_TEST_RESEARCH_MOCK",
   "PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE",
@@ -80,6 +130,88 @@ for (const key of [
   "PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS",
   "PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY"
 ]) assert.equal(hostileEnvironment[key], "", `${key} was not scrubbed.`);
+
+const testHandoffKeys = generateKeyPairSync("ed25519");
+const testHandoffPayload = zoningV11RunnerHandoffPayload({
+  runID: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  executionCommit: "b".repeat(40),
+  parentPID: process.pid,
+  childPID: process.pid + 1,
+  challenge: "c".repeat(43)
+});
+const testHandoffSignature = signZoningV11RunnerHandoff({
+  privateKey: testHandoffKeys.privateKey,
+  payload: testHandoffPayload
+});
+const testHandoffPublicKey = testHandoffKeys.publicKey.export({
+  type: "spki",
+  format: "der"
+}).toString("base64");
+verifyZoningV11RunnerHandoff({
+  payload: testHandoffPayload,
+  signature: testHandoffSignature,
+  publicKeyDERBase64: testHandoffPublicKey
+});
+assert.throws(
+  () => verifyZoningV11RunnerHandoff({
+    payload: { ...testHandoffPayload, runID: "dddddddd-dddd-4ddd-8ddd-dddddddddddd" },
+    signature: testHandoffSignature,
+    publicKeyDERBase64: testHandoffPublicKey
+  }),
+  /authenticated runner handoff/i,
+  "A v11 runner signature was replayed for a different run."
+);
+assert.equal(zoningV11RunnerHandoffProtocol,
+  "permitext-zoning-remediation-3-v11-runner-handoff-v1");
+
+const handoffRunID = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
+const handoffExecutionCommit = "f".repeat(40);
+const handoffModuleURL = new URL(
+  "../evals/zoning-v11-paid-runner-handoff.mjs",
+  import.meta.url
+).href;
+const handoffChildSource = `
+  import { requireAuthenticatedZoningV11RunnerHandoff } from ${JSON.stringify(handoffModuleURL)};
+  await requireAuthenticatedZoningV11RunnerHandoff({
+    runID: ${JSON.stringify(handoffRunID)},
+    executionCommit: ${JSON.stringify(handoffExecutionCommit)},
+    publicKeyDERBase64: ${JSON.stringify(testHandoffPublicKey)}
+  });
+`;
+const authenticatedHandoffChild = spawn(
+  process.execPath,
+  ["--input-type=module", "--eval", handoffChildSource],
+  {
+    cwd: serverRoot,
+    env: { ...process.env, NODE_OPTIONS: "" },
+    stdio: ["ignore", "pipe", "pipe", "ipc"]
+  }
+);
+let authenticatedHandoffOutput = "";
+authenticatedHandoffChild.stdout.on("data", (chunk) => {
+  authenticatedHandoffOutput += chunk;
+});
+authenticatedHandoffChild.stderr.on("data", (chunk) => {
+  authenticatedHandoffOutput += chunk;
+});
+authenticatedHandoffChild.once("message", (message) => {
+  const response = respondToZoningV11RunnerChallenge({
+    message,
+    childPID: authenticatedHandoffChild.pid,
+    runID: handoffRunID,
+    executionCommit: handoffExecutionCommit,
+    privateKey: testHandoffKeys.privateKey
+  });
+  authenticatedHandoffChild.send(response);
+});
+const authenticatedHandoffExit = await new Promise((resolveExit, rejectExit) => {
+  authenticatedHandoffChild.once("error", rejectExit);
+  authenticatedHandoffChild.once("exit", (code, signal) => {
+    resolveExit({ code, signal });
+  });
+});
+assert.deepEqual(authenticatedHandoffExit, { code: 0, signal: null },
+  `The authenticated v11 runner IPC handoff failed: ${authenticatedHandoffOutput}`);
 
 assert.equal(zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
   exactRepairCommit);
@@ -89,6 +221,10 @@ assert.equal(zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
   exactEconomicsSHA256);
 assert.equal(zoningRemediationSuccessor3V11ConfirmationAppSHA256,
   exactAppSHA256);
+assert.equal(zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+  "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327");
+assert.equal(zoningRemediationSuccessor3V11ConfirmationRunnerPublicKeySHA256,
+  "7830127ce97437dcb85971faecfac4ad031288d4f98608837fa5c22aa2c64918");
 assert.equal(zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
   exactLockedAuthorizationSHA256);
 
@@ -141,6 +277,13 @@ assert.equal(current.authorization.lineage.priorResultMarkdownSHA256,
   zoningRemediationSuccessor3V9ConfirmationResultMarkdownSHA256);
 
 const runnerSource = await readFile(runnerPath, "utf8");
+const trackedHandoff = spawnSync(
+  "git",
+  ["ls-files", "--error-unmatch", "--", handoffRelativePath],
+  { cwd: serverRoot, stdio: "ignore" }
+);
+assert.equal(trackedHandoff.status, 0,
+  "The signed v11 runner handoff must be tracked in the locked package.");
 for (const requiredGuard of [
   "--remediation-3-v11-confirmation",
   ".zoning-successor-remediation-3-v11-confirmation-paid-run.lock",
@@ -150,10 +293,17 @@ for (const requiredGuard of [
   "zoningRemediationSuccessor3V11ConfirmationSafetySHA256",
   "zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256",
   "zoningRemediationSuccessor3V11ConfirmationAppSHA256",
+  "zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256",
+  handoffRelativePath,
   "assertPinnedV11RuntimeInputsAtCommit",
   "zoningRemediationSuccessor3V11PaidRunEnvironment",
   "NODE_ENV: \"production\"",
+  "NODE_OPTIONS: \"\"",
+  "PERMITEXT_SYNC_DATABASE_URL: \"\"",
   "PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS: \"\"",
+  "PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS: \"0\"",
+  "PERMITEXT_RESEARCH_REASONING_EFFORT: \"medium\"",
+  "respondToZoningV11RunnerChallenge",
   "assertExactLockedAuthorizationPackage",
   "Only the locked authorization record may change",
   "pendingPaidRequestCount",
@@ -186,7 +336,11 @@ for (const requiredGuard of [
   "globalRunnerLock?.executionCommit === runnerLock?.executionCommit",
   "server changes other than the authorization",
   "The paid v11 child must run with a non-test NODE_ENV",
-  "PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS"
+  "PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS",
+  "requireAuthenticatedZoningV11RunnerHandoff",
+  "PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS",
+  "locked answer reasoning effort",
+  "may not expose its runner authentication in the environment"
 ]) {
   assert(evaluatorSource.includes(requiredGuard),
     `The v11 confirmation evaluator is missing guard: ${requiredGuard}`);
@@ -212,7 +366,7 @@ for (const args of [
   });
   assert.equal(blocked.status, 1, `${args.join(" ")} unexpectedly ran.`);
   assert.match(combinedOutput(blocked),
-    /(?:consuming runner and active run lock|requires a new explicit owner authorization and cumulative spend cap)/i);
+    /(?:authenticated runner IPC handoff|consuming runner and active run lock|requires a new explicit owner authorization and cumulative spend cap)/i);
 }
 for (const args of [
   ["scripts/run-zoning-successor.mjs",
@@ -317,7 +471,7 @@ try {
   assert.equal(forgedDirectAttempt.status, 1,
     "A forged direct-evaluator parent unexpectedly dispatched.");
   assert.match(combinedOutput(forgedDirectAttempt),
-    /(?:server changes other than the authorization|Only the durable running authorization may differ)/i);
+    /authenticated runner IPC handoff/i);
 } finally {
   await writeFile(authorizationPath, lockedAuthorizationText, "utf8");
   if (cohortLockCreated) await rm(v11RunLockPath, { force: true });

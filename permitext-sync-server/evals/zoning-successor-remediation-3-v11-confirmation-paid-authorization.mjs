@@ -18,13 +18,17 @@ import {
   zoningRemediationSuccessor3V9ConfirmationResultMarkdownSHA256,
   zoningRemediationSuccessor3V9ConfirmationRunID
 } from "./zoning-successor-remediation-3-v9-confirmation-paid-authorization.mjs";
+import {
+  zoningV11RunnerHandoffProtocol,
+  zoningV11RunnerPublicKeyDERBase64
+} from "./zoning-v11-paid-runner-handoff.mjs";
 
 const defaultAuthorizationPath = fileURLToPath(new URL(
   "./zoning-successor-remediation-3-v11-confirmation-paid-authorization.json",
   import.meta.url
 ));
 export const zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256 =
-  "91b712dcd50c75937253315f5d0af53862144a61e8d4e27879908d6830f10982";
+  "c5b89c1dd7dca9109e0be01ab78763e6da108cace19dc2fb92f4cc6aed56c024";
 export const zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit =
   "cd1f3a99f32a3648dd8f0d7a8b1d540e5db29bf5";
 export const zoningRemediationSuccessor3V11ConfirmationSafetySHA256 =
@@ -33,6 +37,10 @@ export const zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256 =
   "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0";
 export const zoningRemediationSuccessor3V11ConfirmationAppSHA256 =
   "1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797";
+export const zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256 =
+  "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327";
+export const zoningRemediationSuccessor3V11ConfirmationRunnerPublicKeySHA256 =
+  "7830127ce97437dcb85971faecfac4ad031288d4f98608837fa5c22aa2c64918";
 
 const expectedAuthorizationID = "ee72ca2f-5410-4ce9-a6d6-30deb8ff5169";
 const expectedCohortFile =
@@ -85,6 +93,28 @@ function validateHistoricalReviewedInputs() {
     "permitext-sync-server/app.mjs",
     zoningRemediationSuccessor3V11ConfirmationAppSHA256,
     "The reviewed v11 historical application bytes changed."
+  );
+}
+
+async function validateRunnerHandoffInputs(authorization) {
+  assert(authorization.lineage?.runnerHandoffProtocol ===
+    zoningV11RunnerHandoffProtocol,
+  "The v11 package names the wrong signed runner handoff protocol.");
+  assert(authorization.lineage?.runnerHandoffSHA256 ===
+    zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+  "The v11 package names the wrong signed runner handoff SHA.");
+  assert(authorization.lineage?.runnerHandoffPublicKeySHA256 ===
+    zoningRemediationSuccessor3V11ConfirmationRunnerPublicKeySHA256,
+  "The v11 package names the wrong signed runner public-key SHA.");
+  await assertFileHash(
+    new URL("./zoning-v11-paid-runner-handoff.mjs", import.meta.url),
+    zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+    "The signed v11 runner handoff implementation changed."
+  );
+  assert(
+    sha256(Buffer.from(zoningV11RunnerPublicKeyDERBase64, "base64")) ===
+      zoningRemediationSuccessor3V11ConfirmationRunnerPublicKeySHA256,
+    "The signed v11 runner handoff public key changed."
   );
 }
 
@@ -155,6 +185,7 @@ export async function validateZoningRemediationSuccessor3V11ConfirmationPaidAuth
     zoningRemediationSuccessor3V11ConfirmationAppSHA256,
   "The v11 confirmation package names the wrong application SHA.");
   validateHistoricalReviewedInputs();
+  await validateRunnerHandoffInputs(authorization);
   await validateHistoricalV9Lineage(authorization);
 
   assert(authorization.execution?.webSupportEnabled === false,

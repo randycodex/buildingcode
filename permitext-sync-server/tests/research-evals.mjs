@@ -57,8 +57,12 @@ import {
   zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
   zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
   zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
   zoningRemediationSuccessor3V11ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v11-confirmation-paid-authorization.mjs";
+import {
+  requireAuthenticatedZoningV11RunnerHandoff
+} from "../evals/zoning-v11-paid-runner-handoff.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
@@ -2345,7 +2349,10 @@ async function assertV11ConfirmationChildExecutionInputs({
       zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
       "Research economics"],
     ["permitext-sync-server/app.mjs",
-      zoningRemediationSuccessor3V11ConfirmationAppSHA256, "application"]
+      zoningRemediationSuccessor3V11ConfirmationAppSHA256, "application"],
+    ["permitext-sync-server/evals/zoning-v11-paid-runner-handoff.mjs",
+      zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+      "signed runner handoff"]
   ]) {
     const content = await gitText([
       "show", `${authorizationPackageCommit}:${path}`
@@ -2385,6 +2392,29 @@ async function assertV11ConfirmationChildExecutionInputs({
   );
   assert(process.env.NODE_ENV === "production",
     "The paid v11 child must run with a non-test NODE_ENV.");
+  for (const key of [
+    "NODE_OPTIONS",
+    "NODE_PATH",
+    "NODE_EXTRA_CA_CERTS",
+    "HTTP_PROXY",
+    "HTTPS_PROXY",
+    "ALL_PROXY",
+    "NO_PROXY",
+    "PERMITEXT_SYNC_DATABASE_URL",
+    "DATABASE_URL",
+    "STORAGE_URL",
+    "POSTGRES_URL",
+    "NEON_DATABASE_URL",
+    "VERCEL",
+    "VERCEL_ENV"
+  ]) {
+    assert(!process.env[key],
+      `The paid v11 child inherited forbidden runtime configuration: ${key}.`);
+  }
+  assert(process.env.NODE_USE_ENV_PROXY === "0",
+    "The paid v11 child may not use inherited proxy configuration.");
+  assert(process.env.NODE_TLS_REJECT_UNAUTHORIZED === "1",
+    "The paid v11 child must retain TLS certificate verification.");
   for (const key of [
     "PERMITEXT_TEST_RESEARCH_MOCK",
     "PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE",
@@ -4386,6 +4416,14 @@ async function main() {
         zoningRemediationSuccessor3V9ConfirmationMode ||
         zoningRemediationSuccessor3V11ConfirmationMode
       ) {
+        let v11ExecutionCommit = null;
+        if (zoningRemediationSuccessor3V11ConfirmationMode) {
+          v11ExecutionCommit = await currentGitCommit();
+          await requireAuthenticatedZoningV11RunnerHandoff({
+            runID: requestedRunID,
+            executionCommit: v11ExecutionCommit
+          });
+        }
         const runLockPath = join(
           serverRoot,
           "evals",
@@ -4408,7 +4446,10 @@ async function main() {
             runnerLock?.runID === requestedRunID &&
             typeof runnerLock?.nonce === "string" &&
             runnerLock.nonce.length > 0 &&
-            runnerLock.nonce === process.env.PERMITEXT_ZONING_PAID_RUNNER_NONCE,
+            (
+              zoningRemediationSuccessor3V11ConfirmationMode ||
+              runnerLock.nonce === process.env.PERMITEXT_ZONING_PAID_RUNNER_NONCE
+            ),
           "Paid remediation successor 3 must run through its consuming runner and active run lock."
         );
         let globalRunnerLock = null;
@@ -4447,7 +4488,13 @@ async function main() {
             "Paid v11 confirmation may not enable an evidence-budget prototype mode.");
           assert(process.env.PERMITEXT_RESEARCH_WEB_SUPPORT === "off",
             "Paid v11 confirmation must keep provider web support disabled.");
-          const executionCommit = await currentGitCommit();
+          assert(process.env.PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS === "0",
+            "Paid v11 confirmation must keep model evidence analysis disabled.");
+          assert(process.env.PERMITEXT_RESEARCH_REASONING_EFFORT === "medium",
+            "Paid v11 confirmation must use the locked answer reasoning effort.");
+          assert(!process.env.PERMITEXT_ZONING_PAID_RUNNER_NONCE,
+            "Paid v11 confirmation may not expose its runner authentication in the environment.");
+          const executionCommit = v11ExecutionCommit;
           assert(
             runnerLock.executionCommit === executionCommit &&
               globalRunnerLock.executionCommit === executionCommit &&

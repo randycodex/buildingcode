@@ -37,8 +37,13 @@ import {
   zoningRemediationSuccessor3V11ConfirmationEconomicsSHA256,
   zoningRemediationSuccessor3V11ConfirmationLockedAuthorizationSHA256,
   zoningRemediationSuccessor3V11ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
   zoningRemediationSuccessor3V11ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v11-confirmation-paid-authorization.mjs";
+import {
+  respondToZoningV11RunnerChallenge,
+  zoningV11RunnerPrivateKey
+} from "../evals/zoning-v11-paid-runner-handoff.mjs";
 import {
   researchCommercializationBenchmark,
   researchCommercializationBenchmarkEnvironment
@@ -184,8 +189,12 @@ function changedServerFiles(arguments_) {
     .filter(Boolean);
 }
 
-function assertPinnedV11RuntimeInputsAtCommit(commit, label) {
-  for (const [path, expectedHash, inputLabel] of [
+function assertPinnedV11RuntimeInputsAtCommit(
+  commit,
+  label,
+  { includeRunnerHandoff = false } = {}
+) {
+  const inputs = [
     ["permitext-sync-server/research-zoning-safety.mjs",
       zoningRemediationSuccessor3V11ConfirmationSafetySHA256, "Zoning safety"],
     ["permitext-sync-server/research-economics.mjs",
@@ -193,7 +202,15 @@ function assertPinnedV11RuntimeInputsAtCommit(commit, label) {
       "Research economics"],
     ["permitext-sync-server/app.mjs",
       zoningRemediationSuccessor3V11ConfirmationAppSHA256, "application"]
-  ]) {
+  ];
+  if (includeRunnerHandoff) {
+    inputs.push([
+      "permitext-sync-server/evals/zoning-v11-paid-runner-handoff.mjs",
+      zoningRemediationSuccessor3V11ConfirmationRunnerHandoffSHA256,
+      "signed runner handoff"
+    ]);
+  }
+  for (const [path, expectedHash, inputLabel] of inputs) {
     const reviewedText = gitOutput(
       ["show", `${commit}:${path}`],
       `Could not read the ${label} v11 ${inputLabel} bytes.`
@@ -393,7 +410,13 @@ async function consumeAuthorization({
   return { resultFile, result };
 }
 
-function runEvaluation(environment, repetitions, runID) {
+function runEvaluation({
+  environment,
+  repetitions,
+  runID,
+  executionCommit,
+  v11RunnerPrivateKey
+}) {
   return new Promise((resolveRun, rejectRun) => {
     const childArguments = [
       "tests/research-evals.mjs",
@@ -414,8 +437,31 @@ function runEvaluation(environment, repetitions, runID) {
     const child = spawn(process.execPath, childArguments, {
       cwd: serverRoot,
       env: environment,
-      stdio: "inherit"
+      stdio: remediationSuccessor3V11ConfirmationMode
+        ? ["inherit", "inherit", "inherit", "ipc"]
+        : "inherit"
     });
+    if (remediationSuccessor3V11ConfirmationMode) {
+      child.once("message", (message) => {
+        try {
+          const response = respondToZoningV11RunnerChallenge({
+            message,
+            childPID: child.pid,
+            runID,
+            executionCommit,
+            privateKey: v11RunnerPrivateKey
+          });
+          child.send(response, (error) => {
+            if (!error) return;
+            child.kill();
+            rejectRun(error);
+          });
+        } catch (error) {
+          child.kill();
+          rejectRun(error);
+        }
+      });
+    }
     child.once("error", rejectRun);
     child.once("exit", (code, signal) => resolveRun({ code, signal }));
   });
@@ -428,11 +474,30 @@ export function zoningRemediationSuccessor3V11PaidRunEnvironment(
   return {
     ...researchCommercializationBenchmarkEnvironment(sourceEnvironment),
     NODE_ENV: "production",
+    NODE_OPTIONS: "",
+    NODE_PATH: "",
+    NODE_EXTRA_CA_CERTS: "",
+    NODE_USE_ENV_PROXY: "0",
+    NODE_TLS_REJECT_UNAUTHORIZED: "1",
+    HTTP_PROXY: "",
+    HTTPS_PROXY: "",
+    ALL_PROXY: "",
+    NO_PROXY: "",
+    PERMITEXT_SYNC_DATABASE_URL: "",
+    DATABASE_URL: "",
+    STORAGE_URL: "",
+    POSTGRES_URL: "",
+    NEON_DATABASE_URL: "",
+    VERCEL: "",
+    VERCEL_ENV: "",
     PERMITEXT_TEST_RESEARCH_MOCK: "",
     PERMITEXT_TEST_RESEARCH_MOCK_WEB_FIXTURE: "",
     PERMITEXT_TEST_RESEARCH_MOCK_DELAY_MS: "",
     PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS: "",
     PERMITEXT_TEST_RESEARCH_EVIDENCE_PACKAGE_ONLY: "",
+    PERMITEXT_ZONING_PAID_RUNNER_NONCE: "",
+    PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS: "0",
+    PERMITEXT_RESEARCH_REASONING_EFFORT: "medium",
     PERMITEXT_RESEARCH_EVAL_MAX_USD: String(maximumCumulativeSpendUSD),
     PERMITEXT_RESEARCH_PROMPT_VERSION: supportedResearchPromptVersions[0],
     PERMITEXT_RESEARCH_PRICING_VERSION: "openai-gpt-5.6-terra-2026-08-30",
@@ -474,6 +539,7 @@ async function main() {
     resolve(serverRoot, "evals", "zoning-successor-paid-authorization.mjs"),
     authorizationModulePath,
     authorizationPath,
+    resolve(serverRoot, "evals", "zoning-v11-paid-runner-handoff.mjs"),
     validation.cohortPath
   ].map((path) => relative(repositoryRoot, path));
   const trackedStatus = spawnSync(
@@ -497,6 +563,7 @@ async function main() {
   }
 
   let executionCommit = null;
+  let v11RunnerPrivateKey = null;
   if (remediationSuccessor3V11ConfirmationMode) {
     const authorizationPackageCommit =
       authorization.execution.authorizationPackageCommit;
@@ -519,7 +586,8 @@ async function main() {
     assertExactLockedAuthorizationPackage(authorizationPackageCommit);
     assertPinnedV11RuntimeInputsAtCommit(
       authorizationPackageCommit,
-      "owner-selected package"
+      "owner-selected package",
+      { includeRunnerHandoff: true }
     );
     const ancestry = spawnSync(
       "git",
@@ -557,6 +625,21 @@ async function main() {
     assert.match(executionCommit, /^[0-9a-f]{40}$/i,
       "The clean v11 confirmation execution commit is invalid.");
     await assertV11ExecutionInputs({ expectedStatus: "authorized" });
+    const commonGitDirectory = gitOutput(
+      ["rev-parse", "--git-common-dir"],
+      "Could not resolve the common Git directory for the local v11 runner handoff key."
+    ).trim();
+    const resolvedRunnerPrivateKeyPath = resolve(
+      repositoryRoot,
+      commonGitDirectory,
+      "permitext-zoning-v11-runner-ed25519.pem"
+    );
+    const runnerPrivateKeyStat = await stat(resolvedRunnerPrivateKeyPath);
+    assert.equal(runnerPrivateKeyStat.mode & 0o077, 0,
+      "The local v11 runner handoff key must be accessible only to its owner.");
+    v11RunnerPrivateKey = zoningV11RunnerPrivateKey(
+      await readFile(resolvedRunnerPrivateKeyPath, "utf8")
+    );
   }
 
   const environment = zoningRemediationSuccessor3V11PaidRunEnvironment(
@@ -570,7 +653,9 @@ async function main() {
   );
   const runID = randomUUID();
   const runnerNonce = randomUUID();
-  environment.PERMITEXT_ZONING_PAID_RUNNER_NONCE = runnerNonce;
+  if (!remediationSuccessor3V11ConfirmationMode) {
+    environment.PERMITEXT_ZONING_PAID_RUNNER_NONCE = runnerNonce;
+  }
   const lockEvidence = {
     pid: process.pid,
     runID,
@@ -605,11 +690,13 @@ async function main() {
       expectedStatus: "running",
       executionCommit
     });
-    result = await runEvaluation(
+    result = await runEvaluation({
       environment,
-      authorization.scope.repetitions,
-      runID
-    );
+      repetitions: authorization.scope.repetitions,
+      runID,
+      executionCommit,
+      v11RunnerPrivateKey
+    });
     if (result.signal) {
       throw new Error(`Zoning successor diagnostic stopped by ${result.signal}.`);
     }
