@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "dc46f544-f4f9-4085-b8f5-f29ab5412936",
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -21,11 +21,11 @@
     "exactSpendingCapPhrase": "authorize exactly package commit 39b8c62941022c07560ee746c29a60922907cb94 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
-    "status": "not_started",
-    "attemptID": null,
-    "startedAt": null,
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "attemptID": "b7227309-2c20-46ed-a641-dda9f6d3548d",
+    "startedAt": "2026-08-31T23:26:33.959Z",
+    "runID": "b7227309-2c20-46ed-a641-dda9f6d3548d",
+    "consumedAt": "2026-08-31T23:27:47.534Z"
   },
   "lineage": {
     "preparedFromCommit": "c933bb4a5789e6698668732057c5aa7b19c5c9f8",
@@ -48,7 +48,7 @@
   },
   "execution": {
     "authorizationPackageCommit": "39b8c62941022c07560ee746c29a60922907cb94",
-    "executionCommit": null,
+    "executionCommit": "16ded32b122fc00c615b2d4b59dfc7520d2a9cfb",
     "webSupportEnabled": false,
     "stopOnExecutionError": true
   },
@@ -57,5 +57,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "The Permitext owner authorized exactly package 39b8c62941022c07560ee746c29a60922907cb94 for all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. No public release, deployment, pricing, allowance, or evidence-budget change is authorized."
+  "notes": "One-time authorization consumed by 2026-08-31T23-26-35-678Z-b7227309-2c20-46ed-a641-dda9f6d3548d.json. The result still requires quality, cost, and release-gate review."
 }

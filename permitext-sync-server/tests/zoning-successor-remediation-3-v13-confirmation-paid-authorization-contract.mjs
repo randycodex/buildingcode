@@ -8,9 +8,17 @@ import {
   requireActiveZoningRemediationSuccessor3V13ConfirmationPaidAuthorization,
   validateZoningRemediationSuccessor3V13ConfirmationPaidAuthorization,
   zoningRemediationSuccessor3V13ConfirmationAppSHA256,
+  zoningRemediationSuccessor3V13ConfirmationAuthorizationPackageCommit,
+  zoningRemediationSuccessor3V13ConfirmationConsumedAuthorizationSHA256,
   zoningRemediationSuccessor3V13ConfirmationEconomicsSHA256,
+  zoningRemediationSuccessor3V13ConfirmationExecutionCommit,
   zoningRemediationSuccessor3V13ConfirmationLockedAuthorizationSHA256,
   zoningRemediationSuccessor3V13ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V13ConfirmationResultJSONFile,
+  zoningRemediationSuccessor3V13ConfirmationResultJSONSHA256,
+  zoningRemediationSuccessor3V13ConfirmationResultMarkdownFile,
+  zoningRemediationSuccessor3V13ConfirmationResultMarkdownSHA256,
+  zoningRemediationSuccessor3V13ConfirmationRunID,
   zoningRemediationSuccessor3V13ConfirmationRunnerHandoffSHA256,
   zoningRemediationSuccessor3V13ConfirmationRunnerPublicKeySHA256,
   zoningRemediationSuccessor3V13ConfirmationSafetySHA256
@@ -42,6 +50,14 @@ const exactCohortSHA256 =
   "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc";
 const exactLockedAuthorizationSHA256 =
   "ea4d49cae91e99b2344c8e84321f503adc04b219d5c9785876f70cfd01e9bf11";
+const exactConsumedAuthorizationSHA256 =
+  "1f5aff577b856a608edcf152df2ea93680eb70a7756b190917e387ed24175038";
+const exactAuthorizationPackageCommit =
+  "39b8c62941022c07560ee746c29a60922907cb94";
+const exactExecutionCommit = "16ded32b122fc00c615b2d4b59dfc7520d2a9cfb";
+const exactRunID = "b7227309-2c20-46ed-a641-dda9f6d3548d";
+const authorizationRelativePath =
+  "evals/zoning-successor-remediation-3-v13-confirmation-paid-authorization.json";
 const combinedOutput = (result) => `${result.stdout || ""}\n${result.stderr || ""}`;
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const noPaidEnvironment = {
@@ -51,12 +67,23 @@ const noPaidEnvironment = {
   PERMITEXT_RESEARCH_EVAL_MAX_USD: ""
 };
 
-const authorizationText = await readFile(authorizationPath, "utf8");
-assert.equal(sha256(authorizationText), exactLockedAuthorizationSHA256);
 assert.equal(
   zoningRemediationSuccessor3V13ConfirmationLockedAuthorizationSHA256,
   exactLockedAuthorizationSHA256
 );
+assert.equal(
+  zoningRemediationSuccessor3V13ConfirmationConsumedAuthorizationSHA256,
+  exactConsumedAuthorizationSHA256
+);
+assert.equal(
+  zoningRemediationSuccessor3V13ConfirmationAuthorizationPackageCommit,
+  exactAuthorizationPackageCommit
+);
+assert.equal(
+  zoningRemediationSuccessor3V13ConfirmationExecutionCommit,
+  exactExecutionCommit
+);
+assert.equal(zoningRemediationSuccessor3V13ConfirmationRunID, exactRunID);
 assert.equal(
   zoningRemediationSuccessor3V13ConfirmationPreparedFromCommit,
   "c933bb4a5789e6698668732057c5aa7b19c5c9f8"
@@ -82,84 +109,102 @@ assert.equal(
   "7830127ce97437dcb85971faecfac4ad031288d4f98608837fa5c22aa2c64918"
 );
 
-const locked =
+const lockedAuthorizationBlob = spawnSync("git", [
+  "show",
+  `${exactAuthorizationPackageCommit}:permitext-sync-server/${authorizationRelativePath}`
+], {
+  cwd: serverRoot,
+  encoding: "utf8",
+  maxBuffer: 4 * 1024 * 1024
+});
+assert.equal(lockedAuthorizationBlob.status, 0,
+  "The historical locked v13 authorization could not be read.");
+const lockedAuthorizationText = lockedAuthorizationBlob.stdout;
+assert.equal(sha256(lockedAuthorizationText), exactLockedAuthorizationSHA256);
+const lockedAuthorization = JSON.parse(lockedAuthorizationText);
+
+const consumedAuthorizationText = await readFile(authorizationPath, "utf8");
+assert.equal(sha256(consumedAuthorizationText), exactConsumedAuthorizationSHA256);
+const current =
   await validateZoningRemediationSuccessor3V13ConfirmationPaidAuthorization();
-assert.equal(locked.authorization.authorizationID, exactAuthorizationID);
-assert.equal(locked.authorization.status, "locked");
-assert.equal(locked.active, false);
-assert.equal(locked.authorization.cohort.sha256, exactCohortSHA256);
-assert.equal(locked.cohort.cases.length, 30);
-assert.deepEqual(
-  {
-    caseCount: locked.authorization.scope.caseCount,
-    repetitions: locked.authorization.scope.repetitions,
-    maximumCumulativeSpendUSD:
-      locked.authorization.scope.maximumCumulativeSpendUSD,
-    authorizedAt: locked.authorization.ownerDecision.authorizedAt,
-    authorizedBy: locked.authorization.ownerDecision.authorizedBy,
-    exactAuthorizationPhrase:
-      locked.authorization.ownerDecision.exactAuthorizationPhrase,
-    exactSpendingCapPhrase:
-      locked.authorization.ownerDecision.exactSpendingCapPhrase,
-    authorizationPackageCommit:
-      locked.authorization.execution.authorizationPackageCommit,
-    executionCommit: locked.authorization.execution.executionCommit
-  },
-  {
-    caseCount: null,
-    repetitions: null,
-    maximumCumulativeSpendUSD: null,
-    authorizedAt: null,
-    authorizedBy: null,
-    exactAuthorizationPhrase: null,
-    exactSpendingCapPhrase: null,
-    authorizationPackageCommit: null,
-    executionCommit: null
-  }
-);
-assert.equal(locked.authorization.consumption.status, "not_started");
-assert.equal(locked.authorization.publicResearchReleaseAuthorized, false);
-assert.equal(locked.authorization.professionalZoningSignoff, false);
-assert.equal(locked.authorization.deploymentAuthorized, false);
-assert.equal(locked.authorization.pricingOrAllowanceChangeAuthorized, false);
-assert.equal(locked.authorization.evidenceBudgetCandidateEnabled, false);
+assert.equal(current.authorization.authorizationID, exactAuthorizationID);
+assert.equal(current.authorization.status, "consumed");
+assert.equal(current.active, false);
+assert.equal(current.authorization.cohort.sha256, exactCohortSHA256);
+assert.equal(current.cohort.cases.length, 30);
+assert.equal(current.authorization.scope.caseCount, 30);
+assert.equal(current.authorization.scope.repetitions, 1);
+assert.equal(current.authorization.scope.maximumCumulativeSpendUSD, 5);
+assert.equal(current.authorization.ownerDecision.authorizedBy, "Permitext owner");
+const exactOwnerPhrase =
+  `authorize exactly package commit ${exactAuthorizationPackageCommit} for all 30 ` +
+  "ordered cases, one repetition, with a maximum cumulative API spend of $5.";
+assert.equal(current.authorization.ownerDecision.exactAuthorizationPhrase,
+  exactOwnerPhrase);
+assert.equal(current.authorization.ownerDecision.exactSpendingCapPhrase,
+  exactOwnerPhrase);
+assert.equal(current.authorization.execution.authorizationPackageCommit,
+  exactAuthorizationPackageCommit);
+assert.equal(current.authorization.execution.executionCommit, exactExecutionCommit);
+assert.equal(current.authorization.consumption.attemptID, exactRunID);
+assert.equal(current.authorization.consumption.runID, exactRunID);
+assert.equal(current.authorization.execution.webSupportEnabled, false);
+assert.equal(current.authorization.execution.stopOnExecutionError, true);
+assert.equal(current.authorization.publicResearchReleaseAuthorized, false);
+assert.equal(current.authorization.professionalZoningSignoff, false);
+assert.equal(current.authorization.deploymentAuthorized, false);
+assert.equal(current.authorization.pricingOrAllowanceChangeAuthorized, false);
+assert.equal(current.authorization.evidenceBudgetCandidateEnabled, false);
 assert.throws(
   () => requireActiveZoningRemediationSuccessor3V13ConfirmationPaidAuthorization(
-    locked
+    current
   ),
   /requires a new explicit owner authorization and cumulative spend cap/
 );
 
+for (const [file, expectedHash] of [
+  [zoningRemediationSuccessor3V13ConfirmationResultJSONFile,
+    zoningRemediationSuccessor3V13ConfirmationResultJSONSHA256],
+  [zoningRemediationSuccessor3V13ConfirmationResultMarkdownFile,
+    zoningRemediationSuccessor3V13ConfirmationResultMarkdownSHA256]
+]) {
+  assert.equal(
+    sha256(await readFile(new URL(`../evals/${file}`, import.meta.url), "utf8")),
+    expectedHash,
+    `The retained v13 result changed: ${file}`
+  );
+}
+
 assert.equal(
-  locked.authorization.lineage.priorAuthorizationSHA256,
+  current.authorization.lineage.priorAuthorizationSHA256,
   zoningRemediationSuccessor3V12ConfirmationConsumedAuthorizationSHA256
 );
 assert.equal(
-  locked.authorization.lineage.priorAuthorizationPackageCommit,
+  current.authorization.lineage.priorAuthorizationPackageCommit,
   zoningRemediationSuccessor3V12ConfirmationAuthorizationPackageCommit
 );
 assert.equal(
-  locked.authorization.lineage.priorExecutionCommit,
+  current.authorization.lineage.priorExecutionCommit,
   zoningRemediationSuccessor3V12ConfirmationExecutionCommit
 );
 assert.equal(
-  locked.authorization.lineage.priorRunID,
+  current.authorization.lineage.priorRunID,
   zoningRemediationSuccessor3V12ConfirmationRunID
 );
 assert.equal(
-  locked.authorization.lineage.priorResultJSONFile,
+  current.authorization.lineage.priorResultJSONFile,
   zoningRemediationSuccessor3V12ConfirmationResultJSONFile
 );
 assert.equal(
-  locked.authorization.lineage.priorResultJSONSHA256,
+  current.authorization.lineage.priorResultJSONSHA256,
   zoningRemediationSuccessor3V12ConfirmationResultJSONSHA256
 );
 assert.equal(
-  locked.authorization.lineage.priorResultMarkdownFile,
+  current.authorization.lineage.priorResultMarkdownFile,
   zoningRemediationSuccessor3V12ConfirmationResultMarkdownFile
 );
 assert.equal(
-  locked.authorization.lineage.priorResultMarkdownSHA256,
+  current.authorization.lineage.priorResultMarkdownSHA256,
   zoningRemediationSuccessor3V12ConfirmationResultMarkdownSHA256
 );
 
@@ -240,7 +285,7 @@ for (const args of [
   assert.equal(blocked.status, 1, `${args.join(" ")} unexpectedly ran.`);
 }
 assert.deepEqual((await readdir(resultsPath)).sort(), resultsBefore,
-  "A locked or malformed v12 attempt created a result file.");
+  "A consumed or malformed v13 attempt created a result file.");
 
 const mockPreflight = spawnSync(process.execPath, [
   "tests/research-evals.mjs",
@@ -262,7 +307,7 @@ const temporaryDirectory = await mkdtemp(
 );
 try {
   const fixturePath = join(temporaryDirectory, "authorization.json");
-  const authorizedFixture = structuredClone(locked.authorization);
+  const authorizedFixture = structuredClone(lockedAuthorization);
   authorizedFixture.status = "authorized";
   authorizedFixture.scope.caseCount = 30;
   authorizedFixture.scope.repetitions = 1;
@@ -324,9 +369,9 @@ try {
 }
 
 assert.equal(sha256(await readFile(authorizationPath, "utf8")),
-  exactLockedAuthorizationSHA256);
+  exactConsumedAuthorizationSHA256);
 assert.deepEqual((await readdir(resultsPath)).sort(), resultsBefore,
   "The v13 authorization contract created a paid result file.");
 console.log(
-  "Zoning remediation-successor-3 v13 confirmation authorization contract passed; locked scope, consumed v12 lineage, hostile-runtime scrubbing, paid-dispatch blocks, and 30/30 no-cost preflight remain intact."
+  "Zoning remediation-successor-3 v13 confirmation authorization contract passed; consumed run/result integrity, immutable locked-package history, consumed v12 lineage, hostile-runtime scrubbing, paid-dispatch blocks, and 30/30 no-cost preflight remain intact."
 );
