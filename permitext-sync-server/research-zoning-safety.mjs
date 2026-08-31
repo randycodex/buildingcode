@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 export const zoningResearchSafetyVersion =
-  "20260830-zoning-material-completeness-v9";
+  "20260831-zoning-material-completeness-v10";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -329,13 +329,21 @@ function genericMappedPredicateSubject({
   const subjectContext = mappedPredicateSubjectContext(text, predicateIndex);
   const appendixJSourceLead = String.raw`(?:(?:(?:under|in|according to)\s+(?:the\s+)?Appendix\s+J,\s*)|(?:(?:the\s+)?Appendix\s+J\s+(?:[A-Za-z-]+\s+){1,3}that\s+))`;
   const discourseLead = String.raw`(?:(?:however|nevertheless|nonetheless),\s*)?`;
-  const facilityLocation = String.raw`(?:\s+(?:in|within)\s+(?:the\s+)?Subarea\s*[12])?`;
+  const facilityLocation = String.raw`(?:\s+(?:(?:located|situated)\s+)?(?:in|within)\s+(?:the\s+)?Subarea\s*[12])?`;
   const genericFacilitySubject = new RegExp(
-    String.raw`^${discourseLead}(?:${appendixJSourceLead}(?:a\s+|the\s+)?self[- ]service storage facilit(?:y|ies)|(?:the\s+)?self[- ]service storage facilities|if\s+(?:a\s+|the\s+)?self[- ]service storage facilit(?:y|ies))${facilityLocation}$`,
+    String.raw`^${discourseLead}(?:${appendixJSourceLead}(?:a\s+|the\s+)?self[- ]service storage facilit(?:y|ies)|(?:the\s+)?self[- ]service storage facilities|a\s+self[- ]service storage facility|(?:if|where)\s+a\s+self[- ]service storage facility)${facilityLocation}$`,
+    "i"
+  );
+  const preposedGenericFacilitySubject = new RegExp(
+    String.raw`^${discourseLead}(?:for\s+(?:the\s+)?areas?\s+mapped\s+(?:in|within)\s+(?:the\s+)?Subarea\s*[12]|as\s+shown\s+on\s+(?:the\s+)?Subarea\s*[12]\s+maps?),\s+(?:the\s+)?self[- ]service storage facilities$`,
+    "i"
+  );
+  const sourceRelativeGenericFacilitySubject = new RegExp(
+    String.raw`^${discourseLead}(?:the\s+)?Appendix\s+J\s+maps?\s+(?:designate|identify|show)s?\s+(?:the\s+)?(?:designated\s+)?areas?\s+(?:(?:in|within)\s+(?:the\s+)?Subarea\s*[12]\s+)?(?:where|in\s+which)\s+(?:the\s+)?self[- ]service storage facilities$`,
     "i"
   );
   const genericAreaSubject = new RegExp(
-    String.raw`^${discourseLead}(?:${appendixJSourceLead}|if\s+)?(?:the\s+)?(?:designated\s+)?areas?(?:\s+(?:in|within|shown on)\s+(?:the\s+)?(?:Subarea\s*[12]|Appendix\s+J))?$`,
+    String.raw`^${discourseLead}(?:${appendixJSourceLead}|(?:(?:the\s+)?selected\s+Appendix\s+J\s+material\s+(?:shows?|provides?|establishes?)\s+that\s+)|if\s+)?(?:the\s+)?(?:designated\s+)?areas?(?:\s+(?:in|within|shown on)\s+(?:the\s+)?(?:Subarea\s*[12]|Appendix\s+J))?$`,
     "i"
   );
   const genericSubareaSubject = new RegExp(
@@ -344,6 +352,8 @@ function genericMappedPredicateSubject({
   );
   if (
     genericFacilitySubject.test(subjectContext) ||
+    preposedGenericFacilitySubject.test(subjectContext) ||
+    sourceRelativeGenericFacilitySubject.test(subjectContext) ||
     genericAreaSubject.test(subjectContext) ||
     genericSubareaSubject.test(subjectContext)
   ) {

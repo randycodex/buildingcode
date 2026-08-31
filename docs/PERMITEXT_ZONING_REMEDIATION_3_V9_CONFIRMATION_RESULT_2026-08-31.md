@@ -71,6 +71,14 @@ This rules out the narrow explanation that the complete response omitted every m
 
 Any further engineering must begin with no-cost reproduction against safe source-level variants and matched unsafe parcel-specific counterexamples. A future semantic rerun, if still justified after that work, would require a distinct locked package and a new exact owner authorization; this consumed authorization cannot be reused.
 
+## Subsequent no-cost v10 diagnosis
+
+The required no-cost diagnosis reproduced the retained v9 shape without a provider call. Twelve clear source-level Appendix J variants each included the recognized parcel/map boundary, but v9 still classified their repeated structured clauses as direct conclusions rather than source rules. This confirms a bounded false-positive wording family; it does not reveal or rescore the unavailable paid answer.
+
+Prospective Zoning safety v10 adds recognition only for six explicit generic forms: Appendix J maps designating areas where self-service storage is regulated; selected Appendix J material describing regulated areas; generic facilities located in a named Subarea; generic conditional facilities located in a named Subarea; source-level treatment shown on Subarea maps; and source-level treatment for areas mapped in a named Subarea. Six matched Acme Center, this-site, proposed-facility, property, and project conclusions remain blocked by `zoning_missing_mapped_location`. The six exploratory forms not covered by those narrow rules also remain blocked.
+
+The consumed v9 guard now validates its reviewed safety, economics, and application bytes from historical commit `1fae244d775192f55f0fd6ee17d90cb82648ba01`, rather than requiring future working files to remain byte-identical. Its authorization, retained results, hashes, and outcome are unchanged. The safety contract and consumed-authorization contract pass, and the frozen 30-case mock preflight reports 30/30 evidence-ready with credentials unset, zero provider tokens, and zero paid calls. This is prospective no-cost engineering evidence only: no semantic confirmation, paid authorization, rescore, public enablement, merge, push, deployment, pricing change, or allowance change occurred.
+
 ## Economics and reliability
 
 The two completed turns cost `$0.088225` mean/p50, `$0.088847` p90, and `$0.089002` maximum in production-operation cost. Including failed production work gives `$0.134398` per completed turn and a mechanical projection of `$13.44` per 100 all-Zoning turns. Completed-turn latency was 21.593 seconds mean/p50, 26.280 seconds p90, and 27.452 seconds maximum.
@@ -81,4 +89,4 @@ This projection is not decision-ready. The run completed only two turns against 
 
 Retain this result as an integrity-valid terminal partial diagnostic, not as a complete 30-case v9 confirmation. Do not enable public Zoning Research or the 24,000-character candidate, change the `$20` price or 100-turn allowance, merge, push, or deploy from it. Semantic, reliability, cost, exact-release web/TestFlight physical-iPhone, and final public-release gates remain open.
 
-The next Zoning step is a no-cost diagnosis of the new clause classifications with matched safe and unsafe structural probes. Stop after documenting that diagnosis and any recommended bounded repair. Do not run another paid confirmation without a new distinct locked package and explicit exact-package authorization.
+The no-cost clause diagnosis and bounded prospective v10 repair are complete. The next Zoning step is an independent no-cost review of the v10 diff and its matched safe/unsafe regression boundary. Only after that review may a distinct confirmation package be considered. Do not run another paid confirmation without a new reviewed locked package and explicit exact-package authorization.

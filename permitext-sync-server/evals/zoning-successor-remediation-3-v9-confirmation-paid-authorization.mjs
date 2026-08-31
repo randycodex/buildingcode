@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -57,6 +58,7 @@ const expectedCohortSHA256 =
 const expectedSafetyVersion = "20260830-zoning-material-completeness-v9";
 const expectedPriorAuthorizationFile =
   "zoning-successor-remediation-3-v8-confirmation-paid-authorization.json";
+const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -70,21 +72,35 @@ async function assertFileHash(url, expectedHash, message) {
   assert(sha256(await readFile(fileURLToPath(url), "utf8")) === expectedHash, message);
 }
 
-async function validateReviewedInputs() {
-  await assertFileHash(
-    new URL("../research-zoning-safety.mjs", import.meta.url),
+function assertHistoricalFileHash(relativePath, expectedHash, message) {
+  const blob = spawnSync("git", [
+    "show",
+    `${zoningRemediationSuccessor3V9ConfirmationPreparedFromCommit}:${relativePath}`
+  ], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+    maxBuffer: 4 * 1024 * 1024
+  });
+  assert(blob.status === 0,
+    `Unable to read the reviewed v9 historical bytes for ${relativePath}.`);
+  assert(sha256(blob.stdout) === expectedHash, message);
+}
+
+function validateHistoricalReviewedInputs() {
+  assertHistoricalFileHash(
+    "permitext-sync-server/research-zoning-safety.mjs",
     zoningRemediationSuccessor3V9ConfirmationSafetySHA256,
-    "The reviewed v9 Zoning safety bytes changed."
+    "The reviewed v9 historical Zoning safety bytes changed."
   );
-  await assertFileHash(
-    new URL("../research-economics.mjs", import.meta.url),
+  assertHistoricalFileHash(
+    "permitext-sync-server/research-economics.mjs",
     zoningRemediationSuccessor3V9ConfirmationEconomicsSHA256,
-    "The reviewed v9 Research economics bytes changed."
+    "The reviewed v9 historical Research economics bytes changed."
   );
-  await assertFileHash(
-    new URL("../app.mjs", import.meta.url),
+  assertHistoricalFileHash(
+    "permitext-sync-server/app.mjs",
     zoningRemediationSuccessor3V9ConfirmationAppSHA256,
-    "The reviewed v9 application bytes changed."
+    "The reviewed v9 historical application bytes changed."
   );
 }
 
@@ -246,7 +262,7 @@ export async function validateZoningRemediationSuccessor3V9ConfirmationPaidAutho
   assert(authorization.lineage?.appSHA256 ===
     zoningRemediationSuccessor3V9ConfirmationAppSHA256,
   "The v9 confirmation package names the wrong application SHA.");
-  await validateReviewedInputs();
+  validateHistoricalReviewedInputs();
   await validateHistoricalV8Lineage(authorization);
 
   assert(authorization.execution?.webSupportEnabled === false,

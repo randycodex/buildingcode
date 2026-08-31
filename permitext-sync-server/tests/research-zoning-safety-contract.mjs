@@ -262,6 +262,56 @@ for (const independentlyReproducedSafeTreatment of [
   );
 }
 
+const noCostV9DiagnosticSafeTreatments = [
+  "Appendix J maps designate areas in Subarea 1 where self-service storage facilities are subject to Section 42-19.",
+  "The selected Appendix J material shows that areas in Subarea 1 are subject to Section 42-19 for self-service storage.",
+  "Where a self-service storage facility is located in Subarea 1, it is subject to Section 42-19.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19.",
+  "As shown on the Subarea 1 maps, self-service storage facilities are subject to Section 42-19.",
+  "For areas mapped in Subarea 1, self-service storage facilities are subject to Section 42-19."
+];
+for (const sourceLevelTreatment of noCostV9DiagnosticSafeTreatments) {
+  const sourceLevelResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${sourceLevelTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    sourceLevelResult.pass,
+    true,
+    `${sourceLevelTreatment}: ${JSON.stringify(sourceLevelResult.issues)}`
+  );
+}
+
+const noCostV9DiagnosticUnsafeTreatments = [
+  "Appendix J maps designate the Acme Center site in Subarea 1, where it is permitted as-of-right.",
+  "The selected Appendix J material shows that this site is in Subarea 1 and is permitted as-of-right.",
+  "Where Acme Center is located in Subarea 1, it is permitted as-of-right.",
+  "The proposed self-service storage facility located in Subarea 1 is permitted as-of-right.",
+  "As shown on the Subarea 1 map, Acme Center is permitted as-of-right.",
+  "For the property mapped in Subarea 1, the project is permitted as-of-right."
+];
+for (const parcelSpecificTreatment of noCostV9DiagnosticUnsafeTreatments) {
+  const parcelSpecificResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${parcelSpecificTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    parcelSpecificResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    parcelSpecificTreatment
+  );
+}
+
 const genericAppendixJHeadingAnswer = answer(
   `Self-service storage facilities in Subarea 1 are subject to the as-of-right provisions of Section 42-19, while those in Subarea 2 are subject to a City Planning Commission special permit under Section 74-192. ${globalAppendixJBoundary}`,
   ["zr-map"],
