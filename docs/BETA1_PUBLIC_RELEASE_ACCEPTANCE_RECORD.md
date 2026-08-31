@@ -165,7 +165,7 @@ Gate ID: `zoning-research-semantic-cost-clients`
 Status: **OPEN**
 Release-bound: **yes**
 
-The retained owner-approved successor is SHA-256 `d07063fa12ec993fde8802e6b58971d5cc1873a52fbefbe9e538b81acb94d30f`. Its first one-time semantic run is retained as partial evidence only: 30 case slots, 27 graded answers, 18 passes, nine quality failures, three fail-closed execution errors, and a $10.01 failed-work-amortized projection per 100 all-Zoning turns. This result does not satisfy this gate.
+The newest retained owner-approved successor is remediation successor 3 at SHA-256 `852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc`. Its one-time run `b4ef6990-5347-40d5-8654-611b893e8f1b` is partial evidence only: two of 30 cases completed and both passed grading; `zr-appendix-map-boundaries` then failed closed on `zoning_missing_mapped_location`, leaving 27 cases unattempted. Ten settled requests cost `$0.287113`, zero remained pending, the failed operation was uncharged, and the authorization is consumed. Its `$13.04` two-turn projection is not sample-ready and does not replace remediation successor 2's `$20.18` current risk-planning sensitivity. This result does not satisfy this gate.
 
 - Exact successor lineage, case order, source edition, selected evidence, and safety boundaries reverified:
 - Newly authorized clean semantic run completed every case without execution failure and passed every required fatal quality gate:
@@ -177,7 +177,7 @@ The retained owner-approved successor is SHA-256 `d07063fa12ec993fde8802e6b58971
 - Project context, turn accounting, fail-closed recovery, unofficial-aid wording, privacy disclosure, and no-professional-signoff boundary passed:
 - Redacted evidence and timestamp:
 
-Detailed retained failure evidence: [PERMITEXT_ZONING_SUCCESSOR_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_SUCCESSOR_SEMANTIC_RESULT_2026-08-30.md).
+Detailed newest retained failure evidence: [PERMITEXT_ZONING_REMEDIATION_3_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_REMEDIATION_3_SEMANTIC_RESULT_2026-08-30.md). Controlling risk sensitivity: [PERMITEXT_ZONING_REMEDIATION_2_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_REMEDIATION_2_SEMANTIC_RESULT_2026-08-30.md).
 
 Do not enable public Zoning Research, change pricing or allowances, deploy, or mark this gate complete from no-cost tests or a partial paid run.
 

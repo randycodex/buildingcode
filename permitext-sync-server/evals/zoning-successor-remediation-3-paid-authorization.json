@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -20,11 +20,11 @@
     "exactSpendingCapPhrase": "Use a $5 maximum"
   },
   "consumption": {
-    "status": "not_started",
-    "attemptID": null,
-    "startedAt": null,
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "attemptID": "b4ef6990-5347-40d5-8654-611b893e8f1b",
+    "startedAt": "2026-08-31T00:41:48.416Z",
+    "runID": "b4ef6990-5347-40d5-8654-611b893e8f1b",
+    "consumedAt": "2026-08-31T00:42:58.385Z"
   },
   "recovery": {
     "verifiedAt": "2026-08-31T00:41:21Z",
@@ -39,5 +39,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "The first runner attempt stopped before provider dispatch because the child expected authorized instead of the runner's durable running state. Manual review verified no result and zero provider requests, so the original unspent one-run authorization was restored after repairing the state handoff."
+  "notes": "One-time authorization consumed by 2026-08-31T00-41-50-396Z-b4ef6990-5347-40d5-8654-611b893e8f1b.json. The result still requires quality, cost, and release-gate review."
 }
