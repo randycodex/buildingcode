@@ -267,6 +267,7 @@ const noCostV9DiagnosticSafeTreatments = [
   "The selected Appendix J material shows that areas in Subarea 1 are subject to Section 42-19 for self-service storage.",
   "Where a self-service storage facility is located in Subarea 1, it is subject to Section 42-19.",
   "A self-service storage facility located in Subarea 1 is subject to Section 42-19.",
+  "A Self-Service Storage Facility located in Subarea 1 is subject to Section 42-19.",
   "As shown on the Subarea 1 maps, self-service storage facilities are subject to Section 42-19.",
   "For areas mapped in Subarea 1, self-service storage facilities are subject to Section 42-19."
 ];
@@ -310,6 +311,247 @@ for (const parcelSpecificTreatment of noCostV9DiagnosticUnsafeTreatments) {
       issue.type === "zoning_missing_mapped_location"),
     parcelSpecificTreatment
   );
+}
+
+for (const adversarialSpecificExampleTreatment of [
+  "A self-service storage facility located in Subarea 1, including Acme Center, is permitted as-of-right.",
+  "A self-service storage facility located in Subarea 1, such as Acme Center, is permitted as-of-right.",
+  "A self-service storage facility located in Subarea 1, namely Acme Center, is permitted as-of-right.",
+  "A self-service storage facility located in Subarea 1, in our application, is permitted as-of-right.",
+  "Where a self-service storage facility is located in Subarea 1, including Acme Center, it is permitted as-of-right.",
+  "Appendix J maps designate areas in Subarea 1 where self-service storage facilities, including Acme Center, are permitted as-of-right.",
+  "The selected Appendix J material shows that areas in Subarea 1, including Acme Center, are permitted as-of-right for self-service storage.",
+  "As shown on the Subarea 1 maps, self-service storage facilities, including Acme Center, are permitted as-of-right.",
+  "For areas mapped in Subarea 1, self-service storage facilities, including Acme Center, are permitted as-of-right.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right, including Acme Center.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right for Acme Center.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right when operated as Acme Center.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; this includes Acme Center.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right—Acme Center qualifies.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right for warehouse alpha.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the applicant may proceed.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; our client may proceed.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the owner may proceed.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the tenant may proceed.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; Acme Center gets the benefit.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; Acme Center receives as-of-right treatment.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; that rule covers Acme Center.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; this applies to Acme Center.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the applicant gets the benefit.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; our project gets the benefit.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the proposed facility receives that treatment.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; warehouse alpha gets the benefit.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the project gets the benefit.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the proposal receives that treatment.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; this applies to site alpha.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the project may proceed.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the proposal can go forward.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; this applies to the project.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; this includes acme center.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the site is eligible.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the project obtains approval.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the project is entitled to the benefit.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the project enjoys the benefit.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the project can move forward.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the site gains approval.",
+  "A self-service storage facility located in Subarea 1 is permitted as-of-right; the proposal is cleared to proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification because the project is permitted as-of-right.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map confirming the project is eligible.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant is authorized to request the zoning map for review because the site receives the benefit.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification before proceeding as-of-right.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification and then may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification after which the applicant may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map before taking advantage of the benefit.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification before moving forward.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification if it wants to move forward.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map before exercising the permission.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must request the zoning map for review after which the applicant may operate.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the official map before relying on that rule.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. They may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification; afterward, they can move forward.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. She receives the benefit.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification; afterward, they are eligible.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. After verification, they may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. Once verified, they can move forward.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. Result: they may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. (They may proceed.)",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. Said applicant may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. The same may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. Appendix J maps designate areas in Subarea 1 where self-service storage facilities are subject to Section 42-19. He may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. Appendix J maps designate areas in Subarea 1 where self-service storage facilities are subject to Section 42-19. She receives the benefit.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. No parcel-specific conclusion can be made without the applicable official map, so he may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. Appendix J maps designate areas in Subarea 1 where self-service storage facilities are subject to Section 42-19. No parcel-specific conclusion can be made without the applicable official map, so she receives the benefit.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The client should verify the applicable official map. You may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant should verify the applicable official map. We may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. They describe source categories only, so he may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. It is a source-level rule, so she receives the benefit.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map, but may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. She cannot establish whether the site is in Subarea 1, yet can move forward.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He may proceed even though he cannot determine the mapped status without the official map.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. We can move forward, but we cannot confirm the mapped status without the official map.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map, but is cleared to proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map, but may commence operations.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map, but can begin work.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map, but retains the right to proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map, but has authority to proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map: he may commence operations.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map, plus he can begin work.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He may commence operations notwithstanding that he cannot determine the mapped status without the official map.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map; however, may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map; but may proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map. He cannot determine the mapped status without the official map. Nevertheless, may proceed."
+]) {
+  const adversarialSpecificExampleResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${adversarialSpecificExampleTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    adversarialSpecificExampleResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    adversarialSpecificExampleTreatment
+  );
+}
+
+for (const safeGenericExampleTreatment of [
+  "Appendix J maps designate areas in Subarea 1 where self-service storage facilities, including facilities used only for storage, are subject to Section 42-19.",
+  "A Self-Service Storage Facility located in Subarea 1 is subject to Section 42-19.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must provide the property address and BBL before review.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should verify the applicable official map.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant may proceed only with obtaining the official Appendix J map for verification.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner is authorized to request the official map for verification.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The property address has not been supplied.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The project's mapped status remains unknown.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The facility type is not established.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The site's mapped status has yet to be verified.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The site location remains unknown.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The parcel location is unresolved.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The property address is unavailable.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must provide the property address and obtain the official Appendix J map for review.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The owner should obtain and review the applicable official map.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The location of the site is unknown.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. It is unknown whether the site lies in Subarea 1.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. No mapped status is available for the property.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. Neither the site location nor its mapped status is known.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. Appendix J maps designate areas in Subarea 1 where self-service storage facilities are subject to Section 42-19. They describe source categories only.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. Appendix J maps designate areas in Subarea 1 where self-service storage facilities are subject to Section 42-19. They contain source categories only.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. Appendix J maps designate areas in Subarea 1 where self-service storage facilities are subject to Section 42-19. It is a source-level rule.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. The selected passage supports this limitation.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. He cannot determine the mapped status and is permitted only to request the official map.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. He cannot determine the mapped status and is not permitted to proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. He cannot determine the mapped status and has no approval.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. He cannot determine the mapped status, but cannot proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. He cannot determine the mapped status and remains unable to proceed.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. He cannot determine the mapped status, but the issue remains unresolved.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. He cannot determine the mapped status; however, may request the official map for verification.",
+  "A self-service storage facility located in Subarea 1 is subject to Section 42-19. The applicant must obtain the official Appendix J map for verification. He cannot determine the mapped status. Nevertheless, may not proceed.",
+  "Appendix J Maps Designate Areas In Subarea 1 Where Self-Service Storage Facilities Are Subject To Section 42-19."
+]) {
+  const safeGenericExampleResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${safeGenericExampleTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    safeGenericExampleResult.pass,
+    true,
+    `${safeGenericExampleTreatment}: ${JSON.stringify(safeGenericExampleResult.issues)}`
+  );
+}
+
+for (const safeParentheticalTreatment of [
+  "Appendix J maps designate areas in Subarea 1 where self-service storage facilities, under the selected text, are subject to Section 42-19.",
+  "The selected Appendix J material shows that areas in Subarea 1, under the selected text, are subject to Section 42-19 for self-service storage.",
+  "Where a self-service storage facility is located in Subarea 1, under the selected text, it is subject to Section 42-19.",
+  "A self-service storage facility located in Subarea 1, under the selected text, is subject to Section 42-19.",
+  "As shown on the Subarea 1 maps, self-service storage facilities, under the selected text, are subject to Section 42-19.",
+  "For areas mapped in Subarea 1, self-service storage facilities, under the selected text, are subject to Section 42-19."
+]) {
+  const safeParentheticalResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${safeParentheticalTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    safeParentheticalResult.pass,
+    true,
+    `${safeParentheticalTreatment}: ${JSON.stringify(safeParentheticalResult.issues)}`
+  );
+}
+
+const reviewedV11UnsafeMutationFactories = [
+  (treatment) => `${treatment} for the applicant`,
+  (treatment) => `${treatment} for our client`,
+  (treatment) => `${treatment} in this application`,
+  (treatment) => `${treatment} with respect to Acme Center`,
+  (treatment) => `${treatment} in relation to Acme Center`,
+  (treatment) => `${treatment}, including Acme Center`,
+  (treatment) => `${treatment}, such as Acme Center`,
+  (treatment) => `${treatment}, namely Acme Center`,
+  (treatment) => `${treatment}, covering Acme Center`,
+  (treatment) => `${treatment}, encompassing Acme Center`,
+  (treatment) => `${treatment}; the applicant may proceed`,
+  (treatment) => `${treatment}; our client may proceed`,
+  (treatment) => `${treatment}; Acme Center is covered`,
+  (treatment) => `${treatment}—Acme Center qualifies`,
+  (treatment) => `${treatment} (including Acme Center)`
+];
+const reviewedV11SafeSurfaceVariants = [
+  "Appendix J map identifies a designated area within Subarea 2 in which self-service storage facilities are permitted as-of-right.",
+  "Selected Appendix J material establishes that designated areas within Subarea 2 are subject to a City Planning Commission special permit under Section 74-192 for self-service storage.",
+  "Where a self-service storage facility is situated within Subarea 2, such a facility requires a CPC special permit under Section 74-192."
+];
+for (const safeTreatment of reviewedV11SafeSurfaceVariants) {
+  const safeSurfaceResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${safeTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    safeSurfaceResult.pass,
+    true,
+    `${safeTreatment}: ${JSON.stringify(safeSurfaceResult.issues)}`
+  );
+}
+
+for (const safeTreatment of [
+  ...noCostV9DiagnosticSafeTreatments,
+  ...reviewedV11SafeSurfaceVariants
+]) {
+  const baseTreatment = safeTreatment.replace(/[.!?]+$/, "");
+  for (const mutate of reviewedV11UnsafeMutationFactories) {
+    const mutatedTreatment = `${mutate(baseTreatment)}.`;
+    const mutatedResult = evaluateZoningResearchSafety({
+      question: sourceBoundaryQuestion,
+      evidence: mapEvidence,
+      answer: answer(
+        `${mutatedTreatment} ${globalAppendixJBoundary}`,
+        ["zr-map"],
+        appendixJMissingFacts
+      )
+    });
+    assert(
+      mutatedResult.issues.some((issue) =>
+        issue.type === "zoning_missing_mapped_location"),
+      mutatedTreatment
+    );
+  }
 }
 
 const genericAppendixJHeadingAnswer = answer(
