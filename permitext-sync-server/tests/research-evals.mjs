@@ -53,6 +53,11 @@ const zoningRemediationSuccessor2CasesPath = join(
   "evals",
   "zoning-cases-expanded-batch-1-successor-remediation-2.json"
 );
+const zoningRemediationSuccessor3CasesPath = join(
+  serverRoot,
+  "evals",
+  "zoning-cases-expanded-batch-1-successor-remediation-3.json"
+);
 const resultsDirectory = join(serverRoot, "evals", "results");
 const baselinesDirectory = join(serverRoot, "evals", "baselines");
 const comparisonsDirectory = join(serverRoot, "evals", "comparisons");
@@ -63,7 +68,10 @@ const zoningExpandedMode = process.argv.includes("--zoning-expanded-batch-1");
 const zoningSuccessorMode = process.argv.includes("--zoning-successor");
 const zoningRemediationSuccessor2Mode =
   process.argv.includes("--zoning-successor-remediation-2");
-const zoningSuccessorFamilyMode = zoningSuccessorMode || zoningRemediationSuccessor2Mode;
+const zoningRemediationSuccessor3Mode =
+  process.argv.includes("--zoning-successor-remediation-3");
+const zoningSuccessorFamilyMode = zoningSuccessorMode ||
+  zoningRemediationSuccessor2Mode || zoningRemediationSuccessor3Mode;
 const zoningMode = process.argv.includes("--zoning") || zoningExpandedMode ||
   zoningSuccessorFamilyMode;
 const zoningEvidenceBudgetPrototypeMode = process.argv.includes("--zoning-evidence-budget-prototype");
@@ -84,8 +92,14 @@ const zoningSuccessorAdvisoryImplementationPaths = [
   "package.json",
   "tests/research-evals.mjs"
 ];
-if (zoningRemediationSuccessor2Mode &&
-  (zoningSuccessorMode || zoningExpandedMode || process.argv.includes("--zoning"))) {
+const zoningDatasetModeCount = [
+  process.argv.includes("--zoning"),
+  zoningExpandedMode,
+  zoningSuccessorMode,
+  zoningRemediationSuccessor2Mode,
+  zoningRemediationSuccessor3Mode
+].filter(Boolean).length;
+if (zoningDatasetModeCount > 1) {
   throw new Error("Choose exactly one Zoning evaluation dataset mode.");
 }
 if (zoningSuccessorEvidenceBudgetAdvisoryMode) {
@@ -4004,10 +4018,10 @@ async function runSelfTest(dataset, datasetText) {
 async function main() {
   if (process.argv.includes("--help")) {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
-    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor. None is baseline-eligible.");
+    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor. None is baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
-    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
+    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
     console.log("No-cost successor advisory: --zoning-successor --zoning-successor-evidence-budget-advisory (compares disabled 24000 candidate with 48000 across only the canonically ready cases while the full gate stays blocked)");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error]");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
@@ -4039,8 +4053,9 @@ async function main() {
   let sourceZoningDataset = null;
   let dataset = baseDataset;
   if (zoningMode) {
-    const selectedZoningCasesPath = zoningRemediationSuccessor2Mode
-      ? zoningRemediationSuccessor2CasesPath
+    const selectedZoningCasesPath = zoningRemediationSuccessor3Mode
+      ? zoningRemediationSuccessor3CasesPath
+      : zoningRemediationSuccessor2Mode ? zoningRemediationSuccessor2CasesPath
       : zoningSuccessorMode ? zoningSuccessorCasesPath
       : zoningExpandedMode ? zoningExpandedCasesPath : zoningCasesPath;
     datasetText = await readFile(selectedZoningCasesPath, "utf8");
@@ -4156,6 +4171,8 @@ async function main() {
 
   if (liveMode) {
     if (zoningMode) {
+      assert(!zoningRemediationSuccessor3Mode,
+        "Remediation successor 3 has no paid authorization. A paid run requires a new exact-cohort owner authorization and cumulative spend cap.");
       const authorized = zoningRemediationSuccessor2Mode
         ? requireActiveZoningRemediationSuccessor2PaidAuthorization(
             await validateZoningRemediationSuccessor2PaidAuthorization()

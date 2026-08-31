@@ -23,6 +23,12 @@ import {
 const serverRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const repositoryRoot = resolve(serverRoot, "..");
 const resultsDirectory = resolve(serverRoot, "evals", "results");
+const runnerArguments = process.argv.slice(2);
+assert(
+  runnerArguments.length <= 1 &&
+    runnerArguments.every((argument) => argument === "--remediation-2"),
+  "Unsupported Zoning successor paid-run argument. Remediation successor 3 has no live runner or paid authorization."
+);
 const remediationSuccessor2Mode = process.argv.includes("--remediation-2");
 const authorizationPath = resolve(
   serverRoot,

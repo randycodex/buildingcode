@@ -244,4 +244,26 @@ assert.deepEqual(
   "The separately frozen remediation successor 2 must contain no answer-key reference absent from selected evidence."
 );
 
+const remediationSuccessor3Dataset = JSON.parse(await readFile(
+  new URL("../evals/zoning-cases-expanded-batch-1-successor-remediation-3.json", import.meta.url),
+  "utf8"
+));
+const remediationSuccessor3Adapted = await adaptZoningEvaluationDataset({
+  zoningDataset: remediationSuccessor3Dataset,
+  automaticScoring: {},
+  sectionReader: zoningSection,
+  sectionSummaryReader: zoningSectionSummary
+});
+assert.equal(remediationSuccessor3Adapted.cases.length, 30);
+assert.deepEqual(
+  remediationSuccessor3Adapted.cases
+    .filter((testCase) => testCase.answerKeyEvidenceMismatches.length)
+    .map((testCase) => ({
+      id: testCase.id,
+      answerKeyEvidenceMismatches: testCase.answerKeyEvidenceMismatches
+    })),
+  [],
+  "The separately frozen remediation successor 3 must contain no answer-key reference absent from selected evidence."
+);
+
 console.log("zoning evaluation adapter contract passed");

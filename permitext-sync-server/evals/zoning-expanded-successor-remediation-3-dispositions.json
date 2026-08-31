@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 3,
+  "status": "owner_approved",
+  "createdAt": "2026-08-30T23:58:38.000Z",
+  "sourceCohort": {
+    "file": "zoning-cases-expanded-batch-1-successor-remediation-2.json",
+    "caseCount": 30,
+    "sha256": "459b2273b7ebd209d4519bf9206b6135dc2fc7706052fa9b333c4bf5e63e8a8b",
+    "mutationAuthorized": false
+  },
+  "reviewEvidence": [
+    {
+      "file": "../../docs/PERMITEXT_ZONING_REMEDIATION_2_SEMANTIC_RESULT_2026-08-30.md",
+      "sha256": "81af92d91864a08dbb2f05a0e5dd4c04fca3134f0445fec14d8ca07da5dc3969"
+    },
+    {
+      "file": "../../docs/PERMITEXT_ZONING_SUCCESSOR_REMEDIATION_3_OWNER_DISPOSITION_2026-08-30.md",
+      "sha256": "cd1e88ac2080533863ebed4e1c3f21f974e710db3aebc6088ee8b34cf21e3226"
+    }
+  ],
+  "ownerDecision": {
+    "required": true,
+    "recordedAt": "2026-08-30T23:58:38.000Z",
+    "recordedBy": "Permitext owner",
+    "acceptedDecisionIDs": [
+      "narrow-missing-location-to-selected-lot-area-fact",
+      "narrow-parking-special-area-to-selected-evidence"
+    ],
+    "exactApprovalPhrase": "Ok, go ahead",
+    "approvalContextFile": "../../docs/PERMITEXT_ZONING_SUCCESSOR_REMEDIATION_3_OWNER_DISPOSITION_2026-08-30.md"
+  },
+  "decisions": [
+    {
+      "id": "narrow-missing-location-to-selected-lot-area-fact",
+      "kind": "question_and_answer_key_evidence_alignment",
+      "caseID": "zr-missing-location-facts",
+      "status": "approved",
+      "summary": "Replace the unsupported existing-facility legal branch with the selected ZR 42-192 zoning-lot area fact dated December 19, 2017.",
+      "allowedSubstantiveFields": [
+        "question",
+        "requiredConcepts"
+      ],
+      "changesQuestion": true,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    },
+    {
+      "id": "narrow-parking-special-area-to-selected-evidence",
+      "kind": "answer_key_evidence_alignment",
+      "caseID": "zr-candidate-b1-r6-parking-unverified-transit-zone",
+      "status": "approved",
+      "summary": "Replace the unsupported special-parking-area or special-district result with the selected-evidence limitation and request for the controlling enacted provision.",
+      "allowedSubstantiveFields": [
+        "requiredConcepts"
+      ],
+      "changesQuestion": false,
+      "changesSelectedEvidence": false,
+      "changesForbiddenClaims": false
+    }
+  ],
+  "successor": {
+    "outputFile": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
+    "generationAllowed": true,
+    "paidEvaluationAllowed": false,
+    "publicResearchReleaseAuthorized": false,
+    "professionalZoningSignoff": false,
+    "productionConfigurationChanged": false,
+    "pricingChanged": false,
+    "requiresSeparatePaidAuthorization": true,
+    "requiresSeparateCumulativeSpendCap": true
+  }
+}
