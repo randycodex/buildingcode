@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "151aa121-7962-48d1-80b3-56728e62fc75",
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -21,11 +21,11 @@
     "exactSpendingCapPhrase": "with a maximum cumulative API spend of $5."
   },
   "consumption": {
-    "status": "not_started",
-    "attemptID": null,
-    "startedAt": null,
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "attemptID": "1521497c-8df4-4ed9-98ce-79ef2805d1a6",
+    "startedAt": "2026-08-31T01:59:24.845Z",
+    "runID": "1521497c-8df4-4ed9-98ce-79ef2805d1a6",
+    "consumedAt": "2026-08-31T02:00:43.263Z"
   },
   "lineage": {
     "preparedFromCommit": "747887054e1bba16578a44477720f813a55fc357",
@@ -41,7 +41,7 @@
   },
   "execution": {
     "authorizationPackageCommit": "7cc2af325dbb3c5c98e4e15e2c15196a4794cb76",
-    "executionCommit": null,
+    "executionCommit": "9d4af1b31762568caa5accf63b52e275f0e39bde",
     "webSupportEnabled": false,
     "stopOnExecutionError": true
   },
@@ -50,5 +50,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "Authorized once by the Permitext owner for the exact committed locked package, all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. Execution remains pending and must use the consuming runner."
+  "notes": "One-time authorization consumed by 2026-08-31T01-59-26-104Z-1521497c-8df4-4ed9-98ce-79ef2805d1a6.json. The result still requires quality, cost, and release-gate review."
 }
