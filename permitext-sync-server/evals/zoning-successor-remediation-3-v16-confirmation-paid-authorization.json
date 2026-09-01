@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "authorizationID": "7eb2e708-3802-403f-95e6-4e594f3310da",
+  "status": "locked",
+  "cohort": {
+    "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
+    "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
+    "caseCount": 30
+  },
+  "scope": {
+    "purpose": "one complete 30-case owner-approved remediation successor 3 semantic run",
+    "caseCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
+  },
+  "ownerDecision": {
+    "required": true,
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
+  },
+  "consumption": {
+    "status": "not_started",
+    "attemptID": null,
+    "startedAt": null,
+    "runID": null,
+    "consumedAt": null
+  },
+  "lineage": {
+    "preparedFromCommit": "661eda3cc5f6eef5959851caeb35e198ea4eb911",
+    "zoningSafetyVersion": "20260831-zoning-appendix-j-preposed-subarea-source-rule-v16",
+    "zoningSafetySHA256": "c3d1a470bb88314086f23acb04d5d40b3011f5ec35f7bda7341f1ef7bed8f7aa",
+    "researchEconomicsSHA256": "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0",
+    "appSHA256": "1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797",
+    "runnerHandoffProtocol": "permitext-zoning-remediation-3-v11-runner-handoff-v1",
+    "runnerHandoffSHA256": "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327",
+    "runnerHandoffPublicKeySHA256": "7830127ce97437dcb85971faecfac4ad031288d4f98608837fa5c22aa2c64918",
+    "priorAuthorizationFile": "zoning-successor-remediation-3-v15-confirmation-paid-authorization.json",
+    "priorAuthorizationSHA256": "0ef1e44e90ab0b7802913e4a3bc2785889875324eec1579a30e13331e14455a5",
+    "priorAuthorizationPackageCommit": "8fe33ab45f8d2d4b4653207aee47d8bb557c68b3",
+    "priorExecutionCommit": "1fde866860433e9152d00bd78cc324e825034956",
+    "priorRunID": "fe0367c2-2c62-41e3-bc4c-1fc168fae68e",
+    "priorResultJSONFile": "results/2026-09-01T01-20-39-269Z-fe0367c2-2c62-41e3-bc4c-1fc168fae68e.json",
+    "priorResultJSONSHA256": "0ce9050c8aa4e7d59b42a524b1c20372b7535bc1b42efa0527a56bf3357f0e58",
+    "priorResultMarkdownFile": "results/2026-09-01T01-20-39-269Z-fe0367c2-2c62-41e3-bc4c-1fc168fae68e.md",
+    "priorResultMarkdownSHA256": "4ce4144d54d62b297355f25a5b6a5cd2d26b877f83dbdac4e84fc762f38e15d6"
+  },
+  "execution": {
+    "authorizationPackageCommit": null,
+    "executionCommit": null,
+    "webSupportEnabled": false,
+    "stopOnExecutionError": true
+  },
+  "publicResearchReleaseAuthorized": false,
+  "professionalZoningSignoff": false,
+  "deploymentAuthorized": false,
+  "pricingOrAllowanceChangeAuthorized": false,
+  "evidenceBudgetCandidateEnabled": false,
+  "notes": "Locked v16 confirmation package preparation only. No paid run is authorized. A future exact owner authorization must name the committed package, all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5."
+}
