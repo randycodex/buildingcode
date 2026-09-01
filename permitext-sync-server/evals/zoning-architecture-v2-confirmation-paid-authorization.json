@@ -78,5 +78,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "The Permitext owner authorized the exact locked Architecture V2 package for all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. The one-use confirmation has not started."
+  "notes": "Manual review confirmed pre-provider launch attempt adfc0d4e-fcb2-46a8-a64c-82657f7562d7 stopped during module loading because locked dependencies were not installed. No evaluation code, provider request, result, or API spend occurred. The exact owner authorization remains active for the first actual provider run after installing package-lock dependencies."
 }
