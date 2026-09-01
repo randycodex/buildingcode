@@ -9,11 +9,15 @@ const defaultAuthorizationPath = join(
   evalRoot,
   "zoning-architecture-v1-confirmation-paid-authorization.json"
 );
+const cohortPath = join(
+  evalRoot,
+  "zoning-cases-expanded-batch-1-successor-remediation-3.json"
+);
 
 export const zoningArchitectureV1ConfirmationAuthorizationID =
-  "d79db463-bc42-47c6-9e74-5931875cab50";
+  "fd3fe34f-0d25-4fad-90b5-bae5c9bdde31";
 export const zoningArchitectureV1ConfirmationLockedAuthorizationSHA256 =
-  "bf1152aa39dda331a6298e344bbf2f8161a74f3b2501c892614bd9ed6191473b";
+  "d46cd00c30dc62d88537b778d2f9ea810d81a01201503f4bbbc68d19a5dac66b";
 export const zoningArchitectureV1ConfirmationCohortSHA256 =
   "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc";
 export const zoningArchitectureV1ConfirmationPreparedFromCommit =
@@ -81,7 +85,7 @@ export async function validateZoningArchitectureV1ConfirmationPaidAuthorization(
 } = {}) {
   const [authorizationText, cohortText, preflightText, priorAuthorizationText] = await Promise.all([
     readFile(authorizationPath, "utf8"),
-    readFile(join(evalRoot, "zoning-cases-expanded-batch-1-successor-remediation-3.json"), "utf8"),
+    readFile(cohortPath, "utf8"),
     readFile(join(evalRoot, "results", "zoning-architecture-v1-no-cost-preflight.json"), "utf8"),
     readFile(join(evalRoot, "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json"), "utf8")
   ]);
@@ -197,6 +201,7 @@ export async function validateZoningArchitectureV1ConfirmationPaidAuthorization(
   return {
     authorization,
     cohort,
+    cohortPath,
     preflight,
     active,
     authorizationSHA256: sha256(authorizationText)

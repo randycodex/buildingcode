@@ -31,6 +31,8 @@ assert.equal(locked.authorization.authorizationID, zoningArchitectureV1Confirmat
 assert.equal(locked.authorization.cohort.sha256, zoningArchitectureV1ConfirmationCohortSHA256);
 assert.equal(locked.authorization.status, "locked");
 assert.equal(locked.active, false);
+assert.equal(typeof locked.cohortPath, "string");
+assert.match(locked.cohortPath, /zoning-cases-expanded-batch-1-successor-remediation-3\.json$/);
 assert.equal(locked.cohort.cases.length, 30);
 assert.equal(locked.preflight.summary.pass, true);
 assert.equal(locked.preflight.summary.providerRequests.p50, 1);

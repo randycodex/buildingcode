@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "authorizationID": "d79db463-bc42-47c6-9e74-5931875cab50",
-  "status": "authorized",
+  "authorizationID": "fd3fe34f-0d25-4fad-90b5-bae5c9bdde31",
+  "status": "locked",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -15,16 +15,16 @@
     "maximumCumulativeSpendUSD": 5
   },
   "scope": {
-    "caseCount": 30,
-    "repetitions": 1,
-    "maximumCumulativeSpendUSD": 5
+    "caseCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": "2026-09-01T12:53:25.000Z",
-    "authorizedBy": "Permitext owner",
-    "exactAuthorizationPhrase": "authorize exactly package commit 3a3cad04d7799da906a5484af981aea5bf014ef2 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.",
-    "exactSpendingCapPhrase": "authorize exactly package commit 3a3cad04d7799da906a5484af981aea5bf014ef2 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
   },
   "consumption": {
     "status": "not_started",
@@ -51,7 +51,13 @@
     "plannerContractSHA256": "dd5e130beefab2897c71209e8f103125668492a5d88b23375d6dfdb41a45d4c3",
     "priorV17AuthorizationFile": "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json",
     "priorV17AuthorizationSHA256": "5474123dc94e2c934eb556bc05e1bce823f743d1db39cde8f65cecfade1487aa",
-    "priorV17RunID": "d2fdc1c4-7099-430d-9d33-2b759021afd2"
+    "priorV17RunID": "d2fdc1c4-7099-430d-9d33-2b759021afd2",
+    "supersededAuthorizationID": "d79db463-bc42-47c6-9e74-5931875cab50",
+    "supersededAuthorizationPackageCommit": "3a3cad04d7799da906a5484af981aea5bf014ef2",
+    "supersededAuthorizationExecutionCommit": "cb33a96134a2a8121995c34372519557920ea24d",
+    "supersededAttemptProviderRequests": 0,
+    "supersededAttemptActualSpendUSD": 0,
+    "supersededAttemptReason": "The pre-dispatch tracked-input check stopped because the validator omitted cohortPath."
   },
   "economics": {
     "productionNominalUSDPerHundred": 0.18179,
@@ -66,7 +72,7 @@
     "projectionOnly": true
   },
   "execution": {
-    "authorizationPackageCommit": "3a3cad04d7799da906a5484af981aea5bf014ef2",
+    "authorizationPackageCommit": null,
     "executionCommit": null,
     "webSupportEnabled": false,
     "lunaFirst": true,
@@ -85,6 +91,6 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "networkOrModelCallAuthorized": true,
-  "notes": "The Permitext owner authorized the exact locked Architecture V1 package for all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. The one-use confirmation has not started."
+  "networkOrModelCallAuthorized": false,
+  "notes": "Replacement lock after the exact 3a3cad04d7799da906a5484af981aea5bf014ef2 package stopped before provider access and spent $0. This new authorization identity cannot dispatch without a fresh exact package sentence and cumulative spend cap."
 }
