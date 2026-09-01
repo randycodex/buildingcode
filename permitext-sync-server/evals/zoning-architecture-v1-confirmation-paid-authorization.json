@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "fd3fe34f-0d25-4fad-90b5-bae5c9bdde31",
-  "status": "locked",
+  "status": "authorized",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -15,16 +15,16 @@
     "maximumCumulativeSpendUSD": 5
   },
   "scope": {
-    "caseCount": null,
-    "repetitions": null,
-    "maximumCumulativeSpendUSD": null
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": null,
-    "authorizedBy": null,
-    "exactAuthorizationPhrase": null,
-    "exactSpendingCapPhrase": null
+    "authorizedAt": "2026-09-01T13:07:45.000Z",
+    "authorizedBy": "Permitext owner",
+    "exactAuthorizationPhrase": "authorize exactly package commit cec4eed3ab89ca235dfd25544dedf5b28a067801 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.",
+    "exactSpendingCapPhrase": "authorize exactly package commit cec4eed3ab89ca235dfd25544dedf5b28a067801 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
     "status": "not_started",
@@ -72,7 +72,7 @@
     "projectionOnly": true
   },
   "execution": {
-    "authorizationPackageCommit": null,
+    "authorizationPackageCommit": "cec4eed3ab89ca235dfd25544dedf5b28a067801",
     "executionCommit": null,
     "webSupportEnabled": false,
     "lunaFirst": true,
@@ -91,6 +91,6 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "networkOrModelCallAuthorized": false,
-  "notes": "Replacement lock after the exact 3a3cad04d7799da906a5484af981aea5bf014ef2 package stopped before provider access and spent $0. This new authorization identity cannot dispatch without a fresh exact package sentence and cumulative spend cap."
+  "networkOrModelCallAuthorized": true,
+  "notes": "The Permitext owner authorized the exact locked replacement Architecture V1 package for all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. The one-use confirmation has not started."
 }
