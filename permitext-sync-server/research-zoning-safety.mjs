@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 export const zoningResearchSafetyVersion =
-  "20260831-zoning-appendix-j-explicit-input-boundary-v15";
+  "20260831-zoning-appendix-j-preposed-subarea-source-rule-v16";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -579,6 +579,7 @@ function statesReviewedV11GenericSourceTreatment(value) {
   const reviewedForms = [
     String.raw`(?:the\s+)?Appendix\s+J\s+maps?\s+(?:designates?|identif(?:y|ies)|shows?)\s+(?:(?:a|the)\s+)?(?:designated\s+)?areas?\s+(?:(?:in|within)\s+${subarea}\s+)?(?:where|in\s+which)\s+${facilities}\s+${treatment}`,
     String.raw`(?:the\s+)?selected\s+Appendix\s+J\s+material\s+(?:shows?|provides?|establishes?)\s+that\s+(?:the\s+)?(?:designated\s+)?areas?\s+(?:in|within)\s+${subarea}\s+${treatment}(?:\s+for\s+(?:the\s+)?self[- ]service storage)?`,
+    String.raw`(?:for|in|within)\s+${subarea},\s+${facilities}\s+${treatment}`,
     String.raw`where\s+${facility}\s+(?:is\s+)?(?:located|situated)\s+(?:in|within)\s+${subarea}\s*,?\s*(?:it|such\s+(?:a\s+)?facility)\s+${treatment}`,
     String.raw`${facility}\s+(?:located|situated)\s+(?:in|within)\s+${subarea}\s+${treatment}`,
     String.raw`as\s+shown\s+on\s+${subarea}\s+maps?,\s+${facilities}\s+${treatment}`,

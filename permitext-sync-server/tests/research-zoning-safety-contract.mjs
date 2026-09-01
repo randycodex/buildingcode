@@ -442,6 +442,93 @@ for (const sourceLevelTreatment of noCostV9DiagnosticSafeTreatments) {
   );
 }
 
+const v15PostRunPreposedSubareaSafeTreatments = [
+  "For Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19.",
+  "In Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19.",
+  "Within Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19.",
+  "For Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192.",
+  "In Subarea 2, self-service storage facilities are subject to a City Planning Commission special permit under Section 74-192.",
+  "Within Subarea 2, self-service storage facilities shall be subject to special permit of the City Planning Commission pursuant to Section 74-192."
+];
+for (const preposedSubareaTreatment of v15PostRunPreposedSubareaSafeTreatments) {
+  const preposedSubareaResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${preposedSubareaTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    preposedSubareaResult.pass,
+    true,
+    `${preposedSubareaTreatment}: ${JSON.stringify(preposedSubareaResult.issues)}`
+  );
+}
+
+const v15PostRunPreposedSubareaUnsafeTreatments = [
+  "For Subarea 1, this self-service storage facility is permitted as-of-right.",
+  "In Subarea 1, the proposed self-service storage facility is permitted as-of-right.",
+  "Within Subarea 1, Acme Center is permitted as-of-right.",
+  "For Subarea 1, self-service storage facilities, including Acme Center, are permitted as-of-right.",
+  "For Subarea 1, self-service storage facilities are subject to Section 42-19, so this project may proceed.",
+  "In Subarea 2, the applicant requires a City Planning Commission special permit under Section 74-192.",
+  "Within Subarea 2, our client must obtain a City Planning Commission special permit under Section 74-192.",
+  "For Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192; this applies to the project."
+];
+for (const unsafePreposedSubareaTreatment of v15PostRunPreposedSubareaUnsafeTreatments) {
+  const unsafePreposedSubareaResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `${unsafePreposedSubareaTreatment} ${globalAppendixJBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    unsafePreposedSubareaResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    unsafePreposedSubareaTreatment
+  );
+}
+
+const v15PostRunUnsafeMutationFactories = [
+  (treatment) => treatment.replace(
+    /self-service storage facilities/i,
+    "the proposed self-service storage facility"
+  ),
+  (treatment) => treatment.replace(
+    /self-service storage facilities/i,
+    "self-service storage facilities, including Acme Center,"
+  ),
+  (treatment) => `${treatment} This project may proceed.`,
+  (treatment) => `${treatment} The applicant receives the benefit.`,
+  (treatment) => `${treatment.replace(/\.$/, "")}; this applies to the site.`
+];
+for (const safePreposedSubareaTreatment of v15PostRunPreposedSubareaSafeTreatments) {
+  for (const mutateUnsafe of v15PostRunUnsafeMutationFactories) {
+    const mutatedPreposedSubareaTreatment = mutateUnsafe(
+      safePreposedSubareaTreatment
+    );
+    const mutatedPreposedSubareaResult = evaluateZoningResearchSafety({
+      question: sourceBoundaryQuestion,
+      evidence: mapEvidence,
+      answer: answer(
+        `${mutatedPreposedSubareaTreatment} ${globalAppendixJBoundary}`,
+        ["zr-map"],
+        appendixJMissingFacts
+      )
+    });
+    assert(
+      mutatedPreposedSubareaResult.issues.some((issue) =>
+        issue.type === "zoning_missing_mapped_location"),
+      mutatedPreposedSubareaTreatment
+    );
+  }
+}
+
 const noCostV9DiagnosticUnsafeTreatments = [
   "Appendix J maps designate the Acme Center site in Subarea 1, where it is permitted as-of-right.",
   "The selected Appendix J material shows that this site is in Subarea 1 and is permitted as-of-right.",
