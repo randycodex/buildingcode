@@ -12,6 +12,7 @@ import {
   selectZoningResearchEvidence,
   zoningResearchDeterministicContext,
   zoningResearchDispositions,
+  zoningResearchCompilerVersion,
   zoningResearchEvidenceLimits,
   zoningResearchPaths,
   zoningResearchPlannerVersion,
@@ -27,19 +28,54 @@ import {
 } from "../zoning-content.mjs";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const architectureV21 = process.argv.includes("--architecture-v21");
+const paidEnvironmentNames = [
+  "OPENAI_API_KEY",
+  "AZURE_OPENAI_API_KEY",
+  "ANTHROPIC_API_KEY",
+  "GOOGLE_GENERATIVE_AI_API_KEY",
+  "PERMITEXT_RUN_PAID_RESEARCH_EVALS",
+  "PERMITEXT_RESEARCH_EVAL_MAX_USD"
+];
+const credentialVariablesPresent = paidEnvironmentNames.filter((name) => compactEnvironmentValue(process.env[name]));
+if (architectureV21 && credentialVariablesPresent.length) {
+  throw new Error(`Architecture V2.1 no-cost preflight refuses paid credentials or eval authorization: ${credentialVariablesPresent.join(", ")}`);
+}
+let networkAttemptCount = 0;
+const providerDispatchAvailable = false;
+if (architectureV21) {
+  globalThis.fetch = async () => {
+    networkAttemptCount += 1;
+    throw new Error("Architecture V2.1 no-cost preflight blocked a network attempt.");
+  };
+}
 const cohortPath = join(root, "evals", "zoning-cases-expanded-batch-1-successor-remediation-3.json");
-const retainedV1Path = join(
+const retainedResultPath = join(
   root,
   "evals",
   "results",
-  "2026-09-01T14-35-20-650Z-90f42d5b-b758-4df4-98af-933350f036e7.json"
+  architectureV21
+    ? "2026-09-01T16-49-32-263Z-9f67f4ba-3944-46a4-b438-fcec082144e3.json"
+    : "2026-09-01T14-35-20-650Z-90f42d5b-b758-4df4-98af-933350f036e7.json"
 );
-const resultPath = join(root, "evals", "results", "zoning-architecture-v2-no-cost-preflight.json");
+const regressionFixturePath = join(root, "evals", "zoning-architecture-v21-regression-fixtures.json");
+const resultPath = join(
+  root,
+  "evals",
+  "results",
+  architectureV21
+    ? "zoning-architecture-v21-no-cost-preflight.json"
+    : "zoning-architecture-v2-no-cost-preflight.json"
+);
 const hybridEnvironment = {
   PERMITEXT_RESEARCH_ROUTING_MODE: "hybrid",
   PERMITEXT_RESEARCH_FAST_MODEL: "gpt-5.6-luna",
   PERMITEXT_RESEARCH_ACCURATE_MODEL: "gpt-5.6-terra"
 };
+
+function compactEnvironmentValue(value) {
+  return String(value || "").trim();
+}
 
 function hash(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -169,7 +205,8 @@ async function compileCase(caseRecord, catalogByID, retainedCase = null) {
   const evidenceReadiness = evaluateZoningEvidenceReadiness({
     question: caseRecord.question,
     evidence: selection.sources,
-    plan
+    plan,
+    deterministicContext
   });
   const route = routeResearchAnswerModel({
     question: caseRecord.question,
@@ -236,25 +273,34 @@ async function compileCase(caseRecord, catalogByID, retainedCase = null) {
   };
 }
 
-function retainedEvidence(result, plan) {
-  return result.testCase.selectedEvidence.map((selected, index) => ({
-    sourceID: result.answer?.citations?.find((citation) =>
-      citation.sectionNumber === selected.reference.replace(/^ZR\s+/i, "")
-    )?.sourceIDs?.[0] || `retained-${result.testCase.id}-${index}`,
-    sectionID: selected.sectionID,
-    sectionNumber: selected.reference.replace(/^ZR\s+/i, ""),
-    codePrefix: "ZR",
-    text: selected.exactPassages.join("\n"),
-    evidencePriority: { evidenceRole: "governing", claimCoverageRequired: true }
+async function retainedEvidence(result) {
+  return Promise.all(result.testCase.selectedEvidence.map(async (selected, index) => {
+    const section = await zoningSection(selected.sectionID);
+    const richSourceGrids = section
+      ? structuredRichSources(section)
+        .filter((source) => source.kind === "table")
+        .flatMap((source) => source.grids || [])
+      : [];
+    return {
+      sourceID: result.answer?.citations?.find((citation) =>
+        citation.sectionNumber === selected.reference.replace(/^ZR\s+/i, "")
+      )?.sourceIDs?.[0] || `retained-${result.testCase.id}-${index}`,
+      sectionID: selected.sectionID,
+      sectionNumber: selected.reference.replace(/^ZR\s+/i, ""),
+      codePrefix: "ZR",
+      text: selected.exactPassages.join("\n"),
+      richSourceGrids,
+      evidencePriority: { evidenceRole: "governing", claimCoverageRequired: true }
+    };
   }));
 }
 
-function replayRetainedAnswers(retained) {
+async function replayRetainedAnswers(retained) {
   const delivered = retained.results.filter((result) => result.answer);
-  const answers = delivered.map((result) => {
+  const answers = await Promise.all(delivered.map(async (result) => {
     const question = result.testCase.question;
     const plan = planZoningResearchQuestion({ question });
-    const evidence = retainedEvidence(result, plan);
+    const evidence = await retainedEvidence(result);
     const deterministicContext = zoningResearchDeterministicContext({ question, evidence, plan });
     const controls = evaluateZoningDeterministicControls({
       plan,
@@ -262,7 +308,7 @@ function replayRetainedAnswers(retained) {
       answer: result.answer
     });
     return { id: result.testCase.id, pass: controls.pass, issues: controls.issues };
-  });
+  }));
   return {
     deliveredCount: answers.length,
     preservedFullScoreIDs: answers.filter((item) => item.pass).map((item) => item.id),
@@ -271,7 +317,7 @@ function replayRetainedAnswers(retained) {
   };
 }
 
-function adversarialGates(retained) {
+async function adversarialGates(retained) {
   const missingMap = planZoningResearchQuestion({
     question: "Can this specific property be placed in Appendix J when its address, BBL, and official map are not provided?"
   });
@@ -322,7 +368,7 @@ function adversarialGates(retained) {
     result.testCase.id === "zr-candidate-b1-r6-parking-unverified-transit-zone"
   );
   const repairPlan = planZoningResearchQuestion({ question: parkingResult.testCase.question });
-  const repairEvidence = retainedEvidence(parkingResult, repairPlan);
+  const repairEvidence = await retainedEvidence(parkingResult);
   const repairPacket = zoningResearchRepairPacket({
     question: parkingResult.testCase.question,
     issues: [{ type: "zoning_parking_geography_evidence_boundary", detail: "Do not infer the missing special-parking rule." }],
@@ -334,6 +380,69 @@ function adversarialGates(retained) {
       plan: repairPlan
     })
   });
+  const v21Gates = {};
+  if (architectureV21) {
+    const controlsFor = async (id, answer) => {
+      const result = retained.results.find((item) => item.testCase.id === id);
+      const plan = planZoningResearchQuestion({ question: result.testCase.question });
+      const evidence = await retainedEvidence(result);
+      return evaluateZoningDeterministicControls({
+        plan,
+        deterministicContext: zoningResearchDeterministicContext({
+          question: result.testCase.question,
+          evidence,
+          plan
+        }),
+        answer
+      });
+    };
+    const lotCoverage = await controlsFor("zr-r7a-lot-coverage", {
+      answerText: "The basic cap is 80 percent, or 8,000 square feet, so 8,500 square feet exceeds it."
+    });
+    const throughLotResult = retained.results.find((item) =>
+      item.testCase.id === "zr-candidate-b1-deep-through-lot-vertical-yard"
+    );
+    const throughLot = await controlsFor(throughLotResult.testCase.id, throughLotResult.answer);
+    const splitResult = retained.results.find((item) =>
+      item.testCase.id === "zr-candidate-b1-r7a-r8a-weighted-far"
+    );
+    const splitLot = await controlsFor(splitResult.testCase.id, splitResult.answer);
+    const conversionResult = retained.results.find((item) =>
+      item.testCase.id === "zr-candidate-b1-c6-2-office-residential-conversion"
+    );
+    const conversionMutation = structuredClone(conversionResult.answer);
+    const wrongMappingSourceID = conversionResult.answer?.citations?.find((citation) =>
+      citation.sectionNumber === "32-121"
+    )?.sourceIDs?.[0];
+    const correctMappingSourceID = conversionResult.answer?.citations?.find((citation) =>
+      citation.sectionNumber === "34-112"
+    )?.sourceIDs?.[0];
+    const mappingPoint = conversionMutation.supportedPoints?.find((point) =>
+      (point?.sourceIDs || []).includes(correctMappingSourceID)
+    );
+    if (mappingPoint && wrongMappingSourceID) {
+      mappingPoint.explanation = "C6-2 maps to the R8 residential equivalent.";
+      mappingPoint.sourceIDs = [wrongMappingSourceID];
+    }
+    const conversion = await controlsFor(conversionResult.testCase.id, conversionMutation);
+    const transitionResult = retained.results.find((item) =>
+      item.testCase.id === "zr-candidate-b1-city-of-yes-transition"
+    );
+    const transition = await controlsFor(transitionResult.testCase.id, transitionResult.answer);
+    Object.assign(v21Gates, {
+      omittedLotCoverageBoundariesFail: lotCoverage.pass === false &&
+        lotCoverage.issues.some((issue) => issue.obligationID === "basic_lot_coverage_independent_bulk_boundary"),
+      omittedMeasurementAndObstructionUncertaintyFails: throughLot.pass === false &&
+        throughLot.issues.some((issue) => issue.obligationID === "through_lot_regulated_depth_orientation_unresolved") &&
+        throughLot.issues.some((issue) => issue.obligationID === "through_lot_actual_permitted_obstructions_unresolved"),
+      totalVsAllocationContradictionFails: splitLot.pass === false &&
+        splitLot.issues.some((issue) => issue.code === "ANSWER_OBLIGATION_CONTRADICTED"),
+      misboundCitationRolesFail: conversion.pass === false &&
+        conversion.issues.some((issue) => issue.code === "ANSWER_OBLIGATION_SOURCE_MISBOUND"),
+      omittedSpecificTransitionRouteFails: transition.pass === false &&
+        transition.issues.some((issue) => issue.obligationID === "city_of_yes_specific_transition_route")
+    });
+  }
   return {
     missingPropertyFactsStopBeforeModel: missingMap.disposition !== zoningResearchDispositions.ready &&
       missingMap.callPolicy.maximumProviderCalls === 0,
@@ -345,19 +454,22 @@ function adversarialGates(retained) {
     sourceBoundedRepairPacketEnforced: repairPacket.sources.length > 0 &&
       repairPacket.usage.characterCount <= 8_000,
     disabledTwentyFourKCandidateRemainsDisabled: Object.values(zoningResearchPaths)
-      .every((path) => zoningResearchEvidenceLimits(path).maximumCharacters < 24_000)
+      .every((path) => zoningResearchEvidenceLimits(path).maximumCharacters < 24_000),
+    ...v21Gates
   };
 }
 
 async function buildResult() {
-  const [cohortText, retainedText, catalog, metadata] = await Promise.all([
+  const [cohortText, retainedText, regressionFixtureText, catalog, metadata] = await Promise.all([
     readFile(cohortPath, "utf8"),
-    readFile(retainedV1Path, "utf8"),
+    readFile(retainedResultPath, "utf8"),
+    architectureV21 ? readFile(regressionFixturePath, "utf8") : Promise.resolve(null),
     zoningSectionCatalog(),
     zoningContentMetadata()
   ]);
   const cohort = JSON.parse(cohortText);
   const retained = JSON.parse(retainedText);
+  const regressionFixtures = regressionFixtureText ? JSON.parse(regressionFixtureText) : null;
   const catalogByID = new Map(catalog.map((section) => [String(section.id), section]));
   const retainedByID = new Map(retained.results.map((result) => [result.testCase.id, result]));
   const cases = [];
@@ -369,12 +481,20 @@ async function buildResult() {
   const adverseUSD = cases.reduce((sum, item) => sum + item.cost.production.adverseUSD, 0);
   const nominalCalls = readyCases.map((item) => item.cost.production.nominalRequestCount);
   const adverseCalls = readyCases.map((item) => item.cost.production.adverseRequestCount);
-  const answerReplay = replayRetainedAnswers(retained);
-  const adversarial = adversarialGates(retained);
-  const expectedJudgeFailures = [
-    "zr-candidate-b1-r6a-uap-insufficient-affordable-area",
-    "zr-candidate-b1-deep-through-lot-vertical-yard"
-  ];
+  const answerReplay = await replayRetainedAnswers(retained);
+  const adversarial = await adversarialGates(retained);
+  const expectedJudgeFailures = architectureV21
+    ? [
+        "zr-candidate-b1-deep-through-lot-vertical-yard",
+        "zr-candidate-b1-mx-nonadditive-far",
+        "zr-candidate-b1-r7a-r8a-weighted-far",
+        "zr-candidate-b1-c6-2-office-residential-conversion",
+        "zr-candidate-b1-city-of-yes-transition"
+      ]
+    : [
+        "zr-candidate-b1-r6a-uap-insufficient-affordable-area",
+        "zr-candidate-b1-deep-through-lot-vertical-yard"
+      ];
   const aggregateGates = {
     exactFrozenCohortCount: cases.length === 30,
     everyCaseCompiles: cases.every((item) => item.pass),
@@ -390,20 +510,32 @@ async function buildResult() {
       readyCases.length > 0 && (nominalUSD / readyCases.length) * 100 <= 6,
     productionAdverseCostAtMostSixPerHundred:
       readyCases.length > 0 && (adverseUSD / readyCases.length) * 100 <= 6,
-    twelveFullScoreRetainedAnswersPreserved: answerReplay.preservedFullScoreIDs.length === 12,
-    twoKnownJudgeFailuresNowRejected: JSON.stringify(answerReplay.rejectedKnownJudgeFailureIDs.sort()) ===
-      JSON.stringify(expectedJudgeFailures.sort()),
+    ...(architectureV21 ? {
+      sixteenAcceptedRetainedAnswersPreserved: answerReplay.preservedFullScoreIDs.length === 16,
+      fiveObservedSemanticFailuresRejected: JSON.stringify(answerReplay.rejectedKnownJudgeFailureIDs.sort()) ===
+        JSON.stringify(expectedJudgeFailures.sort()),
+      eightObservedFailureFixturesLocked: regressionFixtures?.cases?.length === 8 &&
+        regressionFixtures?.rubricsModified === false &&
+        new Set(regressionFixtures.cases.map((item) => item.id)).size === 8
+    } : {
+      twelveFullScoreRetainedAnswersPreserved: answerReplay.preservedFullScoreIDs.length === 12,
+      twoKnownJudgeFailuresNowRejected: JSON.stringify(answerReplay.rejectedKnownJudgeFailureIDs.sort()) ===
+        JSON.stringify(expectedJudgeFailures.sort())
+    }),
     allAdversarialGatesPass: Object.values(adversarial).every(Boolean),
-    noNetworkOrProviderCalls: true,
-    noCredentialsLoaded: true,
-    noPaidSpend: true,
-    judgeLedgerSeparateAndZero: true
+    noNetworkOrProviderCalls: networkAttemptCount === 0 && providerDispatchAvailable === false,
+    noCredentialsLoaded: credentialVariablesPresent.length === 0,
+    noPaidSpend: networkAttemptCount === 0 && providerDispatchAvailable === false && credentialVariablesPresent.length === 0,
+    judgeLedgerSeparateAndZero: providerDispatchAvailable === false
   };
   return {
-    schemaVersion: 1,
-    artifact: "Permitext Zoning Research Architecture V2 no-cost preflight",
+    schemaVersion: architectureV21 ? 2 : 1,
+    artifact: architectureV21
+      ? "Permitext Zoning Research Architecture V2.1 no-cost preflight"
+      : "Permitext Zoning Research Architecture V2 no-cost preflight",
     artifactDate: "2026-09-01",
     plannerVersion: zoningResearchPlannerVersion,
+    compilerVersion: zoningResearchCompilerVersion,
     cohort: {
       path: "evals/zoning-cases-expanded-batch-1-successor-remediation-3.json",
       sha256: hash(cohortText),
@@ -416,11 +548,25 @@ async function buildResult() {
       })))),
       caseCount: cases.length
     },
-    retainedV1: {
-      path: "evals/results/2026-09-01T14-35-20-650Z-90f42d5b-b758-4df4-98af-933350f036e7.json",
-      sha256: hash(retainedText),
-      answerReplay
-    },
+    ...(architectureV21 ? {
+      retainedV2Confirmation: {
+        path: "evals/results/2026-09-01T16-49-32-263Z-9f67f4ba-3944-46a4-b438-fcec082144e3.json",
+        sha256: hash(retainedText),
+        answerReplay
+      },
+      observedFailureRegressions: {
+        path: "evals/zoning-architecture-v21-regression-fixtures.json",
+        sha256: hash(regressionFixtureText),
+        caseCount: regressionFixtures.cases.length,
+        rubricsModified: regressionFixtures.rubricsModified
+      }
+    } : {
+      retainedV1: {
+        path: "evals/results/2026-09-01T14-35-20-650Z-90f42d5b-b758-4df4-98af-933350f036e7.json",
+        sha256: hash(retainedText),
+        answerReplay
+      }
+    }),
     corpus: {
       id: metadata.id,
       codeVersion: metadata.codeVersion,
@@ -455,6 +601,13 @@ async function buildResult() {
       },
       judgeCost: { requestCount: 0, nominalUSD: 0, adverseUSD: 0 }
     },
+    noCostInstrumentation: {
+      networkGuardInstalled: architectureV21,
+      networkAttemptCount,
+      providerDispatchPath: providerDispatchAvailable ? "available" : "not_imported",
+      guaranteeScope: "static local compiler, canonical-corpus replay, and deterministic controls",
+      credentialVariablesPresent
+    },
     adversarial,
     aggregateGates,
     cases
@@ -486,8 +639,10 @@ console.log(JSON.stringify({
   providerRequests: result.summary.providerRequests,
   productionCost: result.summary.productionCost,
   retainedAnswerReplay: {
-    preserved: result.retainedV1.answerReplay.preservedFullScoreIDs.length,
-    rejectedKnownGaps: result.retainedV1.answerReplay.rejectedKnownJudgeFailureIDs.length
+    preserved: (result.retainedV2Confirmation || result.retainedV1).answerReplay.preservedFullScoreIDs.length,
+    rejectedKnownGaps: (result.retainedV2Confirmation || result.retainedV1).answerReplay.rejectedKnownJudgeFailureIDs.length
   },
-  paidModelCalls: 0
+  paidModelCalls: 0,
+  networkAttempts: networkAttemptCount,
+  credentialVariablesPresent
 }, null, 2));

@@ -18574,14 +18574,17 @@ async function handleResearchConversationMessage(request, response) {
       ? zoningResearchDeterministicContext({
           question,
           evidence: assembledEvidence,
-          plan: zoningPlan
+          plan: zoningPlan,
+          projectFacts: combinedProjectFacts,
+          conversationFactContext
         })
       : null;
     const zoningEvidenceReadiness = zoningPlan
       ? evaluateZoningEvidenceReadiness({
           question,
           evidence: assembledEvidence,
-          plan: zoningPlan
+          plan: zoningPlan,
+          deterministicContext: zoningDeterministicContext
         })
       : { pass: true, issues: [] };
     if (zoningPlan && !zoningEvidenceReadiness.pass) {

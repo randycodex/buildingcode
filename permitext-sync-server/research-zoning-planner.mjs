@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 export const zoningResearchPlannerVersion = "20260901-question-compiler-v2";
 
-export const zoningResearchCompilerVersion = "20260901-answer-obligations-v2";
+export const zoningResearchCompilerVersion = "20260901-answer-obligations-v21";
 export const zoningResearchRepairVersion = "20260901-source-bounded-patch-v2";
 
 export const zoningResearchPaths = Object.freeze({
@@ -128,6 +128,18 @@ function combinedFactText({ question, projectFacts = [], conversationFactContext
     ...(Array.isArray(conversationFactContext?.hypothetical) ? conversationFactContext.hypothetical : []),
     ...(Array.isArray(conversationFactContext?.unknown) ? conversationFactContext.unknown : [])
   ].filter(Boolean).join(" "));
+}
+
+function resolvedFactText({ question, projectFacts = [], conversationFactContext = {} } = {}) {
+  return compactText([
+    question,
+    ...(Array.isArray(projectFacts) ? projectFacts : []),
+    ...(Array.isArray(conversationFactContext?.established) ? conversationFactContext.established : []),
+    ...(Array.isArray(conversationFactContext?.hypothetical) ? conversationFactContext.hypothetical : [])
+  ]
+    .flatMap((value) => String(value || "").split(/(?<=[.!?])\s+/))
+    .filter((statement) => !explicitMissingPattern.test(statement))
+    .join(" "));
 }
 
 function questionPath(question) {
@@ -377,7 +389,9 @@ const calendarDatePattern = /\b(?:January|February|March|April|May|June|July|Aug
 const measurementPattern = /\b(\d[\d,]*(?:\.\d+)?)\s*(square feet|square-foot|feet|foot|dwelling units?|units?|percent|%|FAR)\b/gi;
 
 function numericValue(value) {
-  const number = Number(String(value || "").replace(/,/g, ""));
+  const normalized = String(value ?? "").replace(/,/g, "").trim();
+  if (!normalized) return null;
+  const number = Number(normalized);
   return Number.isFinite(number) ? number : null;
 }
 
@@ -476,30 +490,126 @@ function questionDistrict(question) {
     matches[0]?.[0]?.toUpperCase() || null;
 }
 
+function normalizedGridCellText(cell) {
+  const raw = compactText(cell?.text);
+  const markerIndex = raw.lastIndexOf('">');
+  return compactText(markerIndex >= 0 ? raw.slice(markerIndex + 2) : raw);
+}
+
+function validStructuredGrid(grid) {
+  return (Array.isArray(grid?.rows) ? grid.rows : []).some((row) =>
+    (Array.isArray(row?.cells) ? row.cells : []).some((cell) => normalizedGridCellText(cell))
+  );
+}
+
+function structuredRowsForSection(evidence, sectionNumber) {
+  const wanted = compactText(sectionNumber).replace(/^ZR\s+/i, "");
+  const output = [];
+  for (const source of Array.isArray(evidence) ? evidence : []) {
+    if (compactText(source?.sectionNumber).replace(/^ZR\s+/i, "") !== wanted) continue;
+    for (const grid of Array.isArray(source?.richSourceGrids) ? source.richSourceGrids : []) {
+      if (!validStructuredGrid(grid)) continue;
+      const rows = (Array.isArray(grid?.rows) ? grid.rows : [])
+        .map((row) => (Array.isArray(row?.cells) ? row.cells : []).map(normalizedGridCellText))
+        .filter((cells) => cells.some(Boolean));
+      if (!rows.length) continue;
+      output.push({ sourceID: source.sourceID, rows });
+    }
+  }
+  return output;
+}
+
+function districtTokens(value) {
+  return compactText(value).toUpperCase().match(/\b(?:R\d{1,2}[A-Z]?(?:-\d[A-Z]?)?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d[A-Z]?)?)\b/g) || [];
+}
+
+function firstDecimal(value) {
+  const match = compactText(value).match(/(?:^|\s)(\d+(?:\.\d+)?)(?=\s|$)/);
+  return match ? Number(match[1]) : null;
+}
+
+function structuredFARRow(question, evidence, district, sectionNumber = "23-22") {
+  const target = compactText(district).toUpperCase();
+  if (!target) return null;
+  const candidates = [];
+  for (const table of structuredRowsForSection(evidence, sectionNumber)) {
+    const header = table.rows[0].map((cell) => cell.toLowerCase());
+    const districtColumn = header.findIndex((cell) => /\bdistricts?\b/.test(cell));
+    const numericColumns = header
+      .map((cell, index) => ({ cell, index }))
+      .filter(({ cell }) => /(?:floor area ratio|standard residences|qualifying affordable)/.test(cell))
+      .map(({ index }) => index);
+    if (districtColumn < 0 || !numericColumns.length) continue;
+    for (const cells of table.rows.slice(1)) {
+      const tokens = districtTokens(cells[districtColumn]);
+      if (!tokens.includes(target)) continue;
+      const values = numericColumns.map((index) => firstDecimal(cells[index])).filter((value) => value !== null);
+      if (!values.length) continue;
+      candidates.push({
+        district: target,
+        districtCell: cells[districtColumn],
+        districtTokens: tokens,
+        standardFAR: values[0],
+        qualifyingFAR: values[1] ?? null,
+        sourceIDs: [table.sourceID].filter(Boolean)
+      });
+    }
+  }
+  if (candidates.length <= 1) return candidates[0] || null;
+  const withinWideStreet = /\bwithin\s+100\s+feet\s+of\s+a\s+wide\s+street\b/i.test(question);
+  const outsideWideStreet = /\b(?:beyond|outside|more than)\s+100\s+feet\s+(?:of|from)\s+a\s+wide\s+street\b/i.test(question);
+  if (withinWideStreet) return candidates.find((candidate) => candidate.districtTokens.length === 1) || null;
+  if (outsideWideStreet) return candidates.find((candidate) => candidate.districtTokens.length > 1) || null;
+  return null;
+}
+
 function tableFARValues(question, evidence) {
   const district = questionDistrict(question);
   if (!district) return null;
-  for (const source of Array.isArray(evidence) ? evidence : []) {
-    const tokens = compactText(sourceText(source)).split(" ");
-    const index = tokens.findIndex((token) => token.toUpperCase() === district);
-    if (index < 0) continue;
-    const values = tokens.slice(index + 1, index + 16)
-      .map((token) => token.replace(/[^0-9.]/g, ""))
-      .filter((token) => /^\d+\.\d+$/.test(token))
-      .map(Number);
-    if (values.length < 2) continue;
-    return {
-      district,
-      standardFAR: values[0],
-      qualifyingFAR: values[1],
-      sourceIDs: [source.sourceID].filter(Boolean)
-    };
+  const row = structuredFARRow(question, evidence, district);
+  if (!row || row.qualifyingFAR === null) return null;
+  return row;
+}
+
+function sourceIDsForSections(evidence, sectionNumbers = []) {
+  const wanted = new Set(sectionNumbers.map((value) => compactText(value).replace(/^ZR\s+/i, "")));
+  return unique((Array.isArray(evidence) ? evidence : [])
+    .filter((source) => wanted.has(compactText(source?.sectionNumber).replace(/^ZR\s+/i, "")))
+    .map((source) => source?.sourceID));
+}
+
+function structuredEquivalentDistrict(evidence, commercialDistrict) {
+  const target = compactText(commercialDistrict).toUpperCase();
+  if (!target) return null;
+  for (const table of structuredRowsForSection(evidence, "34-112")) {
+    const header = table.rows[0].map((cell) => cell.toLowerCase());
+    const districtColumn = header.findIndex((cell) => /\bdistricts?\b/.test(cell));
+    const equivalentColumn = header.findIndex((cell) => /residential equivalent/.test(cell));
+    if (districtColumn < 0 || equivalentColumn < 0) continue;
+    for (const cells of table.rows.slice(1)) {
+      if (!districtTokens(cells[districtColumn]).includes(target)) continue;
+      const equivalent = districtTokens(cells[equivalentColumn])[0];
+      if (equivalent) return { district: equivalent, sourceIDs: [table.sourceID].filter(Boolean) };
+    }
   }
   return null;
 }
 
+function sectionNumericValue(evidence, sectionNumber, pattern) {
+  const source = (Array.isArray(evidence) ? evidence : []).find((item) =>
+    compactText(item?.sectionNumber).replace(/^ZR\s+/i, "") === sectionNumber
+  );
+  const match = source ? sourceText(source).match(pattern) : null;
+  const numericWords = new Map([
+    ["one", 1], ["two", 2], ["three", 3], ["four", 4], ["five", 5], ["six", 6],
+    ["seven", 7], ["eight", 8], ["nine", 9], ["ten", 10], ["eleven", 11], ["twelve", 12]
+  ]);
+  const value = match ? numericValue(match[1]) ?? numericWords.get(compactText(match[1]).toLowerCase()) ?? null : null;
+  return value === null ? null : { value, sourceIDs: [source.sourceID].filter(Boolean) };
+}
+
 function obligation(id, kind, detail, values = [], sourceIDs = [], options = {}) {
-  return {
+  const record = {
     id,
     kind,
     detail,
@@ -507,6 +617,25 @@ function obligation(id, kind, detail, values = [], sourceIDs = [], options = {})
     sourceIDs: unique(sourceIDs.map(String)),
     requireAllValues: options.requireAllValues === true
   };
+  const valueGroups = (Array.isArray(options.valueGroups) ? options.valueGroups : [])
+    .map((group) => unique((Array.isArray(group) ? group : [group]).map((value) => compactText(value))))
+    .filter((group) => group.length);
+  if (valueGroups.length) record.valueGroups = valueGroups;
+  if (options.coverageScope) record.coverageScope = options.coverageScope;
+  if (options.requireSourceBound === true) record.requireSourceBound = true;
+  if (options.rejectMisboundCoverage === true) record.rejectMisboundCoverage = true;
+  if (options.unresolvedEvidence === true) record.unresolvedEvidence = true;
+  if (Array.isArray(options.requiredSourceSections) && options.requiredSourceSections.length) {
+    record.requiredSourceSections = unique(options.requiredSourceSections.map(String));
+  }
+  if (Array.isArray(options.prohibitedPatterns) && options.prohibitedPatterns.length) {
+    record.prohibitedPatterns = options.prohibitedPatterns.map(String);
+  }
+  if (Array.isArray(options.requiredPatterns) && options.requiredPatterns.length) {
+    record.requiredPatterns = options.requiredPatterns.map(String);
+  }
+  if (options.affirmativeRequiredPatterns === true) record.affirmativeRequiredPatterns = true;
+  return record;
 }
 
 function tableLegendObligations(question, evidence = []) {
@@ -537,7 +666,490 @@ function tableLegendObligations(question, evidence = []) {
   return obligations;
 }
 
-function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic }) {
+function observedFailureObligations({ question, evidence = [], plan, facts = question }) {
+  const obligations = [];
+  const flatEvidence = compactText(evidenceText(evidence));
+
+  const lotArea = firstQuestionNumber(question, [
+    /(\d[\d,]*(?:\.\d+)?)[- ]square-foot\s+(?:[A-Z0-9-]+\s+)?(?:zoning\s+)?lot\b/i,
+    /(?:zoning\s+)?lot\s+(?:contains|has|is)\s+(\d[\d,]*(?:\.\d+)?)\s*square feet/i
+  ]);
+
+  const proposedCoverage = firstQuestionNumber(question, [
+    /cover\s+(\d[\d,]*(?:\.\d+)?)\s*square feet/i
+  ]);
+  const basicCoveragePercent = numericValue(flatEvidence.match(
+    /maximum residential lot coverage for interior lots? or through lots? shall be (\d+(?:\.\d+)?) percent/i
+  )?.[1]);
+  if (lotArea && proposedCoverage && basicCoveragePercent === null && /basic lot[- ]coverage/i.test(question)) {
+    obligations.push(obligation(
+      "basic_lot_coverage_governing_percentage_unresolved",
+      "evidence_boundary",
+      "The enacted basic lot-coverage percentage and its controlling table or rule must be resolved before calculating the cap.",
+      [],
+      [],
+      {
+        requireSourceBound: true,
+        unresolvedEvidence: true,
+        requiredSourceSections: ["23-362", "23-363", "23-342"]
+      }
+    ));
+  }
+  if (lotArea && proposedCoverage && basicCoveragePercent !== null && /basic lot[- ]coverage/i.test(question)) {
+    const basicCap = Number((lotArea * basicCoveragePercent / 100).toFixed(4));
+    const sourceIDs = sourceIDsForSections(evidence, ["23-362", "23-363", "23-342"]);
+    obligations.push(obligation(
+      "basic_lot_coverage_numerical_cap",
+      "numerical_boundary",
+      `State the ${basicCoveragePercent}-percent basic cap (${basicCap} square feet), compare the proposed ${proposedCoverage} square feet, and preserve that it exceeds the basic cap.`,
+      [],
+      sourceIDs,
+      {
+        valueGroups: [
+          [`${basicCoveragePercent} percent`, `${basicCoveragePercent}%`],
+          numberTextAlternatives(basicCap),
+          numberTextAlternatives(proposedCoverage),
+          ["exceeds", "over the basic", "above the basic"]
+        ]
+      }
+    ));
+    obligations.push(obligation(
+      "basic_lot_coverage_modification_boundaries",
+      "regulatory_boundary",
+      "Preserve the shallow-lot, near-corner, and short-block-dimension modification routes instead of presenting the basic percentage as universal.",
+      [],
+      sourceIDsForSections(evidence, ["23-363"]),
+      {
+        valueGroups: [
+          ["shallow lot", "shallow zoning lot"],
+          ["corner", "within 100 feet"],
+          ["short dimension", "short block"]
+        ]
+      }
+    ));
+    obligations.push(obligation(
+      "basic_lot_coverage_independent_bulk_boundary",
+      "regulatory_boundary",
+      "State that the numerical lot-coverage cap is not a footprint entitlement because yard, open-area, and other bulk rules remain independently applicable.",
+      [],
+      sourceIDs,
+      {
+        valueGroups: [
+          ["not an entitlement", "does not establish entitlement", "may be more restrictive", "independently applicable"],
+          ["yard"],
+          ["open area", "open-area"],
+          ["bulk"]
+        ]
+      }
+    ));
+  }
+
+  if (/Inner Transit Zone/i.test(question) && /parking spaces?/i.test(question) && /December 5, 2024/i.test(question)) {
+    obligations.push(obligation(
+      "inner_transit_post_2024_zero_spaces",
+      "effective_date_boundary",
+      "Tie the zero-space result to units created after December 5, 2024 within the Inner Transit Zone.",
+      [],
+      sourceIDsForSections(evidence, ["25-211"]),
+      {
+        valueGroups: [
+          ["zero", "no accessory off-street parking spaces"],
+          ["created after December 5, 2024"],
+          ["Inner Transit Zone"]
+        ],
+        requiredPatterns: [
+          "(?:\\bzero\\b[^.;]{0,80}\\b(?:spaces?|parking)\\b|\\bno accessory off-street parking spaces (?:are )?required\\b)"
+        ],
+        affirmativeRequiredPatterns: true,
+        coverageScope: "answer",
+        prohibitedPatterns: [
+          "\\bzero(?: parking)? spaces? (?:are|is) not required\\b",
+          "\\bno accessory off-street parking spaces (?:are|is) not required\\b"
+        ],
+        requireSourceBound: true
+      }
+    ));
+    obligations.push(obligation(
+      "inner_transit_transition_and_existing_parking_boundary",
+      "effective_date_boundary",
+      "Address the Section 11-333 continuation boundary and distinguish existing-unit parking from the stated post-December 5, 2024 units.",
+      [],
+      sourceIDsForSections(evidence, ["11-333", "25-211"]),
+      {
+        valueGroups: [
+          ["11-333"],
+          ["pre-December 5, 2024", "existing units", "existing parking"],
+          ["25-212", "maintenance provisions", "may only be reduced or eliminated"]
+        ]
+      }
+    ));
+    obligations.push(obligation(
+      "inner_transit_created_certificate_definition",
+      "definition_branch",
+      "Use the temporary-or-final-certificate definition of when a dwelling unit is created.",
+      [],
+      sourceIDsForSections(evidence, ["25-211"]),
+      {
+        valueGroups: [
+          ["temporary certificate of occupancy"],
+          ["final certificate of occupancy"]
+        ],
+        requireSourceBound: true
+      }
+    ));
+  }
+
+  if (/below-grade/i.test(question) && /base plane/i.test(question) && /storage/i.test(question) && /floor area/i.test(question)) {
+    const cellarSourceIDs = sourceIDsForSections(evidence, ["12-10"]);
+    obligations.push(obligation(
+      "cellar_floor_area_classification",
+      "definition_branch",
+      "Apply the more-than-one-half-height cellar test and the non-dwelling cellar floor-area exclusion.",
+      [],
+      cellarSourceIDs,
+      {
+        valueGroups: [
+          ["more than one-half", "more than half"],
+          ["base plane"],
+          ["cellar"],
+          ["not used for dwelling", "non-dwelling", "not dwelling"],
+          ["does not count", "excluded from floor area", "shall not include"]
+        ],
+        requireSourceBound: true
+      }
+    ));
+    const unresolvedCellarConditions = [];
+    if (!/\b(?:base plane is not sloping|non[- ]sloping base plane|sloping-base-plane rule does not apply)\b/i.test(facts)) {
+      unresolvedCellarConditions.push({ label: "sloping base plane", valueGroups: [["sloping base plane"]] });
+    }
+    if (!/\b(?:not a through lot|interior lot|controlling street wall line (?:is|has been) (?:identified|confirmed))\b/i.test(facts)) {
+      unresolvedCellarConditions.push({
+        label: "through-lot street-wall-line measurement",
+        valueGroups: [["street wall line", "through lot"]]
+      });
+    }
+    if (!/\b(?:no yard (?:was|has been) lowered|yard (?:was|has been) not lowered)\b[^.]{0,80}\b(?:December 5, 1990|after 1990)\b/i.test(facts)) {
+      unresolvedCellarConditions.push({
+        label: "post-December 5, 1990 lowered-yard condition",
+        valueGroups: [
+          ["lowered yard", "yard was lowered", "yard is lowered"],
+          ["December 5, 1990"]
+        ]
+      });
+    }
+    if (unresolvedCellarConditions.length) {
+      obligations.push(obligation(
+        "cellar_special_measurement_conditions",
+        "definition_branch",
+        `Keep these unstated measurement conditions explicit and unresolved: ${unresolvedCellarConditions.map((item) => item.label).join(", ")}.`,
+        [],
+        cellarSourceIDs,
+        {
+          coverageScope: "uncertainty",
+          valueGroups: unresolvedCellarConditions.flatMap((item) => item.valueGroups)
+        }
+      ));
+    }
+    obligations.push(obligation(
+      "cellar_retail_parking_loading_caveat",
+      "definition_branch",
+      "Preserve the retail-cellar caveat only for parking, bicycle-parking, and loading calculations.",
+      [],
+      cellarSourceIDs,
+      {
+        valueGroups: [
+          ["retail", "retailing"],
+          ["parking"],
+          ["bicycle"],
+          ["loading"]
+        ]
+      }
+    ));
+  }
+
+  if (/Special Mixed Use District/i.test(question) && /(?:fabrication|manufacturing)/i.test(question) && /combine them/i.test(question)) {
+    const manufacturingArea = firstQuestionNumber(question, [
+      /and\s+(\d[\d,]*(?:\.\d+)?)\s*square feet of (?:a\s+)?(?:fabrication|manufacturing|commercial)/i
+    ]);
+    const manufacturingDistrict = question.match(/\bM\d-\d[A-Z]?\b/i)?.[0];
+    const manufacturingTableRow = structuredFARRow(question, evidence, manufacturingDistrict, "43-12");
+    const manufacturingMaximumFAR = manufacturingTableRow?.standardFAR ?? null;
+    if (lotArea && manufacturingArea && manufacturingMaximumFAR !== null) {
+      const componentFAR = Number((manufacturingArea / lotArea).toFixed(4));
+      const manufacturingMaximumArea = Number((lotArea * manufacturingMaximumFAR).toFixed(4));
+      const manufacturingSourceIDs = manufacturingTableRow.sourceIDs;
+      obligations.push(obligation(
+        "mixed_use_manufacturing_component_far",
+        "component_calculation",
+        `Calculate the manufacturing component as ${manufacturingArea} / ${lotArea} = ${componentFAR} FAR and state that it is within the ${manufacturingMaximumFAR} FAR component limit.`,
+        [],
+        manufacturingSourceIDs,
+        {
+          valueGroups: [
+            [`${componentFAR} FAR`, `${componentFAR.toFixed(2)} FAR`],
+            [`${manufacturingMaximumFAR} FAR`, `${manufacturingMaximumFAR.toFixed(2)} FAR`],
+            ["below", "within"]
+          ],
+          requireSourceBound: true
+        }
+      ));
+      obligations.push(obligation(
+        "mixed_use_manufacturing_component_area_ceiling",
+        "component_calculation",
+        `Show the manufacturing component ceiling: ${lotArea} x ${manufacturingMaximumFAR} = ${manufacturingMaximumArea} square feet.`,
+        [],
+        manufacturingSourceIDs,
+        {
+          valueGroups: [
+            numberTextAlternatives(manufacturingMaximumArea),
+            [`${manufacturingMaximumFAR} FAR`, `${manufacturingMaximumFAR.toFixed(2)} FAR`]
+          ],
+          requireSourceBound: true
+        }
+      ));
+    } else {
+      obligations.push(obligation(
+        "mixed_use_manufacturing_table_row_unresolved",
+        "evidence_boundary",
+        `The structured ZR 43-12 table row for ${manufacturingDistrict || "the stated manufacturing district"} must be resolved before calculating its component FAR ceiling.`,
+        [],
+        manufacturingTableRow?.sourceIDs || [],
+        {
+          requireSourceBound: true,
+          unresolvedEvidence: true,
+          requiredSourceSections: ["43-12"]
+        }
+      ));
+    }
+  }
+
+  if (
+    /split by a district boundary/i.test(question) &&
+    /wide street/i.test(flatEvidence) &&
+    /adjusted maximum floor area ratio|multiply[^.]{0,180}percentage of the zoning lot/i.test(flatEvidence)
+  ) {
+    obligations.push(obligation(
+      "split_district_allocation_does_not_change_total",
+      "total_vs_allocation_boundary",
+      "State that the wide-street exception concerns allocation of the already-calculated floor area and cannot increase or leave unresolved the adjusted total-floor-area maximum.",
+      [],
+      sourceIDsForSections(evidence, ["77-22"]),
+      {
+        valueGroups: [
+          ["allocation", "located", "placement"],
+          ["does not increase", "does not change", "cannot increase"],
+          ["adjusted maximum", "total floor area", "total-floor-area"]
+        ],
+        prohibitedPatterns: [
+          "(?:whether|might|could|may|unresolved)[^.;]{0,180}(?:110,?000|total floor area|total-floor-area)[^.;]{0,120}(?:achiev|allow|permit|compli)",
+          "(?:110,?000|total floor area|total-floor-area)[^.;]{0,120}(?:may|might|could|unresolved)[^.;]{0,120}(?:achiev|allow|permit|compli)"
+        ]
+      }
+    ));
+  }
+
+  if (/C6-2/i.test(question) && /office building/i.test(question) && /convert/i.test(question) && /recreation space/i.test(question)) {
+    const commercialDistrict = question.match(/\bC\d(?:-\d[A-Z]?)?\b/i)?.[0];
+    const residentialEquivalent = structuredEquivalentDistrict(evidence, commercialDistrict);
+    const residentialFAR = residentialEquivalent
+      ? structuredFARRow(question, evidence, residentialEquivalent.district, "23-22")
+      : null;
+    const dwellingFactor = sectionNumericValue(
+      evidence,
+      "23-52",
+      /applicable dwelling unit factor shall be (\d[\d,]*(?:\.\d+)?)/i
+    );
+    const recreationPercent = sectionNumericValue(
+      evidence,
+      "23-63",
+      /minimum of (\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten) percent of the residential floor area/i
+    );
+    const buildingArea = firstQuestionNumber(question, [
+      /lawful\s+(\d[\d,]*(?:\.\d+)?)[- ]square-foot office building/i,
+      /(?:existing|lawful)\s+(\d[\d,]*(?:\.\d+)?)\s*square feet[^.]{0,80}office/i
+    ]);
+    const proposedUnits = firstQuestionNumber(question, [
+      /convert[^.]{0,160}\bto\s+(\d[\d,]*)\s+(?:market-rate\s+)?(?:apartments|dwelling units|units)\b/i
+    ]);
+    const requiredInputs = [
+      [commercialDistrict, "commercial district"],
+      [residentialEquivalent, "structured ZR 34-112 residential-equivalent row"],
+      [residentialFAR, "structured ZR 23-22 FAR row for the stated wide-street geography"],
+      [dwellingFactor, "ZR 23-52 dwelling-unit factor"],
+      [recreationPercent, "ZR 23-63 recreation percentage"],
+      [lotArea, "zoning-lot area"],
+      [buildingArea, "existing residential conversion floor area"],
+      [proposedUnits, "proposed unit count"]
+    ];
+    const missingInputs = requiredInputs.filter(([value]) => value === null || value === undefined).map(([, label]) => label);
+    if (missingInputs.length) {
+      obligations.push(obligation(
+        "conversion_controlling_inputs_unresolved",
+        "evidence_boundary",
+        `Do not calculate conversion density or recreation space until these controlling inputs are resolved: ${missingInputs.join(", ")}.`,
+        [],
+        unique([
+          ...(residentialEquivalent?.sourceIDs || []),
+          ...(residentialFAR?.sourceIDs || []),
+          ...(dwellingFactor?.sourceIDs || []),
+          ...(recreationPercent?.sourceIDs || [])
+        ]),
+        {
+          requireSourceBound: true,
+          unresolvedEvidence: true,
+          requiredSourceSections: ["34-112", "23-22", "23-52", "23-63"]
+        }
+      ));
+    } else {
+      const maximumResidentialArea = Number((lotArea * residentialFAR.standardFAR).toFixed(4));
+      const rawUnitMaximum = maximumResidentialArea / dwellingFactor.value;
+      const wholeUnits = Math.floor(rawUnitMaximum);
+      const preliminaryUnitMaximum = wholeUnits + (rawUnitMaximum - wholeUnits >= 0.75 ? 1 : 0);
+      const unitMargin = preliminaryUnitMaximum - proposedUnits;
+      const unitComparison = unitMargin > 0
+        ? {
+            detail: `${proposedUnits} is ${unitMargin} units below it`,
+            values: [`${unitMargin} units below`, `${unitMargin} dwelling units below`]
+          }
+        : unitMargin < 0
+          ? {
+              detail: `${proposedUnits} is ${Math.abs(unitMargin)} units above it`,
+              values: [
+                `${Math.abs(unitMargin)} units above`,
+                `${Math.abs(unitMargin)} dwelling units above`,
+                `exceeds it by ${Math.abs(unitMargin)}`
+              ]
+            }
+          : {
+              detail: `${proposedUnits} equals it`,
+              values: ["equals the preliminary", "is equal to the preliminary", "exactly the preliminary"]
+            };
+      const recreationArea = Number((buildingArea * recreationPercent.value / 100).toFixed(4));
+      obligations.push(obligation(
+        "conversion_preliminary_density_not_approval",
+        "approval_boundary",
+        `Present ${preliminaryUnitMaximum} units as a preliminary density maximum, state that ${unitComparison.detail}, and do not convert that calculation into legal approval.`,
+        [],
+        sourceIDsForSections(evidence, ["15-111", "23-52"]),
+        {
+          coverageScope: "answer",
+          valueGroups: [
+            ["preliminary"],
+            numberTextAlternatives(preliminaryUnitMaximum),
+            unitComparison.values,
+            ["does not establish", "not establish"],
+            ["legally approvable", "legal approvability"]
+          ],
+          prohibitedPatterns: [`\\b${proposedUnits}(?: market-rate)? (?:apartments|units) (?:are|is) allowed\\b`]
+        }
+      ));
+      obligations.push(obligation(
+        "conversion_c6_2_r8_citation_role",
+        "citation_role",
+        `Bind the ${commercialDistrict}-to-${residentialEquivalent.district} residential-equivalent proposition to ZR 34-112.`,
+        [],
+        residentialEquivalent.sourceIDs,
+        {
+          valueGroups: [[commercialDistrict], [residentialEquivalent.district]],
+          requiredPatterns: [
+            `(?:\\b${commercialDistrict}\\b[^.;]{0,100}\\b(?:maps?|assigned|equivalent)\\b[^.;]{0,100}\\b${residentialEquivalent.district}\\b|\\b${residentialEquivalent.district}\\b[^.;]{0,100}\\b(?:equivalent|assigned)\\b[^.;]{0,100}\\b${commercialDistrict}\\b)`
+          ],
+          requireSourceBound: true,
+          rejectMisboundCoverage: true,
+          prohibitedPatterns: [
+            `\\b${commercialDistrict}\\b[^.;]{0,80}\\b(?:does not|doesn't|is not)\\b[^.;]{0,80}\\b${residentialEquivalent.district}\\b`
+          ]
+        }
+      ));
+      obligations.push(obligation(
+        "conversion_density_factor_citation_role",
+        "citation_role",
+        `Bind the ${dwellingFactor.value} dwelling-unit factor and three-quarter rounding rule to ZR 23-52.`,
+        [],
+        dwellingFactor.sourceIDs,
+        {
+          valueGroups: [numberTextAlternatives(dwellingFactor.value), ["three-quarter", "three quarters", "0.75", "fraction"]],
+          requiredPatterns: [
+            `(?:\\b${dwellingFactor.value}\\b[^.;]{0,120}\\b(?:factor|divide|three-quarter|three quarters|fraction)\\b|\\b(?:factor|divide|three-quarter|three quarters|fraction)\\b[^.;]{0,120}\\b${dwellingFactor.value}\\b)`
+          ],
+          requireSourceBound: true,
+          rejectMisboundCoverage: true
+        }
+      ));
+      obligations.push(obligation(
+        "conversion_recreation_baseline_citation_role",
+        "citation_role",
+        `Bind the ${recreationPercent.value}-percent recreation baseline and ${recreationArea}-square-foot calculation to ZR 23-63.`,
+        [],
+        recreationPercent.sourceIDs,
+        {
+          valueGroups: [
+            [`${recreationPercent.value} percent`, `${recreationPercent.value}%`],
+            numberTextAlternatives(recreationArea)
+          ],
+          requiredPatterns: [
+            `\\b${recreationPercent.value}(?: percent|%)\\b[^.;]{0,120}\\b(?:recreation|baseline|${String(recreationArea).replace(".", "\\.")})\\b`
+          ],
+          requireSourceBound: true,
+          rejectMisboundCoverage: true
+        }
+      ));
+    }
+  }
+
+  if (/City of Yes/i.test(question) && /November 20, 2024/i.test(question) && /foundation/i.test(question)) {
+    const transitionSourceIDs = sourceIDsForSections(evidence, ["11-333"]);
+    obligations.push(obligation(
+      "city_of_yes_specific_transition_route",
+      "effective_date_boundary",
+      "Apply the N 240290 ZRY route for an application filed by December 5, 2024 and approved by DOB by December 5, 2025 on a complete zoning analysis.",
+      [],
+      transitionSourceIDs,
+      {
+        valueGroups: [
+          ["N 240290 ZRY", "N 240290"],
+          ["December 5, 2024"],
+          ["December 5, 2025"],
+          ["complete zoning analysis"],
+          ["DOB", "Department of Buildings"]
+        ],
+        requireSourceBound: true
+      }
+    ));
+    obligations.push(obligation(
+      "city_of_yes_amendment_and_records_boundary",
+      "effective_date_boundary",
+      "State that qualifying amendments may retain status through the deadline and require DOB approval records plus verified pre-amendment substantive text.",
+      [],
+      transitionSourceIDs,
+      {
+        valueGroups: [
+          ["amended", "amendments"],
+          ["DOB records", "Department of Buildings records", "approval records"],
+          ["historical text", "pre-amendment text", "prior rules"]
+        ]
+      }
+    ));
+    obligations.push(obligation(
+      "city_of_yes_foundation_percentage_not_dispositive",
+      "regulatory_boundary",
+      "Distinguish the general completed-foundation rule from ZR 11-333(9), whose eligibility is not decided by the stated foundation percentage.",
+      [],
+      transitionSourceIDs,
+      {
+        valueGroups: [
+          ["60 percent", "60%"],
+          ["all foundation work", "all foundations"],
+          ["does not resolve", "not dispositive", "does not decide", "separate route"]
+        ]
+      }
+    ));
+  }
+
+  return obligations;
+}
+
+function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic, facts = question }) {
   const obligations = [];
   const sourceIDs = evidence.map((source) => source?.sourceID).filter(Boolean);
   const flatEvidence = compactText(evidenceText(evidence));
@@ -583,6 +1195,24 @@ function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic }
       }
     }
   }
+  const residentialDistrict = question.match(/\bR\d{1,2}[A-Z]?(?:-\d[A-Z]?)?\b/i)?.[0];
+  if (
+    lotArea && residentialDistrict && /\b(?:FAR|floor area ratio|floor area)\b/i.test(question) &&
+    !tableValues
+  ) {
+    obligations.push(obligation(
+      "residential_far_table_row_unresolved",
+      "evidence_boundary",
+      `The structured ZR 23-22 table row for ${residentialDistrict} and the stated geography must be resolved before calculating a residential floor-area ceiling.`,
+      [],
+      [],
+      {
+        requireSourceBound: true,
+        unresolvedEvidence: true,
+        requiredSourceSections: ["23-22"]
+      }
+    ));
+  }
 
   const throughLotDepth = firstQuestionNumber(question, [/(\d[\d,]*(?:\.\d+)?)[- ]foot[- ]deep through lot/i]);
   const openAreaDepth = firstQuestionNumber(question, [/(\d[\d,]*(?:\.\d+)?)[- ]foot[- ]wide open area/i]);
@@ -604,6 +1234,43 @@ function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic }
         ["through_lot_upper_tier_shortfall", `Show the upper-tier rear-yard-equivalent shortfall: ${upperRequiredDepth} - ${openAreaDepth} = ${upperShortfall} feet.`, upperShortfall],
         ["through_lot_upper_vertical_portion", `Identify the portion above ${heightTier} feet: ${buildingHeight} - ${heightTier} = ${upperHeight} feet.`, upperHeight]
       ]) obligations.push(obligation(id, "tiered_dimension", detail, numberTextAlternatives(value), sourceIDs));
+      const orientationResolved = /\b(?:30[- ]foot (?:dimension|open area) (?:is|was) measured perpendicular|regulated depth (?:is|was) confirmed|depth orientation (?:is|was) confirmed)\b/i.test(facts);
+      const obstructionsResolved = /\b(?:contains? no obstructions|no actual obstructions|actual obstructions (?:are|were) confirmed (?:as )?permitted|all obstructions (?:are|were) permitted)\b/i.test(facts);
+      if (!orientationResolved) {
+        obligations.push(obligation(
+          "through_lot_regulated_depth_orientation_unresolved",
+          "measurement_boundary",
+          "Keep unresolved whether the supplied open-area dimension is measured in the regulated rear-yard-equivalent depth orientation.",
+          [],
+          sourceIDsForSections(evidence, ["23-343"]),
+          {
+            coverageScope: "uncertainty",
+            valueGroups: [
+              ["orientation", "measured perpendicular", "regulated depth"],
+              ["30-foot", "30 foot", "30 feet"]
+            ]
+          }
+        ));
+      }
+      if (!obstructionsResolved) {
+        obligations.push(obligation(
+          "through_lot_actual_permitted_obstructions_unresolved",
+          "measurement_boundary",
+          "Keep unresolved whether actual obstructions fit the permitted-obstruction rules.",
+          [],
+          sourceIDsForSections(evidence, ["23-343"]),
+          {
+            coverageScope: "uncertainty",
+            valueGroups: [
+              ["permitted obstruction", "permitted-obstruction"],
+              ["whether", "verify", "confirm", "unresolved"]
+            ],
+            requiredPatterns: [
+              "(?:\\b(?:whether|verify|confirm|unresolved)\\b[^.;]{0,120}\\b(?:actual )?obstructions?\\b|\\b(?:actual )?obstructions?\\b[^.;]{0,120}\\b(?:whether|verify|confirm|unresolved)\\b)"
+            ]
+          }
+        ));
+      }
     }
   }
 
@@ -633,19 +1300,28 @@ function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic }
       sourceIDs
     ));
   }
-  return obligations;
+  return obligations.concat(observedFailureObligations({ question, evidence, plan, facts }));
 }
 
-export function zoningResearchDeterministicContext({ question, evidence = [], plan } = {}) {
+export function zoningResearchDeterministicContext({
+  question,
+  evidence = [],
+  plan,
+  projectFacts = [],
+  conversationFactContext = {}
+} = {}) {
   const dates = unique(Array.from(compactText(question).matchAll(calendarDatePattern), (match) => match[0]));
   const structuredTables = (Array.isArray(evidence) ? evidence : [])
-    .filter((source) => Array.isArray(source?.richSourceGrids) && source.richSourceGrids.length > 0)
-    .map((source) => ({
-      sourceID: source.sourceID,
-      contentHash: source.richSourceContentHash || stableHash(source.richSourceGrids),
-      gridHash: stableHash(source.richSourceGrids),
-      gridCount: source.richSourceGrids.length
-    }));
+    .filter((source) => (Array.isArray(source?.richSourceGrids) ? source.richSourceGrids : []).some(validStructuredGrid))
+    .map((source) => {
+      const grids = source.richSourceGrids.filter(validStructuredGrid);
+      return {
+        sourceID: source.sourceID,
+        contentHash: source.richSourceContentHash || stableHash(grids),
+        gridHash: stableHash(grids),
+        gridCount: grids.length
+      };
+    });
   const passages = (Array.isArray(evidence) ? evidence : []).map((source) => ({
     sourceID: source.sourceID,
     sectionID: source.sectionID,
@@ -661,7 +1337,8 @@ export function zoningResearchDeterministicContext({ question, evidence = [], pl
     question: compactText(question),
     evidence,
     plan,
-    arithmetic
+    arithmetic,
+    facts: resolvedFactText({ question, projectFacts, conversationFactContext })
   }).concat(tableLegendObligations(question, evidence));
   const context = {
     schemaVersion: 2,
@@ -697,7 +1374,7 @@ export function zoningResearchPromptContext(plan, deterministicContext) {
   ].filter(Boolean).join("\n");
 }
 
-export function evaluateZoningEvidenceReadiness({ question, evidence = [], plan } = {}) {
+export function evaluateZoningEvidenceReadiness({ question, evidence = [], plan, deterministicContext = null } = {}) {
   const sources = Array.isArray(evidence) ? evidence : [];
   const issues = [];
   if (!sources.length) {
@@ -707,7 +1384,7 @@ export function evaluateZoningEvidenceReadiness({ question, evidence = [], plan 
     });
   }
   if (plan?.path === zoningResearchPaths.structuredTableSymbol &&
-      !sources.some((source) => Array.isArray(source?.richSourceGrids) && source.richSourceGrids.length)) {
+      !sources.some((source) => (Array.isArray(source?.richSourceGrids) ? source.richSourceGrids : []).some(validStructuredGrid))) {
     issues.push({
       code: "STRUCTURED_TABLE_GRID_MISSING",
       detail: "The selected table was not resolved as a structured grid with its headers, symbols, legend, and footnotes."
@@ -728,6 +1405,24 @@ export function evaluateZoningEvidenceReadiness({ question, evidence = [], plan 
       code: "CONTROLLING_SPECIAL_PARKING_RULE_MISSING",
       detail: "The selected evidence names special parking geography but does not supply the controlling enacted parking rule for that geography."
     });
+  }
+  for (const answerObligation of deterministicContext?.answerObligations || []) {
+    if (answerObligation?.unresolvedEvidence === true) {
+      issues.push({
+        code: "CONTROLLING_OBLIGATION_EVIDENCE_UNRESOLVED",
+        obligationID: answerObligation.id,
+        detail: answerObligation.detail,
+        requiredSourceSections: answerObligation.requiredSourceSections || []
+      });
+    }
+    if (answerObligation?.requireSourceBound === true && !(answerObligation?.sourceIDs || []).length) {
+      issues.push({
+        code: "CONTROLLING_OBLIGATION_SOURCE_MISSING",
+        obligationID: answerObligation.id,
+        detail: `${answerObligation.detail} No controlling source identifier was resolved.`,
+        requiredSourceSections: answerObligation.requiredSourceSections || []
+      });
+    }
   }
   return {
     schemaVersion: 1,
@@ -927,6 +1622,75 @@ function proposedAnswerText(answer) {
   ].filter(Boolean).join(" "));
 }
 
+function proposedPrimaryAnswerText(answer) {
+  return compactText([
+    answer?.answerText,
+    answer?.conclusion,
+    answer?.explanation
+  ].filter(Boolean).join(" "));
+}
+
+function proposedUncertaintyText(answer) {
+  return compactText([
+    ...(Array.isArray(answer?.assumptions) ? answer.assumptions : []),
+    ...(Array.isArray(answer?.missingFacts) ? answer.missingFacts : []),
+    ...(Array.isArray(answer?.followUpQuestions) ? answer.followUpQuestions : []),
+    ...(Array.isArray(answer?.evidenceLimitations) ? answer.evidenceLimitations : []),
+    ...(Array.isArray(answer?.additionalEvidenceNeeded) ? answer.additionalEvidenceNeeded : [])
+  ].filter(Boolean).join(" "));
+}
+
+function escapedPattern(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function textContainsObligationValue(text, value) {
+  const expected = compactText(value);
+  if (!expected) return false;
+  const leftBoundary = /^[A-Za-z0-9]/.test(expected) ? "(?<![A-Za-z0-9])" : "";
+  const rightBoundary = /[A-Za-z0-9]$/.test(expected) ? "(?![A-Za-z0-9])" : "";
+  return new RegExp(`${leftBoundary}${escapedPattern(expected)}${rightBoundary}`, "i").test(compactText(text));
+}
+
+function obligationCoveredByText(answerObligation, text) {
+  const values = Array.isArray(answerObligation?.values) ? answerObligation.values : [];
+  const valueGroups = Array.isArray(answerObligation?.valueGroups) ? answerObligation.valueGroups : [];
+  const valuesCovered = !values.length || (answerObligation?.requireAllValues
+    ? values.every((value) => textContainsObligationValue(text, value))
+    : values.some((value) => textContainsObligationValue(text, value)));
+  const groupsCovered = valueGroups.every((group) =>
+    group.some((value) => textContainsObligationValue(text, value))
+  );
+  const normalizedText = compactText(text);
+  const patternsCovered = (answerObligation?.requiredPatterns || []).every((pattern) => {
+    const expression = new RegExp(pattern, "ig");
+    for (const match of normalizedText.matchAll(expression)) {
+      if (answerObligation?.affirmativeRequiredPatterns !== true) return true;
+      const prefix = normalizedText.slice(Math.max(0, (match.index || 0) - 160), match.index || 0);
+      const clausePrefix = prefix.split(/[.;!?]/).at(-1) || "";
+      const matchedText = match[0] || "";
+      const negatedInMatch = /\b(?:not|never)\b[^.;]{0,40}\brequired\b/i.test(matchedText);
+      const negatedInPrefix = /(?:\b(?:false|untrue|not true|not the case)\s+that|\b(?:wrong|incorrect|inaccurate)\s+to\s+(?:say|state|conclude|claim)\s+that|\b(?:cannot|can't|could not|couldn't|would not|wouldn't|should not|shouldn't)\s+(?:say|state|conclude|claim)\s+that|\bno\s+(?:basis|grounds)\s+to\s+(?:say|state|conclude|claim)\s+that)\s*$/i.test(clausePrefix);
+      if (!negatedInMatch && !negatedInPrefix) return true;
+    }
+    return false;
+  });
+  return valuesCovered && groupsCovered && patternsCovered;
+}
+
+function prohibitedPatternDetected(pattern, text) {
+  const expression = new RegExp(pattern, "ig");
+  for (const match of compactText(text).matchAll(expression)) {
+    const prefix = compactText(text).slice(Math.max(0, (match.index || 0) - 80), match.index || 0);
+    const quotedNegation = `${prefix} ${match[0]}`;
+    if (/\b(?:wrong|incorrect|inaccurate) to say\b|\bdoes not (?:mean|establish)\b|\bnot true that\b/i.test(quotedNegation)) {
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+
 function proposedCitationIDs(answer) {
   return unique((Array.isArray(answer?.citations) ? answer.citations : [])
     .flatMap((citation) => citation?.sourceIDs || []));
@@ -939,7 +1703,13 @@ export function evaluateZoningDeterministicControls({
   providerRequestCount = 0
 } = {}) {
   const text = proposedAnswerText(answer);
+  const primaryText = proposedPrimaryAnswerText(answer);
+  const uncertaintyText = proposedUncertaintyText(answer);
   const citationIDs = new Set(proposedCitationIDs(answer));
+  const supportedPoints = (Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : []).map((point) => ({
+    text: compactText([point?.heading, point?.explanation].filter(Boolean).join(" ")),
+    sourceIDs: new Set((Array.isArray(point?.sourceIDs) ? point.sourceIDs : []).map(String))
+  }));
   const issues = [];
   if (
     plan?.disposition !== zoningResearchDispositions.ready &&
@@ -991,19 +1761,78 @@ export function evaluateZoningDeterministicControls({
       }
     }
   }
-  const normalizedText = text.toLowerCase();
   for (const answerObligation of deterministicContext?.answerObligations || []) {
-    const values = Array.isArray(answerObligation?.values) ? answerObligation.values : [];
-    const covered = answerObligation?.requireAllValues
-      ? values.every((value) => normalizedText.includes(String(value).toLowerCase()))
-      : values.some((value) => normalizedText.includes(String(value).toLowerCase()));
-    if (!values.length || covered) continue;
-    issues.push({
-      code: "ANSWER_OBLIGATION_NOT_COVERED",
-      obligationID: answerObligation.id,
-      sourceIDs: answerObligation.sourceIDs || [],
-      detail: answerObligation.detail
-    });
+    const scopeText = answerObligation?.coverageScope === "uncertainty"
+      ? compactText(`${primaryText} ${uncertaintyText}`)
+      : answerObligation?.coverageScope === "answer"
+        ? primaryText
+        : text;
+    const covered = obligationCoveredByText(answerObligation, scopeText);
+    if (!covered) {
+      issues.push({
+        code: "ANSWER_OBLIGATION_NOT_COVERED",
+        obligationID: answerObligation.id,
+        sourceIDs: answerObligation.sourceIDs || [],
+        detail: answerObligation.detail
+      });
+    }
+    const allowedSourceIDs = new Set((answerObligation?.sourceIDs || []).map(String));
+    if (answerObligation?.unresolvedEvidence === true) {
+      issues.push({
+        code: "ANSWER_OBLIGATION_EVIDENCE_UNRESOLVED",
+        obligationID: answerObligation.id,
+        sourceIDs: answerObligation.sourceIDs || [],
+        detail: answerObligation.detail
+      });
+    }
+    if (answerObligation?.requireSourceBound === true && !allowedSourceIDs.size) {
+      issues.push({
+        code: "ANSWER_OBLIGATION_SOURCE_UNRESOLVED",
+        obligationID: answerObligation.id,
+        sourceIDs: [],
+        detail: `${answerObligation.detail} No controlling source identifier was resolved.`
+      });
+    }
+    if (covered && answerObligation?.requireSourceBound === true && allowedSourceIDs.size) {
+      const sourceBound = supportedPoints.some((point) =>
+        obligationCoveredByText(answerObligation, point.text) &&
+        point.sourceIDs.size > 0 &&
+        Array.from(point.sourceIDs).every((sourceID) => allowedSourceIDs.has(sourceID))
+      );
+      if (!sourceBound) {
+        issues.push({
+          code: "ANSWER_OBLIGATION_SOURCE_NOT_BOUND",
+          obligationID: answerObligation.id,
+          sourceIDs: answerObligation.sourceIDs || [],
+          detail: `${answerObligation.detail} The matching supported point is not bound to the controlling source.`
+        });
+      }
+    }
+    if (answerObligation?.rejectMisboundCoverage === true && allowedSourceIDs.size) {
+      const misbound = supportedPoints.some((point) =>
+        obligationCoveredByText(answerObligation, point.text) &&
+        point.sourceIDs.size > 0 &&
+        Array.from(point.sourceIDs).some((sourceID) => !allowedSourceIDs.has(sourceID))
+      );
+      if (misbound) {
+        issues.push({
+          code: "ANSWER_OBLIGATION_SOURCE_MISBOUND",
+          obligationID: answerObligation.id,
+          sourceIDs: answerObligation.sourceIDs || [],
+          detail: `${answerObligation.detail} A supported point assigns that proposition to a different source.`
+        });
+      }
+    }
+    for (const pattern of answerObligation?.prohibitedPatterns || []) {
+      if (!prohibitedPatternDetected(pattern, text)) continue;
+      issues.push({
+        code: "ANSWER_OBLIGATION_CONTRADICTED",
+        obligationID: answerObligation.id,
+        sourceIDs: answerObligation.sourceIDs || [],
+        detail: answerObligation.detail
+      });
+      break;
+    }
   }
   const deduplicated = [];
   const seen = new Set();

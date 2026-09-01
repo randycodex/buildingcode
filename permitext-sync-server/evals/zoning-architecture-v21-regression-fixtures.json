@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "artifact": "Permitext Zoning Research Architecture V2.1 observed-failure regressions",
+  "sourceResult": "evals/results/2026-09-01T16-49-32-263Z-9f67f4ba-3944-46a4-b438-fcec082144e3.json",
+  "sourceRunID": "9f67f4ba-3944-46a4-b438-fcec082144e3",
+  "rubricsModified": false,
+  "cases": [
+    {
+      "id": "zr-r7a-lot-coverage",
+      "failureKind": "deterministic_verifier_block",
+      "failingAnswerProvenance": "representative_reconstruction",
+      "requiredFailureObligationIDs": [
+        "basic_lot_coverage_modification_boundaries",
+        "basic_lot_coverage_independent_bulk_boundary"
+      ],
+      "failingAnswer": {
+        "answerText": "No. The basic maximum is 80 percent, or 8,000 square feet, so the proposed 8,500 square feet exceeds the basic cap."
+      },
+      "passingAnswer": {
+        "answerText": "No under the basic rule. 80 percent of 10,000 square feet is 8,000 square feet, so 8,500 square feet exceeds the basic cap. ZR 23-363 may modify that percentage for a qualifying shallow lot, a portion within 100 feet of a corner, or frontage along the short dimension of the block. The 8,000-square-foot calculation is not an entitlement to that footprint: yard, open-area, and other bulk rules remain independently applicable."
+      }
+    },
+    {
+      "id": "zr-inner-transit-zone-new-unit-parking",
+      "failureKind": "deterministic_verifier_block",
+      "failingAnswerProvenance": "representative_reconstruction",
+      "requiredFailureObligationIDs": [
+        "inner_transit_post_2024_zero_spaces",
+        "inner_transit_transition_and_existing_parking_boundary",
+        "inner_transit_created_certificate_definition"
+      ],
+      "failingAnswer": {
+        "answerText": "Section 25-211 requires zero accessory parking spaces for this Inner Transit Zone development."
+      },
+      "passingAnswer": {
+        "answerText": "Section 25-211 requires zero accessory off-street parking spaces for the stated units because they are created after December 5, 2024 within the Inner Transit Zone. The stated facts exclude the Section 11-333 pre-December 5, 2024 continuation route. Existing units and existing parking remain governed by Section 25-212 and may only be reduced or eliminated through the separately identified procedures. A unit is created when its temporary certificate of occupancy is issued or, if none is issued, when its final certificate of occupancy is issued.",
+        "supportedPoints": [
+          {
+            "heading": "Post-December 5, 2024 Inner Transit Zone units",
+            "explanation": "No accessory off-street parking spaces are required for units created after December 5, 2024 within the Inner Transit Zone. Creation is measured by the temporary certificate of occupancy or, if none, the final certificate of occupancy.",
+            "sectionNumbers": ["25-211"]
+          },
+          {
+            "heading": "Transition boundary",
+            "explanation": "Section 11-333 is a separate pre-December 5, 2024 continuation route and the question states that its filing and approval conditions are not met.",
+            "sectionNumbers": ["11-333"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "zr-cellar-floor-area-definition",
+      "failureKind": "deterministic_verifier_block",
+      "failingAnswerProvenance": "representative_reconstruction",
+      "requiredFailureObligationIDs": [
+        "cellar_special_measurement_conditions"
+      ],
+      "failingAnswer": {
+        "answerText": "No. More than one-half of the level is below the base plane, so it is a cellar, and non-dwelling cellar storage is excluded from zoning floor area. Retail cellar space is counted only for accessory parking, bicycle parking, and loading calculations.",
+        "supportedPoints": [
+          {
+            "heading": "Cellar classification",
+            "explanation": "The more-than-one-half test below the base plane makes the level a cellar, and cellar space not used for dwelling purposes does not count as floor area.",
+            "sectionNumbers": ["12-10"]
+          }
+        ]
+      },
+      "passingAnswer": {
+        "answerText": "No on the stated facts, subject to the special measurement rules. More than one-half of the floor-to-ceiling height is below the applicable base plane, so the level is a cellar; because the storage is not used for dwelling purposes, it is excluded from zoning floor area. Retail cellar space is counted only for accessory parking, bicycle-parking, and loading calculations, which does not turn ordinary storage into zoning floor area.",
+        "missingFacts": [
+          "Confirm whether a sloping base plane applies, which street wall line level controls on any through lot, and whether a yard was lowered after December 5, 1990 before treating the cellar measurement as conclusive."
+        ],
+        "supportedPoints": [
+          {
+            "heading": "Cellar and floor-area definitions",
+            "explanation": "A space with more than one-half its height below the base plane is a cellar, and cellar space not used for dwelling purposes does not count because it is excluded from floor area.",
+            "sectionNumbers": ["12-10"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "zr-candidate-b1-deep-through-lot-vertical-yard",
+      "failureKind": "judged_semantic_failure",
+      "failingAnswerProvenance": "retained_delivered_answer",
+      "requiredFailureObligationIDs": [
+        "through_lot_regulated_depth_orientation_unresolved",
+        "through_lot_actual_permitted_obstructions_unresolved"
+      ],
+      "failingAnswer": "retained",
+      "passingAnswer": {
+        "answerText": "The stated 30-foot area is 10 feet short of the 40-foot lower-tier requirement and 30 feet short of the 60-foot upper-tier requirement. Each 100-foot wing has a 25-foot vertical portion above the 75-foot tier.",
+        "missingFacts": [
+          "Confirm whether the stated 30-foot measurement is taken in the regulated depth orientation and whether any actual obstructions satisfy the permitted-obstruction rules."
+        ]
+      }
+    },
+    {
+      "id": "zr-candidate-b1-mx-nonadditive-far",
+      "failureKind": "judged_semantic_failure",
+      "failingAnswerProvenance": "retained_delivered_answer",
+      "requiredFailureObligationIDs": [
+        "mixed_use_manufacturing_component_far",
+        "mixed_use_manufacturing_component_area_ceiling"
+      ],
+      "failingAnswer": "retained",
+      "passingAnswer": {
+        "answerText": "No. The residential component is 45,000 divided by 10,000, or 4.50 FAR. The R7A standard ceiling is 40,000 square feet and its qualifying ceiling is 50,100 square feet. The 10,000-square-foot manufacturing component is 1.00 FAR, within the M1-4 limit of 2.00 FAR; that component ceiling is 10,000 times 2.00, or 20,000 square feet. Individual component compliance does not cure the 55,000-square-foot total exceeding the controlling 50,100-square-foot mixed-use cap.",
+        "supportedPoints": [
+          {
+            "heading": "Manufacturing component",
+            "explanation": "The 10,000-square-foot manufacturing component equals 1.00 FAR and is within the 2.00 FAR limit. On this lot, 2.00 FAR equals a 20,000-square-foot manufacturing ceiling.",
+            "sectionNumbers": ["43-12"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "zr-candidate-b1-r7a-r8a-weighted-far",
+      "failureKind": "judged_semantic_failure",
+      "failingAnswerProvenance": "retained_delivered_answer",
+      "requiredFailureObligationIDs": [
+        "split_district_allocation_does_not_change_total"
+      ],
+      "failingAnswer": "retained",
+      "passingAnswer": {
+        "answerText": "No. The weighted adjusted maximum is 5.212 FAR, or 104,240 square feet, while the proposed 110,000 square feet is 5.50 FAR and exceeds that maximum by 5,760 square feet. The wide-street exception concerns allocation or placement of already-permitted floor area; it does not increase the adjusted maximum total floor area. Its unresolved location facts therefore cannot make the definite total overage uncertain."
+      }
+    },
+    {
+      "id": "zr-candidate-b1-c6-2-office-residential-conversion",
+      "failureKind": "judged_semantic_failure",
+      "failingAnswerProvenance": "retained_delivered_answer",
+      "requiredFailureObligationIDs": [
+        "conversion_preliminary_density_not_approval"
+      ],
+      "requiredCompiledObligationIDs": [
+        "conversion_preliminary_density_not_approval",
+        "conversion_c6_2_r8_citation_role",
+        "conversion_density_factor_citation_role",
+        "conversion_recreation_baseline_citation_role"
+      ],
+      "failingAnswer": "retained",
+      "passingAnswer": {
+        "answerText": "The proposed 100 units are 33 units below the preliminary density maximum of 133 units. That numerical calculation does not establish that the conversion is legally approvable; existing-floor-area legality, light and air, unit configuration, recreation design, and other applicable requirements remain unresolved. The general recreation-space minimum is 3 percent of 90,000 square feet, or 2,700 square feet; a qualifying outdoor conversion space may use the separate 2-percent amount of 1,800 square feet.",
+        "supportedPoints": [
+          {
+            "heading": "C6-2 residential equivalent",
+            "explanation": "C6-2 maps to the R8 residential equivalent.",
+            "sectionNumbers": ["34-112"]
+          },
+          {
+            "heading": "Preliminary density factor",
+            "explanation": "The 680 dwelling-unit factor applies, and a fraction of at least three-quarters rounds to one unit.",
+            "sectionNumbers": ["23-52"]
+          },
+          {
+            "heading": "General recreation baseline",
+            "explanation": "The 3 percent baseline produces 2,700 square feet of recreation space.",
+            "sectionNumbers": ["23-63"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "zr-candidate-b1-city-of-yes-transition",
+      "failureKind": "judged_semantic_failure",
+      "failingAnswerProvenance": "retained_delivered_answer",
+      "requiredFailureObligationIDs": [
+        "city_of_yes_specific_transition_route",
+        "city_of_yes_amendment_and_records_boundary",
+        "city_of_yes_foundation_percentage_not_dispositive"
+      ],
+      "failingAnswer": "retained",
+      "passingAnswer": {
+        "answerText": "The November 20, 2024 filing, December 4, 2024 permit, and 60 percent foundation completion do not by themselves decide whether prior zoning remains available. Under the general rule, all foundation work had to be completed, but that does not resolve the separate N 240290 ZRY route in ZR 11-333. An application filed by December 5, 2024 may continue if DOB approved it by December 5, 2025 based on a complete zoning analysis; qualifying amendments can retain status if their associated analysis was approved by that deadline. Review the DOB approval records and verified pre-amendment historical text before deciding what prior rules are preserved.",
+        "supportedPoints": [
+          {
+            "heading": "N 240290 ZRY transition route",
+            "explanation": "ZR 11-333 provides a separate N 240290 ZRY route for an application filed by December 5, 2024 and approved by DOB by December 5, 2025 based on a complete zoning analysis.",
+            "sectionNumbers": ["11-333"]
+          }
+        ]
+      }
+    }
+  ]
+}

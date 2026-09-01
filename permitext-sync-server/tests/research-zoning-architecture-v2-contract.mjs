@@ -7,6 +7,8 @@ import {
   zoningResearchDeterministicContext,
   zoningResearchDispositions
 } from "../research-zoning-planner.mjs";
+import { structuredRichSources } from "../evidence-discovery.mjs";
+import { zoningSection } from "../zoning-content.mjs";
 
 const retainedResultPath = new URL(
   "../evals/results/2026-09-01T14-35-20-650Z-90f42d5b-b758-4df4-98af-933350f036e7.json",
@@ -14,28 +16,33 @@ const retainedResultPath = new URL(
 );
 const retained = JSON.parse(await readFile(retainedResultPath, "utf8"));
 
-function evidenceFor(result, plan) {
-  return result.testCase.selectedEvidence.map((selected, index) => {
+async function evidenceFor(result) {
+  return Promise.all(result.testCase.selectedEvidence.map(async (selected, index) => {
     const sectionNumber = selected.reference.replace(/^ZR\s+/i, "");
     const citedSourceID = result.answer?.citations?.find((citation) =>
       citation.sectionNumber === sectionNumber
     )?.sourceIDs?.[0];
+    const section = await zoningSection(selected.sectionID);
     return {
       sourceID: citedSourceID || `retained-${result.testCase.id}-${index}`,
       sectionID: selected.sectionID,
       sectionNumber,
       codePrefix: "ZR",
       text: selected.exactPassages.join("\n"),
-      richSourceGrids: plan.path === "structured_table_symbol" ? [{ rows: [] }] : [],
+      richSourceGrids: section
+        ? structuredRichSources(section)
+          .filter((source) => source.kind === "table")
+          .flatMap((source) => source.grids || [])
+        : [],
       evidencePriority: { evidenceRole: "governing", claimCoverageRequired: true }
     };
-  });
+  }));
 }
 
-function controlsFor(result, answer = result.answer) {
+async function controlsFor(result, answer = result.answer) {
   const question = result.testCase.question;
   const plan = planZoningResearchQuestion({ question });
-  const evidence = evidenceFor(result, plan);
+  const evidence = await evidenceFor(result);
   const deterministicContext = zoningResearchDeterministicContext({ question, evidence, plan });
   return {
     plan,
@@ -47,18 +54,23 @@ function controlsFor(result, answer = result.answer) {
 
 const delivered = retained.results.filter((result) => result.answer);
 assert.equal(delivered.length, 14);
-const replay = new Map(delivered.map((result) => [result.testCase.id, controlsFor(result)]));
-const knownJudgeFailures = new Set([
+const replay = new Map(await Promise.all(delivered.map(async (result) => [
+  result.testCase.id,
+  await controlsFor(result)
+])));
+const knownObligationFailures = new Set([
+  "zr-r7a-lot-coverage",
   "zr-candidate-b1-r6a-uap-insufficient-affordable-area",
-  "zr-candidate-b1-deep-through-lot-vertical-yard"
+  "zr-candidate-b1-deep-through-lot-vertical-yard",
+  "zr-candidate-b1-r7a-r8a-weighted-far"
 ]);
 
 for (const result of delivered) {
   const controls = replay.get(result.testCase.id).controls;
   assert.equal(
     controls.pass,
-    !knownJudgeFailures.has(result.testCase.id),
-    `${result.testCase.id} must preserve a full-score retained answer or reject its known judged omission.`
+    !knownObligationFailures.has(result.testCase.id),
+    `${result.testCase.id} must preserve a retained answer or reject a later-confirmed obligation failure.`
   );
 }
 
@@ -84,7 +96,11 @@ assert.equal(evaluateZoningDeterministicControls({
   deterministicContext: throughLot.deterministicContext,
   answer: {
     ...delivered.find((result) => result.testCase.id === "zr-candidate-b1-deep-through-lot-vertical-yard").answer,
-    answerText: `${delivered.find((result) => result.testCase.id === "zr-candidate-b1-deep-through-lot-vertical-yard").answer.answerText}\n\nThe upper 25 feet of each 100-foot wing is above the 75-foot tier.`
+    answerText: `${delivered.find((result) => result.testCase.id === "zr-candidate-b1-deep-through-lot-vertical-yard").answer.answerText}\n\nThe upper 25 feet of each 100-foot wing is above the 75-foot tier.`,
+    missingFacts: [
+      ...(delivered.find((result) => result.testCase.id === "zr-candidate-b1-deep-through-lot-vertical-yard").answer.missingFacts || []),
+      "Confirm whether the stated 30-foot measurement is taken in the regulated depth orientation and whether actual obstructions satisfy the permitted-obstruction rules."
+    ]
   }
 }).pass, true);
 
@@ -95,8 +111,9 @@ assert.equal(failedV1.length, 11);
 for (const result of failedV1) {
   const question = result.testCase.question;
   const plan = planZoningResearchQuestion({ question });
-  const evidence = evidenceFor(result, plan);
-  const readiness = evaluateZoningEvidenceReadiness({ question, evidence, plan });
+  const evidence = await evidenceFor(result);
+  const deterministicContext = zoningResearchDeterministicContext({ question, evidence, plan });
+  const readiness = evaluateZoningEvidenceReadiness({ question, evidence, plan, deterministicContext });
   if (result.testCase.id === "zr-candidate-b1-r6-parking-unverified-transit-zone") {
     assert.notEqual(plan.disposition, zoningResearchDispositions.ready);
     assert.equal(plan.callPolicy.maximumProviderCalls, 0);
@@ -118,8 +135,8 @@ assert.equal(missingMap.callPolicy.maximumProviderCalls, 0);
 console.log(JSON.stringify({
   pass: true,
   retainedDeliveredAnswers: delivered.length,
-  retainedFullScoreAnswersPreserved: 12,
-  knownJudgeOmissionsRejected: 2,
+  retainedAnswersPreserved: 10,
+  knownObligationFailuresRejected: 4,
   formerVerifierBlocksWithBoundedRepair: 10,
   formerVerifierBlockConvertedToEarlyEvidenceBoundary: 1,
   paidModelCalls: 0
