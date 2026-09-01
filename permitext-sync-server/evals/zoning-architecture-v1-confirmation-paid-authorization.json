@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "048cb366-4332-4379-9dbc-62feb3fe7224",
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -27,11 +27,11 @@
     "exactSpendingCapPhrase": "authorize exactly package commit 6f222ac1a0d5375cef14a3f10299d8b8e06b9112 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
-    "status": "not_started",
-    "attemptID": null,
-    "startedAt": null,
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "attemptID": "90f42d5b-b758-4df4-98af-933350f036e7",
+    "startedAt": "2026-09-01T14:35:19.394Z",
+    "runID": "90f42d5b-b758-4df4-98af-933350f036e7",
+    "consumedAt": "2026-09-01T14:46:08.899Z"
   },
   "lineage": {
     "preparedFromCommit": "3f72999be05ebfbababe55ba0a2a9c48052738cb",
@@ -86,7 +86,7 @@
   },
   "execution": {
     "authorizationPackageCommit": "6f222ac1a0d5375cef14a3f10299d8b8e06b9112",
-    "executionCommit": null,
+    "executionCommit": "5e3263505a33c2dff2055558be19e274aab5d36a",
     "webSupportEnabled": false,
     "lunaFirst": true,
     "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only",
@@ -105,5 +105,5 @@
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
   "networkOrModelCallAuthorized": true,
-  "notes": "The Permitext owner authorized the exact locked Architecture V1 successor package for all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. The one-use successor confirmation has not started."
+  "notes": "One-time authorization consumed by 2026-09-01T14-35-20-650Z-90f42d5b-b758-4df4-98af-933350f036e7.json. The result still requires quality, cost, and release-gate review."
 }
