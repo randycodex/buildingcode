@@ -294,6 +294,84 @@ for (const independentlyReproducedSafeTreatment of [
   );
 }
 
+const v15ExplicitRequiredInputBoundaries = [
+  "A parcel-specific conclusion requires the property's address or BBL and the applicable official Appendix J map.",
+  "A site-specific conclusion requires the address or BBL and the applicable official Appendix J map.",
+  "The property's address or BBL and the applicable official Appendix J map are required to make a parcel-specific conclusion.",
+  "The property's address or BBL and the applicable official Appendix J map must be identified before a parcel-specific conclusion is made.",
+  "To make a property-specific conclusion, the property's address or BBL and the applicable official Appendix J map are required.",
+  "A site-specific determination needs the property's address or BBL and the applicable official Appendix J map.",
+  "The address or BBL and the applicable official Appendix J map are needed for any parcel-specific conclusion.",
+  "Before making a site-specific conclusion, identify the property's address or BBL and the applicable official Appendix J map."
+];
+for (const explicitRequiredInputBoundary of v15ExplicitRequiredInputBoundaries) {
+  const explicitRequiredInputBoundaryResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `Appendix J provides that self-service storage facilities are subject to the as-of-right provisions of Section 42-19 in Subarea 1, while they are subject to City Planning Commission special permit under Section 74-192 in Subarea 2. ${explicitRequiredInputBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert.equal(
+    explicitRequiredInputBoundaryResult.pass,
+    true,
+    `${explicitRequiredInputBoundary}: ${JSON.stringify(explicitRequiredInputBoundaryResult.issues)}`
+  );
+}
+
+for (const incompleteRequiredInputBoundary of [
+  "The property's address or BBL and the official Appendix J map are required for the application form.",
+  "The applicable official Appendix J map is required to make a parcel-specific conclusion.",
+  "The property's address or BBL is required to make a parcel-specific conclusion.",
+  "A parcel-specific conclusion requires supporting evidence. The property's address or BBL and the applicable official Appendix J map are listed separately.",
+  "To make a property-specific conclusion, legal review is required, while the property's address or BBL and the applicable official Appendix J map are optional.",
+  "The property's address or BBL and the applicable official Appendix J map are optional, but legal review is required to make a property-specific conclusion."
+]) {
+  const incompleteRequiredInputBoundaryResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `Appendix J provides that self-service storage facilities are subject to the as-of-right provisions of Section 42-19 in Subarea 1. ${incompleteRequiredInputBoundary}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    incompleteRequiredInputBoundaryResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    incompleteRequiredInputBoundary
+  );
+}
+
+for (const maskedExplicitInputConclusion of [
+  `${v15ExplicitRequiredInputBoundaries[2].replace(/\.$/, "")}, so this site may proceed as-of-right.`,
+  `${v15ExplicitRequiredInputBoundaries[3]} This property is in Subarea 1 and is permitted as-of-right.`,
+  `${v15ExplicitRequiredInputBoundaries[4].replace(/\.$/, "")}, but this project qualifies for the benefit.`,
+  `${v15ExplicitRequiredInputBoundaries[5]} The applicant may proceed.`,
+  `This site is permitted as-of-right. ${v15ExplicitRequiredInputBoundaries[6]}`,
+  `${v15ExplicitRequiredInputBoundaries[7]} The owner receives the benefit.`,
+  `${v15ExplicitRequiredInputBoundaries[2].replace(/\.$/, "")}, but the project qualifies for the benefit.`,
+  `${v15ExplicitRequiredInputBoundaries[3].replace(/\.$/, "")}, so the site may proceed.`,
+  `${v15ExplicitRequiredInputBoundaries[4].replace(/\.$/, "")}, and the property is permitted as-of-right.`
+]) {
+  const maskedExplicitInputConclusionResult = evaluateZoningResearchSafety({
+    question: sourceBoundaryQuestion,
+    evidence: mapEvidence,
+    answer: answer(
+      `Appendix J provides that self-service storage facilities are subject to the as-of-right provisions of Section 42-19 in Subarea 1. ${maskedExplicitInputConclusion}`,
+      ["zr-map"],
+      appendixJMissingFacts
+    )
+  });
+  assert(
+    maskedExplicitInputConclusionResult.issues.some((issue) =>
+      issue.type === "zoning_missing_mapped_location"),
+    maskedExplicitInputConclusion
+  );
+}
+
 const namedAppendixJInventory = evaluateZoningResearchSafety({
   question: sourceBoundaryQuestion,
   evidence: appendixJStructuredEvidence,

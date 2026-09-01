@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 export const zoningResearchSafetyVersion =
-  "20260831-zoning-appendix-j-source-boundary-prompt-v14";
+  "20260831-zoning-appendix-j-explicit-input-boundary-v15";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -253,10 +253,74 @@ function categoricalProjectConclusion(value) {
     ).test(value);
 }
 
+function statesExplicitMappedInputBoundary(value) {
+  const siteSpecificResult = /\b(?:site|property|parcel)[- ]specific\s+(?:conclusion|determination|result|applicability|finding|assessment)\b/i;
+  const addressOrBBL = /\b(?:(?:(?:the\s+)?(?:property(?:['’]s)?\s+)?address)\s*(?:or|\/)\s*(?:(?:the\s+)?BBL)|(?:(?:the\s+)?BBL)\s*(?:or|\/)\s*(?:(?:the\s+)?(?:property(?:['’]s)?\s+)?address))\b/i;
+  const officialAppendixJMap = /\b(?:the\s+)?(?:applicable\s+)?official\s+Appendix\s+J\s+map\b/i;
+  const resultAction = /\b(?:mak(?:e|ing)|reach(?:ing)?|giv(?:e|ing)|determin(?:e|ing)|establish(?:ing)?|confirm(?:ing)?|support(?:ing)?|assess(?:ing)?)\b/i;
+  const inputRequirement = /\b(?:requires?|needs?|depends?\s+on|(?:is|are)\s+(?:required|needed)|must\s+be\s+(?:identified|provided|established|known|verified|reviewed|located|obtained))\b/i;
+  const inputAction = /\b(?:identify|provide|establish|verify|review|locate|obtain)\b/i;
+  return compactText(value)
+    .split(/[.!?;]+\s*/)
+    .map(compactText)
+    .filter(Boolean)
+    .some((clause) => {
+      const resultMatch = siteSpecificResult.exec(clause);
+      const identifierMatch = addressOrBBL.exec(clause);
+      const mapMatch = officialAppendixJMap.exec(clause);
+      if (!resultMatch || !identifierMatch || !mapMatch) return false;
+      const inputsStart = Math.min(identifierMatch.index, mapMatch.index);
+      const inputsEnd = Math.max(
+        identifierMatch.index + identifierMatch[0].length,
+        mapMatch.index + mapMatch[0].length
+      );
+      const inputActionMatch = inputAction.exec(clause);
+      const imperativeBeforeResult = Boolean(resultMatch) &&
+        /\bbefore\b/i.test(clause.slice(0, resultMatch.index)) &&
+        Boolean(inputActionMatch) &&
+        inputActionMatch.index > resultMatch.index + resultMatch[0].length &&
+        inputActionMatch.index < inputsStart &&
+        !/\b(?:not|never)\s*$/i.test(clause.slice(
+          resultMatch.index + resultMatch[0].length,
+          inputActionMatch.index
+        ));
+      const requirementMatch = inputRequirement.exec(clause);
+      if (!requirementMatch) return imperativeBeforeResult;
+      const resultEnd = resultMatch.index + resultMatch[0].length;
+      const requirementEnd = requirementMatch.index + requirementMatch[0].length;
+      const resultDirectlyRequiresInputs = inputsStart >= requirementEnd &&
+        /^[,:]?\s*(?:the\s+)?$/i.test(clause.slice(requirementEnd, inputsStart));
+      const inputsDirectlyRequired = requirementMatch.index >= inputsEnd &&
+        /^\s*(?:(?:is|are)\s+(?:required|needed)|must\s+be\s+(?:identified|provided|established|known|verified|reviewed|located|obtained))$/i.test(
+          clause.slice(inputsEnd, requirementEnd)
+        );
+      const resultRequiresInputs = requirementMatch.index >= resultEnd &&
+        requirementMatch.index - resultEnd <= 100 &&
+        resultDirectlyRequiresInputs;
+      const requiredInputsLeadToResult = inputsDirectlyRequired &&
+        resultMatch.index >= requirementEnd &&
+        resultMatch.index - requirementEnd <= 180 &&
+        (
+          /\b(?:before|for)\b/i.test(clause.slice(requirementEnd, resultMatch.index)) ||
+          resultAction.test(clause.slice(requirementEnd, resultMatch.index))
+        );
+      const resultLeadRequiresInputs = inputsDirectlyRequired &&
+        resultMatch.index < inputsStart &&
+        requirementMatch.index - resultEnd <= 220 &&
+        (
+          /\b(?:to|before|for)\b/i.test(clause.slice(0, resultMatch.index)) ||
+          resultAction.test(clause.slice(0, requirementMatch.index))
+        );
+      return resultRequiresInputs || requiredInputsLeadToResult ||
+        resultLeadRequiresInputs || imperativeBeforeResult;
+    });
+}
+
 function hasAppendedMappedActorConclusion(value) {
   const clauses = compactText(value).split(/[.!?;]+\s*/).map(compactText).filter(Boolean);
   const boundaryMarker = /\b(?:no\s+(?:site-specific|property-specific|parcel-specific)\s+(?:conclusion|determination)|(?:cannot|could not|does not|not enough|insufficient|unable to)\b[^.]{0,180}\b(?:determine|establish|conclude|confirm|place|locate|map|apply)|(?:site-specific|property-specific|parcel-specific)\b[^.]{0,100}\b(?:cannot|not|unknown|unresolved|requires?))\b/i;
   const actorReference = /\b(?:they|them|he|him|she|her|you|we|us|the\s+same|the\s+former|the\s+latter|(?:(?:the|this|that|our|your|their|said)\s+)?(?:applicant|owner|tenant|client|customer|developer|operator|lessee|landlord))\b/i;
+  const projectReference = /\b(?:(?:the|this|that|our|your|their|said)\s+)(?:application|proposal|project|facility|premises|building|warehouse|lot|(?:site|property|parcel)(?!\s+(?:address|location|mapped\s+status)|['’]s\s+(?:address|location|mapped\s+status)))\b/i;
   const boundaryConnector = /(?:\s*[:—–]\s*|(?:,\s*)?\b(?:even\s+though|although|whereas|however|nevertheless|nonetheless|notwithstanding(?:\s+that)?|despite(?:\s+the\s+fact\s+that)?|though|while|but|yet|and|plus|so|therefore|thus|accordingly|consequently|hence|meaning)\b(?:\s*,)?)/i;
   const safeEvidenceOnlyContinuation = (value) => {
     const text = compactText(value).replace(
@@ -271,27 +335,34 @@ function hasAppendedMappedActorConclusion(value) {
     if (/^(?:is|are)\s+(?:permitted|allowed|authorized)\s+only\s+to\s+(?:request|obtain|verify|review|check|provide|supply|submit)\s+(?:the\s+)?(?:(?:property\s+)?address|BBL|(?:applicable\s+)?official\s+(?:Appendix\s+J\s+)?map|zoning\s+map|mapped\s+(?:district|area|status))(?:\s+(?:before|for)\s+(?:review|verification|confirmation|mapping))?$/i.test(text)) {
       return true;
     }
-    return /^(?:(?:the\s+)?(?:(?:property\s+)?address|BBL|(?:applicable\s+)?official\s+(?:Appendix\s+J\s+)?map|zoning\s+map|mapped\s+(?:district|area|status)|issue)\b[^.]{0,100}\b(?:is|are|remains?)\s+(?:needed|required|missing|unknown|unverified|unresolved|unavailable)|(?:the\s+)?(?:address|BBL|official\s+map|mapped\s+(?:district|area|status)))$/i.test(text);
+    return /^(?:(?:the\s+)?(?:(?:property\s+)?address|BBL|(?:applicable\s+)?official\s+(?:Appendix\s+J\s+)?map|zoning\s+map|mapped\s+(?:district|area|status)|issue)\b[^.]{0,100}\b(?:is|are|remains?)\s+(?:needed|required|missing|unknown|unverified|unresolved|unavailable)|(?:the\s+)?(?:address|BBL|(?:applicable\s+)?official\s+(?:Appendix\s+J\s+)?map|mapped\s+(?:district|area|status)))$/i.test(text);
   };
   return clauses.some((clause) => {
     const boundaryMatch = clause.match(boundaryMarker);
-    if (!boundaryMatch) return false;
+    const explicitInputBoundary = statesExplicitMappedInputBoundary(clause);
+    if (!boundaryMatch && !explicitInputBoundary) return false;
     if (!/\b(?:mapped|map|location|site|property|parcel|address|BBL|Subarea|district|designated\s+area|zoning\s+district)\b/i.test(clause)) {
       return false;
     }
     const projectPronounActor = /^(?:it|this|that)\b/i.test(clause) ||
       /\b(?:even\s+though|although|whereas|however|nevertheless|nonetheless|notwithstanding(?:\s+that)?|despite(?:\s+the\s+fact\s+that)?|though|while|but|yet|and|plus|so|therefore|thus|accordingly|consequently|hence|meaning)\s+(?:it|this|that)\b/i.test(clause);
-    if (!actorReference.test(clause) && !projectPronounActor) return false;
+    if (!actorReference.test(clause) && !projectPronounActor && !projectReference.test(clause)) {
+      return false;
+    }
     if (boundaryConnector.test(clause)) {
       const segments = clause.split(boundaryConnector).map(compactText).filter(Boolean);
-      const boundarySegments = segments.filter((segment) => boundaryMarker.test(segment));
+      const boundarySegments = segments.filter((segment) =>
+        boundaryMarker.test(segment) || statesExplicitMappedInputBoundary(segment)
+      );
       if (boundarySegments.length > 0) {
         return segments.some((segment) =>
-          !boundaryMarker.test(segment) && !safeEvidenceOnlyContinuation(segment)
+          !boundaryMarker.test(segment) &&
+          !statesExplicitMappedInputBoundary(segment) &&
+          !safeEvidenceOnlyContinuation(segment)
         );
       }
     }
-    return /\b(?:may|can|could|would|will|shall|must)\s+(?!not\b)(?:proceed|go\s+forward|move\s+forward|operate|qualify)\b|\b(?:receives?|gets?|has|obtains?)\s+(?:the\s+)?(?:benefit|permission|approval|authorization|clearance)\b|\b(?:is|are)\s+(?:(?:now|otherwise)\s+)?(?:eligible|entitled|cleared|approved|permitted|allowed|authorized|lawful|compliant|free|able)\b(?:\s+to\s+(?:proceed|go\s+forward|move\s+forward|operate))?|\b(?:has|have)\s+(?:the\s+)?(?:green\s+light|go[- ]ahead)\b|\b(?:is|are)\s+good\s+to\s+go\b/i.test(clause);
+    return /\b(?:may|can|could|would|will|shall|must)\s+(?!not\b)(?:proceed|go\s+forward|move\s+forward|operate|qualify)\b|\bqualif(?:y|ies|ied)\b[^.]{0,60}\b(?:for|to)\s+(?:the\s+)?(?:benefit|permission|approval|authorization|clearance)\b|\b(?:receives?|gets?|has|obtains?)\s+(?:the\s+)?(?:benefit|permission|approval|authorization|clearance)\b|\b(?:is|are)\s+(?:(?:now|otherwise)\s+)?(?:eligible|entitled|cleared|approved|permitted|allowed|authorized|lawful|compliant|free|able)\b(?:\s+to\s+(?:proceed|go\s+forward|move\s+forward|operate))?|\b(?:has|have)\s+(?:the\s+)?(?:green\s+light|go[- ]ahead)\b|\b(?:is|are)\s+good\s+to\s+go\b/i.test(clause);
   });
 }
 
@@ -304,7 +375,8 @@ function statesLocationBoundary(value) {
     /\b(?:the\s+)?location\s+of\s+(?:the\s+)?(?:site|property|parcel)\b[^.]{0,80}\b(?:is|remains?)\s+(?:unknown|unverified|unresolved|unavailable)\b/i.test(value) ||
     /^it\s+is\s+(?:unknown|unverified|unresolved)\s+whether\s+(?:(?:the|this|that)\s+)?(?:site|property|parcel|lot|facility)\b[^.]{0,100}\b(?:lies?|falls?|is|sits?)\b/i.test(compactText(value)) ||
     /^no\s+mapped\s+(?:district|area|status)\s+is\s+available\s+for\s+(?:the\s+)?(?:site|property|parcel)\b/i.test(compactText(value)) ||
-    /^neither\s+(?:the\s+)?(?:site|property|parcel)\s+location\s+nor\s+(?:its|the\s+(?:site|property|parcel)['’]s)\s+mapped\s+(?:district|area|status)\s+(?:is|are)\s+(?:known|verified|established|available)\b/i.test(compactText(value));
+    /^neither\s+(?:the\s+)?(?:site|property|parcel)\s+location\s+nor\s+(?:its|the\s+(?:site|property|parcel)['’]s)\s+mapped\s+(?:district|area|status)\s+(?:is|are)\s+(?:known|verified|established|available)\b/i.test(compactText(value)) ||
+    statesExplicitMappedInputBoundary(value);
   return boundaryPresent && !hasAppendedMappedActorConclusion(value);
 }
 
