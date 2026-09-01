@@ -10,7 +10,9 @@ import {
   validateZoningArchitectureV1ConfirmationPaidAuthorization,
   zoningArchitectureV1ConfirmationAuthorizationID,
   zoningArchitectureV1ConfirmationCohortSHA256,
-  zoningArchitectureV1ConfirmationLockedAuthorizationSHA256
+  zoningArchitectureV1ConfirmationConsumedAuthorizationSHA256,
+  zoningArchitectureV1ConfirmationExecutionCommit,
+  zoningArchitectureV1ConfirmationRunID
 } from "../evals/zoning-architecture-v1-confirmation-paid-authorization.mjs";
 import {
   zoningArchitectureV1ContinuableResult
@@ -28,35 +30,43 @@ const runnerPath = new URL("../scripts/run-zoning-successor.mjs", import.meta.ur
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 const authorizationText = await readFile(authorizationPath, "utf8");
-assert.equal(sha256(authorizationText), zoningArchitectureV1ConfirmationLockedAuthorizationSHA256);
-const locked = await validateZoningArchitectureV1ConfirmationPaidAuthorization();
-assert.equal(locked.authorization.authorizationID, zoningArchitectureV1ConfirmationAuthorizationID);
-assert.equal(locked.authorization.cohort.sha256, zoningArchitectureV1ConfirmationCohortSHA256);
-assert.equal(locked.authorization.status, "locked");
-assert.equal(locked.active, false);
-assert.equal(typeof locked.cohortPath, "string");
-assert.match(locked.cohortPath, /zoning-cases-expanded-batch-1-successor-remediation-3\.json$/);
-assert.equal(locked.cohort.cases.length, 30);
-assert.equal(locked.preflight.summary.pass, true);
-assert.equal(locked.preflight.summary.providerRequests.p50, 1);
-assert.equal(locked.preflight.summary.providerRequests.maximum, 2);
-assert.ok(locked.preflight.summary.productionCost.adverseUSDPerHundred <= 6);
-assert.equal(locked.preflight.summary.judgeCost.adverseUSDPerHundred, 0);
-assert.equal(locked.authorization.networkOrModelCallAuthorized, false);
-assert.equal(locked.authorization.publicResearchReleaseAuthorized, false);
-assert.equal(locked.authorization.deploymentAuthorized, false);
-assert.equal(locked.authorization.pricingOrAllowanceChangeAuthorized, false);
-assert.equal(locked.authorization.evidenceBudgetCandidateEnabled, false);
-assert.equal(locked.authorization.execution.continueAfterPrerequisiteBoundary, true);
+assert.equal(sha256(authorizationText), zoningArchitectureV1ConfirmationConsumedAuthorizationSHA256);
+const consumed = await validateZoningArchitectureV1ConfirmationPaidAuthorization();
+assert.equal(consumed.authorization.authorizationID, zoningArchitectureV1ConfirmationAuthorizationID);
+assert.equal(consumed.authorization.cohort.sha256, zoningArchitectureV1ConfirmationCohortSHA256);
+assert.equal(consumed.authorization.status, "consumed");
+assert.equal(consumed.authorization.consumption.runID, zoningArchitectureV1ConfirmationRunID);
+assert.equal(consumed.authorization.execution.executionCommit,
+  zoningArchitectureV1ConfirmationExecutionCommit);
+assert.equal(consumed.active, false);
+assert.equal(typeof consumed.cohortPath, "string");
+assert.match(consumed.cohortPath, /zoning-cases-expanded-batch-1-successor-remediation-3\.json$/);
+assert.equal(consumed.cohort.cases.length, 30);
+assert.equal(consumed.result.results.length, 30);
+assert.equal(consumed.result.configuration.actualUSD, 0.391986);
+assert.equal(consumed.result.configuration.pendingPaidRequestCount, 0);
+assert.equal(consumed.result.economics.sample.sampleReady, false);
+assert.equal(consumed.result.economics.readyForPricingDecision, false);
+assert.equal(consumed.preflight.summary.pass, true);
+assert.equal(consumed.preflight.summary.providerRequests.p50, 1);
+assert.equal(consumed.preflight.summary.providerRequests.maximum, 2);
+assert.ok(consumed.preflight.summary.productionCost.adverseUSDPerHundred <= 6);
+assert.equal(consumed.preflight.summary.judgeCost.adverseUSDPerHundred, 0);
+assert.equal(consumed.authorization.networkOrModelCallAuthorized, true);
+assert.equal(consumed.authorization.publicResearchReleaseAuthorized, false);
+assert.equal(consumed.authorization.deploymentAuthorized, false);
+assert.equal(consumed.authorization.pricingOrAllowanceChangeAuthorized, false);
+assert.equal(consumed.authorization.evidenceBudgetCandidateEnabled, false);
+assert.equal(consumed.authorization.execution.continueAfterPrerequisiteBoundary, true);
 assert.equal(
-  locked.authorization.lineage.priorArchitectureV1RunID,
+  consumed.authorization.lineage.priorArchitectureV1RunID,
   "4381fd0a-f719-4e86-b231-972b299e6a57"
 );
-assert.equal(locked.authorization.lineage.priorArchitectureV1OrderedOperations, 3);
-assert.equal(locked.authorization.lineage.priorArchitectureV1ActualSpendUSD, 0.03472);
-assert.equal(locked.authorization.lineage.priorArchitectureV1PendingPaidRequests, 0);
+assert.equal(consumed.authorization.lineage.priorArchitectureV1OrderedOperations, 3);
+assert.equal(consumed.authorization.lineage.priorArchitectureV1ActualSpendUSD, 0.03472);
+assert.equal(consumed.authorization.lineage.priorArchitectureV1PendingPaidRequests, 0);
 assert.deepEqual(
-  locked.authorization.execution.allowedContinuationFailureCodes,
+  consumed.authorization.execution.allowedContinuationFailureCodes,
   ["RESEARCH_VERIFICATION_FAILED", "RESEARCH_ZONING_PREREQUISITES_REQUIRED"]
 );
 const continuablePrerequisiteBoundary = {
@@ -89,7 +99,7 @@ for (const mutation of [
   );
 }
 assert.throws(
-  () => requireActiveZoningArchitectureV1ConfirmationPaidAuthorization(locked),
+  () => requireActiveZoningArchitectureV1ConfirmationPaidAuthorization(consumed),
   /exact locked-package authorization sentence and cumulative spend cap/
 );
 
@@ -127,10 +137,15 @@ assert.match(
 const temporaryDirectory = await mkdtemp(join(tmpdir(), "permitext-zoning-architecture-v1-"));
 try {
   const fixturePath = join(temporaryDirectory, "authorization.json");
-  const authorizedFixture = structuredClone(locked.authorization);
+  const authorizedFixture = structuredClone(consumed.authorization);
   const packageCommit = "1".repeat(40);
   const exactPhrase = `authorize exactly package commit ${packageCommit} for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.`;
   authorizedFixture.status = "authorized";
+  authorizedFixture.consumption.status = "not_started";
+  authorizedFixture.consumption.attemptID = null;
+  authorizedFixture.consumption.startedAt = null;
+  authorizedFixture.consumption.runID = null;
+  authorizedFixture.consumption.consumedAt = null;
   authorizedFixture.scope.caseCount = 30;
   authorizedFixture.scope.repetitions = 1;
   authorizedFixture.scope.maximumCumulativeSpendUSD = 5;
@@ -139,6 +154,7 @@ try {
   authorizedFixture.ownerDecision.exactAuthorizationPhrase = exactPhrase;
   authorizedFixture.ownerDecision.exactSpendingCapPhrase = exactPhrase;
   authorizedFixture.execution.authorizationPackageCommit = packageCommit;
+  authorizedFixture.execution.executionCommit = null;
   authorizedFixture.networkOrModelCallAuthorized = true;
   await writeFile(fixturePath, `${JSON.stringify(authorizedFixture, null, 2)}\n`, "utf8");
   const authorized = await validateZoningArchitectureV1ConfirmationPaidAuthorization({
@@ -175,4 +191,4 @@ try {
   await rm(temporaryDirectory, { recursive: true, force: true });
 }
 
-console.log("Permitext Zoning Architecture V1 locked confirmation authorization contract passed; paid model calls: no.");
+console.log("Permitext Zoning Architecture V1 consumed confirmation contract passed; retained 30 ordered results and blocked re-dispatch; paid model calls: no.");

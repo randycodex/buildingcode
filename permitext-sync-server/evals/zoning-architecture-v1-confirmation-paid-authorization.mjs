@@ -18,6 +18,20 @@ export const zoningArchitectureV1ConfirmationAuthorizationID =
   "048cb366-4332-4379-9dbc-62feb3fe7224";
 export const zoningArchitectureV1ConfirmationLockedAuthorizationSHA256 =
   "f36c09e48fb6f60d58a34d4d392b6aea63349bb1e21e6b06ac34953668ce40f4";
+export const zoningArchitectureV1ConfirmationConsumedAuthorizationSHA256 =
+  "74161dd63bc0f29487c1fb0bf5be62329226e9c43c1b9ea5a324fb1d2b143b2e";
+export const zoningArchitectureV1ConfirmationResultJSONFile =
+  "results/2026-09-01T14-35-20-650Z-90f42d5b-b758-4df4-98af-933350f036e7.json";
+export const zoningArchitectureV1ConfirmationResultJSONSHA256 =
+  "551ea803cb2e7758f9952874e2ea86dd31cb2b7c17abde3eb487a19f51a0cb0f";
+export const zoningArchitectureV1ConfirmationResultMarkdownFile =
+  "results/2026-09-01T14-35-20-650Z-90f42d5b-b758-4df4-98af-933350f036e7.md";
+export const zoningArchitectureV1ConfirmationResultMarkdownSHA256 =
+  "a8c7730617681ea8b211fbc01167e54f084d26b26eac7e54dc77fbed112eef77";
+export const zoningArchitectureV1ConfirmationRunID =
+  "90f42d5b-b758-4df4-98af-933350f036e7";
+export const zoningArchitectureV1ConfirmationExecutionCommit =
+  "5e3263505a33c2dff2055558be19e274aab5d36a";
 export const zoningArchitectureV1ConfirmationCohortSHA256 =
   "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc";
 export const zoningArchitectureV1ConfirmationPreparedFromCommit =
@@ -65,7 +79,11 @@ const expectedFiles = Object.freeze({
   "evals/results/2026-09-01T13-08-16-791Z-4381fd0a-f719-4e86-b231-972b299e6a57.json":
     "ce98f26f6856b64d2483b9c0047a8d577bde86c8e9734af61a37849294c125f1",
   "evals/results/2026-09-01T13-08-16-791Z-4381fd0a-f719-4e86-b231-972b299e6a57.md":
-    "ec97efbd6dc277d2a986b06ae12aaad1aac05622baf60205cb7c73aec4397d3b"
+    "ec97efbd6dc277d2a986b06ae12aaad1aac05622baf60205cb7c73aec4397d3b",
+  [`evals/${zoningArchitectureV1ConfirmationResultJSONFile}`]:
+    zoningArchitectureV1ConfirmationResultJSONSHA256,
+  [`evals/${zoningArchitectureV1ConfirmationResultMarkdownFile}`]:
+    zoningArchitectureV1ConfirmationResultMarkdownSHA256
 });
 
 function sha256(value) {
@@ -87,16 +105,24 @@ async function validateBoundFiles() {
 export async function validateZoningArchitectureV1ConfirmationPaidAuthorization({
   authorizationPath = defaultAuthorizationPath
 } = {}) {
-  const [authorizationText, cohortText, preflightText, priorAuthorizationText] = await Promise.all([
+  const [
+    authorizationText,
+    cohortText,
+    preflightText,
+    priorAuthorizationText,
+    resultText
+  ] = await Promise.all([
     readFile(authorizationPath, "utf8"),
     readFile(cohortPath, "utf8"),
     readFile(join(evalRoot, "results", "zoning-architecture-v1-no-cost-preflight.json"), "utf8"),
-    readFile(join(evalRoot, "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json"), "utf8")
+    readFile(join(evalRoot, "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json"), "utf8"),
+    readFile(join(evalRoot, zoningArchitectureV1ConfirmationResultJSONFile), "utf8")
   ]);
   const authorization = JSON.parse(authorizationText);
   const cohort = JSON.parse(cohortText);
   const preflight = JSON.parse(preflightText);
   const priorAuthorization = JSON.parse(priorAuthorizationText);
+  const result = JSON.parse(resultText);
   await validateBoundFiles();
 
   assert(authorization.authorizationID === zoningArchitectureV1ConfirmationAuthorizationID,
@@ -215,6 +241,89 @@ export async function validateZoningArchitectureV1ConfirmationPaidAuthorization(
     assert(authorization.networkOrModelCallAuthorized === true,
       "Only the exact active owner authorization may permit a provider call.");
   }
+  if (authorization.status === "authorized") {
+    assert(authorization.execution?.executionCommit === null &&
+      authorization.consumption?.status === "not_started" &&
+      authorization.consumption?.attemptID === null &&
+      authorization.consumption?.runID === null,
+    "Authorized Architecture V1 execution must not retain a prior attempt.");
+  }
+  if (["running", "consumed"].includes(authorization.status)) {
+    assert(typeof authorization.consumption?.attemptID === "string" &&
+      authorization.consumption.attemptID.length > 0 &&
+      typeof authorization.consumption?.startedAt === "string" &&
+      authorization.consumption.startedAt.length > 0 &&
+      /^[0-9a-f]{40}$/i.test(authorization.execution?.executionCommit || ""),
+    "Architecture V1 execution must retain its durable attempt and execution commit.");
+  }
+  if (authorization.status === "consumed") {
+    assert(sha256(authorizationText) ===
+      zoningArchitectureV1ConfirmationConsumedAuthorizationSHA256,
+    "The consumed Architecture V1 authorization changed.");
+    assert(authorization.consumption?.status === "consumed" &&
+      authorization.consumption?.attemptID === zoningArchitectureV1ConfirmationRunID &&
+      authorization.consumption?.runID === zoningArchitectureV1ConfirmationRunID &&
+      typeof authorization.consumption?.consumedAt === "string" &&
+      authorization.execution?.executionCommit ===
+        zoningArchitectureV1ConfirmationExecutionCommit,
+    "The consumed Architecture V1 authorization lost its exact run identity.");
+    assert(result.configuration?.runID === zoningArchitectureV1ConfirmationRunID &&
+      result.configuration?.gitCommit ===
+        zoningArchitectureV1ConfirmationExecutionCommit &&
+      result.status === "partial" &&
+      result.configuration?.repeat === 1 &&
+      result.configuration?.caseIDs?.length === 30 &&
+      result.results?.length === 30,
+    "The retained Architecture V1 result lost its exact execution scope.");
+    assert(result.configuration.caseIDs.every((caseID, index) =>
+      result.results[index]?.testCase?.id === caseID),
+    "The retained Architecture V1 result is not in the authorized cohort order.");
+    assert(result.configuration?.approvedSpendCapUSD === 5 &&
+      result.configuration?.actualUSD === 0.391986 &&
+      result.configuration?.paidRequestCount === 42 &&
+      result.configuration?.pendingPaidRequestCount === 0,
+    "The retained Architecture V1 result lost its settled cost ledger.");
+    const completed = result.results.filter((entry) =>
+      entry.operationMetric?.status === "completed");
+    const failed = result.results.filter((entry) =>
+      entry.operationMetric?.status === "failed");
+    const rejected = result.results.filter((entry) =>
+      entry.operationMetric?.status === "rejected");
+    const productionUSD = result.results.reduce((total, entry) =>
+      total + (entry.operationMetric?.actualProviderCostUSD || 0), 0);
+    const judgeUSD = result.results.reduce((total, entry) =>
+      total + (entry.judge?.estimatedCost?.estimatedUSD || 0), 0);
+    assert(completed.length === 14 &&
+      completed.filter((entry) => entry.scoring?.passed === true).length === 12 &&
+      failed.length === 11 &&
+      rejected.length === 5,
+    "The retained Architecture V1 result changed its terminal outcome counts.");
+    assert(Number(productionUSD.toFixed(6)) === 0.103877 &&
+      Number(judgeUSD.toFixed(6)) === 0.288109 &&
+      Number((productionUSD + judgeUSD).toFixed(6)) ===
+        result.configuration.actualUSD,
+    "The retained Architecture V1 production and judge ledgers no longer reconcile.");
+    assert(completed.every((entry) =>
+      entry.operationMetric?.charged === true &&
+      entry.operationMetric?.model === "gpt-5.6-luna" &&
+      entry.operationMetric?.escalated === false &&
+      entry.operationMetric?.webSupportRequested === false) &&
+      failed.every((entry) =>
+      entry.operationMetric?.failureCode === "RESEARCH_VERIFICATION_FAILED" &&
+      entry.operationMetric?.charged === false &&
+      entry.operationMetric?.providerRequestCount > 0 &&
+      entry.operationMetric?.pendingProviderRequestCount === 0) &&
+      rejected.every((entry) =>
+        entry.operationMetric?.failureCode ===
+          "RESEARCH_ZONING_PREREQUISITES_REQUIRED" &&
+        entry.operationMetric?.charged === false &&
+        entry.operationMetric?.providerRequestCount === 0 &&
+        entry.operationMetric?.pendingProviderRequestCount === 0),
+    "The retained Architecture V1 fail-closed outcomes changed.");
+    assert(result.economics?.sample?.sampleReady === false &&
+      result.economics?.readyForPricingDecision === false,
+    "The retained Architecture V1 result may not be promoted to pricing evidence.");
+  }
   const active = authorization.status === "authorized" &&
     authorization.networkOrModelCallAuthorized === true;
   return {
@@ -222,6 +331,7 @@ export async function validateZoningArchitectureV1ConfirmationPaidAuthorization(
     cohort,
     cohortPath,
     preflight,
+    result,
     active,
     authorizationSHA256: sha256(authorizationText)
   };

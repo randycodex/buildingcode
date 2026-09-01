@@ -1,4 +1,4 @@
-# Permitext Zoning Architecture V1 — Locked Successor Confirmation Package
+# Permitext Zoning Architecture V1 — Consumed Successor Confirmation Package
 
 Date: September 1, 2026
 
@@ -6,9 +6,11 @@ Working branch: `codex/zoning-research-beta1`
 
 Package commit: `6f222ac1a0d5375cef14a3f10299d8b8e06b9112`
 
-Status: **LOCKED; NO PAID OR NETWORK EXECUTION AUTHORIZED**
+Status: **CONSUMED; COMPLETE ORDERED EXECUTION RETAINED; NO RETRY AUTHORIZED**
 
 ## Outcome
+
+The owner authorized this exact package once. Execution commit `5e3263505a33c2dff2055558be19e274aab5d36a` produced complete ordered [run `90f42d5b-b758-4df4-98af-933350f036e7`](./PERMITEXT_ZONING_ARCHITECTURE_V1_CONFIRMATION_RESULT_2026-09-01.md): all 30 frozen cases were attempted exactly once, 12 answers passed every gate at `4.00/4.00`, two delivered answers failed quality, 11 generation-ready answers failed bounded verification without a customer charge, and five prerequisite cases rejected before provider access. Production and separate Terra-judge spend totaled `$0.391986` with zero pending. The continuation repair worked; semantic and reliability confirmation failed. Authorization `048cb366-4332-4379-9dbc-62feb3fe7224` is consumed and cannot be reused.
 
 The substantial Zoning Research redesign is implemented and its frozen 30-case no-cost gate passes. The live Research path now selects one of six question-specific paths, assembles a narrow evidence package for that path, checks prerequisites before generation, runs deterministic table/symbol/date/arithmetic controls where applicable, routes Luna first, and permits Terra only for provider failure or a separately authorized narrow repair. A failed deterministic or bounded verification gate does not trigger a full-answer rewrite.
 
@@ -24,6 +26,9 @@ This package does not enable public Zoning Research. Zoning Reader and Search re
 - complete locked successor package commit: `6f222ac1a0d5375cef14a3f10299d8b8e06b9112`
 - successor authorization ID: `048cb366-4332-4379-9dbc-62feb3fe7224`
 - locked successor authorization SHA-256: `f36c09e48fb6f60d58a34d4d392b6aea63349bb1e21e6b06ac34953668ce40f4`
+- consumed successor authorization SHA-256: `74161dd63bc0f29487c1fb0bf5be62329226e9c43c1b9ea5a324fb1d2b143b2e`
+- successor execution commit: `5e3263505a33c2dff2055558be19e274aab5d36a`
+- successor run: `90f42d5b-b758-4df4-98af-933350f036e7`; 30 ordered operations, 12 full-score passes, two graded failures, 11 verifier blocks, five prerequisite boundaries, `$0.391986`, zero pending
 - consumed partial package: `cec4eed3ab89ca235dfd25544dedf5b28a067801`
 - consumed partial execution commit: `a63020a713ef7757c81f3eb9f49eef5617850e52`
 - consumed partial run: `4381fd0a-f719-4e86-b231-972b299e6a57`; 3 ordered operations, 2/2 passes, `$0.034720`, zero pending
@@ -37,7 +42,7 @@ This package does not enable public Zoning Research. Zoning Reader and Search re
 - web support: disabled
 - public release, deployment, pricing/allowance change, and 24,000-character candidate: unauthorized
 
-The machine-readable lock is [zoning-architecture-v1-confirmation-paid-authorization.json](../permitext-sync-server/evals/zoning-architecture-v1-confirmation-paid-authorization.json). Its validator rehashes the architecture inputs, frozen cohort, no-cost result, consumed V17 lineage, and exact retained partial-run result/report before accepting even a future authorization record.
+The machine-readable consumed record is [zoning-architecture-v1-confirmation-paid-authorization.json](../permitext-sync-server/evals/zoning-architecture-v1-confirmation-paid-authorization.json). Its validator rehashes the architecture inputs, frozen cohort, no-cost result, consumed V17 lineage, prior partial result, and exact complete successor result/report. It verifies the terminal outcome and cost counts and blocks re-dispatch.
 
 ## Frozen no-cost result
 
@@ -52,7 +57,7 @@ The retained local preflight passed all 30 cases with zero paid/model/network ca
 
 These figures are deterministic planning projections, not a semantic-quality acceptance result and not measured Production economics. They clear the requested no-cost architecture gate for preparing this package; only a separately authorized confirmation can measure the new live model path.
 
-## Verification
+## Pre-run verification
 
 The following passed with paid-evaluation credentials removed against the exact server bytes retained in successor package commit `6f222ac1a0d5375cef14a3f10299d8b8e06b9112`:
 
@@ -63,16 +68,12 @@ The following passed with paid-evaluation credentials removed against the exact 
 
 The complete check includes the cohort-path regression, exact rejected-prerequisite continuation controls in both child and parent, altered-telemetry counterexamples, and every historical Zoning authorization/consumption guard. No additional provider request was made.
 
-## Owner authorization boundary
+## Consumed authorization boundary
 
-No confirmation run is authorized now. The locked record has null owner, scope, package, and execution fields and `networkOrModelCallAuthorized: false`. Its `--require-active` path fails before provider access.
+The exact owner sentence was recorded and used once. The record now retains the execution commit, durable attempt/run ID, start and consumption timestamps, complete result hashes, `$5` cap, and settled `$0.391986` actual ledger. Its `--require-active` path fails before provider access because status is `consumed`.
 
-If the owner later chooses to authorize this exact package, the required sentence is:
-
-> authorize exactly package commit 6f222ac1a0d5375cef14a3f10299d8b8e06b9112 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.
-
-That sentence is necessary but does not itself prove execution. The package includes the one-use runner, signed child handoff, clean package/execution-commit checks, global and package run locks, per-request cumulative spend cap, allowlisted fail-closed continuation, and separate production/judge ledgers. Direct runner invocation while the record is locked fails before provider access. After an exact owner sentence, the authorization record must be updated once, committed as the only server change after this package, and revalidated before dispatch. Until then, the package remains non-dispatchable.
+Repeating the former authorization sentence cannot reactivate this package. Any later paid execution would require a materially reviewed successor, a distinct locked package and authorization identity, complete no-cost verification, and a new exact owner decision and cap.
 
 ## Remaining Beta 1 gates
 
-After any separately authorized confirmation, the result still requires semantic, reliability, measured-cost, professional Zoning review, exact-release web/iOS presentation, physical-iPhone acceptance, and final owner release approval. Source/tests/package preparation are not public release evidence.
+The retained confirmation fails semantic and reliability acceptance and is not pricing-ready. The next step is a no-cost diagnosis of the 11 verifier blocks and two judged failures. A later materially revised architecture would still require distinct paid confirmation, professional Zoning review, exact-release web/iOS presentation, physical-iPhone acceptance, and final owner release approval. Source/tests/package execution are not public release evidence.
