@@ -131,6 +131,16 @@ import {
   zoningArchitectureV2ConfirmationSafetySHA256
 } from "../evals/zoning-architecture-v2-confirmation-paid-authorization.mjs";
 import {
+  requireActiveZoningArchitectureV21ConfirmationPaidAuthorization,
+  validateZoningArchitectureV21ConfirmationPaidAuthorization,
+  zoningArchitectureV21ConfirmationAppSHA256,
+  zoningArchitectureV21ConfirmationEconomicsSHA256,
+  zoningArchitectureV21ConfirmationLockedAuthorizationSHA256,
+  zoningArchitectureV21ConfirmationPreparedFromCommit,
+  zoningArchitectureV21ConfirmationRunnerHandoffSHA256,
+  zoningArchitectureV21ConfirmationSafetySHA256
+} from "../evals/zoning-architecture-v21-confirmation-paid-authorization.mjs";
+import {
   respondToZoningV11RunnerChallenge,
   zoningV11RunnerPrivateKey
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
@@ -169,7 +179,8 @@ assert(
         "--remediation-3-v17-confirmation",
         "--remediation-3-v17-full-cohort",
         "--zoning-architecture-v1-confirmation",
-        "--zoning-architecture-v2-confirmation"
+        "--zoning-architecture-v2-confirmation",
+        "--zoning-architecture-v21-confirmation"
       ].includes(argument)),
   "Unsupported Zoning successor paid-run argument."
 );
@@ -199,8 +210,11 @@ const zoningArchitectureV1ConfirmationMode =
   process.argv.includes("--zoning-architecture-v1-confirmation");
 const zoningArchitectureV2ConfirmationMode =
   process.argv.includes("--zoning-architecture-v2-confirmation");
+const zoningArchitectureV21ConfirmationMode =
+  process.argv.includes("--zoning-architecture-v21-confirmation");
 const zoningArchitectureConfirmationMode =
-  zoningArchitectureV1ConfirmationMode || zoningArchitectureV2ConfirmationMode;
+  zoningArchitectureV1ConfirmationMode || zoningArchitectureV2ConfirmationMode ||
+  zoningArchitectureV21ConfirmationMode;
 const remediationSuccessor3AuthenticatedConfirmationMode =
   remediationSuccessor3V11ConfirmationMode ||
   remediationSuccessor3V12ConfirmationMode ||
@@ -227,7 +241,24 @@ if (runnerInvokedDirectly && remediationSuccessor3V17ConfirmationMode) {
 const remediationSuccessor3FamilyMode = remediationSuccessor3Mode ||
   remediationSuccessor3V8ConfirmationMode || remediationSuccessor3V9ConfirmationMode ||
   remediationSuccessor3AuthenticatedConfirmationMode;
-const authenticatedConfirmation = zoningArchitectureV2ConfirmationMode
+const authenticatedConfirmation = zoningArchitectureV21ConfirmationMode
+  ? {
+      version: "architecture-v21",
+      validate: validateZoningArchitectureV21ConfirmationPaidAuthorization,
+      requireActive: requireActiveZoningArchitectureV21ConfirmationPaidAuthorization,
+      appSHA256: zoningArchitectureV21ConfirmationAppSHA256,
+      economicsSHA256: zoningArchitectureV21ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningArchitectureV21ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit: zoningArchitectureV21ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningArchitectureV21ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningArchitectureV21ConfirmationSafetySHA256,
+      stopOnExecutionError: false,
+      continueAfterVerifiedResearchFailure: true,
+      continueAfterPrerequisiteBoundary: true
+    }
+  : zoningArchitectureV2ConfirmationMode
   ? {
       version: "architecture-v2",
       validate: validateZoningArchitectureV2ConfirmationPaidAuthorization,
@@ -411,7 +442,9 @@ const authenticatedConfirmation = zoningArchitectureV2ConfirmationMode
 const authorizationPath = resolve(
   serverRoot,
   "evals",
-  zoningArchitectureV2ConfirmationMode
+  zoningArchitectureV21ConfirmationMode
+    ? "zoning-architecture-v21-confirmation-paid-authorization.json"
+    : zoningArchitectureV2ConfirmationMode
     ? "zoning-architecture-v2-confirmation-paid-authorization.json"
     : zoningArchitectureV1ConfirmationMode
     ? "zoning-architecture-v1-confirmation-paid-authorization.json"
@@ -444,7 +477,9 @@ const authorizationPath = resolve(
 const authorizationModulePath = resolve(
   serverRoot,
   "evals",
-  zoningArchitectureV2ConfirmationMode
+  zoningArchitectureV21ConfirmationMode
+    ? "zoning-architecture-v21-confirmation-paid-authorization.mjs"
+    : zoningArchitectureV2ConfirmationMode
     ? "zoning-architecture-v2-confirmation-paid-authorization.mjs"
     : zoningArchitectureV1ConfirmationMode
     ? "zoning-architecture-v1-confirmation-paid-authorization.mjs"
@@ -477,7 +512,9 @@ const authorizationModulePath = resolve(
 const runLockPath = resolve(
   serverRoot,
   "evals",
-  zoningArchitectureV2ConfirmationMode
+  zoningArchitectureV21ConfirmationMode
+    ? ".zoning-architecture-v21-confirmation-paid-run.lock"
+    : zoningArchitectureV2ConfirmationMode
     ? ".zoning-architecture-v2-confirmation-paid-run.lock"
     : zoningArchitectureV1ConfirmationMode
     ? ".zoning-architecture-v1-confirmation-paid-run.lock"
@@ -809,7 +846,8 @@ async function consumeAuthorization({
       "The Architecture V1 result did not retain its deterministic prerequisite-boundary policy.");
     const terminalResult = result.results.at(-1);
     for (const item of result.results.filter((entry) => entry.error)) {
-      const continuationSafe = zoningArchitectureV2ConfirmationMode
+      const continuationSafe =
+        (zoningArchitectureV2ConfirmationMode || zoningArchitectureV21ConfirmationMode)
         ? zoningArchitectureV2ContinuableResult(item)
         : zoningArchitectureV1ContinuableResult(item);
       const terminalStop =
@@ -887,7 +925,9 @@ function runEvaluation({
   return new Promise((resolveRun, rejectRun) => {
     const childArguments = [
       "tests/research-evals.mjs",
-      zoningArchitectureV2ConfirmationMode
+      zoningArchitectureV21ConfirmationMode
+        ? "--zoning-architecture-v21-confirmation"
+        : zoningArchitectureV2ConfirmationMode
         ? "--zoning-architecture-v2-confirmation"
         : zoningArchitectureV1ConfirmationMode
         ? "--zoning-architecture-v1-confirmation"
@@ -1170,7 +1210,11 @@ async function main() {
       `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning ` +
       `${remediationSuccessor3AuthenticatedConfirmationMode
         ? zoningArchitectureConfirmationMode
-          ? `${authenticatedConfirmation.version === "architecture-v2" ? "Architecture V2" : "Architecture V1"} confirmation`
+          ? `${authenticatedConfirmation.version === "architecture-v21"
+            ? "Architecture V2.1"
+            : authenticatedConfirmation.version === "architecture-v2"
+            ? "Architecture V2"
+            : "Architecture V1"} confirmation`
           : `remediation successor 3 ${authenticatedConfirmation.version} confirmation`
         : remediationSuccessor3Mode ? "remediation successor 3"
         : remediationSuccessor2Mode ? "remediation successor 2" : "successor"} ` +
@@ -1227,7 +1271,11 @@ async function main() {
   if (result.code === 3) {
     console.error(
       zoningArchitectureConfirmationMode
-        ? `The ${authenticatedConfirmation.version === "architecture-v2" ? "Architecture V2" : "Architecture V1"} confirmation retained one or more quality, prerequisite-boundary, or fail-closed case results.`
+        ? `The ${authenticatedConfirmation.version === "architecture-v21"
+          ? "Architecture V2.1"
+          : authenticatedConfirmation.version === "architecture-v2"
+          ? "Architecture V2"
+          : "Architecture V1"} confirmation retained one or more quality, prerequisite-boundary, or fail-closed case results.`
         : remediationSuccessor3V17FullCohortMode
         ? "The full-cohort diagnostic retained one or more case failures or stopped at a fail-closed boundary."
         : "The complete cohort finished, but one or more cases failed quality or execution checks."

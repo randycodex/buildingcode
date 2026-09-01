@@ -142,6 +142,15 @@ import {
   zoningArchitectureV2ConfirmationSafetySHA256
 } from "../evals/zoning-architecture-v2-confirmation-paid-authorization.mjs";
 import {
+  validateZoningArchitectureV21ConfirmationPaidAuthorization,
+  zoningArchitectureV21ConfirmationAppSHA256,
+  zoningArchitectureV21ConfirmationEconomicsSHA256,
+  zoningArchitectureV21ConfirmationLockedAuthorizationSHA256,
+  zoningArchitectureV21ConfirmationPreparedFromCommit,
+  zoningArchitectureV21ConfirmationRunnerHandoffSHA256,
+  zoningArchitectureV21ConfirmationSafetySHA256
+} from "../evals/zoning-architecture-v21-confirmation-paid-authorization.mjs";
+import {
   requireAuthenticatedZoningV11RunnerHandoff
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
 
@@ -197,8 +206,11 @@ const zoningArchitectureV1ConfirmationMode =
   process.argv.includes("--zoning-architecture-v1-confirmation");
 const zoningArchitectureV2ConfirmationMode =
   process.argv.includes("--zoning-architecture-v2-confirmation");
+const zoningArchitectureV21ConfirmationMode =
+  process.argv.includes("--zoning-architecture-v21-confirmation");
 const zoningArchitectureConfirmationMode =
-  zoningArchitectureV1ConfirmationMode || zoningArchitectureV2ConfirmationMode;
+  zoningArchitectureV1ConfirmationMode || zoningArchitectureV2ConfirmationMode ||
+  zoningArchitectureV21ConfirmationMode;
 const zoningRemediationSuccessor3AuthenticatedConfirmationMode =
   zoningRemediationSuccessor3V11ConfirmationMode ||
   zoningRemediationSuccessor3V12ConfirmationMode ||
@@ -209,7 +221,26 @@ const zoningRemediationSuccessor3AuthenticatedConfirmationMode =
   zoningRemediationSuccessor3V17ConfirmationMode ||
   zoningRemediationSuccessor3V17FullCohortMode ||
   zoningArchitectureConfirmationMode;
-const authenticatedConfirmation = zoningArchitectureV2ConfirmationMode
+const authenticatedConfirmation = zoningArchitectureV21ConfirmationMode
+  ? {
+      version: "architecture-v21",
+      validate: validateZoningArchitectureV21ConfirmationPaidAuthorization,
+      appSHA256: zoningArchitectureV21ConfirmationAppSHA256,
+      economicsSHA256: zoningArchitectureV21ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningArchitectureV21ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit: zoningArchitectureV21ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningArchitectureV21ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningArchitectureV21ConfirmationSafetySHA256,
+      authorizationFile:
+        "zoning-architecture-v21-confirmation-paid-authorization.json",
+      runLockFile: ".zoning-architecture-v21-confirmation-paid-run.lock",
+      stopOnExecutionError: false,
+      continueAfterVerifiedResearchFailure: true,
+      continueAfterPrerequisiteBoundary: true
+    }
+  : zoningArchitectureV2ConfirmationMode
   ? {
       version: "architecture-v2",
       validate: validateZoningArchitectureV2ConfirmationPaidAuthorization,
@@ -452,7 +483,8 @@ const zoningDatasetModeCount = [
   zoningRemediationSuccessor3V17ConfirmationMode,
   zoningRemediationSuccessor3V17FullCohortMode,
   zoningArchitectureV1ConfirmationMode,
-  zoningArchitectureV2ConfirmationMode
+  zoningArchitectureV2ConfirmationMode,
+  zoningArchitectureV21ConfirmationMode
 ].filter(Boolean).length;
 if (zoningDatasetModeCount > 1) {
   throw new Error("Choose exactly one Zoning evaluation dataset mode.");
@@ -5121,7 +5153,8 @@ async function main() {
         stopOnExecutionError,
         continueAfterVerifiedResearchFailure,
         allowZoningPrerequisiteBoundary: zoningArchitectureConfirmationMode,
-        allowZoningEvidenceBoundary: zoningArchitectureV2ConfirmationMode,
+        allowZoningEvidenceBoundary:
+          zoningArchitectureV2ConfirmationMode || zoningArchitectureV21ConfirmationMode,
         runID: requestedRunID,
         datasetKind: zoningMode ? "zoning-resolution" : "construction-code",
         retrievalVersion: zoningMode

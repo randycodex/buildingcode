@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "authorizationID": "1dd05bd4-a98d-4b44-8de5-f0e2a79b890f",
+  "status": "locked",
+  "cohort": {
+    "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
+    "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
+    "caseCount": 30,
+    "ordered": true
+  },
+  "plannedScope": {
+    "purpose": "one Architecture V2.1 confirmation of the frozen owner-approved Zoning cohort",
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
+  },
+  "scope": {
+    "caseCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
+  },
+  "ownerDecision": {
+    "required": true,
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
+  },
+  "consumption": {
+    "status": "not_started",
+    "attemptID": null,
+    "startedAt": null,
+    "runID": null,
+    "consumedAt": null
+  },
+  "lineage": {
+    "preparedFromCommit": "d35a8cba80077f24da9ed945ae30e5c84ededc62",
+    "plannerVersion": "20260901-question-compiler-v2",
+    "compilerVersion": "20260901-answer-obligations-v21",
+    "repairVersion": "20260901-source-bounded-patch-v2",
+    "plannerSHA256": "cafa083e33d5c2706cf6eb683e09a3796132fda7b2bb834f5de95bb9b1b0e099",
+    "routingSHA256": "c10f4be6bf5249868744a4794997008d6d5548811672f7da1a6b0101836ae634",
+    "appSHA256": "dadd566fa0c916365c05725f6e819cc935f0f174aa21e21ac7dc5c1f16828074",
+    "zoningSafetySHA256": "e0c5f298e9cfbeaed9ed6d084df30b77643f29f011cfe5f309a0fb59a11277df",
+    "researchEconomicsSHA256": "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0",
+    "runnerHandoffProtocol": "permitext-zoning-v11-runner-handoff-v1",
+    "runnerHandoffSHA256": "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327",
+    "paidRunnerSHA256": "13f8acdd40ca79d563ea51382a451339122c611b5c246d90a1913e0a204b8985",
+    "evaluationHarnessSHA256": "938f617de16aa2283ac8b0476454c6493932946463c9eb8fcb2e56946acfe4c6",
+    "noCostPreflightSHA256": "5501d15f40567a824a2f9efa10dd469703f358969c7eb10ae6507352cb47f4f2",
+    "regressionFixturesSHA256": "d53e11f8e7955822775b5c4e681694b2e753804a2ca6d4d3dd2ccbcd723f3f8c",
+    "regressionContractSHA256": "29f3a8245ef3ad35b73cf957aea05d58ea86413be0bdd364c2192f268370774a",
+    "priorArchitectureV2AuthorizationID": "7b58a481-a900-4be1-9cf5-1d26e5fda78b",
+    "priorArchitectureV2RunID": "9f67f4ba-3944-46a4-b438-fcec082144e3",
+    "priorArchitectureV2ResultSHA256": "06af0893b2dc201f12c48a405accaf5b6262f72aeaa67014013de89c7b9ece44",
+    "priorArchitectureV2ConsumedAuthorizationSHA256": "275dbe7be87b74a02fc6ab2c7b99b48efbaf339a57984bbabc427a2c0376ea42"
+  },
+  "execution": {
+    "authorizationPackageCommit": null,
+    "executionCommit": null,
+    "webSupportEnabled": false,
+    "selectiveLunaTerraRouting": true,
+    "fullAnswerRewriteAllowed": false,
+    "maximumLogicalModelStagesPerCase": 3,
+    "maximumSourceBoundedRepairsPerCase": 1,
+    "maximumRepairSources": 5,
+    "maximumRepairSourceCharacters": 8000,
+    "judgeLedgerSeparate": true,
+    "stopOnExecutionError": false,
+    "continueAfterVerifiedResearchFailure": true,
+    "continueAfterPreGenerationBoundary": true,
+    "allowedContinuationFailureCodes": [
+      "RESEARCH_VERIFICATION_FAILED",
+      "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
+      "RESEARCH_ZONING_EVIDENCE_REQUIRED",
+      "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED"
+    ]
+  },
+  "networkOrModelCallAuthorized": false,
+  "publicResearchReleaseAuthorized": false,
+  "professionalZoningSignoff": false,
+  "deploymentAuthorized": false,
+  "pricingOrAllowanceChangeAuthorized": false,
+  "evidenceBudgetCandidateEnabled": false,
+  "notes": "Locked Architecture V2.1 confirmation package. Preparing or validating this record makes no provider request. A paid run requires a later exact owner sentence naming the committed package, all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5."
+}

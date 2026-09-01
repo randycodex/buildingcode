@@ -69,6 +69,6 @@ The no-cost replay proves that the compiler now rejects the five exact retained 
 
 ## Controlling next gate
 
-The scoped independent review is clean after its reported adversarial findings were repaired, and the complete repository check passes on the reviewed bytes with provider credentials removed. Do not run another paid evaluation yet. The owner may now decide whether to prepare one distinct immutable confirmation package. Preparing a package would not authorize execution; any paid run would still require a new exact package-commit authorization and cumulative spend cap.
+The scoped independent review is clean after its reported adversarial findings were repaired, and the complete repository check passes on the reviewed bytes with provider credentials removed. The owner then directed work to continue, so one [distinct immutable V2.1 confirmation package](./PERMITEXT_ZONING_ARCHITECTURE_V21_CONFIRMATION_PACKAGE_2026-09-01.md) is now locked without active scope or model-call authorization. Preparing the package did not authorize execution; any paid run still requires a new exact package-commit authorization and cumulative spend cap.
 
 Public Zoning Research, the 24,000-character candidate, pricing and allowance changes, merge, push, deployment, professional review, exact-release web/iOS acceptance, and physical-iPhone acceptance remain outside this result.
