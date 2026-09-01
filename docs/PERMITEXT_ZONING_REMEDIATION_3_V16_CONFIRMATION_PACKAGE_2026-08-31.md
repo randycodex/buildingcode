@@ -6,13 +6,13 @@ Branch: `codex/zoning-research-beta1`
 
 Exact package commit: `9751e50d1f830db527a822b1a515552465749907`
 
-Status: locked; no paid run authorized
+Status: consumed by one authorized run; terminal partial result retained
 
 ## Outcome
 
 The privacy-bounded v15 diagnosis produced a narrow v16 repair at commit `661eda3cc5f6eef5959851caeb35e198ea4eb911`. It recognizes one fully anchored source-rule form for plural generic self-service storage facilities introduced by `for`, `in`, or `within Subarea 1/2`. Six matched safe controls pass while 38 specific-site, proposed-facility, actor, proceed/benefit, and applicability mutations remain fail-closed.
 
-This distinct package binds that reviewed repair, the unchanged ordered 30-case cohort, the signed parent/child handoff, and immutable consumed-v15 authorization/result lineage. Authorization ID `7eb2e708-3802-403f-95e6-4e594f3310da` is locked. Every owner, scope, spending-cap, execution-commit, and run field remains null or not started.
+This distinct package binds that reviewed repair, the unchanged ordered 30-case cohort, the signed parent/child handoff, and immutable consumed-v15 authorization/result lineage. The owner later authorized this exact package once. Execution commit `0e17527e218daeb0d8ab938a37f34c04ee10febf` produced terminal partial run `784648df-2d7b-4957-972a-1ef14a054c43`. Authorization ID `7eb2e708-3802-403f-95e6-4e594f3310da` is consumed and cannot be reused.
 
 The partial v15 `$10.85` per-100 projection uses only two completed turns and is not sample-ready. Remediation successor 2's `$20.18` failed-work-amortized all-Zoning projection remains the controlling risk signal.
 
@@ -28,6 +28,11 @@ The partial v15 `$10.85` per-100 projection uses only two completed turns and is
 | Application | `1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797` |
 | Locked authorization ID | `7eb2e708-3802-403f-95e6-4e594f3310da` |
 | Locked authorization JSON | `33c8112e307ecde61ab1b8007d318e16a932875b5df3fba2202d53154ce180f6` |
+| Consumed authorization JSON | `f841d27c4f664990305a28ac6d2cc2817a2c910f53f402be44d3c0e3959153e5` |
+| Execution commit | `0e17527e218daeb0d8ab938a37f34c04ee10febf` |
+| Terminal run | `784648df-2d7b-4957-972a-1ef14a054c43` |
+| Retained result JSON | `94b0032df134daf360eb5ed59c80d4fd7c6cfd0b80e1564f095493b9a6fb673d` |
+| Retained result Markdown | `f48f5d5005fb5c347b7d368dbbc929ed4b2cdc2b42bb9afd152d65f5e7a89a58` |
 | Signed runner-handoff module | `e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327` |
 | Runner public key, DER bytes | `7830127ce97437dcb85971faecfac4ad031288d4f98608837fa5c22aa2c64918` |
 | Historical consumed v15 authorization | `0ef1e44e90ab0b7802913e4a3bc2785889875324eec1579a30e13331e14455a5` |
@@ -41,11 +46,11 @@ The guard rehashes the committed repair inputs, locked authorization, cohort, si
 
 ## Required fresh authorization
 
-The prior v15 authorization cannot activate this package. V16 can be activated only by the owner sending exactly:
+The prior v15 authorization could not activate this package. The owner activated v16 exactly once by sending:
 
 > authorize exactly package commit 9751e50d1f830db527a822b1a515552465749907 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.
 
-No shorthand, standing approval, prior authorization, or sentence naming another commit can activate v16. This sentence authorizes only one ordered 30-case semantic confirmation, one repetition, and at most `$5` cumulative API spend. It does not authorize public Zoning Research, the disabled 24,000-character candidate, professional Zoning signoff, deployment, pricing or allowance changes, merge, push, TestFlight release, or final public release.
+No shorthand, standing approval, prior authorization, or sentence naming another commit could activate v16. The resulting authorization is consumed and cannot authorize a retry, public Zoning Research, the disabled 24,000-character candidate, professional Zoning signoff, deployment, pricing or allowance changes, merge, push, TestFlight release, or final public release.
 
 ## No-cost verification
 
@@ -61,6 +66,8 @@ The following passed with OpenAI, database, and Stripe credentials removed:
 
 Zero paid provider calls were made while preparing or verifying this package. No merge, push, deployment, price change, allowance change, or public enablement occurred.
 
-## Next gate
+## Executed result and next gate
 
-Obtain the exact fresh owner authorization above. Only after that authorization may the locked record be activated and committed for one paid confirmation run. The run must preserve all 30 ordered cases, one repetition, the `$5` cumulative cap, disabled web support, stop-on-first-execution-error behavior, and one non-reusable pre-dispatch attempt identity.
+The [retained result](./PERMITEXT_ZONING_REMEDIATION_3_V16_CONFIRMATION_RESULT_2026-08-31.md) is terminal partial: one 4.00/4 pass, one 3.68/4 quality failure, one uncharged third-case stop, 27 unattempted cases, eight settled paid requests, zero pending, and `$0.218828` actual spend. Its `$9.04` mechanical per-100 projection is not sample-ready. The consumed authorization cannot activate another run.
+
+The next gate is a no-cost privacy-bounded diagnosis. Any later paid confirmation requires a materially justified repair, a distinct locked package, and a new exact owner authorization and cumulative cap.
