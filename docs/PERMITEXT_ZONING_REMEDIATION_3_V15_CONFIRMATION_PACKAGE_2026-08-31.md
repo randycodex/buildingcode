@@ -6,13 +6,13 @@ Branch: `codex/zoning-research-beta1`
 
 Exact package commit: `8fe33ab45f8d2d4b4653207aee47d8bb557c68b3`
 
-Status: locked; no paid run authorized or started
+Status: consumed by one authorized run; terminal partial result retained
 
 ## Outcome
 
 The privacy-bounded v14 diagnosis produced an explicit-input-boundary v15 repair at commit `167a8ee0106dd4e2ecce7a4c259b09d969f60990`. It recognizes eight same-clause boundary forms only when a site/property/parcel-specific result is directly bound to both the address-or-BBL and official Appendix J map. Incomplete, unrelated, optional-input, and masked parcel/actor outcomes remain rejected.
 
-This distinct package binds that repair, the unchanged ordered 30-case cohort, the signed parent/child handoff, and immutable consumed-v14 authorization/result lineage. Authorization ID `23d686fc-1a01-4cf0-8242-7c894f67ecbd` remains locked. Its owner, scope, spending-cap, package, and execution fields are null, so neither the runner nor evaluator can make a provider call.
+This distinct package binds that repair, the unchanged ordered 30-case cohort, the signed parent/child handoff, and immutable consumed-v14 authorization/result lineage. The owner later authorized this exact package once. Execution commit `1fde866860433e9152d00bd78cc324e825034956` produced terminal partial run `fe0367c2-2c62-41e3-bc4c-1fc168fae68e`. Authorization ID `23d686fc-1a01-4cf0-8242-7c894f67ecbd` is consumed and cannot be reused.
 
 The partial v14 `$11.22` per-100 projection uses only two completed turns and is not sample-ready. Remediation successor 2's `$20.18` failed-work-amortized all-Zoning projection remains the controlling risk signal.
 
@@ -28,6 +28,11 @@ The partial v14 `$11.22` per-100 projection uses only two completed turns and is
 | Application | `1b907f5db72f65248489b80801904a2011b2df91ce5d739a7e6dc39cce702797` |
 | Locked authorization ID | `23d686fc-1a01-4cf0-8242-7c894f67ecbd` |
 | Locked authorization JSON | `774e18e65313eaeeb601c2ed3bbf3f6f050907f564ba5765aeea3d9d2824855b` |
+| Consumed authorization JSON | `0ef1e44e90ab0b7802913e4a3bc2785889875324eec1579a30e13331e14455a5` |
+| Execution commit | `1fde866860433e9152d00bd78cc324e825034956` |
+| Terminal run | `fe0367c2-2c62-41e3-bc4c-1fc168fae68e` |
+| Retained result JSON | `0ce9050c8aa4e7d59b42a524b1c20372b7535bc1b42efa0527a56bf3357f0e58` |
+| Retained result Markdown | `4ce4144d54d62b297355f25a5b6a5cd2d26b877f83dbdac4e84fc762f38e15d6` |
 | Signed runner-handoff module | `e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327` |
 | Runner public key, DER bytes | `7830127ce97437dcb85971faecfac4ad031288d4f98608837fa5c22aa2c64918` |
 | Historical consumed v14 authorization | `8815940412be2456286e1f2034641c7a45979a145828bed5d55f4a750b883185` |
@@ -41,11 +46,11 @@ The guard rehashes the committed repair inputs, locked authorization, cohort, si
 
 ## Required fresh authorization
 
-The prior v14 authorization is consumed and cannot activate this package. If the owner chooses to run v15, the exact required sentence is:
+The prior v14 authorization could not activate this package. The owner activated v15 exactly once with:
 
 > authorize exactly package commit 8fe33ab45f8d2d4b4653207aee47d8bb557c68b3 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.
 
-No shorthand, standing approval, prior authorization, or sentence naming another commit can activate v15. Supplying the sentence authorizes only the single capped confirmation described above. It does not authorize a retry, public Zoning Research, the disabled 24,000-character candidate, professional Zoning signoff, deployment, pricing or allowance changes, merge, push, TestFlight release, or final public release.
+No shorthand, standing approval, prior authorization, or sentence naming another commit could activate v15. The resulting authorization is consumed and does not authorize a retry, public Zoning Research, the disabled 24,000-character candidate, professional Zoning signoff, deployment, pricing or allowance changes, merge, push, TestFlight release, or final public release.
 
 ## No-cost verification
 
@@ -61,6 +66,8 @@ The following passed with provider credentials unset:
 
 Zero paid provider calls were made while preparing or verifying this package. No merge, push, deployment, price change, allowance change, or public enablement occurred.
 
-## Next gate
+## Executed result and next gate
 
-The immediate gate is the owner's fresh exact decision on this package. If authorized, the dedicated runner may consume this authorization once, stop on the first execution error, keep web support disabled, and enforce a `$5` cumulative cap. The result must then be reviewed before any later Zoning, economics, or release decision.
+The [retained result](./PERMITEXT_ZONING_REMEDIATION_3_V15_CONFIRMATION_RESULT_2026-08-31.md) is terminal partial: one 4.00/4 pass, one 3.84/4 pass, one uncharged third-case stop, 27 unattempted cases, nine settled requests, zero pending, and `$0.249778` actual spend. The consumed authorization cannot activate another run.
+
+The next gate is a no-cost diagnosis of the changed third-case diagnostic shape. Any later paid confirmation requires a materially justified repair, a distinct locked package, and a new exact owner authorization and cumulative cap.
