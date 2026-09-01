@@ -656,6 +656,25 @@ async function beginAuthorizationAttempt(runID, executionCommit = null) {
   return authorization;
 }
 
+export function zoningArchitectureV1ContinuableResult(item) {
+  const operation = item?.operationMetric;
+  const verificationFailure =
+    operation?.status === "failed" &&
+    operation?.failureCode === "RESEARCH_VERIFICATION_FAILED" &&
+    Number.isInteger(operation?.providerRequestCount) &&
+    operation.providerRequestCount > 0;
+  const prerequisiteBoundary =
+    operation?.status === "rejected" &&
+    operation?.failureCode === "RESEARCH_ZONING_PREREQUISITES_REQUIRED" &&
+    operation?.providerRequestCount === 0;
+  return Boolean(
+    operation?.charged === false &&
+    (verificationFailure || prerequisiteBoundary) &&
+    operation?.pendingProviderRequestCount === 0 &&
+    !item?.error?.telemetryError
+  );
+}
+
 async function consumeAuthorization({
   runID,
   cohort,
@@ -729,20 +748,7 @@ async function consumeAuthorization({
       "The Architecture V1 result did not retain its deterministic prerequisite-boundary policy.");
     const terminalResult = result.results.at(-1);
     for (const item of result.results.filter((entry) => entry.error)) {
-      const operation = item.operationMetric;
-      const verificationFailure =
-        operation?.failureCode === "RESEARCH_VERIFICATION_FAILED" &&
-        Number.isInteger(operation?.providerRequestCount) &&
-        operation.providerRequestCount > 0;
-      const prerequisiteBoundary =
-        operation?.failureCode === "RESEARCH_ZONING_PREREQUISITES_REQUIRED" &&
-        operation?.providerRequestCount === 0;
-      const continuationSafe =
-        operation?.status === "failed" &&
-        operation?.charged === false &&
-        (verificationFailure || prerequisiteBoundary) &&
-        operation?.pendingProviderRequestCount === 0 &&
-        !item.error?.telemetryError;
+      const continuationSafe = zoningArchitectureV1ContinuableResult(item);
       const terminalStop =
         item === terminalResult &&
         result.failure?.caseID === item.testCase?.id;

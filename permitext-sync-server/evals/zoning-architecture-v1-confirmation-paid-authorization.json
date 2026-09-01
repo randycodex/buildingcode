@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "authorizationID": "fd3fe34f-0d25-4fad-90b5-bae5c9bdde31",
-  "status": "consumed",
+  "authorizationID": "048cb366-4332-4379-9dbc-62feb3fe7224",
+  "status": "locked",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -15,23 +15,23 @@
     "maximumCumulativeSpendUSD": 5
   },
   "scope": {
-    "caseCount": 30,
-    "repetitions": 1,
-    "maximumCumulativeSpendUSD": 5
+    "caseCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": "2026-09-01T13:07:45.000Z",
-    "authorizedBy": "Permitext owner",
-    "exactAuthorizationPhrase": "authorize exactly package commit cec4eed3ab89ca235dfd25544dedf5b28a067801 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.",
-    "exactSpendingCapPhrase": "authorize exactly package commit cec4eed3ab89ca235dfd25544dedf5b28a067801 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
   },
   "consumption": {
-    "status": "consumed",
-    "attemptID": "4381fd0a-f719-4e86-b231-972b299e6a57",
-    "startedAt": "2026-09-01T13:08:15.624Z",
-    "runID": "4381fd0a-f719-4e86-b231-972b299e6a57",
-    "consumedAt": "2026-09-01T13:09:03.727Z"
+    "status": "not_started",
+    "attemptID": null,
+    "startedAt": null,
+    "runID": null,
+    "consumedAt": null
   },
   "lineage": {
     "preparedFromCommit": "3f72999be05ebfbababe55ba0a2a9c48052738cb",
@@ -45,8 +45,8 @@
     "appSHA256": "e33bf343a987980cc993274d5783bd1d84389bd32c1e8cbe12d89135ce833f4b",
     "researchEconomicsSHA256": "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0",
     "runnerHandoffSHA256": "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327",
-    "paidRunnerSHA256": "cb330eab2ac8f3190ceb956211f85a467d7e4a85a710df7a4ffbf4c68de88f47",
-    "evaluationHarnessSHA256": "10f3d268e2fd8dac7a849e447ba07c62490cd84aba345b6389513165c4e30dab",
+    "paidRunnerSHA256": "aed95f015846c9645dbd8299240de8dbb391f88c78447b8b66d9a5e945062a2d",
+    "evaluationHarnessSHA256": "31b659d0fc7717a30f77cd52571ab241f9dad6e60e30c8983c8bc848d3284a2e",
     "preflightScriptSHA256": "3b191d855061b91ea2efe4ab1a5f5e281c4a7466a26707886659eeb2c0052211",
     "plannerContractSHA256": "dd5e130beefab2897c71209e8f103125668492a5d88b23375d6dfdb41a45d4c3",
     "priorV17AuthorizationFile": "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json",
@@ -57,7 +57,20 @@
     "supersededAuthorizationExecutionCommit": "cb33a96134a2a8121995c34372519557920ea24d",
     "supersededAttemptProviderRequests": 0,
     "supersededAttemptActualSpendUSD": 0,
-    "supersededAttemptReason": "The pre-dispatch tracked-input check stopped because the validator omitted cohortPath."
+    "supersededAttemptReason": "The pre-dispatch tracked-input check stopped because the validator omitted cohortPath.",
+    "priorArchitectureV1AuthorizationID": "fd3fe34f-0d25-4fad-90b5-bae5c9bdde31",
+    "priorArchitectureV1ConsumedAuthorizationSHA256": "56fdf3442620b6032b0ce3267e3ea28a17f07ab4b7feed761c7ae5008087175c",
+    "priorArchitectureV1AuthorizationPackageCommit": "cec4eed3ab89ca235dfd25544dedf5b28a067801",
+    "priorArchitectureV1ExecutionCommit": "a63020a713ef7757c81f3eb9f49eef5617850e52",
+    "priorArchitectureV1RunID": "4381fd0a-f719-4e86-b231-972b299e6a57",
+    "priorArchitectureV1ResultFile": "results/2026-09-01T13-08-16-791Z-4381fd0a-f719-4e86-b231-972b299e6a57.json",
+    "priorArchitectureV1ResultSHA256": "ce98f26f6856b64d2483b9c0047a8d577bde86c8e9734af61a37849294c125f1",
+    "priorArchitectureV1ReportSHA256": "ec97efbd6dc277d2a986b06ae12aaad1aac05622baf60205cb7c73aec4397d3b",
+    "priorArchitectureV1OrderedOperations": 3,
+    "priorArchitectureV1ActualSpendUSD": 0.03472,
+    "priorArchitectureV1PaidRequests": 5,
+    "priorArchitectureV1PendingPaidRequests": 0,
+    "priorArchitectureV1StopReason": "The harness required status failed for a deterministic prerequisite boundary recorded by Production as rejected."
   },
   "economics": {
     "productionNominalUSDPerHundred": 0.18179,
@@ -72,8 +85,8 @@
     "projectionOnly": true
   },
   "execution": {
-    "authorizationPackageCommit": "cec4eed3ab89ca235dfd25544dedf5b28a067801",
-    "executionCommit": "a63020a713ef7757c81f3eb9f49eef5617850e52",
+    "authorizationPackageCommit": null,
+    "executionCommit": null,
     "webSupportEnabled": false,
     "lunaFirst": true,
     "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only",
@@ -91,6 +104,6 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "networkOrModelCallAuthorized": true,
-  "notes": "One-time authorization consumed by 2026-09-01T13-08-16-791Z-4381fd0a-f719-4e86-b231-972b299e6a57.json. The result still requires quality, cost, and release-gate review."
+  "networkOrModelCallAuthorized": false,
+  "notes": "Locked successor after run 4381fd0a-f719-4e86-b231-972b299e6a57 consumed its authorization at 3 ordered operations and $0.034720. The narrow repair recognizes only exact uncharged zero-request prerequisite rejections; this new authorization identity cannot dispatch without a fresh exact package sentence and cumulative spend cap."
 }

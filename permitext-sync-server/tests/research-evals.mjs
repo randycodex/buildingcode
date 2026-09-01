@@ -3189,11 +3189,12 @@ function continuableVerifiedResearchFailure(
     metric.providerRequestCount > 0;
   const prerequisiteBoundary =
     allowZoningPrerequisiteBoundary &&
+    metric?.status === "rejected" &&
     metric?.failureCode === "RESEARCH_ZONING_PREREQUISITES_REQUIRED" &&
     metric?.providerRequestCount === 0;
   return Boolean(
     !error?.telemetryError &&
-    metric?.status === "failed" &&
+    (verificationFailure ? metric?.status === "failed" : prerequisiteBoundary) &&
     metric?.charged === false &&
     (verificationFailure || prerequisiteBoundary) &&
     metric?.pendingProviderRequestCount === 0
@@ -4475,6 +4476,37 @@ async function runSelfTest(dataset, datasetText) {
       new Error("Verified answer failed closed.")
     ),
     "The full-cohort policy rejected an exact terminal Research verification failure."
+  );
+  const zoningPrerequisiteBoundaryFixture = {
+    operationMetric: {
+      status: "rejected",
+      charged: false,
+      failureCode: "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
+      providerRequestCount: 0,
+      pendingProviderRequestCount: 0
+    }
+  };
+  assert(
+    !continuableVerifiedResearchFailure(
+      zoningPrerequisiteBoundaryFixture,
+      new Error("Deterministic Zoning prerequisite boundary.")
+    ) &&
+      continuableVerifiedResearchFailure(
+        zoningPrerequisiteBoundaryFixture,
+        new Error("Deterministic Zoning prerequisite boundary."),
+        { allowZoningPrerequisiteBoundary: true }
+      ) &&
+      !continuableVerifiedResearchFailure(
+        {
+          operationMetric: {
+            ...zoningPrerequisiteBoundaryFixture.operationMetric,
+            status: "failed"
+          }
+        },
+        new Error("Wrong prerequisite terminal status."),
+        { allowZoningPrerequisiteBoundary: true }
+      ),
+    "The Architecture V1 policy did not distinguish an exact rejected prerequisite boundary."
   );
   for (const [label, result, error] of [
     ["pending provider request", {

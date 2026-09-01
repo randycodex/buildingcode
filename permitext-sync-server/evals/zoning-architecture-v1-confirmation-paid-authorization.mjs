@@ -15,9 +15,9 @@ const cohortPath = join(
 );
 
 export const zoningArchitectureV1ConfirmationAuthorizationID =
-  "fd3fe34f-0d25-4fad-90b5-bae5c9bdde31";
+  "048cb366-4332-4379-9dbc-62feb3fe7224";
 export const zoningArchitectureV1ConfirmationLockedAuthorizationSHA256 =
-  "d46cd00c30dc62d88537b778d2f9ea810d81a01201503f4bbbc68d19a5dac66b";
+  "f36c09e48fb6f60d58a34d4d392b6aea63349bb1e21e6b06ac34953668ce40f4";
 export const zoningArchitectureV1ConfirmationCohortSHA256 =
   "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc";
 export const zoningArchitectureV1ConfirmationPreparedFromCommit =
@@ -31,9 +31,9 @@ export const zoningArchitectureV1ConfirmationEconomicsSHA256 =
 export const zoningArchitectureV1ConfirmationRunnerHandoffSHA256 =
   "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327";
 export const zoningArchitectureV1ConfirmationPaidRunnerSHA256 =
-  "cb330eab2ac8f3190ceb956211f85a467d7e4a85a710df7a4ffbf4c68de88f47";
+  "aed95f015846c9645dbd8299240de8dbb391f88c78447b8b66d9a5e945062a2d";
 export const zoningArchitectureV1ConfirmationEvaluationHarnessSHA256 =
-  "10f3d268e2fd8dac7a849e447ba07c62490cd84aba345b6389513165c4e30dab";
+  "31b659d0fc7717a30f77cd52571ab241f9dad6e60e30c8983c8bc848d3284a2e";
 
 const expectedFiles = Object.freeze({
   "evals/results/zoning-architecture-v1-no-cost-preflight.json":
@@ -53,15 +53,19 @@ const expectedFiles = Object.freeze({
   "evals/zoning-v11-paid-runner-handoff.mjs":
     "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327",
   "scripts/run-zoning-successor.mjs":
-    "cb330eab2ac8f3190ceb956211f85a467d7e4a85a710df7a4ffbf4c68de88f47",
+    "aed95f015846c9645dbd8299240de8dbb391f88c78447b8b66d9a5e945062a2d",
   "tests/research-evals.mjs":
-    "10f3d268e2fd8dac7a849e447ba07c62490cd84aba345b6389513165c4e30dab",
+    "31b659d0fc7717a30f77cd52571ab241f9dad6e60e30c8983c8bc848d3284a2e",
   "scripts/preflight-zoning-architecture-v1.mjs":
     "3b191d855061b91ea2efe4ab1a5f5e281c4a7466a26707886659eeb2c0052211",
   "tests/research-zoning-planner-contract.mjs":
     "dd5e130beefab2897c71209e8f103125668492a5d88b23375d6dfdb41a45d4c3",
   "evals/zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json":
-    "5474123dc94e2c934eb556bc05e1bce823f743d1db39cde8f65cecfade1487aa"
+    "5474123dc94e2c934eb556bc05e1bce823f743d1db39cde8f65cecfade1487aa",
+  "evals/results/2026-09-01T13-08-16-791Z-4381fd0a-f719-4e86-b231-972b299e6a57.json":
+    "ce98f26f6856b64d2483b9c0047a8d577bde86c8e9734af61a37849294c125f1",
+  "evals/results/2026-09-01T13-08-16-791Z-4381fd0a-f719-4e86-b231-972b299e6a57.md":
+    "ec97efbd6dc277d2a986b06ae12aaad1aac05622baf60205cb7c73aec4397d3b"
 });
 
 function sha256(value) {
@@ -135,6 +139,21 @@ export async function validateZoningArchitectureV1ConfirmationPaidAuthorization(
     authorization.lineage?.evaluationHarnessSHA256 ===
       zoningArchitectureV1ConfirmationEvaluationHarnessSHA256,
   "The Architecture V1 package lost a pinned runtime input.");
+  assert(authorization.lineage?.priorArchitectureV1AuthorizationID ===
+      "fd3fe34f-0d25-4fad-90b5-bae5c9bdde31" &&
+    authorization.lineage?.priorArchitectureV1ConsumedAuthorizationSHA256 ===
+      "56fdf3442620b6032b0ce3267e3ea28a17f07ab4b7feed761c7ae5008087175c" &&
+    authorization.lineage?.priorArchitectureV1RunID ===
+      "4381fd0a-f719-4e86-b231-972b299e6a57" &&
+    authorization.lineage?.priorArchitectureV1ResultSHA256 ===
+      "ce98f26f6856b64d2483b9c0047a8d577bde86c8e9734af61a37849294c125f1" &&
+    authorization.lineage?.priorArchitectureV1ReportSHA256 ===
+      "ec97efbd6dc277d2a986b06ae12aaad1aac05622baf60205cb7c73aec4397d3b" &&
+    authorization.lineage?.priorArchitectureV1OrderedOperations === 3 &&
+    authorization.lineage?.priorArchitectureV1ActualSpendUSD === 0.03472 &&
+    authorization.lineage?.priorArchitectureV1PaidRequests === 5 &&
+    authorization.lineage?.priorArchitectureV1PendingPaidRequests === 0,
+  "The Architecture V1 package lost its consumed partial-run lineage.");
   assert(authorization.execution?.webSupportEnabled === false,
     "The Architecture V1 confirmation may not enable web support.");
   assert(authorization.execution?.lunaFirst === true,

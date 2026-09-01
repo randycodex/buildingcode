@@ -12,6 +12,9 @@ import {
   zoningArchitectureV1ConfirmationCohortSHA256,
   zoningArchitectureV1ConfirmationLockedAuthorizationSHA256
 } from "../evals/zoning-architecture-v1-confirmation-paid-authorization.mjs";
+import {
+  zoningArchitectureV1ContinuableResult
+} from "../scripts/run-zoning-successor.mjs";
 
 const authorizationPath = new URL(
   "../evals/zoning-architecture-v1-confirmation-paid-authorization.json",
@@ -45,10 +48,46 @@ assert.equal(locked.authorization.deploymentAuthorized, false);
 assert.equal(locked.authorization.pricingOrAllowanceChangeAuthorized, false);
 assert.equal(locked.authorization.evidenceBudgetCandidateEnabled, false);
 assert.equal(locked.authorization.execution.continueAfterPrerequisiteBoundary, true);
+assert.equal(
+  locked.authorization.lineage.priorArchitectureV1RunID,
+  "4381fd0a-f719-4e86-b231-972b299e6a57"
+);
+assert.equal(locked.authorization.lineage.priorArchitectureV1OrderedOperations, 3);
+assert.equal(locked.authorization.lineage.priorArchitectureV1ActualSpendUSD, 0.03472);
+assert.equal(locked.authorization.lineage.priorArchitectureV1PendingPaidRequests, 0);
 assert.deepEqual(
   locked.authorization.execution.allowedContinuationFailureCodes,
   ["RESEARCH_VERIFICATION_FAILED", "RESEARCH_ZONING_PREREQUISITES_REQUIRED"]
 );
+const continuablePrerequisiteBoundary = {
+  operationMetric: {
+    status: "rejected",
+    charged: false,
+    failureCode: "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
+    providerRequestCount: 0,
+    pendingProviderRequestCount: 0
+  },
+  error: {}
+};
+assert.equal(zoningArchitectureV1ContinuableResult(continuablePrerequisiteBoundary), true);
+for (const mutation of [
+  { status: "failed" },
+  { charged: true },
+  { failureCode: "RESEARCH_PROVIDER_FAILED" },
+  { providerRequestCount: 1 },
+  { pendingProviderRequestCount: 1 }
+]) {
+  assert.equal(
+    zoningArchitectureV1ContinuableResult({
+      ...continuablePrerequisiteBoundary,
+      operationMetric: {
+        ...continuablePrerequisiteBoundary.operationMetric,
+        ...mutation
+      }
+    }),
+    false
+  );
+}
 assert.throws(
   () => requireActiveZoningArchitectureV1ConfirmationPaidAuthorization(locked),
   /exact locked-package authorization sentence and cumulative spend cap/
