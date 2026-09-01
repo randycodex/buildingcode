@@ -133,6 +133,15 @@ import {
   zoningArchitectureV1ConfirmationSafetySHA256
 } from "../evals/zoning-architecture-v1-confirmation-paid-authorization.mjs";
 import {
+  validateZoningArchitectureV2ConfirmationPaidAuthorization,
+  zoningArchitectureV2ConfirmationAppSHA256,
+  zoningArchitectureV2ConfirmationEconomicsSHA256,
+  zoningArchitectureV2ConfirmationLockedAuthorizationSHA256,
+  zoningArchitectureV2ConfirmationPreparedFromCommit,
+  zoningArchitectureV2ConfirmationRunnerHandoffSHA256,
+  zoningArchitectureV2ConfirmationSafetySHA256
+} from "../evals/zoning-architecture-v2-confirmation-paid-authorization.mjs";
+import {
   requireAuthenticatedZoningV11RunnerHandoff
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
 
@@ -186,6 +195,10 @@ const zoningRemediationSuccessor3V17FullCohortMode =
   process.argv.includes("--zoning-successor-remediation-3-v17-full-cohort");
 const zoningArchitectureV1ConfirmationMode =
   process.argv.includes("--zoning-architecture-v1-confirmation");
+const zoningArchitectureV2ConfirmationMode =
+  process.argv.includes("--zoning-architecture-v2-confirmation");
+const zoningArchitectureConfirmationMode =
+  zoningArchitectureV1ConfirmationMode || zoningArchitectureV2ConfirmationMode;
 const zoningRemediationSuccessor3AuthenticatedConfirmationMode =
   zoningRemediationSuccessor3V11ConfirmationMode ||
   zoningRemediationSuccessor3V12ConfirmationMode ||
@@ -195,8 +208,27 @@ const zoningRemediationSuccessor3AuthenticatedConfirmationMode =
   zoningRemediationSuccessor3V16ConfirmationMode ||
   zoningRemediationSuccessor3V17ConfirmationMode ||
   zoningRemediationSuccessor3V17FullCohortMode ||
-  zoningArchitectureV1ConfirmationMode;
-const authenticatedConfirmation = zoningArchitectureV1ConfirmationMode
+  zoningArchitectureConfirmationMode;
+const authenticatedConfirmation = zoningArchitectureV2ConfirmationMode
+  ? {
+      version: "architecture-v2",
+      validate: validateZoningArchitectureV2ConfirmationPaidAuthorization,
+      appSHA256: zoningArchitectureV2ConfirmationAppSHA256,
+      economicsSHA256: zoningArchitectureV2ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningArchitectureV2ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit: zoningArchitectureV2ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningArchitectureV2ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningArchitectureV2ConfirmationSafetySHA256,
+      authorizationFile:
+        "zoning-architecture-v2-confirmation-paid-authorization.json",
+      runLockFile: ".zoning-architecture-v2-confirmation-paid-run.lock",
+      stopOnExecutionError: false,
+      continueAfterVerifiedResearchFailure: true,
+      continueAfterPrerequisiteBoundary: true
+    }
+  : zoningArchitectureV1ConfirmationMode
   ? {
       version: "architecture-v1",
       validate: validateZoningArchitectureV1ConfirmationPaidAuthorization,
@@ -419,7 +451,8 @@ const zoningDatasetModeCount = [
   zoningRemediationSuccessor3V16ConfirmationMode,
   zoningRemediationSuccessor3V17ConfirmationMode,
   zoningRemediationSuccessor3V17FullCohortMode,
-  zoningArchitectureV1ConfirmationMode
+  zoningArchitectureV1ConfirmationMode,
+  zoningArchitectureV2ConfirmationMode
 ].filter(Boolean).length;
 if (zoningDatasetModeCount > 1) {
   throw new Error("Choose exactly one Zoning evaluation dataset mode.");
@@ -3180,7 +3213,10 @@ function evaluationErrorRecord(error) {
 function continuableVerifiedResearchFailure(
   result,
   error,
-  { allowZoningPrerequisiteBoundary = false } = {}
+  {
+    allowZoningPrerequisiteBoundary = false,
+    allowZoningEvidenceBoundary = false
+  } = {}
 ) {
   const metric = result?.operationMetric;
   const verificationFailure =
@@ -3192,11 +3228,19 @@ function continuableVerifiedResearchFailure(
     metric?.status === "rejected" &&
     metric?.failureCode === "RESEARCH_ZONING_PREREQUISITES_REQUIRED" &&
     metric?.providerRequestCount === 0;
+  const evidenceBoundary =
+    allowZoningEvidenceBoundary &&
+    metric?.status === "rejected" &&
+    [
+      "RESEARCH_ZONING_EVIDENCE_REQUIRED",
+      "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED"
+    ].includes(metric?.failureCode) &&
+    metric?.providerRequestCount === 0;
   return Boolean(
     !error?.telemetryError &&
-    (verificationFailure ? metric?.status === "failed" : prerequisiteBoundary) &&
+    (verificationFailure ? metric?.status === "failed" : prerequisiteBoundary || evidenceBoundary) &&
     metric?.charged === false &&
-    (verificationFailure || prerequisiteBoundary) &&
+    (verificationFailure || prerequisiteBoundary || evidenceBoundary) &&
     metric?.pendingProviderRequestCount === 0
   );
 }
@@ -3241,6 +3285,8 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
       options.continueAfterVerifiedResearchFailure === true,
     continueAfterZoningPrerequisiteBoundary:
       options.allowZoningPrerequisiteBoundary === true,
+    continueAfterZoningEvidenceBoundary:
+      options.allowZoningEvidenceBoundary === true,
     pricingVersion: estimatedResearchCost({ inputTokens: 0, outputTokens: 0 }).pricingVersion,
     gitCommit: await currentGitCommit()
   };
@@ -3382,7 +3428,9 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
           options.continueAfterVerifiedResearchFailure === true &&
           continuableVerifiedResearchFailure(result, error, {
             allowZoningPrerequisiteBoundary:
-              options.allowZoningPrerequisiteBoundary === true
+              options.allowZoningPrerequisiteBoundary === true,
+            allowZoningEvidenceBoundary:
+              options.allowZoningEvidenceBoundary === true
           });
         if (error.code === "RESEARCH_EVAL_SPEND_CAP" || error.name === "AbortError") {
           haltedFailure = {
@@ -4508,6 +4556,37 @@ async function runSelfTest(dataset, datasetText) {
       ),
     "The Architecture V1 policy did not distinguish an exact rejected prerequisite boundary."
   );
+  const zoningEvidenceBoundaryFixture = {
+    operationMetric: {
+      status: "rejected",
+      charged: false,
+      failureCode: "RESEARCH_ZONING_EVIDENCE_REQUIRED",
+      providerRequestCount: 0,
+      pendingProviderRequestCount: 0
+    }
+  };
+  assert(
+    !continuableVerifiedResearchFailure(
+      zoningEvidenceBoundaryFixture,
+      new Error("Deterministic Zoning evidence boundary.")
+    ) &&
+      continuableVerifiedResearchFailure(
+        zoningEvidenceBoundaryFixture,
+        new Error("Deterministic Zoning evidence boundary."),
+        { allowZoningEvidenceBoundary: true }
+      ) &&
+      continuableVerifiedResearchFailure(
+        {
+          operationMetric: {
+            ...zoningEvidenceBoundaryFixture.operationMetric,
+            failureCode: "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED"
+          }
+        },
+        new Error("Deterministic Zoning evidence-budget boundary."),
+        { allowZoningEvidenceBoundary: true }
+      ),
+    "The Architecture V2 policy did not distinguish exact rejected evidence boundaries."
+  );
   for (const [label, result, error] of [
     ["pending provider request", {
       operationMetric: {
@@ -4643,7 +4722,7 @@ async function runSelfTest(dataset, datasetText) {
 async function main() {
   if (process.argv.includes("--help")) {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
-    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; the versioned confirmations and --zoning-architecture-v1-confirmation use that same frozen cohort through distinct confirmation authorizations. None is baseline-eligible.");
+    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; the versioned confirmations and Architecture V1/V2 confirmations use that same frozen cohort through distinct confirmation authorizations. None is baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
     console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3 | --zoning-successor-remediation-3-v8-confirmation | --zoning-successor-remediation-3-v9-confirmation | --zoning-successor-remediation-3-v11-confirmation | --zoning-successor-remediation-3-v12-confirmation | --zoning-successor-remediation-3-v13-confirmation | --zoning-successor-remediation-3-v14-confirmation | --zoning-successor-remediation-3-v15-confirmation | --zoning-successor-remediation-3-v16-confirmation | --zoning-successor-remediation-3-v17-confirmation | --zoning-successor-remediation-3-v17-full-cohort) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
@@ -5041,7 +5120,8 @@ async function main() {
         stopOnError,
         stopOnExecutionError,
         continueAfterVerifiedResearchFailure,
-        allowZoningPrerequisiteBoundary: zoningArchitectureV1ConfirmationMode,
+        allowZoningPrerequisiteBoundary: zoningArchitectureConfirmationMode,
+        allowZoningEvidenceBoundary: zoningArchitectureV2ConfirmationMode,
         runID: requestedRunID,
         datasetKind: zoningMode ? "zoning-resolution" : "construction-code",
         retrievalVersion: zoningMode

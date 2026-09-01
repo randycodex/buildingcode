@@ -121,6 +121,16 @@ import {
   zoningArchitectureV1ConfirmationSafetySHA256
 } from "../evals/zoning-architecture-v1-confirmation-paid-authorization.mjs";
 import {
+  requireActiveZoningArchitectureV2ConfirmationPaidAuthorization,
+  validateZoningArchitectureV2ConfirmationPaidAuthorization,
+  zoningArchitectureV2ConfirmationAppSHA256,
+  zoningArchitectureV2ConfirmationEconomicsSHA256,
+  zoningArchitectureV2ConfirmationLockedAuthorizationSHA256,
+  zoningArchitectureV2ConfirmationPreparedFromCommit,
+  zoningArchitectureV2ConfirmationRunnerHandoffSHA256,
+  zoningArchitectureV2ConfirmationSafetySHA256
+} from "../evals/zoning-architecture-v2-confirmation-paid-authorization.mjs";
+import {
   respondToZoningV11RunnerChallenge,
   zoningV11RunnerPrivateKey
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
@@ -158,7 +168,8 @@ assert(
         "--remediation-3-v16-confirmation",
         "--remediation-3-v17-confirmation",
         "--remediation-3-v17-full-cohort",
-        "--zoning-architecture-v1-confirmation"
+        "--zoning-architecture-v1-confirmation",
+        "--zoning-architecture-v2-confirmation"
       ].includes(argument)),
   "Unsupported Zoning successor paid-run argument."
 );
@@ -186,6 +197,10 @@ const remediationSuccessor3V17FullCohortMode =
   process.argv.includes("--remediation-3-v17-full-cohort");
 const zoningArchitectureV1ConfirmationMode =
   process.argv.includes("--zoning-architecture-v1-confirmation");
+const zoningArchitectureV2ConfirmationMode =
+  process.argv.includes("--zoning-architecture-v2-confirmation");
+const zoningArchitectureConfirmationMode =
+  zoningArchitectureV1ConfirmationMode || zoningArchitectureV2ConfirmationMode;
 const remediationSuccessor3AuthenticatedConfirmationMode =
   remediationSuccessor3V11ConfirmationMode ||
   remediationSuccessor3V12ConfirmationMode ||
@@ -195,7 +210,7 @@ const remediationSuccessor3AuthenticatedConfirmationMode =
   remediationSuccessor3V16ConfirmationMode ||
   remediationSuccessor3V17ConfirmationMode ||
   remediationSuccessor3V17FullCohortMode ||
-  zoningArchitectureV1ConfirmationMode;
+  zoningArchitectureConfirmationMode;
 const retiredPaidPathMessage =
   "Historical Zoning successor paid runner modes are retired. Each must run through " +
   "its consuming runner and active run lock, and each now requires a new explicit owner " +
@@ -212,7 +227,24 @@ if (runnerInvokedDirectly && remediationSuccessor3V17ConfirmationMode) {
 const remediationSuccessor3FamilyMode = remediationSuccessor3Mode ||
   remediationSuccessor3V8ConfirmationMode || remediationSuccessor3V9ConfirmationMode ||
   remediationSuccessor3AuthenticatedConfirmationMode;
-const authenticatedConfirmation = zoningArchitectureV1ConfirmationMode
+const authenticatedConfirmation = zoningArchitectureV2ConfirmationMode
+  ? {
+      version: "architecture-v2",
+      validate: validateZoningArchitectureV2ConfirmationPaidAuthorization,
+      requireActive: requireActiveZoningArchitectureV2ConfirmationPaidAuthorization,
+      appSHA256: zoningArchitectureV2ConfirmationAppSHA256,
+      economicsSHA256: zoningArchitectureV2ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningArchitectureV2ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit: zoningArchitectureV2ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningArchitectureV2ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningArchitectureV2ConfirmationSafetySHA256,
+      stopOnExecutionError: false,
+      continueAfterVerifiedResearchFailure: true,
+      continueAfterPrerequisiteBoundary: true
+    }
+  : zoningArchitectureV1ConfirmationMode
   ? {
       version: "architecture-v1",
       validate: validateZoningArchitectureV1ConfirmationPaidAuthorization,
@@ -379,7 +411,9 @@ const authenticatedConfirmation = zoningArchitectureV1ConfirmationMode
 const authorizationPath = resolve(
   serverRoot,
   "evals",
-  zoningArchitectureV1ConfirmationMode
+  zoningArchitectureV2ConfirmationMode
+    ? "zoning-architecture-v2-confirmation-paid-authorization.json"
+    : zoningArchitectureV1ConfirmationMode
     ? "zoning-architecture-v1-confirmation-paid-authorization.json"
     : remediationSuccessor3V17FullCohortMode
     ? "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json"
@@ -410,7 +444,9 @@ const authorizationPath = resolve(
 const authorizationModulePath = resolve(
   serverRoot,
   "evals",
-  zoningArchitectureV1ConfirmationMode
+  zoningArchitectureV2ConfirmationMode
+    ? "zoning-architecture-v2-confirmation-paid-authorization.mjs"
+    : zoningArchitectureV1ConfirmationMode
     ? "zoning-architecture-v1-confirmation-paid-authorization.mjs"
     : remediationSuccessor3V17FullCohortMode
     ? "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.mjs"
@@ -441,7 +477,9 @@ const authorizationModulePath = resolve(
 const runLockPath = resolve(
   serverRoot,
   "evals",
-  zoningArchitectureV1ConfirmationMode
+  zoningArchitectureV2ConfirmationMode
+    ? ".zoning-architecture-v2-confirmation-paid-run.lock"
+    : zoningArchitectureV1ConfirmationMode
     ? ".zoning-architecture-v1-confirmation-paid-run.lock"
     : remediationSuccessor3V17FullCohortMode
     ? ".zoning-successor-remediation-3-v17-full-cohort-paid-run.lock"
@@ -675,6 +713,29 @@ export function zoningArchitectureV1ContinuableResult(item) {
   );
 }
 
+export function zoningArchitectureV2ContinuableResult(item) {
+  const operation = item?.operationMetric;
+  const verificationFailure =
+    operation?.status === "failed" &&
+    operation?.failureCode === "RESEARCH_VERIFICATION_FAILED" &&
+    Number.isInteger(operation?.providerRequestCount) &&
+    operation.providerRequestCount > 0;
+  const preGenerationBoundary =
+    operation?.status === "rejected" &&
+    [
+      "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
+      "RESEARCH_ZONING_EVIDENCE_REQUIRED",
+      "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED"
+    ].includes(operation?.failureCode) &&
+    operation?.providerRequestCount === 0;
+  return Boolean(
+    operation?.charged === false &&
+    (verificationFailure || preGenerationBoundary) &&
+    operation?.pendingProviderRequestCount === 0 &&
+    !item?.error?.telemetryError
+  );
+}
+
 async function consumeAuthorization({
   runID,
   cohort,
@@ -737,7 +798,7 @@ async function consumeAuthorization({
         `A ${authenticatedConfirmation.version} confirmation operation used unbudgeted web support.`);
     }
   }
-  if (zoningArchitectureV1ConfirmationMode) {
+  if (zoningArchitectureConfirmationMode) {
     assert.equal(result.configuration?.webSupportEnabled, false,
       "The Architecture V1 result unexpectedly enabled unbudgeted web-search fees.");
     assert.equal(result.configuration?.stopOnExecutionError, false,
@@ -748,7 +809,9 @@ async function consumeAuthorization({
       "The Architecture V1 result did not retain its deterministic prerequisite-boundary policy.");
     const terminalResult = result.results.at(-1);
     for (const item of result.results.filter((entry) => entry.error)) {
-      const continuationSafe = zoningArchitectureV1ContinuableResult(item);
+      const continuationSafe = zoningArchitectureV2ConfirmationMode
+        ? zoningArchitectureV2ContinuableResult(item)
+        : zoningArchitectureV1ContinuableResult(item);
       const terminalStop =
         item === terminalResult &&
         result.failure?.caseID === item.testCase?.id;
@@ -824,7 +887,9 @@ function runEvaluation({
   return new Promise((resolveRun, rejectRun) => {
     const childArguments = [
       "tests/research-evals.mjs",
-      zoningArchitectureV1ConfirmationMode
+      zoningArchitectureV2ConfirmationMode
+        ? "--zoning-architecture-v2-confirmation"
+        : zoningArchitectureV1ConfirmationMode
         ? "--zoning-architecture-v1-confirmation"
         : remediationSuccessor3V17FullCohortMode
         ? "--zoning-successor-remediation-3-v17-full-cohort"
@@ -854,7 +919,7 @@ function runEvaluation({
       runID,
       ...(remediationSuccessor3V17FullCohortMode
         ? ["--continue-after-verified-research-failure"]
-        : zoningArchitectureV1ConfirmationMode
+        : zoningArchitectureConfirmationMode
         ? ["--continue-after-verified-research-failure"]
         : remediationSuccessor3FamilyMode ? ["--stop-on-execution-error"] : [])
     ];
@@ -1104,8 +1169,8 @@ async function main() {
     console.log(
       `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning ` +
       `${remediationSuccessor3AuthenticatedConfirmationMode
-        ? zoningArchitectureV1ConfirmationMode
-          ? "Architecture V1 confirmation"
+        ? zoningArchitectureConfirmationMode
+          ? `${authenticatedConfirmation.version === "architecture-v2" ? "Architecture V2" : "Architecture V1"} confirmation`
           : `remediation successor 3 ${authenticatedConfirmation.version} confirmation`
         : remediationSuccessor3Mode ? "remediation successor 3"
         : remediationSuccessor2Mode ? "remediation successor 2" : "successor"} ` +
@@ -1161,8 +1226,8 @@ async function main() {
   }
   if (result.code === 3) {
     console.error(
-      zoningArchitectureV1ConfirmationMode
-        ? "The Architecture V1 confirmation retained one or more quality, prerequisite-boundary, or fail-closed case results."
+      zoningArchitectureConfirmationMode
+        ? `The ${authenticatedConfirmation.version === "architecture-v2" ? "Architecture V2" : "Architecture V1"} confirmation retained one or more quality, prerequisite-boundary, or fail-closed case results.`
         : remediationSuccessor3V17FullCohortMode
         ? "The full-cohort diagnostic retained one or more case failures or stopped at a fail-closed boundary."
         : "The complete cohort finished, but one or more cases failed quality or execution checks."

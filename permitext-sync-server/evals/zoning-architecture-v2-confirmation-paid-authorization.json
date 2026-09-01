@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "authorizationID": "7b58a481-a900-4be1-9cf5-1d26e5fda78b",
+  "status": "locked",
+  "cohort": {
+    "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
+    "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
+    "caseCount": 30,
+    "ordered": true
+  },
+  "plannedScope": {
+    "purpose": "one Architecture V2 confirmation of the frozen owner-approved Zoning cohort",
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
+  },
+  "scope": {
+    "caseCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
+  },
+  "ownerDecision": {
+    "required": true,
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
+  },
+  "consumption": {
+    "status": "not_started",
+    "attemptID": null,
+    "startedAt": null,
+    "runID": null,
+    "consumedAt": null
+  },
+  "lineage": {
+    "preparedFromCommit": "991d38a0047f53d49975fa6af5259f0063d4bd0e",
+    "plannerVersion": "20260901-question-compiler-v2",
+    "repairVersion": "20260901-source-bounded-patch-v2",
+    "plannerSHA256": "87d9a9e425100b17aa7209f04b8084ed065fec7ee5d712c36e85d2e104eb0a17",
+    "routingSHA256": "c10f4be6bf5249868744a4794997008d6d5548811672f7da1a6b0101836ae634",
+    "appSHA256": "e3088a644dfdf9ecfb929a607a95a5eb38ee9e3b2b06276cc01d24bbd49b910a",
+    "zoningSafetySHA256": "e0c5f298e9cfbeaed9ed6d084df30b77643f29f011cfe5f309a0fb59a11277df",
+    "researchEconomicsSHA256": "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0",
+    "runnerHandoffProtocol": "permitext-zoning-v11-runner-handoff-v1",
+    "runnerHandoffSHA256": "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327",
+    "paidRunnerSHA256": "df4d71757d534f7e310c47b79c4281389312beebdf2b67541aff0fccfa178c9f",
+    "evaluationHarnessSHA256": "19f1200321194e23368f7a5f9ffe4536e5a5c21c2e032773e0b54e996ad851fd",
+    "noCostPreflightSHA256": "795676531eda046b046d55215afcf4d01c08846f2e9f1a7404e79ac3348d614c",
+    "priorArchitectureV1AuthorizationID": "048cb366-4332-4379-9dbc-62feb3fe7224",
+    "priorArchitectureV1RunID": "90f42d5b-b758-4df4-98af-933350f036e7",
+    "priorArchitectureV1ResultSHA256": "551ea803cb2e7758f9952874e2ea86dd31cb2b7c17abde3eb487a19f51a0cb0f"
+  },
+  "execution": {
+    "authorizationPackageCommit": null,
+    "executionCommit": null,
+    "webSupportEnabled": false,
+    "selectiveLunaTerraRouting": true,
+    "fullAnswerRewriteAllowed": false,
+    "maximumLogicalModelStagesPerCase": 3,
+    "maximumSourceBoundedRepairsPerCase": 1,
+    "maximumRepairSources": 5,
+    "maximumRepairSourceCharacters": 8000,
+    "judgeLedgerSeparate": true,
+    "stopOnExecutionError": false,
+    "continueAfterVerifiedResearchFailure": true,
+    "continueAfterPreGenerationBoundary": true,
+    "allowedContinuationFailureCodes": [
+      "RESEARCH_VERIFICATION_FAILED",
+      "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
+      "RESEARCH_ZONING_EVIDENCE_REQUIRED",
+      "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED"
+    ]
+  },
+  "networkOrModelCallAuthorized": false,
+  "publicResearchReleaseAuthorized": false,
+  "professionalZoningSignoff": false,
+  "deploymentAuthorized": false,
+  "pricingOrAllowanceChangeAuthorized": false,
+  "evidenceBudgetCandidateEnabled": false,
+  "notes": "Locked Architecture V2 confirmation package. Preparing or validating this record makes no provider request. A paid run requires a later exact owner sentence naming the committed package, all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5."
+}
