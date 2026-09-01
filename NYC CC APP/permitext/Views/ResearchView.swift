@@ -1835,6 +1835,154 @@ private struct ResearchVisualReviewSheet: View {
     }
 }
 
+private struct ResearchFormattedNarrative: View {
+    private struct Block: Identifiable {
+        enum Kind {
+            case paragraph(String)
+            case heading(String)
+            case list([String])
+            case quote(String)
+            case table(header: [String], rows: [[String]])
+        }
+
+        let id: Int
+        let kind: Kind
+    }
+
+    let text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(Self.blocks(in: text)) { block in
+                switch block.kind {
+                case .paragraph(let value):
+                    inlineText(value)
+                case .heading(let value):
+                    inlineText(value)
+                        .font(.headline)
+                        .padding(.top, 2)
+                case .list(let items):
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(Array(items.enumerated()), id: \.offset) { _, item in
+                            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                Text("•")
+                                inlineText(item)
+                            }
+                        }
+                    }
+                case .quote(let value):
+                    HStack(alignment: .top, spacing: 10) {
+                        Rectangle()
+                            .fill(Color.secondary.opacity(0.45))
+                            .frame(width: 3)
+                        inlineText(value)
+                            .foregroundStyle(.secondary)
+                    }
+                case .table(let header, let rows):
+                    narrativeTable(header: header, rows: rows)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func inlineText(_ value: String) -> Text {
+        if let attributed = try? AttributedString(markdown: value) {
+            return Text(attributed)
+        }
+        return Text(value)
+    }
+
+    private func narrativeTable(header: [String], rows: [[String]]) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .top, spacing: 0) {
+                    ForEach(Array(header.enumerated()), id: \.offset) { _, value in
+                        inlineText(value)
+                            .font(.subheadline.weight(.bold))
+                            .frame(width: 170, alignment: .leading)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                    }
+                }
+                Divider()
+                ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
+                    HStack(alignment: .top, spacing: 0) {
+                        ForEach(Array(row.enumerated()), id: \.offset) { _, value in
+                            inlineText(value)
+                                .frame(width: 170, alignment: .leading)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 8)
+                        }
+                    }
+                    Divider()
+                }
+            }
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Research answer comparison table")
+    }
+
+    private static func blocks(in value: String) -> [Block] {
+        value
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .components(separatedBy: "\n\n")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .enumerated()
+            .map { index, rawBlock in
+                let lines = rawBlock
+                    .components(separatedBy: "\n")
+                    .map { $0.trimmingCharacters(in: .whitespaces) }
+                    .filter { !$0.isEmpty }
+                if let table = tableValue(lines) {
+                    return Block(id: index, kind: .table(header: table.header, rows: table.rows))
+                }
+                if lines.count == 1,
+                   let marker = lines[0].range(of: #"^#{2,4}\s+"#, options: .regularExpression) {
+                    return Block(id: index, kind: .heading(String(lines[0][marker.upperBound...])))
+                }
+                if !lines.isEmpty, lines.allSatisfy({ $0.hasPrefix("- ") || $0.hasPrefix("* ") }) {
+                    return Block(id: index, kind: .list(lines.map { String($0.dropFirst(2)) }))
+                }
+                if !lines.isEmpty, lines.allSatisfy({ $0.hasPrefix(">") }) {
+                    let quote = lines.map {
+                        String($0.dropFirst()).trimmingCharacters(in: .whitespaces)
+                    }.joined(separator: "\n")
+                    return Block(id: index, kind: .quote(quote))
+                }
+                return Block(id: index, kind: .paragraph(rawBlock))
+            }
+    }
+
+    private static func tableValue(_ lines: [String]) -> (header: [String], rows: [[String]])? {
+        guard lines.count >= 3, lines.allSatisfy({ $0.contains("|") }) else { return nil }
+        let header = tableCells(lines[0])
+        let separator = tableCells(lines[1])
+        guard header.count >= 2,
+              separator.count == header.count,
+              separator.allSatisfy(isTableSeparator) else { return nil }
+        let rows = lines.dropFirst(2).map(tableCells)
+        guard rows.allSatisfy({ $0.count == header.count }) else { return nil }
+        return (header, rows)
+    }
+
+    private static func tableCells(_ line: String) -> [String] {
+        var normalized = line.trimmingCharacters(in: .whitespaces)
+        if normalized.hasPrefix("|") { normalized.removeFirst() }
+        if normalized.hasSuffix("|") { normalized.removeLast() }
+        return normalized
+            .split(separator: "|", omittingEmptySubsequences: false)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+    }
+
+    private static func isTableSeparator(_ value: String) -> Bool {
+        let normalized = value.trimmingCharacters(in: .whitespaces)
+        return normalized.filter { $0 == "-" }.count >= 3 &&
+            normalized.allSatisfy { $0 == "-" || $0 == ":" }
+    }
+}
+
 private struct ResearchAnswerView: View {
     let answer: ResearchAnswer
     let sourceStatus: String
@@ -1856,7 +2004,7 @@ private struct ResearchAnswerView: View {
                     .background(Color.secondary.opacity(0.12), in: Capsule())
                     .accessibilityIdentifier("research-answer-authority-status")
             }
-            Text(primaryNarrative)
+            ResearchFormattedNarrative(text: primaryNarrative)
                 .font(.body)
                 .textSelection(.enabled)
             if let basisText {

@@ -9,6 +9,10 @@ const [serverSource, clientSource] = await Promise.all([
   readFile(join(root, "../app.mjs"), "utf8"),
   readFile(join(root, "../public/app.js"), "utf8")
 ]);
+const nativeResearchSource = await readFile(
+  join(root, "../../NYC CC APP/permitext/Views/ResearchView.swift"),
+  "utf8"
+);
 
 const evidence = [{
   sectionID: "smoke-separation",
@@ -68,6 +72,11 @@ assert.doesNotMatch(serverSource, /write conclusion and explanation so they read
 assert.match(serverSource, /Do not target a fixed number of paragraphs or sentences/);
 assert.match(serverSource, /Use the shortest answer that fully and reliably resolves the question/);
 assert.match(serverSource, /Never omit a material qualification, applicability issue, conflicting provision, or evidence limitation/);
+assert.match(serverSource, /open-ended request for design requirements/);
+assert.match(serverSource, /Do not let a narrow exception, a specialized ramp or equipment type/);
+assert.match(serverSource, /Adapt the presentation to the question instead of forcing a fixed report template/);
+assert.match(serverSource, /a concise Markdown table is permitted/);
+assert.match(serverSource, /If the user asks for a short paragraph or quick explanation/);
 assert.match(serverSource, /Do not silently correct or normalize enacted wording/);
 assert.match(serverSource, /RELATIONSHIP: \$\{section\.relationship/);
 assert.match(serverSource, /USER_SELECTED_TEXT is the exact model-visible focus and citation target/);
@@ -77,8 +86,19 @@ assert.match(serverSource, /Preserve cumulative and alternative conditions exact
 assert.match(serverSource, /A and B must not be restated as A or B/);
 assert.match(serverSource, /Treat facts explicitly stated in the current question as established premises/);
 assert.match(serverSource, /Ordinary internal corpus exclusions are not user-facing evidence limitations/);
+assert.match(serverSource, /When the question names a code edition or year, verify every legal claim/);
+assert.match(serverSource, /Never borrow similarly numbered text from another edition/);
+assert.match(serverSource, /fail with wrong_attribution if any legal claim or human-readable section reference is taken from another edition/);
 assert.doesNotMatch(serverSource, /`EXCLUDED_CORPORA:/);
 assert.match(clientSource, /function appendResearchAnswerNarrative\(container, result\)/);
+assert.match(clientSource, /function researchAnswerTable\(block\)/);
+assert.match(clientSource, /research-answer-table/);
+assert.match(clientSource, /appendResearchInlineFormatting/);
+assert.match(clientSource, /research-answer-quote/);
+assert.match(nativeResearchSource, /private struct ResearchFormattedNarrative: View/);
+assert.match(nativeResearchSource, /case table\(header: \[String\], rows: \[\[String\]\]\)/);
+assert.match(nativeResearchSource, /AttributedString\(markdown: value\)/);
+assert.match(nativeResearchSource, /ResearchFormattedNarrative\(text: primaryNarrative\)/);
 assert.match(clientSource, /text\.split\(\/\\n\\s\*\\n\/\)/);
 assert.match(clientSource, /list\.className = "research-answer-list"/);
 assert.doesNotMatch(clientSource, /card\.append\(answer, explanation\)/);

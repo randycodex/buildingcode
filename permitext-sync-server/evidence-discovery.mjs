@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260824-hybrid-candidates-v17";
+export const evidenceDiscoveryVersion = "20260901-hybrid-candidates-v19";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -40,6 +40,10 @@ const conceptExpansions = [
   {
     pattern: /\b(accessible|accessibility|disabled|wheelchair)\b/i,
     terms: ["accessible", "accessibility", "wheelchair"]
+  },
+  {
+    pattern: /\bramps?\b/i,
+    terms: ["ramp", "ramps", "slope", "rise", "landing", "handrail", "edge", "protection"]
   },
   {
     pattern: /\b(existing|prior-code|legacy|alteration|enlargement)\b/i,
@@ -141,6 +145,16 @@ const topicRoutes = [
     targets: [
       { codePrefix: "ZR", sectionPrefix: "32-121" },
       { codePrefix: "ZR", sectionPrefix: "32-123" }
+    ]
+  },
+  {
+    pattern: /^(?=[\s\S]*\bC4-4D\b)(?=[\s\S]*\bR8A\b)(?=[\s\S]*\b(?:similar|compare|comparison|difference|same|equivalent)\b)/i,
+    label: "C4-4D and R8A current bulk comparison",
+    targets: [
+      { codePrefix: "ZR", sectionPrefix: "34-112" },
+      { codePrefix: "ZR", sectionPrefix: "23-22" },
+      { codePrefix: "ZR", sectionPrefix: "23-432" },
+      { codePrefix: "ZR", sectionPrefix: "33-122" }
     ]
   },
   {
@@ -381,6 +395,16 @@ const topicRoutes = [
     targets: [{ codePrefix: "BC", sectionPrefix: "1020.1" }]
   },
   {
+    pattern: /^(?=[\s\S]*\b(?:hall|hallway|corridor)\b)(?=[\s\S]*\b(?:minimum|width|wide|fire\s+escape|exit)\b)(?=[\s\S]*\b(?:ADA|accessible|accessibility|fire\s+escape|exit)\b)/i,
+    label: "corridor width and accessible-route applicability",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1020.2" },
+      { codePrefix: "BC", sectionPrefix: "1101.2" },
+      { codePrefix: "BC", sectionPrefix: "1103.2" },
+      { codePrefix: "BC", sectionPrefix: "1104.3" }
+    ]
+  },
+  {
     pattern: /\bshaft(?:\s+enclosure)?\b.*\bfire[- ]resistance\s+rating\b|\bfire[- ]resistance\s+rating\b.*\bshaft(?:\s+enclosure)?\b/i,
     label: "shaft-enclosure fire-resistance ratings",
     targets: [{ codePrefix: "BC", sectionPrefix: "713.4" }]
@@ -389,6 +413,18 @@ const topicRoutes = [
     pattern: /\bfire\s+barrier\b.*\bdoor\b|\bdoor\b.*\bfire\s+barrier\b|\bopening[- ]protective\b.*\brating\b/i,
     label: "fire-door opening-protective ratings",
     targets: [{ codePrefix: "BC", sectionPrefix: "716.5" }]
+  },
+  {
+    pattern: /^(?=[\s\S]*\b(?:vision\s+(?:light|lite|panel)|door\s+glazing|glazing\s+in\s+(?:a\s+)?door)\b)(?=[\s\S]*\b(?:fire[- ]rated|rated\s+door|maximum|size|square\s+(?:inch|inches|feet|foot)|sq\s*(?:in|ft))\b)/i,
+    label: "fire-door vision glazing size and listing provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "716.5.5.1" },
+      { codePrefix: "BC", sectionPrefix: "716.5.7.1.1" },
+      { codePrefix: "BC", sectionPrefix: "716.5.8.1" },
+      { codePrefix: "BC", sectionPrefix: "716.5.8.1.1" },
+      { codePrefix: "BC", sectionPrefix: "716.5.8.1.2.1" },
+      { codePrefix: "BC", sectionPrefix: "716.5.8.1.2.2" }
+    ]
   },
   {
     pattern: /\btype\s+i{1,3}[ab]?\b|\bconstruction\s+type\b.*\b(?:structural\s+frame|exterior\s+walls?|floor|roof)\b/i,
@@ -408,6 +444,14 @@ const topicRoutes = [
     ]
   },
   {
+    pattern: /^(?=[\s\S]*\b(?:habitable\s+(?:room|space)|bedroom)\b)(?=[\s\S]*\b(?:minimum|square\s+(?:feet|foot)|sq\s*ft|dimension|width|distance\s+between\s+walls?)\b)/i,
+    label: "habitable-room minimum area and plan dimensions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1208.1" },
+      { codePrefix: "BC", sectionPrefix: "1208.3.1" }
+    ]
+  },
+  {
     pattern: /\bstory\s+above\s+grade\s+plane\b|\bgrade\s+plane\b.*\bstor(?:y|ies)\b|\bhigh[- ]rise\s+building\b|\bhighest\s+occupied\s+floor\b.*\bfire\s+department\b/i,
     label: "grade-plane, story, and high-rise definitions",
     targets: [{ codePrefix: "BC", sectionPrefix: "202" }]
@@ -416,6 +460,22 @@ const topicRoutes = [
     pattern: /\baccessible\s+route\b.*\b(?:entrance|room|space|connect)\b|\b(?:entrance|room|space)\b.*\baccessible\s+route\b/i,
     label: "accessible-route scoping",
     targets: [{ codePrefix: "BC", sectionPrefix: "1104.3" }]
+  },
+  {
+    pattern: /^(?![\s\S]*\b(?:construction[- ]site|construction\s+ramp|runway|motor[- ]vehicle|vehicular)\b)(?=[\s\S]*\bramps?\b)(?=[\s\S]*\b(?:design|designing|requirements?|accessible|accessibility|pedestrian|slope|rise|landing|handrails?|edge\s+protection)\b)/i,
+    label: "pedestrian ramp design and accessibility provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1101.2" },
+      { codePrefix: "BC", sectionPrefix: "1012.1" },
+      { codePrefix: "BC", sectionPrefix: "1012.2" },
+      { codePrefix: "BC", sectionPrefix: "1012.3" },
+      { codePrefix: "BC", sectionPrefix: "1012.4" },
+      { codePrefix: "BC", sectionPrefix: "1012.5.1" },
+      { codePrefix: "BC", sectionPrefix: "1012.6" },
+      { codePrefix: "BC", sectionPrefix: "1012.7.1" },
+      { codePrefix: "BC", sectionPrefix: "1012.8" },
+      { codePrefix: "BC", sectionPrefix: "1012.10" }
+    ]
   },
   {
     pattern: /\b(?:accessible|type\s+b\+?nyc|type\s+b)\s+units?\b|\bcategories\s+of\s+accessible\s+units?\b/i,
@@ -432,6 +492,11 @@ const topicRoutes = [
       { codePrefix: "BC", sectionPrefix: "1107.7" },
       { codePrefix: "BC", sectionPrefix: "1107.7.4" }
     ]
+  },
+  {
+    pattern: /\b(?:BC\s*[- ]?)?Appendix\s+P\b/i,
+    label: "current Building Code Appendix P status",
+    targets: [{ codePrefix: "BC", sectionPrefix: "P" }]
   },
   {
     pattern: /\bmaneuvering\s+clearance\b.*\bdoor\b|\bdoor\s+configuration\b.*\baccessible\b|\bbathroom\b.*\baccessib(?:le|ility)\b/i,

@@ -1063,9 +1063,17 @@ export async function assembleResearchEvidence({
         pinnedEvidence.length &&
         source?.researchAssemblyOrigin === sourceOrigins.discovered
       ) continue;
-      for (const reference of normalizedCrossReferences(source, {
+      for (const unresolvedReference of normalizedCrossReferences(source, {
         inlineOnly: query.relevanceComparison
       })) {
+        const sourceSectionRoot = compactText(source?.sectionNumber).split(".")[0];
+        const referenceSectionRoot = compactText(unresolvedReference?.sectionNumber).split(".")[0];
+        const reference = {
+          ...unresolvedReference,
+          sameSectionFamily: Boolean(
+            sourceSectionRoot && referenceSectionRoot && sourceSectionRoot === referenceSectionRoot
+          )
+        };
         const identity = sectionIdentity(reference);
         if (
           !identity ||
@@ -1078,8 +1086,9 @@ export async function assembleResearchEvidence({
     }
   }
   const crossReferencePriority = (reference) => {
-    if (reference?.referencePurpose === "canonical_ancestor_scope") return 3;
-    if (String(reference?.referenceKind || "").toLowerCase() === "table") return 2;
+    if (reference?.referencePurpose === "canonical_ancestor_scope") return 4;
+    if (String(reference?.referenceKind || "").toLowerCase() === "table") return 3;
+    if (reference?.sameSectionFamily === true) return 2;
     return 0;
   };
   crossReferenceQueue.sort((left, right) =>

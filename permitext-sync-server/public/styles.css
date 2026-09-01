@@ -5573,7 +5573,9 @@ mark {
 }
 
 .research-answer-paragraph,
-.research-answer-list {
+.research-answer-list,
+.research-answer-table,
+.research-answer-quote {
   margin: 0;
   line-height: var(--reader-line-height);
 }
@@ -5584,6 +5586,12 @@ mark {
 
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-paragraph,
 body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-list {
+  color: #ffffff !important;
+}
+
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-table,
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-quote,
+body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-heading {
   color: #ffffff !important;
 }
 
@@ -5640,6 +5648,42 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-answer-
 
 .research-answer-list {
   padding-left: 1.25rem;
+}
+
+.research-answer-heading {
+  margin: var(--space-1) 0 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.research-answer-quote {
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--border-strong);
+  color: var(--text-secondary);
+}
+
+.research-answer-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.research-answer-table {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.research-answer-table th,
+.research-answer-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.research-answer-table th {
+  font-weight: 700;
 }
 
 .research-answer-citation-chips {

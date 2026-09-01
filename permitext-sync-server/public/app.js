@@ -59,7 +59,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260830-stripe-tax-copy-v14";
+} from "./offline-storage.js?v=20260901-research-answer-format-v15";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -94,7 +94,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260830-stripe-tax-copy-v14";
+} from "./research-intent-state.js?v=20260901-research-answer-format-v15";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15224,6 +15224,47 @@ function researchAnswerCopyText(result) {
   return sections.join("\n\n");
 }
 
+function appendResearchInlineFormatting(container, value) {
+  const text = String(value || "");
+  const pattern = /\*\*([^*\n]+)\*\*/g;
+  let cursor = 0;
+  for (const match of text.matchAll(pattern)) {
+    const index = match.index ?? 0;
+    if (index > cursor) container.append(document.createTextNode(text.slice(cursor, index)));
+    const strong = document.createElement("strong");
+    strong.textContent = match[1];
+    container.append(strong);
+    cursor = index + match[0].length;
+  }
+  if (cursor < text.length) container.append(document.createTextNode(text.slice(cursor)));
+}
+
+function appendResearchInlineLines(container, value) {
+  String(value || "").split("\n").forEach((line, index) => {
+    if (index) container.append(document.createElement("br"));
+    appendResearchInlineFormatting(container, line);
+  });
+}
+
+function researchAnswerTable(block) {
+  const lines = String(block || "").split("\n").map((line) => line.trim()).filter(Boolean);
+  const cells = (line) => {
+    const normalized = line.replace(/^\|/, "").replace(/\|$/, "");
+    return normalized.split("|").map((cell) => cell.trim());
+  };
+  if (lines.length < 3 || !lines.every((line) => line.includes("|"))) return null;
+  const header = cells(lines[0]);
+  const separator = cells(lines[1]);
+  if (
+    header.length < 2 ||
+    separator.length !== header.length ||
+    !separator.every((cell) => /^:?-{3,}:?$/.test(cell))
+  ) return null;
+  const rows = lines.slice(2).map(cells);
+  if (rows.some((row) => row.length !== header.length)) return null;
+  return { header, rows };
+}
+
 function appendResearchAnswerNarrative(container, result) {
   const text = researchAnswerNarrativeText(result);
   if (!text) return;
@@ -15231,12 +15272,56 @@ function appendResearchAnswerNarrative(container, result) {
   narrative.className = "research-answer-narrative";
   text.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean).forEach((block) => {
     const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+    const tableValue = researchAnswerTable(block);
+    if (tableValue) {
+      const scroller = document.createElement("div");
+      scroller.className = "research-answer-table-scroll";
+      const table = document.createElement("table");
+      table.className = "research-answer-table";
+      const head = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      tableValue.header.forEach((value) => {
+        const cell = document.createElement("th");
+        cell.scope = "col";
+        appendResearchInlineFormatting(cell, value);
+        headRow.append(cell);
+      });
+      head.append(headRow);
+      const body = document.createElement("tbody");
+      tableValue.rows.forEach((values) => {
+        const row = document.createElement("tr");
+        values.forEach((value) => {
+          const cell = document.createElement("td");
+          appendResearchInlineFormatting(cell, value);
+          row.append(cell);
+        });
+        body.append(row);
+      });
+      table.append(head, body);
+      scroller.append(table);
+      narrative.append(scroller);
+      return;
+    }
+    if (lines.length === 1 && /^#{2,4}\s+/.test(lines[0])) {
+      const heading = document.createElement("h3");
+      heading.className = "research-answer-heading";
+      appendResearchInlineFormatting(heading, lines[0].replace(/^#{2,4}\s+/, ""));
+      narrative.append(heading);
+      return;
+    }
+    if (lines.length && lines.every((line) => /^>\s?/.test(line))) {
+      const quote = document.createElement("blockquote");
+      quote.className = "research-answer-quote";
+      appendResearchInlineLines(quote, lines.map((line) => line.replace(/^>\s?/, "")).join("\n"));
+      narrative.append(quote);
+      return;
+    }
     if (lines.length && lines.every((line) => /^[-*]\s+/.test(line))) {
       const list = document.createElement("ul");
       list.className = "research-answer-list";
       lines.forEach((line) => {
         const item = document.createElement("li");
-        item.textContent = line.replace(/^[-*]\s+/, "");
+        appendResearchInlineFormatting(item, line.replace(/^[-*]\s+/, ""));
         list.append(item);
       });
       narrative.append(list);
@@ -15244,7 +15329,7 @@ function appendResearchAnswerNarrative(container, result) {
     }
     const paragraph = document.createElement("p");
     paragraph.className = "research-answer-paragraph";
-    paragraph.textContent = block;
+    appendResearchInlineLines(paragraph, block);
     narrative.append(paragraph);
   });
   container.append(narrative);
