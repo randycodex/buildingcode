@@ -257,14 +257,19 @@ import {
   zoningResearchSafetyRevisionIssues
 } from "./research-zoning-safety.mjs";
 import {
+  applyZoningResearchRepairPatch,
+  evaluateZoningEvidenceReadiness,
   evaluateZoningDeterministicControls,
   planZoningResearchQuestion,
   selectZoningResearchEvidence,
+  zoningResearchBoundaryResponse,
   zoningResearchDeterministicContext,
   zoningResearchDispositions,
   zoningResearchEvidenceLimits,
   zoningResearchPlannerVersion,
-  zoningResearchPromptContext
+  zoningResearchPromptContext,
+  zoningResearchRepairPacket,
+  zoningResearchRepairVersion
 } from "./research-zoning-planner.mjs";
 import {
   evaluateResearchRequiredClaimCoverage,
@@ -10151,6 +10156,189 @@ async function openAIResearchVerification(question, evidence, interpretation, us
   };
 }
 
+function zoningResearchRepairPatchSchema(repairPacket) {
+  const sourceIDs = repairPacket.sources.map((source) => source.sourceID);
+  const sectionIDs = Array.from(new Set(repairPacket.sources.map((source) => source.sectionID)));
+  const indexArray = {
+    type: "array",
+    maxItems: maximumResearchSupportedPoints,
+    items: { type: "integer", minimum: 0, maximum: maximumResearchSupportedPoints - 1 }
+  };
+  const stringArray = { type: "array", maxItems: 12, items: { type: "string" } };
+  const supportedPoint = {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      heading: { type: "string" },
+      explanation: { type: "string" },
+      sectionID: { type: "string", enum: sectionIDs },
+      sourceIDs: { type: "array", minItems: 1, items: { type: "string", enum: sourceIDs } }
+    },
+    required: ["heading", "explanation", "sectionID", "sourceIDs"]
+  };
+  const citation = {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      sectionID: { type: "string", enum: sectionIDs },
+      sourceIDs: { type: "array", minItems: 1, items: { type: "string", enum: sourceIDs } },
+      relevance: { type: "string" }
+    },
+    required: ["sectionID", "sourceIDs", "relevance"]
+  };
+  const upsert = (valueSchema) => ({
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      targetIndex: { type: ["integer", "null"], minimum: 0, maximum: maximumResearchSupportedPoints - 1 },
+      value: valueSchema
+    },
+    required: ["targetIndex", "value"]
+  });
+  return {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      answerText: { type: "string", minLength: 1 },
+      supportedPointUpserts: { type: "array", maxItems: 12, items: upsert(supportedPoint) },
+      supportedPointRemovals: indexArray,
+      citationUpserts: { type: "array", maxItems: 12, items: upsert(citation) },
+      citationRemovals: indexArray,
+      missingFactsAdd: stringArray,
+      missingFactsRemove: stringArray,
+      evidenceLimitationsAdd: stringArray,
+      evidenceLimitationsRemove: stringArray,
+      additionalEvidenceNeededAdd: stringArray,
+      additionalEvidenceNeededRemove: stringArray
+    },
+    required: [
+      "answerText",
+      "supportedPointUpserts",
+      "supportedPointRemovals",
+      "citationUpserts",
+      "citationRemovals",
+      "missingFactsAdd",
+      "missingFactsRemove",
+      "evidenceLimitationsAdd",
+      "evidenceLimitationsRemove",
+      "additionalEvidenceNeededAdd",
+      "additionalEvidenceNeededRemove"
+    ]
+  };
+}
+
+async function openAIResearchZoningRepair(
+  question,
+  evidence,
+  interpretation,
+  userID,
+  issues,
+  options = {}
+) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    const error = new Error("Research AI is not configured.");
+    error.code = "RESEARCH_NOT_CONFIGURED";
+    throw error;
+  }
+  const configuration = {
+    ...researchModelConfiguration(),
+    ...(options.model ? { model: options.model } : {})
+  };
+  const repairPacket = zoningResearchRepairPacket({
+    question,
+    issues,
+    evidence,
+    answer: interpretation,
+    deterministicContext: options.zoningDeterministicContext
+  });
+  if (!repairPacket.sources.length) {
+    const error = new Error("Permitext could not bind the Zoning repair to a controlling source passage.");
+    error.code = "RESEARCH_VERIFICATION_FAILED";
+    throw error;
+  }
+  const requestBody = {
+    model: configuration.model,
+    store: false,
+    reasoning: { effort: "low" },
+    max_output_tokens: 3_000,
+    safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
+    instructions: [
+      "Repair only the identified defects in a proposed Zoning Research answer.",
+      "This is a source-bounded structured patch, not permission to regenerate the whole answer or introduce outside law.",
+      "Preserve every unaffected conclusion, qualification, supported point, citation, missing fact, and limitation.",
+      "Use only the supplied repair passages and exact source identifiers. Never cite or infer an unprovided provision.",
+      "Replace answerText with the corrected complete user-facing narrative while retaining unaffected wording where possible.",
+      "Use an upsert only for a supported point or citation that must be added or corrected. Use removals only for an identified defective record.",
+      "Every mandatory answer obligation must be explicit. Preserve dates, table categories and symbols, arithmetic, applicability branches, and unresolved property facts.",
+      "A numerical table ceiling is not entitlement to use that table column. A mapped or historical conclusion remains conditional unless the controlling official facts are supplied.",
+      "Do not include commentary outside the structured patch."
+    ].join(" "),
+    input: [
+      `QUESTION\n${question}`,
+      `ZONING PLAN\n${JSON.stringify(options.zoningPlan || {})}`,
+      `FAILED CHECKS\n${JSON.stringify(repairPacket.issues)}`,
+      `MANDATORY ANSWER OBLIGATIONS\n${JSON.stringify(repairPacket.answerObligations)}`,
+      `SOURCE-BOUNDED REPAIR PACKET ${repairPacket.packetHash}\n${JSON.stringify(repairPacket.sources)}`,
+      `PREVIOUS ANSWER JSON\n${JSON.stringify(interpretation)}`
+    ].join("\n\n"),
+    text: {
+      format: {
+        type: "json_schema",
+        name: "permitext_zoning_source_bounded_repair",
+        strict: true,
+        schema: zoningResearchRepairPatchSchema(repairPacket)
+      }
+    }
+  };
+  const { payload } = await requestResearchProvider({
+    apiKey,
+    requestBody,
+    signal: options.signal,
+    timeoutMilliseconds: 45_000,
+    failureMessage: "The source-bounded Zoning repair request failed.",
+    failureCode: "RESEARCH_ZONING_REPAIR_ERROR",
+    reserveEvaluationSpend: reserveResearchEvaluationSpend,
+    reserveProviderSpend: reserveResearchProviderSpend,
+    settleProviderSpend: settleResearchProviderSpend
+  });
+  let patch;
+  try {
+    patch = JSON.parse(outputTextFromResponse(payload));
+  } catch (error) {
+    if (error.code === "RESEARCH_REFUSAL") throw error;
+    const invalid = new Error("The source-bounded Zoning repair returned invalid structured output.");
+    invalid.code = "INVALID_ZONING_REPAIR_PATCH";
+    invalid.providerUsage = researchUsageFromProviderPayload(payload, configuration.model);
+    throw invalid;
+  }
+  let repaired;
+  try {
+    repaired = validateResearchInterpretation(
+      normalizeResearchInterpretationEvidenceBindings(
+        applyZoningResearchRepairPatch(interpretation, patch),
+        evidence
+      ),
+      evidence,
+      options.webSupport?.sources || [],
+      { allowOfficialGuidanceOnly: false }
+    );
+  } catch (error) {
+    error.code ||= "INVALID_ZONING_REPAIR_PATCH";
+    error.providerUsage ||= researchUsageFromProviderPayload(payload, configuration.model);
+    throw error;
+  }
+  return {
+    interpretation: repaired,
+    patch,
+    repairPacket,
+    requestedModel: configuration.model,
+    model: payload.model || configuration.model,
+    usage: researchUsageFromProviderPayload(payload, configuration.model),
+    configuration
+  };
+}
+
 async function handleResearchInterpretation(request, response) {
   const body = await readJSON(request);
   const userID = String(body.auth?.accountUserID || "").trim();
@@ -18355,12 +18543,14 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     if (zoningPlan && zoningPlan.disposition !== zoningResearchDispositions.ready) {
+      const boundary = zoningResearchBoundaryResponse({ plan: zoningPlan });
       researchOperation.failureCode = "RESEARCH_ZONING_PREREQUISITES_REQUIRED";
       progressResponse.json(422, {
-        error: zoningPlan.clarification || "Additional verified facts are required before this Zoning conclusion can be generated.",
+        error: boundary.cannotConclude,
         code: "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
         charged: false,
-        zoningPlan
+        zoningPlan,
+        boundary
       });
       return;
     }
@@ -18387,6 +18577,29 @@ async function handleResearchConversationMessage(request, response) {
           plan: zoningPlan
         })
       : null;
+    const zoningEvidenceReadiness = zoningPlan
+      ? evaluateZoningEvidenceReadiness({
+          question,
+          evidence: assembledEvidence,
+          plan: zoningPlan
+        })
+      : { pass: true, issues: [] };
+    if (zoningPlan && !zoningEvidenceReadiness.pass) {
+      const boundary = zoningResearchBoundaryResponse({
+        plan: zoningPlan,
+        evidenceReadiness: zoningEvidenceReadiness
+      });
+      researchOperation.failureCode = "RESEARCH_ZONING_EVIDENCE_REQUIRED";
+      progressResponse.json(422, {
+        error: boundary.cannotConclude,
+        code: "RESEARCH_ZONING_EVIDENCE_REQUIRED",
+        charged: false,
+        zoningPlan,
+        evidenceReadiness: zoningEvidenceReadiness,
+        boundary
+      });
+      return;
+    }
     progressResponse.progress("checking_citation_support", "active");
     const requiredClaims = requiredResearchClaimsFromEvidence(assembledEvidence);
     const materialityClaims = requiredClaims.map((claim) => ({
@@ -18790,6 +19003,8 @@ async function handleResearchConversationMessage(request, response) {
     let evidenceBoundaryFallback = false;
     let verifierUsage = combinedResearchUsage();
     let answerGenerationUsage = result.usage;
+    let zoningRepairApplied = false;
+    const zoningRepairPacketHashes = [];
     let requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
       requiredClaims,
       evidence: assembledEvidence,
@@ -18937,6 +19152,199 @@ async function handleResearchConversationMessage(request, response) {
         error.code = "RESEARCH_VERIFICATION_FAILED";
         error.verificationAttempts = verificationAttempts;
         throw error;
+      }
+    } else if (zoningPlan) {
+      const refreshZoningGates = () => {
+        requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
+          requiredClaims,
+          evidence: assembledEvidence,
+          answer: result.interpretation
+        });
+        claimMateriality = evaluateResearchClaimMateriality({
+          claims: materialityClaims,
+          evidence: assembledEvidence,
+          answer: result.interpretation
+        });
+        zoningDeterministicControls = evaluateZoningDeterministicControls({
+          plan: zoningPlan,
+          deterministicContext: zoningDeterministicContext,
+          answer: result.interpretation
+        });
+        answerQuality = evaluateResearchAnswerQuality({
+          question,
+          evidence: assembledEvidence,
+          answer: result.interpretation
+        });
+        zoningSafety = evaluateZoningResearchSafety({
+          question,
+          evidence: assembledEvidence,
+          answer: result.interpretation,
+          projectFacts: combinedProjectFacts,
+          conversationFactContext,
+          questionPlan: zoningPlan
+        });
+        webAttribution = evaluateResearchWebAttribution({
+          question,
+          answer: result.interpretation,
+          evidence: assembledEvidence,
+          webSupport
+        });
+        return requiredClaimCoverage.pass &&
+          claimMateriality.pass &&
+          zoningDeterministicControls.pass &&
+          answerQuality.pass &&
+          zoningSafety.pass &&
+          webAttribution.pass;
+      };
+      const currentZoningIssues = () => combinedResearchAnswerRevisionIssues({
+        requiredClaimCoverage,
+        claimMateriality,
+        zoningDeterministicControls,
+        answerQuality,
+        zoningSafety,
+        webAttribution
+      });
+      let repairAttempted = false;
+      const repairZoningAnswer = async (issues, reasonCode) => {
+        if (!zoningPlan.callPolicy.repairEligible || repairAttempted) {
+          const error = new Error("The Zoning answer did not pass the bounded correction policy.");
+          error.code = "RESEARCH_VERIFICATION_FAILED";
+          error.verificationAttempts = verificationAttempts;
+          throw error;
+        }
+        repairAttempted = true;
+        const repaired = await openAIResearchZoningRepair(
+          question,
+          assembledEvidence,
+          result.interpretation,
+          context.userID,
+          issues,
+          {
+            zoningPlan,
+            zoningDeterministicContext,
+            webSupport,
+            model: accurateModel,
+            signal: progressResponse.signal
+          }
+        );
+        answerGenerationUsage = combinedResearchUsage(answerGenerationUsage, repaired.usage);
+        zoningRepairApplied = true;
+        zoningRepairPacketHashes.push(repaired.repairPacket.packetHash);
+        answerEscalated ||= result.requestedModel !== repaired.requestedModel;
+        modelEscalationStages.push({
+          stage: "zoning_source_bounded_repair",
+          fromModel: result.requestedModel,
+          toModel: repaired.requestedModel,
+          reasonCode,
+          repairVersion: zoningResearchRepairVersion,
+          repairPacketHash: repaired.repairPacket.packetHash,
+          repairSourceIDs: repaired.repairPacket.sources.map((source) => source.sourceID),
+          issueTypes: Array.from(new Set(issues.map((issue) => issue.type).filter(Boolean)))
+        });
+        result = {
+          ...result,
+          interpretation: repaired.interpretation,
+          requestedModel: repaired.requestedModel,
+          model: repaired.model,
+          configuration: repaired.configuration
+        };
+        result = preserveDeclaredProjectFactUncertainty(result);
+        result = applyDeterministicAnswerRepairs(result);
+      };
+
+      const initialDeterministicPass = refreshZoningGates();
+      if (!initialDeterministicPass) {
+        const issues = currentZoningIssues();
+        verificationAttempts.push({
+          pass: false,
+          issues,
+          model: "permitext-deterministic-answer-quality-gate",
+          ...(researchZoningAttemptDiagnostics(zoningSafety)
+            ? { diagnostics: researchZoningAttemptDiagnostics(zoningSafety) }
+            : {})
+        });
+        if (!applyEvidenceBoundaryFallback()) {
+          await repairZoningAnswer(issues, "DETERMINISTIC_GATE_REPAIR");
+          if (!refreshZoningGates()) {
+            verificationAttempts.push({
+              pass: false,
+              issues: currentZoningIssues(),
+              model: "permitext-deterministic-post-repair-gate",
+              ...(researchZoningAttemptDiagnostics(zoningSafety)
+                ? { diagnostics: researchZoningAttemptDiagnostics(zoningSafety) }
+                : {})
+            });
+            const error = new Error("The source-bounded Zoning repair did not pass every deterministic safety gate.");
+            error.code = "RESEARCH_VERIFICATION_FAILED";
+            error.verificationAttempts = verificationAttempts;
+            throw error;
+          }
+          verificationAttempts.push({
+            pass: true,
+            issues: [],
+            model: "permitext-deterministic-post-repair-acceptance"
+          });
+        }
+      } else if (!zoningPlan.callPolicy.subjectiveVerification) {
+        verificationAttempts.push({
+          pass: true,
+          issues: [],
+          model: "permitext-deterministic-zoning-compiler"
+        });
+      } else {
+        const verification = await openAIResearchVerification(
+          question,
+          assembledEvidence,
+          result.interpretation,
+          context.userID,
+          {
+            projectContextFacts: combinedProjectFacts,
+            conversationFactContext,
+            webSupport,
+            allowOfficialGuidanceOnly,
+            codeBasis: answerCodeBasis,
+            requiredClaims,
+            structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+            zoningPlan,
+            zoningDeterministicContext,
+            model: modelRouting.configuration.verificationModel,
+            signal: progressResponse.signal
+          }
+        );
+        verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
+        const contextualVerification = researchVerificationResultForWebContext(
+          verification.result,
+          { webSupport, webAttribution }
+        );
+        verificationAttempts.push({
+          ...contextualVerification,
+          model: verification.model
+        });
+        if (!contextualVerification.pass && !applyEvidenceBoundaryFallback()) {
+          await repairZoningAnswer(
+            contextualVerification.issues,
+            "SUBJECTIVE_VERIFIER_REPAIR"
+          );
+          if (!refreshZoningGates()) {
+            verificationAttempts.push({
+              pass: false,
+              issues: currentZoningIssues(),
+              model: "permitext-deterministic-post-repair-gate",
+              ...(researchZoningAttemptDiagnostics(zoningSafety)
+                ? { diagnostics: researchZoningAttemptDiagnostics(zoningSafety) }
+                : {})
+            });
+            const error = new Error("The verifier-directed Zoning repair did not pass every deterministic safety gate.");
+            error.code = "RESEARCH_VERIFICATION_FAILED";
+            error.verificationAttempts = verificationAttempts;
+            throw error;
+          }
+          verificationAttempts.push({
+            pass: true,
+            issues: [],
+            model: "permitext-deterministic-post-repair-acceptance"
+          });
+        }
       }
     } else {
       for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
@@ -19233,7 +19641,11 @@ async function handleResearchConversationMessage(request, response) {
             plannerVersion: zoningResearchPlannerVersion,
             plan: zoningPlan,
             deterministicContext: zoningDeterministicContext,
-            evidenceSelection: evidencePackage.zoningSelection
+            evidenceSelection: evidencePackage.zoningSelection,
+            evidenceReadiness: zoningEvidenceReadiness,
+            repairVersion: zoningResearchRepairVersion,
+            sourceBoundedRepairApplied: zoningRepairApplied,
+            repairPacketHashes: zoningRepairPacketHashes
           }
         } : {}),
         retrieval: {
@@ -19265,7 +19677,8 @@ async function handleResearchConversationMessage(request, response) {
           pass: !evidenceBoundaryFallback,
           ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,
-          regenerated: verificationAttempts.length > 1,
+          regenerated: !zoningPlan && verificationAttempts.length > 1,
+          sourceBoundedRepairApplied: zoningRepairApplied,
           history: verificationAttempts
         },
         authorityStatus,
@@ -19287,7 +19700,9 @@ async function handleResearchConversationMessage(request, response) {
           ...(zoningPlan ? {
             zoningPlannerVersion: zoningResearchPlannerVersion,
             maximumProviderCalls: zoningPlan.callPolicy.maximumProviderCalls,
-            fullAnswerRewriteAllowed: zoningPlan.callPolicy.allowFullAnswerRewrite
+            fullAnswerRewriteAllowed: zoningPlan.callPolicy.allowFullAnswerRewrite,
+            sourceBoundedRepairApplied: zoningRepairApplied,
+            repairVersion: zoningResearchRepairVersion
           } : {})
         },
         disclaimer

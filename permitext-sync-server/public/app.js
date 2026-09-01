@@ -17881,6 +17881,14 @@ function researchFailureMessage(error) {
   if (code === "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE") {
     return "Permitext could not retrieve attributable official guidance from the approved sources. Your question is still here.";
   }
+  if ([
+    "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
+    "RESEARCH_ZONING_EVIDENCE_REQUIRED",
+    "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED"
+  ].includes(code)) {
+    return error?.payload?.boundary?.cannotConclude || error?.message ||
+      "Permitext needs the identified property facts or governing Zoning evidence before it can make this conclusion. Your question is still here.";
+  }
   if (verificationCodes.has(code)) {
     return "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here.";
   }

@@ -1,6 +1,6 @@
 import { extractResearchCodeReferences } from "./research-conversation-topic.mjs";
 
-export const researchModelRoutingVersion = "20260901-luna-terra-hybrid-zoning-planner-v5";
+export const researchModelRoutingVersion = "20260901-luna-terra-hybrid-zoning-compiler-v6";
 
 function normalized(value) {
   return String(value || "").trim();
@@ -137,10 +137,13 @@ export function routeResearchAnswerModel({
     ? researchQuestionIsBoundedCitationLookup(question)
     : Boolean(boundedCitationLookup);
   if (zoningPlan?.disposition === "ready") {
+    const accurate = zoningPlan?.callPolicy?.initialTier === "accurate";
     return {
-      model: configuration.fastModel,
-      tier: "fast",
-      reasons: [`zoning_planner_luna_first:${zoningPlan.path || "unknown"}`],
+      model: accurate ? configuration.accurateModel : configuration.fastModel,
+      tier: accurate ? "accurate" : "fast",
+      reasons: [
+        `${accurate ? "zoning_compiler_terra_first" : "zoning_compiler_luna_first"}:${zoningPlan.path || "unknown"}`
+      ],
       configuration
     };
   }

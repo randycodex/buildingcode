@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import {
+  applyZoningResearchRepairPatch,
+  evaluateZoningEvidenceReadiness,
   evaluateZoningDeterministicControls,
   planZoningResearchQuestion,
   selectZoningResearchEvidence,
@@ -7,7 +9,8 @@ import {
   zoningResearchDispositions,
   zoningResearchEvidenceLimits,
   zoningResearchPaths,
-  zoningResearchPlanCostProjection
+  zoningResearchPlanCostProjection,
+  zoningResearchRepairPacket
 } from "../research-zoning-planner.mjs";
 import { routeResearchAnswerModel } from "../research-model-routing.mjs";
 import { evaluateZoningResearchSafety } from "../research-zoning-safety.mjs";
@@ -27,7 +30,7 @@ for (const [path, question] of questionsByPath) {
   assert.ok(plan.planHash);
   assert.ok(plan.evidenceLimits.maximumCharacters < 24_000);
   assert.equal(plan.callPolicy.allowFullAnswerRewrite, false);
-  assert.ok(plan.callPolicy.maximumProviderCalls <= 2);
+  assert.ok(plan.callPolicy.maximumProviderCalls <= 3);
   assert.deepEqual(plan, planZoningResearchQuestion({ question }), "Planner output must be deterministic.");
 }
 
@@ -158,9 +161,9 @@ const zoningRoute = routeResearchAnswerModel({
   zoningPlan: tablePlan,
   environment: hybridEnvironment
 });
-assert.equal(zoningRoute.model, "gpt-5.6-luna");
-assert.equal(zoningRoute.tier, "fast");
-assert.match(zoningRoute.reasons[0], /zoning_planner_luna_first/);
+assert.equal(zoningRoute.model, "gpt-5.6-terra");
+assert.equal(zoningRoute.tier, "accurate");
+assert.match(zoningRoute.reasons[0], /zoning_compiler_terra_first/);
 
 const directPlan = planZoningResearchQuestion({ question: "What does this Zoning definition say?" });
 const generalSafety = evaluateZoningResearchSafety({
@@ -184,8 +187,80 @@ const projection = zoningResearchPlanCostProjection({
   evidenceCharacters: zoningResearchEvidenceLimits(tablePlan).maximumCharacters
 });
 assert.equal(projection.production.requestCount, 2);
+assert.equal(projection.production.adverseRequestCount, 3);
 assert.equal(projection.judge.requestCount, 0);
 assert.ok(projection.production.adverseUSD >= projection.production.nominalUSD);
 assert.ok(projection.production.adverseUSD * 100 < 6);
 
-console.log("Permitext Zoning question-specific planner contract passed; paid model calls: no.");
+const missingSpecialParkingRule = evaluateZoningEvidenceReadiness({
+  question: "The broker says this R6 site is close to a subway. What parking applies?",
+  plan: planZoningResearchQuestion({
+    question: "The broker says this R6 site is close to a subway. What parking applies?"
+  }),
+  evidence: [{
+    sourceID: "definition-only",
+    sectionID: "12-10",
+    sectionNumber: "12-10",
+    text: "Greater Transit Zone General Definition: the boundary includes special parking areas."
+  }]
+});
+assert.equal(missingSpecialParkingRule.pass, false);
+assert.equal(missingSpecialParkingRule.issues[0].code, "CONTROLLING_SPECIAL_PARKING_RULE_MISSING");
+
+const repairPacket = zoningResearchRepairPacket({
+  question: "What does the selected rule require?",
+  issues: [{ type: "missed_material_conclusion", detail: "Add the 30-foot requirement from source-a." }],
+  evidence: [
+    {
+      sourceID: "source-a",
+      sectionID: "section-a",
+      sectionNumber: "23-343",
+      text: "A minimum depth of 30 feet shall be provided.",
+      evidencePriority: { evidenceRole: "governing" }
+    },
+    {
+      sourceID: "source-b",
+      sectionID: "section-b",
+      text: "Unrelated collateral material.",
+      evidencePriority: { evidenceRole: "contextual", topicRouteRelationship: "collateral" }
+    }
+  ],
+  answer: { citations: [{ sourceIDs: ["source-a"] }] }
+});
+assert.equal(repairPacket.sources[0].sourceID, "source-a");
+assert.ok(repairPacket.usage.characterCount <= repairPacket.usage.maximumCharacters);
+
+const patched = applyZoningResearchRepairPatch({
+  answerText: "The rule may apply.",
+  conclusion: "The rule may apply.",
+  explanation: "",
+  supportedPoints: [{ heading: "Old", explanation: "Old.", sectionID: "section-a", sourceIDs: ["source-a"] }],
+  assumptions: [],
+  missingFacts: ["Old missing fact"],
+  followUpQuestions: [],
+  evidenceLimitations: ["Original limitation."],
+  additionalEvidenceNeeded: [],
+  supportingSourceUses: [],
+  supportingSources: [],
+  citations: [{ sectionID: "section-a", sourceIDs: ["source-a"], relevance: "Old." }]
+}, {
+  answerText: "The selected rule requires 30 feet.",
+  supportedPointUpserts: [{
+    targetIndex: 0,
+    value: { heading: "Required depth", explanation: "The rule requires 30 feet.", sectionID: "section-a", sourceIDs: ["source-a"] }
+  }],
+  supportedPointRemovals: [],
+  citationUpserts: [],
+  citationRemovals: [],
+  missingFactsAdd: [],
+  missingFactsRemove: ["Old missing fact"],
+  evidenceLimitationsAdd: [],
+  evidenceLimitationsRemove: [],
+  additionalEvidenceNeededAdd: [],
+  additionalEvidenceNeededRemove: []
+});
+assert.equal(patched.supportedPoints[0].heading, "Required depth");
+assert.deepEqual(patched.missingFacts, []);
+assert.equal(patched.answerText, "The selected rule requires 30 feet.");
+
+console.log("Permitext Zoning Architecture V2 compiler and bounded-repair contract passed; paid model calls: no.");

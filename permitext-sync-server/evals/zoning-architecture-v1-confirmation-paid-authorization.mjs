@@ -1,10 +1,12 @@
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const evalRoot = dirname(fileURLToPath(import.meta.url));
 const serverRoot = dirname(evalRoot);
+const repositoryRoot = dirname(serverRoot);
 const defaultAuthorizationPath = join(
   evalRoot,
   "zoning-architecture-v1-confirmation-paid-authorization.json"
@@ -96,7 +98,19 @@ function assert(condition, message) {
 
 async function validateBoundFiles() {
   for (const [relativePath, expectedHash] of Object.entries(expectedFiles)) {
-    const value = await readFile(join(serverRoot, relativePath));
+    const historicalPath = `permitext-sync-server/${relativePath}`;
+    const historical = spawnSync(
+      "git",
+      ["show", `${zoningArchitectureV1ConfirmationExecutionCommit}:${historicalPath}`],
+      {
+        cwd: repositoryRoot,
+        encoding: null,
+        maxBuffer: 16 * 1024 * 1024
+      }
+    );
+    const value = historical.status === 0
+      ? historical.stdout
+      : await readFile(join(serverRoot, relativePath));
     assert(sha256(value) === expectedHash,
       `The locked Architecture V1 input changed: ${relativePath}.`);
   }

@@ -1,6 +1,9 @@
 import { createHash } from "node:crypto";
 
-export const zoningResearchPlannerVersion = "20260901-question-path-v1";
+export const zoningResearchPlannerVersion = "20260901-question-compiler-v2";
+
+export const zoningResearchCompilerVersion = "20260901-answer-obligations-v2";
+export const zoningResearchRepairVersion = "20260901-source-bounded-patch-v2";
 
 export const zoningResearchPaths = Object.freeze({
   directRule: "direct_rule",
@@ -99,6 +102,24 @@ function stableHash(value) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
+function initialTierForPath(path) {
+  return [
+    zoningResearchPaths.structuredTableSymbol,
+    zoningResearchPaths.effectiveDateHistory,
+    zoningResearchPaths.propertyMapApplicability,
+    zoningResearchPaths.calculationScenario
+  ].includes(path) ? "accurate" : "fast";
+}
+
+function subjectiveVerificationForPath(path) {
+  return [
+    zoningResearchPaths.structuredTableSymbol,
+    zoningResearchPaths.effectiveDateHistory,
+    zoningResearchPaths.propertyMapApplicability,
+    zoningResearchPaths.calculationScenario
+  ].includes(path);
+}
+
 function combinedFactText({ question, projectFacts = [], conversationFactContext = {} } = {}) {
   return compactText([
     question,
@@ -133,7 +154,8 @@ function factRequirements(path, facts, question) {
     const asksSourceBoundary = /\bwhat can .* establish\b|\bwhat .*cannot be made\b|\bwithout identifying\b/i.test(question);
     const historicMIHLot = /\bMIH\b|Mandatory Inclusionary Housing/i.test(question) &&
       /\b(?:established in|date of establishment|combined in|historical zoning lot|small[- ]development exception)\b/i.test(question);
-    const needsMappedDistrict = /\b(?:mapped zoning district|mapped district|transit zone|Appendix [A-Z]|subarea|specific property|self-service storage)\b/i.test(question);
+    const needsMappedDistrict = /\b(?:mapped zoning district|mapped district|transit zone|Appendix [A-Z]|subarea|specific property|self-service storage|close to (?:a|the) subway)\b/i.test(question) ||
+      /\bbroker says\b[^.]{0,120}\bsubway\b/i.test(question);
     const mappedStatusPresent = concreteMappedStatusPattern.test(facts);
     const propertyIdentityMaterial = /\b(?:specific property|address.*not provided|self-service storage)\b/i.test(question);
     if (propertyIdentityMaterial && !propertyIdentifierPattern.test(facts) && !asksSourceBoundary && !mappedStatusPresent) {
@@ -216,18 +238,20 @@ export function planZoningResearchQuestion({
   const requirements = factRequirements(path, facts, normalizedQuestion);
   const missingFacts = requirements.filter((item) => !item.present);
   const disposition = dispositionFor(path, requirements, normalizedQuestion);
-  const subjectiveVerification = [
-    zoningResearchPaths.structuredTableSymbol,
-    zoningResearchPaths.effectiveDateHistory
-  ].includes(path);
-  const maximumProviderCalls = disposition === zoningResearchDispositions.ready
-    ? subjectiveVerification ? 2 : 1
-    : 0;
+  const subjectiveVerification = subjectiveVerificationForPath(path);
+  const initialTier = initialTierForPath(path);
+  const repairEligible = disposition === zoningResearchDispositions.ready &&
+    path !== zoningResearchPaths.directRule;
+  const maximumProviderCalls = disposition !== zoningResearchDispositions.ready
+    ? 0
+    : subjectiveVerification
+      ? 3
+      : repairEligible ? 2 : 1;
   const clarification = missingFacts.length
     ? `Before Permitext can make the requested Zoning conclusion, provide ${missingFacts.map((item) => item.label).join(" and ")}.`
     : null;
   const plan = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     plannerVersion: zoningResearchPlannerVersion,
     path,
     pathLabel: pathLabels[path],
@@ -245,13 +269,19 @@ export function planZoningResearchQuestion({
       propertyAndMapPrerequisites: path === zoningResearchPaths.propertyMapApplicability
     },
     callPolicy: {
-      initialTier: "fast",
-      initialModelRole: "luna_first",
+      initialTier,
+      initialModelRole: initialTier === "fast" ? "luna_first" : "terra_first_for_complex_path",
       subjectiveVerification,
       verifierTier: subjectiveVerification ? "fast" : null,
       maximumProviderCalls,
       allowFullAnswerRewrite: false,
-      terraEscalation: "provider_failure_or_separately_authorized_narrow_repair_only"
+      repairEligible,
+      repairTier: repairEligible ? "accurate" : null,
+      maximumRepairAttempts: repairEligible ? 1 : 0,
+      repairMode: repairEligible ? "source_bounded_structured_patch" : null,
+      terraEscalation: initialTier === "accurate"
+        ? "planned_complex_path_or_one_source_bounded_repair"
+        : "provider_failure_or_one_source_bounded_repair"
     },
     questionSignals: {
       explicitMissingFact: explicitMissingPattern.test(normalizedQuestion),
@@ -408,11 +438,202 @@ function arithmeticLedger(question) {
     const match = question.match(candidate.pattern);
     if (match) addRatio(candidate.id, match[candidate.numerator], match[candidate.denominator], candidate.kind);
   }
-  const affordableShare = question.match(
-    /(\d[\d,]*(?:\.\d+)?)\s*square feet of (?:residential )?floor area[^.]{0,100}\bincluding\s+(\d[\d,]*(?:\.\d+)?)\s*square feet[^.]{0,40}\baffordable/i
-  );
-  if (affordableShare) addRatio("affordable_floor_area_share", affordableShare[2], affordableShare[1], "percentage");
   return { measurements, calculations };
+}
+
+function evidenceText(evidence = []) {
+  return (Array.isArray(evidence) ? evidence : [])
+    .map((source) => sourceText(source))
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function numberTextAlternatives(value, { percent = false } = {}) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return [];
+  const values = new Set([
+    String(number),
+    number.toFixed(2),
+    number.toLocaleString("en-US", { maximumFractionDigits: 4 })
+  ]);
+  if (Number.isInteger(number)) values.add(number.toLocaleString("en-US"));
+  if (percent) values.add(`${number}%`);
+  return Array.from(values);
+}
+
+function firstQuestionNumber(question, patterns) {
+  for (const pattern of patterns) {
+    const match = question.match(pattern);
+    const value = match ? numericValue(match[1]) : null;
+    if (value !== null) return value;
+  }
+  return null;
+}
+
+function questionDistrict(question) {
+  const matches = Array.from(String(question || "").matchAll(/\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d[A-Z]?)?)\b/gi));
+  return matches.map((match) => match[0].toUpperCase()).find((value) => /[A-Z]$/.test(value)) ||
+    matches[0]?.[0]?.toUpperCase() || null;
+}
+
+function tableFARValues(question, evidence) {
+  const district = questionDistrict(question);
+  if (!district) return null;
+  for (const source of Array.isArray(evidence) ? evidence : []) {
+    const tokens = compactText(sourceText(source)).split(" ");
+    const index = tokens.findIndex((token) => token.toUpperCase() === district);
+    if (index < 0) continue;
+    const values = tokens.slice(index + 1, index + 16)
+      .map((token) => token.replace(/[^0-9.]/g, ""))
+      .filter((token) => /^\d+\.\d+$/.test(token))
+      .map(Number);
+    if (values.length < 2) continue;
+    return {
+      district,
+      standardFAR: values[0],
+      qualifyingFAR: values[1],
+      sourceIDs: [source.sourceID].filter(Boolean)
+    };
+  }
+  return null;
+}
+
+function obligation(id, kind, detail, values = [], sourceIDs = [], options = {}) {
+  return {
+    id,
+    kind,
+    detail,
+    values: unique(values.map((value) => compactText(value))),
+    sourceIDs: unique(sourceIDs.map(String)),
+    requireAllValues: options.requireAllValues === true
+  };
+}
+
+function tableLegendObligations(question, evidence = []) {
+  if (!/\b(?:symbols?|legend|asterisk|dagger|blank cell)\b/i.test(question)) return [];
+  const obligations = [];
+  for (const source of evidence) {
+    const cells = (Array.isArray(source?.richSourceGrids) ? source.richSourceGrids : [])
+      .flatMap((grid) => Array.isArray(grid?.rows) ? grid.rows : [])
+      .flatMap((row) => Array.isArray(row?.cells) ? row.cells : [])
+      .map((cell) => compactText(cell?.text))
+      .filter((text) => text.includes("="));
+    for (const cell of cells) {
+      const pairs = Array.from(cell.matchAll(/([●♦○–*SPU])\s*=\s*(.+?)(?=\s+[●♦○–*SPU]\s*=|$)/g));
+      for (const pair of pairs) {
+        const symbol = pair[1];
+        const meaning = compactText(pair[2]);
+        obligations.push(obligation(
+          `table_legend_${stableHash(`${source.sourceID}:${symbol}:${meaning}`).slice(0, 12)}`,
+          "table_legend",
+          `Preserve the exact table legend mapping ${symbol} = ${meaning}.`,
+          [symbol, meaning],
+          [source.sourceID],
+          { requireAllValues: true }
+        ));
+      }
+    }
+  }
+  return obligations;
+}
+
+function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic }) {
+  const obligations = [];
+  const sourceIDs = evidence.map((source) => source?.sourceID).filter(Boolean);
+  const flatEvidence = compactText(evidenceText(evidence));
+  const lotArea = firstQuestionNumber(question, [
+    /(\d[\d,]*(?:\.\d+)?)[- ]square-foot\s+(?:[A-Z0-9-]+\s+)?(?:zoning\s+)?lot\b/i,
+    /(?:zoning\s+)?lot\s+(?:contains|has|is)\s+(\d[\d,]*(?:\.\d+)?)\s*square feet/i
+  ]);
+  const proposedFloorArea = firstQuestionNumber(question, [
+    /(?:want|proposed(?:\s+with|\s+for)?|contains?)\s+(\d[\d,]*(?:\.\d+)?)\s*square feet of (?:residential )?floor area/i,
+    /(?:want|proposed(?:\s+with|\s+for)?)\s+(\d[\d,]*(?:\.\d+)?)\s*square feet/i
+  ]);
+  const tableValues = tableFARValues(question, evidence);
+  if (lotArea && proposedFloorArea) {
+    const proposedFAR = Number((proposedFloorArea / lotArea).toFixed(4));
+    obligations.push(obligation(
+      "scenario_proposed_far",
+      "arithmetic",
+      `Show the proposed floor-area ratio: ${proposedFloorArea} / ${lotArea} = ${proposedFAR}.`,
+      numberTextAlternatives(proposedFAR),
+      sourceIDs
+    ));
+  }
+  if (lotArea && tableValues) {
+    const standardArea = Number((lotArea * tableValues.standardFAR).toFixed(4));
+    const qualifyingArea = Number((lotArea * tableValues.qualifyingFAR).toFixed(4));
+    const splitDistrictScenario = /\b(?:split|straddles|district boundary|weighted)\b/i.test(question);
+    if (!splitDistrictScenario) {
+      obligations.push(obligation(
+        "table_standard_floor_area_ceiling",
+        "table_calculation",
+        `Show the ${tableValues.district} standard-residence ceiling: ${lotArea} x ${tableValues.standardFAR} = ${standardArea} square feet.`,
+        numberTextAlternatives(standardArea),
+        tableValues.sourceIDs
+      ));
+      if (/\b(?:affordable|qualifying|MIH|UAP|higher FAR|higher column)\b/i.test(question)) {
+        obligations.push(obligation(
+          "table_qualifying_floor_area_ceiling",
+          "table_calculation",
+          `Show the ${tableValues.district} qualifying-housing table ceiling: ${lotArea} x ${tableValues.qualifyingFAR} = ${qualifyingArea} square feet.`,
+          numberTextAlternatives(qualifyingArea),
+          tableValues.sourceIDs
+        ));
+      }
+    }
+  }
+
+  const throughLotDepth = firstQuestionNumber(question, [/(\d[\d,]*(?:\.\d+)?)[- ]foot[- ]deep through lot/i]);
+  const openAreaDepth = firstQuestionNumber(question, [/(\d[\d,]*(?:\.\d+)?)[- ]foot[- ]wide open area/i]);
+  const buildingHeight = firstQuestionNumber(question, [/wings rise to (\d[\d,]*(?:\.\d+)?)\s*feet/i]);
+  const throughLotRule = flatEvidence.match(
+    /(\d+) feet or more[^.]{0,180}at or below a height of (\d+) feet[^.]{0,100}minimum depth of (\d+) feet[^.]{0,120}above a height of \2 feet[^.]{0,80}of (\d+) feet/i
+  );
+  if (throughLotDepth && openAreaDepth && buildingHeight && throughLotRule) {
+    const standardDepthThreshold = Number(throughLotRule[1]);
+    const heightTier = Number(throughLotRule[2]);
+    const lowerRequiredDepth = Number(throughLotRule[3]);
+    const upperRequiredDepth = Number(throughLotRule[4]);
+    if (throughLotDepth >= standardDepthThreshold) {
+      const lowerShortfall = Math.max(0, lowerRequiredDepth - openAreaDepth);
+      const upperShortfall = Math.max(0, upperRequiredDepth - openAreaDepth);
+      const upperHeight = Math.max(0, buildingHeight - heightTier);
+      for (const [id, detail, value] of [
+        ["through_lot_lower_tier_shortfall", `Show the lower-tier rear-yard-equivalent shortfall: ${lowerRequiredDepth} - ${openAreaDepth} = ${lowerShortfall} feet.`, lowerShortfall],
+        ["through_lot_upper_tier_shortfall", `Show the upper-tier rear-yard-equivalent shortfall: ${upperRequiredDepth} - ${openAreaDepth} = ${upperShortfall} feet.`, upperShortfall],
+        ["through_lot_upper_vertical_portion", `Identify the portion above ${heightTier} feet: ${buildingHeight} - ${heightTier} = ${upperHeight} feet.`, upperHeight]
+      ]) obligations.push(obligation(id, "tiered_dimension", detail, numberTextAlternatives(value), sourceIDs));
+    }
+  }
+
+  if (
+    plan?.path === zoningResearchPaths.definitionCrossReference &&
+    /\b(?:tax lots?|common ownership|share ownership|contigu)/i.test(question) &&
+    /\(a\).*\(b\).*\(c\).*\(d\)/i.test(flatEvidence)
+  ) {
+    const definitionChecks = [
+      ["definition_historical_branches", "Distinguish the historical definition branches from the current contiguity branches.", ["December 15, 1961"]],
+      ["definition_contiguity_threshold", "State the minimum current-branch contiguity threshold.", ["10 linear feet", "10 feet"]],
+      ["definition_party_or_declaration", "Identify the party-in-interest or recorded-Declaration requirements for the current branches.", ["party in interest", "Declaration"]],
+      ["definition_tax_map_distinction", "Distinguish a zoning lot from a tax lot shown on the official tax map.", ["tax map", "tax lot"]]
+    ];
+    for (const [id, detail, values] of definitionChecks) {
+      obligations.push(obligation(id, "definition_branch", detail, values, sourceIDs));
+    }
+  }
+
+  for (const calculation of arithmetic?.calculations || []) {
+    if (obligations.some((item) => item.id === calculation.id)) continue;
+    obligations.push(obligation(
+      calculation.id,
+      "arithmetic",
+      `Show deterministic calculation ${calculation.display}.`,
+      numberTextAlternatives(calculation.result),
+      sourceIDs
+    ));
+  }
+  return obligations;
 }
 
 export function zoningResearchDeterministicContext({ question, evidence = [], plan } = {}) {
@@ -433,15 +654,24 @@ export function zoningResearchDeterministicContext({ question, evidence = [], pl
     evidenceRole: sourceRole(source),
     topicRouteRelationship: sourceRelationship(source)
   }));
+  const arithmetic = plan?.deterministicControls?.arithmeticLedger
+    ? arithmeticLedger(compactText(question))
+    : { measurements: [], calculations: [] };
+  const answerObligations = scenarioAnswerObligations({
+    question: compactText(question),
+    evidence,
+    plan,
+    arithmetic
+  }).concat(tableLegendObligations(question, evidence));
   const context = {
-    schemaVersion: 1,
+    schemaVersion: 2,
+    compilerVersion: zoningResearchCompilerVersion,
     plannerVersion: zoningResearchPlannerVersion,
     planHash: plan?.planHash || null,
     path: plan?.path || null,
     dates,
-    arithmetic: plan?.deterministicControls?.arithmeticLedger
-      ? arithmeticLedger(compactText(question))
-      : { measurements: [], calculations: [] },
+    arithmetic,
+    answerObligations,
     structuredTables,
     passages
   };
@@ -457,10 +687,233 @@ export function zoningResearchPromptContext(plan, deterministicContext) {
     `PLAN_HASH: ${plan.planHash}`,
     `DISPOSITION: ${plan.disposition}`,
     `DETERMINISTIC_CONTEXT: ${JSON.stringify(deterministicContext || {})}`,
+    deterministicContext?.answerObligations?.length
+      ? `MANDATORY_ANSWER_OBLIGATIONS: ${JSON.stringify(deterministicContext.answerObligations)}`
+      : "",
     "Answer only the planned question path. Treat collateral provisions as reviewed-only and do not create conclusions from them.",
     "Preserve exact table symbols, dates, arithmetic inputs, prerequisite order, passage identifiers, and source hashes supplied by the server.",
+    "Cover every mandatory answer obligation explicitly in the user-facing answer and in the supported point bound to its supplied source.",
     "Do not infer property or mapped applicability. Do not rewrite an otherwise supported answer merely to add unrelated context."
-  ].join("\n");
+  ].filter(Boolean).join("\n");
+}
+
+export function evaluateZoningEvidenceReadiness({ question, evidence = [], plan } = {}) {
+  const sources = Array.isArray(evidence) ? evidence : [];
+  const issues = [];
+  if (!sources.length) {
+    issues.push({
+      code: "GOVERNING_ZONING_EVIDENCE_MISSING",
+      detail: "No enacted Zoning passage was resolved for the planned question path."
+    });
+  }
+  if (plan?.path === zoningResearchPaths.structuredTableSymbol &&
+      !sources.some((source) => Array.isArray(source?.richSourceGrids) && source.richSourceGrids.length)) {
+    issues.push({
+      code: "STRUCTURED_TABLE_GRID_MISSING",
+      detail: "The selected table was not resolved as a structured grid with its headers, symbols, legend, and footnotes."
+    });
+  }
+  const asksParkingGeography = /\bparking\b/i.test(question) &&
+    /\b(?:subway|transit zone|parking geography|mapped|broker)\b/i.test(question);
+  const mentionsSpecialParking = sources.some((source) => /\bspecial parking areas?\b/i.test(sourceText(source)));
+  const suppliesSpecialParkingRule = sources.some((source) => {
+    const text = sourceText(source);
+    if (!/\bspecial parking areas?\b/i.test(text)) return false;
+    if (compactText(source?.sectionNumber) === "12-10" || /\bGeneral Definition\b/i.test(text)) return false;
+    return /\b(?:shall|required|requirements?|percentage|percent|waiver|spaces?)\b/i.test(text) &&
+      !/\b(?:means|consists of|includes)\b[^.]{0,200}\bspecial parking areas?\b/i.test(text);
+  });
+  if (asksParkingGeography && mentionsSpecialParking && !suppliesSpecialParkingRule) {
+    issues.push({
+      code: "CONTROLLING_SPECIAL_PARKING_RULE_MISSING",
+      detail: "The selected evidence names special parking geography but does not supply the controlling enacted parking rule for that geography."
+    });
+  }
+  return {
+    schemaVersion: 1,
+    pass: issues.length === 0,
+    disposition: issues.length ? zoningResearchDispositions.deterministicBoundary : zoningResearchDispositions.ready,
+    issues,
+    requiredEvidence: issues.map((issue) => issue.detail)
+  };
+}
+
+export function zoningResearchBoundaryResponse({ plan, evidenceReadiness = null } = {}) {
+  const missingFacts = Array.isArray(plan?.missingFacts) ? plan.missingFacts : [];
+  const evidenceIssues = Array.isArray(evidenceReadiness?.issues) ? evidenceReadiness.issues : [];
+  const needed = unique([
+    ...missingFacts.map((item) => item.label),
+    ...evidenceIssues.map((item) => item.detail)
+  ]);
+  return {
+    schemaVersion: 1,
+    path: plan?.path || null,
+    status: missingFacts.length ? "missing_project_facts" : "missing_governing_evidence",
+    whatCanBeEstablished: "Permitext can preserve and cite the selected enacted material without converting it into an unsupported property or applicability conclusion.",
+    cannotConclude: plan?.clarification || evidenceIssues[0]?.detail ||
+      "The requested Zoning conclusion is not supported by the currently selected governing evidence.",
+    needed
+  };
+}
+
+const repairStopWords = new Set([
+  "about", "after", "answer", "before", "between", "cannot", "conclusion", "could", "detail",
+  "does", "evidence", "from", "into", "missing", "must", "only", "permitext", "question", "require",
+  "required", "source", "supported", "that", "their", "there", "these", "this", "through", "under",
+  "with", "without", "zoning"
+]);
+
+function repairTerms(value) {
+  return unique(compactText(value).toLowerCase().match(/[a-z0-9][a-z0-9.-]{2,}/g) || [])
+    .filter((term) => !repairStopWords.has(term));
+}
+
+function excerptForRepair(source, terms, maximumCharacters = 2_400) {
+  const text = sourceText(source);
+  if (text.length <= maximumCharacters) return text;
+  const chunks = text.split(/(?<=[.;:])\s+|\n+/).map(compactText).filter(Boolean);
+  const scored = chunks.map((chunk, index) => ({
+    chunk,
+    index,
+    score: terms.reduce((total, term) => total + (chunk.toLowerCase().includes(term) ? 1 : 0), 0)
+  })).sort((left, right) => right.score - left.score || left.index - right.index);
+  const selected = [];
+  let characters = 0;
+  for (const entry of scored) {
+    if (selected.length && entry.score === 0) continue;
+    if (characters + entry.chunk.length + 2 > maximumCharacters) continue;
+    selected.push(entry);
+    characters += entry.chunk.length + 2;
+  }
+  if (!selected.length) return text.slice(0, maximumCharacters);
+  return selected.sort((left, right) => left.index - right.index).map((entry) => entry.chunk).join("\n");
+}
+
+export function zoningResearchRepairPacket({
+  question,
+  issues = [],
+  evidence = [],
+  answer = {},
+  deterministicContext = null,
+  maximumSources = 5,
+  maximumCharacters = 8_000
+} = {}) {
+  const values = Array.isArray(evidence) ? evidence : [];
+  const issueText = (Array.isArray(issues) ? issues : []).map((issue) =>
+    `${issue?.type || issue?.code || ""} ${issue?.detail || ""}`
+  ).join(" ");
+  const obligationText = (deterministicContext?.answerObligations || [])
+    .map((item) => `${item.id} ${item.detail}`)
+    .join(" ");
+  const terms = repairTerms(`${question} ${issueText} ${obligationText}`);
+  const citedIDs = new Set(proposedCitationIDs(answer));
+  const issueSourceIDs = new Set((deterministicContext?.answerObligations || [])
+    .filter((item) => issueText.includes(item.id) || issueText.includes(item.detail))
+    .flatMap((item) => item.sourceIDs || []));
+  const scored = values.map((source, index) => {
+    const text = sourceText(source).toLowerCase();
+    const sourceID = String(source?.sourceID || "");
+    let score = terms.reduce((total, term) => total + (text.includes(term) ? 1 : 0), 0);
+    if (issueText.includes(sourceID) || issueSourceIDs.has(sourceID)) score += 1_000;
+    if (citedIDs.has(sourceID)) score += 100;
+    if (sourceRole(source) === "governing") score += 50;
+    if (source?.evidencePriority?.claimCoverageRequired === true) score += 25;
+    return { source, sourceID, index, score };
+  }).sort((left, right) => right.score - left.score || left.index - right.index);
+  const sources = [];
+  let characters = 0;
+  for (const entry of scored) {
+    if (sources.length >= maximumSources) break;
+    const remaining = maximumCharacters - characters;
+    if (remaining <= 0) break;
+    const text = excerptForRepair(entry.source, terms, Math.min(2_400, remaining));
+    if (!text) continue;
+    sources.push({
+      sourceID: entry.sourceID,
+      sectionID: String(entry.source?.sectionID || ""),
+      codePrefix: compactText(entry.source?.codePrefix),
+      sectionNumber: compactText(entry.source?.sectionNumber),
+      evidenceRole: sourceRole(entry.source),
+      text,
+      textHash: stableHash(text)
+    });
+    characters += text.length;
+  }
+  const packet = {
+    schemaVersion: 1,
+    repairVersion: zoningResearchRepairVersion,
+    question: compactText(question),
+    issues: (Array.isArray(issues) ? issues : []).map((issue) => ({
+      type: compactText(issue?.type || issue?.code || "zoning_repair"),
+      detail: compactText(issue?.detail)
+    })),
+    answerObligations: deterministicContext?.answerObligations || [],
+    sources,
+    usage: { sourceCount: sources.length, characterCount: characters, maximumCharacters }
+  };
+  return { ...packet, packetHash: stableHash(packet) };
+}
+
+function patchedList(current, additions, removals) {
+  const removed = new Set((Array.isArray(removals) ? removals : []).map(compactText));
+  return unique([
+    ...(Array.isArray(current) ? current : []).map(compactText).filter((item) => !removed.has(item)),
+    ...(Array.isArray(additions) ? additions : []).map(compactText)
+  ]);
+}
+
+function patchedIndexedRecords(current, upserts, removals) {
+  const output = structuredClone(Array.isArray(current) ? current : []);
+  const indexes = Array.from(new Set((Array.isArray(removals) ? removals : [])
+    .map(Number)
+    .filter((index) => Number.isSafeInteger(index) && index >= 0)))
+    .sort((left, right) => right - left);
+  for (const index of indexes) {
+    if (index < output.length) output.splice(index, 1);
+  }
+  for (const upsert of Array.isArray(upserts) ? upserts : []) {
+    const targetIndex = upsert?.targetIndex;
+    const value = structuredClone(upsert?.value);
+    if (!value || typeof value !== "object") continue;
+    if (Number.isSafeInteger(targetIndex) && targetIndex >= 0 && targetIndex < output.length) {
+      output[targetIndex] = value;
+    } else {
+      output.push(value);
+    }
+  }
+  return output;
+}
+
+export function applyZoningResearchRepairPatch(answer = {}, patch = {}) {
+  const answerText = String(patch?.answerText || "").trim();
+  if (!answerText) {
+    const error = new Error("A Zoning repair patch must provide the corrected user-facing answer text.");
+    error.code = "INVALID_ZONING_REPAIR_PATCH";
+    throw error;
+  }
+  return {
+    ...structuredClone(answer),
+    answerText,
+    conclusion: answerText,
+    explanation: "",
+    supportedPoints: patchedIndexedRecords(
+      answer?.supportedPoints,
+      patch?.supportedPointUpserts,
+      patch?.supportedPointRemovals
+    ),
+    citations: patchedIndexedRecords(answer?.citations, patch?.citationUpserts, patch?.citationRemovals),
+    missingFacts: patchedList(answer?.missingFacts, patch?.missingFactsAdd, patch?.missingFactsRemove),
+    evidenceLimitations: patchedList(
+      answer?.evidenceLimitations,
+      patch?.evidenceLimitationsAdd,
+      patch?.evidenceLimitationsRemove
+    ),
+    additionalEvidenceNeeded: patchedList(
+      answer?.additionalEvidenceNeeded,
+      patch?.additionalEvidenceNeededAdd,
+      patch?.additionalEvidenceNeededRemove
+    )
+  };
 }
 
 function proposedAnswerText(answer) {
@@ -538,11 +991,34 @@ export function evaluateZoningDeterministicControls({
       }
     }
   }
+  const normalizedText = text.toLowerCase();
+  for (const answerObligation of deterministicContext?.answerObligations || []) {
+    const values = Array.isArray(answerObligation?.values) ? answerObligation.values : [];
+    const covered = answerObligation?.requireAllValues
+      ? values.every((value) => normalizedText.includes(String(value).toLowerCase()))
+      : values.some((value) => normalizedText.includes(String(value).toLowerCase()));
+    if (!values.length || covered) continue;
+    issues.push({
+      code: "ANSWER_OBLIGATION_NOT_COVERED",
+      obligationID: answerObligation.id,
+      sourceIDs: answerObligation.sourceIDs || [],
+      detail: answerObligation.detail
+    });
+  }
+  const deduplicated = [];
+  const seen = new Set();
+  for (const issue of issues) {
+    const identity = `${issue.code}\u0000${issue.obligationID || ""}\u0000${issue.detail}`;
+    if (seen.has(identity)) continue;
+    seen.add(identity);
+    deduplicated.push(issue);
+  }
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     plannerVersion: zoningResearchPlannerVersion,
-    pass: issues.length === 0,
-    issues
+    compilerVersion: zoningResearchCompilerVersion,
+    pass: deduplicated.length === 0,
+    issues: deduplicated
   };
 }
 
@@ -570,28 +1046,54 @@ export function zoningResearchPlanCostProjection({
   };
   const estimatedTokens = (characters) => Math.ceil((Math.max(0, characters) / 4) * 1.25);
   const requestInputTokens = estimatedTokens(sharedPromptCharacters + evidenceCharacters);
-  const calls = [];
+  const nominalCalls = [];
   if ((plan?.callPolicy?.maximumProviderCalls || 0) > 0) {
-    calls.push({ stage: "answer", ledger: "production", tier: "fast", inputTokens: requestInputTokens, outputTokens: answerOutputTokens });
+    nominalCalls.push({
+      stage: "answer",
+      ledger: "production",
+      tier: plan?.callPolicy?.initialTier === "accurate" ? "accurate" : "fast",
+      inputTokens: requestInputTokens,
+      outputTokens: answerOutputTokens
+    });
   }
   if (plan?.callPolicy?.subjectiveVerification && (plan?.callPolicy?.maximumProviderCalls || 0) > 1) {
-    calls.push({ stage: "verification", ledger: "production", tier: "fast", inputTokens: requestInputTokens, outputTokens: verifierOutputTokens });
+    nominalCalls.push({
+      stage: "verification",
+      ledger: "production",
+      tier: "fast",
+      inputTokens: requestInputTokens,
+      outputTokens: verifierOutputTokens
+    });
   }
+  const repairCall = plan?.callPolicy?.repairEligible
+    ? {
+        stage: "source_bounded_repair",
+        ledger: "production",
+        tier: "accurate",
+        inputTokens: estimatedTokens(3_000 + Math.min(8_000, evidenceCharacters)),
+        outputTokens: 900
+      }
+    : null;
+  const adverseCalls = repairCall ? [...nominalCalls, repairCall] : nominalCalls;
   const cost = (call, adverse = false) => {
     const rate = rates[call.tier];
     const input = Math.ceil(call.inputTokens * (adverse ? adverseInputMultiplier : 1));
     const output = Math.ceil(call.outputTokens * (adverse ? adverseOutputMultiplier : 1));
     return (input * rate.input + output * rate.output) / 1_000_000;
   };
-  const productionNominalUSD = calls.reduce((sum, call) => sum + cost(call), 0);
-  const productionAdverseUSD = calls.reduce((sum, call) => sum + cost(call, true), 0);
+  const productionNominalUSD = nominalCalls.reduce((sum, call) => sum + cost(call), 0);
+  const productionAdverseUSD = adverseCalls.reduce((sum, call) => sum + cost(call, true), 0);
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     pricing: rates,
     tokenEstimator: "ceil(bytes/4*1.25)",
-    calls,
+    calls: adverseCalls,
+    nominalCalls,
+    adverseCalls,
     production: {
-      requestCount: calls.length,
+      requestCount: nominalCalls.length,
+      nominalRequestCount: nominalCalls.length,
+      adverseRequestCount: adverseCalls.length,
       nominalUSD: Number(productionNominalUSD.toFixed(6)),
       adverseUSD: Number(productionAdverseUSD.toFixed(6))
     },
