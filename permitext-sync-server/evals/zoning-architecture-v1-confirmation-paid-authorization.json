@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "authorizationID": "d79db463-bc42-47c6-9e74-5931875cab50",
+  "status": "locked",
+  "cohort": {
+    "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
+    "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
+    "caseCount": 30,
+    "ordered": true
+  },
+  "plannedScope": {
+    "purpose": "one Architecture V1 confirmation of the frozen owner-approved Zoning cohort",
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
+  },
+  "scope": {
+    "caseCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
+  },
+  "ownerDecision": {
+    "required": true,
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
+  },
+  "consumption": {
+    "status": "not_started",
+    "attemptID": null,
+    "startedAt": null,
+    "runID": null,
+    "consumedAt": null
+  },
+  "lineage": {
+    "preparedFromCommit": "be69f1a5648321f90b6e35b287f6dd7b572030c6",
+    "plannerVersion": "20260901-question-path-v1",
+    "noCostPreflightFile": "results/zoning-architecture-v1-no-cost-preflight.json",
+    "noCostPreflightSHA256": "0c1337c26c237f774d7320cc95bb034f2b6bb6e6f6a6a19016814d141b6b5c88",
+    "plannerSHA256": "e9ec4d986ad7c150af51bcfb1f60ec87b03ce2d6d723b1296726c865af1fa500",
+    "modelRoutingSHA256": "acd1c85f3f88ffda919a24138035d458791c216ef1f06e0f44964037b7e8aa65",
+    "evidenceAssemblySHA256": "a5f094303fd72fb011ea858d5539b2cf4ff2f60b8e84d291c606156b453cdcb1",
+    "zoningSafetySHA256": "e0c5f298e9cfbeaed9ed6d084df30b77643f29f011cfe5f309a0fb59a11277df",
+    "appSHA256": "e33bf343a987980cc993274d5783bd1d84389bd32c1e8cbe12d89135ce833f4b",
+    "preflightScriptSHA256": "3b191d855061b91ea2efe4ab1a5f5e281c4a7466a26707886659eeb2c0052211",
+    "plannerContractSHA256": "dd5e130beefab2897c71209e8f103125668492a5d88b23375d6dfdb41a45d4c3",
+    "priorV17AuthorizationFile": "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json",
+    "priorV17AuthorizationSHA256": "5474123dc94e2c934eb556bc05e1bce823f743d1db39cde8f65cecfade1487aa",
+    "priorV17RunID": "d2fdc1c4-7099-430d-9d33-2b759021afd2"
+  },
+  "economics": {
+    "productionNominalUSDPerHundred": 0.18179,
+    "productionAdverseUSDPerHundred": 0.24543,
+    "judgeNominalUSDPerHundred": 0,
+    "judgeAdverseUSDPerHundred": 0,
+    "providerRequestsP50": 1,
+    "providerRequestsP90": 2,
+    "providerRequestsMaximum": 2,
+    "publicCostTargetUSDPerHundredMinimum": 4,
+    "publicCostTargetUSDPerHundredMaximum": 6,
+    "projectionOnly": true
+  },
+  "execution": {
+    "authorizationPackageCommit": null,
+    "executionCommit": null,
+    "webSupportEnabled": false,
+    "lunaFirst": true,
+    "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only",
+    "fullAnswerRewriteAllowed": false,
+    "maximumProviderRequestsPerCase": 2,
+    "judgeLedgerSeparate": true
+  },
+  "publicResearchReleaseAuthorized": false,
+  "professionalZoningSignoff": false,
+  "deploymentAuthorized": false,
+  "pricingOrAllowanceChangeAuthorized": false,
+  "evidenceBudgetCandidateEnabled": false,
+  "networkOrModelCallAuthorized": false,
+  "notes": "Locked after the 30-case no-cost Architecture V1 preflight passed. This record cannot authorize or dispatch a provider request without a later exact package sentence and cumulative spend cap."
+}

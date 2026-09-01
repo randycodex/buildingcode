@@ -535,6 +535,60 @@ function targetedDefinitionValue(value, context, maximumCharacters) {
   };
 }
 
+const questionSpecificIgnoredTerms = new Set([
+  "about", "after", "again", "also", "before", "between", "could", "does", "from",
+  "have", "into", "only", "permitext", "should", "that", "their", "these", "this",
+  "under", "using", "what", "when", "where", "which", "with", "would", "your"
+]);
+
+function questionSpecificTerms(value) {
+  return Array.from(new Set((compactText(value).toLowerCase().match(/[a-z0-9][a-z0-9-]{2,}/g) || [])
+    .filter((term) => !questionSpecificIgnoredTerms.has(term))));
+}
+
+function questionSpecificBlockValue(value, question, maximumCharacters) {
+  const original = canonicalText(value);
+  if (!original || original.length <= maximumCharacters) return value;
+  const blocks = (Array.isArray(value?.body?.blocks) ? value.body.blocks : [])
+    .map((block, index) => ({ index, text: compactText(block?.plainText) }))
+    .filter((block) => block.text);
+  if (blocks.length < 2) return value;
+  const terms = questionSpecificTerms(question);
+  const references = explicitCodeReferences(question);
+  const ranked = blocks.map((block) => {
+    const normalized = block.text.toLowerCase();
+    const termMatches = terms.filter((term) => normalized.includes(term)).length;
+    const referenceMatches = references.filter((reference) => {
+      const [, sectionNumber] = reference.split(":");
+      return sectionNumber && normalized.includes(sectionNumber.toLowerCase());
+    }).length;
+    return {
+      ...block,
+      score: referenceMatches * 1_000 + termMatches * 10 - Math.min(block.text.length / 1_000, 9)
+    };
+  }).filter((block) => block.score > 0)
+    .sort((left, right) => right.score - left.score || left.index - right.index);
+  const selected = [];
+  let used = 0;
+  for (const block of ranked) {
+    const separator = selected.length ? 2 : 0;
+    if (used + separator + block.text.length > maximumCharacters) continue;
+    selected.push(block);
+    used += separator + block.text.length;
+  }
+  if (!selected.length) return value;
+  selected.sort((left, right) => left.index - right.index);
+  return {
+    ...value,
+    text: selected.map((block) => block.text).join("\n\n"),
+    questionSpecificPassage: {
+      version: "20260901-question-specific-block-v1",
+      canonicalSectionCharacterCount: original.length,
+      selectedBlockIndexes: selected.map((block) => block.index)
+    }
+  };
+}
+
 function definitionSelectionContext(query, values = []) {
   return [
     compactText(query),
@@ -746,7 +800,7 @@ export async function assembleResearchEvidence({
     const remainingPins = resolvedPins.length - position;
     const fairPinnedShare = remainingPins ? Math.floor(remainingCharacters / remainingPins) : 0;
     const allowance = Math.min(limits.maximumCharactersPerSource, fairPinnedShare);
-    const targeted = !entry.pinned.richSourceID &&
+    let targeted = !entry.pinned.richSourceID &&
       allowance > 0 &&
       targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
@@ -755,6 +809,12 @@ export async function assembleResearchEvidence({
           allowance
         )
       : { value: entry.value, excerpt: null };
+    if (!targeted.excerpt && !entry.pinned.richSourceID && allowance > 0) {
+      targeted = {
+        ...targeted,
+        value: questionSpecificBlockValue(targeted.value, query.retrievalQuery, allowance)
+      };
+    }
     const record = sourceRecord(targeted.value, {
       origin: sourceOrigins.pinned,
       sourceID: compactText(entry.pinned.sourceID || entry.pinned.id) ||
@@ -772,6 +832,9 @@ export async function assembleResearchEvidence({
       targetedDefinition: targeted.excerpt,
       retrievedAt
     });
+    if (targeted.value.questionSpecificPassage) {
+      record.questionSpecificPassage = structuredClone(targeted.value.questionSpecificPassage);
+    }
     record.userSelectedText = compactText(
       entry.pinned.userSelectedText || entry.pinned.selectedText || entry.pinned.text
     );

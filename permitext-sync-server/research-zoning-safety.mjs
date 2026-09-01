@@ -1014,7 +1014,13 @@ function exactSpecialDistrictLabels(value) {
   ) || []);
 }
 
-function riskProfile({ question, evidence, projectFacts = [], conversationFactContext = {} } = {}) {
+function riskProfile({
+  question,
+  evidence,
+  projectFacts = [],
+  conversationFactContext = {},
+  questionPlan = null
+} = {}) {
   const sources = zoningEvidence(evidence);
   if (!sources.length) {
     return {
@@ -1035,11 +1041,17 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
   ].filter(Boolean).join(" ")).join(" "));
   const sourceTextWithoutDefinitionalTaxMap = sourceText.replace(/\btax map\b/gi, "");
   const propertyIdentifierKnown = hasConcretePropertyIdentifier(facts);
-  const propertySpecific = propertyIdentifierKnown ||
-    /\b(?:specific property|property|parcel|site|zoning lot|tax lot|this lot|this project|proposed|proposal|development|building)\b/i.test(questionText);
-  const mappedApplicability =
-    /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea|zoning district|special[- ]district|subdistrict|transit zone)\b/i.test(questionText) ||
-    /\b(?:map|Appendix [A-Z]|designated area|subarea|special[- ]district|subdistrict|transit zone)\b/i.test(sourceTextWithoutDefinitionalTaxMap);
+  const plannedPropertyMap = questionPlan?.path === "property_map_applicability";
+  const propertySpecific = questionPlan
+    ? propertyIdentifierKnown || plannedPropertyMap ||
+      /\b(?:specific property|parcel|site|this lot|this project)\b/i.test(questionText)
+    : propertyIdentifierKnown ||
+      /\b(?:specific property|property|parcel|site|zoning lot|tax lot|this lot|this project|proposed|proposal|development|building)\b/i.test(questionText);
+  const mappedApplicability = questionPlan
+    ? plannedPropertyMap ||
+      /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea|zoning district|special[- ]district|subdistrict|transit zone)\b/i.test(questionText)
+    : /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea|zoning district|special[- ]district|subdistrict|transit zone)\b/i.test(questionText) ||
+      /\b(?:map|Appendix [A-Z]|designated area|subarea|special[- ]district|subdistrict|transit zone)\b/i.test(sourceTextWithoutDefinitionalTaxMap);
   const missingMappedLocation = propertySpecific && mappedApplicability && !hasConcreteMappedLocation(facts);
   const specialDistrictLabels = exactSpecialDistrictLabels(questionText);
   const table = /\btable\b/i.test(questionText) || sources.some((source) =>
@@ -1061,8 +1073,12 @@ function riskProfile({ question, evidence, projectFacts = [], conversationFactCo
     (amendment && /\b(?:particular|specific) date\b/i.test(questionText));
   const historicalSubstantiveText = effectiveDate &&
     /\b(?:old|prior|previous|pre[- ](?:amendment|city of yes|december))\b[^.]{0,100}\b(?:zoning|rules?|text|provisions?)\b/i.test(questionText);
-  const map = /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea)\b/i.test(`${questionText} ${sourceTextWithoutDefinitionalTaxMap}`) ||
-    sources.some((source) => Array.isArray(source?.visualSources) && source.visualSources.length > 0);
+  const map = questionPlan
+    ? plannedPropertyMap ||
+      /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea)\b/i.test(questionText) ||
+      sources.some((source) => Array.isArray(source?.visualSources) && source.visualSources.length > 0)
+    : /\b(?:map|mapped|Appendix [A-Z]|designated area|subarea)\b/i.test(`${questionText} ${sourceTextWithoutDefinitionalTaxMap}`) ||
+      sources.some((source) => Array.isArray(source?.visualSources) && source.visualSources.length > 0);
   const basicLotCoverage = /\bbasic\b[^?]{0,100}\blot[- ]coverage\b|\blot[- ]coverage\b[^?]{0,100}\bbasic\b/i.test(questionText);
   const parkingGeography = /\bparking\b/i.test(questionText) &&
     /\b(?:transit zone|Greater Transit Zone|special parking areas?|special district)\b/i.test(`${questionText} ${sourceText}`);
@@ -1226,9 +1242,16 @@ export function evaluateZoningResearchSafety({
   evidence,
   answer,
   projectFacts = [],
-  conversationFactContext = {}
+  conversationFactContext = {},
+  questionPlan = null
 } = {}) {
-  const profile = riskProfile({ question, evidence, projectFacts, conversationFactContext });
+  const profile = riskProfile({
+    question,
+    evidence,
+    projectFacts,
+    conversationFactContext,
+    questionPlan
+  });
   if (!profile.applies) {
     return {
       schemaVersion: 1,

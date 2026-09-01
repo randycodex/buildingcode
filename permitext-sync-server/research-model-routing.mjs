@@ -1,6 +1,6 @@
 import { extractResearchCodeReferences } from "./research-conversation-topic.mjs";
 
-export const researchModelRoutingVersion = "20260827-luna-terra-hybrid-v4";
+export const researchModelRoutingVersion = "20260901-luna-terra-hybrid-zoning-planner-v5";
 
 function normalized(value) {
   return String(value || "").trim();
@@ -119,6 +119,7 @@ export function routeResearchAnswerModel({
   codeBasis = null,
   webSupportRequested = false,
   boundedCitationLookup = null,
+  zoningPlan = null,
   environment = process.env
 } = {}) {
   const configuration = researchModelRoutingConfiguration(environment);
@@ -135,6 +136,14 @@ export function routeResearchAnswerModel({
   const isBoundedCitationLookup = boundedCitationLookup === null
     ? researchQuestionIsBoundedCitationLookup(question)
     : Boolean(boundedCitationLookup);
+  if (zoningPlan?.disposition === "ready") {
+    return {
+      model: configuration.fastModel,
+      tier: "fast",
+      reasons: [`zoning_planner_luna_first:${zoningPlan.path || "unknown"}`],
+      configuration
+    };
+  }
   if (complexQuestionPattern.test(normalized(question))) reasons.push("complex_question_language");
   if (materialBoundaryQuestionPattern.test(normalized(question))) reasons.push("material_evidence_boundary");
   if (webSupportRequested && !isBoundedCitationLookup) reasons.push("outside_library_support");

@@ -1,0 +1,5631 @@
+{
+  "schemaVersion": 1,
+  "artifact": "Permitext Zoning Research Architecture V1 no-cost preflight",
+  "artifactDate": "2026-09-01",
+  "plannerVersion": "20260901-question-path-v1",
+  "cohort": {
+    "path": "evals/zoning-cases-expanded-batch-1-successor-remediation-3.json",
+    "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
+    "caseCount": 30,
+    "approvedCaseCount": 30
+  },
+  "corpus": {
+    "id": "nyc-zoning-resolution",
+    "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+    "syncCodeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+    "textChangesThrough": "2026-08-13",
+    "researchEligibility": false
+  },
+  "summary": {
+    "pass": true,
+    "pathCounts": {
+      "direct_rule": 7,
+      "definition_cross_reference": 4,
+      "structured_table_symbol": 2,
+      "effective_date_history": 4,
+      "property_map_applicability": 5,
+      "calculation_scenario": 8
+    },
+    "dispositionCounts": {
+      "ready": 25,
+      "deterministic_boundary": 5,
+      "clarification_required": 0
+    },
+    "providerRequests": {
+      "p50": 1,
+      "p90": 2,
+      "maximum": 2,
+      "totalProjected": 30
+    },
+    "productionCost": {
+      "frozenCohortNominalUSD": 0.054537,
+      "frozenCohortAdverseUSD": 0.073629,
+      "nominalUSDPerHundred": 0.18179,
+      "adverseUSDPerHundred": 0.24543
+    },
+    "judgeCost": {
+      "frozenCohortNominalUSD": 0,
+      "frozenCohortAdverseUSD": 0,
+      "nominalUSDPerHundred": 0,
+      "adverseUSDPerHundred": 0
+    }
+  },
+  "adversarial": {
+    "generalDefinitionDoesNotRequireMap": true,
+    "propertyMapMissingFactsStopsModel": true,
+    "missingEffectiveDateFails": true,
+    "exactEffectiveDatePasses": true,
+    "uncitedStructuredTableFails": true,
+    "citedStructuredTablePasses": true,
+    "missingArithmeticFails": true,
+    "shownArithmeticPasses": true,
+    "modelCallBeforePrerequisitesFails": true,
+    "twentyFourKCandidateRemainsDisabled": true
+  },
+  "aggregateGates": {
+    "exactFrozenCohortCount": true,
+    "everyCasePasses": true,
+    "allSixQuestionPathsCovered": true,
+    "selectedSourceRecallComplete": true,
+    "noModelWithMissingPrerequisites": true,
+    "medianProviderRequestsAtMostOne": true,
+    "maximumProviderRequestsAtMostTwo": true,
+    "nominalProductionCostAtMostSixPerHundred": true,
+    "adverseProductionCostAtMostSixPerHundred": true,
+    "judgeLedgerSeparateAndZero": true,
+    "allAdversarialGatesPass": true,
+    "noNetworkOrModelCalls": true,
+    "noCredentialsLoaded": true,
+    "noPaidSpend": true
+  },
+  "cases": [
+    {
+      "id": "zr-rules-of-construction",
+      "category": "citation-fidelity",
+      "question": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+      "selectedEvidenceSectionIDs": [
+        "20018521"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "direct_rule",
+        "pathLabel": "direct enacted rule",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "30e7567c617e0f89022fab30e455cefed3108f9f9d42524f319f7e9f8ba2c97c"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018521"
+        ],
+        "sectionIDs": [
+          "20018521"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 2528,
+          "pinnedCharacterCount": 2528,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 2541,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 8000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 2541,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "04ee56c81eaf5988e3e4694580b006322ac779ee4f0c140d9ede09f63b750ffe",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018521",
+            "sectionID": "20018521",
+            "sectionNumber": "12-01",
+            "textHash": "636df4e3605f52da81e1ac71deff7debb72293ca4bea103f1e4d780e89203583",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 3290,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.001738,
+          "adverseUSD": 0.002346
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-use-group-table",
+      "category": "table",
+      "question": "Using only the selected table, summarize how Use Group I allowances differ across M1, M2, and M3 districts and explain the table symbols.",
+      "selectedEvidenceSectionIDs": [
+        "20017276"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "structured_table_symbol",
+        "pathLabel": "structured table and symbol",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": true,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": true,
+          "verifierTier": "fast",
+          "maximumProviderCalls": 2,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "b07e1353a1c17b157bbd7d90b820c56723e430d258f5f032ca6efe7eab564f60"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20017276"
+        ],
+        "sectionIDs": [
+          "20017276"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 902,
+          "pinnedCharacterCount": 902,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 903,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 6903,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 903,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "8b810c9f042330ff2b4a76554da89ffc2821b6cb592b98ce7365eb931d94ccfb",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20017276",
+            "sectionID": "20017276",
+            "sectionNumber": "42-111",
+            "textHash": "8353eb552be4d34b69af285cabac7113499b5ab78721b95fb958107c35bc03b7",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 2782,
+            "outputTokens": 900
+          },
+          {
+            "stage": "verification",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 2782,
+            "outputTokens": 350
+          }
+        ],
+        "production": {
+          "requestCount": 2,
+          "nominalUSD": 0.002613,
+          "adverseUSD": 0.003528
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-appendix-map-boundaries",
+      "category": "map",
+      "question": "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+      "selectedEvidenceSectionIDs": [
+        "20021237"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "property_map_applicability",
+        "pathLabel": "property, BBL, and mapped applicability",
+        "disposition": "deterministic_boundary",
+        "requirements": [
+          {
+            "id": "official_mapped_status",
+            "label": "controlling official map or verified mapped-district status",
+            "present": false,
+            "reason": "General geography and third-party descriptions do not establish official mapped status."
+          }
+        ],
+        "missingFacts": [
+          {
+            "id": "official_mapped_status",
+            "label": "controlling official map or verified mapped-district status",
+            "present": false,
+            "reason": "General geography and third-party descriptions do not establish official mapped status."
+          }
+        ],
+        "clarification": "Before Permitext can make the requested Zoning conclusion, provide controlling official map or verified mapped-district status.",
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": true
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 0,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "41044825e5bd88679b89461779873d868c8ea6f3036fb2a3e143281ce2a0e609"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20021237"
+        ],
+        "sectionIDs": [
+          "20021237"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 1550,
+          "pinnedCharacterCount": 1550,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 1555,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 7555,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 1555,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "2287a8fbc237b17c0d0a9db1f8143a0e889b29f2175e6b737ca314c08ba7fc17",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20021237",
+            "sectionID": "20021237",
+            "sectionNumber": "APPENDIX J",
+            "textHash": "94949b5727783ffa55ccee982628addd8cc085538e4c66fe5f5f6c783562c336",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [],
+        "production": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-special-district-demolition",
+      "category": "special-purpose-district",
+      "question": "Within the Atlantic Avenue Subdistrict of the Special Downtown Brooklyn District, what two prerequisites does Section 101-75 state before a demolition permit may be issued, and what unsafe-building exception does it recognize?",
+      "selectedEvidenceSectionIDs": [
+        "20020818",
+        "20020889"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "direct_rule",
+        "pathLabel": "direct enacted rule",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "30e7567c617e0f89022fab30e455cefed3108f9f9d42524f319f7e9f8ba2c97c"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20020818",
+          "zoning-preflight-20020889"
+        ],
+        "sectionIDs": [
+          "20020818",
+          "20020889"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 2,
+          "characterCount": 1540,
+          "pinnedCharacterCount": 1540,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 2,
+          "pinnedCharacterCount": 1542,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 2,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 7542,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 1542,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "35ae4397f4140390892268a3a3945ecef5a42a498147634432dee429835fade8",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20020818",
+            "sectionID": "20020818",
+            "sectionNumber": "101-04",
+            "textHash": "444f894498da0b74abbf39b6661671dfef5081c75aa25be135f35cdc7a79c729",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20020889",
+            "sectionID": "20020889",
+            "sectionNumber": "101-75",
+            "textHash": "4b78956c3515c7a35597c87a4ae692621bd4992e9d72c31bd0a3a198325f4055",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 2982,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.001676,
+          "adverseUSD": 0.002263
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-amendment-history",
+      "category": "amendment-history",
+      "question": "What does NYC Planning's official amendment-history metadata currently identify for Section 42-00, and what must a professional still verify before reconstructing the text in force on a particular date?",
+      "selectedEvidenceSectionIDs": [
+        "20017271"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "effective_date_history",
+        "pathLabel": "effective date and history",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 12000,
+          "maximumSupplementalCharacters": 10000,
+          "maximumCharactersPerSource": 6000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": true,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": true,
+          "verifierTier": "fast",
+          "maximumProviderCalls": 2,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "31d28518bf7db71fb75573334a89027057a91b7c0061334ef768dfc459910d55"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20017271"
+        ],
+        "sectionIDs": [
+          "20017271"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 2640,
+          "pinnedCharacterCount": 2640,
+          "maximumCharacters": 12000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 12000,
+          "maximumSupplementalCharacters": 10000,
+          "maximumCharactersPerSource": 6000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 2642,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 12000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 2642,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "1291192df7e0e3484b6d408254277064f38b796bc1aa3d28de6918ca3fbde757",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20017271",
+            "sectionID": "20017271",
+            "sectionNumber": "42-00",
+            "textHash": "2e0988929bb215d4de311e5171af7845657577d2afa39948be6fc9d9cea1a68a",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 3325,
+            "outputTokens": 900
+          },
+          {
+            "stage": "verification",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 3325,
+            "outputTokens": 350
+          }
+        ],
+        "production": {
+          "requestCount": 2,
+          "nominalUSD": 0.00283,
+          "adverseUSD": 0.003821
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-missing-location-facts",
+      "category": "explicit-uncertainty",
+      "question": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, current lot area, and zoning-lot area on December 19, 2017 have not been provided?",
+      "selectedEvidenceSectionIDs": [
+        "20022472",
+        "20022473",
+        "20022474",
+        "20019206",
+        "20021237"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "property_map_applicability",
+        "pathLabel": "property, BBL, and mapped applicability",
+        "disposition": "deterministic_boundary",
+        "requirements": [
+          {
+            "id": "property_identifier",
+            "label": "property address or BBL",
+            "present": false,
+            "reason": "A parcel-specific mapped conclusion needs a usable property identifier."
+          },
+          {
+            "id": "official_mapped_status",
+            "label": "controlling official map or verified mapped-district status",
+            "present": false,
+            "reason": "General geography and third-party descriptions do not establish official mapped status."
+          }
+        ],
+        "missingFacts": [
+          {
+            "id": "property_identifier",
+            "label": "property address or BBL",
+            "present": false,
+            "reason": "A parcel-specific mapped conclusion needs a usable property identifier."
+          },
+          {
+            "id": "official_mapped_status",
+            "label": "controlling official map or verified mapped-district status",
+            "present": false,
+            "reason": "General geography and third-party descriptions do not establish official mapped status."
+          }
+        ],
+        "clarification": "Before Permitext can make the requested Zoning conclusion, provide property address or BBL and controlling official map or verified mapped-district status.",
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": true
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 0,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "420ecaa642b69d9d0b8f9d341a1c39e0fcf349b8b3ad3b08be2a9a72dce2725a"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20022472",
+          "zoning-preflight-20022473",
+          "zoning-preflight-20022474",
+          "zoning-preflight-20019206",
+          "zoning-preflight-20021237"
+        ],
+        "sectionIDs": [
+          "20022472",
+          "20022473",
+          "20022474",
+          "20019206",
+          "20021237"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 5,
+          "characterCount": 7504,
+          "pinnedCharacterCount": 7504,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 5,
+          "pinnedCharacterCount": 7517,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 2,
+          "pinnedSelectionTruncatedCount": 3,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 8000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 7517,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "6d743502b9d244271c67996ed0d22b4f1dcc28ad24f8067186bc80eb418361ff",
+        "dates": [
+          "December 19, 2017"
+        ],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20022472",
+            "sectionID": "20022472",
+            "sectionNumber": "42-191",
+            "textHash": "2690537317e33cbda18ca4eb8a2192487c60a4dc5a310215360479e04c4c8468",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022473",
+            "sectionID": "20022473",
+            "sectionNumber": "42-192",
+            "textHash": "5913a9cfc0ba7555191123eff9f3f4442cc2c650fab4e57400fd166f8e67f4bb",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022474",
+            "sectionID": "20022474",
+            "sectionNumber": "42-193",
+            "textHash": "440a57351c9a7586ecf5361b8990c0fe08bba0878919d76f66d627cfc13548b2",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20019206",
+            "sectionID": "20019206",
+            "sectionNumber": "74-192",
+            "textHash": "0bb6f2959096526c3c96211b4126ff519c2f912cf9daced0e5bd06ec8476ea20",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20021237",
+            "sectionID": "20021237",
+            "sectionNumber": "APPENDIX J",
+            "textHash": "94949b5727783ffa55ccee982628addd8cc085538e4c66fe5f5f6c783562c336",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [],
+        "production": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-mapped-district-missing",
+      "category": "mapped-applicability",
+      "question": "A 10,000-square-foot site in the Bronx is proposed for a 40,000-square-foot residential building. What is the maximum permitted residential FAR when the mapped zoning district has not been established?",
+      "selectedEvidenceSectionIDs": [
+        "20018425"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "property_map_applicability",
+        "pathLabel": "property, BBL, and mapped applicability",
+        "disposition": "deterministic_boundary",
+        "requirements": [
+          {
+            "id": "official_mapped_status",
+            "label": "controlling official map or verified mapped-district status",
+            "present": false,
+            "reason": "General geography and third-party descriptions do not establish official mapped status."
+          }
+        ],
+        "missingFacts": [
+          {
+            "id": "official_mapped_status",
+            "label": "controlling official map or verified mapped-district status",
+            "present": false,
+            "reason": "General geography and third-party descriptions do not establish official mapped status."
+          }
+        ],
+        "clarification": "Before Permitext can make the requested Zoning conclusion, provide controlling official map or verified mapped-district status.",
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": true
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 0,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "41044825e5bd88679b89461779873d868c8ea6f3036fb2a3e143281ce2a0e609"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018425"
+        ],
+        "sectionIDs": [
+          "20018425"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 338,
+          "pinnedCharacterCount": 338,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 338,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 6338,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 338,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "1e86162162a8430daa340b4ea1f2c79996c0f7b92f0839aaacd79e1123c850cf",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018425",
+            "sectionID": "20018425",
+            "sectionNumber": "11-14",
+            "textHash": "78c3a10e12fa32122716cb988ad57805899f53d9bbe187c3ad45f22c2738be9b",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [],
+        "production": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-r7a-standard-far",
+      "category": "arithmetic",
+      "question": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
+      "selectedEvidenceSectionIDs": [
+        "20018017",
+        "20018523"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "definition_cross_reference",
+        "pathLabel": "definition and cross-reference",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 2,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 10000,
+          "maximumSupplementalCharacters": 8000,
+          "maximumCharactersPerSource": 6000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "8bb5dea1f8ce664d1e1a8f7d0868f7f6a54e989603bb19bdf3ff5496aca9ba2d"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018017",
+          "zoning-preflight-20018523"
+        ],
+        "sectionIDs": [
+          "20018017",
+          "20018523"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 2,
+          "characterCount": 7036,
+          "pinnedCharacterCount": 7036,
+          "maximumCharacters": 10000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 10000,
+          "maximumSupplementalCharacters": 8000,
+          "maximumCharactersPerSource": 6000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 2,
+          "pinnedCharacterCount": 7042,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 1,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 10000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 1,
+          "crossReferenceCount": 0,
+          "characterCount": 7042,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "94a473acb21b7395df3e9e94e1146f2eeb9df1a5eb213229cb26bb743981ed3a",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018017",
+            "sectionID": "20018017",
+            "sectionNumber": "23-22",
+            "textHash": "bb65a88541a0d15953081afbe0c93d382e6c035ba0a8523f8c0bb04c497a8742",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018523",
+            "sectionID": "20018523",
+            "sectionNumber": "12-10",
+            "textHash": "14df164298f31e992281cb5ab2f66a542e185d2bd1855bcc21354daecbc017f9",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 4699,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.00202,
+          "adverseUSD": 0.002727
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-r7a-affordable-far-qualification",
+      "category": "conditional-qualification",
+      "question": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area and is merely described as containing qualifying affordable housing. What does the Section 23-22 table establish numerically, and what qualification and affordable-floor-area facts are still needed before concluding that the higher FAR is available?",
+      "selectedEvidenceSectionIDs": [
+        "20018017",
+        "20022699",
+        "20022711",
+        "20018523"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "calculation_scenario",
+        "pathLabel": "calculation and scenario",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": true,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": true,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "39d532b08b441b490f605e9c430de27a935bb18cc6511a2eff5787d77bef6247"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018017",
+          "zoning-preflight-20022699",
+          "zoning-preflight-20022711",
+          "zoning-preflight-20018523"
+        ],
+        "sectionIDs": [
+          "20018017",
+          "20022699",
+          "20022711",
+          "20018523"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 4,
+          "characterCount": 13971,
+          "pinnedCharacterCount": 13971,
+          "maximumCharacters": 14000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 4,
+          "pinnedCharacterCount": 13999,
+          "pinnedCanonicalContextCharacterCount": 1,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 3,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 14000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 1,
+          "crossReferenceCount": 0,
+          "characterCount": 13999,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "4a512c4b8bcd6b241c2b9c625b9cac59e8cd1ac5d6cee1c387d5e9baead4c74f",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [
+            {
+              "raw": "48,000 square feet",
+              "value": 48000,
+              "unit": "square feet"
+            }
+          ],
+          "calculations": [
+            {
+              "id": "proposed_floor_area_far",
+              "operation": "division",
+              "numerator": 48000,
+              "denominator": 10000,
+              "result": 4.8,
+              "resultKind": "far",
+              "display": "48000 / 10000 = 4.8"
+            }
+          ]
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018017",
+            "sectionID": "20018017",
+            "sectionNumber": "23-22",
+            "textHash": "bb65a88541a0d15953081afbe0c93d382e6c035ba0a8523f8c0bb04c497a8742",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022699",
+            "sectionID": "20022699",
+            "sectionNumber": "27-111",
+            "textHash": "76bd582528b19066c53266512c40e55ff45ff54c0a020f1b1f5671bcee50a947",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022711",
+            "sectionID": "20022711",
+            "sectionNumber": "27-16",
+            "textHash": "c56bc0dd52b3d0039007de6ecd16ba12d06d7607ba51008ccd46bd5e821833bd",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018523",
+            "sectionID": "20018523",
+            "sectionNumber": "12-10",
+            "textHash": "4015ece5b1ec179cac20aa19e30a396ff7bd88e50960b5081f75b08eca8e48a8",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 6866,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.002453,
+          "adverseUSD": 0.003312
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-r7a-standard-height",
+      "category": "table",
+      "question": "Can a standard residential building in an R7A district be 90 feet tall under the basic height-and-setback table?",
+      "selectedEvidenceSectionIDs": [
+        "20018085",
+        "20018087"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "structured_table_symbol",
+        "pathLabel": "structured table and symbol",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": true,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": true,
+          "verifierTier": "fast",
+          "maximumProviderCalls": 2,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "b07e1353a1c17b157bbd7d90b820c56723e430d258f5f032ca6efe7eab564f60"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018085",
+          "zoning-preflight-20018087"
+        ],
+        "sectionIDs": [
+          "20018085",
+          "20018087"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 2,
+          "characterCount": 5472,
+          "pinnedCharacterCount": 5472,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 2,
+          "pinnedCharacterCount": 5481,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 2,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 8000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 5481,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "6c95d56128938c717f87e5444f7d6424f1363c0df503a16bbcb80442276c179b",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018085",
+            "sectionID": "20018085",
+            "sectionNumber": "23-432",
+            "textHash": "719d858a83648b2d08027f845b2403adfd390eebe4387f49eade52ee1e1cb315",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018087",
+            "sectionID": "20018087",
+            "sectionNumber": "23-434",
+            "textHash": "99d1e8bff9724c81aa5d44025d8d83a37914a74c30cb0e79c9b7d5810f323014",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 4210,
+            "outputTokens": 900
+          },
+          {
+            "stage": "verification",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 4210,
+            "outputTokens": 350
+          }
+        ],
+        "production": {
+          "requestCount": 2,
+          "nominalUSD": 0.003184,
+          "adverseUSD": 0.004299
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-r7a-lot-coverage",
+      "category": "lot-coverage",
+      "question": "An R7A interior zoning lot contains 10,000 square feet. Can a standard residential development cover 8,500 square feet of the lot under the basic lot-coverage regulation?",
+      "selectedEvidenceSectionIDs": [
+        "20022764",
+        "20018020",
+        "20018051"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "calculation_scenario",
+        "pathLabel": "calculation and scenario",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": true,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "f76c13b679df1820f440919870095696c40330e5548d1154625e938c5767193b"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20022764",
+          "zoning-preflight-20018020",
+          "zoning-preflight-20018051"
+        ],
+        "sectionIDs": [
+          "20022764",
+          "20018020",
+          "20018051"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 3,
+          "characterCount": 4642,
+          "pinnedCharacterCount": 4642,
+          "maximumCharacters": 14000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 3,
+          "pinnedCharacterCount": 4647,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 3,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 14000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 4647,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "9e81b41c8aa722529e88681a18fbc20a5f05318bb1740bd56fadc98455c85961",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [
+            {
+              "raw": "10,000 square feet",
+              "value": 10000,
+              "unit": "square feet"
+            },
+            {
+              "raw": "8,500 square feet",
+              "value": 8500,
+              "unit": "square feet"
+            }
+          ],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20022764",
+            "sectionID": "20022764",
+            "sectionNumber": "23-362",
+            "textHash": "8aa015257b75ca0d966c7fcdbf0ec5d90e614f38fe3ebce1cdad8c13feb7e242",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018020",
+            "sectionID": "20018020",
+            "sectionNumber": "23-363",
+            "textHash": "96495260ec88924c584721dc0ba4eb1b7db20f1a776bd5c828663495539552e5",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018051",
+            "sectionID": "20018051",
+            "sectionNumber": "23-342",
+            "textHash": "a6e71d2cea4dfeffe32df5d7b2b57a6251657d57f3cf3fe83513083babb4262d",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 3951,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.00187,
+          "adverseUSD": 0.002525
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-narrow-attached-rear-yard",
+      "category": "yard",
+      "question": "An attached residential building is proposed on a 35-foot-wide interior zoning lot with a 20-foot rear yard. Is that sufficient under the standard rear-yard rule?",
+      "selectedEvidenceSectionIDs": [
+        "20018051"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "direct_rule",
+        "pathLabel": "direct enacted rule",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "30e7567c617e0f89022fab30e455cefed3108f9f9d42524f319f7e9f8ba2c97c"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018051"
+        ],
+        "sectionIDs": [
+          "20018051"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 1901,
+          "pinnedCharacterCount": 1901,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 1903,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 7903,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 1903,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "aa2907975995874677c0edda5f49c9eb0926107e64cc92e819b9a4d67f665167",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018051",
+            "sectionID": "20018051",
+            "sectionNumber": "23-342",
+            "textHash": "a6e71d2cea4dfeffe32df5d7b2b57a6251657d57f3cf3fe83513083babb4262d",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 3095,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.001699,
+          "adverseUSD": 0.002294
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-through-lot-historic-shallow-condition",
+      "category": "historical-applicability",
+      "question": "A through lot is 150 feet deep and the proposal provides a 20-foot rear yard equivalent. Is that enough when the lot's historical shallow-lot condition is unknown?",
+      "selectedEvidenceSectionIDs": [
+        "20018060"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "effective_date_history",
+        "pathLabel": "effective date and history",
+        "disposition": "deterministic_boundary",
+        "requirements": [
+          {
+            "id": "historical_lot_condition",
+            "label": "the lot's material historical condition",
+            "present": false,
+            "reason": "The stated historical condition is unresolved."
+          }
+        ],
+        "missingFacts": [
+          {
+            "id": "historical_lot_condition",
+            "label": "the lot's material historical condition",
+            "present": false,
+            "reason": "The stated historical condition is unresolved."
+          }
+        ],
+        "clarification": "Before Permitext can make the requested Zoning conclusion, provide the lot's material historical condition.",
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 12000,
+          "maximumSupplementalCharacters": 10000,
+          "maximumCharactersPerSource": 6000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": true,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": true,
+          "verifierTier": "fast",
+          "maximumProviderCalls": 0,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": true,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "0950158383c0b163b8cceedeb5f0fa3ae2affa1d92466470eac0562ca3bf7935"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018060"
+        ],
+        "sectionIDs": [
+          "20018060"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 3321,
+          "pinnedCharacterCount": 3321,
+          "maximumCharacters": 12000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 12000,
+          "maximumSupplementalCharacters": 10000,
+          "maximumCharactersPerSource": 6000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 3324,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 12000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 3324,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "fc1c8f0c0bcbcc924b45470f9abb116e269e0c10686ccdccb17d6b46744ea94b",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018060",
+            "sectionID": "20018060",
+            "sectionNumber": "23-343",
+            "textHash": "ff4edfb6869f2228fc8eb6d7656f260d15b78e7550c62a271307d62b9ecaf931",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [],
+        "production": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-residential-building-spacing",
+      "category": "building-spacing",
+      "question": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+      "selectedEvidenceSectionIDs": [
+        "20018102"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "direct_rule",
+        "pathLabel": "direct enacted rule",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "30e7567c617e0f89022fab30e455cefed3108f9f9d42524f319f7e9f8ba2c97c"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018102"
+        ],
+        "sectionIDs": [
+          "20018102"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 3997,
+          "pinnedCharacterCount": 3997,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 4000,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 0,
+          "pinnedSelectionTruncatedCount": 1,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 8000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 4000,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "3a601eb49d27ef250876c2aa46be07a03a75a66fc5e632ee193a6ceca97aad10",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018102",
+            "sectionID": "20018102",
+            "sectionNumber": "23-371",
+            "textHash": "96604bf74580d23cad3d3a5a6d36bde3938f0bdf4ef3d17a0e1bb0bb31faafe2",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 3750,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.00183,
+          "adverseUSD": 0.002471
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-c3-professional-office",
+      "category": "use-permission",
+      "question": "A 1,500-square-foot architectural office is proposed in a C3 district. Is the professional office use permitted as-of-right under the underlying C3 use regulations?",
+      "selectedEvidenceSectionIDs": [
+        "20017827",
+        "20022494"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "direct_rule",
+        "pathLabel": "direct enacted rule",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "30e7567c617e0f89022fab30e455cefed3108f9f9d42524f319f7e9f8ba2c97c"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20017827",
+          "zoning-preflight-20022494"
+        ],
+        "sectionIDs": [
+          "20017827",
+          "20022494"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 2,
+          "characterCount": 1346,
+          "pinnedCharacterCount": 1346,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 2,
+          "pinnedCharacterCount": 1349,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 2,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 7349,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 1349,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "bf6709b4d0f870ecaf7271749f26ae5e9106ecd4ed97e96a5b3ea410e5014c75",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20017827",
+            "sectionID": "20017827",
+            "sectionNumber": "32-17",
+            "textHash": "c54fd9586e8cfa2b70b24b42e2cc07fa402f1ff6090d7c3ed9d055612d32a3cd",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022494",
+            "sectionID": "20022494",
+            "sectionNumber": "32-171",
+            "textHash": "9169d925d84ba11d565661fc7f97a52a32bfece21129c3ce7d513db809b0eb61",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 2921,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.001664,
+          "adverseUSD": 0.002247
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-c4-4-residential-use",
+      "category": "use-permission",
+      "question": "A C4-4 zoning lot is proposed with retail on the ground floor and apartments above. Is the residential use permitted under the underlying use regulations?",
+      "selectedEvidenceSectionIDs": [
+        "20022450",
+        "20022452"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "direct_rule",
+        "pathLabel": "direct enacted rule",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "30e7567c617e0f89022fab30e455cefed3108f9f9d42524f319f7e9f8ba2c97c"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20022450",
+          "zoning-preflight-20022452"
+        ],
+        "sectionIDs": [
+          "20022450",
+          "20022452"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 2,
+          "characterCount": 1294,
+          "pinnedCharacterCount": 1294,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 2,
+          "pinnedCharacterCount": 1295,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 2,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 7295,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 1295,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "5b3a90557a7bb8f1ec0009969d535bc4486ede722f768770e84a196f7ef14c22",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20022450",
+            "sectionID": "20022450",
+            "sectionNumber": "32-121",
+            "textHash": "19085b9ce26b6a2fe9a4bb46c1e3ec7556d770cd3b0dbd91b216c40f0b0bef80",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022452",
+            "sectionID": "20022452",
+            "sectionNumber": "32-123",
+            "textHash": "76bd2c24cffc79421b8cd2cc40187d339279426de427d85819ee4c37de5b570f",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 2905,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.001661,
+          "adverseUSD": 0.002242
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-inner-transit-zone-new-unit-parking",
+      "category": "effective-date",
+      "question": "An 80-unit R7A residential development is within the Inner Transit Zone; every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333. How many accessory off-street residential parking spaces does Section 25-211 require for those units?",
+      "selectedEvidenceSectionIDs": [
+        "20018444",
+        "20017540",
+        "20017541"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "effective_date_history",
+        "pathLabel": "effective date and history",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 12000,
+          "maximumSupplementalCharacters": 10000,
+          "maximumCharactersPerSource": 6000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": true,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": true,
+          "verifierTier": "fast",
+          "maximumProviderCalls": 2,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": true
+        },
+        "planHash": "400e0a5307f8d374cca694b110abd7734c9cffd03b420f9a04cfe94b2606e713"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018444",
+          "zoning-preflight-20017540",
+          "zoning-preflight-20017541"
+        ],
+        "sectionIDs": [
+          "20018444",
+          "20017540",
+          "20017541"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 3,
+          "characterCount": 5557,
+          "pinnedCharacterCount": 5557,
+          "maximumCharacters": 12000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 12000,
+          "maximumSupplementalCharacters": 10000,
+          "maximumCharactersPerSource": 6000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 3,
+          "pinnedCharacterCount": 5560,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 2,
+          "pinnedSelectionTruncatedCount": 1,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 12000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 5560,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "5713f1d3b382ad2c7742a011fc9968e62bcfcd72f8a14edfd6486d33877186e3",
+        "dates": [
+          "December 5, 2024"
+        ],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018444",
+            "sectionID": "20018444",
+            "sectionNumber": "11-333",
+            "textHash": "5bee0f48f9d06c4879482b42f373c4f4880681d2be2a825c48e0caa4d27da961",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20017540",
+            "sectionID": "20017540",
+            "sectionNumber": "25-20",
+            "textHash": "08bfe69b1f4802b85a9d470dc7da1f955c87c7f70fc27a4e3f61e42bdca333c0",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20017541",
+            "sectionID": "20017541",
+            "sectionNumber": "25-211",
+            "textHash": "9ffcd3d7f591601c42dbd571c4b44eca417ab9279e0ee8b2b899b9f75ced8f0b",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 4237,
+            "outputTokens": 900
+          },
+          {
+            "stage": "verification",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 4237,
+            "outputTokens": 350
+          }
+        ],
+        "production": {
+          "requestCount": 2,
+          "nominalUSD": 0.003195,
+          "adverseUSD": 0.004314
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-new-divided-zoning-lot",
+      "category": "cross-provision",
+      "question": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+      "selectedEvidenceSectionIDs": [
+        "20018891",
+        "20018894",
+        "20018899"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "definition_cross_reference",
+        "pathLabel": "definition and cross-reference",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 2,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 10000,
+          "maximumSupplementalCharacters": 8000,
+          "maximumCharactersPerSource": 6000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "8bb5dea1f8ce664d1e1a8f7d0868f7f6a54e989603bb19bdf3ff5496aca9ba2d"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018891",
+          "zoning-preflight-20018894",
+          "zoning-preflight-20018899"
+        ],
+        "sectionIDs": [
+          "20018891",
+          "20018894",
+          "20018899"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 3,
+          "characterCount": 3838,
+          "pinnedCharacterCount": 3838,
+          "maximumCharacters": 10000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 10000,
+          "maximumSupplementalCharacters": 8000,
+          "maximumCharactersPerSource": 6000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 3,
+          "pinnedCharacterCount": 3844,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 3,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 10000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 3844,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "043c025f7f77fbe1a7f0692610ceaed636dee6d747ab1913d67db0c068060741",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018891",
+            "sectionID": "20018891",
+            "sectionNumber": "77-02",
+            "textHash": "47c7a1461e8506bd408e0847a75027fbd7dd1f75e9dada69443fa381bafb8ea4",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018894",
+            "sectionID": "20018894",
+            "sectionNumber": "77-11",
+            "textHash": "47e3a1664b724f1215f897cb1e620c2f3bab866f6fdde4391d2f93d64e5635b6",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018899",
+            "sectionID": "20018899",
+            "sectionNumber": "77-22",
+            "textHash": "54565cfc4d4cf339560df8247f0c16da48dbd01cb79c5736a2726835a3611107",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 3700,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.00182,
+          "adverseUSD": 0.002457
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-zoning-lot-contiguity-definition",
+      "category": "definition",
+      "question": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+      "selectedEvidenceSectionIDs": [
+        "20018523"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "definition_cross_reference",
+        "pathLabel": "definition and cross-reference",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 2,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 10000,
+          "maximumSupplementalCharacters": 8000,
+          "maximumCharactersPerSource": 6000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "8bb5dea1f8ce664d1e1a8f7d0868f7f6a54e989603bb19bdf3ff5496aca9ba2d"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018523"
+        ],
+        "sectionIDs": [
+          "20018523"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 5999,
+          "pinnedCharacterCount": 5999,
+          "maximumCharacters": 10000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 10000,
+          "maximumSupplementalCharacters": 8000,
+          "maximumCharactersPerSource": 6000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 6000,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 0,
+          "pinnedSelectionTruncatedCount": 1,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 10000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 1,
+          "crossReferenceCount": 0,
+          "characterCount": 6000,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "843c0195ef6f621f1929b805961c2a896c79f62a9c6bde1dc8cd0cc831aa8808",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018523",
+            "sectionID": "20018523",
+            "sectionNumber": "12-10",
+            "textHash": "14df164298f31e992281cb5ab2f66a542e185d2bd1855bcc21354daecbc017f9",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 4375,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.001955,
+          "adverseUSD": 0.002639
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-cellar-floor-area-definition",
+      "category": "definition",
+      "question": "A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?",
+      "selectedEvidenceSectionIDs": [
+        "20018523"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "definition_cross_reference",
+        "pathLabel": "definition and cross-reference",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 2,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 10000,
+          "maximumSupplementalCharacters": 8000,
+          "maximumCharactersPerSource": 6000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "8bb5dea1f8ce664d1e1a8f7d0868f7f6a54e989603bb19bdf3ff5496aca9ba2d"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018523"
+        ],
+        "sectionIDs": [
+          "20018523"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 5999,
+          "pinnedCharacterCount": 5999,
+          "maximumCharacters": 10000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 10000,
+          "maximumSupplementalCharacters": 8000,
+          "maximumCharactersPerSource": 6000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 6000,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 0,
+          "pinnedSelectionTruncatedCount": 1,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 10000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 1,
+          "crossReferenceCount": 0,
+          "characterCount": 6000,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "843c0195ef6f621f1929b805961c2a896c79f62a9c6bde1dc8cd0cc831aa8808",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018523",
+            "sectionID": "20018523",
+            "sectionNumber": "12-10",
+            "textHash": "14df164298f31e992281cb5ab2f66a542e185d2bd1855bcc21354daecbc017f9",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 4375,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.001955,
+          "adverseUSD": 0.002639
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-nonconforming-use-discontinuance",
+      "category": "nonconforming-use",
+      "question": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+      "selectedEvidenceSectionIDs": [
+        "20018658"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "direct_rule",
+        "pathLabel": "direct enacted rule",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "30e7567c617e0f89022fab30e455cefed3108f9f9d42524f319f7e9f8ba2c97c"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018658"
+        ],
+        "sectionIDs": [
+          "20018658"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 1,
+          "characterCount": 1597,
+          "pinnedCharacterCount": 1597,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 4000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 1,
+          "pinnedCharacterCount": 1601,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 7601,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 1601,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "0baad4e0a36f05f9b9148f6df1095fceb9fea6e30439e1dad911818b749d82bf",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018658",
+            "sectionID": "20018658",
+            "sectionNumber": "52-61",
+            "textHash": "bd94c21d816b0b5bf84d8753c571299a3f61c6602cdcdc4874f48dc0f845c51c",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 3000,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.00168,
+          "adverseUSD": 0.002268
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-candidate-b1-r6a-uap-insufficient-affordable-area",
+      "category": "conditional-qualification",
+      "question": "My 8,000-square-foot R6A lot is outside an MIH area. I want 31,000 square feet of residential floor area, including 6,200 square feet that I intend to make affordable. Since 31,000 square feet is below the R6A 3.90 FAR limit, can I build it?",
+      "selectedEvidenceSectionIDs": [
+        "20018017",
+        "20022699",
+        "20022710"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "calculation_scenario",
+        "pathLabel": "calculation and scenario",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": true,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "f76c13b679df1820f440919870095696c40330e5548d1154625e938c5767193b"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018017",
+          "zoning-preflight-20022699",
+          "zoning-preflight-20022710"
+        ],
+        "sectionIDs": [
+          "20018017",
+          "20022699",
+          "20022710"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 3,
+          "characterCount": 10745,
+          "pinnedCharacterCount": 10745,
+          "maximumCharacters": 14000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 3,
+          "pinnedCharacterCount": 10777,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 2,
+          "pinnedSelectionTruncatedCount": 1,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 14000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 10777,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "048680837f545e1bb682f3eb7225004b424a6bce139ac88ef463efe263cd31dd",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [
+            {
+              "raw": "31,000 square feet",
+              "value": 31000,
+              "unit": "square feet"
+            },
+            {
+              "raw": "6,200 square feet",
+              "value": 6200,
+              "unit": "square feet"
+            },
+            {
+              "raw": "31,000 square feet",
+              "value": 31000,
+              "unit": "square feet"
+            },
+            {
+              "raw": "3.90 FAR",
+              "value": 3.9,
+              "unit": "far"
+            }
+          ],
+          "calculations": [
+            {
+              "id": "affordable_floor_area_share",
+              "operation": "division",
+              "numerator": 6200,
+              "denominator": 31000,
+              "result": 0.2,
+              "resultKind": "percentage",
+              "display": "6200 / 31000 = 0.2"
+            }
+          ]
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018017",
+            "sectionID": "20018017",
+            "sectionNumber": "23-22",
+            "textHash": "bb65a88541a0d15953081afbe0c93d382e6c035ba0a8523f8c0bb04c497a8742",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022699",
+            "sectionID": "20022699",
+            "sectionNumber": "27-111",
+            "textHash": "18f5fc202bb14c9afcae494f01181c7a78b9ec737d2d7398d5ff958a3d0b8bfd",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022710",
+            "sectionID": "20022710",
+            "sectionNumber": "27-151",
+            "textHash": "7dfc00540314003491796fd43495e1941f954084594c214223ea3a2e40f03874",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 5858,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.002252,
+          "adverseUSD": 0.00304
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-candidate-b1-deep-through-lot-vertical-yard",
+      "category": "dimensional",
+      "question": "We have a 200-foot-deep through lot in an R7A district. The design has residential wings facing both streets with a 30-foot-wide open area between them. Both wings rise to 100 feet. Is the 30-foot open area enough for the rear yard equivalent? The building and zoning lot contain no community-facility use.",
+      "selectedEvidenceSectionIDs": [
+        "20018523",
+        "20018060"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "calculation_scenario",
+        "pathLabel": "calculation and scenario",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": true,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "f76c13b679df1820f440919870095696c40330e5548d1154625e938c5767193b"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018523",
+          "zoning-preflight-20018060"
+        ],
+        "sectionIDs": [
+          "20018523",
+          "20018060"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 2,
+          "characterCount": 10320,
+          "pinnedCharacterCount": 10320,
+          "maximumCharacters": 14000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 2,
+          "pinnedCharacterCount": 10324,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 1,
+          "pinnedSelectionTruncatedCount": 1,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 14000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 1,
+          "crossReferenceCount": 0,
+          "characterCount": 10324,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "6587d8cad6ee581454705efbec84b6ff1a9b946e2e5889d500b79cd56164a759",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [
+            {
+              "raw": "100 feet",
+              "value": 100,
+              "unit": "feet"
+            }
+          ],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018523",
+            "sectionID": "20018523",
+            "sectionNumber": "12-10",
+            "textHash": "e42cf32694f1593e13ab91e0c5663401a6b5bb5fe86b62ce40379c0881f35b45",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018060",
+            "sectionID": "20018060",
+            "sectionNumber": "23-343",
+            "textHash": "ff4edfb6869f2228fc8eb6d7656f260d15b78e7550c62a271307d62b9ecaf931",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 5725,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.002225,
+          "adverseUSD": 0.003004
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-candidate-b1-r6-parking-unverified-transit-zone",
+      "category": "mapped-applicability",
+      "question": "We are planning a new 60-unit market-rate apartment building in an R6 district. It will be completed after December 5, 2024. The broker says it is close to a subway, so no parking should be required. Is that correct?",
+      "selectedEvidenceSectionIDs": [
+        "20018523",
+        "20017541",
+        "20022799",
+        "20022801"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "property_map_applicability",
+        "pathLabel": "property, BBL, and mapped applicability",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": true
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": true,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "2d76f8f12f65b8ddcc87716d8f0526b473558875d34bacc08b0c378ac7a8eb8b"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018523",
+          "zoning-preflight-20017541",
+          "zoning-preflight-20022799",
+          "zoning-preflight-20022801"
+        ],
+        "sectionIDs": [
+          "20018523",
+          "20017541",
+          "20022799",
+          "20022801"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 4,
+          "characterCount": 7751,
+          "pinnedCharacterCount": 7751,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 4,
+          "pinnedCharacterCount": 7769,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 3,
+          "pinnedSelectionTruncatedCount": 1,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 8000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 1,
+          "crossReferenceCount": 0,
+          "characterCount": 7769,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "36515b3162d780c6b6d6e8dc678fc0c2a393442c551cec6047c956a613f658fb",
+        "dates": [
+          "December 5, 2024"
+        ],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018523",
+            "sectionID": "20018523",
+            "sectionNumber": "12-10",
+            "textHash": "dab6f9811d087d4ad0cc6d659368e53317422eb74a4495ca25517e56e30e3a72",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20017541",
+            "sectionID": "20017541",
+            "sectionNumber": "25-211",
+            "textHash": "9ffcd3d7f591601c42dbd571c4b44eca417ab9279e0ee8b2b899b9f75ced8f0b",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022799",
+            "sectionID": "20022799",
+            "sectionNumber": "25-222",
+            "textHash": "8737053eb41f2f8e0ff6914d903236aa4b40089fecb1e174423e84b3013db985",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022801",
+            "sectionID": "20022801",
+            "sectionNumber": "25-232",
+            "textHash": "e949852650e1e31ae3eea17275baba271997c04867b3b4fe3f8c1b71017578c0",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 4923,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.002065,
+          "adverseUSD": 0.002787
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-candidate-b1-mx-nonadditive-far",
+      "category": "arithmetic",
+      "question": "We have a 10,000-square-foot zoning lot in a verified M1-4/R7A Special Mixed Use District. We want 45,000 square feet of qualifying affordable residential floor area and 10,000 square feet of a fabrication use that has already been confirmed as permitted. Since R7A allows 5.01 FAR and M1-4 allows 2.00 FAR, can we combine them for 7.01 FAR?",
+      "selectedEvidenceSectionIDs": [
+        "20020562",
+        "20018017",
+        "20017375",
+        "20020563"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "calculation_scenario",
+        "pathLabel": "calculation and scenario",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": true,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": true
+        },
+        "planHash": "a9dcb2e68954e1019add7f9e6ed1b78a04acb31be407af5d5c678bae246888d5"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20020562",
+          "zoning-preflight-20018017",
+          "zoning-preflight-20017375",
+          "zoning-preflight-20020563"
+        ],
+        "sectionIDs": [
+          "20020562",
+          "20018017",
+          "20017375",
+          "20020563"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 4,
+          "characterCount": 5808,
+          "pinnedCharacterCount": 5808,
+          "maximumCharacters": 14000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 4,
+          "pinnedCharacterCount": 5829,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 4,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 14000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 5829,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "e64dd7443af546b86bae4cc762166f19ea0a63219d6429e073a4f8d220d7906d",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [
+            {
+              "raw": "45,000 square feet",
+              "value": 45000,
+              "unit": "square feet"
+            },
+            {
+              "raw": "10,000 square feet",
+              "value": 10000,
+              "unit": "square feet"
+            },
+            {
+              "raw": "5.01 FAR",
+              "value": 5.01,
+              "unit": "far"
+            },
+            {
+              "raw": "2.00 FAR",
+              "value": 2,
+              "unit": "far"
+            },
+            {
+              "raw": "7.01 FAR",
+              "value": 7.01,
+              "unit": "far"
+            }
+          ],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20020562",
+            "sectionID": "20020562",
+            "sectionNumber": "123-622",
+            "textHash": "42497776e3a057fe17490084c154e01390b4a0d666c87e9fbd35299f61da36fc",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018017",
+            "sectionID": "20018017",
+            "sectionNumber": "23-22",
+            "textHash": "bb65a88541a0d15953081afbe0c93d382e6c035ba0a8523f8c0bb04c497a8742",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20017375",
+            "sectionID": "20017375",
+            "sectionNumber": "43-12",
+            "textHash": "dcd392994984813a0131233c20cfac025c23e002a8c3f850ee65d133c03410fd",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20020563",
+            "sectionID": "20020563",
+            "sectionNumber": "123-623",
+            "textHash": "cb401527847a290739a789a4c7637e6a9bc08a31ff0f27bdf34d7d443344408d",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 4315,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.001943,
+          "adverseUSD": 0.002623
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-candidate-b1-nonconforming-warehouse-enlargement",
+      "category": "nonconforming-use",
+      "question": "A lawful 20,000-square-foot warehouse has operated continuously in an R6B district since 1980. It occupied the same 20,000 square feet on December 17, 1987, and has never been enlarged. We want to add 5,000 square feet. Aren’t nonconforming uses allowed a 25 percent enlargement?",
+      "selectedEvidenceSectionIDs": [
+        "20018626",
+        "20018642",
+        "20018643",
+        "20018645",
+        "20018870"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "calculation_scenario",
+        "pathLabel": "calculation and scenario",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": true,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "f76c13b679df1820f440919870095696c40330e5548d1154625e938c5767193b"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018626",
+          "zoning-preflight-20018642",
+          "zoning-preflight-20018643",
+          "zoning-preflight-20018645",
+          "zoning-preflight-20018870"
+        ],
+        "sectionIDs": [
+          "20018626",
+          "20018642",
+          "20018643",
+          "20018645",
+          "20018870"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 5,
+          "characterCount": 10398,
+          "pinnedCharacterCount": 10398,
+          "maximumCharacters": 14000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 5,
+          "pinnedCharacterCount": 10439,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 5,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 14000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 10439,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "1ddc432f2bb350a994fa20c3cb735ea5e40a8aca27a0d01ea5025273afad8055",
+        "dates": [
+          "December 17, 1987"
+        ],
+        "arithmetic": {
+          "measurements": [
+            {
+              "raw": "20,000 square feet",
+              "value": 20000,
+              "unit": "square feet"
+            },
+            {
+              "raw": "5,000 square feet",
+              "value": 5000,
+              "unit": "square feet"
+            },
+            {
+              "raw": "25 percent",
+              "value": 25,
+              "unit": "percent"
+            }
+          ],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018626",
+            "sectionID": "20018626",
+            "sectionNumber": "52-11",
+            "textHash": "ca97070f95bf9cf0b0879cd142678837f2c0f8663f6b1890b1e849d97a3940bb",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018642",
+            "sectionID": "20018642",
+            "sectionNumber": "52-41",
+            "textHash": "601580c793e5f279736cf04455dc92cfc7da0122bcbe67fe4f0abb65f19119dc",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018643",
+            "sectionID": "20018643",
+            "sectionNumber": "52-42",
+            "textHash": "715d4e8e872bd933a2b3d82f32c80f55034c9336561798268b431318600ef39d",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018645",
+            "sectionID": "20018645",
+            "sectionNumber": "52-43",
+            "textHash": "3f3e1798dd55dc968d71da1658009f290505e89a119e7fe3fcb43367f8b28c03",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018870",
+            "sectionID": "20018870",
+            "sectionNumber": "73-53",
+            "textHash": "66ff4ebcbe52f9cddf36caf64ee2563c19109dca86af69020a63884a3ca5b531",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 5750,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.00223,
+          "adverseUSD": 0.003011
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-candidate-b1-r7a-r8a-weighted-far",
+      "category": "arithmetic",
+      "question": "Our 20,000-square-foot zoning lot is split by a district boundary: 8,000 square feet is in R7A and 12,000 square feet is in R8A. We want 110,000 square feet of standard market-rate residential floor area and plan to put most of the building on the R8A side. Can we use the R8A FAR for the whole lot?",
+      "selectedEvidenceSectionIDs": [
+        "20018017",
+        "20018891",
+        "20018899"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "calculation_scenario",
+        "pathLabel": "calculation and scenario",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": true,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "f76c13b679df1820f440919870095696c40330e5548d1154625e938c5767193b"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018017",
+          "zoning-preflight-20018891",
+          "zoning-preflight-20018899"
+        ],
+        "sectionIDs": [
+          "20018017",
+          "20018891",
+          "20018899"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 3,
+          "characterCount": 3421,
+          "pinnedCharacterCount": 3421,
+          "maximumCharacters": 14000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 3,
+          "pinnedCharacterCount": 3430,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 3,
+          "pinnedSelectionTruncatedCount": 0,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 14000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 3430,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "a669e353db0d49ca91853721ea24a54fc6b413f3d9eb12ecfd7140e823e64a3c",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [
+            {
+              "raw": "8,000 square feet",
+              "value": 8000,
+              "unit": "square feet"
+            },
+            {
+              "raw": "12,000 square feet",
+              "value": 12000,
+              "unit": "square feet"
+            },
+            {
+              "raw": "110,000 square feet",
+              "value": 110000,
+              "unit": "square feet"
+            }
+          ],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018017",
+            "sectionID": "20018017",
+            "sectionNumber": "23-22",
+            "textHash": "bb65a88541a0d15953081afbe0c93d382e6c035ba0a8523f8c0bb04c497a8742",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018891",
+            "sectionID": "20018891",
+            "sectionNumber": "77-02",
+            "textHash": "47c7a1461e8506bd408e0847a75027fbd7dd1f75e9dada69443fa381bafb8ea4",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018899",
+            "sectionID": "20018899",
+            "sectionNumber": "77-22",
+            "textHash": "54565cfc4d4cf339560df8247f0c16da48dbd01cb79c5736a2726835a3611107",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 3570,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.001794,
+          "adverseUSD": 0.002422
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-candidate-b1-c6-2-office-residential-conversion",
+      "category": "conditional-qualification",
+      "question": "We have a lawful 90,000-square-foot office building constructed in 1985 on a 15,000-square-foot C6-2 zoning lot. The lot is on a narrow street and entirely beyond 100 feet of a wide street. It is outside a special district and outside a special density area. We want to convert the entire building to 100 market-rate apartments without enlarging it. Is 100 units allowed, and how much recreation space is required?",
+      "selectedEvidenceSectionIDs": [
+        "20018362",
+        "20022450",
+        "20018312",
+        "20018017",
+        "20018373",
+        "20018026",
+        "20018375",
+        "20017505",
+        "20018374"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "calculation_scenario",
+        "pathLabel": "calculation and scenario",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": true,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 1,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": true,
+          "mappedStatusPresent": false
+        },
+        "planHash": "e950c84ddcfef1f691953b0f22febe3585cc42b059369b65d21bbd801c9b1ddd"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018362",
+          "zoning-preflight-20022450",
+          "zoning-preflight-20018312",
+          "zoning-preflight-20018017",
+          "zoning-preflight-20018373",
+          "zoning-preflight-20018026",
+          "zoning-preflight-20018375",
+          "zoning-preflight-20017505",
+          "zoning-preflight-20018374"
+        ],
+        "sectionIDs": [
+          "20018362",
+          "20022450",
+          "20018312",
+          "20018017",
+          "20018373",
+          "20018026",
+          "20018375",
+          "20017505",
+          "20018374"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 9,
+          "characterCount": 11545,
+          "pinnedCharacterCount": 11545,
+          "maximumCharacters": 14000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 14000,
+          "maximumSupplementalCharacters": 12000,
+          "maximumCharactersPerSource": 7000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 9,
+          "pinnedCharacterCount": 11575,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 7,
+          "pinnedSelectionTruncatedCount": 2,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 14000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 11575,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "8ec6112936820b9ae5bc0c0e1a1e78286848b02326cb7089ea162450bbb9c51b",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [
+            {
+              "raw": "100 feet",
+              "value": 100,
+              "unit": "feet"
+            },
+            {
+              "raw": "100 units",
+              "value": 100,
+              "unit": "units"
+            }
+          ],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018362",
+            "sectionID": "20018362",
+            "sectionNumber": "15-01",
+            "textHash": "bac96e2e615a2124e057ef6408b47e219a29d2c1aaa486ffd1076102df573bfd",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20022450",
+            "sectionID": "20022450",
+            "sectionNumber": "32-121",
+            "textHash": "19085b9ce26b6a2fe9a4bb46c1e3ec7556d770cd3b0dbd91b216c40f0b0bef80",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018312",
+            "sectionID": "20018312",
+            "sectionNumber": "34-112",
+            "textHash": "209ac75e8def0c589f8d72d50c38aeed27fb91658b04c92552754da81466c9bf",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018017",
+            "sectionID": "20018017",
+            "sectionNumber": "23-22",
+            "textHash": "bb65a88541a0d15953081afbe0c93d382e6c035ba0a8523f8c0bb04c497a8742",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018373",
+            "sectionID": "20018373",
+            "sectionNumber": "15-111",
+            "textHash": "a5ff7da045b1d7c5f91aca6d333c1901f3e8993aa9e51d5bf9e0c0b3b28957e5",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018026",
+            "sectionID": "20018026",
+            "sectionNumber": "23-52",
+            "textHash": "ce4c53217795974ad4913b01f08aa81ffa0122b2a4dd552339eaa839c615f152",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018375",
+            "sectionID": "20018375",
+            "sectionNumber": "15-12",
+            "textHash": "4bf2f7cb1bb7ab4e6868b46b436c2e5ab9389ec7d4b76fea17c94df912f162a2",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20017505",
+            "sectionID": "20017505",
+            "sectionNumber": "23-63",
+            "textHash": "33a357b093e580bde4e59a39967342d1f9718c5c1fb366975153beb262a56cd7",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018374",
+            "sectionID": "20018374",
+            "sectionNumber": "15-112",
+            "textHash": "84f3ba8bc44cecc82b3c6c31f31a6ce1d656d85f2503fb5521f28a7840d0dd7d",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 6108,
+            "outputTokens": 900
+          }
+        ],
+        "production": {
+          "requestCount": 1,
+          "nominalUSD": 0.002302,
+          "adverseUSD": 0.003107
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-candidate-b1-city-of-yes-transition",
+      "category": "effective-date-transition",
+      "question": "We filed a new-building application for one building on November 20, 2024, and DOB issued the permit on December 4, 2024. By December 5, 2024, about 60 percent of the foundation work was complete. The design complies with the zoning rules that existed before City of Yes but not with the new rules. Can we keep building under the old zoning?",
+      "selectedEvidenceSectionIDs": [
+        "20018440",
+        "20018442",
+        "20018444"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "effective_date_history",
+        "pathLabel": "effective date and history",
+        "disposition": "ready",
+        "requirements": [],
+        "missingFacts": [],
+        "clarification": null,
+        "evidenceLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 4,
+          "maximumCharacters": 12000,
+          "maximumSupplementalCharacters": 10000,
+          "maximumCharactersPerSource": 6000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": true,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": false
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": true,
+          "verifierTier": "fast",
+          "maximumProviderCalls": 2,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": false,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": false
+        },
+        "planHash": "31d28518bf7db71fb75573334a89027057a91b7c0061334ef768dfc459910d55"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20018440",
+          "zoning-preflight-20018442",
+          "zoning-preflight-20018444"
+        ],
+        "sectionIDs": [
+          "20018440",
+          "20018442",
+          "20018444"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 3,
+          "characterCount": 11063,
+          "pinnedCharacterCount": 11063,
+          "maximumCharacters": 12000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 8,
+          "maximumDiscovered": 3,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 3,
+          "maximumCharacters": 12000,
+          "maximumSupplementalCharacters": 10000,
+          "maximumCharactersPerSource": 6000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 3,
+          "pinnedCharacterCount": 11086,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 2,
+          "pinnedSelectionTruncatedCount": 1,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 12000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 0,
+          "crossReferenceCount": 0,
+          "characterCount": 11086,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "5d89b8d84d69712074a1fdba5145be9792d2d97087ca95e596aec1b847389c22",
+        "dates": [
+          "November 20, 2024",
+          "December 4, 2024",
+          "December 5, 2024"
+        ],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20018440",
+            "sectionID": "20018440",
+            "sectionNumber": "11-31",
+            "textHash": "df28101daea3c7246348f6ad9d4ae4a04c85dda091872890015431006241183d",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018442",
+            "sectionID": "20018442",
+            "sectionNumber": "11-331",
+            "textHash": "85dd3acbdd0654baa3c6f5b74791b49421bcba7f00a2c9a57339fc296d5842f5",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018444",
+            "sectionID": "20018444",
+            "sectionNumber": "11-333",
+            "textHash": "d3459e3b65a8f18e035550b4ad1f63e8c895e068a89aa8fb735ca05b0139102e",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [
+          {
+            "stage": "answer",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 5958,
+            "outputTokens": 900
+          },
+          {
+            "stage": "verification",
+            "ledger": "production",
+            "tier": "fast",
+            "inputTokens": 5958,
+            "outputTokens": 350
+          }
+        ],
+        "production": {
+          "requestCount": 2,
+          "nominalUSD": 0.003883,
+          "adverseUSD": 0.005243
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    },
+    {
+      "id": "zr-candidate-b1-mih-historical-zoning-lot",
+      "category": "explicit-uncertainty",
+      "question": "The property is confirmed to be in an MIH area that the owner says was established in 2017. We want one development with eight apartments and 10,000 square feet of residential floor area. The current tax lots were combined in 2025. Since the project has no more than 10 units and no more than 12,500 square feet, does it qualify for the MIH small-development exception?",
+      "selectedEvidenceSectionIDs": [
+        "20022704",
+        "20018523"
+      ],
+      "unresolvedSectionIDs": [],
+      "plan": {
+        "schemaVersion": 1,
+        "plannerVersion": "20260901-question-path-v1",
+        "path": "property_map_applicability",
+        "pathLabel": "property, BBL, and mapped applicability",
+        "disposition": "deterministic_boundary",
+        "requirements": [
+          {
+            "id": "mih_establishment_date",
+            "label": "official MIH-area establishment date",
+            "present": false,
+            "reason": "An owner-provided year is not the controlling establishment record."
+          },
+          {
+            "id": "historical_zoning_lot_configuration",
+            "label": "official evidence of the zoning lot on the establishment date",
+            "present": false,
+            "reason": "A later tax-lot combination does not prove the earlier zoning-lot configuration."
+          }
+        ],
+        "missingFacts": [
+          {
+            "id": "mih_establishment_date",
+            "label": "official MIH-area establishment date",
+            "present": false,
+            "reason": "An owner-provided year is not the controlling establishment record."
+          },
+          {
+            "id": "historical_zoning_lot_configuration",
+            "label": "official evidence of the zoning lot on the establishment date",
+            "present": false,
+            "reason": "A later tax-lot combination does not prove the earlier zoning-lot configuration."
+          }
+        ],
+        "clarification": "Before Permitext can make the requested Zoning conclusion, provide official MIH-area establishment date and official evidence of the zoning lot on the establishment date.",
+        "evidenceLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "deterministicControls": {
+          "exactPassageBinding": true,
+          "stableSourceHashes": true,
+          "tableGridAndLegend": false,
+          "effectiveDateEventBinding": false,
+          "arithmeticLedger": false,
+          "propertyAndMapPrerequisites": true
+        },
+        "callPolicy": {
+          "initialTier": "fast",
+          "initialModelRole": "luna_first",
+          "subjectiveVerification": false,
+          "verifierTier": null,
+          "maximumProviderCalls": 0,
+          "allowFullAnswerRewrite": false,
+          "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only"
+        },
+        "questionSignals": {
+          "explicitMissingFact": true,
+          "propertyIdentifierPresent": false,
+          "mappedStatusPresent": true
+        },
+        "planHash": "8a991e7e8b95d856e2d920a64517ea7c56bfaa365a7897dd592763ccfedf0287"
+      },
+      "evidence": {
+        "sourceIDs": [
+          "zoning-preflight-20022704",
+          "zoning-preflight-20018523"
+        ],
+        "sectionIDs": [
+          "20022704",
+          "20018523"
+        ],
+        "sourceRecall": 1,
+        "usage": {
+          "sourceCount": 2,
+          "characterCount": 7998,
+          "pinnedCharacterCount": 7998,
+          "maximumCharacters": 8000
+        },
+        "rejected": [],
+        "gateFailures": [],
+        "assemblyLimits": {
+          "maximumCandidates": 6,
+          "maximumDiscovered": 2,
+          "maximumTargetedDefinitions": 1,
+          "maximumCrossReferences": 2,
+          "maximumCharacters": 8000,
+          "maximumSupplementalCharacters": 6000,
+          "maximumCharactersPerSource": 5000
+        },
+        "assemblyUsage": {
+          "pinnedCount": 2,
+          "pinnedCharacterCount": 8000,
+          "pinnedCanonicalContextCharacterCount": 0,
+          "pinnedSelectionExactCount": 0,
+          "pinnedSelectionTruncatedCount": 2,
+          "structuredPinnedCount": 0,
+          "supplementalCharacterCeiling": 8000,
+          "supplementalCharacterCount": 0,
+          "candidateCount": 0,
+          "discoveredCount": 0,
+          "targetedDefinitionCount": 1,
+          "crossReferenceCount": 0,
+          "characterCount": 8000,
+          "resolverFailureCount": 0,
+          "nonMaterialCandidateCount": 0
+        }
+      },
+      "deterministicContext": {
+        "contextHash": "af5a8bca7e013c49ed1d90b71cbf02f944c063715eea5951425a913d6db6f77c",
+        "dates": [],
+        "arithmetic": {
+          "measurements": [],
+          "calculations": []
+        },
+        "structuredTables": [],
+        "passageHashes": [
+          {
+            "sourceID": "zoning-preflight-20022704",
+            "sectionID": "20022704",
+            "sectionNumber": "27-131",
+            "textHash": "c5b8e93dbc8528be3eacc754f80cbe81d5c7c175609d18078e79645e0935d6ec",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          },
+          {
+            "sourceID": "zoning-preflight-20018523",
+            "sectionID": "20018523",
+            "sectionNumber": "12-10",
+            "textHash": "58fdc1cd86be4e5bcafab30f5736c1599405c26f42119aae5694953554d79440",
+            "evidenceRole": "governing",
+            "topicRouteRelationship": "unrestricted"
+          }
+        ]
+      },
+      "cost": {
+        "schemaVersion": 1,
+        "pricing": {
+          "fast": {
+            "input": 0.2,
+            "cachedInput": 0.02,
+            "output": 1.2
+          },
+          "accurate": {
+            "input": 2,
+            "cachedInput": 0.2,
+            "output": 12
+          }
+        },
+        "tokenEstimator": "ceil(bytes/4*1.25)",
+        "calls": [],
+        "production": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        },
+        "judge": {
+          "requestCount": 0,
+          "nominalUSD": 0,
+          "adverseUSD": 0
+        }
+      },
+      "gates": {
+        "allSelectedSectionsResolved": true,
+        "selectedSourceRecallComplete": true,
+        "questionSpecificEvidenceBudgetPass": true,
+        "noConstructionCorpusSearch": true,
+        "planStable": true,
+        "noModelWithMissingPrerequisites": true,
+        "lunaFirst": true,
+        "providerRequestMaximumPass": true,
+        "noFullAnswerRewrite": true,
+        "disabledGlobalTwentyFourKCandidate": true
+      },
+      "pass": true
+    }
+  ]
+}

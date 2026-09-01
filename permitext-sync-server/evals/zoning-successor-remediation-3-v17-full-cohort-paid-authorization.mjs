@@ -28,6 +28,8 @@ const supersededAuthorizationURL = new URL(
 );
 export const zoningRemediationSuccessor3V17FullCohortLockedAuthorizationSHA256 =
   "89f6049bb4e1c72852e8edbfc870dd561864cce8ef6691b6c1ef5f6175bc0c81";
+export const zoningRemediationSuccessor3V17FullCohortConsumedAuthorizationSHA256 =
+  "5474123dc94e2c934eb556bc05e1bce823f743d1db39cde8f65cecfade1487aa";
 export const zoningRemediationSuccessor3V17FullCohortPreparedFromCommit =
   zoningRemediationSuccessor3V17ConfirmationPreparedFromCommit;
 export const zoningRemediationSuccessor3V17FullCohortSafetySHA256 =

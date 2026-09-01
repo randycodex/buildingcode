@@ -8,6 +8,7 @@ import {
   requireActiveZoningRemediationSuccessor3V17FullCohortPaidAuthorization,
   validateZoningRemediationSuccessor3V17FullCohortPaidAuthorization,
   zoningRemediationSuccessor3V17FullCohortAppSHA256,
+  zoningRemediationSuccessor3V17FullCohortConsumedAuthorizationSHA256,
   zoningRemediationSuccessor3V17FullCohortEconomicsSHA256,
   zoningRemediationSuccessor3V17FullCohortLockedAuthorizationSHA256,
   zoningRemediationSuccessor3V17FullCohortPreparedFromCommit,
@@ -36,6 +37,8 @@ const exactCohortSHA256 =
   "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc";
 const exactLockedAuthorizationSHA256 =
   "89f6049bb4e1c72852e8edbfc870dd561864cce8ef6691b6c1ef5f6175bc0c81";
+const exactConsumedAuthorizationSHA256 =
+  "5474123dc94e2c934eb556bc05e1bce823f743d1db39cde8f65cecfade1487aa";
 const combinedOutput = (result) => `${result.stdout || ""}\n${result.stderr || ""}`;
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const noPaidEnvironment = {
@@ -46,10 +49,14 @@ const noPaidEnvironment = {
 };
 
 const authorizationText = await readFile(authorizationPath, "utf8");
-assert.equal(sha256(authorizationText), exactLockedAuthorizationSHA256);
+assert.equal(sha256(authorizationText), exactConsumedAuthorizationSHA256);
 assert.equal(
   zoningRemediationSuccessor3V17FullCohortLockedAuthorizationSHA256,
   exactLockedAuthorizationSHA256
+);
+assert.equal(
+  zoningRemediationSuccessor3V17FullCohortConsumedAuthorizationSHA256,
+  exactConsumedAuthorizationSHA256
 );
 assert.equal(
   zoningRemediationSuccessor3V17FullCohortPreparedFromCommit,
@@ -80,55 +87,57 @@ assert.equal(
   "4d858e8813127f1adf16569e60d3d1bb570ee515"
 );
 
-const locked =
+const retained =
   await validateZoningRemediationSuccessor3V17FullCohortPaidAuthorization();
-assert.equal(locked.authorization.authorizationID, exactAuthorizationID);
-assert.equal(locked.authorization.status, "locked");
-assert.equal(locked.active, false);
-assert.equal(locked.authorization.cohort.sha256, exactCohortSHA256);
-assert.equal(locked.cohort.cases.length, 30);
+assert.equal(retained.authorization.authorizationID, exactAuthorizationID);
+assert.equal(retained.authorization.status, "consumed");
+assert.equal(retained.active, false);
+assert.equal(retained.authorization.cohort.sha256, exactCohortSHA256);
+assert.equal(retained.cohort.cases.length, 30);
 assert.deepEqual(
   {
-    caseCount: locked.authorization.scope.caseCount,
-    repetitions: locked.authorization.scope.repetitions,
+    caseCount: retained.authorization.scope.caseCount,
+    repetitions: retained.authorization.scope.repetitions,
     maximumCumulativeSpendUSD:
-      locked.authorization.scope.maximumCumulativeSpendUSD,
+      retained.authorization.scope.maximumCumulativeSpendUSD,
     exactAuthorizationPhrase:
-      locked.authorization.ownerDecision.exactAuthorizationPhrase,
+      retained.authorization.ownerDecision.exactAuthorizationPhrase,
     authorizationPackageCommit:
-      locked.authorization.execution.authorizationPackageCommit,
-    executionCommit: locked.authorization.execution.executionCommit
+      retained.authorization.execution.authorizationPackageCommit,
+    executionCommit: retained.authorization.execution.executionCommit,
+    runID: retained.authorization.consumption.runID
   },
   {
-    caseCount: null,
-    repetitions: null,
-    maximumCumulativeSpendUSD: null,
-    exactAuthorizationPhrase: null,
-    authorizationPackageCommit: null,
-    executionCommit: null
+    caseCount: 30,
+    repetitions: 1,
+    maximumCumulativeSpendUSD: 5,
+    exactAuthorizationPhrase: "authorize exactly package commit e0c1c5d2846707641a6352fcdf0a397736724fda for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.",
+    authorizationPackageCommit: "e0c1c5d2846707641a6352fcdf0a397736724fda",
+    executionCommit: "0b8c7dca4ef33cd70f2889a5d61eea2add02d993",
+    runID: "d2fdc1c4-7099-430d-9d33-2b759021afd2"
   }
 );
-assert.equal(locked.authorization.execution.stopOnExecutionError, false);
+assert.equal(retained.authorization.execution.stopOnExecutionError, false);
 assert.equal(
-  locked.authorization.execution.continueAfterVerifiedResearchFailure,
+  retained.authorization.execution.continueAfterVerifiedResearchFailure,
   true
 );
 assert.deepEqual(
-  locked.authorization.execution.allowedContinuationFailureCodes,
+  retained.authorization.execution.allowedContinuationFailureCodes,
   ["RESEARCH_VERIFICATION_FAILED"]
 );
 assert.equal(
-  locked.authorization.lineage.supersededLockedAuthorizationSHA256,
+  retained.authorization.lineage.supersededLockedAuthorizationSHA256,
   zoningRemediationSuccessor3V17ConfirmationLockedAuthorizationSHA256
 );
-assert.equal(locked.authorization.publicResearchReleaseAuthorized, false);
-assert.equal(locked.authorization.deploymentAuthorized, false);
-assert.equal(locked.authorization.pricingOrAllowanceChangeAuthorized, false);
+assert.equal(retained.authorization.publicResearchReleaseAuthorized, false);
+assert.equal(retained.authorization.deploymentAuthorized, false);
+assert.equal(retained.authorization.pricingOrAllowanceChangeAuthorized, false);
 assert.throws(
   () => requireActiveZoningRemediationSuccessor3V17FullCohortPaidAuthorization(
-    locked
+    retained
   ),
-  /requires a new explicit owner authorization and cumulative spend cap/
+  /consumed|not active|authorization/i
 );
 
 const scrubbedEnvironment = zoningRemediationSuccessor3V11PaidRunEnvironment({
@@ -220,7 +229,7 @@ const temporaryDirectory = await mkdtemp(
 );
 try {
   const fixturePath = join(temporaryDirectory, "authorization.json");
-  const authorizedFixture = structuredClone(locked.authorization);
+  const authorizedFixture = structuredClone(retained.authorization);
   authorizedFixture.status = "authorized";
   authorizedFixture.scope.caseCount = 30;
   authorizedFixture.scope.repetitions = 1;
@@ -234,6 +243,12 @@ try {
   authorizedFixture.ownerDecision.exactAuthorizationPhrase = ownerPhrase;
   authorizedFixture.ownerDecision.exactSpendingCapPhrase = ownerPhrase;
   authorizedFixture.execution.authorizationPackageCommit = packageCommit;
+  authorizedFixture.execution.executionCommit = null;
+  authorizedFixture.consumption.status = "not_started";
+  authorizedFixture.consumption.attemptID = null;
+  authorizedFixture.consumption.startedAt = null;
+  authorizedFixture.consumption.runID = null;
+  authorizedFixture.consumption.consumedAt = null;
   await writeFile(fixturePath,
     `${JSON.stringify(authorizedFixture, null, 2)}\n`, "utf8");
   const authorized =
@@ -284,9 +299,9 @@ try {
 }
 
 assert.equal(sha256(await readFile(authorizationPath, "utf8")),
-  exactLockedAuthorizationSHA256);
+  exactConsumedAuthorizationSHA256);
 assert.deepEqual((await readdir(resultsPath)).sort(), resultsBefore,
   "The v17 full-cohort authorization contract created a paid result file.");
 console.log(
-  "Zoning v17 full-cohort authorization contract passed; the fail-fast package is superseded, verified Research failures may continue, all other errors stop, 30/30 no-cost preflight passes, and paid dispatch remains locked."
+  "Zoning v17 full-cohort consumed authorization contract passed; the fail-fast package remains superseded, retained result integrity passes, and paid redispatch is blocked."
 );

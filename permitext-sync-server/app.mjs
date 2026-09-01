@@ -257,6 +257,16 @@ import {
   zoningResearchSafetyRevisionIssues
 } from "./research-zoning-safety.mjs";
 import {
+  evaluateZoningDeterministicControls,
+  planZoningResearchQuestion,
+  selectZoningResearchEvidence,
+  zoningResearchDeterministicContext,
+  zoningResearchDispositions,
+  zoningResearchEvidenceLimits,
+  zoningResearchPlannerVersion,
+  zoningResearchPromptContext
+} from "./research-zoning-planner.mjs";
+import {
   evaluateResearchRequiredClaimCoverage,
   requiredResearchClaimsFromEvidence,
   researchRequiredClaimCoverageVersion,
@@ -7583,18 +7593,34 @@ async function researchCorpusPlanForTurn({
     projectFacts,
     registry
   });
-  const selectedIDs = new Set(routed.selected.map((corpus) => corpus.id));
-  const pinnedCorpora = Array.from(new Set(
+  const pinnedCorpusIDs = Array.from(new Set(
     (Array.isArray(pinnedEvidence) ? pinnedEvidence : [])
       .map((source) => researchCorpusByPrefix(registry, source?.codePrefix)?.id)
       .filter(Boolean)
-  )).filter((id) => !selectedIDs.has(id)).map((id) => ({
+  ));
+  const defaultConstructionOnly = routed.selected.length === 1 &&
+    routed.selected[0].id === "nyc-2022-construction-codes" &&
+    routed.selected[0].routeReason === "ordinary Construction Code default";
+  const eligiblePinnedCorpus = pinnedCorpusIDs.length === 1
+    ? registry.find((corpus) =>
+        corpus.id === pinnedCorpusIDs[0] && corpus.automaticResearchEligible === true
+      )
+    : null;
+  const selected = defaultConstructionOnly && eligiblePinnedCorpus
+    ? [{ ...eligiblePinnedCorpus, routeReason: "explicitly pinned evidence" }]
+    : routed.selected;
+  const selectedIDs = new Set(selected.map((corpus) => corpus.id));
+  const pinnedCorpora = pinnedCorpusIDs.filter((id) => !selectedIDs.has(id)).map((id) => ({
     ...registry.find((corpus) => corpus.id === id),
     routeReason: "explicitly pinned evidence"
   }));
   const pinnedIDs = new Set(pinnedCorpora.map((corpus) => corpus.id));
   return {
     ...routed,
+    selected,
+    requestedCorpusIDs: defaultConstructionOnly && eligiblePinnedCorpus
+      ? [eligiblePinnedCorpus.id]
+      : routed.requestedCorpusIDs,
     pinnedCorpora,
     excluded: routed.excluded.filter((corpus) => !pinnedIDs.has(corpus.id))
   };
@@ -8089,8 +8115,13 @@ function researchPrompt(question, evidence, options = {}) {
     question,
     evidence,
     projectFacts: options.projectContextFacts,
-    conversationFactContext: options.conversationFactContext
+    conversationFactContext: options.conversationFactContext,
+    questionPlan: options.zoningPlan
   });
+  const zoningExecutionContext = zoningResearchPromptContext(
+    options.zoningPlan,
+    options.zoningDeterministicContext
+  );
   const codeBasis = options.codeBasis
     ? [
         "RESEARCH CODE BASIS",
@@ -8137,6 +8168,7 @@ function researchPrompt(question, evidence, options = {}) {
     history ? `UNTRUSTED CONVERSATION HISTORY FOR CONTEXT ONLY — NOT AUTHORITY\n${history}` : "",
     `AUTHORIZED ENACTED EVIDENCE\n${sources}`,
     requiredClaimChecklist,
+    zoningExecutionContext,
     zoningSafetyContext,
     structuredEvidenceAnalysis,
     supportingWebContext,
@@ -9122,12 +9154,30 @@ function combinedResearchClaimRevisionIssues(...results) {
 
 function combinedResearchAnswerRevisionIssues({
   requiredClaimCoverage = null,
+  claimMateriality = null,
+  zoningDeterministicControls = null,
   answerQuality = null,
   zoningSafety = null,
   webAttribution = null
 } = {}) {
   const issues = [
     ...combinedResearchClaimRevisionIssues(requiredClaimCoverage),
+    ...((claimMateriality?.missingClaimIDs || []).map((claimID) => ({
+      type: "missing_material_claim",
+      detail: `Bind the material claim ${claimID} to one supported point and its exact cited source passages.`
+    }))),
+    ...((claimMateriality?.unknownAnswerSourceIDs || []).map((sourceID) => ({
+      type: "incorrect_citation",
+      detail: `Remove the unknown evidence source ${sourceID}.`
+    }))),
+    ...((claimMateriality?.irrelevantAnswerSourceIDs || []).map((sourceID) => ({
+      type: "irrelevant_citation",
+      detail: `Do not use the irrelevant evidence source ${sourceID} to support a material claim.`
+    }))),
+    ...((zoningDeterministicControls?.issues || []).map((issue) => ({
+      type: String(issue?.code || "zoning_deterministic_control").toLowerCase(),
+      detail: String(issue?.detail || "The Zoning deterministic control did not pass.")
+    }))),
     ...researchAnswerQualityRevisionIssues(answerQuality),
     ...zoningResearchSafetyRevisionIssues(zoningSafety),
     ...researchWebAttributionRevisionIssues(webAttribution)
@@ -10047,8 +10097,13 @@ async function openAIResearchVerification(question, evidence, interpretation, us
         question,
         evidence,
         projectFacts: options.projectContextFacts,
-        conversationFactContext: options.conversationFactContext
+        conversationFactContext: options.conversationFactContext,
+        questionPlan: options.zoningPlan
       }),
+      zoningResearchPromptContext(
+        options.zoningPlan,
+        options.zoningDeterministicContext
+      ),
       options.webSupport?.sources?.length || options.webSupport?.limitation
         ? `NONCONTROLLING SUPPORTING WEB MATERIAL\n${JSON.stringify({
             limitation: options.webSupport.limitation || null,
@@ -10922,6 +10977,7 @@ async function assembledResearchEvidenceForTurn({
   projectFacts,
   topicContext,
   corpusPlan,
+  zoningPlan = null,
   onStage
 }) {
   const appliedCorpusPlan = corpusPlan || await researchCorpusPlanForTurn({
@@ -10938,13 +10994,16 @@ async function assembledResearchEvidenceForTurn({
   const testSupplementalCharacterBudget = process.env.NODE_ENV === "test"
     ? Number(process.env.PERMITEXT_TEST_RESEARCH_MAX_SUPPLEMENTAL_EVIDENCE_CHARACTERS)
     : Number.NaN;
+  const baseAssemblyLimits = zoningPlan
+    ? zoningResearchEvidenceLimits(zoningPlan)
+    : researchEvidenceAssemblyLimits;
   const assemblyLimits = Number.isSafeInteger(testSupplementalCharacterBudget) &&
     testSupplementalCharacterBudget > 0
     ? {
-        ...researchEvidenceAssemblyLimits,
+        ...baseAssemblyLimits,
         maximumSupplementalCharacters: testSupplementalCharacterBudget
       }
-    : researchEvidenceAssemblyLimits;
+    : baseAssemblyLimits;
   const assembled = await assembleResearchEvidence({
     question,
     previousMessages: messages,
@@ -10966,8 +11025,20 @@ async function assembledResearchEvidenceForTurn({
     }),
     resolveSection: (request) => resolveResearchAssemblySection(request, catalog)
   });
+  const zoningSelection = zoningPlan
+    ? selectZoningResearchEvidence({ question, evidence: assembled.sources, plan: zoningPlan })
+    : null;
   return {
     ...assembled,
+    ...(zoningSelection ? {
+      sources: zoningSelection.sources,
+      zoningSelection,
+      usage: {
+        ...assembled.usage,
+        finalSourceCount: zoningSelection.usage.sourceCount,
+        finalCharacterCount: zoningSelection.usage.characterCount
+      }
+    } : {}),
     corpusPlan: structuredClone(appliedCorpusPlan),
     discovery: {
       ...assembled.discovery,
@@ -18201,6 +18272,13 @@ async function handleResearchConversationMessage(request, response) {
       projectFacts: combinedProjectFacts,
       pinnedEvidence
     });
+    const zoningTurn = [
+      ...(corpusPlan.selected || []),
+      ...(corpusPlan.pinnedCorpora || [])
+    ].some((corpus) => corpus?.id === "nyc-zoning-resolution");
+    const initialZoningPlan = zoningTurn
+      ? planZoningResearchQuestion({ question, projectFacts: combinedProjectFacts })
+      : null;
     const answerCodeBasis = researchCodeBasis(
       conversation.primaryProjectID,
       projectInformation,
@@ -18216,6 +18294,7 @@ async function handleResearchConversationMessage(request, response) {
       projectFacts: combinedProjectFacts,
       topicContext: conversation.topicContext || null,
       corpusPlan,
+      zoningPlan: initialZoningPlan,
       onStage: progressResponse.progress
     });
     const conversationFactState = resolveResearchConversationFacts({
@@ -18224,6 +18303,13 @@ async function handleResearchConversationMessage(request, response) {
       topicContext: conversation.topicContext || null
     });
     const conversationFactContext = researchConversationFactPromptContext(conversationFactState);
+    const zoningPlan = zoningTurn
+      ? planZoningResearchQuestion({
+          question,
+          projectFacts: combinedProjectFacts,
+          conversationFactContext
+        })
+      : null;
     const validUserFacts = Array.from(new Set([
       ...combinedProjectFacts,
       ...conversationFactContext.established,
@@ -18257,6 +18343,27 @@ async function handleResearchConversationMessage(request, response) {
     const assembledEvidence = boundedCitationLookup
       ? boundedCitationEvidence
       : evidencePackage.sources || [];
+    if (zoningPlan && evidencePackage.zoningSelection?.pass === false) {
+      researchOperation.failureCode = "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED";
+      progressResponse.json(422, {
+        error: "Permitext could not assemble a narrow, question-specific Zoning evidence package within the applicable safety budget.",
+        code: "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED",
+        charged: false,
+        zoningPlan,
+        evidenceGate: evidencePackage.zoningSelection
+      });
+      return;
+    }
+    if (zoningPlan && zoningPlan.disposition !== zoningResearchDispositions.ready) {
+      researchOperation.failureCode = "RESEARCH_ZONING_PREREQUISITES_REQUIRED";
+      progressResponse.json(422, {
+        error: zoningPlan.clarification || "Additional verified facts are required before this Zoning conclusion can be generated.",
+        code: "RESEARCH_ZONING_PREREQUISITES_REQUIRED",
+        charged: false,
+        zoningPlan
+      });
+      return;
+    }
     if (!assembledEvidence.length) {
       researchOperation.failureCode = "RESEARCH_EVIDENCE_NOT_FOUND";
       progressResponse.progress("checking_citation_support", "active");
@@ -18273,6 +18380,13 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
+    const zoningDeterministicContext = zoningPlan
+      ? zoningResearchDeterministicContext({
+          question,
+          evidence: assembledEvidence,
+          plan: zoningPlan
+        })
+      : null;
     progressResponse.progress("checking_citation_support", "active");
     const requiredClaims = requiredResearchClaimsFromEvidence(assembledEvidence);
     const materialityClaims = requiredClaims.map((claim) => ({
@@ -18418,7 +18532,8 @@ async function handleResearchConversationMessage(request, response) {
       requiredClaims,
       codeBasis: answerCodeBasis,
       webSupportRequested,
-      boundedCitationLookup
+      boundedCitationLookup,
+      zoningPlan
     });
     Object.assign(researchOperation, {
       routingVersion: researchModelRoutingVersion,
@@ -18553,6 +18668,8 @@ async function handleResearchConversationMessage(request, response) {
       allowOfficialGuidanceOnly,
       codeBasis: answerCodeBasis,
       requiredClaims,
+      zoningPlan,
+      zoningDeterministicContext,
       signal: progressResponse.signal
     };
     const deterministicOfficialGuidanceOnly = !mockMode && researchShouldUseDeterministicOfficialGuidance({
@@ -18683,6 +18800,13 @@ async function handleResearchConversationMessage(request, response) {
       evidence: assembledEvidence,
       answer: result.interpretation
     });
+    let zoningDeterministicControls = zoningPlan
+      ? evaluateZoningDeterministicControls({
+          plan: zoningPlan,
+          deterministicContext: zoningDeterministicContext,
+          answer: result.interpretation
+        })
+      : { pass: true, issues: [] };
     let answerQuality = evaluateResearchAnswerQuality({
       question,
       evidence: assembledEvidence,
@@ -18693,7 +18817,8 @@ async function handleResearchConversationMessage(request, response) {
       evidence: assembledEvidence,
       answer: result.interpretation,
       projectFacts: combinedProjectFacts,
-      conversationFactContext
+      conversationFactContext,
+      questionPlan: zoningPlan
     });
     let webAttribution = evaluateResearchWebAttribution({
       question,
@@ -18727,6 +18852,13 @@ async function handleResearchConversationMessage(request, response) {
         evidence: assembledEvidence,
         answer: result.interpretation
       });
+      zoningDeterministicControls = zoningPlan
+        ? evaluateZoningDeterministicControls({
+            plan: zoningPlan,
+            deterministicContext: zoningDeterministicContext,
+            answer: result.interpretation
+          })
+        : { pass: true, issues: [] };
       answerQuality = evaluateResearchAnswerQuality({
         question,
         evidence: assembledEvidence,
@@ -18737,7 +18869,8 @@ async function handleResearchConversationMessage(request, response) {
         evidence: assembledEvidence,
         answer: result.interpretation,
         projectFacts: combinedProjectFacts,
-        conversationFactContext
+        conversationFactContext,
+        questionPlan: zoningPlan
       });
       webAttribution = evaluateResearchWebAttribution({
         question,
@@ -18777,13 +18910,15 @@ async function handleResearchConversationMessage(request, response) {
       const evidencePackagePrototype = researchEvidencePackagePrototypeMode();
       const deterministicPass =
         evidencePackagePrototype ||
-        (requiredClaimCoverage.pass && answerQuality.pass && zoningSafety.pass && webAttribution.pass);
+        (requiredClaimCoverage.pass && claimMateriality.pass && zoningDeterministicControls.pass && answerQuality.pass && zoningSafety.pass && webAttribution.pass);
       verificationAttempts = [{
         pass: deterministicPass,
         issues: deterministicPass
           ? []
-          : combinedResearchAnswerRevisionIssues({
+            : combinedResearchAnswerRevisionIssues({
               requiredClaimCoverage,
+              claimMateriality,
+              zoningDeterministicControls,
               answerQuality,
               zoningSafety,
               webAttribution
@@ -18858,6 +18993,13 @@ async function handleResearchConversationMessage(request, response) {
           evidence: assembledEvidence,
           answer: result.interpretation
         });
+        zoningDeterministicControls = zoningPlan
+          ? evaluateZoningDeterministicControls({
+              plan: zoningPlan,
+              deterministicContext: zoningDeterministicContext,
+              answer: result.interpretation
+            })
+          : { pass: true, issues: [] };
         answerQuality = evaluateResearchAnswerQuality({
           question,
           evidence: assembledEvidence,
@@ -18868,7 +19010,8 @@ async function handleResearchConversationMessage(request, response) {
           evidence: assembledEvidence,
           answer: result.interpretation,
           projectFacts: combinedProjectFacts,
-          conversationFactContext
+          conversationFactContext,
+          questionPlan: zoningPlan
         });
         webAttribution = evaluateResearchWebAttribution({
           question,
@@ -18878,6 +19021,8 @@ async function handleResearchConversationMessage(request, response) {
         });
         if (
           !requiredClaimCoverage.pass ||
+          !claimMateriality.pass ||
+          !zoningDeterministicControls.pass ||
           !answerQuality.pass ||
           !zoningSafety.pass ||
           !webAttribution.pass
@@ -18886,6 +19031,8 @@ async function handleResearchConversationMessage(request, response) {
             pass: false,
             issues: combinedResearchAnswerRevisionIssues({
               requiredClaimCoverage,
+              claimMateriality,
+              zoningDeterministicControls,
               answerQuality,
               zoningSafety,
               webAttribution
@@ -18896,6 +19043,12 @@ async function handleResearchConversationMessage(request, response) {
               : {})
           });
           if (applyEvidenceBoundaryFallback()) break;
+          if (zoningPlan) {
+            const error = new Error("The Zoning answer failed a deterministic gate; Permitext did not perform a full-answer rewrite.");
+            error.code = "RESEARCH_VERIFICATION_FAILED";
+            error.verificationAttempts = verificationAttempts;
+            throw error;
+          }
           if (attempt === maximumResearchVerificationAttempts - 1) {
             const error = new Error("The answer failed deterministic evidence or source-attribution checks after one bounded revision.");
             error.code = "RESEARCH_VERIFICATION_FAILED";
@@ -18903,6 +19056,14 @@ async function handleResearchConversationMessage(request, response) {
             throw error;
           }
           continue;
+        }
+        if (zoningPlan && !zoningPlan.callPolicy.subjectiveVerification) {
+          verificationAttempts.push({
+            pass: true,
+            issues: [],
+            model: "permitext-deterministic-zoning-plan"
+          });
+          break;
         }
         if (attempt > 0) {
           // The repaired answer already passed the objective citation,
@@ -18930,6 +19091,8 @@ async function handleResearchConversationMessage(request, response) {
             codeBasis: answerCodeBasis,
             requiredClaims,
             structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+            zoningPlan,
+            zoningDeterministicContext,
             model: modelRouting.configuration.verificationModel,
             signal: progressResponse.signal
           }
@@ -18945,6 +19108,12 @@ async function handleResearchConversationMessage(request, response) {
         });
         if (contextualVerification.pass) break;
         if (applyEvidenceBoundaryFallback()) break;
+        if (zoningPlan) {
+          const error = new Error("The Zoning answer did not pass bounded verification; Permitext did not perform a full-answer rewrite.");
+          error.code = "RESEARCH_VERIFICATION_FAILED";
+          error.verificationAttempts = verificationAttempts;
+          throw error;
+        }
         if (attempt === maximumResearchVerificationAttempts - 1) {
           const error = new Error("The answer did not pass verification after one bounded revision.");
           error.code = "RESEARCH_VERIFICATION_FAILED";
@@ -19056,8 +19225,17 @@ async function handleResearchConversationMessage(request, response) {
         conversationFacts: conversationFactState,
         requiredClaimCoverage,
         claimMateriality,
+        zoningDeterministicControls,
         answerQuality,
         zoningSafety,
+        ...(zoningPlan ? {
+          zoningArchitecture: {
+            plannerVersion: zoningResearchPlannerVersion,
+            plan: zoningPlan,
+            deterministicContext: zoningDeterministicContext,
+            evidenceSelection: evidencePackage.zoningSelection
+          }
+        } : {}),
         retrieval: {
           schemaVersion: evidencePackage.schemaVersion,
           assemblyVersion: evidencePackage.assemblyVersion,
@@ -19105,7 +19283,12 @@ async function handleResearchConversationMessage(request, response) {
           escalated: evidenceAnalysisEscalated || answerEscalated,
           escalationStages: modelEscalationStages,
           verificationAttemptCount: verificationAttempts.length,
-          verificationIssueTypes
+          verificationIssueTypes,
+          ...(zoningPlan ? {
+            zoningPlannerVersion: zoningResearchPlannerVersion,
+            maximumProviderCalls: zoningPlan.callPolicy.maximumProviderCalls,
+            fullAnswerRewriteAllowed: zoningPlan.callPolicy.allowFullAnswerRewrite
+          } : {})
         },
         disclaimer
       }
