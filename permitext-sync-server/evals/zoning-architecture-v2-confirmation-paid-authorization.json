@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "7b58a481-a900-4be1-9cf5-1d26e5fda78b",
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -27,11 +27,11 @@
     "exactSpendingCapPhrase": "authorize exactly package commit 3b5db112271da5d015dd84793b5331c59ec0a467 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
-    "status": "not_started",
-    "attemptID": null,
-    "startedAt": null,
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "attemptID": "9f67f4ba-3944-46a4-b438-fcec082144e3",
+    "startedAt": "2026-09-01T16:49:31.077Z",
+    "runID": "9f67f4ba-3944-46a4-b438-fcec082144e3",
+    "consumedAt": "2026-09-01T17:09:20.000Z"
   },
   "lineage": {
     "preparedFromCommit": "991d38a0047f53d49975fa6af5259f0063d4bd0e",
@@ -53,7 +53,7 @@
   },
   "execution": {
     "authorizationPackageCommit": "3b5db112271da5d015dd84793b5331c59ec0a467",
-    "executionCommit": null,
+    "executionCommit": "fffd5c58c8b781bd9e322bdfad421ab2a65450e3",
     "webSupportEnabled": false,
     "selectiveLunaTerraRouting": true,
     "fullAnswerRewriteAllowed": false,
@@ -78,5 +78,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "Manual review confirmed pre-provider launch attempt adfc0d4e-fcb2-46a8-a64c-82657f7562d7 stopped during module loading because locked dependencies were not installed. No evaluation code, provider request, result, or API spend occurred. The exact owner authorization remains active for the first actual provider run after installing package-lock dependencies."
+  "notes": "One-time authorization manually consumed after all 30 ordered cases completed exactly one terminal operation in run 9f67f4ba-3944-46a4-b438-fcec082144e3. Final automatic consumption stopped because one judge reservation remained unreconciled; manual fail-closed review retained the immutable result, charged no customer turn for failed or prerequisite-boundary operations, and used the $1.659459 conservative upper bound, below the $5 cap. No retry is authorized."
 }
