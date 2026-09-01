@@ -115,6 +115,15 @@ import {
   zoningRemediationSuccessor3V17ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v17-confirmation-paid-authorization.mjs";
 import {
+  validateZoningRemediationSuccessor3V17FullCohortPaidAuthorization,
+  zoningRemediationSuccessor3V17FullCohortAppSHA256,
+  zoningRemediationSuccessor3V17FullCohortEconomicsSHA256,
+  zoningRemediationSuccessor3V17FullCohortLockedAuthorizationSHA256,
+  zoningRemediationSuccessor3V17FullCohortPreparedFromCommit,
+  zoningRemediationSuccessor3V17FullCohortRunnerHandoffSHA256,
+  zoningRemediationSuccessor3V17FullCohortSafetySHA256
+} from "../evals/zoning-successor-remediation-3-v17-full-cohort-paid-authorization.mjs";
+import {
   requireAuthenticatedZoningV11RunnerHandoff
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
 
@@ -164,6 +173,8 @@ const zoningRemediationSuccessor3V16ConfirmationMode =
   process.argv.includes("--zoning-successor-remediation-3-v16-confirmation");
 const zoningRemediationSuccessor3V17ConfirmationMode =
   process.argv.includes("--zoning-successor-remediation-3-v17-confirmation");
+const zoningRemediationSuccessor3V17FullCohortMode =
+  process.argv.includes("--zoning-successor-remediation-3-v17-full-cohort");
 const zoningRemediationSuccessor3AuthenticatedConfirmationMode =
   zoningRemediationSuccessor3V11ConfirmationMode ||
   zoningRemediationSuccessor3V12ConfirmationMode ||
@@ -171,8 +182,31 @@ const zoningRemediationSuccessor3AuthenticatedConfirmationMode =
   zoningRemediationSuccessor3V14ConfirmationMode ||
   zoningRemediationSuccessor3V15ConfirmationMode ||
   zoningRemediationSuccessor3V16ConfirmationMode ||
-  zoningRemediationSuccessor3V17ConfirmationMode;
-const authenticatedConfirmation = zoningRemediationSuccessor3V17ConfirmationMode
+  zoningRemediationSuccessor3V17ConfirmationMode ||
+  zoningRemediationSuccessor3V17FullCohortMode;
+const authenticatedConfirmation = zoningRemediationSuccessor3V17FullCohortMode
+  ? {
+      version: "v17-full-cohort",
+      validate:
+        validateZoningRemediationSuccessor3V17FullCohortPaidAuthorization,
+      appSHA256: zoningRemediationSuccessor3V17FullCohortAppSHA256,
+      economicsSHA256:
+        zoningRemediationSuccessor3V17FullCohortEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningRemediationSuccessor3V17FullCohortLockedAuthorizationSHA256,
+      preparedFromCommit:
+        zoningRemediationSuccessor3V17FullCohortPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningRemediationSuccessor3V17FullCohortRunnerHandoffSHA256,
+      safetySHA256: zoningRemediationSuccessor3V17FullCohortSafetySHA256,
+      authorizationFile:
+        "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json",
+      runLockFile:
+        ".zoning-successor-remediation-3-v17-full-cohort-paid-run.lock",
+      stopOnExecutionError: false,
+      continueAfterVerifiedResearchFailure: true
+    }
+  : zoningRemediationSuccessor3V17ConfirmationMode
   ? {
       version: "v17",
       validate:
@@ -190,7 +224,9 @@ const authenticatedConfirmation = zoningRemediationSuccessor3V17ConfirmationMode
       authorizationFile:
         "zoning-successor-remediation-3-v17-confirmation-paid-authorization.json",
       runLockFile:
-        ".zoning-successor-remediation-3-v17-confirmation-paid-run.lock"
+        ".zoning-successor-remediation-3-v17-confirmation-paid-run.lock",
+      stopOnExecutionError: true,
+      continueAfterVerifiedResearchFailure: false
     }
   : zoningRemediationSuccessor3V16ConfirmationMode
   ? {
@@ -350,7 +386,8 @@ const zoningDatasetModeCount = [
   zoningRemediationSuccessor3V14ConfirmationMode,
   zoningRemediationSuccessor3V15ConfirmationMode,
   zoningRemediationSuccessor3V16ConfirmationMode,
-  zoningRemediationSuccessor3V17ConfirmationMode
+  zoningRemediationSuccessor3V17ConfirmationMode,
+  zoningRemediationSuccessor3V17FullCohortMode
 ].filter(Boolean).length;
 if (zoningDatasetModeCount > 1) {
   throw new Error("Choose exactly one Zoning evaluation dataset mode.");
@@ -3108,6 +3145,19 @@ function evaluationErrorRecord(error) {
   };
 }
 
+function continuableVerifiedResearchFailure(result, error) {
+  const metric = result?.operationMetric;
+  return Boolean(
+    !error?.telemetryError &&
+    metric?.status === "failed" &&
+    metric?.charged === false &&
+    metric?.failureCode === "RESEARCH_VERIFICATION_FAILED" &&
+    Number.isInteger(metric?.providerRequestCount) &&
+    metric.providerRequestCount > 0 &&
+    metric?.pendingProviderRequestCount === 0
+  );
+}
+
 async function persistEvaluationRunSnapshot(jsonPath, snapshot) {
   const temporaryPath = `${jsonPath}.tmp-${process.pid}`;
   await writeFile(temporaryPath, `${JSON.stringify(snapshot, null, 2)}\n`);
@@ -3144,6 +3194,8 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
     webSupportEnabled:
       researchSourcePolicyConfiguration(process.env).webSupportEnabled,
     stopOnExecutionError: options.stopOnExecutionError === true,
+    continueAfterVerifiedResearchFailure:
+      options.continueAfterVerifiedResearchFailure === true,
     pricingVersion: estimatedResearchCost({ inputTokens: 0, outputTokens: 0 }).pricingVersion,
     gitCommit: await currentGitCommit()
   };
@@ -3205,7 +3257,11 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
     "Each case runs one production Research turn and one separate grader; internal verification or revision can add provider requests. " +
     `The approved spend cap is checked before every paid request.${options.stopOnError
       ? " This run stops after the first case error or quality failure."
-      : options.stopOnExecutionError ? " This run stops after the first execution error." : ""}`
+      : options.stopOnExecutionError
+        ? " This run stops after the first execution error."
+        : options.continueAfterVerifiedResearchFailure
+          ? " Verified Research safety failures are retained and skipped; spend-cap, provider, telemetry, and other execution failures still stop the run."
+          : ""}`
   );
   await saveSnapshot("running");
   let haltedFailure = null;
@@ -3277,13 +3333,25 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options
         }
         result.error = evaluationErrorRecord(error);
         console.error(`ERROR ${testCase.title}${repeat > 1 ? ` #${repetition}` : ""}: ${error.message}`);
+        const continuationSafe =
+          options.continueAfterVerifiedResearchFailure === true &&
+          continuableVerifiedResearchFailure(result, error);
         if (error.code === "RESEARCH_EVAL_SPEND_CAP" || error.name === "AbortError") {
           haltedFailure = {
             caseID: testCase.id,
             code: error.code || null,
             message: error.message
           };
-        } else if (options.stopOnError || options.stopOnExecutionError) {
+        } else if (continuationSafe) {
+          console.error(
+            `CONTINUE ${testCase.title}: retained terminal ` +
+            "RESEARCH_VERIFICATION_FAILED telemetry with zero pending requests."
+          );
+        } else if (
+          options.stopOnError ||
+          options.stopOnExecutionError ||
+          options.continueAfterVerifiedResearchFailure
+        ) {
           haltedFailure = {
             caseID: testCase.id,
             code: error.code || error.name || null,
@@ -4344,6 +4412,52 @@ async function runSelfTest(dataset, datasetText) {
       researchEvaluationSpendStatus().pendingRequestCount === 0,
     "Research eval judge retry was not capped at one retry with settled attempt usage."
   );
+  const verifiedResearchFailureFixture = {
+    operationMetric: {
+      status: "failed",
+      charged: false,
+      failureCode: "RESEARCH_VERIFICATION_FAILED",
+      providerRequestCount: 2,
+      pendingProviderRequestCount: 0
+    }
+  };
+  assert(
+    continuableVerifiedResearchFailure(
+      verifiedResearchFailureFixture,
+      new Error("Verified answer failed closed.")
+    ),
+    "The full-cohort policy rejected an exact terminal Research verification failure."
+  );
+  for (const [label, result, error] of [
+    ["pending provider request", {
+      operationMetric: {
+        ...verifiedResearchFailureFixture.operationMetric,
+        pendingProviderRequestCount: 1
+      }
+    }, new Error("Pending provider request.")],
+    ["charged failure", {
+      operationMetric: {
+        ...verifiedResearchFailureFixture.operationMetric,
+        charged: true
+      }
+    }, new Error("Charged failure.")],
+    ["provider failure", {
+      operationMetric: {
+        ...verifiedResearchFailureFixture.operationMetric,
+        failureCode: "RESEARCH_PROVIDER_FAILED"
+      }
+    }, new Error("Provider failure.")],
+    ["missing telemetry", {}, new Error("Missing telemetry.")],
+    ["telemetry error", verifiedResearchFailureFixture,
+      Object.assign(new Error("Telemetry error."), {
+        telemetryError: "Terminal operation unavailable."
+      })]
+  ]) {
+    assert(
+      !continuableVerifiedResearchFailure(result, error),
+      `The full-cohort policy allowed a ${label}.`
+    );
+  }
   const visualInputBody = Buffer.from("official visual input");
   const visualInput = researchInputForEvidence("What does the selected map show?", [{
     sourceID: "source-visual-self-test",
@@ -4449,12 +4563,12 @@ async function runSelfTest(dataset, datasetText) {
 async function main() {
   if (process.argv.includes("--help")) {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
-    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; --zoning-successor-remediation-3-v8-confirmation, --zoning-successor-remediation-3-v9-confirmation, --zoning-successor-remediation-3-v11-confirmation, --zoning-successor-remediation-3-v12-confirmation, --zoning-successor-remediation-3-v13-confirmation, --zoning-successor-remediation-3-v14-confirmation, --zoning-successor-remediation-3-v15-confirmation, --zoning-successor-remediation-3-v16-confirmation, and --zoning-successor-remediation-3-v17-confirmation use that same frozen cohort through distinct confirmation authorizations. None is baseline-eligible.");
+    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; --zoning-successor-remediation-3-v8-confirmation, --zoning-successor-remediation-3-v9-confirmation, --zoning-successor-remediation-3-v11-confirmation, --zoning-successor-remediation-3-v12-confirmation, --zoning-successor-remediation-3-v13-confirmation, --zoning-successor-remediation-3-v14-confirmation, --zoning-successor-remediation-3-v15-confirmation, --zoning-successor-remediation-3-v16-confirmation, --zoning-successor-remediation-3-v17-confirmation, and --zoning-successor-remediation-3-v17-full-cohort use that same frozen cohort through distinct confirmation authorizations. None is baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
-    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3 | --zoning-successor-remediation-3-v8-confirmation | --zoning-successor-remediation-3-v9-confirmation | --zoning-successor-remediation-3-v11-confirmation | --zoning-successor-remediation-3-v12-confirmation | --zoning-successor-remediation-3-v13-confirmation | --zoning-successor-remediation-3-v14-confirmation | --zoning-successor-remediation-3-v15-confirmation | --zoning-successor-remediation-3-v16-confirmation | --zoning-successor-remediation-3-v17-confirmation) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
+    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3 | --zoning-successor-remediation-3-v8-confirmation | --zoning-successor-remediation-3-v9-confirmation | --zoning-successor-remediation-3-v11-confirmation | --zoning-successor-remediation-3-v12-confirmation | --zoning-successor-remediation-3-v13-confirmation | --zoning-successor-remediation-3-v14-confirmation | --zoning-successor-remediation-3-v15-confirmation | --zoning-successor-remediation-3-v16-confirmation | --zoning-successor-remediation-3-v17-confirmation | --zoning-successor-remediation-3-v17-full-cohort) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
     console.log("No-cost successor advisory: --zoning-successor --zoning-successor-evidence-budget-advisory (compares disabled 24000 candidate with 48000 across only the canonically ready cases while the full gate stays blocked)");
-    console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error | --stop-on-execution-error] [--run-id UUID]");
+    console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error | --stop-on-execution-error | --continue-after-verified-research-failure] [--run-id UUID]");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
     console.log("Compare: --compare CURRENT_RUN_JSON --against BASELINE_RUN_OR_BASELINE_JSON");
     console.log("Default/--dry-run mode validates the dataset and canonical evidence without calling OpenAI.");
@@ -4548,8 +4662,13 @@ async function main() {
     : null;
   const stopOnError = process.argv.includes("--stop-on-error");
   const stopOnExecutionError = process.argv.includes("--stop-on-execution-error");
-  assert(!(stopOnError && stopOnExecutionError),
-    "Choose only one evaluation stop policy.");
+  const continueAfterVerifiedResearchFailure =
+    process.argv.includes("--continue-after-verified-research-failure");
+  assert(
+    [stopOnError, stopOnExecutionError, continueAfterVerifiedResearchFailure]
+      .filter(Boolean).length <= 1,
+    "Choose only one evaluation stop or continuation policy."
+  );
   if (requestedRunID) {
     assert(liveMode, "--run-id is supported only for live evaluation execution.");
     assert(/^[0-9a-f-]{36}$/i.test(requestedRunID),
@@ -4700,8 +4819,16 @@ async function main() {
           "Paid remediation successor 3 requires the runner's exact durable running authorization."
         );
         if (zoningRemediationSuccessor3AuthenticatedConfirmationMode) {
-          assert(stopOnExecutionError === true && stopOnError === false,
-            `Paid ${authenticatedConfirmation.version} confirmation must use the authorized stop-on-execution-error policy.`);
+          const expectedStopOnExecutionError =
+            authenticatedConfirmation.stopOnExecutionError !== false;
+          const expectedContinuation =
+            authenticatedConfirmation.continueAfterVerifiedResearchFailure === true;
+          assert(
+            stopOnExecutionError === expectedStopOnExecutionError &&
+              stopOnError === false &&
+              continueAfterVerifiedResearchFailure === expectedContinuation,
+            `Paid ${authenticatedConfirmation.version} confirmation must use its exact authorized execution-failure policy.`
+          );
           assert(zoningEvidenceBudgetMode === false,
             `Paid ${authenticatedConfirmation.version} confirmation may not enable an evidence-budget prototype mode.`);
           assert(process.env.PERMITEXT_RESEARCH_WEB_SUPPORT === "off",
@@ -4833,6 +4960,7 @@ async function main() {
         repeat,
         stopOnError,
         stopOnExecutionError,
+        continueAfterVerifiedResearchFailure,
         runID: requestedRunID,
         datasetKind: zoningMode ? "zoning-resolution" : "construction-code",
         retrievalVersion: zoningMode
