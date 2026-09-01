@@ -1,10 +1,12 @@
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const evalRoot = dirname(fileURLToPath(import.meta.url));
 const serverRoot = dirname(evalRoot);
+const repositoryRoot = dirname(serverRoot);
 const defaultAuthorizationPath = join(
   evalRoot,
   "zoning-architecture-v2-confirmation-paid-authorization.json"
@@ -23,6 +25,20 @@ export const zoningArchitectureV2ConfirmationAuthorizationID =
   "7b58a481-a900-4be1-9cf5-1d26e5fda78b";
 export const zoningArchitectureV2ConfirmationLockedAuthorizationSHA256 =
   "50db45e451be9718f2e4c735dcbc2dbcd72c3d0315b96fe1133ae02a16440e5c";
+export const zoningArchitectureV2ConfirmationConsumedAuthorizationSHA256 =
+  "275dbe7be87b74a02fc6ab2c7b99b48efbaf339a57984bbabc427a2c0376ea42";
+export const zoningArchitectureV2ConfirmationResultJSONFile =
+  "results/2026-09-01T16-49-32-263Z-9f67f4ba-3944-46a4-b438-fcec082144e3.json";
+export const zoningArchitectureV2ConfirmationResultJSONSHA256 =
+  "06af0893b2dc201f12c48a405accaf5b6262f72aeaa67014013de89c7b9ece44";
+export const zoningArchitectureV2ConfirmationResultMarkdownFile =
+  "results/2026-09-01T16-49-32-263Z-9f67f4ba-3944-46a4-b438-fcec082144e3.md";
+export const zoningArchitectureV2ConfirmationResultMarkdownSHA256 =
+  "91bcefe323918e20ca11acf1d57ad758008f83f5a405d87db6e3488347172128";
+export const zoningArchitectureV2ConfirmationRunID =
+  "9f67f4ba-3944-46a4-b438-fcec082144e3";
+export const zoningArchitectureV2ConfirmationExecutionCommit =
+  "fffd5c58c8b781bd9e322bdfad421ab2a65450e3";
 export const zoningArchitectureV2ConfirmationCohortSHA256 =
   "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc";
 export const zoningArchitectureV2ConfirmationPreparedFromCommit =
@@ -62,7 +78,11 @@ const expectedFiles = Object.freeze({
   "scripts/preflight-zoning-architecture-v2.mjs":
     "7643aa53f86aba9d3b9d983f0d0ed2143466e602376fa85961fa42f422fb219d",
   "tests/research-zoning-architecture-v2-contract.mjs":
-    "d6de1d320294bc9ced2aa90bc2ffc22c516ae3e8207f74788f2e4cae1365b156"
+    "d6de1d320294bc9ced2aa90bc2ffc22c516ae3e8207f74788f2e4cae1365b156",
+  [`evals/${zoningArchitectureV2ConfirmationResultJSONFile}`]:
+    zoningArchitectureV2ConfirmationResultJSONSHA256,
+  [`evals/${zoningArchitectureV2ConfirmationResultMarkdownFile}`]:
+    zoningArchitectureV2ConfirmationResultMarkdownSHA256
 });
 
 function sha256(value) {
@@ -75,7 +95,19 @@ function assert(condition, message) {
 
 async function validateBoundFiles() {
   for (const [relativePath, expectedHash] of Object.entries(expectedFiles)) {
-    const value = await readFile(join(serverRoot, relativePath));
+    const historicalPath = `permitext-sync-server/${relativePath}`;
+    const historical = spawnSync(
+      "git",
+      ["show", `${zoningArchitectureV2ConfirmationExecutionCommit}:${historicalPath}`],
+      {
+        cwd: repositoryRoot,
+        encoding: null,
+        maxBuffer: 16 * 1024 * 1024
+      }
+    );
+    const value = historical.status === 0
+      ? historical.stdout
+      : await readFile(join(serverRoot, relativePath));
     assert(
       sha256(value) === expectedHash,
       `The locked Architecture V2 input changed: ${relativePath}.`
@@ -86,14 +118,16 @@ async function validateBoundFiles() {
 export async function validateZoningArchitectureV2ConfirmationPaidAuthorization({
   authorizationPath = defaultAuthorizationPath
 } = {}) {
-  const [authorizationText, cohortText, preflightText] = await Promise.all([
+  const [authorizationText, cohortText, preflightText, resultText] = await Promise.all([
     readFile(authorizationPath, "utf8"),
     readFile(cohortPath, "utf8"),
-    readFile(preflightPath, "utf8")
+    readFile(preflightPath, "utf8"),
+    readFile(join(evalRoot, zoningArchitectureV2ConfirmationResultJSONFile), "utf8")
   ]);
   const authorization = JSON.parse(authorizationText);
   const cohort = JSON.parse(cohortText);
   const preflight = JSON.parse(preflightText);
+  const result = JSON.parse(resultText);
   await validateBoundFiles();
 
   assert(
@@ -278,6 +312,108 @@ export async function validateZoningArchitectureV2ConfirmationPaidAuthorization(
       "Architecture V2 execution must retain its durable attempt and execution commit."
     );
   }
+  if (authorization.status === "consumed") {
+    assert(
+      sha256(authorizationText) ===
+        zoningArchitectureV2ConfirmationConsumedAuthorizationSHA256,
+      "The consumed Architecture V2 authorization changed."
+    );
+    assert(
+      authorization.consumption?.status === "consumed" &&
+        authorization.consumption?.attemptID === zoningArchitectureV2ConfirmationRunID &&
+        authorization.consumption?.runID === zoningArchitectureV2ConfirmationRunID &&
+        typeof authorization.consumption?.consumedAt === "string" &&
+        execution.executionCommit === zoningArchitectureV2ConfirmationExecutionCommit,
+      "The consumed Architecture V2 authorization lost its exact run identity."
+    );
+    assert(
+      result.configuration?.runID === zoningArchitectureV2ConfirmationRunID &&
+        result.configuration?.gitCommit === zoningArchitectureV2ConfirmationExecutionCommit &&
+        result.status === "partial" &&
+        result.configuration?.repeat === 1 &&
+        result.configuration?.caseIDs?.length === 30 &&
+        result.results?.length === 30,
+      "The retained Architecture V2 result lost its exact execution scope."
+    );
+    assert(
+      result.configuration.caseIDs.every(
+        (caseID, index) => result.results[index]?.testCase?.id === caseID
+      ),
+      "The retained Architecture V2 result is not in the authorized cohort order."
+    );
+    assert(
+      result.configuration?.approvedSpendCapUSD === 5 &&
+        result.configuration?.actualUSD === 1.519425 &&
+        result.configuration?.conservativeReservedUSD === 1.659459 &&
+        result.configuration?.paidRequestCount === 66 &&
+        result.configuration?.pendingPaidRequestCount === 1 &&
+        result.configuration.conservativeReservedUSD <=
+          result.configuration.approvedSpendCapUSD,
+      "The retained Architecture V2 result lost its fail-closed cost ledger."
+    );
+    const completed = result.results.filter(
+      (entry) => entry.operationMetric?.status === "completed"
+    );
+    const failed = result.results.filter(
+      (entry) => entry.operationMetric?.status === "failed"
+    );
+    const rejected = result.results.filter(
+      (entry) => entry.operationMetric?.status === "rejected"
+    );
+    const productionUSD = result.results.reduce(
+      (total, entry) => total + (entry.operationMetric?.actualProviderCostUSD || 0),
+      0
+    );
+    const judgeUSD = result.results.reduce(
+      (total, entry) => total + (entry.judge?.estimatedCost?.estimatedUSD || 0),
+      0
+    );
+    assert(
+      completed.length === 21 &&
+        completed.filter((entry) => entry.scoring?.passed === true).length === 16 &&
+        completed.filter((entry) => entry.scoring?.overallScore === 4).length === 15 &&
+        failed.length === 3 &&
+        rejected.length === 6,
+      "The retained Architecture V2 result changed its terminal outcome counts."
+    );
+    assert(
+      Number(productionUSD.toFixed(6)) === 0.994388 &&
+        Number(judgeUSD.toFixed(6)) === 0.525037 &&
+        Number((productionUSD + judgeUSD).toFixed(6)) ===
+          result.configuration.actualUSD &&
+        Number((result.configuration.conservativeReservedUSD -
+          result.configuration.actualUSD).toFixed(6)) === 0.140034,
+      "The retained Architecture V2 Production, judge, and pending ledgers no longer reconcile."
+    );
+    assert(
+      completed.every(
+        (entry) => entry.operationMetric?.charged === true &&
+          entry.operationMetric?.webSupportRequested === false &&
+          entry.operationMetric?.pendingProviderRequestCount === 0
+      ) &&
+        failed.every(
+          (entry) => entry.operationMetric?.failureCode === "RESEARCH_VERIFICATION_FAILED" &&
+            entry.operationMetric?.charged === false &&
+            entry.operationMetric?.providerRequestCount > 0 &&
+            entry.operationMetric?.pendingProviderRequestCount === 0
+        ) &&
+        rejected.every(
+          (entry) => entry.operationMetric?.failureCode ===
+              "RESEARCH_ZONING_PREREQUISITES_REQUIRED" &&
+            entry.operationMetric?.charged === false &&
+            entry.operationMetric?.providerRequestCount === 0 &&
+            entry.operationMetric?.pendingProviderRequestCount === 0
+        ),
+      "The retained Architecture V2 fail-closed outcomes changed."
+    );
+    assert(
+      result.economics?.sample?.sampleReady === true &&
+        result.economics?.economics?.projectedCostPer100TurnsUSD === 4.74 &&
+        result.economics?.economics?.targetBand === "within" &&
+        result.economics?.charging?.integrityPass === true,
+      "The retained Architecture V2 measured economics changed."
+    );
+  }
 
   const active =
     authorization.status === "authorized" &&
@@ -287,6 +423,7 @@ export async function validateZoningArchitectureV2ConfirmationPaidAuthorization(
     cohort,
     cohortPath,
     preflight,
+    result,
     active,
     authorizationSHA256: sha256(authorizationText)
   };

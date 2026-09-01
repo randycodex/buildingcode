@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -7,39 +8,61 @@ import {
   requireActiveZoningArchitectureV2ConfirmationPaidAuthorization,
   validateZoningArchitectureV2ConfirmationPaidAuthorization,
   zoningArchitectureV2ConfirmationAuthorizationID,
-  zoningArchitectureV2ConfirmationLockedAuthorizationSHA256
+  zoningArchitectureV2ConfirmationConsumedAuthorizationSHA256,
+  zoningArchitectureV2ConfirmationExecutionCommit,
+  zoningArchitectureV2ConfirmationLockedAuthorizationSHA256,
+  zoningArchitectureV2ConfirmationRunID
 } from "../evals/zoning-architecture-v2-confirmation-paid-authorization.mjs";
 import {
   zoningArchitectureV2ContinuableResult
 } from "../scripts/run-zoning-successor.mjs";
 
 const serverRoot = resolve(import.meta.dirname, "..");
+const repositoryRoot = resolve(serverRoot, "..");
 const authorizationPath = join(
   serverRoot,
   "evals",
   "zoning-architecture-v2-confirmation-paid-authorization.json"
 );
-const lockedText = await readFile(authorizationPath, "utf8");
+const authorizationText = await readFile(authorizationPath, "utf8");
+const consumed = await validateZoningArchitectureV2ConfirmationPaidAuthorization();
+const lockedPackage = spawnSync(
+  "git",
+  [
+    "show",
+    "3b5db112271da5d015dd84793b5331c59ec0a467:permitext-sync-server/evals/zoning-architecture-v2-confirmation-paid-authorization.json"
+  ],
+  { cwd: repositoryRoot, encoding: "utf8" }
+);
+assert.equal(lockedPackage.status, 0, lockedPackage.stderr);
+const lockedText = lockedPackage.stdout;
 const lockedFixture = JSON.parse(lockedText);
-const locked = await validateZoningArchitectureV2ConfirmationPaidAuthorization();
 
-assert.equal(locked.authorization.authorizationID,
+assert.equal(consumed.authorization.authorizationID,
   zoningArchitectureV2ConfirmationAuthorizationID);
-assert.equal(locked.authorizationSHA256,
+assert.equal(consumed.authorizationSHA256,
+  zoningArchitectureV2ConfirmationConsumedAuthorizationSHA256);
+assert.equal(createHash("sha256").update(lockedText).digest("hex"),
   zoningArchitectureV2ConfirmationLockedAuthorizationSHA256);
-assert.equal(locked.authorization.status, "locked");
-assert.equal(locked.active, false);
-assert.equal(locked.authorization.networkOrModelCallAuthorized, false);
-assert.equal(locked.authorization.scope.caseCount, null);
-assert.equal(locked.authorization.ownerDecision.exactAuthorizationPhrase, null);
-assert.equal(locked.authorization.execution.authorizationPackageCommit, null);
-assert.equal(locked.authorization.execution.executionCommit, null);
-assert.equal(locked.preflight.summary.pass, true);
-assert.equal(locked.preflight.summary.readyCaseCount, 24);
-assert.equal(locked.preflight.summary.zeroModelBoundaryCount, 6);
-assert.equal(locked.preflight.aggregateGates.noPaidSpend, true);
+assert.equal(consumed.authorization.status, "consumed");
+assert.equal(consumed.authorization.consumption.runID,
+  zoningArchitectureV2ConfirmationRunID);
+assert.equal(consumed.authorization.execution.executionCommit,
+  zoningArchitectureV2ConfirmationExecutionCommit);
+assert.equal(consumed.active, false);
+assert.equal(consumed.result.results.length, 30);
+assert.equal(consumed.result.configuration.actualUSD, 1.519425);
+assert.equal(consumed.result.configuration.conservativeReservedUSD, 1.659459);
+assert.equal(consumed.result.configuration.pendingPaidRequestCount, 1);
+assert.equal(consumed.result.economics.sample.completed, 21);
+assert.equal(consumed.result.economics.economics.projectedCostPer100TurnsUSD, 4.74);
+assert.equal(consumed.result.economics.charging.integrityPass, true);
+assert.equal(consumed.preflight.summary.pass, true);
+assert.equal(consumed.preflight.summary.readyCaseCount, 24);
+assert.equal(consumed.preflight.summary.zeroModelBoundaryCount, 6);
+assert.equal(consumed.preflight.aggregateGates.noPaidSpend, true);
 assert.throws(
-  () => requireActiveZoningArchitectureV2ConfirmationPaidAuthorization(locked),
+  () => requireActiveZoningArchitectureV2ConfirmationPaidAuthorization(consumed),
   (error) => error?.code === "ZONING_ARCHITECTURE_V2_AUTHORIZATION_REQUIRED"
 );
 
@@ -193,6 +216,6 @@ try {
 }
 
 console.log(
-  "Permitext Zoning Architecture V2 locked confirmation contract passed; " +
-  "30 ordered cases retained, exact authorization required, paid model calls: no."
+  "Permitext Zoning Architecture V2 consumed confirmation contract passed; " +
+  "30 ordered results retained, conservative pending-cost bound retained, re-dispatch blocked; paid model calls: no."
 );

@@ -1,10 +1,10 @@
-# Permitext Zoning Architecture V2 — Locked Confirmation Package
+# Permitext Zoning Architecture V2 — Consumed Confirmation Package
 
 Date: September 1, 2026
 
 Working branch: `codex/zoning-research-beta1`
 
-Status: **LOCKED; OWNER AUTHORIZATION REQUIRED; ZERO PAID CALLS**
+Status: **AUTHORIZED ONCE; RUN COMPLETE; AUTHORIZATION CONSUMED; NO RETRY AUTHORIZED**
 
 ## Purpose
 
@@ -32,7 +32,7 @@ The package is bound to reviewed Architecture V2 implementation commit `991d38a0
 - Web support: disabled
 - Public release, deployment, pricing/allowance change, and 24,000-character candidate: unauthorized
 
-The machine-readable record is [zoning-architecture-v2-confirmation-paid-authorization.json](../permitext-sync-server/evals/zoning-architecture-v2-confirmation-paid-authorization.json). It has `status: locked`; owner, active scope, package commit, execution commit, attempt, and run fields are null; and `networkOrModelCallAuthorized` is false.
+The machine-readable record is [zoning-architecture-v2-confirmation-paid-authorization.json](../permitext-sync-server/evals/zoning-architecture-v2-confirmation-paid-authorization.json). It now has `status: consumed` and is bound to [run `9f67f4ba-3944-46a4-b438-fcec082144e3`](./PERMITEXT_ZONING_ARCHITECTURE_V2_CONFIRMATION_RESULT_2026-09-01.md). The historical locked package remains exact commit `3b5db112271da5d015dd84793b5331c59ec0a467`; re-dispatch is blocked.
 
 ## Bound execution policy
 
@@ -48,9 +48,9 @@ The machine-readable record is [zoning-architecture-v2-confirmation-paid-authori
 
 ## Authorization boundary
 
-Validating or committing this package cannot call a model. A live attempt remains blocked until the owner supplies one exact sentence naming the final package commit, all 30 ordered cases, one repetition, and the `$5` cap. The package validator constructs and checks that exact sentence; a similar sentence, a prior package authorization, or an uncommitted edit does not activate it.
+Validating or committing this package could not call a model. The owner later supplied the exact package-bound sentence for all 30 ordered cases, one repetition, and the `$5` cap. That authorization was used once and is consumed; the validator now binds the retained result and rejects any re-dispatch.
 
-After authorization, a separate execution commit must record only the authorization transition. The runner will then verify clean Git state, ancestry, locked-package hashes, signed local handoff, matching per-run and global locks, hostile-environment scrubbing, exact cohort order, and the cumulative spend cap before dispatch.
+Execution commit `fffd5c58c8b781bd9e322bdfad421ab2a65450e3` recorded only the reviewed authorization/recovery state before provider dispatch. The runner verified clean Git state, ancestry, locked-package hashes, signed local handoff, matching per-run and global locks, hostile-environment scrubbing, exact cohort order, and the cumulative spend cap.
 
 ## Remaining acceptance
 
