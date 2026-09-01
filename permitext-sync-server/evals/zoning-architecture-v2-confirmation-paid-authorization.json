@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "7b58a481-a900-4be1-9cf5-1d26e5fda78b",
-  "status": "locked",
+  "status": "authorized",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -15,16 +15,16 @@
     "maximumCumulativeSpendUSD": 5
   },
   "scope": {
-    "caseCount": null,
-    "repetitions": null,
-    "maximumCumulativeSpendUSD": null
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": null,
-    "authorizedBy": null,
-    "exactAuthorizationPhrase": null,
-    "exactSpendingCapPhrase": null
+    "authorizedAt": "2026-09-01T16:47:32.000Z",
+    "authorizedBy": "Permitext owner",
+    "exactAuthorizationPhrase": "authorize exactly package commit 3b5db112271da5d015dd84793b5331c59ec0a467 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.",
+    "exactSpendingCapPhrase": "authorize exactly package commit 3b5db112271da5d015dd84793b5331c59ec0a467 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
     "status": "not_started",
@@ -52,7 +52,7 @@
     "priorArchitectureV1ResultSHA256": "551ea803cb2e7758f9952874e2ea86dd31cb2b7c17abde3eb487a19f51a0cb0f"
   },
   "execution": {
-    "authorizationPackageCommit": null,
+    "authorizationPackageCommit": "3b5db112271da5d015dd84793b5331c59ec0a467",
     "executionCommit": null,
     "webSupportEnabled": false,
     "selectiveLunaTerraRouting": true,
@@ -72,11 +72,11 @@
       "RESEARCH_ZONING_EVIDENCE_BUDGET_FAILED"
     ]
   },
-  "networkOrModelCallAuthorized": false,
+  "networkOrModelCallAuthorized": true,
   "publicResearchReleaseAuthorized": false,
   "professionalZoningSignoff": false,
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "Locked Architecture V2 confirmation package. Preparing or validating this record makes no provider request. A paid run requires a later exact owner sentence naming the committed package, all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5."
+  "notes": "The Permitext owner authorized the exact locked Architecture V2 package for all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. The one-use confirmation has not started."
 }
