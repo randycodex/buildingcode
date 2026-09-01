@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "d79db463-bc42-47c6-9e74-5931875cab50",
-  "status": "locked",
+  "status": "authorized",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -15,16 +15,16 @@
     "maximumCumulativeSpendUSD": 5
   },
   "scope": {
-    "caseCount": null,
-    "repetitions": null,
-    "maximumCumulativeSpendUSD": null
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": null,
-    "authorizedBy": null,
-    "exactAuthorizationPhrase": null,
-    "exactSpendingCapPhrase": null
+    "authorizedAt": "2026-09-01T12:53:25.000Z",
+    "authorizedBy": "Permitext owner",
+    "exactAuthorizationPhrase": "authorize exactly package commit 3a3cad04d7799da906a5484af981aea5bf014ef2 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.",
+    "exactSpendingCapPhrase": "authorize exactly package commit 3a3cad04d7799da906a5484af981aea5bf014ef2 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
     "status": "not_started",
@@ -66,7 +66,7 @@
     "projectionOnly": true
   },
   "execution": {
-    "authorizationPackageCommit": null,
+    "authorizationPackageCommit": "3a3cad04d7799da906a5484af981aea5bf014ef2",
     "executionCommit": null,
     "webSupportEnabled": false,
     "lunaFirst": true,
@@ -85,6 +85,6 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "networkOrModelCallAuthorized": false,
-  "notes": "Locked after the 30-case no-cost Architecture V1 preflight passed. This record cannot authorize or dispatch a provider request without a later exact package sentence and cumulative spend cap."
+  "networkOrModelCallAuthorized": true,
+  "notes": "The Permitext owner authorized the exact locked Architecture V1 package for all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. The one-use confirmation has not started."
 }
