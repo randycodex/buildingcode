@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 export const zoningResearchSafetyVersion =
-  "20260831-zoning-appendix-j-preposed-subarea-source-rule-v16";
+  "20260831-zoning-canonical-source-output-table-legend-v17";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -1166,13 +1166,13 @@ export function zoningResearchSafetyPromptContext(options = {}) {
         : "The supplied facts do not establish the mapped location needed for a parcel-specific conclusion. State that boundary, separately request a usable property identifier such as the address or BBL and the controlling official map or mapped-district evidence, and keep the result conditional."
       : "Use only mapped-location facts expressly supplied for this question; do not broaden them.",
     appendixJSourceBoundaryQuestion
-      ? "For this Appendix J source-boundary question, describe only the generic Subarea 1 and Subarea 2 source rules. Do not enumerate or summarize named designated areas, boroughs, community districts, map numbers, or table rows. Separately state that no site, property, or parcel conclusion can be made without its address or BBL and the applicable official Appendix J map, and list both items in missingFacts. Do not state or imply that this site, project, applicant, or owner qualifies, is permitted, receives a benefit, or may proceed."
+      ? "For this Appendix J source-boundary question, use these exact standalone source-rule sentences without a preface and without combining, paraphrasing, or extending them: \"For Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19.\" \"For Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192.\" Do not enumerate or summarize named designated areas, boroughs, community districts, map numbers, or table rows. In a separate sentence, state that no site, property, or parcel conclusion can be made without its address or BBL and the applicable official Appendix J map, and list both items in missingFacts. Do not state or imply that this site, project, applicant, or owner qualifies, is permitted, receives a benefit, or may proceed."
       : "",
     profile.specialDistrictLabels.length
       ? `Preserve the exact special-purpose scope named in the evidence: ${profile.specialDistrictLabels.join("; ")}.`
       : "",
     profile.categories.includes("table") && !appendixJSourceBoundaryQuestion
-      ? "Read structured table cells together with their headings, symbols, notes, and footnotes. Do not reconstruct a row from prose or silently ignore a conditional category."
+      ? "Read structured table cells together with their headings, symbols, notes, and footnotes. Preserve each symbol's exact legend wording. If the legend says \"Permitted,\" say \"permitted,\" not \"permitted as-of-right\"; use \"as-of-right\" only where the exact selected evidence expressly says it. Do not reconstruct a row from prose, silently ignore a conditional category, or infer a stronger legal effect from a symbol."
       : "",
     profile.categories.includes("arithmetic")
       ? "Show each distinct decision-relevant calculation expressly needed to answer the question, including the proposed ratio or existing-condition comparison when it changes the result. Include inputs, units, operation, and result, but do not repeat an equivalent proof or add an unused margin merely to show more arithmetic. Distinguish every numerical comparison from overall zoning entitlement or compliance."
@@ -1316,7 +1316,7 @@ export function evaluateZoningResearchSafety({
     issues.push({
       type: "zoning_missing_mapped_location",
       detail: structuralAppendixJBoundary
-        ? "For this Appendix J source-boundary answer, remove named designated-area, borough, community-district, map-number, and table-row inventory and remove every site, property, or parcel result. Restate only the generic Subarea 1 treatment, the generic Subarea 2 treatment, and a separate boundary requiring the address or BBL plus the applicable official Appendix J map; list both missing items in missingFacts."
+        ? "For this Appendix J source-boundary answer, remove named designated-area, borough, community-district, map-number, and table-row inventory and remove every site, property, or parcel result. Use these exact standalone sentences without a preface or extension: \"For Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19.\" \"For Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192.\" Add a separate boundary requiring the address or BBL plus the applicable official Appendix J map, and list both missing items in missingFacts."
         : "Do not make a parcel-specific Zoning conclusion while mapped applicability is unresolved. State the boundary, keep the conclusion conditional, and name the missing address/BBL, mapped district, map area, or special-district fact in missingFacts."
     });
   }
@@ -1359,6 +1359,21 @@ export function evaluateZoningResearchSafety({
     issues.push({
       type: "zoning_table_symbol_omission",
       detail: "The question asks about table symbols. Explain their supplied meaning and any associated note or footnote instead of summarizing only the row labels."
+    });
+  }
+  const tableLegendDefinesPlainPermitted =
+    /(?:●|filled[- ]?circle)[^.;]{0,40}=\s*Permitted\b(?!\s+as[- ]of[- ]right)/i.test(profile.sourceText);
+  const tableLegendUpgradedInAnswer =
+    /(?:●|filled[- ]?circle(?: symbol)?)[^.;]{0,40}\bpermitted\s+as[- ]of[- ]right\b/i.test(narrative) ||
+    /\bpermitted\s+as[- ]of[- ]right\b[^.;]{0,40}(?:●|filled[- ]?circle(?: symbol)?)/i.test(narrative);
+  if (
+    profile.categories.includes("table-symbols") &&
+    tableLegendDefinesPlainPermitted &&
+    tableLegendUpgradedInAnswer
+  ) {
+    issues.push({
+      type: "zoning_table_legend_semantic_upgrade",
+      detail: "Preserve the selected legend's exact meaning: the filled-circle symbol means permitted. Do not restate that symbol as permitted as-of-right unless the selected evidence expressly defines it that way."
     });
   }
   if (

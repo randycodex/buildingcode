@@ -29,6 +29,22 @@ const defaultAuthorizationPath = fileURLToPath(new URL(
 ));
 export const zoningRemediationSuccessor3V16ConfirmationLockedAuthorizationSHA256 =
   "33c8112e307ecde61ab1b8007d318e16a932875b5df3fba2202d53154ce180f6";
+export const zoningRemediationSuccessor3V16ConfirmationConsumedAuthorizationSHA256 =
+  "f841d27c4f664990305a28ac6d2cc2817a2c910f53f402be44d3c0e3959153e5";
+export const zoningRemediationSuccessor3V16ConfirmationAuthorizationPackageCommit =
+  "9751e50d1f830db527a822b1a515552465749907";
+export const zoningRemediationSuccessor3V16ConfirmationExecutionCommit =
+  "0e17527e218daeb0d8ab938a37f34c04ee10febf";
+export const zoningRemediationSuccessor3V16ConfirmationRunID =
+  "784648df-2d7b-4957-972a-1ef14a054c43";
+export const zoningRemediationSuccessor3V16ConfirmationResultJSONFile =
+  "results/2026-09-01T01-59-08-536Z-784648df-2d7b-4957-972a-1ef14a054c43.json";
+export const zoningRemediationSuccessor3V16ConfirmationResultJSONSHA256 =
+  "94b0032df134daf360eb5ed59c80d4fd7c6cfd0b80e1564f095493b9a6fb673d";
+export const zoningRemediationSuccessor3V16ConfirmationResultMarkdownFile =
+  "results/2026-09-01T01-59-08-536Z-784648df-2d7b-4957-972a-1ef14a054c43.md";
+export const zoningRemediationSuccessor3V16ConfirmationResultMarkdownSHA256 =
+  "f48f5d5005fb5c347b7d368dbbc929ed4b2cdc2b42bb9afd152d65f5e7a89a58";
 export const zoningRemediationSuccessor3V16ConfirmationPreparedFromCommit =
   "661eda3cc5f6eef5959851caeb35e198ea4eb911";
 export const zoningRemediationSuccessor3V16ConfirmationSafetySHA256 =

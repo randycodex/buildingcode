@@ -269,7 +269,15 @@ const sourceBoundaryPrompt = zoningResearchSafetyPromptContext({
   question: sourceBoundaryQuestion,
   evidence: mapEvidence
 });
-assert.match(sourceBoundaryPrompt, /describe only the generic Subarea 1 and Subarea 2 source rules/);
+assert.match(
+  sourceBoundaryPrompt,
+  /For Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19\./
+);
+assert.match(
+  sourceBoundaryPrompt,
+  /For Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192\./
+);
+assert.match(sourceBoundaryPrompt, /without a preface and without combining, paraphrasing, or extending them/);
 assert.match(sourceBoundaryPrompt, /Do not enumerate or summarize named designated areas/);
 assert.match(sourceBoundaryPrompt, /address or BBL and the applicable official Appendix J map/);
 assert.match(sourceBoundaryPrompt, /Do not state or imply that this site, project, applicant, or owner qualifies/);
@@ -388,6 +396,14 @@ assert(namedAppendixJInventoryIssue);
 assert.match(
   namedAppendixJInventoryIssue.detail,
   /remove named designated-area, borough, community-district, map-number, and table-row inventory/
+);
+assert.match(
+  namedAppendixJInventoryIssue.detail,
+  /For Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19\./
+);
+assert.match(
+  namedAppendixJInventoryIssue.detail,
+  /For Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192\./
 );
 
 for (const v11FailureReproducedSafeTreatment of [
@@ -1662,6 +1678,13 @@ const tableEvidence = [source({
   richSourceGrids: [{ rows: [{ cells: [{ text: "Use Group I" }, { text: "*" }] }] }]
 })];
 const tableQuestion = "Using only selected Table 42-111, explain the Use Group I symbols and footnotes.";
+const tablePrompt = zoningResearchSafetyPromptContext({
+  question: tableQuestion,
+  evidence: tableEvidence
+});
+assert.match(tablePrompt, /Preserve each symbol's exact legend wording/);
+assert.match(tablePrompt, /If the legend says "Permitted," say "permitted," not "permitted as-of-right"/);
+assert.match(tablePrompt, /use "as-of-right" only where the exact selected evidence expressly says it/);
 const uncitedTable = evaluateZoningResearchSafety({
   question: tableQuestion,
   evidence: tableEvidence,
@@ -1674,6 +1697,36 @@ const citedTable = evaluateZoningResearchSafety({
   answer: answer("The asterisk symbol refers to the supplied footnote condition; the table must be read with that footnote.", ["zr-table"])
 });
 assert.equal(citedTable.pass, true, JSON.stringify(citedTable.issues));
+
+const plainPermittedLegendEvidence = [source({
+  sourceID: "zr-table-plain-permitted",
+  sectionNumber: "42-111",
+  title: "Use Group I",
+  text: "● = Permitted. Where an Open Uses entry is permitted as-of-right, it must be unenclosed.",
+  richSourceGrids: [{ rows: [{ cells: [{ text: "Use Group I" }, { text: "●" }] }] }]
+})];
+const plainPermittedLegendQuestion =
+  "Using only selected Table 42-111, explain the filled-circle symbol and its footnote.";
+const upgradedPlainPermittedLegend = evaluateZoningResearchSafety({
+  question: plainPermittedLegendQuestion,
+  evidence: plainPermittedLegendEvidence,
+  answer: answer(
+    "The filled-circle symbol means permitted as-of-right.",
+    ["zr-table-plain-permitted"]
+  )
+});
+assert(upgradedPlainPermittedLegend.issues.some((issue) =>
+  issue.type === "zoning_table_legend_semantic_upgrade"
+));
+const exactPlainPermittedLegend = evaluateZoningResearchSafety({
+  question: plainPermittedLegendQuestion,
+  evidence: plainPermittedLegendEvidence,
+  answer: answer(
+    "The filled-circle symbol means permitted. Separately, the selected text says an Open Uses entry that is permitted as-of-right must be unenclosed.",
+    ["zr-table-plain-permitted"]
+  )
+});
+assert.equal(exactPlainPermittedLegend.pass, true, JSON.stringify(exactPlainPermittedLegend.issues));
 
 const farEvidence = [source({
   sourceID: "zr-far",
