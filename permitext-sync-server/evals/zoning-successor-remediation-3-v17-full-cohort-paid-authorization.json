@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "1d284c44-1f93-4abd-9992-f77d88d60697",
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -21,11 +21,11 @@
     "exactSpendingCapPhrase": "authorize exactly package commit e0c1c5d2846707641a6352fcdf0a397736724fda for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
-    "status": "not_started",
-    "attemptID": null,
-    "startedAt": null,
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "attemptID": "d2fdc1c4-7099-430d-9d33-2b759021afd2",
+    "startedAt": "2026-09-01T09:47:50.196Z",
+    "runID": "d2fdc1c4-7099-430d-9d33-2b759021afd2",
+    "consumedAt": "2026-09-01T10:10:34.135Z"
   },
   "lineage": {
     "preparedFromCommit": "d191ceae2aa390c3034f5275cceb5cb84935fd5a",
@@ -51,7 +51,7 @@
   },
   "execution": {
     "authorizationPackageCommit": "e0c1c5d2846707641a6352fcdf0a397736724fda",
-    "executionCommit": null,
+    "executionCommit": "0b8c7dca4ef33cd70f2889a5d61eea2add02d993",
     "webSupportEnabled": false,
     "stopOnExecutionError": false,
     "continueAfterVerifiedResearchFailure": true,
@@ -64,5 +64,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "notes": "Owner authorized one exact V17 full-cohort diagnostic: all 30 ordered cases, one repetition, and a $5 maximum cumulative API spend. Individual RESEARCH_VERIFICATION_FAILED operations may be recorded and skipped only after terminal telemetry proves zero pending requests; all other execution failures stop the run."
+  "notes": "One-time authorization consumed by 2026-09-01T09-47-52-289Z-d2fdc1c4-7099-430d-9d33-2b759021afd2.json. The result still requires quality, cost, and release-gate review."
 }
