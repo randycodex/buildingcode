@@ -4,7 +4,9 @@ Date: September 1, 2026
 
 Working branch: `codex/zoning-research-beta1`
 
-Status: **LOCKED; NOT AUTHORIZED; ZERO PROVIDER CALLS; ZERO API SPEND**
+Status: **CONSUMED ONCE; RESULT RETAINED; NO RETRY AUTHORIZED**
+
+Controlling result: [Architecture V2.1 confirmation result](./PERMITEXT_ZONING_ARCHITECTURE_V21_CONFIRMATION_RESULT_2026-09-01.md), run `06e55e77-4419-4732-b7ca-825afabc3bc2`
 
 ## Purpose
 
@@ -33,7 +35,7 @@ The package is bound to reviewed Architecture V2.1 implementation commit `d35a8c
 - Web support: disabled
 - Public release, deployment, pricing/allowance change, professional signoff, and 24,000-character candidate: unauthorized
 
-The machine-readable record is [zoning-architecture-v21-confirmation-paid-authorization.json](../permitext-sync-server/evals/zoning-architecture-v21-confirmation-paid-authorization.json). It remains `status: locked`; its active scope, owner-decision, package-commit, execution-commit, attempt, and model-call authorization fields are null or false.
+The machine-readable record is [zoning-architecture-v21-confirmation-paid-authorization.json](../permitext-sync-server/evals/zoning-architecture-v21-confirmation-paid-authorization.json). It is now `status: consumed` and retains the exact owner sentence, package commit, execution commit, attempt, run ID, and timestamps. It is inactive and cannot dispatch again.
 
 ## Bound execution policy
 
@@ -49,12 +51,12 @@ The machine-readable record is [zoning-architecture-v21-confirmation-paid-author
 
 ## Authorization boundary
 
-Preparing, validating, or committing this package cannot call a model. The current record does not authorize a paid run. A future run requires a new user message in this exact form, using the final package commit reported after commit creation:
+Preparing, validating, or committing the original locked package could not call a model. The owner later supplied this exact sentence:
 
-`authorize exactly package commit <40-character-package-commit> for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.`
+`authorize exactly package commit 0c5eda19a62b4873aebaf47ef015197a5d4f15e6 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.`
 
-No earlier Architecture V1, V2, remediation, or general “keep going” authorization can be reused. Only that later exact sentence may populate the scope and authorize one execution.
+That authority was consumed by run `06e55e77-4419-4732-b7ca-825afabc3bc2`. It cannot be reused, and no retry or successor package is authorized.
 
 ## Remaining acceptance
 
-Even a successful confirmation would not itself enable public Zoning Research. The result would still require semantic/reliability and measured-cost review, professional Zoning review, exact-release web/iOS presentation, physical-iPhone acceptance, and final owner release approval. The `$20` price and 100-turn allowance remain unchanged.
+The confirmation improved delivered-answer quality but did not clear completion or reliability. It does not enable public Zoning Research. Professional Zoning review, a deliberate product decision, exact-release web/iOS presentation, physical-iPhone acceptance, and final owner release approval remain open. The `$20` price and 100-turn allowance remain unchanged.

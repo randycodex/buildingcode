@@ -65,10 +65,10 @@ The mechanical preflight cost projection remains `$1.231246` nominal and `$3.204
 
 ## What this does not prove
 
-The no-cost replay proves that the compiler now rejects the five exact retained failed answers and the three representative verifier-block failure shapes while preserving the 16 accepted answers. It cannot prove that a future model's first answers will satisfy the new obligations or that the live `42.9%` repair rate has fallen. Only a later, separately authorized confirmation could measure that behavior.
+The no-cost replay proves that the compiler rejects the five exact retained failed answers and the three representative verifier-block failure shapes while preserving the 16 accepted answers. It did not itself prove live behavior. The later [V2.1 confirmation](./PERMITEXT_ZONING_ARCHITECTURE_V21_CONFIRMATION_RESULT_2026-09-01.md) measured a `15.4%` repair rate among delivered answers, but completion regressed to 13/30 operations.
 
 ## Controlling next gate
 
-The scoped independent review is clean after its reported adversarial findings were repaired, and the complete repository check passes on the reviewed bytes with provider credentials removed. The owner then directed work to continue, so one [distinct immutable V2.1 confirmation package](./PERMITEXT_ZONING_ARCHITECTURE_V21_CONFIRMATION_PACKAGE_2026-09-01.md) is now locked without active scope or model-call authorization. Preparing the package did not authorize execution; any paid run still requires a new exact package-commit authorization and cumulative spend cap.
+The scoped independent review and complete repository check were clean on the reviewed bytes. The owner later authorized exact [package `0c5eda19a62b4873aebaf47ef015197a5d4f15e6`](./PERMITEXT_ZONING_ARCHITECTURE_V21_CONFIRMATION_PACKAGE_2026-09-01.md) once. Run `06e55e77-4419-4732-b7ca-825afabc3bc2` is retained, the authorization is consumed, and no retry or automatic successor package is authorized.
 
 Public Zoning Research, the 24,000-character candidate, pricing and allowance changes, merge, push, deployment, professional review, exact-release web/iOS acceptance, and physical-iPhone acceptance remain outside this result.

@@ -9,8 +9,11 @@ import {
   validateZoningArchitectureV21ConfirmationPaidAuthorization,
   zoningArchitectureV21ConfirmationAuthorizationID,
   zoningArchitectureV21ConfirmationCohortSHA256,
+  zoningArchitectureV21ConfirmationConsumedAuthorizationSHA256,
+  zoningArchitectureV21ConfirmationExecutionCommit,
   zoningArchitectureV21ConfirmationLockedAuthorizationSHA256,
-  zoningArchitectureV21ConfirmationPreparedFromCommit
+  zoningArchitectureV21ConfirmationPreparedFromCommit,
+  zoningArchitectureV21ConfirmationRunID
 } from "../evals/zoning-architecture-v21-confirmation-paid-authorization.mjs";
 import {
   zoningArchitectureV2ContinuableResult
@@ -24,38 +27,59 @@ const authorizationPath = join(
   "zoning-architecture-v21-confirmation-paid-authorization.json"
 );
 const authorizationText = await readFile(authorizationPath, "utf8");
-const lockedFixture = JSON.parse(authorizationText);
-const locked = await validateZoningArchitectureV21ConfirmationPaidAuthorization();
+const consumed = await validateZoningArchitectureV21ConfirmationPaidAuthorization();
+const lockedPackage = spawnSync(
+  "git",
+  [
+    "show",
+    "0c5eda19a62b4873aebaf47ef015197a5d4f15e6:permitext-sync-server/evals/zoning-architecture-v21-confirmation-paid-authorization.json"
+  ],
+  { cwd: repositoryRoot, encoding: "utf8" }
+);
+assert.equal(lockedPackage.status, 0, lockedPackage.stderr);
+const lockedText = lockedPackage.stdout;
+const lockedFixture = JSON.parse(lockedText);
 
-assert.equal(locked.authorization.authorizationID,
+assert.equal(consumed.authorization.authorizationID,
   zoningArchitectureV21ConfirmationAuthorizationID);
-assert.equal(locked.authorizationSHA256,
+assert.equal(consumed.authorizationSHA256,
+  zoningArchitectureV21ConfirmationConsumedAuthorizationSHA256);
+assert.equal(createHash("sha256").update(lockedText).digest("hex"),
   zoningArchitectureV21ConfirmationLockedAuthorizationSHA256);
 assert.equal(createHash("sha256").update(authorizationText).digest("hex"),
-  zoningArchitectureV21ConfirmationLockedAuthorizationSHA256);
-assert.equal(locked.authorization.status, "locked");
-assert.equal(locked.authorization.networkOrModelCallAuthorized, false);
-assert.equal(locked.active, false);
-assert.equal(locked.cohort.cases.length, 30);
-assert.equal(locked.authorization.cohort.sha256,
+  zoningArchitectureV21ConfirmationConsumedAuthorizationSHA256);
+assert.equal(consumed.authorization.status, "consumed");
+assert.equal(consumed.authorization.consumption.runID,
+  zoningArchitectureV21ConfirmationRunID);
+assert.equal(consumed.authorization.execution.executionCommit,
+  zoningArchitectureV21ConfirmationExecutionCommit);
+assert.equal(consumed.active, false);
+assert.equal(consumed.result.results.length, 30);
+assert.equal(consumed.result.configuration.actualUSD, 0.810632);
+assert.equal(consumed.result.configuration.pendingPaidRequestCount, 0);
+assert.equal(consumed.result.economics.sample.completed, 13);
+assert.equal(consumed.result.economics.economics.projectedCostPer100TurnsUSD, 3.94);
+assert.equal(consumed.result.economics.readyForPricingDecision, false);
+assert.equal(consumed.cohort.cases.length, 30);
+assert.equal(consumed.authorization.cohort.sha256,
   zoningArchitectureV21ConfirmationCohortSHA256);
-assert.equal(locked.authorization.lineage.preparedFromCommit,
+assert.equal(consumed.authorization.lineage.preparedFromCommit,
   zoningArchitectureV21ConfirmationPreparedFromCommit);
-assert.equal(locked.preflight.summary.pass, true);
-assert.equal(locked.preflight.summary.readyCaseCount, 24);
-assert.equal(locked.preflight.summary.zeroModelBoundaryCount, 6);
-assert.equal(locked.preflight.aggregateGates.noPaidSpend, true);
-assert.equal(locked.preflight.aggregateGates.noNetworkOrProviderCalls, true);
-assert.equal(locked.preflight.retainedV2Confirmation.answerReplay
+assert.equal(consumed.preflight.summary.pass, true);
+assert.equal(consumed.preflight.summary.readyCaseCount, 24);
+assert.equal(consumed.preflight.summary.zeroModelBoundaryCount, 6);
+assert.equal(consumed.preflight.aggregateGates.noPaidSpend, true);
+assert.equal(consumed.preflight.aggregateGates.noNetworkOrProviderCalls, true);
+assert.equal(consumed.preflight.retainedV2Confirmation.answerReplay
   .preservedFullScoreIDs.length, 16);
-assert.equal(locked.preflight.retainedV2Confirmation.answerReplay
+assert.equal(consumed.preflight.retainedV2Confirmation.answerReplay
   .rejectedKnownJudgeFailureIDs.length, 5);
-assert.equal(locked.preflight.observedFailureRegressions.caseCount, 8);
-assert.equal(locked.priorAuthorization.status, "consumed");
-assert.equal(locked.priorAuthorization.consumption.runID,
+assert.equal(consumed.preflight.observedFailureRegressions.caseCount, 8);
+assert.equal(consumed.priorAuthorization.status, "consumed");
+assert.equal(consumed.priorAuthorization.consumption.runID,
   "9f67f4ba-3944-46a4-b438-fcec082144e3");
 assert.throws(
-  () => requireActiveZoningArchitectureV21ConfirmationPaidAuthorization(locked),
+  () => requireActiveZoningArchitectureV21ConfirmationPaidAuthorization(consumed),
   (error) => error?.code === "ZONING_ARCHITECTURE_V21_AUTHORIZATION_REQUIRED"
 );
 
@@ -197,6 +221,6 @@ try {
 }
 
 console.log(
-  "Permitext Zoning Architecture V2.1 locked confirmation contract passed for 30 ordered cases; " +
-  "provider dispatch remains unauthorized; paid model calls: no."
+  "Permitext Zoning Architecture V2.1 consumed confirmation contract passed; " +
+  "30 ordered results retained, settled cost ledger retained, re-dispatch blocked; paid model calls: no."
 );
