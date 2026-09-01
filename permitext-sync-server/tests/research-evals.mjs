@@ -106,6 +106,15 @@ import {
   zoningRemediationSuccessor3V16ConfirmationSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v16-confirmation-paid-authorization.mjs";
 import {
+  validateZoningRemediationSuccessor3V17ConfirmationPaidAuthorization,
+  zoningRemediationSuccessor3V17ConfirmationAppSHA256,
+  zoningRemediationSuccessor3V17ConfirmationEconomicsSHA256,
+  zoningRemediationSuccessor3V17ConfirmationLockedAuthorizationSHA256,
+  zoningRemediationSuccessor3V17ConfirmationPreparedFromCommit,
+  zoningRemediationSuccessor3V17ConfirmationRunnerHandoffSHA256,
+  zoningRemediationSuccessor3V17ConfirmationSafetySHA256
+} from "../evals/zoning-successor-remediation-3-v17-confirmation-paid-authorization.mjs";
+import {
   requireAuthenticatedZoningV11RunnerHandoff
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
 
@@ -153,14 +162,37 @@ const zoningRemediationSuccessor3V15ConfirmationMode =
   process.argv.includes("--zoning-successor-remediation-3-v15-confirmation");
 const zoningRemediationSuccessor3V16ConfirmationMode =
   process.argv.includes("--zoning-successor-remediation-3-v16-confirmation");
+const zoningRemediationSuccessor3V17ConfirmationMode =
+  process.argv.includes("--zoning-successor-remediation-3-v17-confirmation");
 const zoningRemediationSuccessor3AuthenticatedConfirmationMode =
   zoningRemediationSuccessor3V11ConfirmationMode ||
   zoningRemediationSuccessor3V12ConfirmationMode ||
   zoningRemediationSuccessor3V13ConfirmationMode ||
   zoningRemediationSuccessor3V14ConfirmationMode ||
   zoningRemediationSuccessor3V15ConfirmationMode ||
-  zoningRemediationSuccessor3V16ConfirmationMode;
-const authenticatedConfirmation = zoningRemediationSuccessor3V16ConfirmationMode
+  zoningRemediationSuccessor3V16ConfirmationMode ||
+  zoningRemediationSuccessor3V17ConfirmationMode;
+const authenticatedConfirmation = zoningRemediationSuccessor3V17ConfirmationMode
+  ? {
+      version: "v17",
+      validate:
+        validateZoningRemediationSuccessor3V17ConfirmationPaidAuthorization,
+      appSHA256: zoningRemediationSuccessor3V17ConfirmationAppSHA256,
+      economicsSHA256:
+        zoningRemediationSuccessor3V17ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningRemediationSuccessor3V17ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit:
+        zoningRemediationSuccessor3V17ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningRemediationSuccessor3V17ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningRemediationSuccessor3V17ConfirmationSafetySHA256,
+      authorizationFile:
+        "zoning-successor-remediation-3-v17-confirmation-paid-authorization.json",
+      runLockFile:
+        ".zoning-successor-remediation-3-v17-confirmation-paid-run.lock"
+    }
+  : zoningRemediationSuccessor3V16ConfirmationMode
   ? {
       version: "v16",
       validate:
@@ -317,7 +349,8 @@ const zoningDatasetModeCount = [
   zoningRemediationSuccessor3V13ConfirmationMode,
   zoningRemediationSuccessor3V14ConfirmationMode,
   zoningRemediationSuccessor3V15ConfirmationMode,
-  zoningRemediationSuccessor3V16ConfirmationMode
+  zoningRemediationSuccessor3V16ConfirmationMode,
+  zoningRemediationSuccessor3V17ConfirmationMode
 ].filter(Boolean).length;
 if (zoningDatasetModeCount > 1) {
   throw new Error("Choose exactly one Zoning evaluation dataset mode.");
@@ -4416,10 +4449,10 @@ async function runSelfTest(dataset, datasetText) {
 async function main() {
   if (process.argv.includes("--help")) {
     console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live | --dry-run] [filters]");
-    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; --zoning-successor-remediation-3-v8-confirmation, --zoning-successor-remediation-3-v9-confirmation, --zoning-successor-remediation-3-v11-confirmation, --zoning-successor-remediation-3-v12-confirmation, --zoning-successor-remediation-3-v13-confirmation, --zoning-successor-remediation-3-v14-confirmation, --zoning-successor-remediation-3-v15-confirmation, and --zoning-successor-remediation-3-v16-confirmation use that same frozen cohort through distinct confirmation authorizations. None is baseline-eligible.");
+    console.log("Dataset: --zoning uses the original frozen 21-case Zoning diagnostic; --zoning-expanded-batch-1 uses the original frozen 30-case expanded cohort; --zoning-successor uses the historical owner-approved successor; --zoning-successor-remediation-2 uses the separately frozen three-correction successor; --zoning-successor-remediation-3 uses the separately frozen two-correction successor; --zoning-successor-remediation-3-v8-confirmation, --zoning-successor-remediation-3-v9-confirmation, --zoning-successor-remediation-3-v11-confirmation, --zoning-successor-remediation-3-v12-confirmation, --zoning-successor-remediation-3-v13-confirmation, --zoning-successor-remediation-3-v14-confirmation, --zoning-successor-remediation-3-v15-confirmation, --zoning-successor-remediation-3-v16-confirmation, and --zoning-successor-remediation-3-v17-confirmation use that same frozen cohort through distinct confirmation authorizations. None is baseline-eligible.");
     console.log("Filters: --case CASE_ID --exclude-case CASE_ID --topic TOPIC --difficulty LEVEL --code-edition EDITION");
     console.log("Diagnostics: --include-drafts (requires PERMITEXT_RUN_UNAPPROVED_RESEARCH_DIAGNOSTICS=1; never baseline-eligible)");
-    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3 | --zoning-successor-remediation-3-v8-confirmation | --zoning-successor-remediation-3-v9-confirmation | --zoning-successor-remediation-3-v11-confirmation | --zoning-successor-remediation-3-v12-confirmation | --zoning-successor-remediation-3-v13-confirmation | --zoning-successor-remediation-3-v14-confirmation | --zoning-successor-remediation-3-v15-confirmation | --zoning-successor-remediation-3-v16-confirmation) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
+    console.log("No-cost Zoning prototype: (--zoning-expanded-batch-1 | --zoning-successor | --zoning-successor-remediation-2 | --zoning-successor-remediation-3 | --zoning-successor-remediation-3-v8-confirmation | --zoning-successor-remediation-3-v9-confirmation | --zoning-successor-remediation-3-v11-confirmation | --zoning-successor-remediation-3-v12-confirmation | --zoning-successor-remediation-3-v13-confirmation | --zoning-successor-remediation-3-v14-confirmation | --zoning-successor-remediation-3-v15-confirmation | --zoning-successor-remediation-3-v16-confirmation | --zoning-successor-remediation-3-v17-confirmation) --zoning-evidence-budget-prototype [--max-supplemental-characters 1..48000]");
     console.log("No-cost successor advisory: --zoning-successor --zoning-successor-evidence-budget-advisory (compares disabled 24000 candidate with 48000 across only the canonically ready cases while the full gate stays blocked)");
     console.log("Live configuration: --model MODEL --prompt-version VERSION --repeat 1..20 [--stop-on-error | --stop-on-execution-error] [--run-id UUID]");
     console.log("Reports: --create-baseline RUN_OR_BASELINE_JSON");
