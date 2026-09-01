@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "048cb366-4332-4379-9dbc-62feb3fe7224",
-  "status": "locked",
+  "status": "authorized",
   "cohort": {
     "file": "zoning-cases-expanded-batch-1-successor-remediation-3.json",
     "sha256": "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc",
@@ -15,16 +15,16 @@
     "maximumCumulativeSpendUSD": 5
   },
   "scope": {
-    "caseCount": null,
-    "repetitions": null,
-    "maximumCumulativeSpendUSD": null
+    "caseCount": 30,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 5
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": null,
-    "authorizedBy": null,
-    "exactAuthorizationPhrase": null,
-    "exactSpendingCapPhrase": null
+    "authorizedAt": "2026-09-01T14:34:44.000Z",
+    "authorizedBy": "Permitext owner",
+    "exactAuthorizationPhrase": "authorize exactly package commit 6f222ac1a0d5375cef14a3f10299d8b8e06b9112 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5.",
+    "exactSpendingCapPhrase": "authorize exactly package commit 6f222ac1a0d5375cef14a3f10299d8b8e06b9112 for all 30 ordered cases, one repetition, with a maximum cumulative API spend of $5."
   },
   "consumption": {
     "status": "not_started",
@@ -85,7 +85,7 @@
     "projectionOnly": true
   },
   "execution": {
-    "authorizationPackageCommit": null,
+    "authorizationPackageCommit": "6f222ac1a0d5375cef14a3f10299d8b8e06b9112",
     "executionCommit": null,
     "webSupportEnabled": false,
     "lunaFirst": true,
@@ -104,6 +104,6 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "evidenceBudgetCandidateEnabled": false,
-  "networkOrModelCallAuthorized": false,
-  "notes": "Locked successor after run 4381fd0a-f719-4e86-b231-972b299e6a57 consumed its authorization at 3 ordered operations and $0.034720. The narrow repair recognizes only exact uncharged zero-request prerequisite rejections; this new authorization identity cannot dispatch without a fresh exact package sentence and cumulative spend cap."
+  "networkOrModelCallAuthorized": true,
+  "notes": "The Permitext owner authorized the exact locked Architecture V1 successor package for all 30 ordered cases, one repetition, and a maximum cumulative API spend of $5. The one-use successor confirmation has not started."
 }
