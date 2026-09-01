@@ -13,9 +13,23 @@ const defaultAuthorizationPath = join(
 export const zoningArchitectureV1ConfirmationAuthorizationID =
   "d79db463-bc42-47c6-9e74-5931875cab50";
 export const zoningArchitectureV1ConfirmationLockedAuthorizationSHA256 =
-  "d0e2dc05ffbb1e7ebd9b52e0e82159892bc8e69b0151c04507d8d17d0276e412";
+  "bf1152aa39dda331a6298e344bbf2f8161a74f3b2501c892614bd9ed6191473b";
 export const zoningArchitectureV1ConfirmationCohortSHA256 =
   "852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc";
+export const zoningArchitectureV1ConfirmationPreparedFromCommit =
+  "3f72999be05ebfbababe55ba0a2a9c48052738cb";
+export const zoningArchitectureV1ConfirmationAppSHA256 =
+  "e33bf343a987980cc993274d5783bd1d84389bd32c1e8cbe12d89135ce833f4b";
+export const zoningArchitectureV1ConfirmationSafetySHA256 =
+  "e0c5f298e9cfbeaed9ed6d084df30b77643f29f011cfe5f309a0fb59a11277df";
+export const zoningArchitectureV1ConfirmationEconomicsSHA256 =
+  "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0";
+export const zoningArchitectureV1ConfirmationRunnerHandoffSHA256 =
+  "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327";
+export const zoningArchitectureV1ConfirmationPaidRunnerSHA256 =
+  "cb330eab2ac8f3190ceb956211f85a467d7e4a85a710df7a4ffbf4c68de88f47";
+export const zoningArchitectureV1ConfirmationEvaluationHarnessSHA256 =
+  "10f3d268e2fd8dac7a849e447ba07c62490cd84aba345b6389513165c4e30dab";
 
 const expectedFiles = Object.freeze({
   "evals/results/zoning-architecture-v1-no-cost-preflight.json":
@@ -30,6 +44,14 @@ const expectedFiles = Object.freeze({
     "e0c5f298e9cfbeaed9ed6d084df30b77643f29f011cfe5f309a0fb59a11277df",
   "app.mjs":
     "e33bf343a987980cc993274d5783bd1d84389bd32c1e8cbe12d89135ce833f4b",
+  "research-economics.mjs":
+    "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0",
+  "evals/zoning-v11-paid-runner-handoff.mjs":
+    "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327",
+  "scripts/run-zoning-successor.mjs":
+    "cb330eab2ac8f3190ceb956211f85a467d7e4a85a710df7a4ffbf4c68de88f47",
+  "tests/research-evals.mjs":
+    "10f3d268e2fd8dac7a849e447ba07c62490cd84aba345b6389513165c4e30dab",
   "scripts/preflight-zoning-architecture-v1.mjs":
     "3b191d855061b91ea2efe4ab1a5f5e281c4a7466a26707886659eeb2c0052211",
   "tests/research-zoning-planner-contract.mjs":
@@ -93,6 +115,22 @@ export async function validateZoningArchitectureV1ConfirmationPaidAuthorization(
   assert(priorAuthorization.status === "consumed" &&
     priorAuthorization.consumption?.runID === authorization.lineage?.priorV17RunID,
   "The Architecture V1 package lost its consumed V17 lineage.");
+  assert(authorization.lineage?.preparedFromCommit ===
+    zoningArchitectureV1ConfirmationPreparedFromCommit,
+  "The Architecture V1 package is not bound to the reviewed redesign commit.");
+  assert(authorization.lineage?.appSHA256 ===
+    zoningArchitectureV1ConfirmationAppSHA256 &&
+    authorization.lineage?.zoningSafetySHA256 ===
+      zoningArchitectureV1ConfirmationSafetySHA256 &&
+    authorization.lineage?.researchEconomicsSHA256 ===
+      zoningArchitectureV1ConfirmationEconomicsSHA256 &&
+    authorization.lineage?.runnerHandoffSHA256 ===
+      zoningArchitectureV1ConfirmationRunnerHandoffSHA256 &&
+    authorization.lineage?.paidRunnerSHA256 ===
+      zoningArchitectureV1ConfirmationPaidRunnerSHA256 &&
+    authorization.lineage?.evaluationHarnessSHA256 ===
+      zoningArchitectureV1ConfirmationEvaluationHarnessSHA256,
+  "The Architecture V1 package lost a pinned runtime input.");
   assert(authorization.execution?.webSupportEnabled === false,
     "The Architecture V1 confirmation may not enable web support.");
   assert(authorization.execution?.lunaFirst === true,
@@ -103,6 +141,14 @@ export async function validateZoningArchitectureV1ConfirmationPaidAuthorization(
     "The Architecture V1 confirmation must retain its two-request maximum.");
   assert(authorization.execution?.judgeLedgerSeparate === true,
     "The Architecture V1 confirmation must keep production and judge ledgers separate.");
+  assert(authorization.execution?.continueAfterPrerequisiteBoundary === true,
+    "The Architecture V1 confirmation must retain deterministic prerequisite-boundary continuation.");
+  assert(JSON.stringify(authorization.execution?.allowedContinuationFailureCodes) ===
+    JSON.stringify([
+      "RESEARCH_VERIFICATION_FAILED",
+      "RESEARCH_ZONING_PREREQUISITES_REQUIRED"
+    ]),
+  "The Architecture V1 confirmation changed its continuation failure allowlist.");
   for (const field of [
     "publicResearchReleaseAuthorized",
     "professionalZoningSignoff",

@@ -34,7 +34,7 @@
     "consumedAt": null
   },
   "lineage": {
-    "preparedFromCommit": "be69f1a5648321f90b6e35b287f6dd7b572030c6",
+    "preparedFromCommit": "3f72999be05ebfbababe55ba0a2a9c48052738cb",
     "plannerVersion": "20260901-question-path-v1",
     "noCostPreflightFile": "results/zoning-architecture-v1-no-cost-preflight.json",
     "noCostPreflightSHA256": "0c1337c26c237f774d7320cc95bb034f2b6bb6e6f6a6a19016814d141b6b5c88",
@@ -43,6 +43,10 @@
     "evidenceAssemblySHA256": "a5f094303fd72fb011ea858d5539b2cf4ff2f60b8e84d291c606156b453cdcb1",
     "zoningSafetySHA256": "e0c5f298e9cfbeaed9ed6d084df30b77643f29f011cfe5f309a0fb59a11277df",
     "appSHA256": "e33bf343a987980cc993274d5783bd1d84389bd32c1e8cbe12d89135ce833f4b",
+    "researchEconomicsSHA256": "d4816da6162137e122355494a3f2954dca09fc9d8978b85eb682516d29ec5ae0",
+    "runnerHandoffSHA256": "e45975a2d028d5d9852032fe6c107aacf0d3e7d18586ba41ae7eac4a2b4df327",
+    "paidRunnerSHA256": "cb330eab2ac8f3190ceb956211f85a467d7e4a85a710df7a4ffbf4c68de88f47",
+    "evaluationHarnessSHA256": "10f3d268e2fd8dac7a849e447ba07c62490cd84aba345b6389513165c4e30dab",
     "preflightScriptSHA256": "3b191d855061b91ea2efe4ab1a5f5e281c4a7466a26707886659eeb2c0052211",
     "plannerContractSHA256": "dd5e130beefab2897c71209e8f103125668492a5d88b23375d6dfdb41a45d4c3",
     "priorV17AuthorizationFile": "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json",
@@ -69,7 +73,12 @@
     "terraEscalation": "provider_failure_or_separately_authorized_narrow_repair_only",
     "fullAnswerRewriteAllowed": false,
     "maximumProviderRequestsPerCase": 2,
-    "judgeLedgerSeparate": true
+    "judgeLedgerSeparate": true,
+    "continueAfterPrerequisiteBoundary": true,
+    "allowedContinuationFailureCodes": [
+      "RESEARCH_VERIFICATION_FAILED",
+      "RESEARCH_ZONING_PREREQUISITES_REQUIRED"
+    ]
   },
   "publicResearchReleaseAuthorized": false,
   "professionalZoningSignoff": false,

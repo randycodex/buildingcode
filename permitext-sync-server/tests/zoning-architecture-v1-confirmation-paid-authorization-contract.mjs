@@ -21,6 +21,7 @@ const guardPath = new URL(
   "../evals/zoning-architecture-v1-confirmation-paid-authorization.mjs",
   import.meta.url
 );
+const runnerPath = new URL("../scripts/run-zoning-successor.mjs", import.meta.url);
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 const authorizationText = await readFile(authorizationPath, "utf8");
@@ -41,6 +42,11 @@ assert.equal(locked.authorization.publicResearchReleaseAuthorized, false);
 assert.equal(locked.authorization.deploymentAuthorized, false);
 assert.equal(locked.authorization.pricingOrAllowanceChangeAuthorized, false);
 assert.equal(locked.authorization.evidenceBudgetCandidateEnabled, false);
+assert.equal(locked.authorization.execution.continueAfterPrerequisiteBoundary, true);
+assert.deepEqual(
+  locked.authorization.execution.allowedContinuationFailureCodes,
+  ["RESEARCH_VERIFICATION_FAILED", "RESEARCH_ZONING_PREREQUISITES_REQUIRED"]
+);
 assert.throws(
   () => requireActiveZoningArchitectureV1ConfirmationPaidAuthorization(locked),
   /exact locked-package authorization sentence and cumulative spend cap/
@@ -57,6 +63,25 @@ const blocked = spawnSync(process.execPath, [fileURLToPath(guardPath), "--requir
 });
 assert.equal(blocked.status, 1, `${blocked.stdout}\n${blocked.stderr}`);
 assert.match(`${blocked.stdout}\n${blocked.stderr}`, /ZONING_ARCHITECTURE_V1_AUTHORIZATION_REQUIRED|exact locked-package authorization sentence/);
+
+const blockedRunner = spawnSync(
+  process.execPath,
+  [fileURLToPath(runnerPath), "--zoning-architecture-v1-confirmation"],
+  {
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      OPENAI_API_KEY: "",
+      PERMITEXT_RUN_PAID_RESEARCH_EVALS: "",
+      PERMITEXT_RESEARCH_EVAL_MAX_USD: ""
+    }
+  }
+);
+assert.equal(blockedRunner.status, 1, `${blockedRunner.stdout}\n${blockedRunner.stderr}`);
+assert.match(
+  `${blockedRunner.stdout}\n${blockedRunner.stderr}`,
+  /Zoning Architecture V1 requires the exact locked-package authorization sentence/
+);
 
 const temporaryDirectory = await mkdtemp(join(tmpdir(), "permitext-zoning-architecture-v1-"));
 try {
@@ -91,6 +116,8 @@ try {
     [(fixture) => { fixture.execution.webSupportEnabled = true; }, /may not enable web support/],
     [(fixture) => { fixture.execution.lunaFirst = false; }, /must remain Luna-first/],
     [(fixture) => { fixture.execution.fullAnswerRewriteAllowed = true; }, /may not enable full-answer rewrites/],
+    [(fixture) => { fixture.execution.continueAfterPrerequisiteBoundary = false; }, /must retain deterministic prerequisite-boundary continuation/],
+    [(fixture) => { fixture.execution.allowedContinuationFailureCodes.push("OTHER"); }, /changed its continuation failure allowlist/],
     [(fixture) => { fixture.evidenceBudgetCandidateEnabled = true; }, /may not authorize evidenceBudgetCandidateEnabled/],
     [(fixture) => { fixture.deploymentAuthorized = true; }, /may not authorize deploymentAuthorized/],
     [(fixture) => { fixture.networkOrModelCallAuthorized = false; }, /exact active owner authorization may permit a provider call/]

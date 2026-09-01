@@ -111,6 +111,16 @@ import {
   zoningRemediationSuccessor3V17FullCohortSafetySHA256
 } from "../evals/zoning-successor-remediation-3-v17-full-cohort-paid-authorization.mjs";
 import {
+  requireActiveZoningArchitectureV1ConfirmationPaidAuthorization,
+  validateZoningArchitectureV1ConfirmationPaidAuthorization,
+  zoningArchitectureV1ConfirmationAppSHA256,
+  zoningArchitectureV1ConfirmationEconomicsSHA256,
+  zoningArchitectureV1ConfirmationLockedAuthorizationSHA256,
+  zoningArchitectureV1ConfirmationPreparedFromCommit,
+  zoningArchitectureV1ConfirmationRunnerHandoffSHA256,
+  zoningArchitectureV1ConfirmationSafetySHA256
+} from "../evals/zoning-architecture-v1-confirmation-paid-authorization.mjs";
+import {
   respondToZoningV11RunnerChallenge,
   zoningV11RunnerPrivateKey
 } from "../evals/zoning-v11-paid-runner-handoff.mjs";
@@ -147,7 +157,8 @@ assert(
         "--remediation-3-v15-confirmation",
         "--remediation-3-v16-confirmation",
         "--remediation-3-v17-confirmation",
-        "--remediation-3-v17-full-cohort"
+        "--remediation-3-v17-full-cohort",
+        "--zoning-architecture-v1-confirmation"
       ].includes(argument)),
   "Unsupported Zoning successor paid-run argument."
 );
@@ -173,6 +184,8 @@ const remediationSuccessor3V17ConfirmationMode =
   process.argv.includes("--remediation-3-v17-confirmation");
 const remediationSuccessor3V17FullCohortMode =
   process.argv.includes("--remediation-3-v17-full-cohort");
+const zoningArchitectureV1ConfirmationMode =
+  process.argv.includes("--zoning-architecture-v1-confirmation");
 const remediationSuccessor3AuthenticatedConfirmationMode =
   remediationSuccessor3V11ConfirmationMode ||
   remediationSuccessor3V12ConfirmationMode ||
@@ -181,7 +194,8 @@ const remediationSuccessor3AuthenticatedConfirmationMode =
   remediationSuccessor3V15ConfirmationMode ||
   remediationSuccessor3V16ConfirmationMode ||
   remediationSuccessor3V17ConfirmationMode ||
-  remediationSuccessor3V17FullCohortMode;
+  remediationSuccessor3V17FullCohortMode ||
+  zoningArchitectureV1ConfirmationMode;
 const retiredPaidPathMessage =
   "Historical Zoning successor paid runner modes are retired. Each must run through " +
   "its consuming runner and active run lock, and each now requires a new explicit owner " +
@@ -198,7 +212,24 @@ if (runnerInvokedDirectly && remediationSuccessor3V17ConfirmationMode) {
 const remediationSuccessor3FamilyMode = remediationSuccessor3Mode ||
   remediationSuccessor3V8ConfirmationMode || remediationSuccessor3V9ConfirmationMode ||
   remediationSuccessor3AuthenticatedConfirmationMode;
-const authenticatedConfirmation = remediationSuccessor3V17FullCohortMode
+const authenticatedConfirmation = zoningArchitectureV1ConfirmationMode
+  ? {
+      version: "architecture-v1",
+      validate: validateZoningArchitectureV1ConfirmationPaidAuthorization,
+      requireActive: requireActiveZoningArchitectureV1ConfirmationPaidAuthorization,
+      appSHA256: zoningArchitectureV1ConfirmationAppSHA256,
+      economicsSHA256: zoningArchitectureV1ConfirmationEconomicsSHA256,
+      lockedAuthorizationSHA256:
+        zoningArchitectureV1ConfirmationLockedAuthorizationSHA256,
+      preparedFromCommit: zoningArchitectureV1ConfirmationPreparedFromCommit,
+      runnerHandoffSHA256:
+        zoningArchitectureV1ConfirmationRunnerHandoffSHA256,
+      safetySHA256: zoningArchitectureV1ConfirmationSafetySHA256,
+      stopOnExecutionError: false,
+      continueAfterVerifiedResearchFailure: true,
+      continueAfterPrerequisiteBoundary: true
+    }
+  : remediationSuccessor3V17FullCohortMode
   ? {
       version: "v17-full-cohort",
       validate:
@@ -348,7 +379,9 @@ const authenticatedConfirmation = remediationSuccessor3V17FullCohortMode
 const authorizationPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3V17FullCohortMode
+  zoningArchitectureV1ConfirmationMode
+    ? "zoning-architecture-v1-confirmation-paid-authorization.json"
+    : remediationSuccessor3V17FullCohortMode
     ? "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.json"
     : remediationSuccessor3V17ConfirmationMode
     ? "zoning-successor-remediation-3-v17-confirmation-paid-authorization.json"
@@ -377,7 +410,9 @@ const authorizationPath = resolve(
 const authorizationModulePath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3V17FullCohortMode
+  zoningArchitectureV1ConfirmationMode
+    ? "zoning-architecture-v1-confirmation-paid-authorization.mjs"
+    : remediationSuccessor3V17FullCohortMode
     ? "zoning-successor-remediation-3-v17-full-cohort-paid-authorization.mjs"
     : remediationSuccessor3V17ConfirmationMode
     ? "zoning-successor-remediation-3-v17-confirmation-paid-authorization.mjs"
@@ -406,7 +441,9 @@ const authorizationModulePath = resolve(
 const runLockPath = resolve(
   serverRoot,
   "evals",
-  remediationSuccessor3V17FullCohortMode
+  zoningArchitectureV1ConfirmationMode
+    ? ".zoning-architecture-v1-confirmation-paid-run.lock"
+    : remediationSuccessor3V17FullCohortMode
     ? ".zoning-successor-remediation-3-v17-full-cohort-paid-run.lock"
     : remediationSuccessor3V17ConfirmationMode
     ? ".zoning-successor-remediation-3-v17-confirmation-paid-run.lock"
@@ -675,13 +712,48 @@ async function consumeAuthorization({
       `The ${authenticatedConfirmation.version} confirmation result operations are not an ordered cohort prefix.`
     );
     for (const item of result.results) {
-      assert.equal(item.operationMetric?.webSupportRequested, false,
+      assert.notEqual(item.operationMetric?.webSupportRequested, true,
         `A ${authenticatedConfirmation.version} confirmation operation requested unbudgeted web support.`);
-      assert.equal(item.operationMetric?.webSupportSearched, false,
+      assert.notEqual(item.operationMetric?.webSupportSearched, true,
         `A ${authenticatedConfirmation.version} confirmation operation used unbudgeted web support.`);
     }
   }
-  if (remediationSuccessor3V17FullCohortMode) {
+  if (zoningArchitectureV1ConfirmationMode) {
+    assert.equal(result.configuration?.webSupportEnabled, false,
+      "The Architecture V1 result unexpectedly enabled unbudgeted web-search fees.");
+    assert.equal(result.configuration?.stopOnExecutionError, false,
+      "The Architecture V1 result unexpectedly enabled fail-fast execution.");
+    assert.equal(result.configuration?.continueAfterVerifiedResearchFailure, true,
+      "The Architecture V1 result did not retain its bounded continuation policy.");
+    assert.equal(result.configuration?.continueAfterZoningPrerequisiteBoundary, true,
+      "The Architecture V1 result did not retain its deterministic prerequisite-boundary policy.");
+    const terminalResult = result.results.at(-1);
+    for (const item of result.results.filter((entry) => entry.error)) {
+      const operation = item.operationMetric;
+      const verificationFailure =
+        operation?.failureCode === "RESEARCH_VERIFICATION_FAILED" &&
+        Number.isInteger(operation?.providerRequestCount) &&
+        operation.providerRequestCount > 0;
+      const prerequisiteBoundary =
+        operation?.failureCode === "RESEARCH_ZONING_PREREQUISITES_REQUIRED" &&
+        operation?.providerRequestCount === 0;
+      const continuationSafe =
+        operation?.status === "failed" &&
+        operation?.charged === false &&
+        (verificationFailure || prerequisiteBoundary) &&
+        operation?.pendingProviderRequestCount === 0 &&
+        !item.error?.telemetryError;
+      const terminalStop =
+        item === terminalResult &&
+        result.failure?.caseID === item.testCase?.id;
+      assert(continuationSafe || terminalStop,
+        "The Architecture V1 result continued past a non-allowlisted execution failure.");
+    }
+    if (!result.failure) {
+      assert.equal(result.results.length, cohort.cases.length,
+        "The Architecture V1 result ended early without a recorded stopping failure.");
+    }
+  } else if (remediationSuccessor3V17FullCohortMode) {
     assert.equal(result.configuration?.webSupportEnabled, false,
       "The capped remediation-successor-3 result unexpectedly enabled unbudgeted web-search fees.");
     assert.equal(result.configuration?.stopOnExecutionError, false,
@@ -746,7 +818,9 @@ function runEvaluation({
   return new Promise((resolveRun, rejectRun) => {
     const childArguments = [
       "tests/research-evals.mjs",
-      remediationSuccessor3V17FullCohortMode
+      zoningArchitectureV1ConfirmationMode
+        ? "--zoning-architecture-v1-confirmation"
+        : remediationSuccessor3V17FullCohortMode
         ? "--zoning-successor-remediation-3-v17-full-cohort"
         : remediationSuccessor3V17ConfirmationMode
         ? "--zoning-successor-remediation-3-v17-confirmation"
@@ -773,6 +847,8 @@ function runEvaluation({
       "--run-id",
       runID,
       ...(remediationSuccessor3V17FullCohortMode
+        ? ["--continue-after-verified-research-failure"]
+        : zoningArchitectureV1ConfirmationMode
         ? ["--continue-after-verified-research-failure"]
         : remediationSuccessor3FamilyMode ? ["--stop-on-execution-error"] : [])
     ];
@@ -1022,7 +1098,9 @@ async function main() {
     console.log(
       `Running the exact frozen ${cohort.cases.length}-case owner-approved Zoning ` +
       `${remediationSuccessor3AuthenticatedConfirmationMode
-        ? `remediation successor 3 ${authenticatedConfirmation.version} confirmation`
+        ? zoningArchitectureV1ConfirmationMode
+          ? "Architecture V1 confirmation"
+          : `remediation successor 3 ${authenticatedConfirmation.version} confirmation`
         : remediationSuccessor3Mode ? "remediation successor 3"
         : remediationSuccessor2Mode ? "remediation successor 2" : "successor"} ` +
       `once with a $${paidEnvironment.approvedSpendCapUSD.toFixed(2)} maximum cumulative cap. ` +
@@ -1077,7 +1155,9 @@ async function main() {
   }
   if (result.code === 3) {
     console.error(
-      remediationSuccessor3V17FullCohortMode
+      zoningArchitectureV1ConfirmationMode
+        ? "The Architecture V1 confirmation retained one or more quality, prerequisite-boundary, or fail-closed case results."
+        : remediationSuccessor3V17FullCohortMode
         ? "The full-cohort diagnostic retained one or more case failures or stopped at a fail-closed boundary."
         : "The complete cohort finished, but one or more cases failed quality or execution checks."
     );
