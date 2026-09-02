@@ -77,6 +77,9 @@ assert.match(serverSource, /Do not let a narrow exception, a specialized ramp or
 assert.match(serverSource, /Adapt the presentation to the question instead of forcing a fixed report template/);
 assert.match(serverSource, /a concise Markdown table is permitted/);
 assert.match(serverSource, /If the user asks for a short paragraph or quick explanation/);
+assert.match(serverSource, /researchAnswerPresentationContract\(\{/);
+assert.match(serverSource, /QUESTION-SPECIFIC ANSWER PRESENTATION CONTRACT/);
+assert.match(serverSource, /The contract controls presentation only; it never permits an unsupported claim or omission/);
 assert.match(serverSource, /Do not silently correct or normalize enacted wording/);
 assert.match(serverSource, /RELATIONSHIP: \$\{section\.relationship/);
 assert.match(serverSource, /USER_SELECTED_TEXT is the exact model-visible focus and citation target/);

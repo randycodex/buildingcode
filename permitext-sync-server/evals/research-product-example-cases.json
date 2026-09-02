@@ -1,0 +1,155 @@
+{
+  "schema": "permitext-research-product-examples-v1",
+  "version": "2026-09-02",
+  "purpose": "Permanent no-cost acceptance cases derived from the owner's real Permitext and ChatGPT examples. Screenshots define the desired usability and presentation, while the enacted Permitext corpora define every legal claim.",
+  "paidModelCallsAuthorized": false,
+  "cases": [
+    {
+      "id": "product-example-ramp-2022",
+      "corpusID": "nyc-2022-construction-codes",
+      "turns": [
+        {
+          "question": "what are the requirements for designing a ramp?",
+          "presentationMode": "requirements-table"
+        }
+      ],
+      "requiredReferences": [
+        "BC 1012.1",
+        "BC 1012.2",
+        "BC 1012.3",
+        "BC 1012.4",
+        "BC 1012.5.1",
+        "BC 1012.6",
+        "BC 1012.7.1",
+        "BC 1012.8",
+        "BC 1012.10",
+        "BC 1101.2"
+      ],
+      "requiredEvidencePhrases": {
+        "BC 1012.2": ["one unit vertical in 12 units horizontal"],
+        "BC 1012.3": ["one unit vertical in 48 units horizontal"],
+        "BC 1012.4": ["30 inches"],
+        "BC 1012.5.1": ["36 inches"],
+        "BC 1012.6": ["landings at the bottom and top"],
+        "BC 1012.8": ["rise greater than 6 inches", "handrails on both sides"]
+      },
+      "answerBoundary": "The Building Code baseline may be summarized, but dimensions found only in ICC A117.1 must not be invented when the referenced standard text is not supplied."
+    },
+    {
+      "id": "product-example-corridor-accessibility-2022",
+      "corpusID": "nyc-2022-construction-codes",
+      "turns": [
+        {
+          "question": "What's the minimum hall towards a fire escape that does not require ADA?",
+          "presentationMode": "numeric-rule"
+        }
+      ],
+      "requiredReferences": [
+        "BC 1020.2",
+        "BC 1103.2",
+        "BC 1104.3"
+      ],
+      "requiredEvidencePhrases": {
+        "BC 1020.2": ["minimum width", "Table 1020.2"],
+        "BC 1103.2": ["exempt from this chapter to the extent specified"],
+        "BC 1104.3": ["at least one accessible route"]
+      },
+      "answerBoundary": "Do not create a general accessibility exemption merely because a corridor leads to an exit or fire escape; identify the occupancy, occupant load, route, and any exact exception needed to select a width."
+    },
+    {
+      "id": "product-example-appendix-p",
+      "corpusID": "nyc-2022-construction-codes",
+      "turns": [
+        {
+          "question": "what BC-Appendix P",
+          "presentationMode": "definition-status"
+        }
+      ],
+      "requiredReferences": ["BC P"],
+      "requiredEvidencePhrases": {
+        "BC P": ["Appendix P: Reserved"]
+      },
+      "answerBoundary": "State that Appendix P is reserved in the 2022 Building Code and distinguish that current status from the prior-edition 2014 accessibility appendix."
+    },
+    {
+      "id": "product-example-omh-bathroom-boundary",
+      "corpusID": "nyc-2022-construction-codes",
+      "outsideAuthorityRequired": true,
+      "turns": [
+        {
+          "question": "This feasibility must comply with NYS Office of Mental Health guidelines. Research the minimum bathroom, toilet, and ADA requirements.",
+          "presentationMode": "external-authority-boundary"
+        }
+      ],
+      "requiredReferences": [],
+      "requiredEvidencePhrases": {},
+      "answerBoundary": "Do not state OMH or 14 NYCRR fixture ratios from memory. Separate any supplied NYC Building Code accessibility evidence and request the exact OMH program type and controlling official source."
+    },
+    {
+      "id": "product-example-habitable-space-2022",
+      "corpusID": "nyc-2022-construction-codes",
+      "turns": [
+        {
+          "question": "in the building code, where are the minimum sq ft, or minimum distance between wall for habitable spaces like a bedroom",
+          "presentationMode": "numeric-rule"
+        }
+      ],
+      "requiredReferences": [
+        "BC 1208.1",
+        "BC 1208.3.1"
+      ],
+      "requiredEvidencePhrases": {
+        "BC 1208.1": ["not less than 8 feet"],
+        "BC 1208.3.1": ["not less than 80 square feet"]
+      },
+      "answerBoundary": "Give the 8-foot and 80-square-foot baselines directly, while preserving the exceptions supplied by those sections."
+    },
+    {
+      "id": "product-example-c4-4d-r8a",
+      "corpusID": "nyc-zoning-resolution",
+      "expectedAvailability": "public-research-disabled",
+      "turns": [
+        {
+          "question": "zoning area c4-4d, how similar it is to r8a?",
+          "presentationMode": "comparison-table"
+        },
+        {
+          "question": "give me just a short paragraph to explain quickly",
+          "presentationMode": "compact-paragraph"
+        }
+      ],
+      "requiredReferences": [
+        "ZR 34-112",
+        "ZR 23-22",
+        "ZR 23-432",
+        "ZR 33-122"
+      ],
+      "requiredEvidencePhrases": {
+        "ZR 34-112": ["C4-4D", "R8A"],
+        "ZR 23-22": ["R8A", "6.02", "7.20"],
+        "ZR 33-122": ["C4-4D", "3.40"]
+      },
+      "answerBoundary": "The residential-equivalent relationship is supported, but current FAR, height, use, and affordability paths must be kept distinct and cited instead of reduced to a timeless rule of thumb."
+    },
+    {
+      "id": "product-example-vision-lite-2014",
+      "corpusID": "nyc-2014-construction-codes",
+      "turns": [
+        {
+          "question": "maximum sq ft for vision light in a door - 2014 NYC Building Code",
+          "presentationMode": "numeric-rule"
+        },
+        {
+          "question": "is this from the 2014 building code?",
+          "presentationMode": "edition-check"
+        }
+      ],
+      "requiredReferences": ["BC 715.4.7.1"],
+      "forbiddenReferences": ["BC 716.5.8.1.1"],
+      "requiredEvidencePhrases": {
+        "BC 715.4.7.1": ["not more than 100 square inches", "without a dimension exceeding 10 inches"]
+      },
+      "answerBoundary": "The 100-square-inch limit applies to the specific fire-protection-rated glazing conditions stated in Section 715.4.7.1, not every rated or unrated door."
+    }
+  ]
+}

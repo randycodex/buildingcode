@@ -286,6 +286,7 @@ import {
   evaluateResearchAnswerQuality,
   researchAnswerQualityRevisionIssues
 } from "./research-answer-quality.mjs";
+import { researchAnswerPresentationContract } from "./research-answer-presentation.mjs";
 import {
   applyResearchProjectFactCoverage,
   researchProjectFactIsExplicitlyUnresolved,
@@ -9751,6 +9752,10 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     sourceID: section.sourceID || `section-${section.sectionID}`,
     codeVersion: section.codeVersion || defaultSyncCodeVersion
   }));
+  const answerPresentation = researchAnswerPresentationContract({
+    question,
+    evidence: passageEvidence
+  });
   const supportingSources = options.webSupport?.sources || [];
   const requestBody = {
       model,
@@ -9795,6 +9800,8 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           ? "Because the user expressly requested official guidance, when that guidance is responsive but the assembled enacted evidence does not establish a responsive rule, do not manufacture an enacted point or citation: return supportedPoints and citations as empty arrays and select the exact supportingSourceUses. Permitext will render the immutable selected claims with the noncontrolling authority boundary."
           : "Do not return a guidance-only answer without enacted bindings. Supporting web material may supplement an enacted answer but cannot replace its required supportedPoints and citations.",
         "Write answerText as the complete user-facing answer. Do not target a fixed number of paragraphs or sentences.",
+        `QUESTION-SPECIFIC ANSWER PRESENTATION CONTRACT\n${JSON.stringify(answerPresentation)}`,
+        "Follow the question-specific presentation contract unless a material safety, applicability, or evidence qualification requires a clearer structure. The contract controls presentation only; it never permits an unsupported claim or omission.",
         "Use the shortest answer that fully and reliably resolves the question from the available evidence. Structure must follow the reasoning: a simple answer may be one paragraph; rule-and-application reasoning may use more; multiple provisions, exceptions, applicability paths, competing interpretations, or evidence gaps may use additional paragraphs or a short hyphen-led breakdown.",
         "Adapt the presentation to the question instead of forcing a fixed report template. Lead with a direct plain-language answer. For several parallel requirements, use a compact hyphen-led checklist; for a genuine side-by-side comparison with at least three shared features, a concise Markdown table is permitted; use a short descriptive heading only when it makes a longer answer easier to scan.",
         "Use Markdown bold sparingly for the controlling result, key dimensions, or short labels. Place a compact human-readable code reference such as (BC § 1012.2) next to the sentence, bullet, or table value it supports, using only section numbers present in the supplied enacted evidence. The structured sourceIDs remain the binding citation map.",

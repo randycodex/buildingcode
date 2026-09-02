@@ -1,6 +1,6 @@
 # Permitext Beta 1 — Master Plan and Current Status
 
-Last updated: September 1, 2026
+Last updated: September 2, 2026
 
 This is the top-level Beta 1 plan. Detailed workstreams remain in their linked documents, but this file is the single place to see what is done, what is happening now, and what still blocks release.
 
@@ -16,6 +16,8 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 - Zoning Research is now planned for Beta 1, but public access remains disabled until the official corpus is current and its citation, table, map, amendment, applicability, evaluation, cost, and cross-platform gates pass.
 
 ## Current position
+
+September 2 Research and historical-code update: the complete official 2014 Construction Codes corpus is now available in the native Reader and Research path. All 111 documents remain validated native content with 158 native tables and 319 bundled local media items; known typography, table, and figure trouble spots pass local web and iOS checks. Research routing now binds pinned evidence and conversational year changes to the exact 2014 or 2022 corpus identity, and native citation navigation opens the matching edition and section. The owner's real product examples are frozen in the [no-cost product-example acceptance benchmark](./PERMITEXT_RESEARCH_PRODUCT_EXAMPLE_ACCEPTANCE_2026-09-02.md): seven topics across nine turns define direct-answer, requirements-table, comparison-table, numeric, short-paragraph, outside-authority, and edition-correction behavior while enacted corpus text—not screenshots—controls every legal claim. This is deterministic acceptance only; no live model call, public Zoning enablement, price/allowance change, merge, push, deployment, TestFlight upload, or release is authorized.
 
 September 1 Architecture V2 controlling update: the [substantial no-cost redesign](./PERMITEXT_ZONING_ARCHITECTURE_V2_NO_COST_RESULT_2026-09-01.md) is implemented. A question compiler now assigns six distinct reasoning paths, stops missing property or controlling-evidence cases before usage reservation, enforces tables/dates/arithmetic/answer obligations deterministically, routes simple bounded work to Luna and known complex work to Terra, and permits at most one source-bounded Terra patch rather than a full-answer rewrite. The frozen 30-case gate passes with 24 generation-ready cases, six zero-model boundaries, 12 retained full-score answers preserved, both former delivered judge failures now rejected, and all adversarial controls green. Mechanical Production projections are `$1.23` nominal and `$3.20` adverse per 100 completed turns, with a separate zero judge ledger; these are no-cost projections, not measured acceptance. One [distinct 30-case confirmation package](./PERMITEXT_ZONING_ARCHITECTURE_V2_CONFIRMATION_PACKAGE_2026-09-01.md) is now locked with no owner, active scope, package, execution, or model-call authorization. The next gate is an exact owner sentence naming its final package commit, all 30 ordered cases, one repetition, and a `$5` maximum cumulative API spend. No paid call, public enablement, price/allowance change, merge, push, or deployment is authorized.
 
@@ -45,12 +47,12 @@ Current development branch: `codex/zoning-research-beta1`
 
 ## Status dashboard
 
-Checklist snapshot: **138 completed, 25 open** across the full file: 14 main open gates plus the separately tracked 11-step final merge, deployment, TestFlight, and release sequence. Those 11 release substeps remain outside the 14 main-gate count and have not been authorized on this branch.
+Checklist snapshot: **145 completed, 24 open** across the full file: 13 main open items plus the separately tracked 11-step final merge, deployment, TestFlight, and release sequence. Those 11 release substeps remain outside the 13 main-item count and have not been authorized on this branch.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
-| Core product and cross-platform foundation | Mostly complete | Shared web/iOS contracts and Research presentation are complete. Final production-web and physical-iPhone verification remains. |
-| Research quality and subscriber economics | Current Beta gate passed | Immutable V6 passed 20/20, and the no-cost 100-turn/full-service economics model is complete. Actual tax, refund, and infrastructure results must be reviewed after the first 25–50 customers. |
+| Core product and cross-platform foundation | Mostly complete | Shared web/iOS contracts, Research presentation, and the native 2014 Construction Codes Reader/Research path are complete. Final production-web and physical-iPhone verification remains. |
+| Research quality and subscriber economics | Current Beta gate passed | Immutable V6 passed 20/20, the no-cost 100-turn/full-service economics model is complete, and the owner's product examples are now a source-verified deterministic benchmark. Live example confirmation and actual tax, refund, and infrastructure results remain separately gated. |
 | Zoning Research Beta 1 expansion | Final architecture confirmation complete; public reliability gate remains open | [Architecture V2.1 confirmation](./PERMITEXT_ZONING_ARCHITECTURE_V21_CONFIRMATION_RESULT_2026-09-01.md) attempted all 30 ordered cases once: 13 delivered answers, 12 required-rubric passes, one delivered quality failure, five verifier blocks, and 12 correct fail-closed prerequisite/evidence boundaries. Delivered-answer repair fell to `15.4%`, but completion regressed and the sample is not pricing-ready. The one-use authorization is consumed; no retry or automatic V2.2 package is authorized. Public Zoning Research and the 24,000-character candidate stay disabled. |
 | Billing and paid continuation | Partially complete | Server billing contracts, local Stripe/Apple exercises, the provider-backed Stripe sandbox lifecycle, isolated Apple staging, and Apple-created purchase/account-restore/cancellation/expiration/refund/renewal/billing-recovery/delayed-delivery evidence pass. The atomic duplicate repair is deployed only to the isolated custom environment, where an exact Apple-signed replay returned `changed: false` and left both database timestamps identical to the microsecond. The public isolated-staging alias now serves that repaired deployment. Controlled Production billing and final serving-release verification remain; Production was unchanged, and additional-turn sales stay disabled. |
 | Authentication and account lifecycle | Configuration ready; acceptance open | Product contracts, exact Production Clerk provider/domain/portal/native configuration, public AASA, and a permanent aggregate-only audit pass. Final fresh/existing Production sign-in plus account export/deletion verification remain. |
@@ -73,6 +75,7 @@ Checklist snapshot: **138 completed, 25 open** across the full file: 14 main ope
 - [x] Account deletion, sign-out, sync/account presentation, and Research Project context have cross-platform coverage.
 - [x] Free/Pro wording and the $20 monthly / 100-turn allowance are aligned across platforms.
 - [x] Research responses expose enacted citations, source/edition state, uncertainty, authority classification, and the unofficial-research disclaimer.
+- [x] Add the complete official 2014 Construction Codes as validated native content with native tables, bundled local figures, edition-specific Research routing, and exact native citation navigation.
 - [x] Zoning public Research remains disabled while the reader/search corpus can continue to exist separately.
 - [ ] Recheck the final merged build on both production web and the physical iPhone before release.
 
@@ -101,6 +104,7 @@ Checklist snapshot: **138 completed, 25 open** across the full file: 14 main ope
 - [x] Build the no-cost V6 subscriber aggregation and full-service planning model.
 - [x] Confirm the 15% App Store rate, ten-minute support assumption, $2 Beta contribution floor, and retention of 100 included turns.
 - [x] Verify the shared Research response contract in the current web source and iOS Simulator, including corpus edition/applicability decoding, display, and copied output.
+- [x] Freeze the owner's real product examples as a no-cost authoritative acceptance benchmark and compile question-specific answer presentation without treating screenshot prose as code authority.
 - [x] Complete the no-cost tax/refund/infrastructure source audit and quantify 10/25/50/100-subscriber plus 0/1/3/5/10%-refund sensitivities.
 - [x] Prepare the tax-registration and optional professional-reference packet and make local Beta readiness require the exact $7 per-user monthly Research-cost ceiling.
 - [x] Prepare a dormant Stripe automatic-tax Checkout path, a fail-closed Production guard that matches an explicit owner decision to the resolved live Price behavior, and a [Stripe tax decision record](./BETA1_STRIPE_TAX_DECISION_RECORD.md). Record the August 30 owner approval of `automatic` + `exclusive` and the exact local web disclosure `$20/month plus applicable taxes shown by Stripe.` Record the August 28 official New York `Issued` status and the no-change recommendation to replace Stripe's generic Product code with `Website Information Services - Business Use`. Leave actual-certificate receipt/display, owner approval and live tax-code/registration changes, filing frequency, Production activation, deployment, and real taxed Checkout open.

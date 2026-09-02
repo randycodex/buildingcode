@@ -1,0 +1,105 @@
+export const researchAnswerPresentationVersion = "20260902-product-example-contract-v1";
+
+const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
+
+const shortAnswerCue = /\b(?:short|brief|quick|quickly|one\s+paragraph|single\s+paragraph|concise)\b/i;
+const comparisonCue = /\b(?:compare|comparison|difference|different|similar|similarity|versus|vs\.?|same as|equivalent)\b/i;
+const requirementsCue = /\b(?:requirements?|designing|design requirements?|minimums?|what (?:do|does) .* require)\b/i;
+const numericCue = /\b(?:maximum|minimum|how (?:much|many|wide|long|high)|square\s+feet|sq\.?\s*ft|width|height|distance|slope|rise|clearance|dimension)\b/i;
+const definitionCue = /\b(?:what (?:is|are|does)|define|definition|meaning|appendix)\b/i;
+const editionCheckCue = /\b(?:is|was|were|does|did) (?:this|that|it|the (?:answer|requirement|section))\b[\s\S]*\b(?:19|20)\d{2}\b|\bfrom (?:the )?(?:19|20)\d{2}(?:\s+edition|\s+code)?\b/i;
+const outsideAuthorityCue = /\b(?:Office of Mental Health|OMH|NYCRR|agency|licensing|funding)\b/i;
+
+function evidenceCount(evidence) {
+  return new Set((Array.isArray(evidence) ? evidence : [])
+    .map((source) => String(source?.sectionID || source?.id || "").trim())
+    .filter(Boolean)).size;
+}
+
+function contractFor(mode, preferredStructure, requiredElements) {
+  return Object.freeze({
+    version: researchAnswerPresentationVersion,
+    mode,
+    preferredStructure,
+    directAnswerFirst: true,
+    requiredElements: Object.freeze(requiredElements),
+    universalRules: Object.freeze([
+      "Place each material code citation next to the claim it supports.",
+      "Separate governing enacted requirements from outside guidance or unsupplied standards.",
+      "Preserve material applicability conditions, exceptions, and unresolved facts.",
+      "Do not add a heading, table, list, calculation, or follow-up question unless it helps answer this question."
+    ])
+  });
+}
+
+export function researchAnswerPresentationContract({ question, evidence = [] } = {}) {
+  const text = compactText(question);
+  const sourceCount = evidenceCount(evidence);
+
+  if (shortAnswerCue.test(text)) {
+    return contractFor("compact-paragraph", "one compact paragraph", [
+      "Answer the requested point in the first sentence.",
+      "Use a second paragraph only when a material qualification cannot safely fit in the first."
+    ]);
+  }
+
+  if (editionCheckCue.test(text)) {
+    return contractFor("edition-check", "direct confirmation or correction", [
+      "Begin with Yes, No, or a direct correction.",
+      "Name the exact edition and correct any earlier overgeneralization before adding detail.",
+      "Cite only sections from the confirmed edition."
+    ]);
+  }
+
+  if (comparisonCue.test(text)) {
+    return contractFor("comparison-table", "short conclusion, compact Markdown table, practical distinction", [
+      "State the controlling relationship before the table.",
+      "Use a table only for shared features that can be compared on the supplied evidence.",
+      "End with the practical design or applicability distinction, without repeating the table."
+    ]);
+  }
+
+  if (outsideAuthorityCue.test(text) && requirementsCue.test(text)) {
+    return contractFor("external-authority-boundary", "conditional answer with separated authorities", [
+      "Identify which requested authority is present in the supplied evidence and which is not.",
+      "Do not invent ratios, dimensions, or program rules from an unsupplied agency or standard.",
+      "Give responsive enacted-code requirements that are established, then request only the missing controlling source or program fact."
+    ]);
+  }
+
+  if (requirementsCue.test(text) && sourceCount >= 4) {
+    return contractFor("requirements-table", "direct scope statement, Item/Requirement/Authority table, practical calculation", [
+      "Summarize the usable baseline rules before requesting project facts.",
+      "Use one row per parallel dimensional or configuration requirement.",
+      "Include a short calculation or design implication only when the evidence and stated facts support it."
+    ]);
+  }
+
+  if (numericCue.test(text)) {
+    return contractFor("numeric-rule", "number first, scope, exceptions", [
+      "Lead with the supported number or explain immediately why one number cannot be selected.",
+      "State the condition to which the number applies.",
+      "Identify any materially different exception or alternate category supplied by the evidence."
+    ]);
+  }
+
+  if (requirementsCue.test(text)) {
+    return contractFor("requirements-checklist", "direct answer with compact checklist", [
+      "Use a checklist only for genuinely parallel requirements.",
+      "Keep each item complete enough to preserve its condition and citation."
+    ]);
+  }
+
+  if (definitionCue.test(text)) {
+    return contractFor("definition-status", "definition, current status, practical consequence", [
+      "Define the term or provision directly.",
+      "When an edition is material, distinguish its historical and current status.",
+      "Ask for context only if it changes which provision controls."
+    ]);
+  }
+
+  return contractFor("direct-answer", "plain-language paragraphs", [
+    "Resolve the question in the first sentence.",
+    "Add only the rule, application, and qualifications needed to support that result."
+  ]);
+}
