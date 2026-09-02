@@ -5076,7 +5076,8 @@ final class CodeLibraryViewModel: ObservableObject {
             authoredCodeStore = nil
             codeSections = []
             selectedCodeSectionID = nil
-            contentLoadTask = Task {
+            contentLoadTask = Task { [weak self] in
+                guard let self else { return }
                 do {
                     let snapshot = try await Task.detached(priority: .userInitiated) {
                         try Self.loadSQLiteContentSnapshot(version: selectedVersion)
@@ -5114,7 +5115,8 @@ final class CodeLibraryViewModel: ObservableObject {
         case .authored:
             let selectedCodeSectionID = self.selectedCodeSectionID
                 ?? storedCodeSectionID()
-            contentLoadTask = Task {
+            contentLoadTask = Task { [weak self] in
+                guard let self else { return }
                 do {
                     let snapshot = try await Task.detached(priority: .userInitiated) {
                         try Self.loadAuthoredContentSnapshot(

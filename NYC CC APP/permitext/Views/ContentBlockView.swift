@@ -1129,7 +1129,8 @@ private struct TableWebView: UIViewRepresentable {
         }
 
         private func measureHeight(in webView: WKWebView, remainingPasses: Int) {
-            webView.evaluateJavaScript("Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)") { result, _ in
+            webView.evaluateJavaScript("Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)") { [weak self, weak webView] result, _ in
+                guard let self else { return }
                 if let value = result as? CGFloat {
                     self.heightChanged?(value)
                 } else if let value = result as? Double {
@@ -1137,7 +1138,7 @@ private struct TableWebView: UIViewRepresentable {
                 } else if let value = result as? Int {
                     self.heightChanged?(CGFloat(value))
                 }
-                guard remainingPasses > 0 else { return }
+                guard remainingPasses > 0, let webView else { return }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self, weak webView] in
                     guard let self, let webView else { return }
                     self.measureHeight(in: webView, remainingPasses: remainingPasses - 1)
