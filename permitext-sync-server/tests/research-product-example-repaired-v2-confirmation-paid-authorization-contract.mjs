@@ -25,6 +25,12 @@ const runLockPath = join(
   serverRoot,
   ".research-product-example-repaired-v2-confirmation-paid-run.lock"
 );
+const retainedResultPath = join(
+  serverRoot,
+  "evals",
+  "results",
+  "2026-09-02T17-28-08-506Z-9e81b093-5075-4e76-8cdf-ae75ffd38e50-product-example-repaired-v2-confirmation.json"
+);
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 const validation =
@@ -33,7 +39,15 @@ assert.equal(
   validation.authorization.authorizationID,
   researchProductExampleRepairedV2ConfirmationAuthorizationID
 );
-assert.equal(validation.authorization.status, "locked");
+assert.equal(validation.authorization.status, "consumed");
+assert.equal(
+  validation.authorization.consumption.runID,
+  "9e81b093-5075-4e76-8cdf-ae75ffd38e50"
+);
+assert.equal(
+  validation.authorization.execution.executionCommit,
+  "188d35e59ed5a55c0f4aacee055bff2dc2bac831"
+);
 assert.equal(
   validation.authorization.lineage.preparedFromCommit,
   researchProductExampleRepairedV2ConfirmationPreparedFromCommit
@@ -53,18 +67,85 @@ assert.equal(
   validation.authorization.execution.validateBothSpendControlLayersBeforeLock,
   true
 );
-assert.equal(
-  sha256(await readFile(authorizationPath)),
-  researchProductExampleRepairedV2ConfirmationLockedAuthorizationSHA256
-);
 assert.throws(
   () => requireActiveResearchProductExampleRepairedV2ConfirmationPaidAuthorization(validation),
   /locked and no provider call is authorized/i
 );
 
+const retainedResult = JSON.parse(await readFile(retainedResultPath, "utf8"));
+assert.equal(retainedResult.runID, validation.authorization.consumption.runID);
+assert.equal(retainedResult.executionCommit, validation.authorization.execution.executionCommit);
+assert.equal(retainedResult.status, "completed");
+assert.equal(retainedResult.scope.expectedConversationCount, 7);
+assert.equal(retainedResult.scope.completedConversationCount, 7);
+assert.equal(retainedResult.scope.expectedOrderedTurnCount, 9);
+assert.equal(retainedResult.scope.attemptedTurnCount, 9);
+assert.equal(retainedResult.scope.completedTurnCount, 9);
+assert.equal(retainedResult.scope.repetitions, 1);
+assert.equal(retainedResult.scope.separateJudgeRequests, 0);
+assert.equal(retainedResult.spend.capUSD, 2);
+assert.equal(retainedResult.spend.actualUSD, 1.289404);
+assert.equal(retainedResult.spend.reservedUSD, 1.289404);
+assert.equal(retainedResult.spend.pendingRequestCount, 0);
+assert.equal(retainedResult.results.length, 7);
+assert.equal(
+  retainedResult.results.reduce((sum, example) => sum + example.turns.length, 0),
+  9
+);
+assert.equal(
+  retainedResult.results.flatMap((example) => example.turns)
+    .filter((turn) => turn.review?.passed === true).length,
+  7
+);
+assert.equal(retainedResult.allDeterministicChecksPassed, false);
+assert.equal(retainedResult.ownerReviewRequired, true);
+assert.equal(retainedResult.publicReleaseAuthorized, false);
+
 const temporaryDirectory = await mkdtemp(join(tmpdir(), "permitext-owner-example-repaired-v2-"));
 try {
-  const tampered = structuredClone(validation.authorization);
+  const locked = structuredClone(validation.authorization);
+  locked.status = "locked";
+  locked.scope = {
+    conversationCount: null,
+    orderedTurnCount: null,
+    repetitions: null,
+    maximumCumulativeSpendUSD: null
+  };
+  locked.ownerDecision = {
+    required: true,
+    authorizedAt: null,
+    authorizedBy: null,
+    exactAuthorizationPhrase: null,
+    exactSpendingCapPhrase: null
+  };
+  locked.consumption = {
+    status: "not_started",
+    attemptID: null,
+    startedAt: null,
+    runID: null,
+    consumedAt: null
+  };
+  locked.execution.authorizationPackageCommit = null;
+  locked.execution.executionCommit = null;
+  locked.networkOrModelCallAuthorized = false;
+  const lockedPath = join(temporaryDirectory, "locked.json");
+  await writeFile(lockedPath, `${JSON.stringify(locked, null, 2)}\n`);
+  const lockedValidation =
+    await validateResearchProductExampleRepairedV2ConfirmationPaidAuthorization({
+      authorizationPath: lockedPath
+    });
+  assert.equal(
+    sha256(await readFile(lockedPath)),
+    researchProductExampleRepairedV2ConfirmationLockedAuthorizationSHA256
+  );
+  assert.throws(
+    () => requireActiveResearchProductExampleRepairedV2ConfirmationPaidAuthorization(
+      lockedValidation
+    ),
+    /locked and no provider call is authorized/i
+  );
+
+  const tampered = structuredClone(locked);
   tampered.notes = `${tampered.notes} changed`;
   const tamperedPath = join(temporaryDirectory, "tampered.json");
   await writeFile(tamperedPath, `${JSON.stringify(tampered, null, 2)}\n`);
@@ -79,7 +160,7 @@ try {
   const phrase =
     `authorize exactly package commit ${packageCommit} for all 9 ordered turns ` +
     "in 7 conversations, one repetition, with a maximum cumulative API spend of $2.";
-  const authorized = structuredClone(validation.authorization);
+  const authorized = structuredClone(locked);
   authorized.status = "authorized";
   authorized.scope = {
     conversationCount: 7,
@@ -170,5 +251,5 @@ assert.match(runnerSource, /product-example-repaired-v2-confirmation/);
 assert.doesNotMatch(runnerSource, /judgeAnswer|PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL/);
 
 console.log(
-  "Permitext repaired-v2 owner-example confirmation contract passed; the consumed zero-spend predecessor is immutable, both spend-control layers are bound, locked dispatch is refused, and no paid model call was made."
+  "Permitext repaired-v2 owner-example confirmation contract passed; the one-use authorization is consumed, the 9/9-turn $1.289404 result is retained with zero pending requests, and repeat dispatch is refused."
 );
