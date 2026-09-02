@@ -9,6 +9,7 @@ const [
   preflight,
   economics,
   currentPlan,
+  policyStaging,
   webIndex,
   webApp,
   iosSettings
@@ -20,6 +21,7 @@ const [
   readFile(new URL("../../docs/PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md", import.meta.url), "utf8"),
+  readFile(new URL("../../docs/PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md", import.meta.url), "utf8"),
   readFile(new URL("../public/index.html", import.meta.url), "utf8"),
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
   readFile(new URL("../../NYC CC APP/permitext/Views/SettingsView.swift", import.meta.url), "utf8")
@@ -28,7 +30,7 @@ const [
 const disclosure = "$20/month plus applicable taxes shown by Stripe.";
 
 for (const requiredDecision of [
-  /Status: \*\*OWNER APPROVED — automatic\/exclusive selected; New York registration issued; certificate receipt and provider activation remain open\*\*/,
+  /Status: \*\*OWNER APPROVED — automatic\/exclusive and `txcd_10701400` selected; owner reports possession of the New York certificate; provider activation remains open\*\*/,
   /PERMITEXT_STRIPE_TAX_MODE=automatic/,
   /PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive/,
   /August 30, 2026/,
@@ -36,7 +38,7 @@ for (const requiredDecision of [
   /Production activation only after the Certificate and provider facts pass review/,
   /txcd_10701400/,
   /Website Information Services - Business Use/,
-  /No live code has changed/
+  /No live Product code has changed yet/
 ]) {
   assert.match(record, requiredDecision);
 }
@@ -54,11 +56,16 @@ assert.match(preflight, /activation is separately authorized/);
 assert.match(preflight, /official registration status is already `Issued`/);
 assert.match(master, /Additional turn packs remain disabled and unpublished/);
 assert.match(master, /real taxed Checkout open/);
-assert.match(master, /actual-certificate receipt\/display/);
+assert.match(master, /owner report of certificate possession/);
 assert.match(acceptance, /registration issued: yes/);
-assert.match(acceptance, /Actual Certificate of Authority received:/);
+assert.match(acceptance, /Actual Certificate of Authority received: owner reported possession on September 2, 2026/);
 assert.match(commercial, /txcd_10701400/);
 assert.match(currentPlan, /txcd_10701400/);
+assert.match(policyStaging, /CONFIGURED IN VERCEL; NOT DEPLOYED OR PUBLISHED/);
+assert.match(policyStaging, /PERMITEXT_TERMS_VERSION=terms-2026-08-28/);
+assert.match(policyStaging, /PERMITEXT_PRIVACY_VERSION=privacy-2026-08-28/);
+assert.match(policyStaging, /PERMITEXT_SUBSCRIPTION_POLICY_VERSION=subscriptions-2026-08-28/);
+assert.match(policyStaging, /two Stripe-tax activation keys remain intentionally unset/);
 
 assert(webIndex.includes(disclosure));
 assert.match(webIndex, /aria-describedby="settings-stripe-tax-disclosure settings-plan-details"/);
