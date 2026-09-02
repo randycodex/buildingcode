@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "fcbb0ba5-2148-4c33-84e2-43b76852f9a3",
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "research-product-example-cases.json",
     "sha256": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
@@ -31,11 +31,11 @@
     "exactSpendingCapPhrase": "authorize exactly package commit 63456909353d0e1b4539a1048010ad957917752f for all 9 ordered turns in 7 conversations, one repetition, with a maximum cumulative API spend of $2."
   },
   "consumption": {
-    "status": "not_started",
-    "attemptID": null,
-    "startedAt": null,
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "attemptID": "fa52cca6-d28f-4d16-968a-0d8c06d596e9",
+    "startedAt": "2026-09-02T16:56:49.594Z",
+    "runID": "fa52cca6-d28f-4d16-968a-0d8c06d596e9",
+    "consumedAt": "2026-09-02T16:56:56.944Z"
   },
   "lineage": {
     "preparedFromCommit": "c1ea51e3b55aaa15be2639b0cdf14c3461b35b2e",
@@ -56,7 +56,7 @@
   },
   "execution": {
     "authorizationPackageCommit": "63456909353d0e1b4539a1048010ad957917752f",
-    "executionCommit": null,
+    "executionCommit": "6911154ad7f5a4c7852a96cd96bdc868432bc851",
     "webSupportEnabled": true,
     "officialDomains": [
       "nyc.gov",

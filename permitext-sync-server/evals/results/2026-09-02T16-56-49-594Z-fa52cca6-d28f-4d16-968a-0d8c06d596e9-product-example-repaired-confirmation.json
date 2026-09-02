@@ -1,0 +1,474 @@
+{
+  "schema": "permitext-research-product-example-repaired-live-confirmation-v1",
+  "runID": "fa52cca6-d28f-4d16-968a-0d8c06d596e9",
+  "status": "failed",
+  "startedAt": "2026-09-02T16:56:49.594Z",
+  "completedAt": "2026-09-02T16:56:56.944Z",
+  "authorizationID": "fcbb0ba5-2148-4c33-84e2-43b76852f9a3",
+  "packageCommit": "63456909353d0e1b4539a1048010ad957917752f",
+  "executionCommit": "6911154ad7f5a4c7852a96cd96bdc868432bc851",
+  "scope": {
+    "expectedConversationCount": 7,
+    "completedConversationCount": 7,
+    "expectedOrderedTurnCount": 9,
+    "attemptedTurnCount": 7,
+    "completedTurnCount": 0,
+    "repetitions": 1,
+    "separateJudgeRequests": 0,
+    "webSupportEnabled": true,
+    "officialDomains": [
+      "nyc.gov",
+      "ny.gov",
+      "rules.cityofnewyork.us",
+      "ada.gov"
+    ]
+  },
+  "spend": {
+    "active": false,
+    "capUSD": null,
+    "reservedUSD": 0,
+    "actualUSD": 0,
+    "requestCount": 0,
+    "pendingRequestCount": 0
+  },
+  "allDeterministicChecksPassed": false,
+  "ownerReviewRequired": true,
+  "publicReleaseAuthorized": false,
+  "fatalFailure": null,
+  "results": [
+    {
+      "id": "product-example-ramp-2022",
+      "corpusID": "nyc-2022-construction-codes",
+      "conversationID": "67e42466-4243-4c25-83e0-b7916ba0d115",
+      "turns": [
+        {
+          "index": 1,
+          "question": "what are the requirements for designing a ramp?",
+          "expectedPresentationMode": "requirements-table",
+          "status": "failed",
+          "operation": {
+            "schemaVersion": 1,
+            "id": "df08595d-a600-4603-9d9b-ee9f5abb9690",
+            "createdAt": "2026-09-02T16:56:49.757Z",
+            "status": "failed",
+            "mode": "openai",
+            "charged": false,
+            "fundingSource": null,
+            "model": null,
+            "requestedModel": null,
+            "modelUsage": [],
+            "routingVersion": null,
+            "routingMode": null,
+            "answerTier": null,
+            "escalated": false,
+            "escalationStages": [],
+            "verificationAttemptCount": 0,
+            "structuredResponseRetryCount": 0,
+            "structuredAttemptFailureCount": 0,
+            "structuredAttemptFailureStages": [],
+            "verificationIssueTypes": [],
+            "verificationAttemptDiagnostics": [],
+            "providerRequestCount": 0,
+            "pendingProviderRequestCount": 0,
+            "inputTokens": 0,
+            "cachedInputTokens": 0,
+            "outputTokens": 0,
+            "totalTokens": 0,
+            "estimatedCostUSD": null,
+            "actualProviderCostUSD": null,
+            "conservativeProviderCostUSD": null,
+            "durationMilliseconds": 1113,
+            "failureCode": "RESEARCH_SPEND_CAP",
+            "failureStage": null,
+            "providerIncompleteReason": null,
+            "webSupportRequested": false,
+            "webSupportSearched": false,
+            "pricingVersion": null
+          },
+          "error": {
+            "name": "Error",
+            "message": "POST /research/conversations/message failed (503): Research is temporarily unavailable. Your question is still here.",
+            "httpStatus": 503
+          },
+          "review": {
+            "passed": false,
+            "humanReviewRequired": true,
+            "returnedReferences": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "product-example-corridor-accessibility-2022",
+      "corpusID": "nyc-2022-construction-codes",
+      "conversationID": "2a6d190a-9120-496c-8090-ca39f6a01120",
+      "turns": [
+        {
+          "index": 1,
+          "question": "What's the minimum hall towards a fire escape that does not require ADA?",
+          "expectedPresentationMode": "numeric-rule",
+          "status": "failed",
+          "operation": {
+            "schemaVersion": 1,
+            "id": "42d42758-0ca5-46cb-8c99-6d4fd077abde",
+            "createdAt": "2026-09-02T16:56:51.522Z",
+            "status": "failed",
+            "mode": "openai",
+            "charged": false,
+            "fundingSource": null,
+            "model": null,
+            "requestedModel": null,
+            "modelUsage": [],
+            "routingVersion": null,
+            "routingMode": null,
+            "answerTier": null,
+            "escalated": false,
+            "escalationStages": [],
+            "verificationAttemptCount": 0,
+            "structuredResponseRetryCount": 0,
+            "structuredAttemptFailureCount": 0,
+            "structuredAttemptFailureStages": [],
+            "verificationIssueTypes": [],
+            "verificationAttemptDiagnostics": [],
+            "providerRequestCount": 0,
+            "pendingProviderRequestCount": 0,
+            "inputTokens": 0,
+            "cachedInputTokens": 0,
+            "outputTokens": 0,
+            "totalTokens": 0,
+            "estimatedCostUSD": null,
+            "actualProviderCostUSD": null,
+            "conservativeProviderCostUSD": null,
+            "durationMilliseconds": 888,
+            "failureCode": "RESEARCH_SPEND_CAP",
+            "failureStage": null,
+            "providerIncompleteReason": null,
+            "webSupportRequested": false,
+            "webSupportSearched": false,
+            "pricingVersion": null
+          },
+          "error": {
+            "name": "Error",
+            "message": "POST /research/conversations/message failed (503): Research is temporarily unavailable. Your question is still here.",
+            "httpStatus": 503
+          },
+          "review": {
+            "passed": false,
+            "humanReviewRequired": true,
+            "returnedReferences": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "product-example-appendix-p",
+      "corpusID": "nyc-2022-construction-codes",
+      "conversationID": "44ee4694-7739-42f6-9695-02ca92cd1910",
+      "turns": [
+        {
+          "index": 1,
+          "question": "what BC-Appendix P",
+          "expectedPresentationMode": "definition-status",
+          "status": "failed",
+          "operation": {
+            "schemaVersion": 1,
+            "id": "afe4551b-e569-4926-bb04-27d26e6175ca",
+            "createdAt": "2026-09-02T16:56:53.152Z",
+            "status": "failed",
+            "mode": "openai",
+            "charged": false,
+            "fundingSource": null,
+            "model": null,
+            "requestedModel": null,
+            "modelUsage": [],
+            "routingVersion": null,
+            "routingMode": null,
+            "answerTier": null,
+            "escalated": false,
+            "escalationStages": [],
+            "verificationAttemptCount": 0,
+            "structuredResponseRetryCount": 0,
+            "structuredAttemptFailureCount": 0,
+            "structuredAttemptFailureStages": [],
+            "verificationIssueTypes": [],
+            "verificationAttemptDiagnostics": [],
+            "providerRequestCount": 0,
+            "pendingProviderRequestCount": 0,
+            "inputTokens": 0,
+            "cachedInputTokens": 0,
+            "outputTokens": 0,
+            "totalTokens": 0,
+            "estimatedCostUSD": null,
+            "actualProviderCostUSD": null,
+            "conservativeProviderCostUSD": null,
+            "durationMilliseconds": 14,
+            "failureCode": "RESEARCH_SPEND_CAP",
+            "failureStage": null,
+            "providerIncompleteReason": null,
+            "webSupportRequested": false,
+            "webSupportSearched": false,
+            "pricingVersion": null
+          },
+          "error": {
+            "name": "Error",
+            "message": "POST /research/conversations/message failed (503): Research is temporarily unavailable. Your question is still here.",
+            "httpStatus": 503
+          },
+          "review": {
+            "passed": false,
+            "humanReviewRequired": true,
+            "returnedReferences": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "product-example-omh-bathroom-boundary",
+      "corpusID": "nyc-2022-construction-codes",
+      "conversationID": "1c0ed214-c6ee-445e-a78d-730402dd2073",
+      "turns": [
+        {
+          "index": 1,
+          "question": "This feasibility must comply with NYS Office of Mental Health guidelines. Research the minimum bathroom, toilet, and ADA requirements.",
+          "expectedPresentationMode": "external-authority-boundary",
+          "status": "failed",
+          "operation": {
+            "schemaVersion": 1,
+            "id": "0adad671-1aba-4987-bb39-6f2309aa0112",
+            "createdAt": "2026-09-02T16:56:53.540Z",
+            "status": "failed",
+            "mode": "openai",
+            "charged": false,
+            "fundingSource": null,
+            "model": null,
+            "requestedModel": null,
+            "modelUsage": [],
+            "routingVersion": null,
+            "routingMode": null,
+            "answerTier": null,
+            "escalated": false,
+            "escalationStages": [],
+            "verificationAttemptCount": 0,
+            "structuredResponseRetryCount": 0,
+            "structuredAttemptFailureCount": 0,
+            "structuredAttemptFailureStages": [],
+            "verificationIssueTypes": [],
+            "verificationAttemptDiagnostics": [],
+            "providerRequestCount": 0,
+            "pendingProviderRequestCount": 0,
+            "inputTokens": 0,
+            "cachedInputTokens": 0,
+            "outputTokens": 0,
+            "totalTokens": 0,
+            "estimatedCostUSD": null,
+            "actualProviderCostUSD": null,
+            "conservativeProviderCostUSD": null,
+            "durationMilliseconds": 624,
+            "failureCode": "RESEARCH_SPEND_CAP",
+            "failureStage": null,
+            "providerIncompleteReason": null,
+            "webSupportRequested": false,
+            "webSupportSearched": false,
+            "pricingVersion": null
+          },
+          "error": {
+            "name": "Error",
+            "message": "POST /research/conversations/message failed (503): Research is temporarily unavailable. Your question is still here.",
+            "httpStatus": 503
+          },
+          "review": {
+            "passed": false,
+            "humanReviewRequired": true,
+            "returnedReferences": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "product-example-habitable-space-2022",
+      "corpusID": "nyc-2022-construction-codes",
+      "conversationID": "7edc1baf-d692-45dd-a617-16f7478712d0",
+      "turns": [
+        {
+          "index": 1,
+          "question": "in the building code, where are the minimum sq ft, or minimum distance between wall for habitable spaces like a bedroom",
+          "expectedPresentationMode": "numeric-rule",
+          "status": "failed",
+          "operation": {
+            "schemaVersion": 1,
+            "id": "d280fd56-cc57-4fea-810d-37c5337388e0",
+            "createdAt": "2026-09-02T16:56:54.600Z",
+            "status": "failed",
+            "mode": "openai",
+            "charged": false,
+            "fundingSource": null,
+            "model": null,
+            "requestedModel": null,
+            "modelUsage": [],
+            "routingVersion": null,
+            "routingMode": null,
+            "answerTier": null,
+            "escalated": false,
+            "escalationStages": [],
+            "verificationAttemptCount": 0,
+            "structuredResponseRetryCount": 0,
+            "structuredAttemptFailureCount": 0,
+            "structuredAttemptFailureStages": [],
+            "verificationIssueTypes": [],
+            "verificationAttemptDiagnostics": [],
+            "providerRequestCount": 0,
+            "pendingProviderRequestCount": 0,
+            "inputTokens": 0,
+            "cachedInputTokens": 0,
+            "outputTokens": 0,
+            "totalTokens": 0,
+            "estimatedCostUSD": null,
+            "actualProviderCostUSD": null,
+            "conservativeProviderCostUSD": null,
+            "durationMilliseconds": 632,
+            "failureCode": "RESEARCH_SPEND_CAP",
+            "failureStage": null,
+            "providerIncompleteReason": null,
+            "webSupportRequested": false,
+            "webSupportSearched": false,
+            "pricingVersion": null
+          },
+          "error": {
+            "name": "Error",
+            "message": "POST /research/conversations/message failed (503): Research is temporarily unavailable. Your question is still here.",
+            "httpStatus": 503
+          },
+          "review": {
+            "passed": false,
+            "humanReviewRequired": true,
+            "returnedReferences": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "product-example-c4-4d-r8a",
+      "corpusID": "nyc-zoning-resolution",
+      "conversationID": "763db7ce-5bee-4589-be97-f1d0fcd5868b",
+      "turns": [
+        {
+          "index": 1,
+          "question": "zoning area c4-4d, how similar it is to r8a?",
+          "expectedPresentationMode": "comparison-table",
+          "status": "failed",
+          "operation": {
+            "schemaVersion": 1,
+            "id": "883d564a-79cf-47e3-9029-04c6f1ee4c66",
+            "createdAt": "2026-09-02T16:56:55.595Z",
+            "status": "failed",
+            "mode": "openai",
+            "charged": false,
+            "fundingSource": null,
+            "model": null,
+            "requestedModel": null,
+            "modelUsage": [],
+            "routingVersion": null,
+            "routingMode": null,
+            "answerTier": null,
+            "escalated": false,
+            "escalationStages": [],
+            "verificationAttemptCount": 0,
+            "structuredResponseRetryCount": 0,
+            "structuredAttemptFailureCount": 0,
+            "structuredAttemptFailureStages": [],
+            "verificationIssueTypes": [],
+            "verificationAttemptDiagnostics": [],
+            "providerRequestCount": 0,
+            "pendingProviderRequestCount": 0,
+            "inputTokens": 0,
+            "cachedInputTokens": 0,
+            "outputTokens": 0,
+            "totalTokens": 0,
+            "estimatedCostUSD": null,
+            "actualProviderCostUSD": null,
+            "conservativeProviderCostUSD": null,
+            "durationMilliseconds": 195,
+            "failureCode": "RESEARCH_SPEND_CAP",
+            "failureStage": null,
+            "providerIncompleteReason": null,
+            "webSupportRequested": false,
+            "webSupportSearched": false,
+            "pricingVersion": null
+          },
+          "error": {
+            "name": "Error",
+            "message": "POST /research/conversations/message failed (503): Research is temporarily unavailable. Your question is still here.",
+            "httpStatus": 503
+          },
+          "review": {
+            "passed": false,
+            "humanReviewRequired": true,
+            "returnedReferences": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "product-example-vision-lite-2014",
+      "corpusID": "nyc-2014-construction-codes",
+      "conversationID": "31af880f-36cf-4372-885f-3b2600a51bda",
+      "turns": [
+        {
+          "index": 1,
+          "question": "maximum sq ft for vision light in a door - 2014 NYC Building Code",
+          "expectedPresentationMode": "numeric-rule",
+          "status": "failed",
+          "operation": {
+            "schemaVersion": 1,
+            "id": "2bd3ad6e-e390-4b34-b0fd-29b1ef1d43f3",
+            "createdAt": "2026-09-02T16:56:56.219Z",
+            "status": "failed",
+            "mode": "openai",
+            "charged": false,
+            "fundingSource": null,
+            "model": null,
+            "requestedModel": null,
+            "modelUsage": [],
+            "routingVersion": null,
+            "routingMode": null,
+            "answerTier": null,
+            "escalated": false,
+            "escalationStages": [],
+            "verificationAttemptCount": 0,
+            "structuredResponseRetryCount": 0,
+            "structuredAttemptFailureCount": 0,
+            "structuredAttemptFailureStages": [],
+            "verificationIssueTypes": [],
+            "verificationAttemptDiagnostics": [],
+            "providerRequestCount": 0,
+            "pendingProviderRequestCount": 0,
+            "inputTokens": 0,
+            "cachedInputTokens": 0,
+            "outputTokens": 0,
+            "totalTokens": 0,
+            "estimatedCostUSD": null,
+            "actualProviderCostUSD": null,
+            "conservativeProviderCostUSD": null,
+            "durationMilliseconds": 403,
+            "failureCode": "RESEARCH_SPEND_CAP",
+            "failureStage": null,
+            "providerIncompleteReason": null,
+            "webSupportRequested": false,
+            "webSupportSearched": false,
+            "pricingVersion": null
+          },
+          "error": {
+            "name": "Error",
+            "message": "POST /research/conversations/message failed (503): Research is temporarily unavailable. Your question is still here.",
+            "httpStatus": 503
+          },
+          "review": {
+            "passed": false,
+            "humanReviewRequired": true,
+            "returnedReferences": []
+          }
+        }
+      ]
+    }
+  ]
+}
