@@ -9,9 +9,10 @@
     "evidence-discovery.mjs": "890bff5fe06276b5f3c849de49e0826c8afeb6435c586402dd67c931fcf4ab91",
     "research-answer-presentation.mjs": "d52799dddf0a9ceb18aab2d7aa016de6cc684044234f659e7ac5adab74625ebc",
     "research-corpus-registry.mjs": "1e3dbf3c072723dffa79326a0c13e08c52fca6ed09469f2fc9e27b208ae96443",
+    "research-product-example-repaired-runtime-environment.mjs": "e46a985cdf1aa1ba5b7a66b28b9ee3e5af5f7f10bebe6b3e3a2fa7f1bd432396",
     "research-source-policy.mjs": "1197b66fcc134a739980f9571ec3f3dc235a4bbf82f93d668793ceba7ce2bace",
     "evals/research-product-example-cases.json": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
-    "scripts/run-research-product-example-repaired-confirmation.mjs": "21f56e96c39e204c6b57c5d6a39e487a14e5106016bb3f413f4b84898177dcb0",
+    "scripts/run-research-product-example-repaired-confirmation.mjs": "6652a9b01ec0e8ed660ea01a71ce2b7ab3415583d822f7f020c7e3968e363a9b",
     "tests/research-product-example-acceptance-contract.mjs": "af5a736b6c8ca128679573b96327b187480c01c357fed8ebcb1370b4090e1c19",
     "tests/research-product-example-runtime-contract.mjs": "834e829d6aa4ec3434c2f808c13be2cafba950b848a0190d24379724c56382cd"
   },
@@ -49,6 +50,17 @@
     "passed": true,
     "conversationCount": 7,
     "orderedTurnCount": 9,
+    "networkAttempts": 0,
+    "paidProviderCalls": 0
+  },
+  "simulatedLiveSpendGuardrails": {
+    "passed": true,
+    "version": "20260902-isolated-spend-guardrails-v1",
+    "maximumRequestUSD": 1,
+    "userDailyCapUSD": 2,
+    "userMonthlyCapUSD": 2,
+    "dailyCapUSD": 2,
+    "monthlyCapUSD": 2,
     "networkAttempts": 0,
     "paidProviderCalls": 0
   }

@@ -6,6 +6,8 @@ import { mkdir, mkdtemp, open, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { researchProductExampleRepairedRuntimeEnvironment } from
+  "../research-product-example-repaired-runtime-environment.mjs";
 import {
   requireActiveResearchProductExampleRepairedConfirmationPaidAuthorization,
   researchProductExampleRepairedConfirmationLockedAuthorizationSHA256,
@@ -399,11 +401,25 @@ async function main() {
     active.maximumCumulativeSpendUSD,
     "The runtime cumulative spend cap must exactly match the owner-authorized $2 cap."
   );
-  process.env.PERMITEXT_RESEARCH_EVAL_MAX_USD = String(active.maximumCumulativeSpendUSD);
   const executionCommit = validateExecutionCommit(validation.authorization);
 
-  const { validatePaidResearchEvaluationEnvironment } = await import("../research-config.mjs");
-  validatePaidResearchEvaluationEnvironment(process.env);
+  const isolatedSpendEnvironment = researchProductExampleRepairedRuntimeEnvironment(
+    process.env,
+    { maximumCumulativeSpendUSD: active.maximumCumulativeSpendUSD }
+  );
+  const {
+    researchSpendGuardrails,
+    validatePaidResearchEvaluationEnvironment
+  } = await import("../research-config.mjs");
+  validatePaidResearchEvaluationEnvironment(isolatedSpendEnvironment);
+  const isolatedSpendGuardrails = researchSpendGuardrails(isolatedSpendEnvironment);
+  assert.equal(
+    isolatedSpendGuardrails.ready,
+    true,
+    `The isolated repaired confirmation spend guardrails are not ready: ${isolatedSpendGuardrails.problems.join(" ")}`
+  );
+  assert.equal(isolatedSpendGuardrails.userMonthlyCapUSD, active.maximumCumulativeSpendUSD);
+  assert.equal(isolatedSpendGuardrails.monthlyCapUSD, active.maximumCumulativeSpendUSD);
 
   const runID = randomUUID();
   const startedAt = new Date().toISOString();
@@ -431,6 +447,7 @@ async function main() {
   const results = [];
   let fatalFailure = null;
   try {
+    Object.assign(process.env, isolatedSpendEnvironment);
     process.env.PERMITEXT_SYNC_DATA_PATH = join(temporaryDirectory, "sync-store.json");
     process.env.PERMITEXT_SYNC_DATABASE_URL = "";
     process.env.DATABASE_URL = "";

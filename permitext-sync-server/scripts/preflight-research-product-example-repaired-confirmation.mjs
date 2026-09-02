@@ -6,6 +6,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { evidenceDiscoveryVersion } from "../evidence-discovery.mjs";
 import {
+  researchProductExampleRepairedRuntimeEnvironment,
+  researchProductExampleRepairedRuntimeEnvironmentVersion
+} from "../research-product-example-repaired-runtime-environment.mjs";
+import {
+  researchSpendGuardrails,
+  validatePaidResearchEvaluationEnvironment
+} from "../research-config.mjs";
+import {
   researchSourcePolicyConfiguration,
   researchSourcePolicyVersion
 } from "../research-source-policy.mjs";
@@ -24,6 +32,7 @@ const boundInputPaths = [
   "evidence-discovery.mjs",
   "research-answer-presentation.mjs",
   "research-corpus-registry.mjs",
+  "research-product-example-repaired-runtime-environment.mjs",
   "research-source-policy.mjs",
   "evals/research-product-example-cases.json",
   "scripts/run-research-product-example-repaired-confirmation.mjs",
@@ -93,6 +102,26 @@ assert.equal(sourcePolicy.webSupportEnabled, true);
 assert.equal(evidenceDiscoveryVersion, "20260902-official-source-seeds-v21");
 assert.equal(researchSourcePolicyVersion, "20260902-supporting-web-v12");
 
+const simulatedLiveEnvironment = researchProductExampleRepairedRuntimeEnvironment({
+  OPENAI_API_KEY: "no-cost-preflight-key-that-is-never-used",
+  PERMITEXT_RUN_PAID_RESEARCH_EVALS: "1",
+  PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "2.00",
+  PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: "0.20",
+  PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "12.00",
+  PERMITEXT_RESEARCH_PRICING_VERSION: "openai-gpt-5.6-terra-2026-08-30"
+}, { maximumCumulativeSpendUSD: 2 });
+const evaluationEnvironment = validatePaidResearchEvaluationEnvironment(
+  simulatedLiveEnvironment
+);
+const spendGuardrails = researchSpendGuardrails(simulatedLiveEnvironment);
+assert.equal(evaluationEnvironment.approvedSpendCapUSD, 2);
+assert.equal(spendGuardrails.ready, true);
+assert.equal(spendGuardrails.maximumRequestUSD, 1);
+assert.equal(spendGuardrails.userDailyCapUSD, 2);
+assert.equal(spendGuardrails.userMonthlyCapUSD, 2);
+assert.equal(spendGuardrails.dailyCapUSD, 2);
+assert.equal(spendGuardrails.monthlyCapUSD, 2);
+
 const report = {
   schema: "permitext-research-product-example-repaired-confirmation-preflight-v1",
   version: "2026-09-02",
@@ -133,6 +162,17 @@ const report = {
     passed: true,
     conversationCount: 7,
     orderedTurnCount: 9,
+    networkAttempts: 0,
+    paidProviderCalls: 0
+  },
+  simulatedLiveSpendGuardrails: {
+    passed: true,
+    version: researchProductExampleRepairedRuntimeEnvironmentVersion,
+    maximumRequestUSD: spendGuardrails.maximumRequestUSD,
+    userDailyCapUSD: spendGuardrails.userDailyCapUSD,
+    userMonthlyCapUSD: spendGuardrails.userMonthlyCapUSD,
+    dailyCapUSD: spendGuardrails.dailyCapUSD,
+    monthlyCapUSD: spendGuardrails.monthlyCapUSD,
     networkAttempts: 0,
     paidProviderCalls: 0
   }
