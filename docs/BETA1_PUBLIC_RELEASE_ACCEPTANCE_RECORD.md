@@ -109,8 +109,8 @@ Release-bound: **no**
 
 - New York Certificate of Authority registration issued: yes — official notice and authenticated Business Express status dated August 28, 2026. The portal's `View Certificate` link returned the DTF-17 application rather than the certificate.
 - Actual Certificate of Authority received: owner reported possession on September 2, 2026; the sensitive certificate was not copied into source control or independently inspected in this record.
-- Certificate saved and printed/displayed as required:
-- Registration effective date and assigned filing frequency recorded:
+- Certificate saved and printed/displayed as required: yes — owner-confirmed September 2, 2026; no certificate image or identifier was retained.
+- Registration effective date and assigned filing frequency recorded: the owner-supplied DTF-17 application shows `09/18/2026` as the New York sales-tax business-start/effective date. Confirmation from the actual Certificate and the assigned filing frequency remain open; the application itself was not retained.
 - No taxable New York sale accepted before authorization: Stripe reported no live transactions before the registration was activated.
 - Stripe customer-location and billing-address behavior reviewed: local Checkout requires a billing address in automatic mode; real customer-location acceptance remains open.
 - Stripe automatic/manual tax decision and inclusive/exclusive behavior recorded: `automatic` + `exclusive` approved August 30, 2026; exact local web disclosure is `$20/month plus applicable taxes shown by Stripe.` Both Production keys were added September 2 without a deployment.

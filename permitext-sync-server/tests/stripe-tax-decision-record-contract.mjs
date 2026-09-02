@@ -40,7 +40,10 @@ for (const requiredDecision of [
   /approved Production keys are now staged in Vercel/,
   /txcd_10701400/,
   /Website Information Services - Business Use/,
-  /live Product was updated and independently reread/
+  /live Product was updated and independently reread/,
+  /privately saved and printed\/displayed/,
+  /DTF-17 application found `09\/18\/2026`/,
+  /assigned filing frequency remain unconfirmed/
 ]) {
   assert.match(record, requiredDecision);
 }
@@ -74,6 +77,9 @@ assert.match(providerActivation, /Starting immediately, you’ll collect Sales t
 assert.match(providerActivation, /PERMITEXT_STRIPE_TAX_MODE=automatic/);
 assert.match(providerActivation, /PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive/);
 assert.match(providerActivation, /No deployment was triggered/);
+assert.match(providerActivation, /owner confirmed that the actual Certificate of Authority is privately saved and printed\/displayed/);
+assert.match(providerActivation, /DTF-17 application found `09\/18\/2026`/);
+assert.match(providerActivation, /contains no assigned filing frequency/);
 
 assert(webIndex.includes(disclosure));
 assert.match(webIndex, /aria-describedby="settings-stripe-tax-disclosure settings-plan-details"/);

@@ -4,6 +4,13 @@ Status: **CONFIGURED IN STRIPE AND VERCEL; NOT DEPLOYED OR REAL-CHARGE VERIFIED*
 
 Recorded at `2026-09-02T21:56:33Z` after the owner's immediate approval and private entry of the New York Sales Tax ID. This record intentionally excludes the taxpayer ID, certificate image, residential address, browser form contents, and full provider identifiers.
 
+## Certificate and application evidence
+
+- The owner confirmed that the actual Certificate of Authority is privately saved and printed/displayed. This is owner-confirmed evidence; the certificate image and identifiers were not copied or independently retained.
+- Read-only inspection of the owner-supplied DTF-17 application found `09/18/2026` on page 1 as the date business will begin in New York for sales-tax purposes and on page 13 as the effective date of assuming responsibility.
+- The DTF-17 PDF is the application, not the issued Certificate of Authority. It contains no assigned filing frequency. Certificate-level corroboration of the effective date and the assigned filing frequency therefore remain open.
+- The PDF and its sensitive contents were not copied into source control.
+
 ## Verified provider state
 
 - Stripe confirmed `Product updated` for the live `Permitext Pro` Product.
@@ -27,7 +34,7 @@ No deployment was triggered. The serving Production release therefore does not u
 
 ## Remaining acceptance boundaries
 
-1. Privately save and print/display the Certificate of Authority, and record its effective date and assigned filing frequency without committing sensitive material.
+1. Confirm the effective date from the actual Certificate of Authority and privately record its assigned filing frequency. Private storage and printing/display are owner-confirmed, and the DTF-17 application records `09/18/2026`, but the application does not assign a filing frequency.
 2. Record the first New York filing deadline and a durable reminder; either configure filing separately or retain a manual filing process.
 3. Deploy the exact approved release and exact policy artifacts, then require the strict Production configuration and policy-publication checks to pass.
 4. Under separate immediate authorization, run the controlled real taxed-Checkout and refund exercise using a disposable account, retaining only redacted evidence.
