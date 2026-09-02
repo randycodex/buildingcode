@@ -20,7 +20,7 @@ Immediately afterward:
 
 - `https://permitext.com/release` still reported serving commit `dbbb6ab40d40d1d3d947303aa45b01fbd9cebce3` from deployment `permitext-sync-68t0wrazg-randycodexs-projects-b72fc111.vercel.app`;
 - the strict policy publication audit still returned `publicationReady: false` because all three live routes served hashes different from the exact approved local artifacts;
-- the two Stripe-tax activation keys remain intentionally unset until the approved Product classification and New York registration are submitted and verified; and
+- later on September 2, after the approved Product classification and New York registration were submitted and verified, both Stripe-tax activation keys were added to Production without a deployment; see [PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md); and
 - `PERMITEXT_MONITORING_PROVIDER` remains intentionally unset because anomaly-specific delivery or an explicit documented operating acceptance is still open.
 
-This record proves only that the three exact policy-version identifiers are staged in the Production environment. It does not prove that the approved policy bytes are live or that the consent flow is active.
+This record proves only that the three exact policy-version identifiers were staged in the Production environment at the recorded checkpoint. The later Stripe-tax evidence proves the two additional key insertions and provider activation. Neither record proves that the approved policy bytes or newly staged values are live, because no deployment occurred.

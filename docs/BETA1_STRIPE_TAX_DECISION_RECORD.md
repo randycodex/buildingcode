@@ -1,18 +1,18 @@
 # Permitext Beta 1 Stripe tax decision record
 
-Status: **OWNER APPROVED — automatic/exclusive and `txcd_10701400` selected; owner reports possession of the New York certificate; provider activation remains open**
+Status: **PROVIDER CONFIGURED — automatic/exclusive staged; `txcd_10701400` and New York collection verified; deployment and filing evidence remain open**
 
-This record documents the owner's August 30, 2026 approval of the Beta 1 Stripe tax presentation and September 2, 2026 approval of the specific Product tax code. It does not determine Permitext's legal tax obligations, activate Stripe Tax, change the live $20 Price, set Production variables, deploy, or authorize a taxable sale. The matching web purchase disclosure is prepared locally only.
+This record documents the owner's August 30, 2026 approval of the Beta 1 Stripe tax presentation and the September 2 provider activation. It does not determine Permitext's legal tax obligations, change the live $20 Price, deploy the newly staged Production values, authorize a taxable sale, or prove the result of a real taxed Checkout. The matching web purchase disclosure remains prepared locally until deployment.
 
 ## Verified current state
 
 - An official New York Business Express notice and the authenticated Business License Information dashboard show that the Certificate of Authority registration was **Issued** on August 28, 2026. On September 2, 2026, the owner reported possessing the actual certificate. This statement records owner confirmation only; the certificate image and taxpayer ID are intentionally not retained in source control. Saving, printing/display, the effective date shown on the certificate, and the assigned filing frequency remain unconfirmed.
 - The live recurring Price remains USD $20 per month and reports `Default (inferred by currency)` tax behavior.
 - Stripe's current setup documentation says its automatic/default behavior excludes tax for USD, meaning applicable tax is added above the stated price.
-- The live Product currently uses preset tax code `txcd_10000000`, `General - Electronically Supplied Services`. Stripe's official reference says this generic code should yield to a more specific software, cloud, or website category when one fits, especially for United States sales.
-- The owner approved `txcd_10701400`, `Website Information Services - Business Use`, on September 2, 2026 as the closest documented Stripe category for Permitext's principal Beta 1 offering: an online information, search, and comparison service accessed through SaaS for commercial use. This is an owner-selected provider classification, not legal advice; the live Product still remains unchanged until the final Stripe submission. New York's official software bulletin independently says licenses to remotely access prewritten software are taxable in New York.
-- The Stripe Tax collecting-locations view showed no live transactions and no collecting-location row. Stripe states that this monitor excludes the home jurisdiction, so that view does not prove the New York registration state.
-- The local Checkout implementation can request automatic tax and require a billing address. Production now fails closed until an explicit local tax decision exists, and the live readiness audit resolves the documented USD default to `exclusive` before comparing it with that decision.
+- The live Product was updated and independently reread as `txcd_10701400`, `Website Information Services - Business Use`. This remains an owner-selected provider classification, not legal advice. New York's official software bulletin independently says licenses to remotely access prewritten software are taxable in New York.
+- Stripe confirmed `Registration added successfully` for New York and stated that Sales tax collection starts immediately. The Locations view then showed New York with one registration. Its `Needs attention` state refers to the separate filing-setup step, which remains open.
+- Stripe's registration review displayed the account-level generic preset and a zero-percent preview. The more specific live Product code overrides that preset for Permitext Pro under Stripe's Product tax-code rules, but a controlled real Checkout still must verify the actual customer-location result and amount.
+- The local Checkout implementation can request automatic tax and require a billing address. The approved Production keys are now staged in Vercel, and the live readiness audit resolves the documented USD default to `exclusive` before comparing it with that decision. No deployment occurred, so the serving release does not use the newly staged values yet.
 
 ## Approved Beta 1 decision
 
@@ -45,28 +45,28 @@ The owner approved:
 - `PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive`;
 - web purchase copy: `$20/month plus applicable taxes shown by Stripe.`
 
-The matching disclosure is now prepared in the local web purchase screen. The approved policy files were not changed. No Production environment variable, Stripe registration, Product tax code, Price, provider setting, deployment, or charge changed.
+The matching disclosure is prepared in the local web purchase screen. This August 30 statement described the state at approval time; the September 2 activation below supersedes its no-change boundary.
 
 ## Owner confirmation — September 2, 2026
 
-The owner reported possession of the actual Certificate of Authority and approved changing the live Permitext Pro Product classification to `txcd_10701400`, `Website Information Services - Business Use`. Stripe's existing-registration flow was inspected and requires the New York Sales Tax ID Number printed on the certificate. The sensitive ID was not requested, entered, logged, or committed during this inspection. The Product-category edit is prepared in the Stripe dashboard, but the final provider submission remains unsent pending immediate confirmation.
+The owner reported possession of the actual Certificate of Authority and approved changing the live Permitext Pro Product classification to `txcd_10701400`, `Website Information Services - Business Use`, adding the existing New York registration, and starting collection immediately. The owner entered the New York Sales Tax ID privately in Stripe. The ID, certificate image, and address were not copied into source control or retained in this evidence. Stripe accepted both provider submissions, and Vercel accepted the two approved Production keys without a deployment.
 
 ## What remains open
 
 1. Save the actual Certificate of Authority privately, print/display it as required, and privately record its effective date and assigned filing frequency. Do not place the certificate image, taxpayer ID, or home address in source control.
-2. Submit and verify the owner-approved `txcd_10701400`, `Website Information Services - Business Use`, on the live Product. No live Product code has changed yet.
-3. Enter the New York Sales Tax ID through a private Stripe session and confirm the applicable New York registration in Stripe Tax.
-4. Separately authorize Production activation only after the Certificate and provider facts pass review.
+2. Record the first filing deadline and durable reminder, and choose a separate filing process; Stripe automatic filing is not configured.
+3. Deploy the exact approved release and policies so the serving Checkout can use the staged `automatic` + `exclusive` values.
+4. Separately authorize and verify a controlled real taxed Checkout and refund using a disposable account.
 
 ## Provider activation sequence after approval
 
-1. Record the actual Certificate, effective date, and filing-frequency evidence privately.
-2. Submit and verify the approved specific Stripe Product tax code and add the applicable New York registration in Stripe Tax.
-3. Set the two Production environment values above without exposing credentials.
-4. Run the strict Production configuration/live-Stripe verifier. The existing USD Price may remain if its resolved exclusive behavior passes; no replacement Price is required solely because the Dashboard labels it `Default (inferred by currency)`.
-5. Publish matching customer copy and exact approved policies before Checkout activation.
-6. Under separate immediate authorization, run the controlled real-charge/refund acceptance and retain only redacted evidence.
+1. [ ] Record the actual Certificate, effective date, filing frequency, first filing deadline, and display evidence privately.
+2. [x] Submit and verify the approved specific Stripe Product tax code and add the applicable New York registration in Stripe Tax.
+3. [x] Set the two Production environment values above without exposing credentials.
+4. [ ] Deploy the exact release and run the strict Production configuration/live-Stripe verifier. The existing USD Price may remain if its resolved exclusive behavior passes; no replacement Price is required solely because the Dashboard labels it `Default (inferred by currency)`.
+5. [ ] Publish matching customer copy and exact approved policies before Checkout activation.
+6. [ ] Under separate immediate authorization, run the controlled real-charge/refund acceptance and retain only redacted evidence.
 
 Until all six steps pass, the `new-york-certificate-stripe-tax` public-release gate remains open and Permitext must not accept a taxable New York web sale.
 
-The three exact approved policy-version identifiers were staged in Vercel Production on September 2 without a deployment; the two Stripe-tax activation keys remain absent. Evidence: [PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md](./PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md).
+The three exact approved policy-version identifiers and both Stripe-tax activation keys are staged in Vercel Production without a deployment. Provider and environment evidence: [PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md).

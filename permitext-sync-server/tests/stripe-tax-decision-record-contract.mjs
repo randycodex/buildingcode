@@ -10,6 +10,7 @@ const [
   economics,
   currentPlan,
   policyStaging,
+  providerActivation,
   webIndex,
   webApp,
   iosSettings
@@ -22,6 +23,7 @@ const [
   readFile(new URL("../../docs/PERMITEXT_RESEARCH_SUBSCRIBER_ECONOMICS_V6.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md", import.meta.url), "utf8"),
+  readFile(new URL("../../docs/PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md", import.meta.url), "utf8"),
   readFile(new URL("../public/index.html", import.meta.url), "utf8"),
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
   readFile(new URL("../../NYC CC APP/permitext/Views/SettingsView.swift", import.meta.url), "utf8")
@@ -30,15 +32,15 @@ const [
 const disclosure = "$20/month plus applicable taxes shown by Stripe.";
 
 for (const requiredDecision of [
-  /Status: \*\*OWNER APPROVED — automatic\/exclusive and `txcd_10701400` selected; owner reports possession of the New York certificate; provider activation remains open\*\*/,
+  /Status: \*\*PROVIDER CONFIGURED — automatic\/exclusive staged; `txcd_10701400` and New York collection verified; deployment and filing evidence remain open\*\*/,
   /PERMITEXT_STRIPE_TAX_MODE=automatic/,
   /PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive/,
   /August 30, 2026/,
-  /No Production environment variable, Stripe registration, Product tax code, Price, provider setting, deployment, or charge changed/,
-  /Production activation only after the Certificate and provider facts pass review/,
+  /Stripe confirmed `Registration added successfully` for New York/,
+  /approved Production keys are now staged in Vercel/,
   /txcd_10701400/,
   /Website Information Services - Business Use/,
-  /No live Product code has changed yet/
+  /live Product was updated and independently reread/
 ]) {
   assert.match(record, requiredDecision);
 }
@@ -50,7 +52,7 @@ for (const synchronizedRecord of [acceptance, master, commercial, economics, cur
   assert(synchronizedRecord.includes(disclosure));
 }
 
-assert.match(acceptance, /The Production keys remain absent/);
+assert.match(acceptance, /Both Production keys were added September 2 without a deployment/);
 assert.match(preflight, /missing Stripe tax keys are expected to remain absent/);
 assert.match(preflight, /activation is separately authorized/);
 assert.match(preflight, /official registration status is already `Issued`/);
@@ -65,7 +67,13 @@ assert.match(policyStaging, /CONFIGURED IN VERCEL; NOT DEPLOYED OR PUBLISHED/);
 assert.match(policyStaging, /PERMITEXT_TERMS_VERSION=terms-2026-08-28/);
 assert.match(policyStaging, /PERMITEXT_PRIVACY_VERSION=privacy-2026-08-28/);
 assert.match(policyStaging, /PERMITEXT_SUBSCRIPTION_POLICY_VERSION=subscriptions-2026-08-28/);
-assert.match(policyStaging, /two Stripe-tax activation keys remain intentionally unset/);
+assert.match(policyStaging, /both Stripe-tax activation keys were added to Production without a deployment/);
+assert.match(providerActivation, /CONFIGURED IN STRIPE AND VERCEL; NOT DEPLOYED OR REAL-CHARGE VERIFIED/);
+assert.match(providerActivation, /Product updated/);
+assert.match(providerActivation, /Starting immediately, you’ll collect Sales tax in New York/);
+assert.match(providerActivation, /PERMITEXT_STRIPE_TAX_MODE=automatic/);
+assert.match(providerActivation, /PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive/);
+assert.match(providerActivation, /No deployment was triggered/);
 
 assert(webIndex.includes(disclosure));
 assert.match(webIndex, /aria-describedby="settings-stripe-tax-disclosure settings-plan-details"/);

@@ -97,7 +97,7 @@ Release-bound: **yes**
 - Canonical URLs are direct HTTPS 200 responses without redirect or fallback bytes:
 - Redacted evidence and timestamp:
 
-The August 30 read-only baseline is [PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md](./PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md). On September 2, the three exact policy-version identifiers were staged in Vercel Production without a deployment; the two Stripe-tax activation keys remain absent. Evidence: [PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md](./PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md).
+The August 30 read-only baseline is [PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md](./PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md). On September 2, the three exact policy-version identifiers and both approved Stripe-tax activation keys were staged in Vercel Production without a deployment. Evidence: [policy staging](./PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md) and [Stripe tax provider activation](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md).
 
 Do not mark this complete from route availability alone; the exact published bytes must match.
 
@@ -111,17 +111,17 @@ Release-bound: **no**
 - Actual Certificate of Authority received: owner reported possession on September 2, 2026; the sensitive certificate was not copied into source control or independently inspected in this record.
 - Certificate saved and printed/displayed as required:
 - Registration effective date and assigned filing frequency recorded:
-- No taxable New York sale accepted before authorization:
-- Stripe customer-location and billing-address behavior reviewed:
-- Stripe automatic/manual tax decision and inclusive/exclusive behavior recorded: `automatic` + `exclusive` approved August 30, 2026; exact local web disclosure is `$20/month plus applicable taxes shown by Stripe.` The Production keys remain absent.
-- Source guard confirmed: yes locally. Production Checkout rejects an unconfigured tax mode, configured automatic mode requests Stripe automatic tax and a billing address, and live readiness verifies the resolved Price tax behavior. This is not provider activation or real taxed-Checkout evidence.
-- Stripe Product tax code reviewed: yes — the owner approved `Website Information Services - Business Use` (`txcd_10701400`) on September 2, 2026. The current generic code remains live until the prepared provider edit is submitted and independently reloaded.
-- Active New York provider registration reviewed after the actual Certificate arrives:
+- No taxable New York sale accepted before authorization: Stripe reported no live transactions before the registration was activated.
+- Stripe customer-location and billing-address behavior reviewed: local Checkout requires a billing address in automatic mode; real customer-location acceptance remains open.
+- Stripe automatic/manual tax decision and inclusive/exclusive behavior recorded: `automatic` + `exclusive` approved August 30, 2026; exact local web disclosure is `$20/month plus applicable taxes shown by Stripe.` Both Production keys were added September 2 without a deployment.
+- Source guard confirmed: yes locally. Production Checkout rejects an unconfigured tax mode, configured automatic mode requests Stripe automatic tax and a billing address, and live readiness verifies the resolved Price tax behavior. The newly staged Production values remain inactive until deployment, and no real taxed Checkout has been run.
+- Stripe Product tax code reviewed: yes — the live Product was updated and independently reread as `Website Information Services - Business Use` (`txcd_10701400`) on September 2, 2026.
+- Active New York provider registration reviewed after the actual Certificate arrives: yes — Stripe confirmed the registration was added successfully and Sales tax collection starts immediately. The Locations view shows one New York registration; separate filing setup remains `Needs attention`.
 - Apple tax-handling boundary recorded separately: [BETA1_APPLE_TAX_HANDLING_RECORD.md](./BETA1_APPLE_TAX_HANDLING_RECORD.md). Stripe automatic tax is web-only. Read-only App Store Connect evidence shows parent category `App Store software` and subscription `Match to parent app`, and the owner approved leaving that classification unchanged for Beta 1. First real financial-report evidence remains open.
 - First sales-tax filing deadline and persistent reminder verified:
-- Redacted evidence and timestamp:
+- Redacted evidence and timestamp: `2026-09-02T21:56:33Z` — [Stripe tax provider activation](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md).
 
-Read-only Production environment-key evidence: [PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md](./PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md). The two Stripe-tax activation keys remain absent; no provider field was changed.
+Provider and Production-key evidence: [PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md). It intentionally retains no taxpayer ID, certificate image, residential address, or unredacted provider payload.
 
 The three approved policy-version identifiers were staged in Vercel Production on September 2 without deploying or changing the serving release. Exact live policy hashes still fail closed. Evidence: [PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md](./PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md).
 
