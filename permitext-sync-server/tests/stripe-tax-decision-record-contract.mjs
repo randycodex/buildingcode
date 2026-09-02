@@ -11,6 +11,7 @@ const [
   currentPlan,
   policyStaging,
   providerActivation,
+  productionLifecycle,
   webIndex,
   webApp,
   iosSettings
@@ -24,6 +25,7 @@ const [
   readFile(new URL("../../docs/PERMITEXT_RESEARCH_COMMERCIALIZATION_CURRENT_PLAN.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md", import.meta.url), "utf8"),
   readFile(new URL("../../docs/PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md", import.meta.url), "utf8"),
+  readFile(new URL("../../docs/PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md", import.meta.url), "utf8"),
   readFile(new URL("../public/index.html", import.meta.url), "utf8"),
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
   readFile(new URL("../../NYC CC APP/permitext/Views/SettingsView.swift", import.meta.url), "utf8")
@@ -32,12 +34,12 @@ const [
 const disclosure = "$20/month plus applicable taxes shown by Stripe.";
 
 for (const requiredDecision of [
-  /Status: \*\*PROVIDER CONFIGURED — automatic\/exclusive staged; `txcd_10701400`, New York collection, and quarterly filing schedule verified; deployment and filing setup remain open\*\*/,
+  /Status: \*\*PRODUCTION VERIFIED — automatic\/exclusive deployed; `txcd_10701400`, New York collection, quarterly filing schedule, and controlled taxed Checkout\/refund verified; certificate-date corroboration and filing operations remain open\*\*/,
   /PERMITEXT_STRIPE_TAX_MODE=automatic/,
   /PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive/,
   /August 30, 2026/,
   /Stripe confirmed `Registration added successfully` for New York/,
-  /approved Production keys are now staged in Vercel/,
+  /deployed Checkout requests automatic tax and requires billing information/,
   /txcd_10701400/,
   /Website Information Services - Business Use/,
   /live Product was updated and independently reread/,
@@ -56,12 +58,12 @@ for (const synchronizedRecord of [acceptance, master, commercial, economics, cur
   assert(synchronizedRecord.includes(disclosure));
 }
 
-assert.match(acceptance, /Both Production keys were added September 2 without a deployment/);
+assert.match(acceptance, /Both Production keys are deployed on the verified release/);
 assert.match(preflight, /missing Stripe tax keys are expected to remain absent/);
 assert.match(preflight, /activation is separately authorized/);
 assert.match(preflight, /official registration status is already `Issued`/);
 assert.match(master, /Additional turn packs remain disabled and unpublished/);
-assert.match(master, /real taxed Checkout open/);
+assert.match(master, /real taxed-Checkout\/refund exercise now pass/);
 assert.match(master, /owner report of certificate possession/);
 assert.match(acceptance, /registration issued: yes/);
 assert.match(acceptance, /Actual Certificate of Authority received: owner reported possession on September 2, 2026/);
@@ -82,6 +84,20 @@ assert.match(providerActivation, /owner confirmed that the actual Certificate of
 assert.match(providerActivation, /DTF-17 application found `09\/18\/2026`/);
 assert.match(providerActivation, /owner identified quarterly filing/);
 assert.match(providerActivation, /first return deadline at December 21, 2026/);
+
+for (const productionFact of [
+  /cb7918b453988a07d57a7834f5982d523d0e3901/,
+  /\$20\.00.*\$1\.78.*\$21\.78/,
+  /showed Free before Checkout/,
+  /Pro active with `100` included Research turns/,
+  /returned to Free after the refund/,
+  /webhook.*HTTP 200/i,
+  /another paid Beta 1 charge is not required/
+]) {
+  assert.match(productionLifecycle, productionFact);
+}
+assert.doesNotMatch(productionLifecycle, /\b(?:cus|sub|pi|cs)_[A-Za-z0-9]+\b/);
+assert.doesNotMatch(productionLifecycle, /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
 
 assert(webIndex.includes(disclosure));
 assert.match(webIndex, /aria-describedby="settings-stripe-tax-disclosure settings-plan-details"/);

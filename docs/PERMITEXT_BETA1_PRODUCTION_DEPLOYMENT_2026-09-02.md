@@ -40,6 +40,6 @@ At approximately 7:04 PM EDT:
 
 ## Boundaries and next gate
 
-This proves merge, deployment, exact release identity, policy publication, public content routing, monitoring marker, and an initially clean Production log window. It does not prove a real taxed Checkout/refund, fresh and existing account acceptance, account export/deletion, a final Production-targeted TestFlight build, physical-iPhone behavior, or public-Beta owner go/no-go.
+This proves merge, deployment, exact release identity, policy publication, public content routing, monitoring marker, and an initially clean Production log window. It did not by itself prove a real taxed Checkout/refund, fresh and existing account acceptance, account export/deletion, a final Production-targeted TestFlight build, physical-iPhone behavior, or public-Beta owner go/no-go.
 
-The browser account available immediately after deployment already showed Pro status, so it was not used to create another subscription. The controlled real Stripe exercise remains open until a dedicated non-Pro account is selected and the owner personally enters payment information.
+The browser account available immediately after deployment already showed Pro status, so it was not used to create another subscription. Later on September 2, the owner selected a dedicated Free account, personally entered payment information, and completed the separately authorized controlled real Stripe lifecycle. That follow-up passed on this exact deployment and is retained in [the Production Stripe lifecycle evidence](./PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md).

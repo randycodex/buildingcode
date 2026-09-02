@@ -1,8 +1,8 @@
 # Permitext Beta 1 Stripe tax decision record
 
-Status: **PROVIDER CONFIGURED — automatic/exclusive staged; `txcd_10701400`, New York collection, and quarterly filing schedule verified; deployment and filing setup remain open**
+Status: **PRODUCTION VERIFIED — automatic/exclusive deployed; `txcd_10701400`, New York collection, quarterly filing schedule, and controlled taxed Checkout/refund verified; certificate-date corroboration and filing operations remain open**
 
-This record documents the owner's August 30, 2026 approval of the Beta 1 Stripe tax presentation and the September 2 provider activation. It does not determine Permitext's legal tax obligations, change the live $20 Price, deploy the newly staged Production values, authorize a taxable sale, or prove the result of a real taxed Checkout. The matching web purchase disclosure remains prepared locally until deployment.
+This record documents the owner's August 30, 2026 approval of the Beta 1 Stripe tax presentation, the September 2 provider activation and Production deployment, and the separately authorized controlled taxed Checkout/refund. It does not determine Permitext's legal tax obligations, change the live `$20` Price, establish the filing process, or authorize uncontrolled customer sales.
 
 ## Verified current state
 
@@ -12,8 +12,9 @@ This record documents the owner's August 30, 2026 approval of the Beta 1 Stripe 
 - Stripe's current setup documentation says its automatic/default behavior excludes tax for USD, meaning applicable tax is added above the stated price.
 - The live Product was updated and independently reread as `txcd_10701400`, `Website Information Services - Business Use`. This remains an owner-selected provider classification, not legal advice. New York's official software bulletin independently says licenses to remotely access prewritten software are taxable in New York.
 - Stripe confirmed `Registration added successfully` for New York and stated that Sales tax collection starts immediately. The Locations view then showed New York with one registration. Its `Needs attention` state refers to the separate filing-setup step, which remains open.
-- Stripe's registration review displayed the account-level generic preset and a zero-percent preview. The more specific live Product code overrides that preset for Permitext Pro under Stripe's Product tax-code rules, but a controlled real Checkout still must verify the actual customer-location result and amount.
-- The local Checkout implementation can request automatic tax and require a billing address. The approved Production keys are now staged in Vercel, and the live readiness audit resolves the documented USD default to `exclusive` before comparing it with that decision. No deployment occurred, so the serving release does not use the newly staged values yet.
+- Stripe's registration review displayed the account-level generic preset and a zero-percent preview. The more specific live Product code overrides that preset for Permitext Pro under Stripe's Product tax-code rules. The controlled real Checkout subsequently verified the actual New York customer-location result: `$1.78` tax on a `$20.00` base price.
+- The deployed Checkout requests automatic tax and requires billing information. The protected readiness audit resolved the documented USD default to `exclusive` before comparing it with the approved decision, and the real controlled transaction verified tax was added above the base price.
+- The owner-authorized Production lifecycle charged `$21.78` total (`$20.00` base plus `$1.78`, or `8.875%`, New York sales tax), activated Pro with 100 turns, then completed cancellation and a full `$21.78` refund. Stripe ended the subscription, Permitext returned the account to Free, all inspected webhook deliveries returned HTTP 200, and no related runtime error was observed. Redacted evidence: [Production Stripe lifecycle](./PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md).
 
 ## Approved Beta 1 decision
 
@@ -57,9 +58,7 @@ The owner reported possession of the actual Certificate of Authority, confirmed 
 ## What remains open
 
 1. Confirm `09/18/2026` from the actual Certificate of Authority. The owner has confirmed private storage and printing/display, and the DTF-17 application states that date twice. Do not place the certificate image, taxpayer ID, home address, or DTF-17 contents in source control.
-2. Establish a durable reminder and separate filing process for the first quarterly return due December 21, 2026; Stripe automatic filing is not configured.
-3. Deploy the exact approved release and policies so the serving Checkout can use the staged `automatic` + `exclusive` values.
-4. Separately authorize and verify a controlled real taxed Checkout and refund using a disposable account.
+2. Retain the durable reminder and establish and rehearse the operational filing process for the first quarterly return due December 21, 2026; Stripe automatic filing is not configured.
 
 ## Provider activation sequence after approval
 
@@ -67,10 +66,10 @@ The owner reported possession of the actual Certificate of Authority, confirmed 
 2. [x] Record quarterly filing and the first deadline of December 21, 2026 from current official New York guidance. The DTF-17 application records `09/18/2026`; confirmation of that date from the actual Certificate remains open.
 3. [x] Submit and verify the approved specific Stripe Product tax code and add the applicable New York registration in Stripe Tax.
 4. [x] Set the two Production environment values above without exposing credentials.
-5. [ ] Deploy the exact release and run the strict Production configuration/live-Stripe verifier. The existing USD Price may remain if its resolved exclusive behavior passes; no replacement Price is required solely because the Dashboard labels it `Default (inferred by currency)`.
-6. [ ] Publish matching customer copy and exact approved policies before Checkout activation.
-7. [ ] Under separate immediate authorization, run the controlled real-charge/refund acceptance and retain only redacted evidence.
+5. [x] Deploy the exact release and run the strict Production configuration/live-Stripe verifier. The existing USD Price passed with resolved exclusive behavior; no replacement Price was required solely because the Dashboard labels it `Default (inferred by currency)`.
+6. [x] Publish matching customer copy and exact approved policies before Checkout activation.
+7. [x] Under separate immediate authorization, run the controlled real-charge/refund acceptance and retain only redacted evidence.
 
-Until all seven steps pass, the `new-york-certificate-stripe-tax` public-release gate remains open and Permitext must not accept a taxable New York web sale.
+The `new-york-certificate-stripe-tax` public-release gate remains open only for actual-certificate date corroboration and the operational filing process. The one explicitly authorized controlled sale is complete and fully refunded; it does not authorize general public sales.
 
-The three exact approved policy-version identifiers and both Stripe-tax activation keys are staged in Vercel Production without a deployment. Provider and environment evidence: [PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md).
+Provider and environment activation evidence: [PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md). Deployment evidence: [PERMITEXT_BETA1_PRODUCTION_DEPLOYMENT_2026-09-02.md](./PERMITEXT_BETA1_PRODUCTION_DEPLOYMENT_2026-09-02.md). Controlled transaction evidence: [PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md](./PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md).

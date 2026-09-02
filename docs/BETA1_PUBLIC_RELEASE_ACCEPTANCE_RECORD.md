@@ -45,20 +45,22 @@ This is deployment evidence only. It does not prove the later manual activation 
 ## Controlled Production billing
 
 Gate ID: `controlled-production-billing`
-Status: **OPEN**
+Status: **CURRENT PRODUCTION LIFECYCLE PASSED — final-release binding and two non-charge cleanup/replay fields remain open**
 Release-bound: **yes**
 
 Run only under separate immediate authorization. Use a dedicated disposable account and the exact serving release. Do not record card data, a raw receipt, an email address, or unredacted customer/provider identifiers.
 
-- Explicit charge/refund authorization and timestamp:
-- Dedicated test-account opaque hash:
-- Signed provider event granted Pro exactly once:
-- Duplicate/delayed event remained inert:
-- Cancellation preserved only the intended prepaid period:
-- Authorized refund completed and removed the intended entitlement:
-- Stripe subscription/customer cleanup confirmed:
-- Permitext entitlement and provider state reconciled:
-- Redacted event references, amounts, timestamps, and cleanup evidence:
+- Explicit charge/refund authorization and timestamp: yes — the owner separately authorized the live charge and later cancellation plus the full refund during the `2026-09-02T23:36:49Z`–`2026-09-02T23:44:06Z` exercise window.
+- Dedicated test-account opaque hash: no account identifier is retained in source control; the authenticated account was verified as Free immediately before Checkout.
+- Signed provider event granted Pro exactly once: yes — Permitext showed Pro with 100 included turns after three purchase-related webhook deliveries returned HTTP 200.
+- Duplicate/delayed event remained inert: not deliberately replayed against live Production; the permanent provider-backed Stripe sandbox and billing contract cover duplicate and delayed delivery without another charge.
+- Cancellation preserved only the intended prepaid period: yes before refund — the Customer Portal scheduled cancellation at the end of the paid month; the later full refund correctly superseded that schedule and ended access immediately.
+- Authorized refund completed and removed the intended entitlement: yes — Stripe showed the full `$21.78` refund and Permitext returned to Free.
+- Stripe subscription/customer cleanup confirmed: subscription canceled and ended; the disposable Stripe customer was not deleted during this exercise and remains part of the separate account-deletion cleanup boundary.
+- Permitext entitlement and provider state reconciled: yes — Stripe showed canceled/ended plus the refunded invoice, while Permitext showed Free.
+- Redacted event references, amounts, timestamps, and cleanup evidence: [Production Stripe lifecycle evidence](./PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md), bound to Git commit `cb7918b453988a07d57a7834f5982d523d0e3901` and deployment `dpl_2i2iRQjwqkuQaQChbzR5MGh6j8EW`.
+
+The controlled monetary and entitlement lifecycle does not need another paid Beta 1 repetition unless billing logic or Production configuration materially changes. This gate remains false in the activation JSON until the final shared web/TestFlight commit is selected and the remaining non-charge replay/customer-cleanup evidence is reconciled.
 
 ## Production authentication and account lifecycle
 
@@ -112,18 +114,18 @@ Release-bound: **no**
 - Certificate saved and printed/displayed as required: yes — owner-confirmed September 2, 2026; no certificate image or identifier was retained.
 - Registration effective date and assigned filing frequency recorded: the owner-supplied DTF-17 application shows `09/18/2026` as the New York sales-tax business-start/effective date; confirmation from the actual Certificate remains open. The owner identified quarterly filing, and current official New York guidance confirms the initial quarterly classification for this taxable, non-manufacturer/wholesaler registration. The first quarter ends November 30, 2026, and the official calendar sets the first filing deadline at December 21, 2026. The application itself was not retained.
 - No taxable New York sale accepted before authorization: Stripe reported no live transactions before the registration was activated.
-- Stripe customer-location and billing-address behavior reviewed: local Checkout requires a billing address in automatic mode; real customer-location acceptance remains open.
-- Stripe automatic/manual tax decision and inclusive/exclusive behavior recorded: `automatic` + `exclusive` approved August 30, 2026; exact local web disclosure is `$20/month plus applicable taxes shown by Stripe.` Both Production keys were added September 2 without a deployment.
-- Source guard confirmed: yes locally. Production Checkout rejects an unconfigured tax mode, configured automatic mode requests Stripe automatic tax and a billing address, and live readiness verifies the resolved Price tax behavior. The newly staged Production values remain inactive until deployment, and no real taxed Checkout has been run.
+- Stripe customer-location and billing-address behavior reviewed: yes — Production Checkout required privately entered billing information and calculated `8.875%` New York tax (`$1.78`) on the `$20.00` base price.
+- Stripe automatic/manual tax decision and inclusive/exclusive behavior recorded: `automatic` + `exclusive` approved August 30, 2026; exact web disclosure is `$20/month plus applicable taxes shown by Stripe.` Both Production keys are deployed on the verified release.
+- Source guard confirmed: yes in Production. The protected build verified the resolved Price behavior, and the real controlled Checkout added tax above the `$20.00` base price as configured.
 - Stripe Product tax code reviewed: yes — the live Product was updated and independently reread as `Website Information Services - Business Use` (`txcd_10701400`) on September 2, 2026.
 - Active New York provider registration reviewed after the actual Certificate arrives: yes — Stripe confirmed the registration was added successfully and Sales tax collection starts immediately. The Locations view shows one New York registration; separate filing setup remains `Needs attention`.
 - Apple tax-handling boundary recorded separately: [BETA1_APPLE_TAX_HANDLING_RECORD.md](./BETA1_APPLE_TAX_HANDLING_RECORD.md). Stripe automatic tax is web-only. Read-only App Store Connect evidence shows parent category `App Store software` and subscription `Match to parent app`, and the owner approved leaving that classification unchanged for Beta 1. First real financial-report evidence remains open.
-- First sales-tax filing deadline and persistent reminder verified: deadline verified as December 21, 2026; durable reminder and filing process remain open.
-- Redacted evidence and timestamp: `2026-09-02T21:56:33Z` — [Stripe tax provider activation](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md).
+- First sales-tax filing deadline and persistent reminder verified: deadline and reminder verified for December 21, 2026; the operational filing process remains separate.
+- Redacted evidence and timestamp: provider activation at `2026-09-02T21:56:33Z`, followed by the controlled taxed lifecycle through `2026-09-02T23:44:06Z` — [Stripe tax provider activation](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md) and [Production Stripe lifecycle evidence](./PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md).
 
 Provider and Production-key evidence: [PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md). It intentionally retains no taxpayer ID, certificate image, residential address, or unredacted provider payload.
 
-The three approved policy-version identifiers were staged in Vercel Production on September 2 without deploying or changing the serving release. Exact live policy hashes still fail closed. Evidence: [PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md](./PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md).
+The three approved policy-version identifiers and both tax values were deployed on September 2, and the exact live policy hashes passed. Evidence: [Production deployment record](./PERMITEXT_BETA1_PRODUCTION_DEPLOYMENT_2026-09-02.md).
 
 Do not include the taxpayer identification number, residential address, or certificate image in source control.
 
