@@ -1,12 +1,13 @@
 # Permitext Beta 1 Stripe tax decision record
 
-Status: **PROVIDER CONFIGURED — automatic/exclusive staged; `txcd_10701400` and New York collection verified; deployment and filing evidence remain open**
+Status: **PROVIDER CONFIGURED — automatic/exclusive staged; `txcd_10701400`, New York collection, and quarterly filing schedule verified; deployment and filing setup remain open**
 
 This record documents the owner's August 30, 2026 approval of the Beta 1 Stripe tax presentation and the September 2 provider activation. It does not determine Permitext's legal tax obligations, change the live $20 Price, deploy the newly staged Production values, authorize a taxable sale, or prove the result of a real taxed Checkout. The matching web purchase disclosure remains prepared locally until deployment.
 
 ## Verified current state
 
-- An official New York Business Express notice and the authenticated Business License Information dashboard show that the Certificate of Authority registration was **Issued** on August 28, 2026. On September 2, 2026, the owner reported possessing the actual certificate and confirmed that it is privately saved and printed/displayed. This statement records owner confirmation only; the certificate image and taxpayer ID are intentionally not retained in source control. A read-only inspection of the owner's DTF-17 application found `09/18/2026` on both the New York sales-tax business-start field and the effective-date field. Because that PDF is the application rather than the issued certificate, corroboration from the actual certificate and the assigned filing frequency remain unconfirmed.
+- An official New York Business Express notice and the authenticated Business License Information dashboard show that the Certificate of Authority registration was **Issued** on August 28, 2026. On September 2, 2026, the owner reported possessing the actual certificate and confirmed that it is privately saved and printed/displayed. This statement records owner confirmation only; the certificate image and taxpayer ID are intentionally not retained in source control. A read-only inspection of the owner's DTF-17 application found `09/18/2026` on both the New York sales-tax business-start field and the effective-date field. Because that PDF is the application rather than the issued certificate, certificate-level corroboration of the date remains open.
+- The owner identified Permitext's filing frequency as quarterly. New York's official filing guidance independently confirms that a new sales-tax registrant is classified quarterly unless it qualifies for the narrow initial annual-filer rule; Permitext's taxable SaaS activity does not meet that manufacturer/wholesaler rule. The first applicable reporting quarter is September 1 through November 30, 2026, and the official 2026 calendar sets its filing deadline at December 21, 2026. A return is required even if the period has no taxable sales.
 - The live recurring Price remains USD $20 per month and reports `Default (inferred by currency)` tax behavior.
 - Stripe's current setup documentation says its automatic/default behavior excludes tax for USD, meaning applicable tax is added above the stated price.
 - The live Product was updated and independently reread as `txcd_10701400`, `Website Information Services - Business Use`. This remains an owner-selected provider classification, not legal advice. New York's official software bulletin independently says licenses to remotely access prewritten software are taxable in New York.
@@ -36,6 +37,8 @@ Official provider references:
 - [Stripe Tax pricing](https://stripe.com/tax/pricing)
 - [Stripe Checkout automatic-tax integration](https://docs.stripe.com/tax/checkout)
 - [New York Tax Bulletin ST-128: Computer Software](https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/computer_software.htm)
+- [New York filing requirements for sales and use tax returns](https://www.tax.ny.gov/pubs_and_bulls/tg_bulletins/st/filing_requirements_for_sales_and_use_tax_returns.htm)
+- [New York 2026 tax filing dates](https://www.tax.ny.gov/help/calendar/2026.htm)
 
 ## Owner confirmation — August 30, 2026
 
@@ -53,15 +56,15 @@ The owner reported possession of the actual Certificate of Authority, confirmed 
 
 ## What remains open
 
-1. Confirm the effective date from the actual Certificate of Authority and privately record the assigned filing frequency. The owner has confirmed private storage and printing/display; the DTF-17 application shows `09/18/2026`, but it does not establish the certificate-issued filing frequency. Do not place the certificate image, taxpayer ID, home address, or DTF-17 contents in source control.
-2. Record the first filing deadline and durable reminder, and choose a separate filing process; Stripe automatic filing is not configured.
+1. Confirm `09/18/2026` from the actual Certificate of Authority. The owner has confirmed private storage and printing/display, and the DTF-17 application states that date twice. Do not place the certificate image, taxpayer ID, home address, or DTF-17 contents in source control.
+2. Establish a durable reminder and separate filing process for the first quarterly return due December 21, 2026; Stripe automatic filing is not configured.
 3. Deploy the exact approved release and policies so the serving Checkout can use the staged `automatic` + `exclusive` values.
 4. Separately authorize and verify a controlled real taxed Checkout and refund using a disposable account.
 
 ## Provider activation sequence after approval
 
 1. [x] Owner confirmed that the actual Certificate is privately saved and printed/displayed; no sensitive image or identifier was retained.
-2. [ ] Confirm the effective date from the actual Certificate and privately record the assigned filing frequency and first filing deadline. The DTF-17 application records `09/18/2026`, but it does not assign a filing frequency.
+2. [x] Record quarterly filing and the first deadline of December 21, 2026 from current official New York guidance. The DTF-17 application records `09/18/2026`; confirmation of that date from the actual Certificate remains open.
 3. [x] Submit and verify the approved specific Stripe Product tax code and add the applicable New York registration in Stripe Tax.
 4. [x] Set the two Production environment values above without exposing credentials.
 5. [ ] Deploy the exact release and run the strict Production configuration/live-Stripe verifier. The existing USD Price may remain if its resolved exclusive behavior passes; no replacement Price is required solely because the Dashboard labels it `Default (inferred by currency)`.

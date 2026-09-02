@@ -32,7 +32,7 @@ const [
 const disclosure = "$20/month plus applicable taxes shown by Stripe.";
 
 for (const requiredDecision of [
-  /Status: \*\*PROVIDER CONFIGURED — automatic\/exclusive staged; `txcd_10701400` and New York collection verified; deployment and filing evidence remain open\*\*/,
+  /Status: \*\*PROVIDER CONFIGURED — automatic\/exclusive staged; `txcd_10701400`, New York collection, and quarterly filing schedule verified; deployment and filing setup remain open\*\*/,
   /PERMITEXT_STRIPE_TAX_MODE=automatic/,
   /PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive/,
   /August 30, 2026/,
@@ -43,7 +43,8 @@ for (const requiredDecision of [
   /live Product was updated and independently reread/,
   /privately saved and printed\/displayed/,
   /DTF-17 application found `09\/18\/2026`/,
-  /assigned filing frequency remain unconfirmed/
+  /first applicable reporting quarter is September 1 through November 30, 2026/,
+  /official 2026 calendar sets its filing deadline at December 21, 2026/
 ]) {
   assert.match(record, requiredDecision);
 }
@@ -79,7 +80,8 @@ assert.match(providerActivation, /PERMITEXT_STRIPE_PRICE_TAX_BEHAVIOR=exclusive/
 assert.match(providerActivation, /No deployment was triggered/);
 assert.match(providerActivation, /owner confirmed that the actual Certificate of Authority is privately saved and printed\/displayed/);
 assert.match(providerActivation, /DTF-17 application found `09\/18\/2026`/);
-assert.match(providerActivation, /contains no assigned filing frequency/);
+assert.match(providerActivation, /owner identified quarterly filing/);
+assert.match(providerActivation, /first return deadline at December 21, 2026/);
 
 assert(webIndex.includes(disclosure));
 assert.match(webIndex, /aria-describedby="settings-stripe-tax-disclosure settings-plan-details"/);

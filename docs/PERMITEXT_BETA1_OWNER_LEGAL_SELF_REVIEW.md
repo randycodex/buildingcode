@@ -86,7 +86,7 @@ These identifiers are a local approval record only. They have not been configure
 ## Open before public paid access
 
 - Stable public URLs and exact web/iOS parity.
-- Receive, save, and print/display the actual New York sales-tax Certificate of Authority and document Stripe tax configuration before a taxable New York web sale, unless the Tax Department gives a different written classification. New York Business Express shows the registration as issued on August 28, 2026, but its `View Certificate` link currently returns the DTF-17 application; the actual certificate and assigned filing frequency remain outstanding.
+- Receive, save, and print/display the actual New York sales-tax Certificate of Authority and document Stripe tax configuration before a taxable New York web sale, unless the Tax Department gives a different written classification. New York Business Express shows the registration as issued on August 28, 2026; the owner confirmed possession, private storage, and printing/display on September 2. The DTF-17 application records `09/18/2026`, while actual-certificate corroboration of that date remains open. Official New York guidance confirms quarterly filing and a first return due December 21, 2026; establish the filing process and durable reminder before that deadline.
 - Production verification of the retainable web confirmation, Stripe portal cancellation, refund, renewal, and policy-version records.
 - Apple-created Sandbox/TestFlight subscription and cancellation evidence.
 - Production account export/deletion and provider cleanup evidence.

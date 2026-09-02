@@ -8,7 +8,8 @@ Recorded at `2026-09-02T21:56:33Z` after the owner's immediate approval and priv
 
 - The owner confirmed that the actual Certificate of Authority is privately saved and printed/displayed. This is owner-confirmed evidence; the certificate image and identifiers were not copied or independently retained.
 - Read-only inspection of the owner-supplied DTF-17 application found `09/18/2026` on page 1 as the date business will begin in New York for sales-tax purposes and on page 13 as the effective date of assuming responsibility.
-- The DTF-17 PDF is the application, not the issued Certificate of Authority. It contains no assigned filing frequency. Certificate-level corroboration of the effective date and the assigned filing frequency therefore remain open.
+- The DTF-17 PDF is the application, not the issued Certificate of Authority. It contains no assigned filing frequency, so certificate-level corroboration of the effective date remains open.
+- The owner identified quarterly filing. New York's current official guidance confirms that a new taxable registrant that does not qualify for the initial manufacturer/wholesaler annual rule is classified quarterly. The September 18 start falls in the September 1–November 30 quarter, and New York's 2026 calendar sets the first return deadline at December 21, 2026. Filing is required even if there are no taxable sales.
 - The PDF and its sensitive contents were not copied into source control.
 
 ## Verified provider state
@@ -34,8 +35,8 @@ No deployment was triggered. The serving Production release therefore does not u
 
 ## Remaining acceptance boundaries
 
-1. Confirm the effective date from the actual Certificate of Authority and privately record its assigned filing frequency. Private storage and printing/display are owner-confirmed, and the DTF-17 application records `09/18/2026`, but the application does not assign a filing frequency.
-2. Record the first New York filing deadline and a durable reminder; either configure filing separately or retain a manual filing process.
+1. Confirm `09/18/2026` from the actual Certificate of Authority. Private storage and printing/display are owner-confirmed, and the DTF-17 application records that date twice.
+2. Establish a durable reminder and either configure filing separately or retain a manual filing process for the first quarterly return due December 21, 2026.
 3. Deploy the exact approved release and exact policy artifacts, then require the strict Production configuration and policy-publication checks to pass.
 4. Under separate immediate authorization, run the controlled real taxed-Checkout and refund exercise using a disposable account, retaining only redacted evidence.
 

@@ -60,7 +60,7 @@ The final owner review and version record are complete. Before opening public pa
 
 1. Stable public URLs serve the exact approved files, and web/iOS purchase screens match them.
 2. The exact policy version variables are configured only after step 1.
-3. The actual New York Certificate of Authority is received, saved, and printed/displayed and the Stripe tax configuration decision is recorded before the first taxable New York web sale. Business Express shows the registration as issued on August 28, 2026, but the portal currently returns the DTF-17 application instead of the certificate and the assigned filing frequency remains open.
+3. The actual New York Certificate of Authority is received, saved, and printed/displayed and the Stripe tax configuration decision is recorded before the first taxable New York web sale. Business Express shows the registration as issued on August 28, 2026, and the owner confirmed possession, private storage, and printing/display on September 2. The DTF-17 application records `09/18/2026`; actual-certificate corroboration of that date remains open. Official New York guidance confirms quarterly filing and a first return due December 21, 2026; the filing process and durable reminder remain open.
 4. Apple App Store metadata and the in-app subscription screen use the same price, duration, renewal, cancellation, and professional-use language.
 5. A no-charge local verification and the separately authorized production lifecycle confirm signup, purchase acknowledgment, entitlement, cancellation, refund, account export, and account deletion.
 
