@@ -4149,6 +4149,17 @@ select option:checked {
   -webkit-text-fill-color: currentColor;
 }
 
+.section-html .code-explicit-list {
+  list-style: none;
+  margin: var(--space-2) 0;
+  padding-left: var(--space-4);
+}
+
+.section-html .code-explicit-list .code-explicit-list {
+  margin: var(--space-1) 0;
+  padding-left: var(--space-5);
+}
+
 .section-html .specialty-provision {
   margin: 0;
 }

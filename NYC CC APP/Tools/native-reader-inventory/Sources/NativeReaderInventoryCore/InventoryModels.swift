@@ -61,6 +61,7 @@ public struct ListInventory: Codable, Equatable, Sendable {
 
 public enum TableRenderingClassification: String, Codable, Sendable {
     case nativeSimple
+    case nativeComplex
     case isolatedHTML
 }
 

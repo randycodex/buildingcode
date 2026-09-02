@@ -471,9 +471,18 @@ public struct NativeReaderChapterDocumentGenerator {
 
     private func semanticBlockKind(for element: XMLElement) -> NativeReaderBlockKind? {
         let name = normalizedName(element)
+        let classes = classTokens(element).map { $0.lowercased() }
         if name.count == 2, name.first == "h", Int(name.dropFirst()) != nil { return .heading }
-        if name == "ol" { return .orderedList }
-        if name == "ul" { return .unorderedList }
+        if name == "ol" {
+            return classes.contains("code-explicit-list") ? nil : .orderedList
+        }
+        if name == "ul" {
+            return classes.contains("code-explicit-list") ? nil : .unorderedList
+        }
+        if name == "div",
+           classes.contains("code-equation") || classes.contains("code-definition") {
+            return .paragraph
+        }
         if name == "table" { return .table }
         if name == "figure" { return .figure }
         if name == "img" || name == "svg" { return .image }
@@ -481,7 +490,6 @@ public struct NativeReaderChapterDocumentGenerator {
         if name == "hr" { return .divider }
         if name == "aside" { return .sourceNote }
         if ["p", "blockquote", "pre"].contains(name) {
-            let classes = classTokens(element).map { $0.lowercased() }
             if classes.contains(where: { $0.contains("editor") || $0 == "ednote" || $0 == "ednotesm" }) {
                 return .editorNote
             }
@@ -496,6 +504,15 @@ public struct NativeReaderChapterDocumentGenerator {
 
     private func isContainer(_ element: XMLElement) -> Bool {
         let name = normalizedName(element)
+        let classes = classTokens(element).map { $0.lowercased() }
+        if ["ol", "ul"].contains(name), classes.contains("code-explicit-list") {
+            return true
+        }
+        if name == "li",
+           let parent = element.parent as? XMLElement,
+           classTokens(parent).map({ $0.lowercased() }).contains("code-explicit-list") {
+            return true
+        }
         if ["body", "main", "article", "section", "header", "footer", "nav", "scrolltable"].contains(name) {
             return true
         }
@@ -1216,7 +1233,7 @@ public struct NativeReaderChapterDocumentGenerator {
             normalizedName(candidate) == "caption"
                 || normalizedName(candidate) == "figcaption"
                 || classTokens(candidate).contains { $0.lowercased().contains("caption") }
-        }.flatMap { nonEmpty(normalizeText($0.stringValue ?? "")) }
+        }.flatMap(AuthoredHTMLSemantics.formattedCaptionText)
     }
 
     private func isTopLevelMediaElement(_ element: XMLElement) -> Bool {

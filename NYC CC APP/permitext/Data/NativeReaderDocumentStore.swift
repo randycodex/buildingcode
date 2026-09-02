@@ -71,6 +71,7 @@ struct NativeReaderRuntimeListItem: Decodable, Equatable, Identifiable, Sendable
 
 enum NativeReaderRuntimeTableRenderingClassification: String, Decodable, Sendable {
     case nativeSimple
+    case nativeComplex
     case isolatedHTML
 }
 
@@ -480,8 +481,8 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
     static let shared = NativeReaderDocumentStore()
 
     static let supportedIndexSchemaVersion = 2
-    static let supportedDocumentSchemaVersion = 1
-    static let supportedParserSchemaVersion = "native-reader-document-v2"
+    static let supportedDocumentSchemaVersion = 2
+    static let supportedParserSchemaVersion = "native-reader-document-v3"
 
     #if DEBUG
     static let debugPilotSourcePaths: Set<String> = [
@@ -986,6 +987,26 @@ final class NativeReaderDocumentStore: @unchecked Sendable {
                       table.sourceHTML == nil else {
                     throw NativeReaderDocumentStoreError.tableValidationFailed(
                         "unsupported native-simple structure in \(table.id)"
+                    )
+                }
+            case .nativeComplex:
+                let supportedReasons: Set<String> = [
+                    "mergedCells", "multiRowHeader", "wideTable", "formattedCells", "linkedCells"
+                ]
+                guard table.rowCount > 0,
+                      table.columnCount > 0,
+                      table.columnCount <= 16,
+                      !table.cells.isEmpty,
+                      !table.classificationReasons.isEmpty,
+                      Set(table.classificationReasons).isSubset(of: supportedReasons),
+                      table.cells.allSatisfy({
+                          $0.classNames.isEmpty
+                              && $0.inlineStyle == nil
+                              && $0.borderSignatures.isEmpty
+                      }),
+                      table.sourceHTML == nil else {
+                    throw NativeReaderDocumentStoreError.tableValidationFailed(
+                        "unsupported native-complex structure in \(table.id)"
                     )
                 }
             case .isolatedHTML:

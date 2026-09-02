@@ -117,6 +117,96 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: "BC Table 307.1(1) compact notes", from: app)
     }
 
+    func test2014BuildingCodeNativeFigureAndStructuredTableRegression() {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--permitext-disable-clerk",
+            "--native-reader-phase9-source",
+            "2014-construction-codes/chapters/bc-7.html",
+            "--native-reader-phase9-width",
+            "402",
+            "--native-reader-phase9-starting-block",
+            "137"
+        ]
+        app.launch()
+
+        XCTAssertTrue(
+            element(in: app, identifier: "phase9-snapshot-ready").waitForExistence(timeout: 45),
+            "2014 BC Chapter 7 did not load in the native-reader snapshot harness."
+        )
+
+        let figure7057 = app.buttons[
+            "native-reader-block-39e6573e633d19899c98f281568284d0eb7b282890b7baf6e64427b285f20af6"
+        ]
+        XCTAssertTrue(figure7057.waitForExistence(timeout: 10))
+        XCTAssertTrue(figure7057.label.localizedCaseInsensitiveContains("FIGURE 705.7"))
+        keepScreenshot(named: "2014 BC Figure 705.7 local native media", from: app)
+
+        app.terminate()
+        app.launchArguments = [
+            "--permitext-disable-clerk",
+            "--native-reader-phase9-source",
+            "2014-construction-codes/chapters/bc-7.html",
+            "--native-reader-phase9-width",
+            "402",
+            "--native-reader-phase9-starting-block",
+            "140"
+        ]
+        app.launch()
+
+        XCTAssertTrue(
+            element(in: app, identifier: "phase9-snapshot-ready").waitForExistence(timeout: 45),
+            "2014 BC Chapter 7 table snapshot did not load in the native-reader harness."
+        )
+        let table7058 = element(
+            in: app,
+            identifier: "native-reader-block-ec717d5216cdeb8d1520e4cd010353791fd2207ec571f171b07a42dfd34d3716"
+        )
+        XCTAssertTrue(table7058.waitForExistence(timeout: 10))
+        XCTAssertTrue(
+            app.staticTexts
+                .matching(NSPredicate(format: "label CONTAINS[c] %@", "TABLE 705.8"))
+                .firstMatch
+                .waitForExistence(timeout: 10)
+        )
+        XCTAssertTrue(
+            app.staticTexts
+                .matching(NSPredicate(format: "label CONTAINS[c] %@", "FIRE SEPARATION DISTANCE"))
+                .firstMatch
+                .waitForExistence(timeout: 10)
+        )
+        keepScreenshot(named: "2014 BC Table 705.8 native merged header", from: app)
+
+        app.terminate()
+        app.launchArguments = [
+            "--permitext-disable-clerk",
+            "--native-reader-phase9-source",
+            "2014-construction-codes/chapters/bc-10.html",
+            "--native-reader-phase9-width",
+            "402",
+            "--native-reader-phase9-starting-block",
+            "114"
+        ]
+        app.launch()
+
+        XCTAssertTrue(
+            element(in: app, identifier: "phase9-snapshot-ready").waitForExistence(timeout: 45),
+            "2014 BC Chapter 10 did not load in the native-reader snapshot harness."
+        )
+        let table100411 = element(
+            in: app,
+            identifier: "native-reader-block-dbdc43066e5bd33db04c83d38806ebcb9bec8b760a50192c33bc7bd1ee5043b0"
+        )
+        XCTAssertTrue(table100411.waitForExistence(timeout: 10))
+        XCTAssertTrue(
+            app.staticTexts
+                .matching(NSPredicate(format: "label CONTAINS[c] %@", "TABLE 1004.1.1"))
+                .firstMatch
+                .waitForExistence(timeout: 10)
+        )
+        keepScreenshot(named: "2014 BC Table 1004.1.1 native formatted cells", from: app)
+    }
+
     func testFuelGasChapterOneCrossCodeLinkOpensTitle28() {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -548,7 +638,9 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
     }
 
     private func element(in app: XCUIApplication, identifier: String) -> XCUIElement {
-        app.descendants(matching: .any)[identifier]
+        app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier == %@", identifier))
+            .firstMatch
     }
 
     private func firstSavedRow(in app: XCUIApplication) -> XCUIElement {

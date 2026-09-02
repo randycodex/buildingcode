@@ -201,6 +201,11 @@ struct PermitextApp: App {
     }
 
     private static func configuredClerkIfAvailable() -> Clerk? {
+#if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--permitext-disable-clerk") {
+            return nil
+        }
+#endif
         guard
             let publishableKey = Bundle.main.object(forInfoDictionaryKey: "PermitextClerkPublishableKey") as? String,
             !publishableKey.isEmpty,

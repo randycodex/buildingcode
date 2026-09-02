@@ -372,7 +372,7 @@ public struct NativeReaderDocumentValidation: Codable, Equatable, Sendable {
 }
 
 public struct NativeReaderChapterDocument: Codable, Equatable, Sendable {
-    public static let schemaVersion = 1
+    public static let schemaVersion = 2
 
     public let schemaVersion: Int
     public let parserSchemaVersion: String

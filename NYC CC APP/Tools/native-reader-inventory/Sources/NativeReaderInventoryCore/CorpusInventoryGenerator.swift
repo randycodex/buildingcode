@@ -63,6 +63,40 @@ enum AuthoredHTMLParserInput {
 }
 
 enum AuthoredHTMLSemantics {
+    static func formattedCaptionText(in element: XMLElement) -> String? {
+        var fragments: [String] = []
+
+        func visit(_ node: XMLNode) {
+            if node.kind == .text {
+                fragments.append(node.stringValue ?? "")
+                return
+            }
+            guard let child = node as? XMLElement else { return }
+            switch normalizedName(child) {
+            case "br":
+                fragments.append("\n")
+            case "sup":
+                fragments.append(scriptText(child.stringValue ?? "", map: superscriptMap))
+            case "sub":
+                fragments.append(scriptText(child.stringValue ?? "", map: subscriptMap))
+            default:
+                for descendant in child.children ?? [] {
+                    visit(descendant)
+                }
+            }
+        }
+
+        visit(element)
+        let lines = fragments.joined()
+            .split(separator: "\n", omittingEmptySubsequences: false)
+            .map { line in
+                line.split(whereSeparator: { $0.isWhitespace }).joined(separator: " ")
+            }
+            .filter { !$0.isEmpty }
+        guard !lines.isEmpty else { return nil }
+        return lines.joined(separator: "\n")
+    }
+
     static func isInsidePresentationalTableHeader(_ element: XMLElement) -> Bool {
         var candidate: XMLElement? = element
         while let current = candidate {
@@ -139,6 +173,31 @@ enum AuthoredHTMLSemantics {
     private static func normalizedName(_ element: XMLElement) -> String {
         (element.localName ?? element.name ?? "").lowercased()
     }
+
+    private static func scriptText(_ value: String, map: [Character: Character]) -> String {
+        String(value.map { map[$0] ?? $0 })
+    }
+
+    private static let superscriptMap: [Character: Character] = [
+        "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+        "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹",
+        "a": "ᵃ", "b": "ᵇ", "c": "ᶜ", "d": "ᵈ", "e": "ᵉ",
+        "f": "ᶠ", "g": "ᵍ", "h": "ʰ", "i": "ⁱ", "j": "ʲ",
+        "k": "ᵏ", "l": "ˡ", "m": "ᵐ", "n": "ⁿ", "o": "ᵒ",
+        "p": "ᵖ", "r": "ʳ", "s": "ˢ", "t": "ᵗ", "u": "ᵘ",
+        "v": "ᵛ", "w": "ʷ", "x": "ˣ", "y": "ʸ", "z": "ᶻ",
+        "+": "⁺", "-": "⁻", "=": "⁼", "(": "⁽", ")": "⁾"
+    ]
+
+    private static let subscriptMap: [Character: Character] = [
+        "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄",
+        "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉",
+        "a": "ₐ", "e": "ₑ", "h": "ₕ", "i": "ᵢ", "j": "ⱼ",
+        "k": "ₖ", "l": "ₗ", "m": "ₘ", "n": "ₙ", "o": "ₒ",
+        "p": "ₚ", "r": "ᵣ", "s": "ₛ", "t": "ₜ", "u": "ᵤ",
+        "v": "ᵥ", "x": "ₓ", "+": "₊", "-": "₋", "=": "₌",
+        "(": "₍", ")": "₎"
+    ]
 }
 
 public enum CorpusInventoryError: LocalizedError {
@@ -160,7 +219,7 @@ public enum CorpusInventoryError: LocalizedError {
 
 public struct CorpusInventoryGenerator {
     public static let schemaVersion = 3
-    public static let parserSchemaVersion = "native-reader-document-v2"
+    public static let parserSchemaVersion = "native-reader-document-v3"
     public static let parserEngine = "Case-insensitive authored JSX Link-to-anchor normalization + libxml2 HTML recovery DOM (xmllint --html --xmlout) + Foundation XMLDocument"
 
     private let fileManager: FileManager
@@ -646,7 +705,7 @@ public struct CorpusInventoryGenerator {
         let headerRows = cellsByRow.filter { $0.contains { normalizedName($0) == "th" } }.count
         let caption = descendants
             .first { normalizedName($0) == "caption" && nearestAncestor(named: "table", from: $0) === table }
-            .flatMap { nonEmpty(normalizeText($0.stringValue ?? "")) }
+            .flatMap(AuthoredHTMLSemantics.formattedCaptionText)
         let footnotes = sortedUnique(descendants.compactMap { element -> String? in
             let name = normalizedName(element)
             let classes = classTokens(element).map { $0.lowercased() }
@@ -718,15 +777,24 @@ public struct CorpusInventoryGenerator {
         ]
         let embeddedElements = sortedUnique(descendants.map(normalizedName).filter { !permittedInsideTable.contains($0) })
 
-        let hasCellFormatting = cells.contains { cell in
-            !classTokens(cell).isEmpty
-                || nonEmpty(attribute("style", in: cell)) != nil
-                || !flattenedElements(from: cell).dropFirst().isEmpty
+        let inlineFormattingElements: Set<String> = [
+            "br", "strong", "b", "em", "i", "u", "s", "strike", "small", "sup", "sub"
+        ]
+        let hasInlineTextFormatting = cells.contains { cell in
+            flattenedElements(from: cell).dropFirst().contains {
+                inlineFormattingElements.contains(normalizedName($0))
+            }
         }
         let hasCellLinks = cells.contains { cell in
             flattenedElements(from: cell).dropFirst().contains {
                 ["a", "link", "area"].contains(normalizedName($0))
             }
+        }
+        let presentationElements = [table] + descendants.filter {
+            ["thead", "tbody", "tfoot", "tr", "th", "td", "colgroup", "col"].contains(normalizedName($0))
+        }
+        let hasAuthoredPresentation = presentationElements.contains {
+            !classTokens($0).isEmpty || nonEmpty(attribute("style", in: $0)) != nil
         }
 
         var reasons: [String] = []
@@ -735,10 +803,21 @@ public struct CorpusInventoryGenerator {
         if headerRows > 1 { reasons.append("multiRowHeader") }
         if logicalColumnCount > 6 { reasons.append("wideTable") }
         if !borderSignatures.isEmpty { reasons.append("customBorders") }
-        if hasCellFormatting { reasons.append("formattedCells") }
+        if hasAuthoredPresentation { reasons.append("authoredPresentation") }
+        if hasInlineTextFormatting { reasons.append("formattedCells") }
         if hasCellLinks { reasons.append("linkedCells") }
         if !embeddedElements.isEmpty { reasons.append("embeddedContent") }
-        let renderingClassification: TableRenderingClassification = reasons.isEmpty ? .nativeSimple : .isolatedHTML
+        let nativeComplexReasons: Set<String> = [
+            "mergedCells", "multiRowHeader", "wideTable", "formattedCells", "linkedCells"
+        ]
+        let renderingClassification: TableRenderingClassification
+        if reasons.isEmpty {
+            renderingClassification = .nativeSimple
+        } else if Set(reasons).isSubset(of: nativeComplexReasons) {
+            renderingClassification = .nativeComplex
+        } else {
+            renderingClassification = .isolatedHTML
+        }
 
         return TableInventory(
             sourceOrder: sourceOrderByElement[ObjectIdentifier(table)] ?? 0,
@@ -1278,7 +1357,10 @@ public struct CorpusInventoryGenerator {
         "reserved", "small", "small-bold", "web", "chapter", "default", "tableparagraph",
         "pseudo-li", "sec-link-inline", "center-align", "embedded-entity", "pb_after",
         "msonormal", "msotablegrid", "msonospacing", "msobodytext", "datetime",
-        "appendix-c-table", "appendix-c-table-header", "appendix-c-row"
+        "appendix-c-table", "appendix-c-table-header", "appendix-c-row",
+        "code-explicit-list", "code-equation", "code-equation-formula", "code-equation-label",
+        "code-equation-where", "code-definition", "code-definition-term",
+        "code-definition-equals", "code-definition-text", "code-table-footnote"
     ]
 
     private static let recognizedClassPrefixes = [

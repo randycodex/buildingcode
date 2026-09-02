@@ -289,13 +289,16 @@ private struct TableBlockView: View {
 struct NativeReaderTableBlockView: View {
     let table: NativeReaderRuntimeTable
     let baseURL: URL?
+    let theme: ReaderTheme
+    let accentColor: UIColor
+    let onOpenLink: (URL) -> Void
     var searchQuery: String = ""
     var activeMatchIndex: Int? = nil
 
     var body: some View {
         switch table.renderingClassification {
-        case .nativeSimple:
-            nativeSimpleTable
+        case .nativeSimple, .nativeComplex:
+            nativeTable
         case .isolatedHTML:
             if let sourceHTML = table.sourceHTML {
                 NativeReaderPreparedTableHTMLView(
@@ -320,16 +323,35 @@ struct NativeReaderTableBlockView: View {
         table.rowCount > 250 || table.cells.count > 2_500
     }
 
-    private var nativeSimpleTable: some View {
+    private var nativeTable: some View {
         VStack(alignment: .leading, spacing: 8) {
             if let caption = table.caption, !caption.isEmpty {
                 Text(caption)
                     .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled)
             }
 
             ScrollView(.horizontal) {
-                simpleGrid
+                NativeReaderSpanningTableLayout(
+                    rowCount: table.rowCount,
+                    columnCount: table.columnCount,
+                    columnWidth: nativeColumnWidth
+                ) {
+                    ForEach(table.cells) { cell in
+                        NativeReaderTableCellView(
+                            cell: cell,
+                            theme: theme,
+                            accentColor: accentColor,
+                            onOpenLink: onOpenLink
+                        )
+                        .layoutValue(key: NativeReaderTableRowKey.self, value: cell.row)
+                        .layoutValue(key: NativeReaderTableColumnKey.self, value: cell.column)
+                        .layoutValue(key: NativeReaderTableRowSpanKey.self, value: cell.rowSpan)
+                        .layoutValue(key: NativeReaderTableColumnSpanKey.self, value: cell.columnSpan)
+                    }
+                }
             }
             .scrollIndicators(.visible)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -344,41 +366,163 @@ struct NativeReaderTableBlockView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var simpleGrid: some View {
-        let cellsByPosition = Dictionary(
-            uniqueKeysWithValues: table.cells.map { ("\($0.row)-\($0.column)", $0) }
+    private var nativeColumnWidth: CGFloat {
+        switch table.columnCount {
+        case 0...1: 336
+        case 2: 176
+        case 3: 156
+        default: 144
+        }
+    }
+}
+
+private struct NativeReaderTableCellView: View {
+    let cell: NativeReaderRuntimeTableCell
+    let theme: ReaderTheme
+    let accentColor: UIColor
+    let onOpenLink: (URL) -> Void
+
+    var body: some View {
+        Text(AttributedString(attributedText))
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 7)
+            .background(
+                cell.isHeader
+                    ? Color(uiColor: .secondarySystemGroupedBackground)
+                    : Color(uiColor: .systemBackground)
+            )
+            .overlay {
+                Rectangle()
+                    .stroke(Color(uiColor: .separator), lineWidth: 0.5)
+            }
+            .textSelection(.enabled)
+            .accessibilityAddTraits(cell.isHeader ? .isHeader : [])
+            .environment(\.openURL, OpenURLAction { url in
+                onOpenLink(url)
+                return .handled
+            })
+    }
+
+    private var attributedText: NSAttributedString {
+        var runs = cell.runs.isEmpty
+            ? [NativeReaderRuntimeTextRun(text: cell.plainText, styles: [], linkTarget: nil)]
+            : cell.runs
+        if cell.isHeader {
+            runs = runs.map { run in
+                let styles = run.styles.contains(.bold) ? run.styles : [.bold] + run.styles
+                return NativeReaderRuntimeTextRun(
+                    text: run.text,
+                    styles: styles,
+                    linkTarget: run.linkTarget
+                )
+            }
+        }
+        return NativeReaderAttributedTextBuilder.attributedText(
+            runs: runs,
+            fallbackText: cell.plainText,
+            theme: theme,
+            role: .body,
+            accentColor: accentColor
         )
-        return Grid(horizontalSpacing: 0, verticalSpacing: 0) {
-            ForEach(0..<table.rowCount, id: \.self) { row in
-                GridRow {
-                    ForEach(0..<table.columnCount, id: \.self) { column in
-                        let cell = cellsByPosition["\(row)-\(column)"]
-                        Text(cell?.plainText ?? "")
-                            .font(cell?.isHeader == true ? .body.weight(.semibold) : .body)
-                            .frame(width: 132, alignment: .leading)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 7)
-                            .background(
-                                cell?.isHeader == true
-                                    ? Color(uiColor: .secondarySystemGroupedBackground)
-                                    : Color.clear
-                            )
-                            .overlay(alignment: .bottom) {
-                                Color(uiColor: .separator).frame(height: 0.5)
-                            }
-                            .overlay(alignment: .trailing) {
-                                Color(uiColor: .separator).frame(width: 0.5)
-                            }
-                            .textSelection(.enabled)
-                            .accessibilityAddTraits(cell?.isHeader == true ? .isHeader : [])
-                    }
+    }
+}
+
+private struct NativeReaderTableRowKey: LayoutValueKey {
+    static let defaultValue = 0
+}
+
+private struct NativeReaderTableColumnKey: LayoutValueKey {
+    static let defaultValue = 0
+}
+
+private struct NativeReaderTableRowSpanKey: LayoutValueKey {
+    static let defaultValue = 1
+}
+
+private struct NativeReaderTableColumnSpanKey: LayoutValueKey {
+    static let defaultValue = 1
+}
+
+private struct NativeReaderSpanningTableLayout: Layout {
+    let rowCount: Int
+    let columnCount: Int
+    let columnWidth: CGFloat
+
+    func sizeThatFits(
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) -> CGSize {
+        let metrics = makeMetrics(subviews: subviews)
+        return CGSize(
+            width: CGFloat(max(columnCount, 1)) * columnWidth,
+            height: metrics.rowHeights.reduce(0, +)
+        )
+    }
+
+    func placeSubviews(
+        in bounds: CGRect,
+        proposal: ProposedViewSize,
+        subviews: Subviews,
+        cache: inout ()
+    ) {
+        let metrics = makeMetrics(subviews: subviews)
+        let rowOrigins = cumulativeOrigins(for: metrics.rowHeights)
+        for subview in subviews {
+            let row = min(max(subview[NativeReaderTableRowKey.self], 0), max(rowCount - 1, 0))
+            let column = min(max(subview[NativeReaderTableColumnKey.self], 0), max(columnCount - 1, 0))
+            let rowSpan = min(max(subview[NativeReaderTableRowSpanKey.self], 1), max(rowCount - row, 1))
+            let columnSpan = min(max(subview[NativeReaderTableColumnSpanKey.self], 1), max(columnCount - column, 1))
+            let width = CGFloat(columnSpan) * columnWidth
+            let height = metrics.rowHeights[row..<(row + rowSpan)].reduce(0, +)
+            subview.place(
+                at: CGPoint(
+                    x: bounds.minX + CGFloat(column) * columnWidth,
+                    y: bounds.minY + rowOrigins[row]
+                ),
+                anchor: .topLeading,
+                proposal: ProposedViewSize(width: width, height: height)
+            )
+        }
+    }
+
+    private func makeMetrics(subviews: Subviews) -> Metrics {
+        guard rowCount > 0, columnCount > 0 else { return Metrics(rowHeights: []) }
+        var rowHeights = Array(repeating: CGFloat(36), count: rowCount)
+        let orderedSubviews = subviews.sorted {
+            $0[NativeReaderTableRowSpanKey.self] < $1[NativeReaderTableRowSpanKey.self]
+        }
+        for subview in orderedSubviews {
+            let row = min(max(subview[NativeReaderTableRowKey.self], 0), rowCount - 1)
+            let column = min(max(subview[NativeReaderTableColumnKey.self], 0), columnCount - 1)
+            let rowSpan = min(max(subview[NativeReaderTableRowSpanKey.self], 1), rowCount - row)
+            let columnSpan = min(max(subview[NativeReaderTableColumnSpanKey.self], 1), columnCount - column)
+            let width = CGFloat(columnSpan) * columnWidth
+            let requiredHeight = subview.sizeThatFits(
+                ProposedViewSize(width: width, height: nil)
+            ).height
+            let currentHeight = rowHeights[row..<(row + rowSpan)].reduce(0, +)
+            if requiredHeight > currentHeight {
+                let addition = (requiredHeight - currentHeight) / CGFloat(rowSpan)
+                for index in row..<(row + rowSpan) {
+                    rowHeights[index] += addition
                 }
             }
         }
-        .overlay {
-            Rectangle()
-                .stroke(Color(uiColor: .separator), lineWidth: 0.5)
+        return Metrics(rowHeights: rowHeights)
+    }
+
+    private func cumulativeOrigins(for sizes: [CGFloat]) -> [CGFloat] {
+        var total: CGFloat = 0
+        return sizes.map { size in
+            defer { total += size }
+            return total
         }
+    }
+
+    private struct Metrics {
+        let rowHeights: [CGFloat]
     }
 }
 

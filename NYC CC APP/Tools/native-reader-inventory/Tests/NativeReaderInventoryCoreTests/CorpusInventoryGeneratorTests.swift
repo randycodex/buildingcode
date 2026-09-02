@@ -82,12 +82,80 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
 
         let chapter = CorpusInventoryGenerator().analyzeChapter(fileURL: chapterURL, sourceRoot: root)
 
-        XCTAssertEqual(chapter.tables.first?.renderingClassification, .isolatedHTML)
+        XCTAssertEqual(chapter.tables.first?.renderingClassification, .nativeComplex)
         XCTAssertEqual(chapter.tables.first?.classificationReasons, ["mergedCells"])
         XCTAssertEqual(chapter.unknownElementNames, ["mystery-widget"])
         XCTAssertEqual(chapter.unknownClassNames, ["unreviewed-variant"])
         XCTAssertEqual(chapter.eligibility.state, .fullHTMLFallback)
         XCTAssertTrue(chapter.eligibility.reasons.contains { $0.contains("unknownElements") })
+    }
+
+    func testMergedHeadersAndInlineLegalFormattingUseNativeComplexTable() throws {
+        let root = try makeTemporaryDirectory()
+        let chapters = root.appendingPathComponent("sample-package/chapters", isDirectory: true)
+        try FileManager.default.createDirectory(at: chapters, withIntermediateDirectories: true)
+        let chapterURL = chapters.appendingPathComponent("native-complex.html")
+        try """
+        <html><body><h2 id="native-complex">Native complex table</h2>
+        <table><caption>TABLE 705.8<br>MAXIMUM AREA OF OPENINGS<sup>m</sup></caption>
+          <tr><th rowspan="2">Distance</th><th colspan="2"><strong>Allowable area</strong></th></tr>
+          <tr><th>Protected<sup>a</sup></th><th>Unprotected<br>sprinklered</th></tr>
+          <tr><td>0 to less than 3</td><td>Not permitted</td><td>Not permitted</td></tr>
+        </table></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let generator = CorpusInventoryGenerator()
+        let chapter = generator.analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: chapter
+        )
+
+        XCTAssertEqual(chapter.tables.first?.renderingClassification, .nativeComplex)
+        XCTAssertEqual(chapter.tables.first?.caption, "TABLE 705.8\nMAXIMUM AREA OF OPENINGSᵐ")
+        XCTAssertEqual(
+            Set(chapter.tables.first?.classificationReasons ?? []),
+            Set(["mergedCells", "multiRowHeader", "formattedCells"])
+        )
+        XCTAssertEqual(chapter.eligibility.state, .native)
+        XCTAssertEqual(chapter.eligibility.reasons, [])
+        let table = try XCTUnwrap(document.blocks.compactMap(\.table).first)
+        XCTAssertEqual(table.caption, "TABLE 705.8\nMAXIMUM AREA OF OPENINGSᵐ")
+        XCTAssertEqual(table.renderingClassification, .nativeComplex)
+        XCTAssertNil(table.sourceHTML)
+        XCTAssertEqual(table.cells.first?.rowSpan, 2)
+        XCTAssertEqual(table.cells.dropFirst().first?.columnSpan, 2)
+        XCTAssertTrue(table.cells.flatMap(\.runs).contains { $0.styles.contains(.superscript) })
+        XCTAssertEqual(NativeReaderRolloutTier(blocks: document.blocks), .nativeTable)
+    }
+
+    func testWideSemanticTableUsesHorizontallyScrollableNativeComplexLayout() throws {
+        let root = try makeTemporaryDirectory()
+        let chapters = root.appendingPathComponent("sample-package/chapters", isDirectory: true)
+        try FileManager.default.createDirectory(at: chapters, withIntermediateDirectories: true)
+        let chapterURL = chapters.appendingPathComponent("wide-native.html")
+        try """
+        <html><body><h2>Wide native table</h2><table>
+          <tr><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr>
+          <tr><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+        </table></body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let generator = CorpusInventoryGenerator()
+        let chapter = generator.analyzeChapter(fileURL: chapterURL, sourceRoot: root)
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: chapter
+        )
+
+        XCTAssertEqual(chapter.tables.first?.logicalColumnCount, 7)
+        XCTAssertEqual(chapter.tables.first?.classificationReasons, ["wideTable"])
+        XCTAssertEqual(chapter.tables.first?.renderingClassification, .nativeComplex)
+        XCTAssertEqual(chapter.eligibility.state, .native)
+        XCTAssertNil(document.blocks.compactMap(\.table).first?.sourceHTML)
+        XCTAssertEqual(NativeReaderRolloutTier(blocks: document.blocks), .nativeTable)
     }
 
     func testComplexTableContainsUnknownFormattingInsideIsolatedBoundary() throws {
@@ -221,6 +289,48 @@ final class CorpusInventoryGeneratorTests: XCTestCase {
         })
         XCTAssertTrue(document.validation.passesStructuralValidation)
         XCTAssertEqual(document.validation.unsupportedBlockCount, 0)
+    }
+
+    func testPermitextExplicitLegalListsAndEquationsRemainNativeWithoutDuplicateMarkers() throws {
+        let root = try makeTemporaryDirectory()
+        let chapterURL = root.appendingPathComponent("sample-package/chapters/10.html")
+        try FileManager.default.createDirectory(
+            at: chapterURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try """
+        <html><body>
+          <p>Applicable conditions:</p>
+          <ol class="code-explicit-list"><li><p>1. First condition.</p></li>
+            <li><p>2. Second condition:</p>
+              <ol class="code-explicit-list"><li><p>2.1. Nested condition.</p></li></ol>
+            </li>
+          </ol>
+          <div class="code-equation"><span class="code-equation-formula">A = B + C</span><span class="code-equation-label">(Equation 1)</span></div>
+          <p class="code-equation-where">where:</p>
+          <div class="code-definition"><span class="code-definition-term">A</span><span class="code-definition-equals">=</span><span class="code-definition-text">Total area.</span></div>
+        </body></html>
+        """.write(to: chapterURL, atomically: true, encoding: .utf8)
+
+        let inventory = CorpusInventoryGenerator().analyzeChapter(
+            fileURL: chapterURL,
+            sourceRoot: root
+        )
+        let document = try NativeReaderChapterDocumentGenerator().generate(
+            fileURL: chapterURL,
+            sourceRoot: root,
+            inventory: inventory
+        )
+
+        XCTAssertTrue(inventory.unknownClassNames.isEmpty)
+        XCTAssertEqual(inventory.eligibility.state, .native)
+        XCTAssertEqual(document.validation.unsupportedBlockCount, 0)
+        XCTAssertTrue(document.validation.passesStructuralValidation)
+        XCTAssertFalse(document.blocks.contains { $0.kind == .orderedList || $0.kind == .unorderedList })
+        XCTAssertTrue(document.blocks.contains { $0.kind == .paragraph && $0.plainText == "1. First condition." })
+        XCTAssertTrue(document.blocks.contains { $0.kind == .paragraph && $0.plainText == "2.1. Nested condition." })
+        XCTAssertTrue(document.blocks.contains { $0.kind == .paragraph && $0.plainText.contains("Equation 1") })
+        XCTAssertTrue(document.blocks.contains { $0.kind == .paragraph && $0.plainText.contains("Total area") })
     }
 
     func testTableNestedInsideListItemIsEmittedOnceAsTableBlock() throws {

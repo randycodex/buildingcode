@@ -18,6 +18,14 @@ const imageManifest = await readJSON(join(historicalConstructionContentRoot, "pr
 const metadata = await historicalConstructionContentMetadata();
 const catalog = await historicalConstructionSectionCatalog();
 const searchIndex = await historicalConstructionSearchIndex();
+const meansOfEgressChapterHTML = await readFile(
+  join(historicalConstructionContentRoot, "chapters", "bc-10.html"),
+  "utf8"
+);
+const fireResistanceChapterHTML = await readFile(
+  join(historicalConstructionContentRoot, "chapters", "bc-7.html"),
+  "utf8"
+);
 
 assert.equal(source.libraryID, "nyc-2014-construction-codes");
 assert.equal(source.chapterPDFs.length, 111, "Every official DOB chapter and appendix PDF must be inventoried.");
@@ -66,12 +74,26 @@ assert.equal(meansOfEgressChapter.semanticHTML.publisher, "International Code Co
 assert.equal(meansOfEgressChapter.semanticHTML.role, "secondary semantic structure reference");
 assert.equal(meansOfEgressChapter.semanticHTML.verifiedStructuredTableCount, 11);
 assert.equal(meansOfEgressChapter.semanticHTML.officialPDFCorrectedCellCount, 1);
+assert.equal(meansOfEgressChapter.semanticHTML.officialPDFRecoveredSectionTextCount, 2);
 assert(meansOfEgressChapter.semanticHTML.verifiedSectionHTMLCount > 300);
 assert(meansOfEgressChapter.semanticHTML.fallbackSectionHTMLCount > 0);
 assert.equal(source.secondaryHTMLReferences.length, 1);
 assert.equal(
   source.secondaryHTMLReferences[0].sourceURL,
   "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-10-means-of-egress"
+);
+assert.equal(
+  (meansOfEgressChapterHTML.match(/<table\b/g) || []).length,
+  11,
+  "Every verified Chapter 10 table must be present in the native-reader source HTML."
+);
+assert.match(
+  meansOfEgressChapterHTML,
+  /data-table-id="nyc-2014-table-bc-10-1004-1-1"/
+);
+assert.match(
+  fireResistanceChapterHTML,
+  /<img src="\.\.\/assets\/2014-bc-7-p0008-figure-01\.png" alt="FIGURE 705\.7">/
 );
 
 const rampScope = catalog.find((section) =>
@@ -96,8 +118,10 @@ assert.equal(
   rampSlopeBody.blocks[0].verificationStatus,
   "semantic-html-token-verified-against-official-pdf"
 );
-assert.match(rampSlopeBody.blocks[0].html, /<ol><li><p>Aisle ramp slope/);
-assert.doesNotMatch(rampSlopeBody.blocks[0].html, /<li><p>1\. Aisle ramp slope/);
+assert.match(
+  rampSlopeBody.blocks[0].html,
+  /<ol class="code-explicit-list"><li><p>1\. Aisle ramp slope/
+);
 assert.equal(rampSlopeBody.blocks[0].html.includes("codes.iccsafe.org"), false);
 
 const corridorWidth = catalog.find((section) =>
@@ -106,16 +130,58 @@ const corridorWidth = catalog.find((section) =>
 assert(corridorWidth, "BC 1018.2 is missing from the 2014 Building Code corpus.");
 const corridorWidthBody = await historicalConstructionSection(corridorWidth.id);
 assert.match(corridorWidthBody.officialText, /not less than 44 inches \(1118 mm\)/);
-assert.match(corridorWidthBody.blocks[0].html, /<ol><li><p>Twenty-four inches/);
-assert.doesNotMatch(
+assert.match(
   corridorWidthBody.blocks[0].html,
-  /<li><p>1\. Twenty-four inches/,
-  "Semantic list HTML must not duplicate the browser-generated ordinal."
+  /<ol class="code-explicit-list"><li><p>1\. Twenty-four inches/
 );
 assert.equal(
   corridorWidthBody.officialText.includes("\nChapter 11"),
   false,
   "A physical PDF wrap before Chapter 11 must not create a legal paragraph break."
+);
+
+const singleExit = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "1021.2"
+);
+assert(singleExit, "BC 1021.2 is missing.");
+const singleExitBody = await historicalConstructionSection(singleExit.id);
+assert.match(singleExitBody.officialText, /1\. Stories in buildings as described in Table 1021\.2/);
+assert.match(singleExitBody.officialText, /4\.1\. The building does not exceed four stories/);
+assert.match(singleExitBody.officialText, /4\.7\. The stairway is enclosed in 2-hour fire-rated walls/);
+assert.match(singleExitBody.officialText, /4\.8\. The building shall be equipped throughout/);
+assert.match(singleExitBody.officialText, /5\. Buildings of Group R-2 occupancy/);
+assert.equal(
+  singleExitBody.blocks[0].verificationStatus,
+  "complete-semantic-passage-token-verified-against-official-pdf"
+);
+assert.equal(
+  singleExitBody.historicalConstructionCode.semanticTextRecovery.previousPDFDerivedTokenCount,
+  70
+);
+assert.deepEqual(
+  singleExitBody.historicalConstructionCode.semanticTextRecovery
+    .officialPDFProvenance.pdfPages,
+  [41, 42]
+);
+assert.match(
+  singleExitBody.blocks[0].html,
+  /<ol class="code-explicit-list"><li><p>1\. Stories in buildings/
+);
+assert.match(
+  singleExitBody.blocks[0].html,
+  /<ol class="code-explicit-list"><li><p>4\.1\. The building does not exceed four stories/
+);
+
+const assemblyCommonPath = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "1028.8"
+);
+assert(assemblyCommonPath, "BC 1028.8 is missing.");
+const assemblyCommonPathBody = await historicalConstructionSection(assemblyCommonPath.id);
+assert.match(assemblyCommonPathBody.officialText, /1\. For areas, such as box seats/);
+assert.match(assemblyCommonPathBody.officialText, /2\. For smoke-protected assembly seating/);
+assert.equal(
+  assemblyCommonPathBody.blocks[0].verificationStatus,
+  "complete-semantic-passage-token-verified-against-official-pdf"
 );
 
 const table1004 = bundle.tables.find((table) =>
@@ -155,11 +221,9 @@ const corridorRatingSection = catalog.find((section) =>
 );
 assert(corridorRatingSection, "BC 1018.1.1 is missing.");
 const corridorRatingBody = await historicalConstructionSection(corridorRatingSection.id);
-assert.match(corridorRatingBody.blocks[0].html, /<ol><li><p>A fire-resistance rating/);
-assert.doesNotMatch(
+assert.match(
   corridorRatingBody.blocks[0].html,
-  /<li><p>1\. A fire-resistance rating/,
-  "Semantic exception lists must not render duplicated ordinals."
+  /<ol class="code-explicit-list"><li><p>1\. A fire-resistance rating/
 );
 assert.equal(
   /1018\.1\.1 INTERIOR CORRIDOR FIRE-RESISTANCE RATING\s*$/i.test(corridorRatingBody.officialText),

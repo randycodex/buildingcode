@@ -123,6 +123,8 @@ class SourceSection:
     lines: list[Line] = field(default_factory=list)
     source_pages: list[dict] = field(default_factory=list)
     blocks: list[dict] = field(default_factory=list)
+    verified_semantic_text: str | None = None
+    semantic_text_recovery: dict | None = None
 
 
 class LinkCollector(HTMLParser):
@@ -198,7 +200,10 @@ class ICCSemanticHTMLSanitizer(HTMLParser):
             elif "italic" in classes:
                 emitted = "em"
         if emitted is not None:
-            self.output.append(f"<{emitted}>")
+            if emitted in {"ol", "ul"}:
+                self.output.append(f'<{emitted} class="code-explicit-list">')
+            else:
+                self.output.append(f"<{emitted}>")
         self.stack.append((tag, emitted, False))
 
     def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
@@ -235,19 +240,17 @@ class ICCSemanticHTMLSanitizer(HTMLParser):
 
     def result(self) -> tuple[str, str]:
         rendered = re.sub(r"\s+", " ", "".join(self.output)).strip()
-        rendered = re.sub(r"<(p|ol|ul|li|strong|em|sup|sub)>\s+", r"<\1>", rendered)
+        rendered = re.sub(
+            r"(<(?:p|ol|ul|li|strong|em|sup|sub)(?:\s+[^>]*)?>)\s+",
+            r"\1",
+            rendered,
+        )
         rendered = re.sub(r"\s+</(p|ol|ul|li|strong|em|sup|sub)>", r"</\1>", rendered)
         rendered = re.sub(r"\s+(<br>)\s*", r"\1", rendered)
         rendered = re.sub(r"\s+([,.;:!?])", r"\1", rendered)
-        # ICC's accessible list markup sometimes retains the printed marker in
-        # each <li>. Browsers already generate that marker, so remove it only
-        # from rendered HTML; plain_text below retains it for PDF verification.
-        rendered = re.sub(
-            r"(<li>(?:<p>)?)\s*(?:\(?\d+[.)]|[a-z][.)]|(?:i{1,3}|iv|v(?:i{0,3})?|ix|x)[.)]|[-•▪])\s+",
-            r"\1",
-            rendered,
-            flags=re.I,
-        )
+        # Retain the printed legal marker inside each item.  The web suppresses
+        # browser-generated markers for code-explicit-list, while the native
+        # attributed-text renderer needs the authored marker in the text.
         plain_text = re.sub(
             r"\s+([,.;:!?])",
             r"\1",
@@ -443,8 +446,12 @@ def normalized_tokens(value: str) -> list[str]:
 
 def semantic_verification_tokens(value: str) -> list[str]:
     """Normalize typography and PDF-attached footnote markers for comparison."""
-    normalized = unicodedata.normalize("NFKD", value or "")
-    normalized = normalized.replace("–", "-").replace("—", "-").replace("½", "1/2")
+    # Replace vulgar fractions before NFKD expands them.  The leading space is
+    # intentional: ``1½`` in the official PDF and ICC's ``1 1/2`` must
+    # produce the same tokens without collapsing to ``11/2``.
+    normalized = (value or "").replace("¼", " 1/4").replace("½", " 1/2").replace("¾", " 3/4")
+    normalized = unicodedata.normalize("NFKD", normalized)
+    normalized = normalized.replace("–", "-").replace("—", "-").replace("⁄", "/")
     normalized = re.sub(
         r"(?<=\d)(?=[A-Za-z])|(?<=[A-Za-z])(?=\d)",
         " ",
@@ -458,6 +465,32 @@ def semantic_verification_tokens(value: str) -> list[str]:
         normalized,
     )
     return re.findall(r"[a-z0-9]+", normalized.lower())
+
+
+def contiguous_token_sequence(
+    haystack: list[str],
+    needle: list[str],
+    start: int = 0,
+) -> int | None:
+    if not needle or len(needle) > len(haystack):
+        return None
+    for index in range(max(start, 0), len(haystack) - len(needle) + 1):
+        if haystack[index:index + len(needle)] == needle:
+            return index
+    return None
+
+
+def ordered_token_subsequence(needle: list[str], haystack: list[str]) -> bool:
+    """Return true only when every needle token appears in order."""
+    if not needle:
+        return True
+    offset = 0
+    for token in haystack:
+        if token == needle[offset]:
+            offset += 1
+            if offset == len(needle):
+                return True
+    return False
 
 
 def positive_html_integer(value: str | None) -> int:
@@ -1818,6 +1851,115 @@ def apply_icc_semantic_tables(
     }
 
 
+def apply_pdf_verified_semantic_section_recoveries(
+    source: SourcePDF,
+    source_hash: str,
+    sections: list[SourceSection],
+    poppler_pages: list[str],
+    semantic_snapshot: dict | None,
+) -> int:
+    """Recover prose hidden by a PDF table detector, without trusting ICC text.
+
+    A recovery is deliberately narrow.  The PDF-derived text must be materially
+    shorter, every surviving token must occur in order in the semantic passage,
+    and the *complete* semantic passage must occur contiguously after the exact
+    section heading on the official DOB PDF pages assigned to that section.
+    ICC supplies list/paragraph structure; the DOB PDF independently proves the
+    words.  Anything that fails one of these gates remains a fail-closed fallback.
+    """
+    if semantic_snapshot is None:
+        return 0
+
+    recovered_count = 0
+    for section_index, section in enumerate(sections):
+        semantic_section = semantic_snapshot.get("sectionHTML", {}).get(
+            section.section_number
+        )
+        if semantic_section is None:
+            continue
+        current_text = source_text(section)
+        current_tokens = semantic_verification_tokens(current_text)
+        semantic_text = str(semantic_section.get("plainText", ""))
+        semantic_tokens = semantic_verification_tokens(semantic_text)
+        if (
+            len(current_tokens) < 12
+            or len(semantic_tokens) < 24
+            or len(semantic_tokens) < len(current_tokens) * 1.2
+            or not ordered_token_subsequence(current_tokens, semantic_tokens)
+        ):
+            continue
+
+        page_numbers = sorted({
+            int(record["pdfPage"])
+            for record in section.source_pages
+            if isinstance(record.get("pdfPage"), int)
+        })
+        if (
+            not page_numbers
+            or any(page < 1 or page > len(poppler_pages) for page in page_numbers)
+        ):
+            continue
+        official_tokens = semantic_verification_tokens(" ".join(
+            poppler_pages[page - 1] for page in page_numbers
+        ))
+        heading_tokens = semantic_verification_tokens(
+            f"{section.section_number} {section.title}"
+        )
+        heading_index = contiguous_token_sequence(official_tokens, heading_tokens)
+        if heading_index is None:
+            continue
+        passage_index = contiguous_token_sequence(
+            official_tokens,
+            semantic_tokens,
+            heading_index + len(heading_tokens),
+        )
+        if passage_index is None:
+            continue
+
+        next_heading_index: int | None = None
+        if section_index + 1 < len(sections):
+            next_section = sections[section_index + 1]
+            next_heading_tokens = semantic_verification_tokens(
+                f"{next_section.section_number} {next_section.title}"
+            )
+            next_heading_index = contiguous_token_sequence(
+                official_tokens,
+                next_heading_tokens,
+                heading_index + len(heading_tokens),
+            )
+        if (
+            next_heading_index is not None
+            and passage_index + len(semantic_tokens) > next_heading_index
+        ):
+            continue
+
+        section.verified_semantic_text = semantic_text
+        section.semantic_text_recovery = {
+            "verificationStatus": (
+                "complete-semantic-passage-token-verified-against-official-pdf"
+            ),
+            "previousPDFDerivedTokenCount": len(current_tokens),
+            "recoveredTokenCount": len(semantic_tokens),
+            "officialPDFProvenance": {
+                "sourceURL": source.url,
+                "sourceSHA256": source_hash,
+                "pdfPages": page_numbers,
+                "extraction": (
+                    "Complete semantic passage matched contiguously after the exact "
+                    "section heading in Poppler text from the official NYC DOB PDF"
+                ),
+            },
+            "htmlStructureReference": {
+                "publisher": "International Code Council",
+                "url": semantic_section["anchorURL"],
+                "sourceSHA256": semantic_snapshot["sourceSHA256"],
+                "role": "secondary semantic structure reference",
+            },
+        }
+        recovered_count += 1
+    return recovered_count
+
+
 def extract_source(
     source: SourcePDF,
     pdf_path: Path,
@@ -2072,6 +2214,13 @@ def extract_source(
         poppler_pages,
         semantic_snapshot,
     )
+    recovered_semantic_section_count = apply_pdf_verified_semantic_section_recoveries(
+        source,
+        source_hash,
+        sections,
+        poppler_pages,
+        semantic_snapshot,
+    )
     if not sections:
         discrepancies.append({
             "kind": "no-section-headings-detected",
@@ -2099,6 +2248,7 @@ def extract_source(
                 "role": "secondary semantic structure reference",
                 "verifiedStructuredTableCount": semantic_table_summary["tableCount"],
                 "officialPDFCorrectedCellCount": semantic_table_summary["correctedCellCount"],
+                "officialPDFRecoveredSectionTextCount": recovered_semantic_section_count,
                 "verifiedSectionHTMLCount": 0,
                 "fallbackSectionHTMLCount": 0,
             }
@@ -2204,6 +2354,8 @@ def line_separator(previous: Line, current: Line) -> str:
 
 
 def source_text(section: SourceSection) -> str:
+    if section.verified_semantic_text is not None:
+        return section.verified_semantic_text
     if (
         section.prefix == "BC"
         and section.chapter_number == "7"
@@ -2269,6 +2421,27 @@ def strip_attached_table_caption_suffix(
                 result = result[:match.start()].rstrip()
                 break
     return result
+
+
+def chapter_block_html(block: dict) -> str:
+    """Render the same local content block into the native-reader source HTML."""
+    block_html = str(block.get("html") or "").strip()
+    if block_html:
+        return block_html
+    if block.get("kind") == "image" and block.get("imageID"):
+        image_id = str(block["imageID"])
+        if "/" in image_id or "\\" in image_id or image_id.startswith("."):
+            raise RuntimeError(f"Unsafe bundled 2014 image identifier: {image_id}")
+        caption = normalized_space(str(block.get("caption") or "Official code figure"))
+        return (
+            "<figure>"
+            f'<img src="../assets/{html.escape(image_id, quote=True)}" '
+            f'alt="{html.escape(caption, quote=True)}">'
+            f"<figcaption>{html.escape(caption)}</figcaption>"
+            "</figure>"
+        )
+    plain_text = str(block.get("plainText") or "").strip()
+    return paragraph_html(plain_text) if plain_text else ""
 
 
 def search_tokens(value: str) -> set[str]:
@@ -2499,7 +2672,11 @@ def build_package(
                 if semantic_html_verified:
                     semantic_summary["verifiedSectionHTMLCount"] += 1
                     text_block.update({
-                        "verificationStatus": "semantic-html-token-verified-against-official-pdf",
+                        "verificationStatus": (
+                            section.semantic_text_recovery["verificationStatus"]
+                            if section.semantic_text_recovery is not None
+                            else "semantic-html-token-verified-against-official-pdf"
+                        ),
                         "htmlStructureReference": {
                             "publisher": "International Code Council",
                             "url": semantic_section["anchorURL"],
@@ -2560,6 +2737,10 @@ def build_package(
                     "researchClaimEligible": True,
                 },
             }
+            if section.semantic_text_recovery is not None:
+                detail["historicalConstructionCode"]["semanticTextRecovery"] = (
+                    section.semantic_text_recovery
+                )
             write_json(output / "prepared" / "sections" / f"{section_id}.json", detail, compact=True)
             summary = {
                 "id": section_id,
@@ -2570,7 +2751,10 @@ def build_package(
                 "contentBlocks": [],
             }
             section_summaries.append(summary)
-            section_html_fragments.append(text_block["html"])
+            section_html_fragments.append("".join(
+                chapter_block_html(block)
+                for block in blocks
+            ))
             catalog.append({
                 "id": section_id,
                 "chapterID": chapter_id,

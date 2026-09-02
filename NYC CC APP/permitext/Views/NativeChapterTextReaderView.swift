@@ -1653,10 +1653,20 @@ private struct NativeReaderTextBlockView: View, Equatable {
                     NativeReaderTableBlockView(
                         table: table,
                         baseURL: route.sourceURL.deletingLastPathComponent(),
+                        theme: theme,
+                        accentColor: accentColor,
+                        onOpenLink: onOpenLink,
                         searchQuery: searchQuery,
                         activeMatchIndex: searchMatches.firstIndex(where: { $0.id == activeSearchMatchID })
                     )
-                    .containerRelativeFrame(.horizontal)
+                    .containerRelativeFrame(.horizontal) { viewportWidth, _ in
+                        max(
+                            viewportWidth
+                                - (CodeScreenMetrics.readerHorizontalPadding * 2)
+                                - hierarchyIndentation,
+                            0
+                        )
+                    }
                 }
             case .unsupportedHTML:
                 EmptyView()
@@ -1754,9 +1764,11 @@ private struct NativeReaderTextBlockView: View, Equatable {
 struct NativeReaderPhase9SnapshotConfiguration: Equatable {
     static let sourceArgument = "--native-reader-phase9-source"
     static let widthArgument = "--native-reader-phase9-width"
+    static let startingBlockArgument = "--native-reader-phase9-starting-block"
 
     let relativeSourcePath: String
     let contentWidth: CGFloat
+    let startingBlockIndex: Int
 
     static var active: Self? {
         let arguments = ProcessInfo.processInfo.arguments
@@ -1772,12 +1784,25 @@ struct NativeReaderPhase9SnapshotConfiguration: Equatable {
         } else {
             requestedWidth = 402
         }
+        let requestedStartingBlock: Int
+        if let blockIndex = arguments.firstIndex(of: startingBlockArgument),
+           arguments.indices.contains(blockIndex + 1),
+           let parsedBlock = Int(arguments[blockIndex + 1]) {
+            requestedStartingBlock = parsedBlock
+        } else {
+            requestedStartingBlock = 0
+        }
         guard !relativeSourcePath.isEmpty,
               !relativeSourcePath.hasPrefix("/"),
               !relativeSourcePath.split(separator: "/").contains(".."),
-              requestedWidth >= 280
+              requestedWidth >= 280,
+              requestedStartingBlock >= 0
         else { return nil }
-        return Self(relativeSourcePath: relativeSourcePath, contentWidth: requestedWidth)
+        return Self(
+            relativeSourcePath: relativeSourcePath,
+            contentWidth: requestedWidth,
+            startingBlockIndex: requestedStartingBlock
+        )
     }
 }
 
@@ -1823,7 +1848,7 @@ struct NativeReaderPhase9SnapshotHarness: View {
     ) -> some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(preparedDocument.displayBlocks) { displayBlock in
+                ForEach(preparedDocument.displayBlocks.dropFirst(configuration.startingBlockIndex)) { displayBlock in
                     NativeReaderTextBlockView(
                         block: displayBlock.block,
                         hierarchyIndentation: displayBlock.hierarchyIndentation,
@@ -2056,6 +2081,9 @@ private struct NativeReaderListBlockView: View {
                                         NativeReaderTableBlockView(
                                             table: table,
                                             baseURL: baseURL,
+                                            theme: theme,
+                                            accentColor: accentColor,
+                                            onOpenLink: onOpenLink,
                                             searchQuery: searchQuery,
                                             activeMatchIndex: nil
                                         )

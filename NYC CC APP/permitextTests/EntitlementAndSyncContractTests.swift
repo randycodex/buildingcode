@@ -5365,8 +5365,9 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
         let sourcePaths = await store.debugValidatedSourcePaths()
 
-        XCTAssertEqual(sourcePaths.count, 463)
+        XCTAssertEqual(sourcePaths.count, 574)
         XCTAssertEqual(Set(sourcePaths.map { $0.split(separator: "/").first.map(String.init) }), [
+            "2014-construction-codes",
             "2022-construction-codes",
             "2025-specialty-codes",
             "2026-enacted-administrative-code",
@@ -5430,6 +5431,70 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
                 }
             }
         }
+    }
+
+    func test2014ConstructionCodesUseValidatedNativeTablesAndLocalMedia() async throws {
+        let store = NativeReaderDocumentStore(corpusRootURL: corpusRootURL)
+        let sourcePaths = await store.debugValidatedSourcePaths().filter {
+            $0.hasPrefix("2014-construction-codes/")
+        }
+
+        XCTAssertEqual(NativeReaderDocumentStore.supportedDocumentSchemaVersion, 2)
+        XCTAssertEqual(NativeReaderDocumentStore.supportedParserSchemaVersion, "native-reader-document-v3")
+        XCTAssertEqual(sourcePaths.count, 111)
+
+        var tableCount = 0
+        var mediaCount = 0
+        for sourcePath in sourcePaths {
+            let resolvedRoute = await store.debugValidatedRoute(forRelativeSourcePath: sourcePath)
+            let route = try XCTUnwrap(resolvedRoute, sourcePath)
+            let document = try await store.loadDocument(for: route)
+            XCTAssertEqual(document.eligibility.state, .native, sourcePath)
+            XCTAssertEqual(document.eligibility.reasons, [], sourcePath)
+            XCTAssertTrue(document.isValidatedNativeContent, sourcePath)
+            XCTAssertFalse(
+                document.allTables.contains { $0.renderingClassification == .isolatedHTML },
+                sourcePath
+            )
+            XCTAssertTrue(document.allTables.allSatisfy { $0.sourceHTML == nil }, sourcePath)
+            tableCount += document.allTables.count
+            mediaCount += document.blocks.flatMap(\.media).count
+        }
+
+        XCTAssertEqual(tableCount, 158)
+        XCTAssertEqual(mediaCount, 319)
+
+        let chapter10Path = "2014-construction-codes/chapters/bc-10.html"
+        let resolvedChapter10Route = await store.debugValidatedRoute(
+            forRelativeSourcePath: chapter10Path
+        )
+        let chapter10Route = try XCTUnwrap(resolvedChapter10Route)
+        let chapter10 = try await store.loadDocument(for: chapter10Route)
+        XCTAssertEqual(chapter10.allTables.count, 11)
+        XCTAssertTrue(chapter10.allTables.allSatisfy { $0.renderingClassification == .nativeComplex })
+        XCTAssertTrue(chapter10.allTables.contains { table in
+            table.cells.contains { $0.rowSpan > 1 || $0.columnSpan > 1 }
+        })
+        XCTAssertTrue(chapter10.allTables.flatMap(\.cells).flatMap(\.runs).contains {
+            $0.styles.contains(.superscript)
+        })
+
+        let chapter7Path = "2014-construction-codes/chapters/bc-7.html"
+        let resolvedChapter7Route = await store.debugValidatedRoute(
+            forRelativeSourcePath: chapter7Path
+        )
+        let chapter7Route = try XCTUnwrap(resolvedChapter7Route)
+        let chapter7 = try await store.loadDocument(for: chapter7Route)
+        XCTAssertEqual(chapter7.allTables.count, 14)
+        XCTAssertEqual(chapter7.blocks.flatMap(\.media).count, 55)
+        XCTAssertTrue(chapter7.allTables.contains { table in
+            table.rowCount == 25
+                && table.columnCount == 3
+                && table.renderingClassification == .nativeComplex
+        })
+        XCTAssertTrue(chapter7.blocks.flatMap(\.media).contains {
+            $0.caption == "FIGURE 705.7" && $0.assetExists
+        })
     }
 
     func testUniversalNativeRoutingCoversEveryKnownCodeCollectionAndFormerFallback() async throws {

@@ -4073,8 +4073,9 @@
         "role": "secondary semantic structure reference",
         "verifiedStructuredTableCount": 11,
         "officialPDFCorrectedCellCount": 1,
-        "verifiedSectionHTMLCount": 359,
-        "fallbackSectionHTMLCount": 42
+        "officialPDFRecoveredSectionTextCount": 2,
+        "verifiedSectionHTMLCount": 377,
+        "fallbackSectionHTMLCount": 24
       }
     },
     {
@@ -13856,8 +13857,9 @@
       "role": "secondary semantic structure reference",
       "verifiedStructuredTableCount": 11,
       "officialPDFCorrectedCellCount": 1,
-      "verifiedSectionHTMLCount": 359,
-      "fallbackSectionHTMLCount": 42
+      "officialPDFRecoveredSectionTextCount": 2,
+      "verifiedSectionHTMLCount": 377,
+      "fallbackSectionHTMLCount": 24
     }
   ],
   "prohibitedSources": [
@@ -13870,6 +13872,6 @@
     ],
     "chapterPDFCount": 111,
     "structuredTableCount": 158,
-    "discrepancyCount": 451
+    "discrepancyCount": 433
   }
 }
