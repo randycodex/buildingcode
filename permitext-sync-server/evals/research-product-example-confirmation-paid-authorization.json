@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "authorizationID": "17baf770-5f0b-4f51-91f3-fea23b415e2d",
+  "status": "locked",
+  "cohort": {
+    "file": "research-product-example-cases.json",
+    "sha256": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "ordered": true
+  },
+  "plannedScope": {
+    "purpose": "one live confirmation of the owner's seven Permitext answer examples across nine ordered turns",
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 2,
+    "separateJudgeRequests": 0
+  },
+  "scope": {
+    "conversationCount": null,
+    "orderedTurnCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
+  },
+  "ownerDecision": {
+    "required": true,
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
+  },
+  "consumption": {
+    "status": "not_started",
+    "attemptID": null,
+    "startedAt": null,
+    "runID": null,
+    "consumedAt": null
+  },
+  "lineage": {
+    "preparedFromCommit": "32b83a69b14fe1910643e8781f4796fe87fc6f71",
+    "presentationVersion": "20260902-product-example-contract-v1",
+    "appSHA256": "82dd78f875c1f56f115dd23cb6ae46189c69ff8586f2b84a1524f6a1f3690c44",
+    "answerPresentationSHA256": "19496df94960d3676cf3304769461a49e11ce155ea40f3aadca8a668aefce248",
+    "corpusRegistrySHA256": "1e3dbf3c072723dffa79326a0c13e08c52fca6ed09469f2fc9e27b208ae96443",
+    "acceptanceContractSHA256": "af5a736b6c8ca128679573b96327b187480c01c357fed8ebcb1370b4090e1c19",
+    "noCostPreflightSHA256": "08f45c335ccc8452b41286c2c67337601d0badad487fe9c081daae8401635968",
+    "preflightRunnerSHA256": "e827585b6934a9ec9e9639409672a942be28d27fbc96f35bdce3ae99fb277d46",
+    "paidRunnerSHA256": "b1bd913a97e9125df7bf8ceab10ef9f3312288a3ee3bc84a60f44716f88d4d65"
+  },
+  "execution": {
+    "authorizationPackageCommit": null,
+    "executionCommit": null,
+    "webSupportEnabled": false,
+    "automaticEnactedCorpusRetrieval": true,
+    "conversationFollowUpsPreserved": true,
+    "separateJudgeRequests": 0,
+    "maximumConversations": 7,
+    "maximumOrderedTurns": 9,
+    "maximumRepetitions": 1,
+    "continueAfterSettledUnchargedFailure": true,
+    "stopOnSpendCapProviderOrTelemetryFailure": true
+  },
+  "networkOrModelCallAuthorized": false,
+  "publicResearchReleaseAuthorized": false,
+  "publicZoningResearchAuthorized": false,
+  "professionalCodeDetermination": false,
+  "deploymentAuthorized": false,
+  "pricingOrAllowanceChangeAuthorized": false,
+  "mergeOrPushAuthorized": false,
+  "notes": "Locked no-cost package. It cannot dispatch a provider request until the owner separately authorizes the exact committed package and $2 cumulative cap. The later live result requires owner review; deterministic checks and screenshots are not legal authority."
+}

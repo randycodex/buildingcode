@@ -1,0 +1,147 @@
+{
+  "schema": "permitext-research-product-example-confirmation-preflight-v1",
+  "version": "2026-09-02",
+  "pass": true,
+  "purpose": "Static no-cost preflight for one later live confirmation of the owner's seven product examples across nine ordered turns.",
+  "fixtureSHA256": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
+  "inputSHA256": {
+    "app.mjs": "82dd78f875c1f56f115dd23cb6ae46189c69ff8586f2b84a1524f6a1f3690c44",
+    "research-answer-presentation.mjs": "19496df94960d3676cf3304769461a49e11ce155ea40f3aadca8a668aefce248",
+    "research-corpus-registry.mjs": "1e3dbf3c072723dffa79326a0c13e08c52fca6ed09469f2fc9e27b208ae96443",
+    "evals/research-product-example-cases.json": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
+    "tests/research-product-example-acceptance-contract.mjs": "af5a736b6c8ca128679573b96327b187480c01c357fed8ebcb1370b4090e1c19"
+  },
+  "scope": {
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "repetitions": 1,
+    "separateJudgeRequests": 0,
+    "webSupportEnabled": false
+  },
+  "safety": {
+    "networkAttempts": 0,
+    "paidProviderCalls": 0,
+    "productionWrites": 0,
+    "publicZoningResearchEnabled": false,
+    "releaseAuthorized": false
+  },
+  "cases": [
+    {
+      "id": "product-example-ramp-2022",
+      "corpusID": "nyc-2022-construction-codes",
+      "turnCount": 1,
+      "turns": [
+        {
+          "question": "what are the requirements for designing a ramp?",
+          "expectedPresentationMode": "requirements-table",
+          "actualPresentationMode": "requirements-table",
+          "directAnswerFirst": true
+        }
+      ],
+      "corpusRoutedOrDisclosed": true,
+      "outsideAuthorityRequired": false
+    },
+    {
+      "id": "product-example-corridor-accessibility-2022",
+      "corpusID": "nyc-2022-construction-codes",
+      "turnCount": 1,
+      "turns": [
+        {
+          "question": "What's the minimum hall towards a fire escape that does not require ADA?",
+          "expectedPresentationMode": "numeric-rule",
+          "actualPresentationMode": "numeric-rule",
+          "directAnswerFirst": true
+        }
+      ],
+      "corpusRoutedOrDisclosed": true,
+      "outsideAuthorityRequired": false
+    },
+    {
+      "id": "product-example-appendix-p",
+      "corpusID": "nyc-2022-construction-codes",
+      "turnCount": 1,
+      "turns": [
+        {
+          "question": "what BC-Appendix P",
+          "expectedPresentationMode": "definition-status",
+          "actualPresentationMode": "definition-status",
+          "directAnswerFirst": true
+        }
+      ],
+      "corpusRoutedOrDisclosed": true,
+      "outsideAuthorityRequired": false
+    },
+    {
+      "id": "product-example-omh-bathroom-boundary",
+      "corpusID": "nyc-2022-construction-codes",
+      "turnCount": 1,
+      "turns": [
+        {
+          "question": "This feasibility must comply with NYS Office of Mental Health guidelines. Research the minimum bathroom, toilet, and ADA requirements.",
+          "expectedPresentationMode": "external-authority-boundary",
+          "actualPresentationMode": "external-authority-boundary",
+          "directAnswerFirst": true
+        }
+      ],
+      "corpusRoutedOrDisclosed": true,
+      "outsideAuthorityRequired": true
+    },
+    {
+      "id": "product-example-habitable-space-2022",
+      "corpusID": "nyc-2022-construction-codes",
+      "turnCount": 1,
+      "turns": [
+        {
+          "question": "in the building code, where are the minimum sq ft, or minimum distance between wall for habitable spaces like a bedroom",
+          "expectedPresentationMode": "numeric-rule",
+          "actualPresentationMode": "numeric-rule",
+          "directAnswerFirst": true
+        }
+      ],
+      "corpusRoutedOrDisclosed": true,
+      "outsideAuthorityRequired": false
+    },
+    {
+      "id": "product-example-c4-4d-r8a",
+      "corpusID": "nyc-zoning-resolution",
+      "turnCount": 2,
+      "turns": [
+        {
+          "question": "zoning area c4-4d, how similar it is to r8a?",
+          "expectedPresentationMode": "comparison-table",
+          "actualPresentationMode": "comparison-table",
+          "directAnswerFirst": true
+        },
+        {
+          "question": "give me just a short paragraph to explain quickly",
+          "expectedPresentationMode": "compact-paragraph",
+          "actualPresentationMode": "compact-paragraph",
+          "directAnswerFirst": true
+        }
+      ],
+      "corpusRoutedOrDisclosed": true,
+      "outsideAuthorityRequired": false
+    },
+    {
+      "id": "product-example-vision-lite-2014",
+      "corpusID": "nyc-2014-construction-codes",
+      "turnCount": 2,
+      "turns": [
+        {
+          "question": "maximum sq ft for vision light in a door - 2014 NYC Building Code",
+          "expectedPresentationMode": "numeric-rule",
+          "actualPresentationMode": "numeric-rule",
+          "directAnswerFirst": true
+        },
+        {
+          "question": "is this from the 2014 building code?",
+          "expectedPresentationMode": "edition-check",
+          "actualPresentationMode": "edition-check",
+          "directAnswerFirst": true
+        }
+      ],
+      "corpusRoutedOrDisclosed": true,
+      "outsideAuthorityRequired": false
+    }
+  ]
+}

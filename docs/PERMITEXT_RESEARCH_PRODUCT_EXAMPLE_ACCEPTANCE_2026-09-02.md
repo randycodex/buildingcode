@@ -2,7 +2,7 @@
 
 Date: September 2, 2026
 
-Status: **NO-COST AUTHORITATIVE BENCHMARK IMPLEMENTED; LIVE MODEL CONFIRMATION NOT AUTHORIZED OR RUN**
+Status: **NO-COST AUTHORITATIVE BENCHMARK AND LOCKED LIVE PACKAGE IMPLEMENTED; LIVE MODEL CONFIRMATION NOT AUTHORIZED OR RUN**
 
 ## Purpose
 
@@ -42,6 +42,6 @@ The machine-readable cases are in `permitext-sync-server/evals/research-product-
 
 ## Remaining acceptance
 
-The deterministic benchmark proves corpus routing, source phrases, edition separation, and answer-shape instructions. It does not prove that a live model will follow them on every turn. A later live confirmation must use a separately reviewed immutable package and explicit cumulative spend authorization. It should test these examples once, not repeat the prior 30-case Zoning cohort.
+The deterministic benchmark proves corpus routing, source phrases, edition separation, and answer-shape instructions. It does not prove that a live model will follow them on every turn. The distinct [locked live-confirmation package](./PERMITEXT_RESEARCH_PRODUCT_EXAMPLE_CONFIRMATION_PACKAGE_2026-09-02.md) now preserves exactly seven conversations and nine ordered turns, uses no separate paid judge, caps any later run at `$2`, and refuses provider access until the owner separately authorizes the exact committed package. It tests these examples once and does not repeat the prior 30-case Zoning cohort.
 
 No result from this benchmark enables public Zoning Research, changes pricing or included turns, authorizes a merge, push, deployment, Production action, TestFlight upload, or public release.
