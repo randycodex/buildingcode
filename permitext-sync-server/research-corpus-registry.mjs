@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20260902-edition-identity-routing-v2";
+export const researchCorpusRegistryVersion = "20260902-edition-identity-routing-v3";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -18,6 +18,7 @@ const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:Construction|Build
 const historicalBuildingCue = /\b1968\s+(?:NYC\s+)?Building\s+Code\b|\bBC68\b/i;
 const historical2014FollowUpCue = /\b(?:the\s+)?2014(?:\s+(?:edition|code))?\b/i;
 const current2022FollowUpCue = /\b(?:the\s+)?2022(?:\s+(?:edition|code))?\b/i;
+const appendixPCrossEditionCue = /\b(?:BC\s*[- ]?)?Appendix\s+P\b/i;
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -167,7 +168,8 @@ export function routeResearchCorpora({
     zoningCue,
     futureExistingBuildingCue,
     historical2014ConstructionCue,
-    historicalBuildingCue
+    historicalBuildingCue,
+    appendixPCrossEditionCue
   ].some((pattern) => pattern.test(currentQuestion)) ||
     shorthand2014Requested ||
     shorthand2022Requested ||
@@ -178,6 +180,8 @@ export function routeResearchCorpora({
   const futureRequested = futureExistingBuildingCue.test(context);
   const historical2014Requested = historical2014ConstructionCue.test(context) || shorthand2014Requested;
   const historicalRequested = historicalBuildingCue.test(context);
+  const appendixPCrossEditionRequested =
+    appendixPCrossEditionCue.test(context) && !/\b(?:2014|2022)\b/.test(context);
   const buildingCodeOnlyScope =
     /\bbased only on (?:the )?(?:selected )?Building Code passages\b/i.test(currentQuestion);
   const explicitCurrentConstructionCue = shorthand2022Requested || /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b2022\s+(?:NYC\s+)?(?:Building|Construction|Plumbing|Mechanical|Fuel\s+Gas)\s+Code\b/i.test(context);
@@ -197,6 +201,10 @@ export function routeResearchCorpora({
   if (futureRequested) requestedIDs.set("nyc-existing-building-code-2027", "future-effective EBC cue");
   if (historical2014Requested) {
     requestedIDs.set("nyc-2014-construction-codes", "explicit 2014 Construction Code cue");
+  }
+  if (appendixPCrossEditionRequested) {
+    requestedIDs.set("nyc-2022-construction-codes", "current Appendix P status");
+    requestedIDs.set("nyc-2014-construction-codes", "Appendix P cross-edition context");
   }
   if (historicalRequested) requestedIDs.set("nyc-1968-building-code", "historical-code cue");
   if (!requestedIDs.size) {

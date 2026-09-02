@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260902-supporting-web-v12";
+export const researchSourcePolicyVersion = "20260902-supporting-web-v13";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";

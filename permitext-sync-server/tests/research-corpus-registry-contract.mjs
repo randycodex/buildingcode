@@ -41,6 +41,36 @@ assert.deepEqual(
 );
 assert.equal(explicit2014.selected[0].applicabilityStatus, "prior-edition-case-specific");
 
+const ambiguousAppendixP = routeResearchCorpora({
+  question: "what BC-Appendix P",
+  registry
+});
+assert.deepEqual(
+  ambiguousAppendixP.selected.map((corpus) => corpus.id),
+  ["nyc-2022-construction-codes", "nyc-2014-construction-codes"],
+  "An Appendix P question without an edition must retrieve current and prior-edition context."
+);
+
+const explicit2014AppendixP = routeResearchCorpora({
+  question: "What did Appendix P require in the 2014 NYC Building Code?",
+  registry
+});
+assert.deepEqual(
+  explicit2014AppendixP.selected.map((corpus) => corpus.id),
+  ["nyc-2014-construction-codes"],
+  "An explicit 2014 Appendix P request must not mix in the 2022 corpus."
+);
+
+const explicit2022AppendixP = routeResearchCorpora({
+  question: "What is Appendix P in the 2022 NYC Building Code?",
+  registry
+});
+assert.deepEqual(
+  explicit2022AppendixP.selected.map((corpus) => corpus.id),
+  ["nyc-2022-construction-codes"],
+  "An explicit 2022 Appendix P request must not mix in the 2014 corpus."
+);
+
 const shorthand2014 = routeResearchCorpora({
   question: "What about 2014?",
   previousMessages: [{

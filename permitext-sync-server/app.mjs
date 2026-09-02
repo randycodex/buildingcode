@@ -286,7 +286,10 @@ import {
   evaluateResearchAnswerQuality,
   researchAnswerQualityRevisionIssues
 } from "./research-answer-quality.mjs";
-import { researchAnswerPresentationContract } from "./research-answer-presentation.mjs";
+import {
+  applyResearchOutsideAuthorityStartingPoints,
+  researchAnswerPresentationContract
+} from "./research-answer-presentation.mjs";
 import {
   applyResearchProjectFactCoverage,
   researchProjectFactIsExplicitlyUnresolved,
@@ -9052,7 +9055,7 @@ export function researchWebSupportRequestBody({
   }
   if (candidateOfficialURLs.length) {
     webInputSections.push(
-      "CANDIDATE OFFICIAL PAGES FROM THE PRIOR SEARCH",
+      "CANDIDATE OFFICIAL PAGES TO OPEN FIRST",
       ...candidateOfficialURLs.map((url) => `- ${url}`)
     );
   }
@@ -9079,6 +9082,7 @@ export function researchWebSupportRequestBody({
       "The enacted Permitext corpus remains the primary legal authority.",
       "Do not make a project compliance determination and do not treat guidance as enacted law.",
       "Do not guess the identity of an unexplained acronym, agency, or program, and do not substitute a similarly named authority. Use a source only when it explicitly identifies the named authority and jurisdiction.",
+      "Open each supplied candidate official page that corresponds to a named outside authority before broadening the search. If a candidate is only an official index or starting page and does not establish a substantive minimum, cite that page and state that limitation instead of inventing a rule.",
       "When the question names an official bulletin or other official document, open that document and summarize the substantive passages relevant to the question; returning only a title or link is not sufficient.",
       "Identify any named official document that could not be opened or read instead of inferring its contents.",
       "Write each useful source-derived claim as its own short bullet and attach an inline web citation from that exact source to the same bullet. Do not combine facts from multiple sources in one bullet.",
@@ -9109,11 +9113,10 @@ export async function openAIResearchWebSupport(question, userID, options = {}) {
   const allowedDomains = policyConfiguration.officialDomains;
   const namedOfficialDocuments = extractResearchOfficialDocumentReferences(sanitizedQuery);
   const requireAttributableSources = options.requireAttributableSources === true;
-  const maximumAttributionAttempts = requireAttributableSources ? 2 : 1;
   let usage = combinedResearchUsage();
   let summary = "";
   let sources = [];
-  let candidateOfficialURLs = normalizeResearchWebSources(
+  const requiredCandidateOfficialURLs = normalizeResearchWebSources(
     (Array.isArray(options.candidateOfficialURLs) ? options.candidateOfficialURLs : [])
       .map((url) => ({ url })),
     { officialDomains: allowedDomains }
@@ -9121,6 +9124,43 @@ export async function openAIResearchWebSupport(question, userID, options = {}) {
     .filter((source) => source.sourceClassification === "official_guidance")
     .map((source) => source.url)
     .slice(0, 5);
+  const maximumAttributionAttempts =
+    requireAttributableSources || requiredCandidateOfficialURLs.length ? 2 : 1;
+  let candidateOfficialURLs = [...requiredCandidateOfficialURLs];
+  const discoveredCandidateOfficialURLs = new Set(requiredCandidateOfficialURLs);
+  const comparableHost = (value) => {
+    try {
+      return new URL(value).hostname.toLowerCase().replace(/^www\./, "");
+    } catch {
+      return "";
+    }
+  };
+  const uncoveredCandidateURLs = () => requiredCandidateOfficialURLs.filter((candidateURL) => {
+    const candidateHost = comparableHost(candidateURL);
+    return !sources.some((source) => comparableHost(source?.url) === candidateHost);
+  });
+  const mergeSources = (current, incoming) => {
+    const byURL = new Map(current.map((source) => [source.url, source]));
+    for (const source of incoming) {
+      const existing = byURL.get(source.url);
+      if (!existing) {
+        byURL.set(source.url, source);
+        continue;
+      }
+      const claimsByID = new Map(
+        (existing.attributedClaims || []).map((claim) => [claim.id, claim])
+      );
+      for (const claim of source.attributedClaims || []) claimsByID.set(claim.id, claim);
+      byURL.set(source.url, {
+        ...existing,
+        ...source,
+        attributedClaims: [...claimsByID.values()],
+        requiredAttribution:
+          existing.requiredAttribution === true || source.requiredAttribution === true
+      });
+    }
+    return [...byURL.values()];
+  };
   let lastFailure = null;
   let attemptCount = 0;
   const requestProvider = options.requestProvider || requestResearchProvider;
@@ -9166,12 +9206,23 @@ export async function openAIResearchWebSupport(question, userID, options = {}) {
       if (attempt + 1 < maximumAttributionAttempts) continue;
       break;
     }
-    ({ summary, sources, candidateOfficialURLs } =
-      researchAttributableWebSupportFromProviderPayload(payload, {
-        allowedDomains,
-        namedOfficialDocuments
-      }));
-    if (sources.length > 0 || !requireAttributableSources) break;
+    const parsed = researchAttributableWebSupportFromProviderPayload(payload, {
+      allowedDomains,
+      namedOfficialDocuments
+    });
+    if (parsed.sources.length > 0) {
+      summary = [summary, parsed.summary].filter(Boolean).join("\n\n");
+    } else if (attempt + 1 === maximumAttributionAttempts) {
+      summary = parsed.summary;
+    }
+    sources = mergeSources(sources, parsed.sources);
+    for (const url of parsed.candidateOfficialURLs) discoveredCandidateOfficialURLs.add(url);
+    const uncovered = uncoveredCandidateURLs();
+    if (sources.length > 0 && uncovered.length === 0) break;
+    if (!requireAttributableSources && requiredCandidateOfficialURLs.length === 0) break;
+    candidateOfficialURLs = uncovered.length
+      ? uncovered
+      : parsed.candidateOfficialURLs;
   }
   const unattributedRequestedDocuments = namedOfficialDocuments.filter((reference) =>
     !sources.some((source) => extractResearchOfficialDocumentReferences([
@@ -9179,8 +9230,11 @@ export async function openAIResearchWebSupport(question, userID, options = {}) {
       ...source.attributedClaims.map((claim) => claim.text)
     ].join(" ")).includes(reference))
   );
+  const unattributedCandidateOfficialURLs = uncoveredCandidateURLs();
   const limitation = unattributedRequestedDocuments.length
     ? `Permitext could not retrieve a source-specific attributable passage for ${unattributedRequestedDocuments.join(", ")}; that document was not used in this answer.`
+    : unattributedCandidateOfficialURLs.length
+      ? `Permitext could not retrieve an attributable passage from ${unattributedCandidateOfficialURLs.join(", ")}; the page remains only an official starting point and was not used as proof of a substantive requirement.`
     : sources.length === 0
       ? "Permitext searched the approved official supporting web sources but could not retrieve an attributable passage; web guidance was not used in this answer."
       : "";
@@ -9193,7 +9247,8 @@ export async function openAIResearchWebSupport(question, userID, options = {}) {
     sanitizedQuery,
     requestedDocuments: namedOfficialDocuments,
     unattributedRequestedDocuments,
-    candidateOfficialURLs,
+    candidateOfficialURLs: [...discoveredCandidateOfficialURLs].slice(0, 5),
+    unattributedCandidateOfficialURLs,
     ...(lastFailure ? {
       lastFailureCode: String(lastFailure?.code || lastFailure?.name || "RESEARCH_PROVIDER_ERROR")
     } : {}),
@@ -19058,21 +19113,26 @@ async function handleResearchConversationMessage(request, response) {
               evidenceAnalysisResult.analysis.unresolvedProjectFacts
             )
           };
-    const applyDeterministicAnswerRepairs = (candidate) =>
-      deterministicOfficialGuidanceOnly
-        ? candidate
-        : {
-            ...candidate,
-            interpretation: applyZoningResearchDeterministicRepairs(
-              applyResearchDeterministicAnswerRepairs(
-                candidate.interpretation,
-                assembledEvidence,
-                { question }
-              ),
+    const applyDeterministicAnswerRepairs = (candidate) => {
+      const repairedInterpretation = deterministicOfficialGuidanceOnly
+        ? candidate.interpretation
+        : applyZoningResearchDeterministicRepairs(
+            applyResearchDeterministicAnswerRepairs(
+              candidate.interpretation,
               assembledEvidence,
               { question }
-            )
-          };
+            ),
+            assembledEvidence,
+            { question }
+          );
+      return {
+        ...candidate,
+        interpretation: applyResearchOutsideAuthorityStartingPoints(
+          repairedInterpretation,
+          evidencePackage.discovery?.outsideCurrentLibrary
+        )
+      };
+    };
     result = preserveDeclaredProjectFactUncertainty(result);
     result = applyDeterministicAnswerRepairs(result);
     let verificationAttempts = [];
@@ -19133,6 +19193,7 @@ async function handleResearchConversationMessage(request, response) {
         interpretation: researchEvidenceBoundaryInterpretation()
       };
       result = preserveDeclaredProjectFactUncertainty(result);
+      result = applyDeterministicAnswerRepairs(result);
       requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
         requiredClaims,
         evidence: assembledEvidence,

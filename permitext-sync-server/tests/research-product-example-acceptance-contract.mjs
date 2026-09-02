@@ -38,7 +38,7 @@ assert.equal(fixture.schema, "permitext-research-product-examples-v1");
 assert.equal(fixture.paidModelCallsAuthorized, false);
 assert.equal(fixture.cases.length, 7);
 assert.equal(new Set(fixture.cases.map((item) => item.id)).size, fixture.cases.length);
-assert.equal(researchAnswerPresentationVersion, "20260902-product-example-contract-v1");
+assert.equal(researchAnswerPresentationVersion, "20260902-product-example-contract-v2");
 
 const codeSectionNames = new Map(
   (constructionBundle.codeSections || []).map((section) => [section.id, section.name])
@@ -166,6 +166,16 @@ assert.equal(
   }).mode,
   "requirements-checklist",
   "A requirements table must not be forced when the supplied evidence does not contain enough parallel rules."
+);
+
+const appendixP = fixture.cases.find((item) => item.id === "product-example-appendix-p");
+assert.deepEqual(
+  routeResearchCorpora({
+    question: appendixP.turns[0].question,
+    registry
+  }).selected.map((corpus) => corpus.id),
+  ["nyc-2022-construction-codes", "nyc-2014-construction-codes"],
+  "An edition-ambiguous Appendix P question must retrieve both its current status and 2014 accessibility context."
 );
 
 console.log("Permitext owner-example Research acceptance contract passed; paid model calls: no.");

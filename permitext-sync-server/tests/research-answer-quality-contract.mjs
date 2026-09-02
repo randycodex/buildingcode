@@ -919,4 +919,39 @@ assert.equal(evaluateResearchAnswerQuality({
   answer: repairedRoomThresholdInference
 }).pass, true);
 
+const enactedQuoteEvidence = [{
+  ...source("bc-quoted-evidence", "1107", "governing", "aligned"),
+  text: "The enacted source intentionally preserves “balanced quotation marks” exactly."
+}];
+const generatedQuoteAnswer = {
+  answerText: "Chapter 11” requires accessible features. A balanced “quoted term” remains intact.",
+  explanation: "Section 1107” supplies the scoped requirement.",
+  supportedPoints: [{
+    heading: "Accessibility section”",
+    explanation: "The cited section.”",
+    sourceIDs: ["bc-quoted-evidence"]
+  }],
+  missingFacts: ["Confirm the occupancy group.”"],
+  additionalEvidenceNeeded: ["Retrieve the project filing record.”"],
+  citations: [{ sourceIDs: ["bc-quoted-evidence"] }]
+};
+const repairedGeneratedQuotes = applyResearchDeterministicAnswerRepairs(
+  generatedQuoteAnswer,
+  enactedQuoteEvidence
+);
+assert.equal(
+  repairedGeneratedQuotes.answerText,
+  "Chapter 11 requires accessible features. A balanced “quoted term” remains intact."
+);
+assert.equal(repairedGeneratedQuotes.explanation, "Section 1107 supplies the scoped requirement.");
+assert.equal(repairedGeneratedQuotes.supportedPoints[0].heading, "Accessibility section");
+assert.equal(repairedGeneratedQuotes.supportedPoints[0].explanation, "The cited section.");
+assert.deepEqual(repairedGeneratedQuotes.missingFacts, ["Confirm the occupancy group."]);
+assert.deepEqual(repairedGeneratedQuotes.additionalEvidenceNeeded, ["Retrieve the project filing record."]);
+assert.equal(
+  enactedQuoteEvidence[0].text,
+  "The enacted source intentionally preserves “balanced quotation marks” exactly.",
+  "Generated-answer typography cleanup must never alter enacted evidence."
+);
+
 console.log("Permitext Research answer-quality and evidence-economy contract passed.");

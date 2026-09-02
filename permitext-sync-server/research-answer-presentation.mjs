@@ -1,4 +1,4 @@
-export const researchAnswerPresentationVersion = "20260902-product-example-contract-v1";
+export const researchAnswerPresentationVersion = "20260902-product-example-contract-v2";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
@@ -9,6 +9,62 @@ const numericCue = /\b(?:maximum|minimum|how (?:much|many|wide|long|high)|square
 const definitionCue = /\b(?:what (?:is|are|does)|define|definition|meaning|appendix)\b/i;
 const editionCheckCue = /\b(?:is|was|were|does|did) (?:this|that|it|the (?:answer|requirement|section))\b[\s\S]*\b(?:19|20)\d{2}\b|\bfrom (?:the )?(?:19|20)\d{2}(?:\s+edition|\s+code)?\b/i;
 const outsideAuthorityCue = /\b(?:Office of Mental Health|OMH|NYCRR|agency|licensing|funding)\b/i;
+
+function normalizedStartingPoint(source) {
+  try {
+    const url = new URL(String(source?.sourceURL || "").trim());
+    if (url.protocol !== "https:") return null;
+    url.hash = "";
+    const label = compactText(source?.sourceName || source?.label)
+      .replace(/[\[\]]/g, "");
+    if (!label) return null;
+    return { label, url: url.toString() };
+  } catch {
+    return null;
+  }
+}
+
+export function applyResearchOutsideAuthorityStartingPoints(
+  answer,
+  outsideCurrentLibrary = []
+) {
+  if (!answer || typeof answer !== "object") return answer;
+  const answerText = String(answer.answerText || "").trim();
+  const existingURLs = new Set([
+    ...Array.from(answerText.matchAll(/https:\/\/[^\s)\]]+/g), (match) => match[0]),
+    ...(Array.isArray(answer.supportingSources) ? answer.supportingSources : [])
+      .map((source) => String(source?.url || "").trim())
+      .filter(Boolean)
+  ]);
+  const entries = [];
+  const seenURLs = new Set();
+  for (const source of Array.isArray(outsideCurrentLibrary) ? outsideCurrentLibrary : []) {
+    const entry = normalizedStartingPoint(source);
+    if (!entry || existingURLs.has(entry.url) || seenURLs.has(entry.url)) continue;
+    seenURLs.add(entry.url);
+    entries.push(entry);
+  }
+  if (!entries.length) return answer;
+  const links = entries.map(({ label, url }) => `[${label}](${url})`).join("; ");
+  const startingPointParagraph =
+    `Official starting ${entries.length === 1 ? "point" : "points"}: ${links}. ` +
+    `${entries.length === 1 ? "This page identifies" : "These pages identify"} the requested ` +
+    `${entries.length === 1 ? "authority" : "authorities"}; Permitext has not treated ` +
+    `${entries.length === 1 ? "it" : "them"} as proof of a program-specific requirement.`;
+  const startingPointLimitation =
+    "An official starting-point link identifies the outside authority but is not a source-bound substantive rule; the controlling program document still must be retrieved before relying on a program-specific minimum.";
+  const evidenceLimitations = Array.isArray(answer.evidenceLimitations)
+    ? [...answer.evidenceLimitations]
+    : [];
+  if (!evidenceLimitations.some((value) => /official starting-point link/i.test(String(value)))) {
+    evidenceLimitations.push(startingPointLimitation);
+  }
+  return {
+    ...answer,
+    answerText: [answerText, startingPointParagraph].filter(Boolean).join("\n\n"),
+    evidenceLimitations
+  };
+}
 
 function evidenceCount(evidence) {
   return new Set((Array.isArray(evidence) ? evidence : [])

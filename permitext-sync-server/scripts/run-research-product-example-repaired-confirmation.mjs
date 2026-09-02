@@ -240,7 +240,13 @@ function presentationCheck(mode, text) {
     return { passed: /\b2014\b/.test(text), detail: "The answer must confirm the 2014 edition." };
   }
   if (mode === "definition-status") {
-    return { passed: /\breserved\b/i.test(text), detail: "Appendix P's current Reserved status must be explicit." };
+    return {
+      passed:
+        /\breserved\b/i.test(text) &&
+        /\b2014\b/.test(text) &&
+        /\baccessib(?:le|ility)\b/i.test(text),
+      detail: "Appendix P's current Reserved status and its 2014 accessibility context must both be explicit."
+    };
   }
   if (mode === "numeric-rule") {
     return { passed: /\d/.test(text), detail: "The direct numeric rule must appear in the answer." };
@@ -268,7 +274,7 @@ function derivedConversionCheck(example, text) {
     passed:
       /\b0\.69(?:4)?\b/.test(text) &&
       /\b(?:square\s+feet|sq\.?\s*ft\.?)\b/i.test(text) &&
-      /(?:\bconvert(?:ed|s|ing|ion)?\b|\bderived\b|\bdivid(?:e|ed|ing)\b|÷|\/\s*144)/i.test(text),
+      /(?:\bconvert(?:ed|s|ing)?\b|\bconversion\b|\bderived\b|\bdivid(?:e|ed|ing)\b|÷|\/\s*144)/i.test(text),
     detail: "The requested 100-square-inch value must be transparently converted to about 0.694 square feet."
   };
 }

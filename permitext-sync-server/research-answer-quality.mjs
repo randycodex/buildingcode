@@ -1,7 +1,7 @@
 import { researchRequestedAreaConversions } from "./research-answer-presentation.mjs";
 
 export const researchAnswerQualityVersion =
-  "20260902-requested-unit-conversion-v24";
+  "20260902-generated-typography-v25";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -50,6 +50,38 @@ const diningSurfaceCalculationPattern =
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function removeUnmatchedClosingCurlyQuotes(value) {
+  let openQuotes = 0;
+  let result = "";
+  for (const character of String(value || "")) {
+    if (character === "“") {
+      openQuotes += 1;
+      result += character;
+    } else if (character === "”") {
+      if (openQuotes > 0) {
+        openQuotes -= 1;
+        result += character;
+      }
+    } else {
+      result += character;
+    }
+  }
+  return result;
+}
+
+function generatedTypographyNeedsRepair(answer) {
+  return [
+    answer?.answerText,
+    answer?.conclusion,
+    answer?.explanation,
+    ...(Array.isArray(answer?.supportedPoints)
+      ? answer.supportedPoints.flatMap((point) => [point?.heading, point?.explanation])
+      : []),
+    ...(Array.isArray(answer?.missingFacts) ? answer.missingFacts : []),
+    ...(Array.isArray(answer?.additionalEvidenceNeeded) ? answer.additionalEvidenceNeeded : [])
+  ].some((value) => removeUnmatchedClosingCurlyQuotes(value) !== String(value || ""));
 }
 
 function unique(values) {
@@ -583,13 +615,6 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = [], {
     compactText(source?.sectionNumber) === "1101.3" &&
     /\bchanges? of use or occupancy to prior[- ]code[- ]buildings\b/i.test(compactText(source?.text))
   );
-  if (
-    !diningSourceIDs.length &&
-    !obstructionSourceIDs.length &&
-    !table403AuthoritySourceIDs.length &&
-    !priorCodeAccessibilitySourceIDs.length &&
-    !certificateOperationSourceIDs.length
-  ) return answer;
   const citedSourceIDs = new Set(
     (Array.isArray(answer.citations) ? answer.citations : [])
       .flatMap((citation) => Array.isArray(citation?.sourceIDs) ? citation.sourceIDs : [])
@@ -610,12 +635,13 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = [], {
     !boundObstructionSourceIDs.length &&
     !boundTable403AuthoritySourceIDs.length &&
     !conditionPriorCodeAccessibility &&
-    !boundCertificateOperationSourceIDs.length
+    !boundCertificateOperationSourceIDs.length &&
+    !generatedTypographyNeedsRepair(answer)
   ) return answer;
 
   const replacementPattern = new RegExp(accessibleDiningSurfaceMisstatementPattern.source, "ig");
   const repairText = (value, { narrative = false } = {}) => {
-    let text = String(value || "");
+    let text = removeUnmatchedClosingCurlyQuotes(value);
     if (boundDiningSourceIDs.length) {
       text = text
         .replace(replacementPattern, accessibleDiningSurfaceCanonicalPhrase)
@@ -656,14 +682,15 @@ export function applyResearchDeterministicAnswerRepairs(answer, evidence = [], {
   const supportedPoints = (Array.isArray(answer.supportedPoints) ? answer.supportedPoints : []).map((point) => {
     const pointText = compactText([point?.heading, point?.explanation].filter(Boolean).join(" "));
     const statesCalculation = diningSurfaceCalculationPattern.test(pointText);
+    const heading = repairedTextField(point?.heading);
     const explanation = repairedTextField(point?.explanation, { narrative: true });
-    if (!statesCalculation) return { ...point, explanation };
+    if (!statesCalculation) return { ...point, heading, explanation };
     const nextSourceIDs = Array.from(new Set([
       ...(Array.isArray(point?.sourceIDs) ? point.sourceIDs : []),
       ...boundDiningSourceIDs
     ]));
     if (nextSourceIDs.length !== (point?.sourceIDs || []).length) changed = true;
-    return { ...point, explanation, sourceIDs: nextSourceIDs };
+    return { ...point, heading, explanation, sourceIDs: nextSourceIDs };
   });
   const missingFacts = Array.isArray(answer.missingFacts)
     ? answer.missingFacts.map((value) => repairedTextField(value))

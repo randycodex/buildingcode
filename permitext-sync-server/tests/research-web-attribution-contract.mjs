@@ -45,7 +45,7 @@ const attributionRetryBody = researchWebSupportRequestBody({
   attributionRetry: true
 });
 assert.match(attributionRetryBody.input, /ATTRIBUTION RETRY/);
-assert.match(attributionRetryBody.input, /CANDIDATE OFFICIAL PAGES FROM THE PRIOR SEARCH/);
+assert.match(attributionRetryBody.input, /CANDIDATE OFFICIAL PAGES TO OPEN FIRST/);
 assert.match(
   attributionRetryBody.input,
   /https:\/\/www\.nyc\.gov\/site\/buildings\/safety\/boiler-compliance\.page/
@@ -263,6 +263,82 @@ assert.equal(
   semanticRetryResult.sources[0].attributedClaims[0].text,
   "Annual inspection is required for registered H-stamped and E-stamped low-pressure boilers."
 );
+
+function attributedWebPayload({ url, title, claim }) {
+  const marker = "[source]";
+  const text = `- ${claim} ${marker}`;
+  const start = text.indexOf(marker);
+  return {
+    model: "gpt-5.6-luna",
+    usage: zeroUsage,
+    output: [{
+      type: "web_search_call",
+      action: { sources: [{ url, title }] }
+    }, {
+      type: "message",
+      content: [{
+        type: "output_text",
+        text,
+        annotations: [{
+          type: "url_citation",
+          url,
+          title,
+          start_index: start,
+          end_index: start + marker.length
+        }]
+      }]
+    }]
+  };
+}
+
+const omhStartingURL = "https://omh.ny.gov/omhweb/policy_and_regulations/";
+const adaStartingURL = "https://www.ada.gov/";
+const multiAuthorityRequests = [];
+const multiAuthorityPayloads = [
+  attributedWebPayload({
+    url: adaStartingURL,
+    title: "ADA.gov",
+    claim: "ADA.gov is the official federal accessibility information portal."
+  }),
+  attributedWebPayload({
+    url: omhStartingURL,
+    title: "OMH Policy and Regulations",
+    claim: "This Office of Mental Health page is the agency policy and regulations starting point."
+  })
+];
+const multiAuthorityResult = await openAIResearchWebSupport(
+  "Find official OMH and federal accessibility sources for this bathroom feasibility question.",
+  "web-support-contract-user",
+  {
+    apiKey: "test-only",
+    model: "gpt-5.6-luna",
+    candidateOfficialURLs: [omhStartingURL, adaStartingURL],
+    policyConfiguration: {
+      webSupportEnabled: true,
+      officialDomains: ["ny.gov", "ada.gov"]
+    },
+    requestProvider: async ({ requestBody }) => {
+      multiAuthorityRequests.push(requestBody);
+      return { payload: multiAuthorityPayloads.shift() };
+    }
+  }
+);
+assert.equal(multiAuthorityRequests.length, 2);
+assert.match(multiAuthorityRequests[0].input, /omh\.ny\.gov/);
+assert.match(multiAuthorityRequests[0].input, /ada\.gov/);
+assert.match(multiAuthorityRequests[1].input, /ATTRIBUTION RETRY/);
+assert.match(multiAuthorityRequests[1].input, /omh\.ny\.gov/);
+assert.doesNotMatch(
+  multiAuthorityRequests[1].input,
+  /^- https:\/\/www\.ada\.gov\/$/m,
+  "The second attempt should focus on the still-uncovered authority."
+);
+assert.deepEqual(
+  new Set(multiAuthorityResult.sources.map((source) => new URL(source.url).hostname.replace(/^www\./, ""))),
+  new Set(["ada.gov", "omh.ny.gov"])
+);
+assert.deepEqual(multiAuthorityResult.unattributedCandidateOfficialURLs, []);
+assert.equal(multiAuthorityResult.limitation, undefined);
 
 const evidence = [{
   sourceID: "bc-718-2-6-1",

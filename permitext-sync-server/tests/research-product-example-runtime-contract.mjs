@@ -14,9 +14,14 @@ import {
   researchAnswerQualityRevisionIssues
 } from "../research-answer-quality.mjs";
 import {
+  applyResearchOutsideAuthorityStartingPoints,
   researchAnswerPresentationContract,
   researchRequestedAreaConversions
 } from "../research-answer-presentation.mjs";
+import {
+  createResearchCorpusRegistry,
+  routeResearchCorpora
+} from "../research-corpus-registry.mjs";
 import {
   assembleResearchEvidence,
   researchEvidenceRetrievalQuery
@@ -138,6 +143,29 @@ try {
   ));
   const currentBuildingCode = await currentBuildingCodeResources();
 
+  const appendixQuestion = "what BC-Appendix P";
+  assert.deepEqual(
+    routeResearchCorpora({
+      question: appendixQuestion,
+      registry: createResearchCorpusRegistry()
+    }).selected.map((corpus) => corpus.id),
+    ["nyc-2022-construction-codes", "nyc-2014-construction-codes"]
+  );
+  const [currentAppendixResult, historicalAppendixResult] = await Promise.all([
+    discover(currentBuildingCode, appendixQuestion),
+    resourcesForCorpus("nyc-2014-construction-codes", currentBuildingCode)
+      .then((resources) => discover(resources, appendixQuestion))
+  ]);
+  assert(
+    currentAppendixResult.candidates.some((candidate) => referenceFor(candidate) === "BC P"),
+    "The current Appendix P Reserved status must remain available."
+  );
+  const historicalAppendixReferences = new Set(
+    historicalAppendixResult.candidates.map(referenceFor)
+  );
+  assert(historicalAppendixReferences.has("BC P101.1"));
+  assert(historicalAppendixReferences.has("BC P102.1"));
+
   for (const example of fixture.cases) {
     const resources = await resourcesForCorpus(example.corpusID, currentBuildingCode);
     const previousMessages = [];
@@ -189,6 +217,33 @@ try {
             url: "https://omh.ny.gov/omhweb/policy_and_regulations/"
           }).sourceClassification,
           "official_guidance"
+        );
+
+        const startingPointAnswer = applyResearchOutsideAuthorityStartingPoints({
+          answerText: "The supplied enacted evidence does not establish an OMH program-specific fixture ratio.",
+          supportingSources: [{ url: "https://www.ada.gov/" }],
+          evidenceLimitations: []
+        }, result.outsideCurrentLibrary);
+        assert.match(
+          startingPointAnswer.answerText,
+          /\[New York State Office of Mental Health\]\(https:\/\/omh\.ny\.gov\/omhweb\/policy_and_regulations\/\)/
+        );
+        assert.doesNotMatch(
+          startingPointAnswer.answerText,
+          /\[federal accessibility requirements\]/,
+          "An already retained supporting source must not be duplicated as a starting-point link."
+        );
+        assert.match(
+          startingPointAnswer.evidenceLimitations.at(-1),
+          /not a source-bound substantive rule/i
+        );
+        assert.deepEqual(
+          applyResearchOutsideAuthorityStartingPoints(
+            startingPointAnswer,
+            result.outsideCurrentLibrary
+          ),
+          startingPointAnswer,
+          "Outside-authority starting-point repair must be idempotent."
         );
       } else {
         const candidateReferences = new Set(result.candidates.map(referenceFor));

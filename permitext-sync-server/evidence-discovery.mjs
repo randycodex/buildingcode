@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260902-official-source-seeds-v21";
+export const evidenceDiscoveryVersion = "20260902-appendix-p-cross-edition-v22";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -509,8 +509,13 @@ const topicRoutes = [
   },
   {
     pattern: /\b(?:BC\s*[- ]?)?Appendix\s+P\b/i,
-    label: "current Building Code Appendix P status",
-    targets: [{ codePrefix: "BC", sectionPrefix: "P" }]
+    label: "Building Code Appendix P current and prior-edition status",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "P", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1101.2", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "P101.1", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "P102.1", codeEdition: "2014" }
+    ]
   },
   {
     pattern: /\bmaneuvering\s+clearance\b.*\bdoor\b|\bdoor\s+configuration\b.*\baccessible\b|\bbathroom\b.*\baccessib(?:le|ility)\b/i,

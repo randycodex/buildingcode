@@ -77,21 +77,33 @@ The practical manual result is seven acceptable turns and two incomplete turns:
 Appendix P and the OMH outside-authority case. This is not an official code
 determination and does not authorize public Research release.
 
-## No-cost next work
+## No-cost correction completion
 
-No third paid confirmation package will be prepared automatically. The next
-work is source-level and no-cost:
+The four source-level corrections exposed by this immutable run are now
+implemented and verified without another provider call:
 
-1. make the Appendix P answer compare the routed 2022 status with the available
-   2014 corpus before explaining the current framework;
-2. preserve a searched official OMH starting source even when no program-bound
-   OMH ratio can yet be claimed, and keep program-specific ratios fail closed;
-3. remove unmatched generated closing quotation marks without altering enacted
-   source text; and
-4. make the edition-confirmation reviewer recognize a conversion already
-   carried forward accurately from the preceding turn.
+1. an edition-ambiguous Appendix P question routes both the current 2022 corpus
+   and the prior 2014 corpus; discovery retrieves the 2022 `Reserved` status,
+   current Chapter 11 context, and the 2014 P101.1/P102.1 accessibility scope;
+2. official outside-authority candidate pages are requested independently. If
+   an attributable OMH passage is still unavailable, the official OMH page is
+   preserved visibly only as a starting point and expressly not as proof of a
+   program-specific ratio;
+3. unmatched closing curly quotation marks are removed from generated answer
+   prose while balanced quotations and enacted evidence remain unchanged; and
+4. the vision-lite reviewer recognizes `conversion` as an explicit description
+   of the carried-forward `100 square inches` to `0.694 square feet` arithmetic.
 
-After those changes pass the no-network suite, the owner can decide whether the
-seven examples are sufficient as deterministic release evidence or whether a
-future live measurement is worth a separately designed decision. The current
-authorization is consumed and cannot be reused.
+The Appendix P acceptance check now requires the current `Reserved` status,
+the 2014 distinction, and accessibility context rather than accepting the word
+`Reserved` alone. The seven-conversation, nine-turn runtime contract passes
+with zero network attempts and zero paid calls, and the complete server
+`npm run check` passes. Retrieval diagnostics and their review packet were
+regenerated for discovery version `20260902-appendix-p-cross-edition-v22`.
+
+These checks prove the deterministic correction paths, not a new live-model
+outcome. The retained run above remains seven acceptable and two incomplete
+turns as historical evidence. No third paid confirmation is planned or needed
+for the present correction work. The current authorization is consumed and
+cannot be reused; any future live measurement would require a separately
+designed package and a new exact owner authorization.
