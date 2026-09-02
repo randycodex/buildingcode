@@ -12,7 +12,7 @@
     "research-product-example-repaired-runtime-environment.mjs": "e46a985cdf1aa1ba5b7a66b28b9ee3e5af5f7f10bebe6b3e3a2fa7f1bd432396",
     "research-source-policy.mjs": "1197b66fcc134a739980f9571ec3f3dc235a4bbf82f93d668793ceba7ce2bace",
     "evals/research-product-example-cases.json": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
-    "scripts/run-research-product-example-repaired-confirmation.mjs": "6652a9b01ec0e8ed660ea01a71ce2b7ab3415583d822f7f020c7e3968e363a9b",
+    "scripts/run-research-product-example-repaired-confirmation.mjs": "6d29edf8f47ff0c1f9cd93125cd7616bf8729fd855d55147447ba96f27691b4f",
     "tests/research-product-example-acceptance-contract.mjs": "af5a736b6c8ca128679573b96327b187480c01c357fed8ebcb1370b4090e1c19",
     "tests/research-product-example-runtime-contract.mjs": "834e829d6aa4ec3434c2f808c13be2cafba950b848a0190d24379724c56382cd"
   },

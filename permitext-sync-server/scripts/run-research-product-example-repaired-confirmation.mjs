@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 import { spawnSync } from "node:child_process";
 import { mkdir, mkdtemp, open, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { researchProductExampleRepairedRuntimeEnvironment } from
   "../research-product-example-repaired-runtime-environment.mjs";
@@ -17,9 +17,9 @@ import {
 const scriptRoot = dirname(fileURLToPath(import.meta.url));
 const serverRoot = join(scriptRoot, "..");
 const repositoryRoot = join(serverRoot, "..");
-const authorizationRelativePath =
+const defaultAuthorizationRelativePath =
   "permitext-sync-server/evals/research-product-example-repaired-confirmation-paid-authorization.json";
-const runLockPath = join(
+const defaultRunLockPath = join(
   serverRoot,
   ".research-product-example-repaired-confirmation-paid-run.lock"
 );
@@ -49,7 +49,10 @@ function git(args, { encoding = "utf8" } = {}) {
   return result.stdout;
 }
 
-function validateExecutionCommit(authorization) {
+function validateExecutionCommit(authorization, {
+  authorizationRelativePath,
+  lockedAuthorizationSHA256
+}) {
   const packageCommit = authorization.execution.authorizationPackageCommit;
   const executionCommit = git(["rev-parse", "HEAD"]).trim();
   assert.equal(
@@ -64,7 +67,7 @@ function validateExecutionCommit(authorization) {
   ]);
   assert.equal(
     sha256(lockedAuthorization),
-    researchProductExampleRepairedConfirmationLockedAuthorizationSHA256,
+    lockedAuthorizationSHA256,
     "The selected package commit does not contain the exact repaired locked authorization."
   );
   const changedPaths = git([
@@ -344,7 +347,7 @@ function errorRecord(error) {
   };
 }
 
-function resultMarkdown(result) {
+function resultMarkdown(result, { title }) {
   const rows = result.results.flatMap((example) => example.turns.map((turn) =>
     `| ${example.id} | ${turn.index} | ${turn.status} | ${turn.review?.passed === true ? "PASS" : "REVIEW"} |`
   ));
@@ -363,7 +366,7 @@ function resultMarkdown(result) {
     ""
   ].join("\n")));
   return [
-    "# Permitext repaired owner-example live confirmation",
+    `# ${title}`,
     "",
     `Run ID: ${result.runID}`,
     "",
@@ -383,11 +386,24 @@ function resultMarkdown(result) {
   ].join("\n");
 }
 
-async function main() {
+export async function runResearchProductExampleRepairedConfirmation({
+  validateAuthorization =
+    validateResearchProductExampleRepairedConfirmationPaidAuthorization,
+  requireActiveAuthorization =
+    requireActiveResearchProductExampleRepairedConfirmationPaidAuthorization,
+  lockedAuthorizationSHA256 =
+    researchProductExampleRepairedConfirmationLockedAuthorizationSHA256,
+  authorizationRelativePath = defaultAuthorizationRelativePath,
+  runLockPath = defaultRunLockPath,
+  resultSchema = "permitext-research-product-example-repaired-live-confirmation-v1",
+  resultFileSuffix = "product-example-repaired-confirmation",
+  resultTitle = "Permitext repaired owner-example live confirmation",
+  consoleLabel = "Repaired owner-example confirmation"
+} = {}) {
   const validation =
-    await validateResearchProductExampleRepairedConfirmationPaidAuthorization();
+    await validateAuthorization();
   const active =
-    requireActiveResearchProductExampleRepairedConfirmationPaidAuthorization(validation);
+    requireActiveAuthorization(validation);
   assert.equal(
     process.env.PERMITEXT_RUN_PAID_RESEARCH_EVALS,
     "1",
@@ -401,7 +417,10 @@ async function main() {
     active.maximumCumulativeSpendUSD,
     "The runtime cumulative spend cap must exactly match the owner-authorized $2 cap."
   );
-  const executionCommit = validateExecutionCommit(validation.authorization);
+  const executionCommit = validateExecutionCommit(validation.authorization, {
+    authorizationRelativePath,
+    lockedAuthorizationSHA256
+  });
 
   const isolatedSpendEnvironment = researchProductExampleRepairedRuntimeEnvironment(
     process.env,
@@ -574,7 +593,7 @@ async function main() {
         ? "completed"
         : completedTurnCount > 0 ? "partial" : "failed";
     const result = {
-      schema: "permitext-research-product-example-repaired-live-confirmation-v1",
+      schema: resultSchema,
       runID,
       status,
       startedAt,
@@ -602,12 +621,12 @@ async function main() {
     };
     await mkdir(resultsRoot, { recursive: true });
     const stamp = startedAt.replace(/[:.]/g, "-");
-    const resultBase = `${stamp}-${runID}-product-example-repaired-confirmation`;
+    const resultBase = `${stamp}-${runID}-${resultFileSuffix}`;
     const jsonPath = join(resultsRoot, `${resultBase}.json`);
     const markdownPath = join(resultsRoot, `${resultBase}.md`);
     await Promise.all([
       writeFile(jsonPath, `${JSON.stringify(result, null, 2)}\n`),
-      writeFile(markdownPath, `${resultMarkdown(result)}\n`)
+      writeFile(markdownPath, `${resultMarkdown(result, { title: resultTitle })}\n`)
     ]);
     await writeFile(runLockPath, `${JSON.stringify({
       authorizationID: active.authorizationID,
@@ -624,7 +643,7 @@ async function main() {
       pendingRequestCount: spend.pendingRequestCount
     }, null, 2)}\n`);
     console.log(
-      `Repaired owner-example confirmation ${status}: ${completedTurnCount}/9 turns completed; ` +
+      `${consoleLabel} ${status}: ${completedTurnCount}/9 turns completed; ` +
       `$${Number(spend.actualUSD || 0).toFixed(6)} actual under the ` +
       `$${active.maximumCumulativeSpendUSD.toFixed(2)} cap; no separate judge requests. ` +
       "Owner review remains required."
@@ -641,4 +660,9 @@ async function main() {
   }
 }
 
-await main();
+if (
+  process.argv[1] &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  await runResearchProductExampleRepairedConfirmation();
+}

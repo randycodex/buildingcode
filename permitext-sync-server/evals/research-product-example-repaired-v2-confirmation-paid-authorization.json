@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "authorizationID": "1c44bd94-38cc-4d5f-874d-26260f696d4d",
+  "status": "locked",
+  "cohort": {
+    "file": "research-product-example-cases.json",
+    "sha256": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "ordered": true
+  },
+  "plannedScope": {
+    "purpose": "one live confirmation of the owner's seven Permitext answer examples after repairing the isolated spend-guardrail environment",
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 2,
+    "separateJudgeRequests": 0
+  },
+  "scope": {
+    "conversationCount": null,
+    "orderedTurnCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
+  },
+  "ownerDecision": {
+    "required": true,
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
+  },
+  "consumption": {
+    "status": "not_started",
+    "attemptID": null,
+    "startedAt": null,
+    "runID": null,
+    "consumedAt": null
+  },
+  "lineage": {
+    "preparedFromCommit": "dbc884a4fc6ad940359ecd49951b2b75bee044f2",
+    "runtimeEnvironmentVersion": "20260902-isolated-spend-guardrails-v1",
+    "previousAuthorizationSHA256": "3b07622db1ce5061452d82006b0fe4c686761ef343022788b21fc6b15fa009d5",
+    "previousResultSHA256": "2b95ed0ce8b3d1a16ed1437c9d4a91fff5b8c0d32bdb34a2c74e1f40fa377f1d",
+    "previousRunID": "fa52cca6-d28f-4d16-968a-0d8c06d596e9",
+    "inputSHA256": {
+      "app.mjs": "aec3c1390abcd170d04aff34185c74f1c561288e60621488cb70e86e6c8b17f7",
+      "evidence-discovery.mjs": "890bff5fe06276b5f3c849de49e0826c8afeb6435c586402dd67c931fcf4ab91",
+      "research-answer-presentation.mjs": "d52799dddf0a9ceb18aab2d7aa016de6cc684044234f659e7ac5adab74625ebc",
+      "research-corpus-registry.mjs": "1e3dbf3c072723dffa79326a0c13e08c52fca6ed09469f2fc9e27b208ae96443",
+      "research-source-policy.mjs": "1197b66fcc134a739980f9571ec3f3dc235a4bbf82f93d668793ceba7ce2bace",
+      "research-product-example-repaired-runtime-environment.mjs": "e46a985cdf1aa1ba5b7a66b28b9ee3e5af5f7f10bebe6b3e3a2fa7f1bd432396",
+      "evals/research-product-example-cases.json": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
+      "evals/results/research-product-example-repaired-confirmation-no-cost-preflight.json": "9c74359a6db8837f3c572c4109e1df7544ff584097dcd1d45904afdd99d4a862",
+      "scripts/preflight-research-product-example-repaired-confirmation.mjs": "bb048ef31b53cca33b63104d7854c144165fd311502e2043bddeb5afd89cb158",
+      "scripts/run-research-product-example-repaired-confirmation.mjs": "6d29edf8f47ff0c1f9cd93125cd7616bf8729fd855d55147447ba96f27691b4f",
+      "scripts/run-research-product-example-repaired-v2-confirmation.mjs": "e702ebd413ba51120a69d55126ad586fcb7f104ad6ef8b48c8648accdd99824c",
+      "tests/research-product-example-acceptance-contract.mjs": "af5a736b6c8ca128679573b96327b187480c01c357fed8ebcb1370b4090e1c19",
+      "tests/research-product-example-runtime-contract.mjs": "834e829d6aa4ec3434c2f808c13be2cafba950b848a0190d24379724c56382cd",
+      "tests/research-product-example-repaired-v2-confirmation-paid-authorization-contract.mjs": "d86ce3f8b94c84d320a97dcc202da1624e30f25da78c2cc13a9dc8a95405c786"
+    }
+  },
+  "execution": {
+    "authorizationPackageCommit": null,
+    "executionCommit": null,
+    "webSupportEnabled": true,
+    "officialDomains": [
+      "nyc.gov",
+      "ny.gov",
+      "rules.cityofnewyork.us",
+      "ada.gov"
+    ],
+    "requiredOfficialSeedURLs": [
+      "https://omh.ny.gov/omhweb/policy_and_regulations/",
+      "https://www.ada.gov/"
+    ],
+    "officialSupportingSourcesRemainNoncontrolling": true,
+    "automaticEnactedCorpusRetrieval": true,
+    "conversationFollowUpsPreserved": true,
+    "separateJudgeRequests": 0,
+    "maximumConversations": 7,
+    "maximumOrderedTurns": 9,
+    "maximumRepetitions": 1,
+    "maximumProviderRequestUSD": 1,
+    "isolatedUserDailyCapUSD": 2,
+    "isolatedUserMonthlyCapUSD": 2,
+    "isolatedSystemDailyCapUSD": 2,
+    "isolatedSystemMonthlyCapUSD": 2,
+    "additionalTurnSalesEnabled": false,
+    "validateBothSpendControlLayersBeforeLock": true,
+    "continueAfterSettledUnchargedFailure": true,
+    "stopOnSpendCapProviderOrTelemetryFailure": true
+  },
+  "networkOrModelCallAuthorized": false,
+  "publicResearchReleaseAuthorized": false,
+  "publicZoningResearchAuthorized": false,
+  "professionalCodeDetermination": false,
+  "deploymentAuthorized": false,
+  "pricingOrAllowanceChangeAuthorized": false,
+  "mergeOrPushAuthorized": false,
+  "notes": "Distinct successor to the consumed zero-spend run fa52cca6-d28f-4d16-968a-0d8c06d596e9. It changes only the isolated runner's spend-guardrail completeness and its no-cost proof. The failed result and consumed authorization remain immutable. No provider call is authorized until the owner supplies the exact package-bound sentence after this package is committed."
+}
