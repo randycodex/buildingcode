@@ -33,6 +33,13 @@ for (const [path, question] of questionsByPath) {
   assert.ok(plan.callPolicy.maximumProviderCalls <= 3);
   assert.deepEqual(plan, planZoningResearchQuestion({ question }), "Planner output must be deterministic.");
 }
+assert.equal(
+  zoningResearchEvidenceLimits(planZoningResearchQuestion({
+    question: "zoning area c4-4d, how similar it is to r8a?"
+  })).maximumDiscovered,
+  4,
+  "A direct current-bulk comparison must retain all four routed provisions."
+);
 
 const missingMap = planZoningResearchQuestion({
   question: "Can this specific property be placed in Appendix J when its address and official map are not provided?"

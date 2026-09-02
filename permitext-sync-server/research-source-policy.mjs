@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260828-supporting-web-v10";
+export const researchSourcePolicyVersion = "20260902-supporting-web-v11";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -25,6 +25,7 @@ export function canonicalResearchOfficialGuidanceNarrative(values = []) {
 
 export const defaultResearchOfficialDomains = Object.freeze([
   "nyc.gov",
+  "ny.gov",
   "rules.cityofnewyork.us"
 ]);
 
@@ -126,7 +127,7 @@ const explicitExternalLookupPattern =
   /\b(?:find|retrieve|locate|search|look up|open|quote|summarize|review|analy[sz]e|what does|according to|using)\b[^?\n]{0,140}\b(?:guidance|interpretation|bulletin|service notice|advisory|faq|agency practice|web|internet|online source|outside (?:the )?(?:library|corpus)|external source)\b/i;
 const knownResearchAcronyms = new Set([
   "AC", "ADA", "BC", "DOB", "DOT", "FDNY", "FGC", "HPD", "IBC", "ICC",
-  "IEBC", "IFGC", "IMC", "IPC", "MC", "MTA", "NFPA", "NYC", "PC", "ZR"
+  "IEBC", "IFGC", "IMC", "IPC", "MC", "MTA", "NFPA", "NYC", "NYS", "OMH", "PC", "ZR"
 ]);
 
 export function unresolvedResearchAuthorityAcronyms(value) {

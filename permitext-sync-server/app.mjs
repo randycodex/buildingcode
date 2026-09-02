@@ -7715,16 +7715,34 @@ async function researchCorpusResources(corpusPlan) {
   return resourcePromise;
 }
 
-async function researchBodyForCatalogSection(section) {
+export async function researchBodyForCatalogSection(section) {
+  const withReservedCatalogTitle = (body) => {
+    if ((body?.blocks || []).some((block) => String(block?.plainText || block?.html || "").trim())) {
+      return body;
+    }
+    const title = String(section?.title || "").replace(/\s+/g, " ").trim();
+    if (!/(?:^|:)\s*Reserved\.?$/i.test(title)) return body;
+    return {
+      ...(body || {}),
+      sectionID: body?.sectionID || section?.id,
+      blocks: [{
+        id: `${section?.id || "reserved-section"}-catalog-title`,
+        kind: "text",
+        plainText: title,
+        researchClaimEligible: true,
+        catalogTitleOnly: true
+      }]
+    };
+  };
   if (
     section?.corpusID === "nyc-2014-construction-codes" ||
     isHistoricalConstructionSectionID(section?.id)
   ) {
     const body = await historicalConstructionSection(section.id) || { blocks: [] };
-    return {
+    return withReservedCatalogTitle({
       ...body,
       blocks: (body.blocks || []).filter((block) => block.researchClaimEligible !== false)
-    };
+    });
   }
   if (section?.corpusID === "nyc-existing-building-code-2027" || isExistingBuildingSectionID(section?.id)) {
     return await existingBuildingSection(section.id) || { blocks: [] };
@@ -7735,10 +7753,10 @@ async function researchBodyForCatalogSection(section) {
   if (section?.corpusID === "nyc-zoning-resolution" || isZoningSectionID(section?.id)) {
     return await zoningSection(section.id) || { blocks: [] };
   }
-  return sectionBody(section?.webSectionID || section?.id, {
+  return withReservedCatalogTitle(await sectionBody(section?.webSectionID || section?.id, {
     allowMissing: true,
     canonicalSectionID: section?.id
-  });
+  }));
 }
 
 function tokenizeSearchText(text) {

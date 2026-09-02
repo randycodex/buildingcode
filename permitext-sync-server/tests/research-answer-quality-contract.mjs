@@ -68,6 +68,36 @@ assert.deepEqual(economical.evidenceEconomy, {
   assembledProvisionCount: 5
 });
 
+const visionLiteEvidence = [{
+  ...source("bc-2014-vision-lite", "715.4.7.1", "governing", "aligned"),
+  applicabilityStatus: "",
+  text: "Fire-protection-rated glazing shall be permitted in fire doors having a fire protection rating of 1 1/2 hours or less and shall be limited to not more than 100 square inches without a dimension exceeding 10 inches."
+}];
+const missingVisionLiteConversion = evaluateResearchAnswerQuality({
+  question: "maximum sq ft for vision light in a door - 2014 NYC Building Code",
+  evidence: visionLiteEvidence,
+  answer: {
+    answerText: "The cited condition limits the glazing to 100 square inches.",
+    supportedPoints: [{ sourceIDs: ["bc-2014-vision-lite"] }],
+    citations: [{ sourceIDs: ["bc-2014-vision-lite"] }]
+  }
+});
+assert.equal(missingVisionLiteConversion.pass, false);
+assert.deepEqual(missingVisionLiteConversion.missingRequestedAreaConversionSourceIDs, [
+  "bc-2014-vision-lite"
+]);
+assert.match(researchAnswerQualityRevisionIssues(missingVisionLiteConversion)[0].detail, /0\.694 square feet/);
+const convertedVisionLite = evaluateResearchAnswerQuality({
+  question: "maximum sq ft for vision light in a door - 2014 NYC Building Code",
+  evidence: visionLiteEvidence,
+  answer: {
+    answerText: "For the cited condition, 100 square inches ÷ 144 = 0.694 square feet (derived conversion).",
+    supportedPoints: [{ sourceIDs: ["bc-2014-vision-lite"] }],
+    citations: [{ sourceIDs: ["bc-2014-vision-lite"] }]
+  }
+});
+assert.equal(convertedVisionLite.pass, true);
+
 const orphan = evaluateResearchAnswerQuality({
   evidence,
   answer: {

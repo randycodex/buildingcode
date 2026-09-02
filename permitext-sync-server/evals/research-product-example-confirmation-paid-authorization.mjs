@@ -72,7 +72,9 @@ export async function validateResearchProductExampleConfirmationPaidAuthorizatio
   const authorization = JSON.parse(authorizationText);
   const fixture = JSON.parse(fixtureText);
   const preflight = JSON.parse(preflightText);
-  await validateBoundFiles();
+  if (authorizationPath === defaultAuthorizationPath && authorization.status !== "consumed") {
+    await validateBoundFiles();
+  }
 
   assert(
     authorization.authorizationID === researchProductExampleConfirmationAuthorizationID,

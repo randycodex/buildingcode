@@ -1023,6 +1023,31 @@ Selected-evidence Zoning Research remains blocked until knowledgeable-human
 review approves sufficient evaluation coverage and the table, map, amendment,
 effective-date, passage-identity, and citation-validation gates are all met.
 
+### Product-example correction checkpoint — September 2, 2026
+
+The seven owner-supplied example conversations, containing nine ordered turns,
+are now a permanent no-cost runtime regression suite. The suite exercises the
+current 2022 Construction Code, 2014 Construction Code, and Zoning catalogs and
+prepared source bodies while hard-blocking network and paid-provider calls. It
+now passes all nine turns locally.
+
+The correction package restores title-only reserved provisions such as Building
+Code Appendix P as bounded Research evidence; retains the prior topic for a
+format-only follow-up such as a request for one short paragraph; assembles all
+four required C4-4D/R8A Zoning sources; and requires transparent source-bound
+square-inch-to-square-foot arithmetic when the user asks for square feet.
+Questions governed by the New York State Office of Mental Health are routed to
+official `ny.gov` supporting sources instead of receiving hard-coded universal
+fixture or accessibility ratios; program type and controlling source remain
+required facts.
+
+Research answers continue to use structured Markdown so paragraphs, lists, and
+comparison tables render natively in both the web and iOS clients. The historical
+paid confirmation record remains immutable and was not rerun for this correction.
+This checkpoint is local engineering evidence only: public Zoning Research
+remains disabled until knowledgeable-human approval, and no production deployment
+is authorized by this work.
+
 ---
 
 # Cross-Platform Synchronization Requirements

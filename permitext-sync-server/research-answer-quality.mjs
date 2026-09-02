@@ -1,5 +1,7 @@
+import { researchRequestedAreaConversions } from "./research-answer-presentation.mjs";
+
 export const researchAnswerQualityVersion =
-  "20260828-occupant-load-filing-boundary-v23";
+  "20260902-requested-unit-conversion-v24";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -228,6 +230,17 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     availableEvidence.get(sourceID)?.topicRouteRelationship === "collateral"
   );
   const applicabilityText = answerApplicabilityText(answer);
+  const requestedAreaConversions = researchRequestedAreaConversions({ question, evidence });
+  const statedSquareFeet = Array.from(
+    applicabilityText.matchAll(/\b(\d+(?:\.\d+)?)\s*(?:square\s+feet|square\s+foot|sq\.?\s*ft\.?)\b/gi),
+    (match) => Number(match[1])
+  ).filter(Number.isFinite);
+  const missingRequestedAreaConversions = requestedAreaConversions.filter(({ squareFeet }) =>
+    !statedSquareFeet.some((value) => Math.abs(value - squareFeet) <= 0.005)
+  );
+  const missingRequestedAreaConversionSourceIDs = unique(
+    missingRequestedAreaConversions.flatMap((conversion) => conversion.sourceIDs)
+  );
   const missingApplicabilityDisclosureSourceIDs = knownCitedSourceIDs.filter((sourceID) =>
     !disclosesApplicability(availableEvidence.get(sourceID), applicabilityText)
   );
@@ -481,7 +494,8 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
       unsupportedCertificateOperationRoomThresholdSourceIDs.length === 0 &&
       misboundAccessibleDiningSurfaceRuleSourceIDs.length === 0 &&
       misstatedAccessibleDiningSurfacePercentageSourceIDs.length === 0 &&
-      misstatedTable403AuthoritySourceIDs.length === 0,
+      misstatedTable403AuthoritySourceIDs.length === 0 &&
+      missingRequestedAreaConversionSourceIDs.length === 0,
     unknownAnswerSourceIDs,
     orphanCitationSourceIDs,
     uncitedSupportedPointSourceIDs,
@@ -504,6 +518,8 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
     misboundAccessibleDiningSurfaceRuleSourceIDs,
     misstatedAccessibleDiningSurfacePercentageSourceIDs,
     misstatedTable403AuthoritySourceIDs,
+    missingRequestedAreaConversions,
+    missingRequestedAreaConversionSourceIDs,
     citedSourceIDs: knownCitedSourceIDs,
     reviewedOnlySourceIDs,
     evidenceEconomy,
@@ -716,6 +732,15 @@ export function researchAnswerQualityRevisionIssues(result) {
     issues.push({
       type: "incorrect_citation",
       detail: `Every retained supported point must cite its exact evidence: ${references(result.uncitedSupportedPointSourceIDs, result.sources)}.`
+    });
+  }
+  if (result.missingRequestedAreaConversionSourceIDs?.length) {
+    const conversions = result.missingRequestedAreaConversions
+      .map(({ squareInches, squareFeet }) => `${squareInches} square inches ÷ 144 = ${squareFeet.toFixed(3)} square feet`)
+      .join("; ");
+    issues.push({
+      type: "missed_material_conclusion",
+      detail: `The user requested square feet. State the source-bound arithmetic conversion (${conversions}) and label it as derived rather than enacted wording. Bind the original area limit to: ${references(result.missingRequestedAreaConversionSourceIDs, result.sources)}.`
     });
   }
   if (result.misstatedAccessibleDiningSurfacePercentageSourceIDs?.length) {

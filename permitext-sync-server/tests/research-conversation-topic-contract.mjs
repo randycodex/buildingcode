@@ -34,6 +34,17 @@ assert.equal(continuation.contextPolicy.replaceRootTopic, false);
 assert.equal(continuation.nextRootTopic.text, continuation.rootTopic.text);
 assert.equal(continuation.nextCurrentTopic.text, continuation.question.text);
 
+const formatFollowUp = decideResearchConversationTopic({
+  question: "give me just a short paragraph to explain quickly",
+  previousMessages: [{
+    role: "user",
+    question: "zoning area c4-4d, how similar it is to r8a?"
+  }]
+});
+assert.equal(formatFollowUp.decision, researchConversationTopicDecisions.continuation);
+assert.equal(formatFollowUp.signals.formatTransformation, true);
+assert.equal(formatFollowUp.contextPolicy.includeRootTopic, true);
+
 const correction = decideResearchConversationTopic({
   question: "Correction: I meant Group R-2, not R-1. Apply BC 1107.6.2.",
   previousMessages: history

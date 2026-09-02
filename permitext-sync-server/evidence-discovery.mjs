@@ -789,6 +789,12 @@ const topicRoutes = [
 
 const outsideLibrarySignals = [
   {
+    pattern: /\b(?:NYS\s+)?Office of Mental Health\b|\bOMH\b/i,
+    label: "NYS Office of Mental Health requirements",
+    sourceName: "New York State Office of Mental Health",
+    sourceURL: "https://omh.ny.gov/"
+  },
+  {
     pattern: /\bHCR\b/i,
     label: "HCR requirements",
     sourceName: "New York State Homes and Community Renewal",

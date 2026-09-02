@@ -16,6 +16,28 @@ function evidenceCount(evidence) {
     .filter(Boolean)).size;
 }
 
+export function researchRequestedAreaConversions({ question, evidence = [] } = {}) {
+  if (!/\b(?:sq\.?\s*ft|square\s+feet|square\s+foot)\b/i.test(compactText(question))) return [];
+  const conversions = [];
+  const seen = new Set();
+  for (const source of Array.isArray(evidence) ? evidence : []) {
+    const text = compactText(source?.text || source?.plainText);
+    for (const match of text.matchAll(/\b(\d+(?:\.\d+)?)\s*(?:square\s+inches|sq\.?\s*in\.?)(?!\w)/gi)) {
+      const squareInches = Number(match[1]);
+      if (!Number.isFinite(squareInches)) continue;
+      const key = String(squareInches);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      conversions.push(Object.freeze({
+        squareInches,
+        squareFeet: squareInches / 144,
+        sourceIDs: Object.freeze([String(source?.sourceID || "").trim()].filter(Boolean))
+      }));
+    }
+  }
+  return conversions;
+}
+
 function contractFor(mode, preferredStructure, requiredElements) {
   return Object.freeze({
     version: researchAnswerPresentationVersion,
@@ -35,6 +57,7 @@ function contractFor(mode, preferredStructure, requiredElements) {
 export function researchAnswerPresentationContract({ question, evidence = [] } = {}) {
   const text = compactText(question);
   const sourceCount = evidenceCount(evidence);
+  const requestedAreaConversions = researchRequestedAreaConversions({ question: text, evidence });
 
   if (shortAnswerCue.test(text)) {
     return contractFor("compact-paragraph", "one compact paragraph", [
@@ -79,7 +102,10 @@ export function researchAnswerPresentationContract({ question, evidence = [] } =
     return contractFor("numeric-rule", "number first, scope, exceptions", [
       "Lead with the supported number or explain immediately why one number cannot be selected.",
       "State the condition to which the number applies.",
-      "Identify any materially different exception or alternate category supplied by the evidence."
+      "Identify any materially different exception or alternate category supplied by the evidence.",
+      ...requestedAreaConversions.map(({ squareInches, squareFeet }) =>
+        `Because the user asked for square feet, convert the supplied ${squareInches} square inches to ${squareFeet.toFixed(3)} square feet and label that arithmetic as a derived conversion.`
+      )
     ]);
   }
 

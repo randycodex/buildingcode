@@ -23,7 +23,7 @@ export const zoningResearchDispositions = Object.freeze({
 const pathLimits = Object.freeze({
   [zoningResearchPaths.directRule]: Object.freeze({
     maximumCandidates: 6,
-    maximumDiscovered: 3,
+    maximumDiscovered: 4,
     maximumTargetedDefinitions: 1,
     maximumCrossReferences: 2,
     maximumCharacters: 8_000,

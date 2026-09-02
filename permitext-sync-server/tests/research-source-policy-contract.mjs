@@ -47,6 +47,7 @@ assert.deepEqual(
   normalizeResearchOfficialDomains(["www.nyc.gov", ".NYC.gov.", "rules.cityofnewyork.us"]),
   ["nyc.gov", "rules.cityofnewyork.us"]
 );
+assert(researchSourcePolicyConfiguration({}).officialDomains.includes("ny.gov"));
 
 const sanitized = sanitizeResearchWebQuery(
   "Client: Acme Tower LLC; email lead@acme.example, call (212) 555-0199. " +
@@ -151,6 +152,18 @@ assert.equal(
   "A genuinely separate outside-library source may still trigger automatic supporting-web research."
 );
 assert.deepEqual(unresolvedResearchAuthorityAcronyms("Does HCR require a vanity?"), ["HCR"]);
+assert.deepEqual(unresolvedResearchAuthorityAcronyms("What does OMH require?"), []);
+assert.deepEqual(
+  researchWebSupportTrigger({
+    question: "This feasibility must comply with NYS Office of Mental Health guidelines. Research the minimum bathroom, toilet, and ADA requirements.",
+    outsideLibraryRequired: true
+  }, {}).reasons,
+  ["outside_library_support_needed"]
+);
+assert.equal(
+  classifyResearchWebSource({ url: "https://omh.ny.gov/omhweb/guidance" }).sourceClassification,
+  "official_guidance"
+);
 assert.deepEqual(
   unresolvedResearchAuthorityAcronyms("What does Homes and Community Renewal (HCR) require?"),
   []

@@ -1,4 +1,4 @@
-export const researchConversationTopicVersion = "20260811-deterministic-topic-decision-v2";
+export const researchConversationTopicVersion = "20260902-format-follow-up-v3";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -160,9 +160,13 @@ function decisionSignals(question, rootTopic, currentTopic) {
   const explicitSwitch = /^(?:new topic|different (?:topic|question)|separate(?:ly)?|unrelated (?:topic|question)|moving on|another (?:topic|question))\b/i.test(question);
   const projectSubjectContinuation = /^(?:the|this|that|our|my)\s+(?:building|structure|project|work|scope|space|room|application|occupant load|(?:exit access )?travel distance|construction type|building height)\b/i.test(question);
   const hypotheticalContinuation = /^(?:what if|suppose|assuming|assume|hypothetically)\b/i.test(question);
+  const formatTransformation =
+    /\b(?:summari[sz]e|rewrite|restate|condense|make|give)\b[\s\S]{0,100}\b(?:short|brief|concise|paragraph|quick|quickly|simpler?)\b/i.test(question) ||
+    /\b(?:short|brief|concise|quick)\b[\s\S]{0,80}\b(?:summary|paragraph|version|explanation)\b/i.test(question);
   const contextualContinuation =
     /^(?:why|how so|explain|tell me more|more details?|go on|what about)\b/i.test(question) ||
     /\b(?:it|its|that|this|those|these|them|they|same|above|remaining|further)\b/i.test(question) ||
+    formatTransformation ||
     projectSubjectContinuation ||
     hypotheticalContinuation;
   const questionReferences = extractResearchCodeReferences(question);
@@ -180,6 +184,7 @@ function decisionSignals(question, rootTopic, currentTopic) {
     explicitSwitch,
     projectSubjectContinuation,
     hypotheticalContinuation,
+    formatTransformation,
     contextualContinuation,
     relatedReference,
     disjointExplicitReference,
@@ -256,6 +261,7 @@ export function decideResearchConversationTopic({
       explicitSwitch: signals.explicitSwitch,
       projectSubjectContinuation: signals.projectSubjectContinuation,
       hypotheticalContinuation: signals.hypotheticalContinuation,
+      formatTransformation: signals.formatTransformation,
       contextualContinuation: signals.contextualContinuation,
       relatedReference: signals.relatedReference,
       disjointExplicitReference: signals.disjointExplicitReference,

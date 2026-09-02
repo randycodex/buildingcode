@@ -307,6 +307,23 @@ assert.equal(
   "Outside-agency boundaries must link to an authoritative starting point."
 );
 
+const omhAuthority = await discoverRelevantEvidence({
+  question: "This feasibility must comply with NYS Office of Mental Health guidelines. Research the minimum bathroom, toilet, and ADA requirements.",
+  catalog,
+  invertedIndex,
+  readSectionBody: async (section) => bodies.get(section.id),
+  limit: 5
+});
+assert.deepEqual(
+  omhAuthority.outsideCurrentLibrary.filter((item) =>
+    item.label === "NYS Office of Mental Health requirements"
+  ).map((item) => ({ sourceName: item.sourceName, sourceURL: item.sourceURL })),
+  [{
+    sourceName: "New York State Office of Mental Health",
+    sourceURL: "https://omh.ny.gov/"
+  }]
+);
+
 const mapAuthority = await discoverRelevantEvidence({
   question: "Show me BC D106.1 fire district maps.",
   catalog,
