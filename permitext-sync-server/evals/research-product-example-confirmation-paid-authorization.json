@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "authorizationID": "17baf770-5f0b-4f51-91f3-fea23b415e2d",
+  "authorizationID": "2ae2f240-6c7d-43ac-b893-d15dafbf0d55",
   "status": "locked",
   "cohort": {
     "file": "research-product-example-cases.json",
@@ -46,7 +46,7 @@
     "acceptanceContractSHA256": "af5a736b6c8ca128679573b96327b187480c01c357fed8ebcb1370b4090e1c19",
     "noCostPreflightSHA256": "08f45c335ccc8452b41286c2c67337601d0badad487fe9c081daae8401635968",
     "preflightRunnerSHA256": "e827585b6934a9ec9e9639409672a942be28d27fbc96f35bdce3ae99fb277d46",
-    "paidRunnerSHA256": "b1bd913a97e9125df7bf8ceab10ef9f3312288a3ee3bc84a60f44716f88d4d65"
+    "paidRunnerSHA256": "a2dc213c4a898bafd6c898a1b5fa56eb30ad5cf39a9ab104bab28e1171b6be33"
   },
   "execution": {
     "authorizationPackageCommit": null,
@@ -68,5 +68,5 @@
   "deploymentAuthorized": false,
   "pricingOrAllowanceChangeAuthorized": false,
   "mergeOrPushAuthorized": false,
-  "notes": "Locked no-cost package. It cannot dispatch a provider request until the owner separately authorizes the exact committed package and $2 cumulative cap. The later live result requires owner review; deterministic checks and screenshots are not legal authority."
+  "notes": "Replacement locked no-cost package after the authorized 70b2d3b4f013f2966d14a40c9eabfedb561a27f6 runner stopped before its permanent lock, local server, or provider access on a self-referential execution-commit assertion. It cannot dispatch a provider request until the owner separately authorizes this exact replacement package and $2 cumulative cap. The later live result requires owner review; deterministic checks and screenshots are not legal authority."
 }

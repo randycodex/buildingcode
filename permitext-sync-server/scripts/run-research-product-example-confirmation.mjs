@@ -48,8 +48,8 @@ function validateExecutionCommit(authorization) {
   const executionCommit = git(["rev-parse", "HEAD"]).trim();
   assert.equal(
     authorization.execution.executionCommit,
-    executionCommit,
-    "The active owner-example authorization must name the exact execution commit."
+    null,
+    "A fresh owner-example authorization must leave the execution commit unset until the runner records HEAD."
   );
   git(["merge-base", "--is-ancestor", packageCommit, executionCommit]);
   const lockedAuthorization = git([

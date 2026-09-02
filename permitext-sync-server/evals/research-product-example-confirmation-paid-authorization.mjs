@@ -11,9 +11,9 @@ const defaultAuthorizationPath = join(
 );
 
 export const researchProductExampleConfirmationAuthorizationID =
-  "17baf770-5f0b-4f51-91f3-fea23b415e2d";
+  "2ae2f240-6c7d-43ac-b893-d15dafbf0d55";
 export const researchProductExampleConfirmationLockedAuthorizationSHA256 =
-  "8e0658b43646768d9c68eafed5b6782cac075ad3c2aa6b1a71ba409816bba37f";
+  "868f9223e5565c40a600af8f010cc0b68a7c9fab974d42211211c80bf6f8c689";
 export const researchProductExampleConfirmationPreparedFromCommit =
   "32b83a69b14fe1910643e8781f4796fe87fc6f71";
 export const researchProductExampleConfirmationMaximumSpendUSD = 2;
@@ -31,7 +31,7 @@ const expectedFiles = Object.freeze({
   "scripts/preflight-research-product-example-confirmation.mjs":
     "e827585b6934a9ec9e9639409672a942be28d27fbc96f35bdce3ae99fb277d46",
   "scripts/run-research-product-example-confirmation.mjs":
-    "b1bd913a97e9125df7bf8ceab10ef9f3312288a3ee3bc84a60f44716f88d4d65",
+    "a2dc213c4a898bafd6c898a1b5fa56eb30ad5cf39a9ab104bab28e1171b6be33",
   "tests/research-product-example-acceptance-contract.mjs":
     "af5a736b6c8ca128679573b96327b187480c01c357fed8ebcb1370b4090e1c19"
 });
@@ -207,6 +207,20 @@ export async function validateResearchProductExampleConfirmationPaidAuthorizatio
         authorization.networkOrModelCallAuthorized === true,
       "Active owner-example confirmation must retain the exact package-bound owner sentence."
     );
+    if (authorization.status === "authorized") {
+      assert(
+        authorization.execution?.executionCommit === null &&
+          authorization.consumption?.status === "not_started" &&
+          authorization.consumption?.attemptID === null &&
+          authorization.consumption?.runID === null,
+        "A fresh owner-example authorization must let the runner record the immutable execution commit."
+      );
+    } else {
+      assert(
+        /^[0-9a-f]{40}$/i.test(authorization.execution?.executionCommit || ""),
+        "A running or consumed owner-example confirmation must retain its execution commit."
+      );
+    }
   }
   return {
     authorization,

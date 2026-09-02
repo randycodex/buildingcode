@@ -61,6 +61,46 @@ try {
     }),
     /locked owner-example confirmation authorization changed/i
   );
+
+  const packageCommit = "a".repeat(40);
+  const exactAuthorizationPhrase =
+    `authorize exactly package commit ${packageCommit} for all 9 ordered turns ` +
+    "in 7 conversations, one repetition, with a maximum cumulative API spend of $2.";
+  const authorized = structuredClone(validation.authorization);
+  authorized.status = "authorized";
+  authorized.scope = {
+    conversationCount: 7,
+    orderedTurnCount: 9,
+    repetitions: 1,
+    maximumCumulativeSpendUSD: 2
+  };
+  authorized.ownerDecision = {
+    required: true,
+    authorizedAt: "2026-09-02T00:00:00Z",
+    authorizedBy: "Permitext owner",
+    exactAuthorizationPhrase,
+    exactSpendingCapPhrase: exactAuthorizationPhrase
+  };
+  authorized.execution.authorizationPackageCommit = packageCommit;
+  authorized.execution.executionCommit = null;
+  authorized.networkOrModelCallAuthorized = true;
+  const authorizedPath = join(temporaryDirectory, "authorized.json");
+  await writeFile(authorizedPath, `${JSON.stringify(authorized, null, 2)}\n`);
+  const authorizedValidation =
+    await validateResearchProductExampleConfirmationPaidAuthorization({
+      authorizationPath: authorizedPath
+    });
+  assert.deepEqual(
+    requireActiveResearchProductExampleConfirmationPaidAuthorization(authorizedValidation),
+    {
+      authorizationID: researchProductExampleConfirmationAuthorizationID,
+      packageCommit,
+      conversationCount: 7,
+      orderedTurnCount: 9,
+      repetitions: 1,
+      maximumCumulativeSpendUSD: 2
+    }
+  );
 } finally {
   await rm(temporaryDirectory, { recursive: true, force: true });
 }
@@ -92,6 +132,8 @@ assert.match(runnerSource, /separateJudgeRequests:\s*0/);
 assert.match(runnerSource, /PERMITEXT_RESEARCH_WEB_SUPPORT = "0"/);
 assert.match(runnerSource, /PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS = "1"/);
 assert.match(runnerSource, /Only the committed authorization record may differ/);
+assert.match(runnerSource, /authorization\.execution\.executionCommit,\s*null/);
+assert.doesNotMatch(runnerSource, /must name the exact execution commit/);
 assert.doesNotMatch(runnerSource, /judgeAnswer|PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL/);
 
 console.log(
