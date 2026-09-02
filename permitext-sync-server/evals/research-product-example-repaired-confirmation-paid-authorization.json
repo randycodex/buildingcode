@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "authorizationID": "fcbb0ba5-2148-4c33-84e2-43b76852f9a3",
+  "status": "locked",
+  "cohort": {
+    "file": "research-product-example-cases.json",
+    "sha256": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "ordered": true
+  },
+  "plannedScope": {
+    "purpose": "one repaired live confirmation of the owner's seven Permitext answer examples across nine ordered turns",
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 2,
+    "separateJudgeRequests": 0
+  },
+  "scope": {
+    "conversationCount": null,
+    "orderedTurnCount": null,
+    "repetitions": null,
+    "maximumCumulativeSpendUSD": null
+  },
+  "ownerDecision": {
+    "required": true,
+    "authorizedAt": null,
+    "authorizedBy": null,
+    "exactAuthorizationPhrase": null,
+    "exactSpendingCapPhrase": null
+  },
+  "consumption": {
+    "status": "not_started",
+    "attemptID": null,
+    "startedAt": null,
+    "runID": null,
+    "consumedAt": null
+  },
+  "lineage": {
+    "preparedFromCommit": "c1ea51e3b55aaa15be2639b0cdf14c3461b35b2e",
+    "presentationVersion": "20260902-product-example-contract-v1",
+    "evidenceDiscoveryVersion": "20260902-official-source-seeds-v21",
+    "sourcePolicyVersion": "20260902-supporting-web-v12",
+    "appSHA256": "aec3c1390abcd170d04aff34185c74f1c561288e60621488cb70e86e6c8b17f7",
+    "evidenceDiscoverySHA256": "890bff5fe06276b5f3c849de49e0826c8afeb6435c586402dd67c931fcf4ab91",
+    "answerPresentationSHA256": "d52799dddf0a9ceb18aab2d7aa016de6cc684044234f659e7ac5adab74625ebc",
+    "corpusRegistrySHA256": "1e3dbf3c072723dffa79326a0c13e08c52fca6ed09469f2fc9e27b208ae96443",
+    "sourcePolicySHA256": "1197b66fcc134a739980f9571ec3f3dc235a4bbf82f93d668793ceba7ce2bace",
+    "acceptanceContractSHA256": "af5a736b6c8ca128679573b96327b187480c01c357fed8ebcb1370b4090e1c19",
+    "runtimeContractSHA256": "834e829d6aa4ec3434c2f808c13be2cafba950b848a0190d24379724c56382cd",
+    "noCostPreflightSHA256": "22865a7c4ee67af5da56f1d7b90fdf5c241341baa58990450744e1fd402f993f",
+    "preflightRunnerSHA256": "0671885e67a279594640eea3c00151a33a0c92ea1756acc0c9536dcf7564cf4f",
+    "paidRunnerSHA256": "21f56e96c39e204c6b57c5d6a39e487a14e5106016bb3f413f4b84898177dcb0",
+    "historicalConsumedAuthorizationSHA256": "a22d6e028429174bf3bf99d7582ad0dc7b3b26c945bc53c2854ff03e80a7ec7a"
+  },
+  "execution": {
+    "authorizationPackageCommit": null,
+    "executionCommit": null,
+    "webSupportEnabled": true,
+    "officialDomains": [
+      "nyc.gov",
+      "ny.gov",
+      "rules.cityofnewyork.us",
+      "ada.gov"
+    ],
+    "requiredOfficialSeedURLs": [
+      "https://omh.ny.gov/omhweb/policy_and_regulations/",
+      "https://www.ada.gov/"
+    ],
+    "officialSupportingSourcesRemainNoncontrolling": true,
+    "automaticEnactedCorpusRetrieval": true,
+    "conversationFollowUpsPreserved": true,
+    "separateJudgeRequests": 0,
+    "maximumConversations": 7,
+    "maximumOrderedTurns": 9,
+    "maximumRepetitions": 1,
+    "continueAfterSettledUnchargedFailure": true,
+    "stopOnSpendCapProviderOrTelemetryFailure": true
+  },
+  "networkOrModelCallAuthorized": false,
+  "publicResearchReleaseAuthorized": false,
+  "publicZoningResearchAuthorized": false,
+  "professionalCodeDetermination": false,
+  "deploymentAuthorized": false,
+  "pricingOrAllowanceChangeAuthorized": false,
+  "mergeOrPushAuthorized": false,
+  "notes": "Distinct post-repair package. The prior live package and its consumed authorization remain immutable and cannot authorize this run. This package enables official-domain web support only for attributable supporting material; enacted Permitext corpora remain the primary legal authority. It cannot dispatch a provider request until the owner separately authorizes this exact committed package and $2 cumulative cap. Results still require owner review and do not authorize release."
+}

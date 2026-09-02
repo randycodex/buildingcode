@@ -63,9 +63,10 @@ source seeding, and answer-shape instructions. It does not prove that a live
 model will follow them on every turn. The earlier [live-confirmation
 package](./PERMITEXT_RESEARCH_PRODUCT_EXAMPLE_CONFIRMATION_PACKAGE_2026-09-02.md)
 was consumed and its partial result remains immutable. It cannot authorize a
-retry or changed code. One distinct repaired package must be locked before any
-later live confirmation; that package must retain exactly seven conversations
-and nine ordered turns, one repetition, a `$2` cumulative ceiling, and no paid
-judge.
+retry or changed code. A [distinct repaired package](./PERMITEXT_RESEARCH_PRODUCT_EXAMPLE_REPAIRED_CONFIRMATION_PACKAGE_2026-09-02.md)
+is now locked for exactly seven conversations and nine ordered turns, one
+repetition, a `$2` cumulative ceiling, official-only supporting web, and no paid
+judge. It cannot call a provider until the owner authorizes that package's exact
+commit in a new package-bound sentence.
 
 No result from this benchmark enables public Zoning Research, changes pricing or included turns, authorizes a merge, push, deployment, Production action, TestFlight upload, or public release.

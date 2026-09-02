@@ -1,0 +1,55 @@
+{
+  "schema": "permitext-research-product-example-repaired-confirmation-preflight-v1",
+  "version": "2026-09-02",
+  "pass": true,
+  "purpose": "No-cost runtime preflight for one later repaired live confirmation of the owner's seven product examples across nine ordered turns.",
+  "fixtureSHA256": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
+  "inputSHA256": {
+    "app.mjs": "aec3c1390abcd170d04aff34185c74f1c561288e60621488cb70e86e6c8b17f7",
+    "evidence-discovery.mjs": "890bff5fe06276b5f3c849de49e0826c8afeb6435c586402dd67c931fcf4ab91",
+    "research-answer-presentation.mjs": "d52799dddf0a9ceb18aab2d7aa016de6cc684044234f659e7ac5adab74625ebc",
+    "research-corpus-registry.mjs": "1e3dbf3c072723dffa79326a0c13e08c52fca6ed09469f2fc9e27b208ae96443",
+    "research-source-policy.mjs": "1197b66fcc134a739980f9571ec3f3dc235a4bbf82f93d668793ceba7ce2bace",
+    "evals/research-product-example-cases.json": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
+    "scripts/run-research-product-example-repaired-confirmation.mjs": "21f56e96c39e204c6b57c5d6a39e487a14e5106016bb3f413f4b84898177dcb0",
+    "tests/research-product-example-acceptance-contract.mjs": "af5a736b6c8ca128679573b96327b187480c01c357fed8ebcb1370b4090e1c19",
+    "tests/research-product-example-runtime-contract.mjs": "834e829d6aa4ec3434c2f808c13be2cafba950b848a0190d24379724c56382cd"
+  },
+  "scope": {
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "repetitions": 1,
+    "separateJudgeRequests": 0,
+    "liveWebSupportEnabledAfterAuthorizationOnly": true
+  },
+  "supportingWeb": {
+    "sourcePolicyVersion": "20260902-supporting-web-v12",
+    "evidenceDiscoveryVersion": "20260902-official-source-seeds-v21",
+    "officialDomains": [
+      "ada.gov",
+      "nyc.gov",
+      "ny.gov",
+      "rules.cityofnewyork.us"
+    ],
+    "requiredSeedURLs": [
+      "https://omh.ny.gov/omhweb/policy_and_regulations/",
+      "https://www.ada.gov/"
+    ],
+    "authorityBoundary": "Attributable official supporting material remains separate from enacted Permitext code evidence."
+  },
+  "safety": {
+    "networkAttempts": 0,
+    "paidProviderCalls": 0,
+    "productionWrites": 0,
+    "publicZoningResearchEnabled": false,
+    "releaseAuthorized": false,
+    "credentialVariablesPresent": []
+  },
+  "runtimeRegression": {
+    "passed": true,
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "networkAttempts": 0,
+    "paidProviderCalls": 0
+  }
+}
