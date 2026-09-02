@@ -380,7 +380,7 @@ async function main() {
     assert(webRoot.text.includes('id="toggle-analysis"'), "Web workspace omitted the global Research chat button.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260901-2014-code-assets-v14"),
+      webRoot.text.includes("20260901-2014-code-assets-v15"),
       "Web workspace omitted the current package asset version."
     );
     assert(

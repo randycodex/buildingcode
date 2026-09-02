@@ -183,21 +183,38 @@ private struct MissingTableBlockView: View {
     }
 }
 
-private func isSimpleTable(_ table: CodeTableBlock) -> Bool {
+func isNativeSimpleTable(_ table: CodeTableBlock) -> Bool {
     guard table.columnCount <= 6 else { return false }
     for cell in table.cells {
         if cell.rowSpan > 1 || cell.columnSpan > 1 { return false }
-        if cell.backgroundColorHex != nil || cell.textColorHex != nil { return false }
+        if let background = cell.backgroundColorHex,
+           background.caseInsensitiveCompare("#F3F4F6") != .orderedSame {
+            return false
+        }
+        if cell.textColorHex != nil { return false }
         if cell.fontSize != nil { return false }
         if hasCustomTableBorders(cell.borders) { return false }
-        if cell.html != cell.plainText, cell.html.contains("<") { return false }
+        if cell.html.range(
+            of: #"<(?!/?(?:strong|br)\b)[^>]+>"#,
+            options: [.regularExpression, .caseInsensitive]
+        ) != nil {
+            return false
+        }
     }
     return true
 }
 
 private func hasCustomTableBorders(_ borders: CodeTableCellBorders) -> Bool {
     [borders.left, borders.right, borders.top, borders.bottom].contains { border in
-        !border.isHidden || border.width != nil || border.colorHex != nil || border.style != nil
+        if border.isHidden {
+            return true
+        }
+        let usesStandardWidth = border.width == nil || border.width == 1
+        let usesStandardColor = border.colorHex == nil
+            || border.colorHex?.caseInsensitiveCompare("#9CA3AF") == .orderedSame
+        let usesStandardStyle = border.style == nil
+            || border.style?.caseInsensitiveCompare("solid") == .orderedSame
+        return !usesStandardWidth || !usesStandardColor || !usesStandardStyle
     }
 }
 
@@ -212,10 +229,15 @@ private struct SimpleTableBlockView: View {
                     ForEach(0..<table.columnCount, id: \.self) { column in
                         let cell = cellsByPosition["\(row)-\(column)"]
                         Text(cell?.plainText ?? "")
-                            .font(.body)
+                            .font(cell?.isBold == true ? .body.weight(.semibold) : .body)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 6)
+                            .background(
+                                cell?.backgroundColorHex == nil
+                                    ? Color.clear
+                                    : Color.secondary.opacity(0.08)
+                            )
                             .overlay(alignment: .bottom) {
                                 Color(uiColor: .separator).frame(height: 0.5)
                             }
@@ -242,8 +264,12 @@ private struct TableBlockView: View {
             }
 
             Group {
-                if isSimpleTable(table) {
-                    SimpleTableBlockView(table: table)
+                if isNativeSimpleTable(table) {
+                    ScrollView(.horizontal) {
+                        SimpleTableBlockView(table: table)
+                            .frame(minWidth: CGFloat(max(table.columnCount, 1)) * 132)
+                    }
+                    .scrollIndicators(.visible)
                 } else {
                     TableHTMLView(html: TableHTMLRenderer.html(for: table), tableID: table.id, baseURL: baseURL)
                 }

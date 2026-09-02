@@ -29,6 +29,7 @@ import re
 import shutil
 import subprocess
 import sys
+import unicodedata
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -51,6 +52,23 @@ ICC_2014_BUILDING_CODE_CHAPTER_7_URL = (
     "https://codes.iccsafe.org/content/NYNYCBC2014E1014/"
     "chapter-7-fire-and-smoke-protection-features"
 )
+ICC_2014_BUILDING_CODE_CHAPTER_10_URL = (
+    "https://codes.iccsafe.org/content/NYNYCBC2014E1014/"
+    "chapter-10-means-of-egress"
+)
+ICC_BC10_TABLE_PDF_PAGES = {
+    "1004.1.1": [5, 6],
+    "1008.1.4.1": [14],
+    "1015.1": [35],
+    "1016.1": [37],
+    "1018.1.1": [39],
+    "1018.1.2": [39],
+    "1021.1": [41],
+    "1021.2": [42],
+    "1028.6.2": [56],
+    "1028.7": [56],
+    "1028.10.1": [58],
+}
 CURATED_BC_705_7_TEXT = """Where protected openings are not limited by Section 705.8, the limitation on the rise of temperature on the unexposed surface of exterior walls as required by ASTM E 119 or UL 263 shall not apply. Where protected openings are limited by Section 705.8, the limitation on the rise of temperature on the unexposed surface of exterior walls as required by ASTM E 119 or UL 263 shall not apply provided that a correction is made for radiation from the unexposed exterior wall surface in accordance with the following formula:
 
 A_e = A + (A_f × F_eo) (Equation 7-1)
@@ -132,6 +150,278 @@ class LinkCollector(HTMLParser):
             self._text = []
 
 
+class ICCSemanticHTMLSanitizer(HTMLParser):
+    """Retain code semantics while removing publisher presentation markup."""
+
+    suppressed_tags = {
+        "del", "figcaption", "h1", "h2", "h3", "h4", "h5", "h6",
+        "img", "script", "style", "table",
+    }
+    block_tags = {"p", "ol", "ul", "li"}
+    inline_tags = {"strong", "em", "sup", "sub"}
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.output: list[str] = []
+        self.text_parts: list[str] = []
+        self.stack: list[tuple[str, str | None, bool]] = []
+        self.suppression_depth = 0
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        tag = tag.lower()
+        attributes = dict(attrs)
+        classes = set((attributes.get("class") or "").lower().split())
+        is_deletion_marker = tag == "span" and any(
+            "deletion-marker" in class_name or "deletion_marker" in class_name
+            for class_name in classes
+        )
+        suppressed = (
+            self.suppression_depth > 0
+            or tag in self.suppressed_tags
+            or is_deletion_marker
+        )
+        if suppressed:
+            if tag not in {"br", "img"}:
+                self.stack.append((tag, None, True))
+                self.suppression_depth += 1
+            return
+        if tag == "br":
+            self.output.append("<br>")
+            self.text_parts.append("\n")
+            return
+        emitted: str | None = None
+        if tag in self.block_tags or tag in self.inline_tags:
+            emitted = tag
+        elif tag == "span":
+            if "bold" in classes:
+                emitted = "strong"
+            elif "italic" in classes:
+                emitted = "em"
+        if emitted is not None:
+            self.output.append(f"<{emitted}>")
+        self.stack.append((tag, emitted, False))
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.lower() == "br" and self.suppression_depth == 0:
+            self.output.append("<br>")
+            self.text_parts.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.lower()
+        if not self.stack:
+            return
+        stack_index = next(
+            (index for index in range(len(self.stack) - 1, -1, -1) if self.stack[index][0] == tag),
+            None,
+        )
+        if stack_index is None:
+            return
+        closed = self.stack[stack_index:]
+        del self.stack[stack_index:]
+        for _source_tag, emitted, suppressed in reversed(closed):
+            if suppressed:
+                self.suppression_depth = max(0, self.suppression_depth - 1)
+            elif emitted is not None:
+                self.output.append(f"</{emitted}> ")
+
+    def handle_data(self, data: str) -> None:
+        if self.suppression_depth:
+            return
+        value = normalized_space(data)
+        if not value:
+            return
+        self.output.append(f"{html.escape(value)} ")
+        self.text_parts.append(value)
+
+    def result(self) -> tuple[str, str]:
+        rendered = re.sub(r"\s+", " ", "".join(self.output)).strip()
+        rendered = re.sub(r"<(p|ol|ul|li|strong|em|sup|sub)>\s+", r"<\1>", rendered)
+        rendered = re.sub(r"\s+</(p|ol|ul|li|strong|em|sup|sub)>", r"</\1>", rendered)
+        rendered = re.sub(r"\s+(<br>)\s*", r"\1", rendered)
+        rendered = re.sub(r"\s+([,.;:!?])", r"\1", rendered)
+        # ICC's accessible list markup sometimes retains the printed marker in
+        # each <li>. Browsers already generate that marker, so remove it only
+        # from rendered HTML; plain_text below retains it for PDF verification.
+        rendered = re.sub(
+            r"(<li>(?:<p>)?)\s*(?:\(?\d+[.)]|[a-z][.)]|(?:i{1,3}|iv|v(?:i{0,3})?|ix|x)[.)]|[-•▪])\s+",
+            r"\1",
+            rendered,
+            flags=re.I,
+        )
+        plain_text = re.sub(
+            r"\s+([,.;:!?])",
+            r"\1",
+            normalized_space(" ".join(self.text_parts)),
+        )
+        return rendered, plain_text
+
+
+class ICCTableHTMLParser(HTMLParser):
+    """Parse ICC's semantic table HTML into publisher-neutral cells."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.caption_parts: list[str] = []
+        self.in_caption = False
+        self.table_class = ""
+        self.in_table = False
+        self.rows: list[list[dict]] = []
+        self.current_row: list[dict] | None = None
+        self.current_cell: dict | None = None
+        self.cell_suppression_depth = 0
+        self.cell_inline_stack: list[tuple[str, str | None, bool]] = []
+        self.in_notes = False
+        self.notes_depth = 0
+        self.note_parts: list[str] | None = None
+        self.footnotes: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        tag = tag.lower()
+        attributes = dict(attrs)
+        classes = set((attributes.get("class") or "").lower().split())
+        if tag == "figcaption":
+            self.in_caption = True
+            return
+        if tag == "table":
+            self.in_table = True
+            self.table_class = attributes.get("class") or ""
+            return
+        if tag == "div":
+            if "table_notes" in classes:
+                self.notes_depth = 1
+            elif self.notes_depth > 0:
+                self.notes_depth += 1
+            self.in_notes = self.notes_depth > 0
+        if self.in_notes and tag == "p" and self.note_parts is None:
+            self.note_parts = []
+        if not self.in_table:
+            return
+        if tag == "tr":
+            self.current_row = []
+            return
+        if tag in {"td", "th"}:
+            self.current_cell = {
+                "sourceTag": tag,
+                "rowSpan": positive_html_integer(attributes.get("rowspan")),
+                "columnSpan": positive_html_integer(attributes.get("colspan")),
+                "horizontalAlignment": html_alignment(attributes.get("align")),
+                "verticalAlignment": html_vertical_alignment(attributes.get("valign")),
+                "plainParts": [],
+                "htmlParts": [],
+                "sourceClass": attributes.get("class") or "",
+            }
+            self.cell_suppression_depth = 0
+            self.cell_inline_stack = []
+            return
+        if self.current_cell is None:
+            return
+        suppressed = self.cell_suppression_depth > 0 or tag == "del"
+        if suppressed:
+            if tag != "br":
+                self.cell_inline_stack.append((tag, None, True))
+                self.cell_suppression_depth += 1
+            return
+        if tag == "br":
+            self.current_cell["htmlParts"].append("<br>")
+            return
+        emitted: str | None = None
+        if tag in {"strong", "em", "sup", "sub"}:
+            emitted = tag
+        elif tag == "span":
+            if "content_newline_inside_td" in classes:
+                if self.current_cell["htmlParts"]:
+                    self.current_cell["htmlParts"].append("<br>")
+            elif "bold" in classes:
+                emitted = "strong"
+            elif "italic" in classes:
+                emitted = "em"
+        if emitted is not None:
+            self.current_cell["htmlParts"].append(f"<{emitted}>")
+        self.cell_inline_stack.append((tag, emitted, False))
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.lower() == "br" and self.current_cell is not None and not self.cell_suppression_depth:
+            self.current_cell["htmlParts"].append("<br>")
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.lower()
+        if tag == "figcaption":
+            self.in_caption = False
+            return
+        if tag == "p" and self.note_parts is not None:
+            value = normalized_space(" ".join(self.note_parts))
+            if value:
+                self.footnotes.append(value)
+            self.note_parts = None
+        if tag == "table":
+            self.in_table = False
+            return
+        if tag == "div" and self.notes_depth > 0 and not self.in_table:
+            self.notes_depth -= 1
+            self.in_notes = self.notes_depth > 0
+        if tag in {"td", "th"} and self.current_cell is not None:
+            self.current_cell["plainText"] = normalized_space(
+                " ".join(self.current_cell.pop("plainParts"))
+            )
+            self.current_cell["plainText"] = re.sub(
+                r"\s+([,.;:!?])",
+                r"\1",
+                self.current_cell["plainText"],
+            )
+            cell_html = re.sub(r"\s+", " ", "".join(self.current_cell.pop("htmlParts"))).strip()
+            cell_html = re.sub(r"<(strong|em|sup|sub)>\s+", r"<\1>", cell_html)
+            cell_html = re.sub(r"\s+</(strong|em|sup|sub)>", r"</\1>", cell_html)
+            self.current_cell["html"] = cell_html
+            if self.current_row is not None:
+                self.current_row.append(self.current_cell)
+            self.current_cell = None
+            self.cell_suppression_depth = 0
+            self.cell_inline_stack = []
+            return
+        if tag == "tr" and self.current_row is not None:
+            self.rows.append(self.current_row)
+            self.current_row = None
+            return
+        if self.current_cell is None or not self.cell_inline_stack:
+            return
+        stack_index = next(
+            (
+                index for index in range(len(self.cell_inline_stack) - 1, -1, -1)
+                if self.cell_inline_stack[index][0] == tag
+            ),
+            None,
+        )
+        if stack_index is None:
+            return
+        closed = self.cell_inline_stack[stack_index:]
+        del self.cell_inline_stack[stack_index:]
+        for _source_tag, emitted, suppressed in reversed(closed):
+            if suppressed:
+                self.cell_suppression_depth = max(0, self.cell_suppression_depth - 1)
+            elif emitted is not None:
+                self.current_cell["htmlParts"].append(f"</{emitted}>")
+
+    def handle_data(self, data: str) -> None:
+        value = normalized_space(data)
+        if not value:
+            return
+        if self.in_caption:
+            self.caption_parts.append(value)
+        if self.note_parts is not None:
+            self.note_parts.append(value)
+        if self.current_cell is None or self.cell_suppression_depth:
+            return
+        self.current_cell["plainParts"].append(value)
+        parts = self.current_cell["htmlParts"]
+        in_compact_inline = any(
+            emitted in {"sup", "sub"} and not suppressed
+            for _source_tag, emitted, suppressed in self.cell_inline_stack
+        )
+        if parts and not in_compact_inline and not str(parts[-1]).endswith((">", " ", "<br>")):
+            parts.append(" ")
+        parts.append(html.escape(value))
+
+
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--source-dir", required=True, type=Path)
@@ -149,6 +439,199 @@ def normalized_space(value: str) -> str:
 
 def normalized_tokens(value: str) -> list[str]:
     return re.findall(r"[a-z0-9]+(?:[.-][a-z0-9]+)*", (value or "").lower())
+
+
+def semantic_verification_tokens(value: str) -> list[str]:
+    """Normalize typography and PDF-attached footnote markers for comparison."""
+    normalized = unicodedata.normalize("NFKD", value or "")
+    normalized = normalized.replace("–", "-").replace("—", "-").replace("½", "1/2")
+    normalized = re.sub(
+        r"(?<=\d)(?=[A-Za-z])|(?<=[A-Za-z])(?=\d)",
+        " ",
+        normalized,
+    )
+    # Poppler joins occupancy labels to superscript table notes (Bc, R-2b),
+    # while semantic HTML exposes the note in a separate <sup> element.
+    normalized = re.sub(
+        r"\b([A-Z](?:-\d+)?)\s*([a-z])\b",
+        r"\1 \2",
+        normalized,
+    )
+    return re.findall(r"[a-z0-9]+", normalized.lower())
+
+
+def positive_html_integer(value: str | None) -> int:
+    try:
+        return max(1, int(value or "1"))
+    except ValueError:
+        return 1
+
+
+def html_alignment(value: str | None) -> str | None:
+    return {
+        "left": "leading",
+        "center": "center",
+        "right": "trailing",
+    }.get((value or "").lower())
+
+
+def html_vertical_alignment(value: str | None) -> str | None:
+    return {
+        "top": "top",
+        "middle": "middle",
+        "bottom": "bottom",
+    }.get((value or "").lower())
+
+
+def parse_icc_heading(value: str) -> tuple[str, str] | None:
+    match = re.match(r"^([A-Z]?\d+(?:\.\d+)+)\s+(.+)$", normalized_space(value))
+    if match is None:
+        return None
+    return match.group(1), match.group(2).strip()
+
+
+def icc_table_cells(rows: list[list[dict]], *, drop_deletion_margin: bool) -> tuple[list[dict], int]:
+    raw_rows = []
+    for row in rows:
+        normalized_row = [dict(cell) for cell in row]
+        if drop_deletion_margin and normalized_row:
+            normalized_row = normalized_row[1:]
+        raw_rows.append(normalized_row)
+
+    occupied_by_row: dict[int, set[int]] = collections.defaultdict(set)
+    cells: list[dict] = []
+    column_count = 0
+    for row_index, row in enumerate(raw_rows):
+        column_index = 0
+        for source_cell in row:
+            while column_index in occupied_by_row[row_index]:
+                column_index += 1
+            row_span = int(source_cell.get("rowSpan", 1))
+            column_span = int(source_cell.get("columnSpan", 1))
+            # ICC's 1018.1.1 semantic source says the final heading spans
+            # three columns, but both its two child headings and the official
+            # NYC PDF establish a two-column span.
+            if (
+                row_index == 0
+                and column_index == 2
+                and column_span == 3
+                and normalized_space(str(source_cell.get("plainText", ""))).startswith(
+                    "REQUIRED FIRE-RESISTANCE RATING"
+                )
+            ):
+                column_span = 2
+            for occupied_row in range(row_index, row_index + row_span):
+                for occupied_column in range(column_index, column_index + column_span):
+                    occupied_by_row[occupied_row].add(occupied_column)
+            is_header = (
+                source_cell.get("sourceTag") == "th"
+                or row_index == 0
+                or "<strong>" in str(source_cell.get("html", "")).lower()
+            )
+            cells.append({
+                "row": row_index,
+                "column": column_index,
+                "rowSpan": row_span,
+                "columnSpan": column_span,
+                "html": str(source_cell.get("html", "")),
+                "plainText": str(source_cell.get("plainText", "")),
+                "borders": {
+                    "top": {"isHidden": False, "style": "solid", "width": 1, "colorHex": "#9CA3AF"},
+                    "right": {"isHidden": False, "style": "solid", "width": 1, "colorHex": "#9CA3AF"},
+                    "bottom": {"isHidden": False, "style": "solid", "width": 1, "colorHex": "#9CA3AF"},
+                    "left": {"isHidden": False, "style": "solid", "width": 1, "colorHex": "#9CA3AF"},
+                },
+                "horizontalAlignment": source_cell.get("horizontalAlignment"),
+                "verticalAlignment": source_cell.get("verticalAlignment"),
+                "backgroundColorHex": "#F3F4F6" if is_header else None,
+                "textColorHex": None,
+                "isBold": True if is_header else None,
+                "isItalic": None,
+                "fontSize": None,
+                "isWrapped": True,
+            })
+            column_index += column_span
+            column_count = max(column_count, column_index)
+    return cells, column_count
+
+
+def parse_icc_table_fragment(fragment: str) -> dict | None:
+    parser = ICCTableHTMLParser()
+    parser.feed(fragment)
+    parser.close()
+    caption_text = normalized_space(" ".join(parser.caption_parts))
+    match = re.search(r"\bTABLE\s+([A-Z0-9.]+)\s*(.*)$", caption_text, re.I)
+    if match is None or not parser.rows:
+        return None
+    reference = match.group(1).upper()
+    title = normalized_space(match.group(2))
+    cells, column_count = icc_table_cells(
+        parser.rows,
+        drop_deletion_margin="deletion-marker-table-margin" in parser.table_class,
+    )
+    return {
+        "reference": reference,
+        "title": title,
+        "caption": f"TABLE {reference}" + (f" — {title}" if title else ""),
+        "rowCount": len(parser.rows),
+        "columnCount": column_count,
+        "cells": cells,
+        "footnotes": parser.footnotes,
+    }
+
+
+def load_icc_semantic_snapshot(source_dir: Path, source: SourcePDF) -> dict | None:
+    if source.prefix != "BC" or source.chapter_number != "10":
+        return None
+    path = source_dir / "icc-html" / "bc-10.json"
+    if not path.is_file():
+        raise FileNotFoundError(
+            "Building Code Chapter 10 requires the independently captured ICC semantic "
+            f"snapshot at {path}; refusing to rebuild a degraded PDF-only chapter."
+        )
+    document = json.loads(path.read_text(encoding="utf-8"))
+    if document.get("sourceURL") != ICC_2014_BUILDING_CODE_CHAPTER_10_URL:
+        raise RuntimeError(f"Unexpected ICC Chapter 10 snapshot URL: {document.get('sourceURL')}")
+    section_html: dict[str, dict] = {}
+    tables: dict[str, dict] = {}
+    for item in document.get("sections", []):
+        fragment = str(item.get("html", ""))
+        heading = parse_icc_heading(str(item.get("heading", "")))
+        if heading is not None:
+            section_number, title = heading
+            sanitizer = ICCSemanticHTMLSanitizer()
+            sanitizer.feed(fragment)
+            sanitizer.close()
+            semantic_html, semantic_text = sanitizer.result()
+            if semantic_html and semantic_text:
+                if section_number in section_html:
+                    raise RuntimeError(f"Duplicate ICC semantic section {section_number}")
+                section_html[section_number] = {
+                    "title": title,
+                    "html": semantic_html,
+                    "plainText": semantic_text,
+                    "anchorURL": f"{ICC_2014_BUILDING_CODE_CHAPTER_10_URL}#{section_number}",
+                }
+        if "<table" in fragment.lower():
+            table = parse_icc_table_fragment(fragment)
+            if table is None:
+                raise RuntimeError("ICC Chapter 10 snapshot contains an unparseable table fragment.")
+            if table["reference"] in tables:
+                raise RuntimeError(f"Duplicate ICC semantic table {table['reference']}")
+            tables[table["reference"]] = table
+    expected_tables = set(ICC_BC10_TABLE_PDF_PAGES)
+    if set(tables) != expected_tables:
+        raise RuntimeError(
+            "ICC Chapter 10 table set mismatch: "
+            f"missing={sorted(expected_tables - set(tables))}, "
+            f"unexpected={sorted(set(tables) - expected_tables)}"
+        )
+    return {
+        "sourceURL": ICC_2014_BUILDING_CODE_CHAPTER_10_URL,
+        "sourceSHA256": sha256(path),
+        "sectionHTML": section_html,
+        "tables": tables,
+    }
 
 
 def sha256(path: Path) -> str:
@@ -208,7 +691,10 @@ def source_from_viewer_link(href: str, title: str) -> SourcePDF | None:
     if not match:
         return None
     prefix = match.group(1).upper()
-    chapter_match = re.search(r"Chapter_?(\d+)", file_name, re.I)
+    # The official DOB filename for Building Code Chapter 10 is misspelled
+    # ``..._Chapte_10_...``.  Accept that exact publisher typo so the complete
+    # means-of-egress chapter cannot disappear from the corpus silently.
+    chapter_match = re.search(r"Chapte(?:r)?_?(\d+)", file_name, re.I)
     appendix_match = re.search(r"Appendix_?([A-Z])", file_name, re.I)
     if chapter_match:
         chapter_number = chapter_match.group(1)
@@ -243,6 +729,18 @@ def discover_code_sources() -> tuple[list[SourcePDF], str]:
     )
     if len(result) < 100:
         raise RuntimeError(f"Official code page yielded only {len(result)} chapter PDFs.")
+    discovered_bc_chapters = {
+        int(source.chapter_number)
+        for source in result
+        if source.prefix == "BC" and source.chapter_number.isdigit()
+    }
+    required_bc_chapters = set(range(1, 36))
+    missing_bc_chapters = sorted(required_bc_chapters - discovered_bc_chapters)
+    if missing_bc_chapters:
+        raise RuntimeError(
+            "Official code page is missing required Building Code chapters: "
+            + ", ".join(map(str, missing_bc_chapters))
+        )
     return result, page_hash
 
 
@@ -571,9 +1069,9 @@ def structured_table_html(table: dict) -> str:
         cells_by_row[int(cell.get("row", 0))].append(cell)
     body_rows = []
     for row_index in range(int(table.get("rowCount", 0))):
-        tag = "th" if row_index == 0 else "td"
         row_cells = []
         for cell in sorted(cells_by_row.get(row_index, []), key=lambda value: int(value.get("column", 0))):
+            tag = "th" if row_index == 0 or cell.get("isBold") is True else "td"
             attributes = []
             if tag == "th":
                 attributes.append('scope="col"')
@@ -1122,11 +1620,210 @@ def apply_curated_pdf_structure_overrides(
     })
 
 
+def apply_icc_semantic_tables(
+    source: SourcePDF,
+    source_hash: str,
+    sections: list[SourceSection],
+    structured_tables: list[dict],
+    discrepancies: list[dict],
+    assets_dir: Path,
+    poppler_pages: list[str],
+    semantic_snapshot: dict | None,
+) -> dict:
+    if semantic_snapshot is None:
+        return {"tableCount": 0, "correctedCellCount": 0}
+
+    prior_table_ids = {
+        str(table.get("id"))
+        for table in structured_tables
+        if table.get("sourceWorkbookPath") == source.file_name
+    }
+    prior_unverified_assets = {
+        str(record.get("asset"))
+        for record in discrepancies
+        if record.get("kind") == "unverified-table"
+        and record.get("sourcePDF") == source.file_name
+        and record.get("asset")
+    }
+    for section in sections:
+        section.blocks = [
+            block
+            for block in section.blocks
+            if block.get("tableID") not in prior_table_ids
+            and block.get("imageID") not in prior_unverified_assets
+        ]
+    structured_tables[:] = [
+        table
+        for table in structured_tables
+        if table.get("id") not in prior_table_ids
+    ]
+    discrepancies[:] = [
+        record
+        for record in discrepancies
+        if not (
+            record.get("kind") == "unverified-table"
+            and record.get("sourcePDF") == source.file_name
+        )
+    ]
+    for asset_name in prior_unverified_assets:
+        asset_path = assets_dir / asset_name
+        if asset_path.is_file():
+            asset_path.unlink()
+
+    corrected_cell_count = 0
+    for reference, source_table in semantic_snapshot["tables"].items():
+        table = json.loads(json.dumps(source_table))
+        semantic_corrections = []
+        if reference == "1004.1.1":
+            official_capacity_note = (
+                "C*-capacity of all passenger vehicles that can be unloaded simultaneously."
+            )
+            if official_capacity_note not in table["footnotes"]:
+                table["footnotes"].insert(0, official_capacity_note)
+                semantic_corrections.append({
+                    "part": "table footnote",
+                    "semanticHTMLValue": "omitted",
+                    "officialPDFValue": official_capacity_note,
+                    "resolution": "official NYC DOB PDF controls",
+                })
+            target_section = next(
+                (section for section in sections if section.section_number == reference),
+                None,
+            )
+            if target_section is not None:
+                target_section.lines = [
+                    line for line in target_section.lines
+                    if not normalized_space(line.text).startswith("C*-capacity")
+                ]
+        if reference == "1018.1.1":
+            semantic_corrections.append({
+                "part": "required fire-resistance rating heading",
+                "semanticHTMLValue": "columnSpan 3",
+                "officialPDFValue": "columnSpan 2",
+                "resolution": "official NYC DOB PDF and two child headings control",
+            })
+        if reference == "1028.10.1":
+            cells_by_row: dict[int, list[dict]] = collections.defaultdict(list)
+            for cell in table["cells"]:
+                cells_by_row[int(cell["row"])].append(cell)
+            correction_applied = False
+            for cells in cells_by_row.values():
+                if not any(cell.get("plainText") == "10,000" for cell in cells):
+                    continue
+                incorrect = next(
+                    (cell for cell in cells if cell.get("plainText") == "7"),
+                    None,
+                )
+                if incorrect is not None:
+                    incorrect["plainText"] = "17"
+                    incorrect["html"] = "17"
+                    correction_applied = True
+                    corrected_cell_count += 1
+                    semantic_corrections.append({
+                        "cell": "10,000 seats / maximum seats per row",
+                        "semanticHTMLValue": "7",
+                        "officialPDFValue": "17",
+                        "resolution": "official NYC DOB PDF controls",
+                    })
+            if not correction_applied:
+                raise RuntimeError(
+                    "Expected ICC Table 1028.10.1 value 7 was not found for official-PDF correction."
+                )
+
+        pdf_pages = ICC_BC10_TABLE_PDF_PAGES[reference]
+        if any(page_number < 1 or page_number > len(poppler_pages) for page_number in pdf_pages):
+            raise RuntimeError(f"Official PDF page map is invalid for Table {reference}: {pdf_pages}")
+        official_counter = collections.Counter(semantic_verification_tokens(" ".join(
+            poppler_pages[page_number - 1] for page_number in pdf_pages
+        )))
+        semantic_values = [
+            str(cell.get("plainText", ""))
+            for cell in table["cells"]
+            if cell.get("plainText")
+        ] + [
+            str(value) for value in table.get("footnotes", []) if value
+        ]
+        semantic_counter = collections.Counter(semantic_verification_tokens(" ".join(semantic_values)))
+        missing_tokens = semantic_counter - official_counter
+        if missing_tokens:
+            raise RuntimeError(
+                f"ICC Table {reference} does not reconcile with the official DOB PDF: "
+                f"{dict(missing_tokens.most_common(8))}"
+            )
+        for cell in table["cells"]:
+            cell_counter = collections.Counter(
+                semantic_verification_tokens(str(cell.get("plainText", "")))
+            )
+            if cell_counter - official_counter:
+                raise RuntimeError(
+                    f"ICC Table {reference} cell is absent from the official DOB PDF: "
+                    f"{cell.get('plainText')}"
+                )
+
+        table_id = f"{TABLE_ID_PREFIX}-bc-10-{reference.replace('.', '-')}"
+        table.update({
+            "id": table_id,
+            "sourceWorkbookPath": source.file_name,
+            "sourceSheetName": "Official PDF page" + ("s" if len(pdf_pages) > 1 else "")
+            + " " + "-".join(str(page) for page in pdf_pages),
+            "sourceRange": None,
+            "columnWidths": None,
+            "rowHeights": None,
+            "officialPDFProvenance": {
+                "sourceURL": source.url,
+                "sourceSHA256": source_hash,
+                "pdfPage": pdf_pages[0],
+                "pdfPages": pdf_pages,
+                "extraction": (
+                    "ICC semantic grid independently reconciled cell-by-cell and as a complete "
+                    "token set against Poppler text from the official NYC DOB PDF"
+                ),
+            },
+            "htmlStructureReference": {
+                "publisher": "International Code Council",
+                "url": f"{semantic_snapshot['sourceURL']}#{reference}",
+                "sourceSHA256": semantic_snapshot["sourceSHA256"],
+                "role": "secondary semantic structure reference",
+            },
+            "verificationStatus": "cell-by-cell-verified-against-official-pdf",
+            "semanticCorrections": semantic_corrections,
+        })
+        structured_tables.append(table)
+        target = next(
+            (section for section in sections if section.section_number == reference),
+            None,
+        )
+        if target is None:
+            raise RuntimeError(f"No Reader section exists for verified Table {reference}")
+        table_plain_text = "\n".join([
+            str(table.get("caption", "")),
+            *semantic_values,
+        ])
+        target.blocks.append({
+            "id": f"{table_id}-block",
+            "kind": "table",
+            "tableID": table_id,
+            "caption": table["caption"],
+            "html": structured_table_html(table),
+            "plainText": table_plain_text,
+            "reviewRequired": False,
+            "researchClaimEligible": True,
+            "verificationStatus": table["verificationStatus"],
+            "officialPDFProvenance": table["officialPDFProvenance"],
+            "htmlStructureReference": table["htmlStructureReference"],
+        })
+    return {
+        "tableCount": len(semantic_snapshot["tables"]),
+        "correctedCellCount": corrected_cell_count,
+    }
+
+
 def extract_source(
     source: SourcePDF,
     pdf_path: Path,
     pdftotext: str,
     assets_dir: Path,
+    semantic_snapshot: dict | None = None,
 ) -> tuple[list[SourceSection], list[dict], list[dict], dict]:
     source_hash = sha256(pdf_path)
     poppler_pages = poppler_layout_pages(pdf_path, pdftotext)
@@ -1365,6 +2062,16 @@ def extract_source(
         discrepancies,
         assets_dir,
     )
+    semantic_table_summary = apply_icc_semantic_tables(
+        source,
+        source_hash,
+        sections,
+        structured_tables,
+        discrepancies,
+        assets_dir,
+        poppler_pages,
+        semantic_snapshot,
+    )
     if not sections:
         discrepancies.append({
             "kind": "no-section-headings-detected",
@@ -1384,6 +2091,20 @@ def extract_source(
         "sectionCount": len(sections),
         "minimumParserAgreement": min((page["parserAgreement"] for page in page_meta), default=0),
         "pageExtraction": page_meta,
+        "semanticHTML": (
+            {
+                "publisher": "International Code Council",
+                "sourceURL": semantic_snapshot["sourceURL"],
+                "sourceSHA256": semantic_snapshot["sourceSHA256"],
+                "role": "secondary semantic structure reference",
+                "verifiedStructuredTableCount": semantic_table_summary["tableCount"],
+                "officialPDFCorrectedCellCount": semantic_table_summary["correctedCellCount"],
+                "verifiedSectionHTMLCount": 0,
+                "fallbackSectionHTMLCount": 0,
+            }
+            if semantic_snapshot is not None
+            else None
+        ),
     }
     return sections, structured_tables, discrepancies, source_record
 
@@ -1445,15 +2166,17 @@ STRUCTURAL_LINE_START = re.compile(
     r"^(?:"
     r"\(?\d+[.)]\s+|"
     r"[a-z][.)]\s+|"
-    r"[ivxlcdm]+[.)]\s+|"
+    # Legal Roman-numeral list markers in these codes are short (i through x).
+    # A broad Roman-character class also misclassifies wrapped metric units
+    # such as ``mm) minimum`` as authored list items.
+    r"(?:i{1,3}|iv|v(?:i{0,3})?|ix|x)[.)]\s+|"
     r"[-•▪] ?\s*|"
     r"Exceptions?\s*:|"
     r"Notes?\s*:|"
     r"For SI\s*:|"
     r"where\s*:|"
     r"[A-Za-z](?:_[A-Za-z]{1,3}|[a-z]{1,3})?\s*=|"
-    r"\*+|"
-    r"(?:SECTION|CHAPTER)\s+[A-Z0-9]"
+    r"\*+"
     r")",
     re.I,
 )
@@ -1503,6 +2226,49 @@ def source_text(section: SourceSection) -> str:
         else:
             result = result.rstrip() + " " + value
     return result.strip()
+
+
+def strip_attached_table_caption_suffix(
+    value: str,
+    section: SourceSection,
+    tables: list[dict],
+) -> str:
+    """Remove a PDF-extraction caption repeated at the end of section prose.
+
+    The table itself remains a structured content block.  This only removes an
+    exact normalized suffix for a table attached to the same section, so an
+    ordinary in-sentence reference such as "Table 1018.1.1" is preserved.
+    """
+    table_ids = {
+        str(block.get("tableID"))
+        for block in section.blocks
+        if block.get("kind") == "table" and block.get("tableID")
+    }
+    if not table_ids:
+        return value
+
+    result = value.strip()
+    for table in tables:
+        if str(table.get("id")) not in table_ids:
+            continue
+        caption = normalized_space(str(table.get("caption", "")))
+        if not caption:
+            continue
+        suffixes = {caption}
+        without_label = re.sub(r"^TABLE\s+", "", caption, flags=re.I)
+        suffixes.add(normalized_space(without_label.replace("—", " ")))
+        suffixes.add(normalized_space(without_label.replace("–", " ")))
+        for suffix in sorted(suffixes, key=len, reverse=True):
+            if not suffix:
+                continue
+            suffix_pattern = r"\s+".join(
+                re.escape(part) for part in suffix.split()
+            )
+            match = re.search(rf"(?:^|\s){suffix_pattern}\s*$", result, re.I)
+            if match:
+                result = result[:match.start()].rstrip()
+                break
+    return result
 
 
 def search_tokens(value: str) -> set[str]:
@@ -1579,6 +2345,67 @@ def reconcile_update_packets(
     return reconciled, discrepancies
 
 
+def existing_stable_ids(output: Path) -> tuple[
+    dict[tuple[str, str], int],
+    dict[tuple[str, str, str], int],
+    int,
+    int,
+]:
+    """Load the current public IDs before rebuilding the generated package.
+
+    Reader links and saved Research citations use these numeric IDs. A newly
+    discovered official PDF must therefore receive new IDs without renumbering
+    any previously published chapter or section.
+    """
+    manifest_path = output / "prepared" / "manifest.json"
+    catalog_path = output / "prepared" / "chapterCatalog.json"
+    if not output.exists() or not any(output.iterdir()):
+        return {}, {}, CHAPTER_ID_BASE + 1, SECTION_ID_BASE
+    if not manifest_path.is_file() or not catalog_path.is_file():
+        raise RuntimeError(
+            "Existing output has no stable-ID catalogs; refusing to replace published Reader IDs."
+        )
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    catalog_document = json.loads(catalog_path.read_text(encoding="utf-8"))
+    chapter_ids: dict[tuple[str, str], int] = {}
+    section_ids: dict[tuple[str, str, str], int] = {}
+    used_chapter_ids: set[int] = set()
+    used_section_ids: set[int] = set()
+
+    for chapter in manifest.get("chapters", []):
+        identity = (
+            str(chapter.get("codePrefix", "")).upper(),
+            str(chapter.get("chapterNumber", "")),
+        )
+        chapter_id = int(chapter.get("chapterID"))
+        if not all(identity) or identity in chapter_ids or chapter_id in used_chapter_ids:
+            raise RuntimeError(f"Duplicate or invalid published chapter identity: {identity}")
+        chapter_ids[identity] = chapter_id
+        used_chapter_ids.add(chapter_id)
+
+    for section in catalog_document.get("chapters", []):
+        identity = (
+            str(section.get("codePrefix", "")).upper(),
+            str(section.get("chapterNumber", "")),
+            str(section.get("sectionNumber", "")),
+        )
+        section_id = int(section.get("id"))
+        if not all(identity) or identity in section_ids or section_id in used_section_ids:
+            raise RuntimeError(f"Duplicate or invalid published section identity: {identity}")
+        section_ids[identity] = section_id
+        used_section_ids.add(section_id)
+
+    if not chapter_ids or not section_ids:
+        raise RuntimeError("Existing stable-ID catalogs are unexpectedly empty.")
+    return (
+        chapter_ids,
+        section_ids,
+        max(used_chapter_ids) + 1,
+        max(used_section_ids) + 1,
+    )
+
+
 def build_package(
     sources: list[SourcePDF],
     source_dir: Path,
@@ -1586,6 +2413,9 @@ def build_package(
     pdftotext: str,
     discovery: dict,
 ) -> dict:
+    existing_chapter_ids, existing_section_ids, next_chapter_id, next_section_id = (
+        existing_stable_ids(output)
+    )
     if output.exists():
         shutil.rmtree(output)
     for relative in ["prepared/chapters", "prepared/sections", "chapters", "assets"]:
@@ -1599,18 +2429,27 @@ def build_package(
     all_tables = []
     all_discrepancies = []
     source_records = []
-    next_section_id = SECTION_ID_BASE
+    reused_chapter_ids = 0
+    reused_section_ids = 0
 
-    for chapter_offset, source in enumerate(sources, start=1):
+    for source in sources:
         pdf_path = source_dir / "chapters" / source.file_name
         if not pdf_path.is_file():
             raise FileNotFoundError(f"Missing official chapter PDF: {pdf_path}")
-        chapter_id = CHAPTER_ID_BASE + chapter_offset
+        semantic_snapshot = load_icc_semantic_snapshot(source_dir, source)
+        chapter_identity = (source.prefix, source.chapter_number)
+        chapter_id = existing_chapter_ids.get(chapter_identity)
+        if chapter_id is None:
+            chapter_id = next_chapter_id
+            next_chapter_id += 1
+        else:
+            reused_chapter_ids += 1
         sections, tables, discrepancies, source_record = extract_source(
             source,
             pdf_path,
             pdftotext,
             output / "assets",
+            semantic_snapshot,
         )
         all_tables.extend(tables)
         all_discrepancies.extend(discrepancies)
@@ -1619,15 +2458,69 @@ def build_package(
         chapter_blocks = []
         section_html_fragments = []
         for section in sections:
-            section_id = next_section_id
-            next_section_id += 1
-            plain_text = source_text(section)
+            section_identity = (
+                section.prefix,
+                section.chapter_number,
+                section.section_number,
+            )
+            section_id = existing_section_ids.get(section_identity)
+            if section_id is None:
+                section_id = next_section_id
+                next_section_id += 1
+            else:
+                reused_section_ids += 1
+            plain_text = strip_attached_table_caption_suffix(
+                source_text(section),
+                section,
+                tables,
+            )
+            semantic_section = (
+                semantic_snapshot.get("sectionHTML", {}).get(section.section_number)
+                if semantic_snapshot is not None
+                else None
+            )
+            semantic_html_verified = bool(
+                semantic_section
+                and semantic_verification_tokens(str(semantic_section.get("plainText", "")))
+                == semantic_verification_tokens(plain_text)
+            )
             text_block = {
                 "id": f"nyc-2014-{section_id}-text",
                 "kind": "html",
-                "html": paragraph_html(plain_text),
+                "html": (
+                    str(semantic_section["html"])
+                    if semantic_html_verified
+                    else paragraph_html(plain_text)
+                ),
                 "plainText": plain_text,
             }
+            if semantic_snapshot is not None:
+                semantic_summary = source_record.get("semanticHTML")
+                if semantic_html_verified:
+                    semantic_summary["verifiedSectionHTMLCount"] += 1
+                    text_block.update({
+                        "verificationStatus": "semantic-html-token-verified-against-official-pdf",
+                        "htmlStructureReference": {
+                            "publisher": "International Code Council",
+                            "url": semantic_section["anchorURL"],
+                            "sourceSHA256": semantic_snapshot["sourceSHA256"],
+                            "role": "secondary semantic structure reference",
+                        },
+                    })
+                else:
+                    semantic_summary["fallbackSectionHTMLCount"] += 1
+                    if semantic_section is not None:
+                        all_discrepancies.append({
+                            "kind": "secondary-semantic-html-text-mismatch",
+                            "sourcePDF": source.file_name,
+                            "sourceSHA256": source_record["sourceSHA256"],
+                            "semanticHTMLSourceURL": semantic_snapshot["sourceURL"],
+                            "semanticHTMLSourceSHA256": semantic_snapshot["sourceSHA256"],
+                            "sectionNumber": section.section_number,
+                            "resolution": "official PDF-derived HTML retained",
+                            "reviewRequired": True,
+                            "researchClaimEligible": True,
+                        })
             if (
                 section.prefix == "BC"
                 and section.chapter_number == "7"
@@ -1766,7 +2659,7 @@ def build_package(
         "nextJurisdictionID": 2,
         "nextCodeID": 2,
         "nextCodeSectionID": len(CODE_NAMES) + 1,
-        "nextChapterID": CHAPTER_ID_BASE + len(bundle_chapters) + 1,
+        "nextChapterID": next_chapter_id,
         "nextSectionID": next_section_id,
         "lastStructuredImportPaths": [],
         "historicalConstructionCodeContract": {
@@ -1828,6 +2721,11 @@ def build_package(
         "amendmentIndexURL": AMENDMENT_INDEX_URL,
         "amendmentIndexSHA256": discovery.get("amendmentIndexSHA256"),
         "chapterPDFs": source_records,
+        "secondaryHTMLReferences": [
+            record["semanticHTML"]
+            for record in source_records
+            if record.get("semanticHTML")
+        ],
         "prohibitedSources": [
             "No UpCodes text, diagram, image, HTML, or other asset is included in this corpus."
         ],
@@ -1866,14 +2764,21 @@ def build_package(
         "Structured tables must reconcile between pdfplumber's grid extraction and Poppler's "
         "independent word map. Unresolved tables and figures are rendered from the official PDF, "
         "marked review-required, and excluded from numerical Research claims until reviewed.\n\n"
+        "Where an ICC Digital Codes semantic HTML snapshot is available, Permitext may use its "
+        "publisher-neutral paragraph, list, and table structure only after its enacted text or "
+        "every table cell reconciles with the controlling DOB PDF. The ICC page is never loaded "
+        "by the app. Any mismatch falls back to the official PDF extraction, and the official PDF "
+        "controls corrections.\n\n"
         "No UpCodes text, diagram, image, HTML, or other asset is part of this package.\n",
         encoding="utf-8",
     )
     return {
         "chapters": len(bundle_chapters),
-        "sections": next_section_id - SECTION_ID_BASE,
+        "sections": len(catalog),
         "tables": len(all_tables),
         "discrepancies": len(all_discrepancies),
+        "reusedChapterIDs": reused_chapter_ids,
+        "reusedSectionIDs": reused_section_ids,
     }
 
 
@@ -1970,6 +2875,59 @@ def validate_package(output: Path) -> dict:
     for table in bundle.get("tables", []):
         if not table.get("officialPDFProvenance", {}).get("sourceSHA256"):
             raise RuntimeError(f"Table lacks official PDF provenance: {table.get('id')}")
+        row_count = int(table.get("rowCount", 0))
+        column_count = int(table.get("columnCount", 0))
+        if row_count <= 0 or column_count <= 0:
+            raise RuntimeError(f"Table has invalid dimensions: {table.get('id')}")
+        occupied: set[tuple[int, int]] = set()
+        for cell in table.get("cells", []):
+            row = int(cell.get("row", -1))
+            column = int(cell.get("column", -1))
+            row_span = int(cell.get("rowSpan", 0))
+            column_span = int(cell.get("columnSpan", 0))
+            if (
+                row < 0 or column < 0 or row_span <= 0 or column_span <= 0
+                or row + row_span > row_count
+                or column + column_span > column_count
+            ):
+                raise RuntimeError(f"Table cell is outside its grid: {table.get('id')} {cell}")
+            for occupied_row in range(row, row + row_span):
+                for occupied_column in range(column, column + column_span):
+                    coordinate = (occupied_row, occupied_column)
+                    if coordinate in occupied:
+                        raise RuntimeError(
+                            f"Table cells overlap at {coordinate}: {table.get('id')}"
+                        )
+                    occupied.add(coordinate)
+    has_bc10 = any(
+        chapter.get("codePrefix") == "BC" and str(chapter.get("chapterNumber")) == "10"
+        for chapter in manifest.get("chapters", [])
+    )
+    if has_bc10:
+        bc10_tables = {
+            str(table.get("id")): table
+            for table in bundle.get("tables", [])
+            if str(table.get("id", "")).startswith(f"{TABLE_ID_PREFIX}-bc-10-")
+        }
+        expected_bc10_ids = {
+            f"{TABLE_ID_PREFIX}-bc-10-{reference.replace('.', '-')}"
+            for reference in ICC_BC10_TABLE_PDF_PAGES
+        }
+        if set(bc10_tables) != expected_bc10_ids:
+            raise RuntimeError(
+                "Chapter 10 native table set mismatch: "
+                f"missing={sorted(expected_bc10_ids - set(bc10_tables))}, "
+                f"unexpected={sorted(set(bc10_tables) - expected_bc10_ids)}"
+            )
+        table_1004 = bc10_tables[f"{TABLE_ID_PREFIX}-bc-10-1004-1-1"]
+        if int(table_1004.get("rowCount", 0)) != 57:
+            raise RuntimeError("Table 1004.1.1 must be one complete 57-row native table.")
+        table_1028 = bc10_tables[f"{TABLE_ID_PREFIX}-bc-10-1028-10-1"]
+        table_1028_values = [
+            str(cell.get("plainText", "")) for cell in table_1028.get("cells", [])
+        ]
+        if "17" not in table_1028_values or table_1028_values.count("7") != 0:
+            raise RuntimeError("Table 1028.10.1 did not retain the official-PDF value 17 correction.")
     unbound_table_ids = sorted(set(tables_by_id) - referenced_table_ids)
     if unbound_table_ids:
         raise RuntimeError(f"Structured tables are not bound to Reader sections: {unbound_table_ids[:5]}")

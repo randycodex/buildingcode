@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "libraryID": "nyc-2014-construction-codes",
-  "generatedAt": "2026-09-01",
+  "generatedAt": "2026-09-02",
   "sourceAuthority": "New York City Department of Buildings and New York City Council",
   "sourcePageURL": "https://www.nyc.gov/site/buildings/codes/2014-construction-codes.page",
   "sourcePageSHA256": "6e1d45d8de369f37c1a918b6f251a9b3e12ea068f459e59021e5e11de3678af3",
@@ -530,7 +530,8 @@
           "pdfplumberTextSHA256": "5b61c3fc192c8cec394ec4e05ae5d88820b5708c73ac3920e4892556faa8c90c",
           "popplerTextSHA256": "d9b17c3a378629753aabe482de58f2bbaeef354bee40ac4e9ab7f16b2f747524"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_AC_Chapter2_Enforcement.pdf",
@@ -712,7 +713,8 @@
           "pdfplumberTextSHA256": "3b6ca65387af26d9cfa657b6268ea49fd38b70a2c38e252cd8841fa92cef3d2d",
           "popplerTextSHA256": "1cfd1a785d4d5394c2c255594d210e855abddcc468ff906f618fbd45c8b256be"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_AC_Chapter3_Maintenance_of_Buildings.pdf",
@@ -1055,7 +1057,8 @@
           "pdfplumberTextSHA256": "3153adcccd10d80217621907d04e2a8de467be44fc83e0848ac670341ac0025b",
           "popplerTextSHA256": "2d641305e55b28308080f9a9898e8cb5c6f657daf78a83bbf2e533d1160b12ee"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_AC_Chapter4_Licensing_and_Registration.pdf",
@@ -1286,7 +1289,8 @@
           "pdfplumberTextSHA256": "f0dd61af355bdb1733a3ebfd01f372635515d6314ab4086bc281d0e0e8827ae7",
           "popplerTextSHA256": "27f29b06db18a5cc0c2ffbe4ae4c58693ee505ebcd92298509654726518d4c22"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_AC_Chapter5_Miscellaneous.pdf",
@@ -1377,7 +1381,8 @@
           "pdfplumberTextSHA256": "3cf1b587ec4020e455484ec39aabdc4b23d274e5ec24472319630b2d44e0b83a",
           "popplerTextSHA256": "d87395af19a731a4889ec7bada627b5ca793d791c63b0f468f91c3c97a836c81"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_1_Administration.pdf",
@@ -1461,7 +1466,8 @@
           "pdfplumberTextSHA256": "44f7bc3df96693ace0de362740843b7580e048bd34d9fa1658dc74451c73ae56",
           "popplerTextSHA256": "f6f11c6ba18a215a3a34e6ab92b11675bad30f8b2ba0441fd3a356bc63079468"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_2_Definitions.pdf",
@@ -1685,7 +1691,8 @@
           "pdfplumberTextSHA256": "1da5f35186b01516723bb67337ef605d221c599f7680cf5012b2460cd729d64f",
           "popplerTextSHA256": "5a3e0229f9136e2ab99eea7d1753696d91bc9a241a90430efd9c6fa99d2d40ab"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_3_Use_and_Occupancy_Classification.pdf",
@@ -1839,7 +1846,8 @@
           "pdfplumberTextSHA256": "b91da0efe677f2d59a11ba141cd63a55bf8182576bb4ac2f264a8e63027b9d0d",
           "popplerTextSHA256": "93ff972ff00f28c403a5f963593286f1a1554daacfd698a4114178f1cbe797cf"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_4_Special_Detailed_Requirements.pdf",
@@ -2224,7 +2232,8 @@
           "pdfplumberTextSHA256": "a46a1ac1d74d858ceb170da27d213881109a95ded79f05de21758b559220ccb9",
           "popplerTextSHA256": "2c50d4b280fef74206b8e70dc7ecd9fe9ae7429ca1e408424c63df506c76b500"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_5_General_Building_Heights_and_Areas.pdf",
@@ -2336,7 +2345,8 @@
           "pdfplumberTextSHA256": "75f22586e8b466bc9d1dfbc702ebfb2d24ee11d09228e0d3a4551597f49d2555",
           "popplerTextSHA256": "7311ca14ab435109d540ddc219b7f4a40e44a2b6f8a4e05a672dbb88e3aea734"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_6_Types_of_Construction.pdf",
@@ -2385,7 +2395,8 @@
           "pdfplumberTextSHA256": "612c081e1377baaca2d18bf8c1cc865fe92b50d164a736bd22b8ef89b4b07727",
           "popplerTextSHA256": "649f21fe7b8f5a4f624d3bb695eabec7cd73439d17183fcb4f03283735dfd989"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
@@ -3120,7 +3131,8 @@
           "pdfplumberTextSHA256": "ebf7a12644cdf10bed48422ad89b3f6614134c5bce5d20b1f56a8511fe06130e",
           "popplerTextSHA256": "6758419d52141ccb927d18e687db84794bc46a6b93112904b7927eaf5e84d842"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_8_Interior_Finishes.pdf",
@@ -3176,7 +3188,8 @@
           "pdfplumberTextSHA256": "0da26f9a0aebd523c2807910ec9dd63651a310c6af32b2fb30d379fc50b366f1",
           "popplerTextSHA256": "9e09ca714135dda927fbdcd338a420d12848ed9c6f4dda5c82781c84709b6383"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_9_Fire_Protection_Systems.pdf",
@@ -3596,7 +3609,473 @@
           "pdfplumberTextSHA256": "a6826999f9ff74eda21bf0a9b34901df17d602638d2a9be798ee211690ff5454",
           "popplerTextSHA256": "1b371bd13207c67c9aca52299a88045c3209ed4f1d9e8380402b5245ad5d1c1c"
         }
-      ]
+      ],
+      "semanticHTML": null
+    },
+    {
+      "fileName": "2014CC_BC_Chapte_10_Means_of_Egress.pdf",
+      "title": "MEANS OF EGRESS",
+      "codePrefix": "BC",
+      "chapterNumber": "10",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2014/2014CC_BC_Chapte_10_Means_of_Egress.pdf",
+      "sourceSHA256": "cdac0477eb744ed215557e18d6ef6980625231dca533abd90a1f419b5aa5e3cb",
+      "bytes": 875349,
+      "pageCount": 63,
+      "sectionCount": 401,
+      "minimumParserAgreement": 0.9891,
+      "pageExtraction": [
+        {
+          "pdfPage": 1,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9964,
+          "pdfplumberTextSHA256": "8a1f1a2fe0c554bdf2a80cf1fc0feae417f68f1c1ac2371a9beb72fc2b7d12a6",
+          "popplerTextSHA256": "879f27cf1551e5bfea150b0da876aecf437448b6434f727d0f91c14b77e97eed"
+        },
+        {
+          "pdfPage": 2,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9947,
+          "pdfplumberTextSHA256": "2ff26d2f650773723858652ec35c8d678dc19eb9940dbe323ea1b77a20195bcf",
+          "popplerTextSHA256": "9da80b9fd6c567895de7fdeb3d3e7c47dd2d1608dd45a90418b272b703b6cfb9"
+        },
+        {
+          "pdfPage": 3,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9966,
+          "pdfplumberTextSHA256": "bb14f0053ec53565e83421fa4eb649654c3ad240b585786e61cbd5a2f7233bfd",
+          "popplerTextSHA256": "0a666ff2840978e0e28f5a2e245095ce5da5d6ace0bf8c276b743341d7ef0181"
+        },
+        {
+          "pdfPage": 4,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9969,
+          "pdfplumberTextSHA256": "dda0c484b9c6b24f36d70700a7e19c345b9fe3c608b3d4b5826051c822b8db14",
+          "popplerTextSHA256": "943154490b1bac129ca09a5b3526588b467411d0f548b8305e36458cba847714"
+        },
+        {
+          "pdfPage": 5,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9891,
+          "pdfplumberTextSHA256": "181c15bcbde86bc16f2d12d2c9ee0978c2f1096b067aa6f033204ad47cd769b7",
+          "popplerTextSHA256": "b9168e71fb8340dd57b5d03f15f25266929d2b0f738222da1cc71eba242f599a"
+        },
+        {
+          "pdfPage": 6,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9939,
+          "pdfplumberTextSHA256": "a7f56798cb1e0395873cedf5f5965d1b2b2a90a8edd0ec4b9cec4c56620847a9",
+          "popplerTextSHA256": "21a2d2a5b8819cc1e37bc8e95346d04896640aeabe1677288752c1ad69456a3d"
+        },
+        {
+          "pdfPage": 7,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9903,
+          "pdfplumberTextSHA256": "fde4f26093c8aef32e472ce616397f59967e1d976f0c8c14b641a685c1f8a67f",
+          "popplerTextSHA256": "303d91332f4cebbb681d1ece441e3d4c1de5f8d7c9e3601886087845a5413fa0"
+        },
+        {
+          "pdfPage": 8,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "3d3ad610e77637f4aaea5a2753ba9f24dadeade5b53944109461e5efb77e2fdf",
+          "popplerTextSHA256": "d6c05a8d6ceeed67524db9d115f7766acf66488c5e89e80a6fb3c218144b7eaa"
+        },
+        {
+          "pdfPage": 9,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "a8545f99a94e1732b6694097cbe0addfcb0c6f8496b9e9e99c6d529ee585dbac",
+          "popplerTextSHA256": "61a9be2a246fa970b322b9668e9d20c445f5b446dd8fb953af08bd2b76f21b90"
+        },
+        {
+          "pdfPage": 10,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "0990a7e7d69fe2828ff7ecd6f35ca10c85d188d02962f478609ac18428a90bc8",
+          "popplerTextSHA256": "8d6e80bf0e72c9526e9ff8415cd179b9c2a62af52f12cc6cce970d7bd50366e5"
+        },
+        {
+          "pdfPage": 11,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9973,
+          "pdfplumberTextSHA256": "1630270a03fe8f25991d0de575a216fb3f1d1cf862b81218b45a80d4b27888bb",
+          "popplerTextSHA256": "5feb8fefbff1275e7cf2bfdd72c7f755bc3c81910920b26651342209d8cbdac8"
+        },
+        {
+          "pdfPage": 12,
+          "printedPageLabel": null,
+          "parserAgreement": 0.997,
+          "pdfplumberTextSHA256": "47bdc1b04e2c207849b29c99d449ef79b8b4b1fc2f6589d44431ddc6b12d99b5",
+          "popplerTextSHA256": "7679f5f5dda6097162a901c1e8fc0a8dbd1850ad38fb285165f42d67281fd84a"
+        },
+        {
+          "pdfPage": 13,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "9217eb762b2734ebaf1f7539d8b832ea09ffb91f01983d439341d9f53b9ba002",
+          "popplerTextSHA256": "accd58056c547a4959026f8d204d5e36b8a77032507604c5fb5d2d4542e15b71"
+        },
+        {
+          "pdfPage": 14,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "dada6d67704b57ace626a4d44fa183b8c05be0e2a86f131a18c93340c81a86e8",
+          "popplerTextSHA256": "09c66f549b4fe4b67b180d462d8026c3cf85601d34a81033edc9583d1057e427"
+        },
+        {
+          "pdfPage": 15,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "10e203bec344bbb3f3c3145f56b2b2dac85fce1e478a2c9427c9bf15532dbeab",
+          "popplerTextSHA256": "a80eed0e06ea415d696e9000cb9792a0de056a7a24d00d1fb0ed0409b15a5f00"
+        },
+        {
+          "pdfPage": 16,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "51d21a1debe17ca2382a1e32ed8fe731426666f4503c0ac23da8f55cd913282a",
+          "popplerTextSHA256": "189a47a1aae4eb87252bf0837e2711dac32022df1c120da3e915d91a40febdf7"
+        },
+        {
+          "pdfPage": 17,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "9b8ae8f7e1858a2dc3133cb5602b40a5b592b8c994c3c29f253f99b7385365b3",
+          "popplerTextSHA256": "e80290e10498dd836e28d6132ace8a8866f6b2ef56f9622da93a7be376ec1e67"
+        },
+        {
+          "pdfPage": 18,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "5ed2b9b2413aee325d1240c947a69c4e328f8a1829d13776ccefbc954dc7155d",
+          "popplerTextSHA256": "df89518cfd630c877bcedb4d2c0b27b43ed2a5315bb568f5ac6f0918cbb7b176"
+        },
+        {
+          "pdfPage": 19,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "28c32bc3d68a5c3cae309f2e14a544594c3847bceae21ba176e94d35842dc295",
+          "popplerTextSHA256": "f8d80d7c0a21508d99770d98e76221fe44d0b3ca6d8faa110c0020d957312037"
+        },
+        {
+          "pdfPage": 20,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9973,
+          "pdfplumberTextSHA256": "752f7afe33409f84f0c06081f9ab61a169d212bdb7f05e432ff89d65ba95c741",
+          "popplerTextSHA256": "ad0640651c905d6076757b4fc5c9a49791206716444a9e5e910696c4427f549f"
+        },
+        {
+          "pdfPage": 21,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9973,
+          "pdfplumberTextSHA256": "00fe280a66aec7bcd0fbfd3fb9e38d8e429496f7650ed30fe3858e0799fd1fc4",
+          "popplerTextSHA256": "e4efb62e97fe51cd1a6a20b8d3e6d630fa537f046667055a2bb8f47fc29f0872"
+        },
+        {
+          "pdfPage": 22,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "141639b0ce9a33aa633c1c557aef5ee4ac4674d684a068bcaf1c38904d213b6a",
+          "popplerTextSHA256": "c3066353b0b5c7d1abdf5c7f5ad1619e10f8ca784f13dd9daaf0cb17dc255090"
+        },
+        {
+          "pdfPage": 23,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "c74f2abd51c40780ff9a5122d1fd39c410e553a9076b1e51461665d13ab07a59",
+          "popplerTextSHA256": "778b66b7629eba8183bc66dd3730aecc11dae81e41819003bfb180d5838a8480"
+        },
+        {
+          "pdfPage": 24,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9897,
+          "pdfplumberTextSHA256": "da4ab2bfcd72fcbef90615442a49970bbab3c08d0e5da4cfdf6536d03a816ffd",
+          "popplerTextSHA256": "7d0a3bd9f9d66e5e2b462350da640f66755ffcecd660ab2af54abfc9bbd48d75"
+        },
+        {
+          "pdfPage": 25,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9949,
+          "pdfplumberTextSHA256": "13294c404d9ea8ed19dc4b93248fcb18561c3f862a9ed46a2e76f75494f22fd2",
+          "popplerTextSHA256": "a441c6b65cfd42ee8189f50731b50768fc6ca1ec02c7bfcf8e197577ab2a91f3"
+        },
+        {
+          "pdfPage": 26,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "5a40a265c37a22825ed25b9f6567d2b7cbf05b1e30afb7978ae119bcb8d67f0c",
+          "popplerTextSHA256": "f4368341fe176345daf8dce2df9ff01e9103714d59f1e0114286223d91f4a422"
+        },
+        {
+          "pdfPage": 27,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "479a18a8f2e7bfbff52e95a1f8f304e15bbcd82cbd041839e70c645fd50cd08f",
+          "popplerTextSHA256": "3ac003fa90406ef69a31e33967ff313f947cdfcbac8c2726af24652be8421ab2"
+        },
+        {
+          "pdfPage": 28,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "a662bc3be39f57805cd342e9c57560976617f748321fa8577fc7d3562dbb56d8",
+          "popplerTextSHA256": "f98cdc652677fdf9d0cb2db63e6d6535b09343e53bc320d3879bd643f282f91d"
+        },
+        {
+          "pdfPage": 29,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9975,
+          "pdfplumberTextSHA256": "4d6d49d018b617af155b6db73e2d56ef51bc2c8296fd60b47c92390c20edfae7",
+          "popplerTextSHA256": "253fd2b9c0052d65fcf5027436381ad4c41aec9f092cfa3937a09f912a00edfb"
+        },
+        {
+          "pdfPage": 30,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "4d71fc111ea8c0b91373bfb83c0a5aa02e5a8866726d378cfbfcfd0d3817b0ec",
+          "popplerTextSHA256": "ba524fa8ef5625fc22c1ecfaa9421e4104d1fc6a69cf93abd1c41beb0d73b7ca"
+        },
+        {
+          "pdfPage": 31,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "24bd75091f01d647034cbef4b448fc904b7729ab95a79ae4319280582eafe28d",
+          "popplerTextSHA256": "8c8930734a523a1240f1bbe38a93f98478adb9e9546856c9d87b9a7f6c42bf63"
+        },
+        {
+          "pdfPage": 32,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9971,
+          "pdfplumberTextSHA256": "4efb3003fff12458e31a18f3c6daadeedc915f3d9024057f5db789fe352d34c7",
+          "popplerTextSHA256": "2b0d7b0e0a40d85816b1192bc5ce0c280d9284332b7f9ecadbdc8f09c4c3a648"
+        },
+        {
+          "pdfPage": 33,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "7bfd868e4771185167c7b8bfc06cecb6105725cc08d83498eb34d28a43fed3da",
+          "popplerTextSHA256": "3cdea710850549411d253a710fb3c0d05a83c879c133e1bc6fb4d61adb64445b"
+        },
+        {
+          "pdfPage": 34,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "ef8f8371176979c65915c8c6abb40d842459c892b4a14023cfb012c655ce0218",
+          "popplerTextSHA256": "296ba47608454517d3b139dba28ea4b26cc6c3700414dadd0ad4ab20786733cd"
+        },
+        {
+          "pdfPage": 35,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9934,
+          "pdfplumberTextSHA256": "080f025760b0a734484c7775b548a4678d4adeec512f95830fac14bca42adb5f",
+          "popplerTextSHA256": "e4b7762bf8503336e037b11548e387540bd75b81850c2085813a6af9cbefb1f9"
+        },
+        {
+          "pdfPage": 36,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9918,
+          "pdfplumberTextSHA256": "d4349768c2ce0f1d523da74fc9bd418782eea67c7bd0b303d8727568d27913ed",
+          "popplerTextSHA256": "836ae6e2dcf3720627352434ad7466dc901b29674ecb7e54641e33b19009d110"
+        },
+        {
+          "pdfPage": 37,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "98fb3ca12992ba2a50de1109bc385f18c5a77087c8227d45fb148501677db18f",
+          "popplerTextSHA256": "3b76e0b24e10277a71f2809fea1d777461820c49e5b2c05733355c48fd6798c8"
+        },
+        {
+          "pdfPage": 38,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "21303ec2f1b3f9b4ecdc0ab473db60c473a30c8f107bbad07a67f113cc83c967",
+          "popplerTextSHA256": "b7eb61252945a68f128421c7d3118989fbf90568608ee95d7597d719bd9030b9"
+        },
+        {
+          "pdfPage": 39,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9911,
+          "pdfplumberTextSHA256": "083dbbfd36a78071996b20b48a011f4989ddd10e0fe6871b7d43d5c97e8b43ab",
+          "popplerTextSHA256": "8eb01da518b917e1ca142debee9b0bd2b972a2b57f5ea72af8a5309c570fc83a"
+        },
+        {
+          "pdfPage": 40,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9966,
+          "pdfplumberTextSHA256": "20ee2e0e892f8607d53ef0debf096bc1eb798c8658210b8f0c8874c5770dded0",
+          "popplerTextSHA256": "15eb785745a55d8021e1cf46e89272764d55df37e50c9bfc8023b78d385128da"
+        },
+        {
+          "pdfPage": 41,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "19739fa2340e96328a3158c5e557d5c0488424d1940dfc751f4a8362ed0d0627",
+          "popplerTextSHA256": "b9af924084ad407710d1bbc2a5c30d741fb8f3a8f2df0cdc40c4c75dcc4a28a1"
+        },
+        {
+          "pdfPage": 42,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "b16d569111bfd89ddc4c097e86ce830cfb1c21de6d267eb85afa4a76ef930574",
+          "popplerTextSHA256": "081c8c8283c5dd1aee61d8ca210603c0d1cdea5f512679934aba3e7fa36ee015"
+        },
+        {
+          "pdfPage": 43,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "47d2a7c653e310fd61f88bf3617900669d30d74bf0d1fe66e635c20ddef9c43b",
+          "popplerTextSHA256": "e0e7de586a39059edb61d9666a80b58ac4bec378a6720c1fb249bc194fab81b9"
+        },
+        {
+          "pdfPage": 44,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "f266e090d1ea3ee84182b932b8910830e9b838fd44278c99a2fc7176abca5292",
+          "popplerTextSHA256": "7bc3a0e51c805b3bf2461a500eb8aee62a307437eb4500277468e9b9a08f4614"
+        },
+        {
+          "pdfPage": 45,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9967,
+          "pdfplumberTextSHA256": "396c7a5e8e13d2a72f7643c3c86f50452259c3d5dff47368ad258231362ba189",
+          "popplerTextSHA256": "1c8791d5be31effdf8491d17044a028169ba09d8fc81c7c7b07f46d5dab74fcc"
+        },
+        {
+          "pdfPage": 46,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "1f73ebe5614f30855d3ae3da79aa55d560ed63c1636a8ecf5f7d86c2f1f3abd3",
+          "popplerTextSHA256": "1dd93a0b26c01304112da8a80a4ae3362b3e3bd2d7db7175fe7a60453ee7d898"
+        },
+        {
+          "pdfPage": 47,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9977,
+          "pdfplumberTextSHA256": "602fb7a8c4a39efb431c906730dc7db091a720f44015b3066408475dd0db63d4",
+          "popplerTextSHA256": "683d8f2b4442b70dd3cca740c748005794b20eee65f83bdf9c29b5c43df98e3f"
+        },
+        {
+          "pdfPage": 48,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "27ab453bd72a49f91600d5d3905ffa8ee4352662c84767fb75e92bedb3effc41",
+          "popplerTextSHA256": "390a64a8303a5c80fc9922639b1381dde15cd188e057be204f85c9e5dadb70df"
+        },
+        {
+          "pdfPage": 49,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "8635620255111006636619417ba4a792b35c2d69e0eb3d5102a3838f589cc6b0",
+          "popplerTextSHA256": "d53c2fc19054cdda072ec036cf62f34fddce5d1a74f464e7813153cd7dc3750f"
+        },
+        {
+          "pdfPage": 50,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9947,
+          "pdfplumberTextSHA256": "e062f24ae4dfccf22ff290604914843cb784e3a4c65c99790293885e867d93bd",
+          "popplerTextSHA256": "8d8e54f4dfbf165397f3c913b0d03ec0714d0a31b35a657d6ab17fd93b255790"
+        },
+        {
+          "pdfPage": 51,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9922,
+          "pdfplumberTextSHA256": "c8304a55e0373bce6cbf00d5d086f11ccbe787afce6d2830a732e2f9a01d5bfa",
+          "popplerTextSHA256": "63fed01095c54d012df500d366b39d116b3e0285ab15424925470a8670444052"
+        },
+        {
+          "pdfPage": 52,
+          "printedPageLabel": null,
+          "parserAgreement": 0.997,
+          "pdfplumberTextSHA256": "aa3c9219d3a74343b2fd69d7fa564a8c014294842eb8d33a9f03982af78ca883",
+          "popplerTextSHA256": "e27dc5b6a6ac547f9ac848328a4a452518c06505718a20c3c45150ed2bbd4acd"
+        },
+        {
+          "pdfPage": 53,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9957,
+          "pdfplumberTextSHA256": "e47a87b7f98a73ff4adacacb8592f4c6d76d01ffe00e970fd2039abe46290421",
+          "popplerTextSHA256": "3f604e4f095b4cb638eb6a0a895fbca0c4b5a9f4f7e02673d7f21e5f5e21402c"
+        },
+        {
+          "pdfPage": 54,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9943,
+          "pdfplumberTextSHA256": "1a6c075d8dd7eab4cb3ff9c193b05e9104f4352f771e9752e7360674c6f85b8e",
+          "popplerTextSHA256": "19fccb37db3c064af7b6bb89318b62586d4ac900d954db05d871d38e6d5351ce"
+        },
+        {
+          "pdfPage": 55,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9967,
+          "pdfplumberTextSHA256": "019dc1dce0cf9cc5c3dea51bb2f878b078c5b7b7b2d1e8aeaa6293232312e155",
+          "popplerTextSHA256": "733be87c204ad361ff7c76145f6ee31d5c0b93755ca7ce30380e45bf892f5fa3"
+        },
+        {
+          "pdfPage": 56,
+          "printedPageLabel": null,
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "7f22f52f1c77b72fdbc8113f23e9712d69493db8f034b5577f8e14001f876c20",
+          "popplerTextSHA256": "d499e225d369ba0d7f52e34f28d8fa9b4b6c3b48053021b8e81701a5a40abaf3"
+        },
+        {
+          "pdfPage": 57,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9962,
+          "pdfplumberTextSHA256": "aa9a7e33ae012b809a24d114bbb803ada42c308ac7aa11d01d79b92aa9201cb9",
+          "popplerTextSHA256": "976cedfdca806afa832d77577f003af557691f2236a968fffaf161244bdf41f1"
+        },
+        {
+          "pdfPage": 58,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9965,
+          "pdfplumberTextSHA256": "afc1b4738296f56fb7bfd20d019d74ab85f856baba533636efe738a11db658ec",
+          "popplerTextSHA256": "e564054087dfecd3f9cdb1aef58765a66f62d5fa014ca73f7f376dc43a8197fc"
+        },
+        {
+          "pdfPage": 59,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9975,
+          "pdfplumberTextSHA256": "7c36ba02e49195c09442a47d84b9e80c71a322f74e72e774dfbeb0ce5d6b00bd",
+          "popplerTextSHA256": "859bdf2b96a04c4bb4c4ed597fa4c347dfbc9b25ba0edea9ee48a1a1782a84f8"
+        },
+        {
+          "pdfPage": 60,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9915,
+          "pdfplumberTextSHA256": "3830569366e2600030e41273fedf6ad77b4dcb3525ac45603b3b661033b82a68",
+          "popplerTextSHA256": "bc46dc558f4a82461553dedba639295dd099f8120028eabbf8c2d773bb3c43a2"
+        },
+        {
+          "pdfPage": 61,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9918,
+          "pdfplumberTextSHA256": "16e0be12be1da1dc981bd82f912d243aa6b0e085d193187c2f25895f8a0806c6",
+          "popplerTextSHA256": "9dc2826124663a9b7e5cfd5a1f22f5f6f0f84363bb9edf28bd00570bb2ac7ce2"
+        },
+        {
+          "pdfPage": 62,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9972,
+          "pdfplumberTextSHA256": "8b54aa553596f75b434ce0770b0b796f431ed6628ac784e5fdca32393546372c",
+          "popplerTextSHA256": "79693b3d22e9ae41ab5e98d50aef6468f933fe6d73b55b4a7e5aaa16609dba0a"
+        },
+        {
+          "pdfPage": 63,
+          "printedPageLabel": null,
+          "parserAgreement": 0.9963,
+          "pdfplumberTextSHA256": "63ff15713090c34b79f9c53162e735628770cee4d8ddc96eeb3c8ee061d9bf75",
+          "popplerTextSHA256": "64729b16d1b701d40d5f36d2d01976e8f446be8b5801fb1e178e22faa183ab10"
+        }
+      ],
+      "semanticHTML": {
+        "publisher": "International Code Council",
+        "sourceURL": "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-10-means-of-egress",
+        "sourceSHA256": "d94a1e5d394b843052a14edac54802f088c6409c5e458327a12fbe8ec2153e45",
+        "role": "secondary semantic structure reference",
+        "verifiedStructuredTableCount": 11,
+        "officialPDFCorrectedCellCount": 1,
+        "verifiedSectionHTMLCount": 359,
+        "fallbackSectionHTMLCount": 42
+      }
     },
     {
       "fileName": "2014CC_BC_Chapter_11_Accessibility.pdf",
@@ -3764,7 +4243,8 @@
           "pdfplumberTextSHA256": "6d894e6cc91395199bf2c2013ca9937a0c1b88a991296c6eafa2af910fb5054c",
           "popplerTextSHA256": "3808e0da28bc440c1e395a158eeb7874230dbea43f51ef1939d7b635e04f7307"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_12_Interior_Environment.pdf",
@@ -3876,7 +4356,8 @@
           "pdfplumberTextSHA256": "e92289f41884e55d421a2506cbbf31d7da9712fb685ff24f6d078a53fbe94ff8",
           "popplerTextSHA256": "573e5ce6419d77a978369fb4fffe83821608def1e034806681ec1835cf1bfbeb"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_13_Energy_Efficiency.pdf",
@@ -3897,7 +4378,8 @@
           "pdfplumberTextSHA256": "4762b5cb6c271926bfdd62d87fabc2d6e2b70f998326b040151f94a640fc6f8d",
           "popplerTextSHA256": "30febe6a02681e6634f8ed581c4c50852db109e37cd26695f7432e6970b37a72"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_14_Exterior_Walls.pdf",
@@ -4009,7 +4491,8 @@
           "pdfplumberTextSHA256": "0b23ba329fb55c0e3f12701a72273ade64bfd8d88398e2bd33c8d9f910d54e14",
           "popplerTextSHA256": "53329a764e447c32c3b92cadd18f1bcb578cf3e794cde6bdab7144b73c1cdfc1"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_15_Roof_Assemblies_and_Rooftop_Structures.pdf",
@@ -4177,7 +4660,8 @@
           "pdfplumberTextSHA256": "37ee158bee594d242256d9c4b9c85a9f85d1932907d67f4bd8b7615836103f03",
           "popplerTextSHA256": "ded7d0d59bd148e91e232f425644cc5fd8fb4779f2ae9833213787cd9ce507df"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_16_Structural_Design.pdf",
@@ -4611,7 +5095,8 @@
           "pdfplumberTextSHA256": "0ae191282b4f2b6364c8d47adeb13f14abd164753bdb0ab073b9aff7c741b52a",
           "popplerTextSHA256": "e9359dddb7f98895b67178fb2920493648803c7799f42c68bb43daf65166dab7"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_17_Structural_Tests_and_Special_Inspections.pdf",
@@ -4807,7 +5292,8 @@
           "pdfplumberTextSHA256": "55423f6d5146f223b9ad09aaa8ade4e7da92fc386bce8f0c19c4550d13f0316a",
           "popplerTextSHA256": "2bebe158ec3c8207537f917fb57eda22b5917e924db6dde81f23c062ee8ff4d6"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_18_Soils_and_Foundations.pdf",
@@ -5108,7 +5594,8 @@
           "pdfplumberTextSHA256": "2e9b7c10668b125503660b5c65d58eac9578a2709f55e4473db8d9b604281442",
           "popplerTextSHA256": "68cbeb7baf8d86da489724fbda0e3e589374f9f311ee290a4a4606c089c75bfa"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_19_Concrete.pdf",
@@ -5283,7 +5770,8 @@
           "pdfplumberTextSHA256": "e82cf20bc05821a00e1740c00b16e9f04f1eb3bb78711f173f3e267659354709",
           "popplerTextSHA256": "a2a3a20805dd3753d705b41c5da172a62ab4b007421ea4a7bacb111a00cbf2c5"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_20_Aluminum.pdf",
@@ -5304,7 +5792,8 @@
           "pdfplumberTextSHA256": "227f33c5a19dfce61a6ee10c821577d00adbff2960c12775888f5000f77a6f0b",
           "popplerTextSHA256": "0b0eb10f05f55cc8e3ac039b442463a584d070d41049505ae256522c60f898e0"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_21_Masonry.pdf",
@@ -5528,7 +6017,8 @@
           "pdfplumberTextSHA256": "ad546c72a2e6d36da46340083f08e73df3334b26b80d9a5f32c6b9e4d7342480",
           "popplerTextSHA256": "32a4109f27d3623157f4fff0adb48005a7563960d88b2d95b322039bba3ecc4b"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_22_Steel.pdf",
@@ -5584,7 +6074,8 @@
           "pdfplumberTextSHA256": "dc81d2a908cf578fb9ce410228399f0cd02ba6d065f5ab1ad7055a6a145397d5",
           "popplerTextSHA256": "1c3634879943525736668072e41b4df1b7e9b4260b5331edffa910d32f71030c"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_23_Wood.pdf",
@@ -6158,7 +6649,8 @@
           "pdfplumberTextSHA256": "ea323d8e970312179ea327c11da080dbb72f64a53e09087b28f67ee032569027",
           "popplerTextSHA256": "67c938789601fbc62b40874c0c7f5d49375efa63cd29ea77168a0605d5b37421"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_24_Glass_and_Glazing.pdf",
@@ -6242,7 +6734,8 @@
           "pdfplumberTextSHA256": "2a98346a45c042e24aa4daf9a7a0e57844d0b63dbf25d6b13568474d240c7808",
           "popplerTextSHA256": "0b786a4e2946ea63bfa8617c8c2e5bae465a24375175452abf49613a87cef7f5"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_25_Gypsum_Board_and_Plaster.pdf",
@@ -6319,7 +6812,8 @@
           "pdfplumberTextSHA256": "58fbbc1d2e6d2ae1522e49a5e455ccaa3dc2e88c3bff9c0ce7f1d1596066b7ca",
           "popplerTextSHA256": "aca0fda071bb91484b4de5a2a48948bc8b3e098d3c1fc1ff9676e1011b473d30"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_26_Plastic.pdf",
@@ -6410,7 +6904,8 @@
           "pdfplumberTextSHA256": "3beb06de2152a858745e6ef66c32d3b9775edd42c33cd2b4d3afe3cf1225dd79",
           "popplerTextSHA256": "20512d03fa97ed0ecd1e7a88ca2249f118a6484b132548e6cc71f766b1d52266"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_27_Electrical.pdf",
@@ -6445,7 +6940,8 @@
           "pdfplumberTextSHA256": "43b4a27dfe8e18dde34ee1448b162b1f10a602971ab0463b8c12c0828468673b",
           "popplerTextSHA256": "ee165c746840bc88d2e8cbbaf58ed431fcfb79228dc3e1f77b02a2f3d003fd94"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_28_Mechanical_Systems.pdf",
@@ -6466,7 +6962,8 @@
           "pdfplumberTextSHA256": "f3b713ac50f3f457911cd760f6e64962ad727731c269d65618f2c0f57b89f7bf",
           "popplerTextSHA256": "9cc1c94cf599ffe5f3f8e53c282389472e3dd9f98816b2bae0d22a9136f625ba"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_29_Plumbing_Systems.pdf",
@@ -6487,7 +6984,8 @@
           "pdfplumberTextSHA256": "2cca1b0915c0da965c9af6639e39e1b4cc92a8586469d21af7f98704b2dc6ba5",
           "popplerTextSHA256": "c3b7f0fad86f2f68ef6288bf561e3380deb7ebde1efe3c5ecb7368a6f057544e"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_30_Elevators_and_Conveying_Systems.pdf",
@@ -6585,7 +7083,8 @@
           "pdfplumberTextSHA256": "f77159cb77742e5eae2f8f23ad8f5036755813e3e838899fc0527c4d92b5f650",
           "popplerTextSHA256": "6d09ac4cc249eaecb4e93d8b29d2e30402b5e9cc41a8d72a58a54cbb210dcbc0"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_31_Special_Construction.pdf",
@@ -6690,7 +7189,8 @@
           "pdfplumberTextSHA256": "00a382ed7b1b49983ae8f1466a660eda0b03d24b415a1feae9861a3062ccb97d",
           "popplerTextSHA256": "3ceb87c1b5125fb3ac6f7d7afc97edab81987a5f37fd22cf84b7608f0d013f79"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_32_Encroachments_into_the_Pulic_Right_of_Way.pdf",
@@ -6746,7 +7246,8 @@
           "pdfplumberTextSHA256": "1aafe4e8d646f6ed28c6080cb6af693efc22d8dbe93ae2e7c8d5dde9863f2a7f",
           "popplerTextSHA256": "a617b44500b936b657333c6e4d16dee615b3b34eebad3756256c2285988971ca"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_33_Safeguards_During_Construction_or_Demo.pdf",
@@ -7523,7 +8024,8 @@
           "pdfplumberTextSHA256": "de79bef9b662feb42eded3bb8ccbc9572379afca3b577974f4c8b402e6706a08",
           "popplerTextSHA256": "9c887fc02e9832a5d6062b19a4f3dffab5eee251c390fe14ebe44dda2e3c6cf9"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_34_Reserved.pdf",
@@ -7544,7 +8046,8 @@
           "pdfplumberTextSHA256": "ca6e90078e61c17e2f9be7f699e20f57cf878c8c300d9a254017acc87d3102e3",
           "popplerTextSHA256": "0480b70e04fac9469523b8b3af8fca439db62de76d1d8df46543398a324f7b97"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Chapter_35_Reference_Standards.pdf",
@@ -7684,7 +8187,8 @@
           "pdfplumberTextSHA256": "cb42d58a5dfc49776cb4c97f8a627e40d677f77c58b48093cc923f5c547b1951",
           "popplerTextSHA256": "4ae96dd74efa3f6783c68fcbf6aa90b7e353795ab7f71f3a5e8e9ff7c590197d"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_A_Reserved.pdf",
@@ -7705,7 +8209,8 @@
           "pdfplumberTextSHA256": "04bb8c9448951c0f39af5a86a252e49dd45e953dc3b5b00b3447988622cb8e4c",
           "popplerTextSHA256": "751bf74913260a7153a8d4fe011c73d86bf2f8354510827ce0f54d0c35b0dceb"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_B_Reserved.pdf",
@@ -7726,7 +8231,8 @@
           "pdfplumberTextSHA256": "5630f581bbc63900adc4de5e0bb503f0451612892fe69430aaf6e6cb4949bcd0",
           "popplerTextSHA256": "4e4b98ae93e3b1e09c8183c233d0b6aa4b2de1e2c8c93629293472b2b9a4efe5"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_C_Reserved.pdf",
@@ -7747,7 +8253,8 @@
           "pdfplumberTextSHA256": "79336f29b2a648936e57ac62551ac06275acd8a8ca58589400a37d7ca8a62832",
           "popplerTextSHA256": "008953c1d61c6317af1dc9c83b6724cbbe3797aaa04e304d4ea9e9e6b153d082"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_D_Fire_Districts.pdf",
@@ -8069,7 +8576,8 @@
           "pdfplumberTextSHA256": "d0d5ec3ff3d0f884c45dd94038723baf3004a630ac1364dfb524b584e27739de",
           "popplerTextSHA256": "4e4f647da2432f4eb7a14e1dcbeb2e2f5cc6e83f1911797c49764af936b2311a"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_E_Supplementary_Accessibility_Requirements.pdf",
@@ -8125,7 +8633,8 @@
           "pdfplumberTextSHA256": "c75e69936d869b5ab18258409a8bc8b96fe7074ccbc162f28524d57a1508dd79",
           "popplerTextSHA256": "ff8a621e38bee0c88c348d6f54829db60b2ad19c48fae213376be54e1335d899"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_F_Rodent-Proofing.pdf",
@@ -8153,7 +8662,8 @@
           "pdfplumberTextSHA256": "f2ee0e39ad7ac120e13cd78a8027c507df706bbcde6d48fc1b40cc37832d39e0",
           "popplerTextSHA256": "4dcae178587e7bf29d219049d913a88d7b3ed64a25164467ab0df9d635ad474d"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_G_Flood-Resistant_Construction.pdf",
@@ -8377,7 +8887,8 @@
           "pdfplumberTextSHA256": "e4c3bba5873f2b9af9aa0486877bcb0f3839fdbd568a3615e4998ed5733fe825",
           "popplerTextSHA256": "142953ae6b9279c17f6674f4ee27927fa497e34d6b7021e875b9c2d15770ca63"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_H_Outdoor_Signs.pdf",
@@ -8440,7 +8951,8 @@
           "pdfplumberTextSHA256": "3335464415705c16a02e6add71bc24cca8ee97253bf647c1fc18f008f24595fe",
           "popplerTextSHA256": "1d1dc062377f3ee3230c400196feabc2f13c0668491df282e6c5f7c0b4ac4942"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_I_Reserved.pdf",
@@ -8461,7 +8973,8 @@
           "pdfplumberTextSHA256": "cd504df8d84520ee775733889f1e04a15903a443fa7110fd5a9e42cb154f22ca",
           "popplerTextSHA256": "b103b2b3f1bce9e8fd88f95b3ebd0f6b73e98550f35520dbb9f8e2e6b5c7a9b3"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_J_Reserved.pdf",
@@ -8482,7 +8995,8 @@
           "pdfplumberTextSHA256": "bb7654209935ba4f2338d055accfc88b5aa456703d9be1f2360324e7a0f35abc",
           "popplerTextSHA256": "409debc93c4ed57163875ad69d8972d7df377b112b86be501bcf8d0da7042194"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_K_Elevators_&_Conveying_Systems.pdf",
@@ -8874,7 +9388,8 @@
           "pdfplumberTextSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "popplerTextSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_L_Reserved.pdf",
@@ -8895,7 +9410,8 @@
           "pdfplumberTextSHA256": "c8cc64e81692c232aeac52fc73c47960c8dfad6be28c395ee9599a59f15232c1",
           "popplerTextSHA256": "dd86e85c8b132aa2bb5885d44ee978c1f0dd23b29dbedba3b9f5fb1028d465b8"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_M_Supplementary_Requirements.pdf",
@@ -8930,7 +9446,8 @@
           "pdfplumberTextSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "popplerTextSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_N_Assistive_Listening_Systems.pdf",
@@ -8965,7 +9482,8 @@
           "pdfplumberTextSHA256": "7f848572ff740fc0f48d5e71b628427e60f08b4d190bce6a3cd02000fa2e8991",
           "popplerTextSHA256": "4e05e58d991f173237a92c711c9d2e2f2f3ba9c180db57def53ef87cd58b2df4"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_O_Reserved.pdf",
@@ -8986,7 +9504,8 @@
           "pdfplumberTextSHA256": "507bd78dc34fec288322e2244f5635bf9a99d1c1f03209cc89791f88d1b5f9e1",
           "popplerTextSHA256": "71a81efad5eb006afc9f967f5b01c28b03fdb77777f2d35b27f0a80cbddd07ef"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_P_R-2_Occupancy_Toilet_Requirements.pdf",
@@ -9028,7 +9547,8 @@
           "pdfplumberTextSHA256": "520f210ed2fb20bca9cec8c115ca66ccf8757b6d322c91e878fe6cb7f0aaf2d9",
           "popplerTextSHA256": "088cb1ab584ff790ccf7c012ce4ebf75cade93ce995666ffe7c41ee79de45644"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_Q_Modified_Standards.pdf",
@@ -9280,7 +9800,8 @@
           "pdfplumberTextSHA256": "e9b2ef5ceac3e6ad8be3ca3a790440ade97eb97001366b680465ca23244c84c0",
           "popplerTextSHA256": "4211ee9c24cfe90178b5c5a0e5e9ea21af675a3a1010a579a631bc7e0730d141"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_R_Acoustical_Tile.pdf",
@@ -9336,7 +9857,8 @@
           "pdfplumberTextSHA256": "abf237351379352997a91e8f40168aa9d838792a1a5aa413fcdbae68b2c4865c",
           "popplerTextSHA256": "d2362e674ca6c9495e4404273146a99dfd6354cac707bfd1dfe6ce5d9598a35b"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_BC_Appendix_S_Photoluminescent.pdf",
@@ -9420,7 +9942,8 @@
           "pdfplumberTextSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "popplerTextSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter1_Administration.pdf",
@@ -9483,7 +10006,8 @@
           "pdfplumberTextSHA256": "2d52393c3a55aa16da58aa0247a332c6f8d5ada4257d20e512ed99cf3432cac0",
           "popplerTextSHA256": "613fc236d2623af283a702cc96194bb1d75ef16ab6f8ce8174ee149cf8899e50"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter2_Definitions.pdf",
@@ -9567,7 +10091,8 @@
           "pdfplumberTextSHA256": "140c16919458b881b89c8156ca89ccc36e5d7ce194fea0964aab89583d62fdee",
           "popplerTextSHA256": "063896ca94ed223159f4da05e7b89ee8f9e679dc74f0bf81010ae2ca8e4700b2"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter3_General_Regulations.pdf",
@@ -9644,7 +10169,8 @@
           "pdfplumberTextSHA256": "dcd2a93a5bd7a75e635e9dc020112af95a080165233ee5f8d9945363d1b6073e",
           "popplerTextSHA256": "3eff281c3bb68b2acd6df050bc60babe1f5b5031da139ddf0268657caa69fed2"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter4_Fixtures_Faucets_and_Fixture_Fittings.pdf",
@@ -9749,7 +10275,8 @@
           "pdfplumberTextSHA256": "d9b5e349d8560c9cf3354d44a2a52afdb2f4e4dc38a755035e1e9d534aea68ac",
           "popplerTextSHA256": "b4d61d030891a5e08342c201c085e1fb1f7a6fc53e82968b7752ab0bcdbd3205"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter5_Water_Heaters.pdf",
@@ -9784,7 +10311,8 @@
           "pdfplumberTextSHA256": "bcc9b7862236d331ed515efaa03f2e4fcae4ddffb6a4bdb7275dd67784da9645",
           "popplerTextSHA256": "c7659d5c337762679149fc99c1d6309f35bb728460a86d5cf8cf37ee5f3c44eb"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter6_Water_Supply_and_Distribution.pdf",
@@ -9945,7 +10473,8 @@
           "pdfplumberTextSHA256": "71d7ec1d0ca9b10ea2254b9c47a09c19e09302ad1d5e60478c66ceb3b3af24be",
           "popplerTextSHA256": "9f6a1866dfb137f6be663b32ac3b495eb853e8f8d66e53f213f9859fd410f694"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter7_Sanitary_Drainage.pdf",
@@ -10085,7 +10614,8 @@
           "pdfplumberTextSHA256": "5101a95296df665ee794d7936787f8d5b748d00611d87a65f0463bf2599ec0df",
           "popplerTextSHA256": "d086fe657b0e0685c3abaf0bcd60da342b724ca755ec45b14ea9755daa4d52b9"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter8_Indirect_Special_Waste.pdf",
@@ -10113,7 +10643,8 @@
           "pdfplumberTextSHA256": "3a978528831b5d234d6a6367b03cb68b91ca3bd9b9252e8ed1d711e331b72d27",
           "popplerTextSHA256": "864cbe8f5f51a5a2bd4eac53406885af9d01edc2b76c284566d7b4cb8afe4039"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter9_Vents.pdf",
@@ -10190,7 +10721,8 @@
           "pdfplumberTextSHA256": "9d1ec77f249258c22785fa6e676e0411d162a2617c96baeecc1777765075e5b5",
           "popplerTextSHA256": "b3dcfc43366ed992a581e5ff308919ae71e6d3a064936953e1e66e05f651e1a4"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter10_Traps_Interceptors_and_Separators.pdf",
@@ -10225,7 +10757,8 @@
           "pdfplumberTextSHA256": "a99f4c98ef6dc9f0e34bbb5923fe605abf1c17c27c5bd78b7bed18679b90a0db",
           "popplerTextSHA256": "c9258e1b4c47eb6a10d44468e48d15c15495fa19b9ba36b43110bf9e05defa7e"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter11_Storm_Drainage.pdf",
@@ -10351,7 +10884,8 @@
           "pdfplumberTextSHA256": "ab8415712cf3d05337b1dc8743ed1d8cb905cf510e70edcb3e6b41c1ca03e244",
           "popplerTextSHA256": "6f2734ceeb7c315803b074373b37a3349a5c2a2810f1b25acc1e5d6d0b81cc29"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter12_Special_Piping_and_Storage_Systems.pdf",
@@ -10372,7 +10906,8 @@
           "pdfplumberTextSHA256": "26a0b617304e523e9608469f06e8b4a9ddf62ee2a4f0547ee218a405652b99d9",
           "popplerTextSHA256": "e96b98191ae0dee07b8966079ec6f22b876be6780c0147344a121f0202ea9dbd"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_Chapter13_Referenced_Standards.pdf",
@@ -10435,7 +10970,8 @@
           "pdfplumberTextSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
           "popplerTextSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_AppendixA_Reserved.pdf",
@@ -10456,7 +10992,8 @@
           "pdfplumberTextSHA256": "576246aca689bd662ed0ac96bf9d769b6e20f8ded6d2b564d1fdd2d5e008df15",
           "popplerTextSHA256": "546b908851104150b911de098e023e36885ed5815c54775444228f0c496258b5"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_AppendixB_Reserved.pdf",
@@ -10477,7 +11014,8 @@
           "pdfplumberTextSHA256": "06d61e1f6fc32ff7aba6cc5df1c60bba2a2cc043ae65227481ad59ed6045c968",
           "popplerTextSHA256": "79e4d43d02c14a8e5e985331e67eeaea78e3aaa520c50614805db59b07636ceb"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_AppendixC_Water_Conservation_Systems.pdf",
@@ -10512,7 +11050,8 @@
           "pdfplumberTextSHA256": "0ae1dc39397a54ddf135001125bfaf86134bb931f9d2ac1e7a99d654932c8657",
           "popplerTextSHA256": "74ed60cfa940d60952f88a018d302e236380b038c6c53f71fade89d7fd3018fa"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_AppendixD_Reserved.pdf",
@@ -10533,7 +11072,8 @@
           "pdfplumberTextSHA256": "ddafc3907d6ab93520802dfeb92c990a9ad3b139911c02b3bb38d6297f9c03a0",
           "popplerTextSHA256": "619c140eda0ccc8626d9666ccdeebeee9ea83af3efe1dd5515c71866f2c5dece"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_AppendixE_Sizing_of_Water_Piping_System.pdf",
@@ -10673,7 +11213,8 @@
           "pdfplumberTextSHA256": "81fdbd2ffe532829484c90ca12cfc637afcc416eefe18065349f2cd22db00e06",
           "popplerTextSHA256": "7c69adca3505d1ba2166c799abf7d4e931abf992726b704418e166a86a6ca560"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_AppendixF_Reserved.pdf",
@@ -10694,7 +11235,8 @@
           "pdfplumberTextSHA256": "ff54fb2b9bbc277a34e883c214350ed53e5dc63b962e46d3c62996a966eba8f4",
           "popplerTextSHA256": "f5f5f4af18e7137df785e7a5f4069c0ceb0d762dfddbd9c810eac919a71a1176"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_PC_AppendixG_Reserved.pdf",
@@ -10715,7 +11257,8 @@
           "pdfplumberTextSHA256": "4c68444a99668278aa4cc618d6d36e64ea148b852db7321e779e93953d483896",
           "popplerTextSHA256": "4571462b973b2729a4f0d8ca3cc85edbce57e96d4d5b1b6b5b6feb731485d222"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter1_Administration.pdf",
@@ -10771,7 +11314,8 @@
           "pdfplumberTextSHA256": "14723d19ada9fc60cb7d992090588eb1337765b93861d0ed03d0d433bf16c5d2",
           "popplerTextSHA256": "4e7ea329f4d414333d520b9cc3b727fa9f6b6bcc09dde5104e4e1e9545541512"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter2_Definitions.pdf",
@@ -10890,7 +11434,8 @@
           "pdfplumberTextSHA256": "c3d5a3cb0e1b0351fb81aa3e39283f6bcbd3f21fa6a8ec3c4451891264e3ffbc",
           "popplerTextSHA256": "722e0a418e0971c7a5ff8d3941d4cd8239e48db64c2525088b10663e77a7123e"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter3_General_Regulations.pdf",
@@ -10974,7 +11519,8 @@
           "pdfplumberTextSHA256": "7f325767b79971729dd3cb1250573d76f3ed44653d5be8698d507a3be311e8aa",
           "popplerTextSHA256": "4e9318f122a638688c75ef2fd59f4fb053e9bf843f065118cda647a87efe88b8"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter4_Ventilation.pdf",
@@ -11058,7 +11604,8 @@
           "pdfplumberTextSHA256": "030aa16661c19067bcbe43d2958825cd00ed5147a34eed98c3c60412643af068",
           "popplerTextSHA256": "ca305b3773c3b3e2c8d02424c06f0f8d7ec06f2bf54bc1ff959b30fb78adfda8"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter5_Exhaust_Systems.pdf",
@@ -11282,7 +11829,8 @@
           "pdfplumberTextSHA256": "b3f5eaaa688983f3e2940de442536952e6617c118f1170e954d45504e3cb6955",
           "popplerTextSHA256": "a2b00e03be837b8ddd7beb30291b87b14222c13af31a7e2ac11c6e5cb6fb357c"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter6_Duct_Systems.pdf",
@@ -11408,7 +11956,8 @@
           "pdfplumberTextSHA256": "4cf29c0eb271095f29402336a6a008f9faa2209fe72d23a72064367da7888543",
           "popplerTextSHA256": "59ec794110745309811e36edacb8f465903b4686ebd87c419866ebc68157e684"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter7_Combustion_Air.pdf",
@@ -11450,7 +11999,8 @@
           "pdfplumberTextSHA256": "1cd50d45739c72ef1c85e3bd07ea64df506edaf0ec73f66210a46b3ad38dae39",
           "popplerTextSHA256": "3fbb317db32e304541cde5be4feecfd66de53b0633d50449bfd4cbcd87e277be"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter8_Chimney_and_Vents.pdf",
@@ -11548,7 +12098,8 @@
           "pdfplumberTextSHA256": "fcdfdd193b8a5cd132a96b0fdbc504bbe48392078d22de66bec45e7db2d892a5",
           "popplerTextSHA256": "98ec04793c4b213daf59dc889448b6675f60aa416cce0601959639c0195c33fc"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter9_Specific_Appliances.pdf",
@@ -11618,7 +12169,8 @@
           "pdfplumberTextSHA256": "aa78a60ab5225b6675a140a8400569ecfab8b371f52cb1af2872393ba0ec066b",
           "popplerTextSHA256": "16fb5e9044555c5a207b5cbc51db2c4e0e1f7c25bf65a1c79d4cd461da067542"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter10_Boilers_Water_Heaters.pdf",
@@ -11667,7 +12219,8 @@
           "pdfplumberTextSHA256": "4f461efdbd4f01b15070a8f4a175f6655ad0140f109091637a881951c96ca0b8",
           "popplerTextSHA256": "7588b382e26e5612801368cc446775e8bef7e4d45816d83fd60ffa131daf06af"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter11_Refrigeration.pdf",
@@ -11772,7 +12325,8 @@
           "pdfplumberTextSHA256": "b74c07cab65d690f3eabf5cd382238f74c40ae102427ae36b9dddc8c29129ce3",
           "popplerTextSHA256": "981c052cbf830c9b8986bbd3d8a87917a6f828792834d9ac5f0d2f082381f7cb"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter12_Hydronic_Piping.pdf",
@@ -11849,7 +12403,8 @@
           "pdfplumberTextSHA256": "2ec7ad5f2eb4bd2e074a8835a5d100466a352e36937dac91b013ab0fe5871084",
           "popplerTextSHA256": "92471dc137d0fea2306c08945c5b1cf6608135876494c6b8f95886d0bc565a52"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter13_Fuel_Oil_Piping_and_Storage.pdf",
@@ -11947,7 +12502,8 @@
           "pdfplumberTextSHA256": "1b532b34396decee3f6d1a7709a3c4de1d709ecdabdd6a066c3b73db9303cfc4",
           "popplerTextSHA256": "9016897c06b1e834d785bd8e26cf53def2af9737ac2825a9cf9c7a97d155c125"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter14_Solar_Systems.pdf",
@@ -11975,7 +12531,8 @@
           "pdfplumberTextSHA256": "2b88a6ee9b2b5200bbeb60bbcda31483fecceda4cba059014ce53aa561f3830f",
           "popplerTextSHA256": "84bfd57c2d45e353b58c4c35a70d81befe4c45b92355336eb303b3fed8fe3660"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_Chapter15_Referenced_Standards.pdf",
@@ -12066,7 +12623,8 @@
           "pdfplumberTextSHA256": "d276ae9955a88cb1a814f440b90fe10461fa2f72ef539d03c0a21d16ad61c785",
           "popplerTextSHA256": "a85a7db7c531372fbd37add868d6917396fae0e2477eb529ce3782b05bfd78e1"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_AppendixA_Combustion_Air_Openings.pdf",
@@ -12115,7 +12673,8 @@
           "pdfplumberTextSHA256": "cb375ddc4b8159a51685ec118f6496551848e4494242c54740101b5481ea40ff",
           "popplerTextSHA256": "85b8540d437a784386d9f9a3e6ff969e3d39e329264ea06531e4372996d31148"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_MC_AppendixB_Reserved.pdf",
@@ -12136,7 +12695,8 @@
           "pdfplumberTextSHA256": "5630f581bbc63900adc4de5e0bb503f0451612892fe69430aaf6e6cb4949bcd0",
           "popplerTextSHA256": "53d1ea1cec5c1add86aa1b69eed0ed69756f69f54e297355e06bd7174e77227a"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_Chapter1_Administration.pdf",
@@ -12192,7 +12752,8 @@
           "pdfplumberTextSHA256": "4a91dfba6cd0669328ada7a5de347672b7aafd3fef761df78c226068fed40a64",
           "popplerTextSHA256": "10f33f3a7d5ca434f9f21e7c59e7ad1ab7f98574f20b7e67caf53c05b72e180b"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_Chapter2_Definitions.pdf",
@@ -12276,7 +12837,8 @@
           "pdfplumberTextSHA256": "292dbb8cd64c484f65a3993c9b232a037e77c226a0700612cb240eaf7e7f2bde",
           "popplerTextSHA256": "b33489e580d291a4b545a2d9d6f6c9b1169c7f49b3cbb10407f5c91bcd5b8595"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_Chapter3_General_Regulations.pdf",
@@ -12395,7 +12957,8 @@
           "pdfplumberTextSHA256": "13a041532dd3b5b7180097c6b604342a1bdcc55051a807a124eeecf24055d8c2",
           "popplerTextSHA256": "8f7ea43310cc2d1ec25aa07b3dea56e924ea4f5bb8a92b5c9264d56ce58711ff"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_Chapter4_Gas_Piping_Installations.pdf",
@@ -12598,7 +13161,8 @@
           "pdfplumberTextSHA256": "f318e0d38be6b35ee58963a066f38927c5ceb7277a4176e1c3109528a4f1c3e7",
           "popplerTextSHA256": "275fca8743ce8741dbc4198e90a04cef61cb970ea24873d8f4545090f7a635ef"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_Chapter5_Chimneys_and_Vents.pdf",
@@ -12941,7 +13505,8 @@
           "pdfplumberTextSHA256": "2879cdec2c741f1e3bf0b8b68e8d1ef2d0ceb6b1b5dd0a87c39afd25b040b32b",
           "popplerTextSHA256": "d16f47363ff0e9757c00b06540827eac05082a321e969f62f03a504e5c4fd6ca"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_Chapter6_Specific_Appliances.pdf",
@@ -13039,7 +13604,8 @@
           "pdfplumberTextSHA256": "4b5066b0a63ba429e478052397ec455835720886c7c576851fbd3d07ea7a6bd4",
           "popplerTextSHA256": "d72503766075fa6627e660ce2061a70ef30f6b26eb51710d9d232b5d70d72333"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_Chapter7_Gaseous_Hydrogen_Systems.pdf",
@@ -13060,7 +13626,8 @@
           "pdfplumberTextSHA256": "1b2900bd1e21b8313a65421674b6e38251669ab49feb96f061390f4dee88d01f",
           "popplerTextSHA256": "30c417ab0e4d7f9db004de28826f4706d3c553e684360640232ea45751a88853"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_Chapter8_Referenced_Standards.pdf",
@@ -13095,7 +13662,8 @@
           "pdfplumberTextSHA256": "eb191a1fb3d8f2a20614416c76f9eb8c6a95b03fefc4cf000ac6698e95b01cb1",
           "popplerTextSHA256": "e3759030ce09b6280470afe81e3b7c8abef73ca1360360938f38f87d78a98081"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_AppendixA_Reserved.pdf",
@@ -13116,7 +13684,8 @@
           "pdfplumberTextSHA256": "04bb8c9448951c0f39af5a86a252e49dd45e953dc3b5b00b3447988622cb8e4c",
           "popplerTextSHA256": "751bf74913260a7153a8d4fe011c73d86bf2f8354510827ce0f54d0c35b0dceb"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_AppendixB_Reserved.pdf",
@@ -13137,7 +13706,8 @@
           "pdfplumberTextSHA256": "5630f581bbc63900adc4de5e0bb503f0451612892fe69430aaf6e6cb4949bcd0",
           "popplerTextSHA256": "4e4b98ae93e3b1e09c8183c233d0b6aa4b2de1e2c8c93629293472b2b9a4efe5"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_AppendixC_Reserved.pdf",
@@ -13158,7 +13728,8 @@
           "pdfplumberTextSHA256": "79336f29b2a648936e57ac62551ac06275acd8a8ca58589400a37d7ca8a62832",
           "popplerTextSHA256": "008953c1d61c6317af1dc9c83b6724cbbe3797aaa04e304d4ea9e9e6b153d082"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_AppendixD_Reserved.pdf",
@@ -13179,7 +13750,8 @@
           "pdfplumberTextSHA256": "6a5df842b01cc8bc0ab6850922beb492d4709f32bca89aafea24e8cbea276ece",
           "popplerTextSHA256": "fd0daa60ae9e66cc78c47df9f82e15a9d9f92d03dffe8eb7b934940ab6abb4ff"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_AppendixE_Meters_and_Gas_Service_Piping.pdf",
@@ -13214,7 +13786,8 @@
           "pdfplumberTextSHA256": "3d3e9de55ffb146b6644614c02a105eb988afdacb0e3f3932e91060d7166328f",
           "popplerTextSHA256": "5f55a6bf7d70282fd7464a1b96f41c3b4e0f858c1fe35b6d5423981576bc5866"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_AppendixF_Reserved.pdf",
@@ -13235,7 +13808,8 @@
           "pdfplumberTextSHA256": "74af17f2242b41f0e7f0b7a5502a552b245b6efef035f338cd1d0520cbe8a47e",
           "popplerTextSHA256": "d81305fce52c16f34b51cf537e1b9da4130286ef5c96f5b151c02340c6d8e75d"
         }
-      ]
+      ],
+      "semanticHTML": null
     },
     {
       "fileName": "2014CC_FGC_AppendixG_High_Pressure_Natural_Gas.pdf",
@@ -13270,7 +13844,20 @@
           "pdfplumberTextSHA256": "fff6efb076238789342ce62027505fd0c3fdfdb03672bb4df7c23cb4d7e28be8",
           "popplerTextSHA256": "8c209cdc4a18f059253840d02f0624a5b841b906b7ee195ec2a798230ef46a0f"
         }
-      ]
+      ],
+      "semanticHTML": null
+    }
+  ],
+  "secondaryHTMLReferences": [
+    {
+      "publisher": "International Code Council",
+      "sourceURL": "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-10-means-of-egress",
+      "sourceSHA256": "d94a1e5d394b843052a14edac54802f088c6409c5e458327a12fbe8ec2153e45",
+      "role": "secondary semantic structure reference",
+      "verifiedStructuredTableCount": 11,
+      "officialPDFCorrectedCellCount": 1,
+      "verifiedSectionHTMLCount": 359,
+      "fallbackSectionHTMLCount": 42
     }
   ],
   "prohibitedSources": [
@@ -13281,8 +13868,8 @@
       "pdfplumber",
       "Poppler pdftotext"
     ],
-    "chapterPDFCount": 110,
-    "structuredTableCount": 147,
-    "discrepancyCount": 413
+    "chapterPDFCount": 111,
+    "structuredTableCount": 158,
+    "discrepancyCount": 451
   }
 }

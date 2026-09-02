@@ -162,6 +162,17 @@
       "sourceSHA256": "e223b157374f3476673b37bb800996fc3954dbeb1d1b890fab1bb2b8479c44f4"
     },
     {
+      "chapterID": 40000111,
+      "chapterNumber": "10",
+      "codePrefix": "BC",
+      "codeSectionID": 2,
+      "sectionCount": 401,
+      "preparedSectionCount": 401,
+      "blockCount": 412,
+      "sourcePDF": "2014CC_BC_Chapte_10_Means_of_Egress.pdf",
+      "sourceSHA256": "cdac0477eb744ed215557e18d6ef6980625231dca533abd90a1f419b5aa5e3cb"
+    },
+    {
       "chapterID": 40000015,
       "chapterNumber": "11",
       "codePrefix": "BC",

@@ -86,10 +86,10 @@ final class BundleDatabaseLocator {
         let entries: [CachedScanEntry]
     }
 
-    // v4 invalidates scans produced before the expanded NYC authored catalog.
-    // Keeping a stale v3 scan made newly bundled code families appear disabled
-    // in the Reader menu until the user deleted the app.
-    private static let cacheDefaultsKey = "BundleDatabaseLocator.cachedScan.v4"
+    // v5 invalidates scans produced before the bundled 2014 Construction
+    // Codes package. Keeping a v4 scan would hide that new offline edition in
+    // the Reader menu until the app version changed or the user deleted data.
+    private static let cacheDefaultsKey = "BundleDatabaseLocator.cachedScan.v5"
 
     private static var appVersionKey: String {
         let info = Bundle.main.infoDictionary

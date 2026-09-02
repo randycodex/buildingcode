@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260901-hybrid-candidates-v19";
+export const evidenceDiscoveryVersion = "20260901-hybrid-candidates-v20";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -398,7 +398,8 @@ const topicRoutes = [
     pattern: /^(?=[\s\S]*\b(?:hall|hallway|corridor)\b)(?=[\s\S]*\b(?:minimum|width|wide|fire\s+escape|exit)\b)(?=[\s\S]*\b(?:ADA|accessible|accessibility|fire\s+escape|exit)\b)/i,
     label: "corridor width and accessible-route applicability",
     targets: [
-      { codePrefix: "BC", sectionPrefix: "1020.2" },
+      { codePrefix: "BC", sectionPrefix: "1020.2", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1018.2", codeEdition: "2014" },
       { codePrefix: "BC", sectionPrefix: "1101.2" },
       { codePrefix: "BC", sectionPrefix: "1103.2" },
       { codePrefix: "BC", sectionPrefix: "1104.3" }
@@ -418,12 +419,13 @@ const topicRoutes = [
     pattern: /^(?=[\s\S]*\b(?:vision\s+(?:light|lite|panel)|door\s+glazing|glazing\s+in\s+(?:a\s+)?door)\b)(?=[\s\S]*\b(?:fire[- ]rated|rated\s+door|maximum|size|square\s+(?:inch|inches|feet|foot)|sq\s*(?:in|ft))\b)/i,
     label: "fire-door vision glazing size and listing provisions",
     targets: [
-      { codePrefix: "BC", sectionPrefix: "716.5.5.1" },
-      { codePrefix: "BC", sectionPrefix: "716.5.7.1.1" },
-      { codePrefix: "BC", sectionPrefix: "716.5.8.1" },
-      { codePrefix: "BC", sectionPrefix: "716.5.8.1.1" },
-      { codePrefix: "BC", sectionPrefix: "716.5.8.1.2.1" },
-      { codePrefix: "BC", sectionPrefix: "716.5.8.1.2.2" }
+      { codePrefix: "BC", sectionPrefix: "716.5.5.1", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "716.5.7.1.1", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "716.5.8.1", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "716.5.8.1.1", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "716.5.8.1.2.1", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "716.5.8.1.2.2", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "715.4.7.1", codeEdition: "2014" }
     ]
   },
   {
@@ -465,16 +467,28 @@ const topicRoutes = [
     pattern: /^(?![\s\S]*\b(?:construction[- ]site|construction\s+ramp|runway|motor[- ]vehicle|vehicular)\b)(?=[\s\S]*\bramps?\b)(?=[\s\S]*\b(?:design|designing|requirements?|accessible|accessibility|pedestrian|slope|rise|landing|handrails?|edge\s+protection)\b)/i,
     label: "pedestrian ramp design and accessibility provisions",
     targets: [
-      { codePrefix: "BC", sectionPrefix: "1101.2" },
-      { codePrefix: "BC", sectionPrefix: "1012.1" },
-      { codePrefix: "BC", sectionPrefix: "1012.2" },
-      { codePrefix: "BC", sectionPrefix: "1012.3" },
-      { codePrefix: "BC", sectionPrefix: "1012.4" },
-      { codePrefix: "BC", sectionPrefix: "1012.5.1" },
-      { codePrefix: "BC", sectionPrefix: "1012.6" },
-      { codePrefix: "BC", sectionPrefix: "1012.7.1" },
-      { codePrefix: "BC", sectionPrefix: "1012.8" },
-      { codePrefix: "BC", sectionPrefix: "1012.10" }
+      { codePrefix: "BC", sectionPrefix: "1101.2", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1012.1", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1012.2", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1012.3", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1012.4", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1012.5.1", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1012.6", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1012.7.1", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1012.8", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1012.10", excludedEditions: ["2014"] },
+      { codePrefix: "BC", sectionPrefix: "1010.1", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.2", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.3", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.4", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.5.1", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.6", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.6.3", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.6.4", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.7.1", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.7.2", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.8", codeEdition: "2014" },
+      { codePrefix: "BC", sectionPrefix: "1010.9", codeEdition: "2014" }
     ]
   },
   {
@@ -909,6 +923,16 @@ function queryBigrams(question) {
 
 function comparableSectionID(value) {
   return String(value || "").trim();
+}
+
+function sectionCodeEdition(section) {
+  const editionSource = [
+    section?.codeEdition,
+    section?.codeVersion,
+    section?.headingLine,
+    section?.codeTitle
+  ].filter(Boolean).join(" ");
+  return editionSource.match(/\b(?:19|20)\d{2}\b/)?.[0] || "";
 }
 
 function plainTextFromPublishedHTML(value) {
@@ -1384,8 +1408,14 @@ export async function discoverRelevantEvidence({
     for (const target of route.targets) {
       for (const section of sections) {
         const sectionNumber = String(section.sectionNumber || "");
+        const codeEdition = sectionCodeEdition(section);
         if (
           String(section.codePrefix || "").toUpperCase() !== target.codePrefix ||
+          (target.codeEdition && codeEdition !== target.codeEdition) ||
+          (
+            Array.isArray(target.excludedEditions) &&
+            target.excludedEditions.includes(codeEdition)
+          ) ||
           (
             sectionNumber !== target.sectionPrefix &&
             !(target.includeDescendants && sectionNumber.startsWith(`${target.sectionPrefix}.`))

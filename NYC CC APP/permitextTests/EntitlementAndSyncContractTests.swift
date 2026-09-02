@@ -2679,7 +2679,8 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
     func testPlumbingFixtureSectionUsesPublishedOfficialTable() throws {
         let version = try XCTUnwrap(
-            BundleDatabaseLocator().availableCodeVersions().first {
+            BundleDatabaseLocator(defaults: isolatedEntitlementDefaults())
+                .availableCodeVersions().first {
                 UserContentSyncCodeVersion.server($0.codeVersion) ==
                     UserContentSyncCodeVersion.canonicalNYC2022
             }
@@ -2702,6 +2703,66 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         XCTAssertEqual(section.sectionNumber, "403.1")
         XCTAssertTrue(tableBlock.html?.localizedCaseInsensitiveContains("<table") == true)
+    }
+
+    func test2014Chapter10TablesLoadOfflineAndUseNativeRenderingPaths() throws {
+        let version = try XCTUnwrap(
+            BundleDatabaseLocator(defaults: isolatedEntitlementDefaults())
+                .availableCodeVersions().first {
+                UserContentSyncCodeVersion.server($0.codeVersion) ==
+                    UserContentSyncCodeVersion.canonicalNYC2014
+            }
+        )
+        let store = try AuthoredCodeStore(
+            jsonURL: version.fileURL,
+            codeID: version.authoredCodeID,
+            jurisdictionID: version.jurisdictionID
+        )
+
+        let occupantLoad = try XCTUnwrap(store.sectionDetail(sectionID: 41_009_379))
+        let occupantLoadTable = try XCTUnwrap(
+            occupantLoad.tableBlocks.first {
+                $0.id == "nyc-2014-table-bc-10-1004-1-1"
+            }
+        )
+        XCTAssertEqual(occupantLoadTable.rowCount, 57)
+        XCTAssertEqual(occupantLoadTable.columnCount, 2)
+        XCTAssertEqual(occupantLoadTable.cells.count, 114)
+        XCTAssertTrue(isNativeSimpleTable(occupantLoadTable))
+        XCTAssertFalse(
+            occupantLoad.contentBlocks.contains {
+                $0.html?.localizedCaseInsensitiveContains("codes.iccsafe.org") == true
+            },
+            "The bundled Reader must not load ICC at runtime."
+        )
+
+        let corridorRating = try XCTUnwrap(store.sectionDetail(sectionID: 41_009_583))
+        let corridorRatingTable = try XCTUnwrap(
+            corridorRating.tableBlocks.first {
+                $0.id == "nyc-2014-table-bc-10-1018-1-1"
+            }
+        )
+        XCTAssertEqual(corridorRatingTable.columnCount, 4)
+        XCTAssertTrue(corridorRatingTable.cells.contains { $0.rowSpan == 2 })
+        XCTAssertTrue(corridorRatingTable.cells.contains { $0.columnSpan == 2 })
+        XCTAssertFalse(isNativeSimpleTable(corridorRatingTable))
+
+        let dualAccess = try XCTUnwrap(store.sectionDetail(sectionID: 41_009_713))
+        let dualAccessTable = try XCTUnwrap(
+            dualAccess.tableBlocks.first {
+                $0.id == "nyc-2014-table-bc-10-1028-10-1"
+            }
+        )
+        let tenThousandRow = try XCTUnwrap(
+            dualAccessTable.cells.first { $0.plainText == "10,000" }?.row
+        )
+        XCTAssertTrue(
+            dualAccessTable.cells.contains {
+                $0.row == tenThousandRow && $0.plainText == "17"
+            },
+            "The iOS bundle must retain the official NYC PDF value rather than ICC's erroneous 7."
+        )
+        XCTAssertFalse(isNativeSimpleTable(dualAccessTable))
     }
 
     func testConstructionRelatedLocalLawsLoadPreparedChapterSections() throws {

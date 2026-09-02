@@ -20,7 +20,7 @@ const catalog = await historicalConstructionSectionCatalog();
 const searchIndex = await historicalConstructionSearchIndex();
 
 assert.equal(source.libraryID, "nyc-2014-construction-codes");
-assert.equal(source.chapterPDFs.length, 110, "Every official DOB chapter and appendix PDF must be inventoried.");
+assert.equal(source.chapterPDFs.length, 111, "Every official DOB chapter and appendix PDF must be inventoried.");
 assert.equal(ledger.updatePackets.length, 90, "Every official DOB update packet must be hashed.");
 assert.match(source.baselineSourceSHA256, /^[a-f0-9]{64}$/);
 assert.match(source.amendmentIndexSHA256, /^[a-f0-9]{64}$/);
@@ -54,10 +54,146 @@ const urls = [
 assert(urls.every((url) => /^https:\/\/(?:www\.)?nyc\.gov\//i.test(url)));
 assert.equal(urls.some((url) => /up\.codes/i.test(url)), false);
 
+const meansOfEgressChapter = source.chapterPDFs.find((record) =>
+  record.fileName === "2014CC_BC_Chapte_10_Means_of_Egress.pdf"
+);
+assert(meansOfEgressChapter, "The official DOB Building Code Chapter 10 PDF is missing.");
+assert.equal(
+  meansOfEgressChapter.sourceSHA256,
+  "cdac0477eb744ed215557e18d6ef6980625231dca533abd90a1f419b5aa5e3cb"
+);
+assert.equal(meansOfEgressChapter.semanticHTML.publisher, "International Code Council");
+assert.equal(meansOfEgressChapter.semanticHTML.role, "secondary semantic structure reference");
+assert.equal(meansOfEgressChapter.semanticHTML.verifiedStructuredTableCount, 11);
+assert.equal(meansOfEgressChapter.semanticHTML.officialPDFCorrectedCellCount, 1);
+assert(meansOfEgressChapter.semanticHTML.verifiedSectionHTMLCount > 300);
+assert(meansOfEgressChapter.semanticHTML.fallbackSectionHTMLCount > 0);
+assert.equal(source.secondaryHTMLReferences.length, 1);
+assert.equal(
+  source.secondaryHTMLReferences[0].sourceURL,
+  "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-10-means-of-egress"
+);
+
+const rampScope = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "1010.1"
+);
+assert(rampScope, "BC 1010.1 is missing from the 2014 Building Code corpus.");
+assert.equal(rampScope.chapterID, 40000111, "The newly discovered chapter must use an appended stable ID.");
+assert.equal(rampScope.id, 41009494, "The new ramp provision must retain its first published stable ID.");
+const rampWidth = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "1010.5.1"
+);
+assert(rampWidth, "BC 1010.5.1 is missing from the 2014 Building Code corpus.");
+const rampWidthBody = await historicalConstructionSection(rampWidth.id);
+assert.match(rampWidthBody.officialText, /36 inches \(914 mm\) minimum/);
+assert.equal(rampWidthBody.officialText.includes("\nmm)"), false);
+const rampSlope = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "1010.2"
+);
+assert(rampSlope, "BC 1010.2 is missing from the 2014 Building Code corpus.");
+const rampSlopeBody = await historicalConstructionSection(rampSlope.id);
+assert.equal(
+  rampSlopeBody.blocks[0].verificationStatus,
+  "semantic-html-token-verified-against-official-pdf"
+);
+assert.match(rampSlopeBody.blocks[0].html, /<ol><li><p>Aisle ramp slope/);
+assert.doesNotMatch(rampSlopeBody.blocks[0].html, /<li><p>1\. Aisle ramp slope/);
+assert.equal(rampSlopeBody.blocks[0].html.includes("codes.iccsafe.org"), false);
+
+const corridorWidth = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "1018.2"
+);
+assert(corridorWidth, "BC 1018.2 is missing from the 2014 Building Code corpus.");
+const corridorWidthBody = await historicalConstructionSection(corridorWidth.id);
+assert.match(corridorWidthBody.officialText, /not less than 44 inches \(1118 mm\)/);
+assert.match(corridorWidthBody.blocks[0].html, /<ol><li><p>Twenty-four inches/);
+assert.doesNotMatch(
+  corridorWidthBody.blocks[0].html,
+  /<li><p>1\. Twenty-four inches/,
+  "Semantic list HTML must not duplicate the browser-generated ordinal."
+);
+assert.equal(
+  corridorWidthBody.officialText.includes("\nChapter 11"),
+  false,
+  "A physical PDF wrap before Chapter 11 must not create a legal paragraph break."
+);
+
+const table1004 = bundle.tables.find((table) =>
+  table.id === "nyc-2014-table-bc-10-1004-1-1"
+);
+assert(table1004, "Complete semantic Table 1004.1.1 is missing.");
+assert.equal(table1004.rowCount, 57);
+assert.equal(table1004.columnCount, 2);
+assert.deepEqual(table1004.officialPDFProvenance.pdfPages, [5, 6]);
+assert.equal(table1004.verificationStatus, "cell-by-cell-verified-against-official-pdf");
+assert.match(table1004.footnotes[0], /^C\*-capacity of all passenger vehicles/);
+const occupantLoadSection = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "1004.1.1"
+);
+assert(occupantLoadSection, "BC 1004.1.1 is missing.");
+const occupantLoadBody = await historicalConstructionSection(occupantLoadSection.id);
+assert.equal(
+  occupantLoadBody.officialText.includes("C*-capacity"),
+  false,
+  "The official table footnote must not leak into Section 1004.1.1 prose."
+);
+assert.equal(
+  bundle.tables.some((table) => table.id === "nyc-2014-table-bc-10-p0006-01"),
+  false,
+  "The partial page-six continuation must not survive beside complete Table 1004.1.1."
+);
+
+const corridorRatingTable = bundle.tables.find((table) =>
+  table.id === "nyc-2014-table-bc-10-1018-1-1"
+);
+assert(corridorRatingTable, "Table 1018.1.1 is missing.");
+assert.equal(corridorRatingTable.columnCount, 4);
+assert(corridorRatingTable.cells.some((cell) => cell.rowSpan === 2));
+assert(corridorRatingTable.cells.some((cell) => cell.columnSpan === 2));
+const corridorRatingSection = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "1018.1.1"
+);
+assert(corridorRatingSection, "BC 1018.1.1 is missing.");
+const corridorRatingBody = await historicalConstructionSection(corridorRatingSection.id);
+assert.match(corridorRatingBody.blocks[0].html, /<ol><li><p>A fire-resistance rating/);
+assert.doesNotMatch(
+  corridorRatingBody.blocks[0].html,
+  /<li><p>1\. A fire-resistance rating/,
+  "Semantic exception lists must not render duplicated ordinals."
+);
+assert.equal(
+  /1018\.1\.1 INTERIOR CORRIDOR FIRE-RESISTANCE RATING\s*$/i.test(corridorRatingBody.officialText),
+  false,
+  "A repeated structured-table caption must not leak into Section 1018.1.1 prose."
+);
+
+const oneExitTable = bundle.tables.find((table) =>
+  table.id === "nyc-2014-table-bc-10-1021-2"
+);
+assert(oneExitTable, "Table 1021.2 is missing.");
+assert(oneExitTable.cells.some((cell) => cell.rowSpan === 5));
+
+const assemblyAisleTable = bundle.tables.find((table) =>
+  table.id === "nyc-2014-table-bc-10-1028-10-1"
+);
+assert(assemblyAisleTable, "Table 1028.10.1 is missing.");
+assert.equal(
+  assemblyAisleTable.cells.find((cell) => cell.plainText === "10,000")?.row,
+  assemblyAisleTable.cells.find((cell) => cell.plainText === "17")?.row,
+  "The official DOB value 17 must occupy the 10,000-seat row."
+);
+assert.deepEqual(assemblyAisleTable.semanticCorrections, [{
+  cell: "10,000 seats / maximum seats per row",
+  semanticHTMLValue: "7",
+  officialPDFValue: "17",
+  resolution: "official NYC DOB PDF controls"
+}]);
+
 const visionPanel = catalog.find((section) =>
   section.codePrefix === "BC" && section.sectionNumber === "715.4.7.1"
 );
 assert(visionPanel, "BC 715.4.7.1 is missing from the 2014 Building Code corpus.");
+assert.equal(visionPanel.id, 41001820, "Existing published Reader section IDs must not be renumbered.");
 const visionPanelBody = await historicalConstructionSection(visionPanel.id);
 assert.match(visionPanelBody.officialText, /not more than 100 square inches/i);
 assert.match(visionPanelBody.officialText, /without a dimension exceeding 10 inches/i);
@@ -249,6 +385,11 @@ for (const table of bundle.tables) {
   if (table.id === "nyc-2014-table-bc-7-705-8") {
     assert.deepEqual(table.officialPDFProvenance.pdfPages, [9, 10]);
     assert.match(table.officialPDFProvenance.extraction, /verified cell-by-cell/i);
+  } else if (table.id.startsWith("nyc-2014-table-bc-10-")) {
+    assert(Array.isArray(table.officialPDFProvenance.pdfPages));
+    assert.match(table.officialPDFProvenance.extraction, /ICC semantic grid independently reconciled/i);
+    assert.equal(table.htmlStructureReference.publisher, "International Code Council");
+    assert.equal(table.htmlStructureReference.role, "secondary semantic structure reference");
   } else {
     assert(Number.isInteger(table.officialPDFProvenance.pdfPage));
     assert.equal(table.officialPDFProvenance.extraction, "pdfplumber-grid verified against Poppler bbox text");
