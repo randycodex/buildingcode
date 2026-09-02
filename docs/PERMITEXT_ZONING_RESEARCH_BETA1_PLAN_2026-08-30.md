@@ -62,7 +62,7 @@ The current official-source revisions materially improve all six cases, and the 
 
 ## Current gate result
 
-Architecture V2.1's paid result is now controlling. Delivered-answer quality improved to `92.3%` and delivered-answer repair fell to `15.4%`, but completion regressed to 13/30 operations and the economics sample is not decision-ready. The final planned paid architecture authorization is consumed; no retry or automatic V2.2 package is authorized. Public Zoning Research, the 24,000-character candidate, pricing/allowance changes, merge, push, and deployment remain disabled. The next evidence is the owner's actual production Research example and professional/product review, not another repetition of this cohort.
+Architecture V2.1's paid result remains controlling. Delivered-answer quality improved to `92.3%` and delivered-answer repair fell to `15.4%`, but completion regressed to 13/30 operations and the economics sample is not decision-ready. The final planned paid architecture authorization is consumed; no retry or automatic V2.2 package is authorized. On September 2, the owner moved the five verifier-blocked cases and one delivered answer with a missing qualification into the post-launch Beta feedback backlog rather than require another pre-Beta architecture cycle. The historical outcomes are not relabeled as passes. Public Zoning Research, the 24,000-character candidate, pricing/allowance changes, merge, and deployment remain disabled until exact-release acceptance and final owner approval.
 
 The permanent no-cost command `npm run audit:zoning-freshness` compares the official homepage date with the imported contract. After the controlled refresh, its expected August 30 result is:
 

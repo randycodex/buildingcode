@@ -159,27 +159,27 @@ Release-bound: **no**
 
 Do not spend or lower the team budget merely to force this gate.
 
-## Zoning Research semantic, cost, and clients
+## Zoning Research Beta limitations and clients
 
-Gate ID: `zoning-research-semantic-cost-clients`
+Gate ID: `zoning-research-beta-limitations-and-clients`
 Status: **OPEN**
 Release-bound: **yes**
 
-The newest retained owner-approved successor is remediation successor 3 at SHA-256 `852e521f427a418eb18c1bd45e3e764736ae50cbb09d0d0a46ce64f8cad893fc`. Its one-time run `b4ef6990-5347-40d5-8654-611b893e8f1b` is partial evidence only: two of 30 cases completed and both passed grading; `zr-appendix-map-boundaries` then failed closed on `zoning_missing_mapped_location`, leaving 27 cases unattempted. Ten settled requests cost `$0.287113`, zero remained pending, the failed operation was uncharged, and the authorization is consumed. Its `$13.04` two-turn projection is not sample-ready and does not replace remediation successor 2's `$20.18` current risk-planning sensitivity. This result does not satisfy this gate.
+The controlling Architecture V2.1 run `06e55e77-4419-4732-b7ca-825afabc3bc2` attempted all 30 ordered cases once. Twelve delivered answers passed, one delivered answer missed a required qualification, five cases failed closed after provider work without a customer charge, and 12 correctly stopped before provider access. On September 2, the owner moved the six unresolved cases into the post-launch Beta feedback backlog rather than require another pre-Beta architecture cycle. This decision does not relabel any historical outcome as passed or weaken the remaining exact-release acceptance gate.
 
-- Exact successor lineage, case order, source edition, selected evidence, and safety boundaries reverified:
-- Newly authorized clean semantic run completed every case without execution failure and passed every required fatal quality gate:
-- Settled Zoning cost and mixed-month sensitivity accepted against the $20/100-turn commercial boundary:
-- Any proposed evidence-budget change passed complete no-cost preservation and newly authorized semantic confirmation before enablement:
-- Zoning `researchEligibility` and public Research routing changed only in the selected release commit after the preceding checks passed:
+- Architecture V2.1 result, six known limitations, consumed authorization, source edition, and case order retained without rescoring:
+- Owner's September 2 Beta sequencing decision recorded without claiming professional approval or a clean semantic pass:
+- Five verifier-blocked cases remain uncharged and fail closed; the known delivered-answer qualification is disclosed for Beta observation:
+- The disabled 24,000-character evidence candidate remains disabled and no additional paid cohort was used:
+- Zoning `researchEligibility` and public Research routing changed only in the selected release commit after these boundaries were verified:
 - Enabled Production web and final TestFlight build returned the same governed Zoning Research contract on a physical iPhone:
 - Zoning citations reopened the exact enacted ZR source and edition; structured tables, maps/visual limits, amendment state, and applicability unknowns remained explicit:
 - Project context, turn accounting, fail-closed recovery, unofficial-aid wording, privacy disclosure, and no-professional-signoff boundary passed:
 - Redacted evidence and timestamp:
 
-Detailed newest retained failure evidence: [PERMITEXT_ZONING_REMEDIATION_3_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_REMEDIATION_3_SEMANTIC_RESULT_2026-08-30.md). Controlling risk sensitivity: [PERMITEXT_ZONING_REMEDIATION_2_SEMANTIC_RESULT_2026-08-30.md](./PERMITEXT_ZONING_REMEDIATION_2_SEMANTIC_RESULT_2026-08-30.md).
+Controlling retained result: [PERMITEXT_ZONING_ARCHITECTURE_V21_CONFIRMATION_RESULT_2026-09-01.md](./PERMITEXT_ZONING_ARCHITECTURE_V21_CONFIRMATION_RESULT_2026-09-01.md). The [master plan](./PERMITEXT_BETA1_MASTER_PLAN.md) records the owner's subsequent sequencing decision.
 
-Do not enable public Zoning Research, change pricing or allowances, deploy, or mark this gate complete from no-cost tests or a partial paid run.
+Do not mark this gate complete until the selected release passes the enabled web/TestFlight physical-iPhone checks and the owner makes the final go/no-go decision. This Beta sequencing decision does not authorize deployment, pricing or allowance changes, or another paid run.
 
 ## Production web, TestFlight, and physical iPhone
 

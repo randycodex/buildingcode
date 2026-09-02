@@ -1,5 +1,5 @@
 {
-  "schema": "permitext-public-beta-release-gate-record-v1",
+  "schema": "permitext-public-beta-release-gate-record-v2",
   "expectedGitCommit": null,
   "gates": {
     "productionDeployment": {
@@ -47,7 +47,7 @@
     "zoningResearch": {
       "complete": false,
       "observedAt": null,
-      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#zoning-research-semantic-cost-and-clients",
+      "reference": "docs/BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md#zoning-research-beta-limitations-and-clients",
       "gitCommit": null
     },
     "productionClients": {

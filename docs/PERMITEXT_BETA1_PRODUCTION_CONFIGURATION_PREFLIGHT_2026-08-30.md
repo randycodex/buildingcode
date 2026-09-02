@@ -29,6 +29,8 @@ The missing activation keys are:
 - `PERMITEXT_PRIVACY_VERSION`;
 - `PERMITEXT_SUBSCRIPTION_POLICY_VERSION`.
 
+A September 2 read-only refresh with Vercel CLI 59.11.2 returned the same 63 Production variable names and the same 23-of-28 result. No new required group disappeared and no activation key was added. The five missing groups remain exactly the two unresolved Stripe Tax settings and the three policy-version identifiers above. The aggregate audit emitted names and readiness only; it did not read or print a secret value, alter Production configuration, or create a deployment.
+
 The owner approved the prepared automatic/exclusive decision on August 30, 2026, and New York Business Express shows the registration as issued. The missing Stripe tax keys are expected to remain absent until the actual Certificate is received, the recommended specific Product tax code and New York provider registration are owner-approved and verified, and activation is separately authorized. The three policy-version keys must remain absent until Production serves the exact approved document bytes and the strict publication audit passes.
 
 Production metadata does contain the required groups for durable PostgreSQL, private Blob storage, Stripe secret/Price/webhook identifiers, canonical public URL, Apple bundle/Pro/root-pin configuration, Clerk Production configuration, and the Research cap and price inputs. Presence does **not** prove any hidden value is correct.

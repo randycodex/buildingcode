@@ -75,6 +75,8 @@ npx --yes vercel@latest env run -e production -- npm run audit:production-auth -
 
 The live audit returned all ten configuration checks ready and all three manual acceptance checks open.
 
+A September 2 read-only refresh returned the same result: all ten configuration checks passed for the public Production Clerk environment, email/Apple/Google/Microsoft providers, email verification, Native API, exact Account Portal paths, and Apple web credentials. The audit continued to report `manualAcceptanceComplete: false` because the final-release fresh/existing provider sign-ins and disposable-account export/deletion lifecycle have not occurred. Vercel again reported that Production Secret values cannot be pulled and loaded only the pre-existing ignored local environment, so this refresh does not claim direct verification of hidden Production values.
+
 ## Remaining release evidence
 
 - Re-run the audit from the final deployed environment and confirm the new aggregate authentication fields on `/health`.

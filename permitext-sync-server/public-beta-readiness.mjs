@@ -1,4 +1,4 @@
-export const publicBetaReleaseGateSchema = "permitext-public-beta-release-gate-record-v1";
+export const publicBetaReleaseGateSchema = "permitext-public-beta-release-gate-record-v2";
 
 export const publicBetaReleaseGateDefinitions = Object.freeze([
   Object.freeze({
@@ -45,9 +45,9 @@ export const publicBetaReleaseGateDefinitions = Object.freeze([
   }),
   Object.freeze({
     key: "zoningResearch",
-    id: "zoning-research-semantic-cost-clients",
+    id: "zoning-research-beta-limitations-and-clients",
     releaseBound: true,
-    detail: "The exact owner-approved Zoning successor must pass clean semantic and accepted cost gates, then pass enabled web/TestFlight physical-iPhone acceptance against the selected release commit."
+    detail: "The six known Architecture V2.1 limitations must remain disclosed and fail closed where required, and enabled web/TestFlight physical-iPhone acceptance must pass against the selected release commit before the owner's final Zoning decision."
   }),
   Object.freeze({
     key: "productionClients",
@@ -135,7 +135,7 @@ export function publicBetaReleaseReadiness({
 
   const openGateIDs = checks.filter((item) => !item.ready).map((item) => item.id);
   return {
-    schema: "permitext-public-beta-readiness-v1",
+    schema: "permitext-public-beta-readiness-v2",
     generatedAt: new Date().toISOString(),
     ready: openGateIDs.length === 0,
     expectedGitCommit,
