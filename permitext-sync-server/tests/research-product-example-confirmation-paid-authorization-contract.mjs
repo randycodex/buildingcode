@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { access, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,8 +26,10 @@ const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 const validation = await validateResearchProductExampleConfirmationPaidAuthorization();
 assert.equal(validation.authorization.authorizationID, researchProductExampleConfirmationAuthorizationID);
-assert.equal(validation.authorization.status, "locked");
-assert.equal(validation.authorization.networkOrModelCallAuthorized, false);
+assert(
+  ["locked", "consumed"].includes(validation.authorization.status),
+  "The committed owner-example authorization must be either the pristine package lock or the retained consumed result."
+);
 assert.equal(validation.authorization.plannedScope.conversationCount, 7);
 assert.equal(validation.authorization.plannedScope.orderedTurnCount, 9);
 assert.equal(validation.authorization.plannedScope.repetitions, 1);
@@ -40,10 +42,6 @@ assert.equal(
   validation.authorization.lineage.preparedFromCommit,
   researchProductExampleConfirmationPreparedFromCommit
 );
-assert.equal(
-  sha256(await readFile(authorizationPath)),
-  researchProductExampleConfirmationLockedAuthorizationSHA256
-);
 assert.throws(
   () => requireActiveResearchProductExampleConfirmationPaidAuthorization(validation),
   /locked and no provider call is authorized/i
@@ -51,7 +49,47 @@ assert.throws(
 
 const temporaryDirectory = await mkdtemp(join(tmpdir(), "permitext-owner-example-auth-"));
 try {
-  const tampered = structuredClone(validation.authorization);
+  const locked = structuredClone(validation.authorization);
+  locked.status = "locked";
+  locked.scope = {
+    conversationCount: null,
+    orderedTurnCount: null,
+    repetitions: null,
+    maximumCumulativeSpendUSD: null
+  };
+  locked.ownerDecision = {
+    required: true,
+    authorizedAt: null,
+    authorizedBy: null,
+    exactAuthorizationPhrase: null,
+    exactSpendingCapPhrase: null
+  };
+  locked.consumption = {
+    status: "not_started",
+    attemptID: null,
+    startedAt: null,
+    runID: null,
+    consumedAt: null
+  };
+  locked.execution.authorizationPackageCommit = null;
+  locked.execution.executionCommit = null;
+  locked.networkOrModelCallAuthorized = false;
+  const lockedPath = join(temporaryDirectory, "locked.json");
+  await writeFile(lockedPath, `${JSON.stringify(locked, null, 2)}\n`);
+  const lockedValidation =
+    await validateResearchProductExampleConfirmationPaidAuthorization({
+      authorizationPath: lockedPath
+    });
+  assert.equal(
+    sha256(await readFile(lockedPath)),
+    researchProductExampleConfirmationLockedAuthorizationSHA256
+  );
+  assert.throws(
+    () => requireActiveResearchProductExampleConfirmationPaidAuthorization(lockedValidation),
+    /locked and no provider call is authorized/i
+  );
+
+  const tampered = structuredClone(locked);
   tampered.notes = `${tampered.notes} changed`;
   const tamperedPath = join(temporaryDirectory, "authorization.json");
   await writeFile(tamperedPath, `${JSON.stringify(tampered, null, 2)}\n`);
@@ -66,7 +104,7 @@ try {
   const exactAuthorizationPhrase =
     `authorize exactly package commit ${packageCommit} for all 9 ordered turns ` +
     "in 7 conversations, one repetition, with a maximum cumulative API spend of $2.";
-  const authorized = structuredClone(validation.authorization);
+  const authorized = structuredClone(locked);
   authorized.status = "authorized";
   authorized.scope = {
     conversationCount: 7,
@@ -105,6 +143,12 @@ try {
   await rm(temporaryDirectory, { recursive: true, force: true });
 }
 
+let runLockBefore = null;
+try {
+  runLockBefore = await readFile(runLockPath, "utf8");
+} catch (error) {
+  if (error.code !== "ENOENT") throw error;
+}
 const lockedRun = spawnSync(
   process.execPath,
   ["scripts/run-research-product-example-confirmation.mjs"],
@@ -121,7 +165,13 @@ const lockedRun = spawnSync(
 );
 assert.notEqual(lockedRun.status, 0);
 assert.match(`${lockedRun.stdout}\n${lockedRun.stderr}`, /locked and no provider call is authorized/i);
-await assert.rejects(access(runLockPath), /ENOENT/);
+let runLockAfter = null;
+try {
+  runLockAfter = await readFile(runLockPath, "utf8");
+} catch (error) {
+  if (error.code !== "ENOENT") throw error;
+}
+assert.equal(runLockAfter, runLockBefore, "The refusal path must not create or alter the permanent run lock.");
 
 const runnerSource = await readFile(
   join(serverRoot, "scripts", "run-research-product-example-confirmation.mjs"),

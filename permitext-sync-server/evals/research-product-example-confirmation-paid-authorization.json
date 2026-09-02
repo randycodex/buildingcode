@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "2ae2f240-6c7d-43ac-b893-d15dafbf0d55",
-  "status": "authorized",
+  "status": "consumed",
   "cohort": {
     "file": "research-product-example-cases.json",
     "sha256": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
@@ -31,11 +31,11 @@
     "exactSpendingCapPhrase": "authorize exactly package commit 41b4f2612b1c982fca60de6400fe802aded5a193 for all 9 ordered turns in 7 conversations, one repetition, with a maximum cumulative API spend of $2."
   },
   "consumption": {
-    "status": "not_started",
-    "attemptID": null,
-    "startedAt": null,
-    "runID": null,
-    "consumedAt": null
+    "status": "consumed",
+    "attemptID": "2063e712-5a7a-4799-9d4e-fa25c3782dcf",
+    "startedAt": "2026-09-02T15:01:27.878Z",
+    "runID": "2063e712-5a7a-4799-9d4e-fa25c3782dcf",
+    "consumedAt": "2026-09-02T15:06:28.709Z"
   },
   "lineage": {
     "preparedFromCommit": "32b83a69b14fe1910643e8781f4796fe87fc6f71",
@@ -50,7 +50,7 @@
   },
   "execution": {
     "authorizationPackageCommit": "41b4f2612b1c982fca60de6400fe802aded5a193",
-    "executionCommit": null,
+    "executionCommit": "6433bc130ff245215e5d30ab492f32f8b443b4d4",
     "webSupportEnabled": false,
     "automaticEnactedCorpusRetrieval": true,
     "conversationFollowUpsPreserved": true,
