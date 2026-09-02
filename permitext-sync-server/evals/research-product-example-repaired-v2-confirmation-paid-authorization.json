@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authorizationID": "1c44bd94-38cc-4d5f-874d-26260f696d4d",
-  "status": "locked",
+  "status": "authorized",
   "cohort": {
     "file": "research-product-example-cases.json",
     "sha256": "39cbbe5b6d88254e585003576212f4d4227cca28f1ac4bc14c98007490f96d97",
@@ -18,17 +18,17 @@
     "separateJudgeRequests": 0
   },
   "scope": {
-    "conversationCount": null,
-    "orderedTurnCount": null,
-    "repetitions": null,
-    "maximumCumulativeSpendUSD": null
+    "conversationCount": 7,
+    "orderedTurnCount": 9,
+    "repetitions": 1,
+    "maximumCumulativeSpendUSD": 2
   },
   "ownerDecision": {
     "required": true,
-    "authorizedAt": null,
-    "authorizedBy": null,
-    "exactAuthorizationPhrase": null,
-    "exactSpendingCapPhrase": null
+    "authorizedAt": "2026-09-02T17:27:29Z",
+    "authorizedBy": "Permitext owner",
+    "exactAuthorizationPhrase": "authorize exactly package commit 5e67d36ef40c21cd2315ebd06f9b06ece94e0b02 for all 9 ordered turns in 7 conversations, one repetition, with a maximum cumulative API spend of $2.",
+    "exactSpendingCapPhrase": "authorize exactly package commit 5e67d36ef40c21cd2315ebd06f9b06ece94e0b02 for all 9 ordered turns in 7 conversations, one repetition, with a maximum cumulative API spend of $2."
   },
   "consumption": {
     "status": "not_started",
@@ -61,7 +61,7 @@
     }
   },
   "execution": {
-    "authorizationPackageCommit": null,
+    "authorizationPackageCommit": "5e67d36ef40c21cd2315ebd06f9b06ece94e0b02",
     "executionCommit": null,
     "webSupportEnabled": true,
     "officialDomains": [
@@ -91,7 +91,7 @@
     "continueAfterSettledUnchargedFailure": true,
     "stopOnSpendCapProviderOrTelemetryFailure": true
   },
-  "networkOrModelCallAuthorized": false,
+  "networkOrModelCallAuthorized": true,
   "publicResearchReleaseAuthorized": false,
   "publicZoningResearchAuthorized": false,
   "professionalCodeDetermination": false,
