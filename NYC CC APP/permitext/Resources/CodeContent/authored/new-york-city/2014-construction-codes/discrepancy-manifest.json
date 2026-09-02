@@ -14,7 +14,7 @@
         564.18
       ],
       "caption": "TABLE 104.7.6.1",
-      "parserAgreement": 0.9414,
+      "parserAgreement": 0.9928,
       "cellCoverage": 0.619,
       "asset": "2014-ac-1-p0024-table-review-01.png",
       "reviewRequired": true,
@@ -32,7 +32,7 @@
         637.74
       ],
       "caption": "TABLE 104.7.6.2",
-      "parserAgreement": 0.9414,
+      "parserAgreement": 0.9928,
       "cellCoverage": 0.7895,
       "asset": "2014-ac-1-p0024-table-review-02.png",
       "reviewRequired": true,
@@ -50,7 +50,7 @@
         711.12
       ],
       "caption": "TABLE 104.7.6.3",
-      "parserAgreement": 0.9414,
+      "parserAgreement": 0.9928,
       "cellCoverage": 0.7895,
       "asset": "2014-ac-1-p0024-table-review-03.png",
       "reviewRequired": true,
@@ -68,7 +68,7 @@
         219.48
       ],
       "caption": "TABLE 104.7.6.5",
-      "parserAgreement": 0.9615,
+      "parserAgreement": 1.0,
       "cellCoverage": 0.5926,
       "asset": "2014-ac-1-p0025-table-review-02.png",
       "reviewRequired": true,
@@ -193,7 +193,7 @@
         540.0,
         684.24
       ],
-      "caption": "§28-304.6.4.1 Periodic inspections. For the periodic inspections listed in Table N1 of ASME A17.1, as modified",
+      "caption": null,
       "parserAgreement": 1.0,
       "cellCoverage": 1.0,
       "asset": "2014-ac-3-p0004-table-review-02.png",
@@ -212,7 +212,7 @@
         629.38
       ],
       "caption": "TABLE 307.1(1)",
-      "parserAgreement": 0.9517,
+      "parserAgreement": 0.948,
       "cellCoverage": 0.7146,
       "asset": "2014-bc-3-p0006-table-review-01.png",
       "reviewRequired": true,
@@ -230,7 +230,7 @@
         427.51
       ],
       "caption": "TABLE 307.1(2)",
-      "parserAgreement": 0.9913,
+      "parserAgreement": 0.9825,
       "cellCoverage": 0.6803,
       "asset": "2014-bc-3-p0008-table-review-01.png",
       "reviewRequired": true,
@@ -248,7 +248,7 @@
         486.55
       ],
       "caption": "TABLE 403.2.4",
-      "parserAgreement": 0.9969,
+      "parserAgreement": 0.9938,
       "cellCoverage": 0.475,
       "asset": "2014-bc-4-p0006-table-review-01.png",
       "reviewRequired": true,
@@ -284,7 +284,7 @@
         546.43
       ],
       "caption": "TABLE 414.2.2",
-      "parserAgreement": 0.9599,
+      "parserAgreement": 0.9532,
       "cellCoverage": 0.8636,
       "asset": "2014-bc-4-p0030-table-review-01.png",
       "reviewRequired": true,
@@ -302,7 +302,7 @@
         761.64
       ],
       "caption": "TABLE 414.2.5(1)",
-      "parserAgreement": 0.9599,
+      "parserAgreement": 0.9532,
       "cellCoverage": 0.679,
       "asset": "2014-bc-4-p0030-table-review-02.png",
       "reviewRequired": true,
@@ -320,7 +320,7 @@
         230.06
       ],
       "caption": null,
-      "parserAgreement": 0.9745,
+      "parserAgreement": 0.9717,
       "cellCoverage": 0.8214,
       "asset": "2014-bc-4-p0031-table-review-01.png",
       "reviewRequired": true,
@@ -338,7 +338,7 @@
         551.95
       ],
       "caption": "TABLE 414.2.5(2)",
-      "parserAgreement": 0.9745,
+      "parserAgreement": 0.9717,
       "cellCoverage": 0.8243,
       "asset": "2014-bc-4-p0031-table-review-02.png",
       "reviewRequired": true,
@@ -356,7 +356,7 @@
         565.27
       ],
       "caption": "TABLE 414.5.1",
-      "parserAgreement": 0.9387,
+      "parserAgreement": 0.9234,
       "cellCoverage": 0.8722,
       "asset": "2014-bc-4-p0033-table-review-01.png",
       "reviewRequired": true,
@@ -446,7 +446,7 @@
         456.55
       ],
       "caption": "TABLE 508.4",
-      "parserAgreement": 0.9874,
+      "parserAgreement": 0.9964,
       "cellCoverage": 0.9451,
       "asset": "2014-bc-5-p0011-table-review-01.png",
       "reviewRequired": true,
@@ -482,7 +482,7 @@
         543.91
       ],
       "caption": "TABLE 602",
-      "parserAgreement": 0.9938,
+      "parserAgreement": 0.9362,
       "cellCoverage": 0.7294,
       "asset": "2014-bc-6-p0003-table-review-01.png",
       "reviewRequired": true,
@@ -500,25 +500,9 @@
         244.94
       ],
       "caption": "TABLE 602.4",
-      "parserAgreement": 0.9942,
+      "parserAgreement": 0.9903,
       "cellCoverage": 0.6607,
       "asset": "2014-bc-6-p0004-table-review-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 7,
-      "bbox": [
-        36.0,
-        375.03,
-        576.0,
-        652.51
-      ],
-      "caption": "Feo = An “equivalent opening factor” derived from Figure 705.7 based on the average temperature of the unexposed wall",
-      "asset": "2014-bc-7-p0007-figure-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -529,12 +513,25 @@
       "pdfPage": 8,
       "bbox": [
         36.0,
-        122.35,
+        72.0,
         576.0,
-        398.39
+        399.51
       ],
       "caption": "FIGURE 705.7",
       "asset": "2014-bc-7-p0008-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        167.75,
+        72.0,
+        444.25,
+        361.15
+      ],
+      "sourceEmbeddedImageBBox": [
+        167.75,
+        72.0,
+        444.25,
+        361.15
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -604,7 +601,7 @@
         348.65
       ],
       "caption": "TABLE 715.4",
-      "parserAgreement": 1.0,
+      "parserAgreement": 0.9961,
       "cellCoverage": 0.7607,
       "asset": "2014-bc-7-p0030-table-review-01.png",
       "reviewRequired": true,
@@ -665,13 +662,6 @@
       "researchClaimEligible": false
     },
     {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 46,
-      "parserAgreement": 0.5401,
-      "reviewRequired": true
-    },
-    {
       "kind": "unverified-table",
       "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
       "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
@@ -683,25 +673,11 @@
         711.58
       ],
       "caption": "TABLE 720.1(1)",
-      "parserAgreement": 0.5401,
+      "parserAgreement": 0.9176,
       "cellCoverage": 0.8394,
       "asset": "2014-bc-7-p0046-table-review-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 47,
-      "parserAgreement": 0.6834,
-      "reviewRequired": true
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 48,
-      "parserAgreement": 0.496,
-      "reviewRequired": true
     },
     {
       "kind": "unverified-table",
@@ -715,32 +691,11 @@
         107.52
       ],
       "caption": null,
-      "parserAgreement": 0.8087,
+      "parserAgreement": 0.9699,
       "cellCoverage": 0.8857,
       "asset": "2014-bc-7-p0049-table-review-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 50,
-      "parserAgreement": 0.6424,
-      "reviewRequired": true
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 51,
-      "parserAgreement": 0.5041,
-      "reviewRequired": true
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 52,
-      "parserAgreement": 0.4289,
-      "reviewRequired": true
     },
     {
       "kind": "unverified-table",
@@ -754,43 +709,11 @@
         619.42
       ],
       "caption": null,
-      "parserAgreement": 0.4289,
+      "parserAgreement": 0.9116,
       "cellCoverage": 0.8655,
       "asset": "2014-bc-7-p0052-table-review-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 53,
-      "parserAgreement": 0.6088,
-      "reviewRequired": true
-    },
-    {
-      "kind": "unverified-table",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 53,
-      "bbox": [
-        120.02,
-        72.12,
-        564.1,
-        629.76
-      ],
-      "caption": null,
-      "parserAgreement": 0.6088,
-      "cellCoverage": 0.9509,
-      "asset": "2014-bc-7-p0053-table-review-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 54,
-      "parserAgreement": 0.6971,
-      "reviewRequired": true
     },
     {
       "kind": "unverified-table",
@@ -804,57 +727,11 @@
         715.55
       ],
       "caption": null,
-      "parserAgreement": 0.6971,
+      "parserAgreement": 0.9596,
       "cellCoverage": 0.69,
       "asset": "2014-bc-7-p0054-table-review-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 56,
-      "parserAgreement": 0.6696,
-      "reviewRequired": true
-    },
-    {
-      "kind": "unverified-table",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 56,
-      "bbox": [
-        49.8,
-        223.34,
-        562.3,
-        663.82
-      ],
-      "caption": "TABLE 720.1(3)",
-      "parserAgreement": 0.6696,
-      "cellCoverage": 0.8894,
-      "asset": "2014-bc-7-p0056-table-review-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 57,
-      "parserAgreement": 0.4642,
-      "reviewRequired": true
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 58,
-      "parserAgreement": 0.4964,
-      "reviewRequired": true
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "pdfPage": 59,
-      "parserAgreement": 0.7086,
-      "reviewRequired": true
     },
     {
       "kind": "unverified-table",
@@ -881,28 +758,25 @@
       "pdfPage": 65,
       "bbox": [
         36.0,
-        36.0,
+        223.91,
         576.0,
-        225.23
-      ],
-      "caption": "ratings shall be permitted to be determined from Figure 721.2.1.2.",
-      "asset": "2014-bc-7-p0065-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 65,
-      "bbox": [
-        36.0,
-        176.73,
-        576.0,
-        452.77
+        462.17
       ],
       "caption": "FIGURE 721.2.1.2",
-      "asset": "2014-bc-7-p0065-figure-02.png",
+      "asset": "2014-bc-7-p0065-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        197.7,
+        223.91,
+        414.3,
+        416.86
+      ],
+      "sourceEmbeddedImageBBox": [
+        197.7,
+        223.91,
+        414.3,
+        416.86
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -918,7 +792,7 @@
         225.74
       ],
       "caption": "TABLE 721.2.1.2(1)",
-      "parserAgreement": 0.9419,
+      "parserAgreement": 0.9379,
       "cellCoverage": 0.7153,
       "asset": "2014-bc-7-p0066-table-review-01.png",
       "reviewRequired": true,
@@ -936,7 +810,7 @@
         355.37
       ],
       "caption": "TABLE 721.2.1.2(2)",
-      "parserAgreement": 0.9419,
+      "parserAgreement": 0.9379,
       "cellCoverage": 0.5,
       "asset": "2014-bc-7-p0066-table-review-02.png",
       "reviewRequired": true,
@@ -946,63 +820,28 @@
       "kind": "official-pdf-figure",
       "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
       "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 66,
-      "bbox": [
-        36.0,
-        234.24,
-        576.0,
-        511.72
-      ],
-      "caption": "721.2.1.3.1 Ceramic fiber joint protection. Figure 721.2.1.3.1 shows thicknesses of ceramic fiber blankets to",
-      "asset": "2014-bc-7-p0066-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
       "pdfPage": 67,
       "bbox": [
         36.0,
-        36.0,
+        54.0,
         576.0,
-        293.15
+        294.27
       ],
       "caption": "FIGURE 721.2.1.3.1",
       "asset": "2014-bc-7-p0067-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 67,
-      "bbox": [
-        36.0,
-        137.02,
-        576.0,
-        414.5
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        177.75,
+        54.0,
+        433.5,
+        257.35
       ],
-      "caption": "resistance rating of the concrete and finish determined from Table 721.2.1.1, Figure 721.2.1.2 or Table",
-      "asset": "2014-bc-7-p0067-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 67,
-      "bbox": [
-        36.0,
-        198.48,
-        576.0,
-        475.96
+      "sourceEmbeddedImageBBox": [
+        177.75,
+        54.0,
+        433.5,
+        257.35
       ],
-      "caption": "determined from Table 721.2.1.1 or Figure 721.2.1.2, or Table 721.2.1.2(1) for the concrete alone, or to the",
-      "asset": "2014-bc-7-p0067-figure-03.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1031,28 +870,25 @@
       "pdfPage": 70,
       "bbox": [
         36.0,
-        36.0,
+        250.08,
         576.0,
-        237.47
-      ],
-      "caption": "721.2.2.1.2 Slabs with sloping soffits. The thickness of slabs with sloping soffits (see Figure 721.2.2.1.2) shall",
-      "asset": "2014-bc-7-p0070-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 70,
-      "bbox": [
-        36.0,
-        132.55,
-        576.0,
-        408.59
+        417.99
       ],
       "caption": "FIGURE 721.2.2.1.2",
-      "asset": "2014-bc-7-p0070-figure-02.png",
+      "asset": "2014-bc-7-p0070-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        108.0,
+        250.08,
+        346.6,
+        356.18
+      ],
+      "sourceEmbeddedImageBBox": [
+        108.0,
+        250.08,
+        346.6,
+        356.18
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1063,28 +899,25 @@
       "pdfPage": 71,
       "bbox": [
         36.0,
-        36.0,
+        54.0,
         576.0,
-        217.88
+        219.0
       ],
       "caption": "FIGURE 721.2.2.1.3",
       "asset": "2014-bc-7-p0071-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 71,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        255.47
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        207.75,
+        54.0,
+        403.6,
+        184.2
       ],
-      "caption": "topping (overlay) of a different type of concrete shall comply with Figure 721.2.2.2.",
-      "asset": "2014-bc-7-p0071-figure-02.png",
+      "sourceEmbeddedImageBBox": [
+        207.75,
+        54.0,
+        403.6,
+        184.2
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1095,12 +928,25 @@
       "pdfPage": 71,
       "bbox": [
         36.0,
-        227.13,
+        254.92,
         576.0,
-        503.17
+        505.25
       ],
       "caption": "FIGURE 721.2.2.2",
-      "asset": "2014-bc-7-p0071-figure-03.png",
+      "asset": "2014-bc-7-p0071-figure-02.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        219.32,
+        254.92,
+        395.02,
+        459.42
+      ],
+      "sourceEmbeddedImageBBox": [
+        219.32,
+        254.92,
+        395.02,
+        459.42
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1111,12 +957,25 @@
       "pdfPage": 72,
       "bbox": [
         36.0,
-        126.19,
+        54.0,
         576.0,
-        402.23
+        411.51
       ],
       "caption": "FIGURE 721.2.2.3(1)",
       "asset": "2014-bc-7-p0072-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        187.07,
+        54.0,
+        424.37,
+        354.1
+      ],
+      "sourceEmbeddedImageBBox": [
+        187.07,
+        54.0,
+        424.37,
+        354.1
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1145,44 +1004,25 @@
       "pdfPage": 73,
       "bbox": [
         36.0,
-        136.87,
+        235.35,
         576.0,
-        412.91
+        422.21
       ],
       "caption": "FIGURE 721.2.2.3(2)",
       "asset": "2014-bc-7-p0073-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 73,
-      "bbox": [
-        36.0,
-        180.96,
-        576.0,
-        458.44
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        184.13,
+        235.35,
+        428.33,
+        370.7
       ],
-      "caption": "resistance rating. The fire-resistance rating for concrete assemblies such as those shown in Figure 721.2.2.3(1)",
-      "asset": "2014-bc-7-p0073-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 73,
-      "bbox": [
-        36.0,
-        191.88,
-        576.0,
-        469.36
+      "sourceEmbeddedImageBBox": [
+        184.13,
+        235.35,
+        428.33,
+        370.7
       ],
-      "caption": "shall be increased by 10 minutes. This increase is not applicable to those shown in Figure 721.2.2.3(2).",
-      "asset": "2014-bc-7-p0073-figure-03.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1198,7 +1038,7 @@
         169.22
       ],
       "caption": "TABLE 721.2.3(2)",
-      "parserAgreement": 0.8725,
+      "parserAgreement": 0.9065,
       "cellCoverage": 0.6071,
       "asset": "2014-bc-7-p0074-table-review-01.png",
       "reviewRequired": true,
@@ -1216,7 +1056,7 @@
         316.01
       ],
       "caption": "TABLE 721.2.3(3)",
-      "parserAgreement": 0.8725,
+      "parserAgreement": 0.9065,
       "cellCoverage": 0.6535,
       "asset": "2014-bc-7-p0074-table-review-02.png",
       "reviewRequired": true,
@@ -1234,7 +1074,7 @@
         528.31
       ],
       "caption": "TABLE 721.2.3(4)",
-      "parserAgreement": 0.8725,
+      "parserAgreement": 0.9065,
       "cellCoverage": 0.5029,
       "asset": "2014-bc-7-p0074-table-review-03.png",
       "reviewRequired": true,
@@ -1252,7 +1092,7 @@
         258.53
       ],
       "caption": "TABLE 721.2.3(5)",
-      "parserAgreement": 0.8883,
+      "parserAgreement": 0.9487,
       "cellCoverage": 0.5533,
       "asset": "2014-bc-7-p0075-table-review-01.png",
       "reviewRequired": true,
@@ -1270,7 +1110,7 @@
         145.7
       ],
       "caption": "TABLE 721.2.4",
-      "parserAgreement": 0.9753,
+      "parserAgreement": 0.9768,
       "cellCoverage": 0.52,
       "asset": "2014-bc-7-p0076-table-review-01.png",
       "reviewRequired": true,
@@ -1288,7 +1128,7 @@
         368.21
       ],
       "caption": "TABLE 721.3.2",
-      "parserAgreement": 0.9931,
+      "parserAgreement": 0.9889,
       "cellCoverage": 0.7769,
       "asset": "2014-bc-7-p0077-table-review-01.png",
       "reviewRequired": true,
@@ -1427,12 +1267,25 @@
       "pdfPage": 82,
       "bbox": [
         36.0,
-        36.0,
+        54.0,
         576.0,
-        176.0
+        185.28
       ],
       "caption": "FIGURE 721.5.1(1)",
       "asset": "2014-bc-7-p0082-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        189.0,
+        54.0,
+        422.3,
+        147.9
+      ],
+      "sourceEmbeddedImageBBox": [
+        189.0,
+        54.0,
+        422.3,
+        147.9
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1443,12 +1296,25 @@
       "pdfPage": 82,
       "bbox": [
         36.0,
-        150.79,
+        201.6,
         576.0,
-        426.83
+        436.97
       ],
       "caption": "FIGURE 721.5.1(2)",
       "asset": "2014-bc-7-p0082-figure-02.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        183.0,
+        201.6,
+        428.95,
+        383.05
+      ],
+      "sourceEmbeddedImageBBox": [
+        183.0,
+        201.6,
+        428.95,
+        383.05
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1459,12 +1325,25 @@
       "pdfPage": 83,
       "bbox": [
         36.0,
-        36.0,
+        0.0,
         576.0,
-        223.04
+        236.52
       ],
       "caption": "FIGURE 721.5.1(3)",
       "asset": "2014-bc-7-p0083-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        209.25,
+        0.0,
+        426.7,
+        191.8
+      ],
+      "sourceEmbeddedImageBBox": [
+        209.25,
+        0.0,
+        426.7,
+        191.8
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1475,12 +1354,25 @@
       "pdfPage": 83,
       "bbox": [
         36.0,
-        324.72,
+        369.9,
         576.0,
-        600.76
+        613.88
       ],
       "caption": "FIGURE 721.5.1(4)",
       "asset": "2014-bc-7-p0083-figure-02.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        195.75,
+        369.9,
+        416.1,
+        576.3
+      ],
+      "sourceEmbeddedImageBBox": [
+        195.75,
+        369.9,
+        416.1,
+        576.3
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1491,12 +1383,25 @@
       "pdfPage": 84,
       "bbox": [
         36.0,
-        36.0,
+        4.56,
         576.0,
-        148.88
+        158.28
       ],
       "caption": "FIGURE 721.5.1(5)",
       "asset": "2014-bc-7-p0084-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        243.75,
+        4.56,
+        367.5,
+        130.56
+      ],
+      "sourceEmbeddedImageBBox": [
+        243.75,
+        4.56,
+        367.5,
+        130.56
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1507,12 +1412,25 @@
       "pdfPage": 84,
       "bbox": [
         36.0,
-        36.0,
+        171.0,
         576.0,
-        309.23
+        301.23
       ],
       "caption": "FIGURE 721.5.1(6)",
       "asset": "2014-bc-7-p0084-figure-02.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        210.0,
+        171.0,
+        417.35,
+        278.15
+      ],
+      "sourceEmbeddedImageBBox": [
+        210.0,
+        171.0,
+        417.35,
+        278.15
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1523,188 +1441,25 @@
       "pdfPage": 84,
       "bbox": [
         36.0,
-        204.21,
+        356.4,
         576.0,
-        480.25
+        489.65
       ],
       "caption": "FIGURE 721.5.1(7)",
       "asset": "2014-bc-7-p0084-figure-03.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 85,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        218.87
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        199.3,
+        356.4,
+        410.1,
+        442.8
       ],
-      "caption": "721.5.1.2.1 Attachment. The gypsum wallboard shall be supported as illustrated in either Figure 721.5.1(2) for",
-      "asset": "2014-bc-7-p0085-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 85,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        229.67
+      "sourceEmbeddedImageBBox": [
+        199.3,
+        356.4,
+        410.1,
+        442.8
       ],
-      "caption": "fire-resistance ratings of 4 hours or less, or Figure 721.5.1(3) for fire-resistance ratings of 3 hours or less.",
-      "asset": "2014-bc-7-p0085-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 85,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        257.99
-      ],
-      "caption": "steel columns from Figure 721.5.1(4) is permitted for various thicknesses of gypsum wallboard as a function of",
-      "asset": "2014-bc-7-p0085-figure-03.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 85,
-      "bbox": [
-        36.0,
-        44.26,
-        576.0,
-        321.74
-      ],
-      "caption": "protected with spray-applied fire-resistant materials, as illustrated in Figure 721.5.1(5), shall be permitted to be",
-      "asset": "2014-bc-7-p0085-figure-04.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 85,
-      "bbox": [
-        36.0,
-        342.75,
-        576.0,
-        620.23
-      ],
-      "caption": "illustrated in Figure 721.5.1(6)(a) and (b), shall be permitted to be determined from the following expression:",
-      "asset": "2014-bc-7-p0085-figure-05.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 86,
-      "bbox": [
-        36.0,
-        140.14,
-        576.0,
-        417.62
-      ],
-      "caption": "reentrant spaces filled [Figure 721.5.1(6)(c)], the thermal capacity of the concrete within the reentrant spaces",
-      "asset": "2014-bc-7-p0086-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 86,
-      "bbox": [
-        36.0,
-        300.0,
-        576.0,
-        577.48
-      ],
-      "caption": "filled, Figure 721.5.1(6)(c) and Tables 721.5.1(7) and 721.5.1(8) indicate the thickness of concrete cover",
-      "asset": "2014-bc-7-p0086-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 86,
-      "bbox": [
-        36.0,
-        350.43,
-        576.0,
-        627.91
-      ],
-      "caption": "column covers as shown in Figure 721.5.1 (6)(a), Tables 721.5.1(9) and 721.5.1(10) indicate the thickness of",
-      "asset": "2014-bc-7-p0086-figure-03.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 86,
-      "bbox": [
-        36.0,
-        400.83,
-        576.0,
-        678.31
-      ],
-      "caption": "masonry units or clay masonry units as illustrated in Figure 721.5.1(7), shall be permitted to be determined",
-      "asset": "2014-bc-7-p0086-figure-04.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 87,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        125.03
-      ],
-      "caption": "D = Heated perimeter of steel column (inches) [see Figure 721.5.1(7)].",
-      "asset": "2014-bc-7-p0087-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 87,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        223.07
-      ],
-      "caption": "p = Inner perimeter of concrete or clay masonry protection (inches) [see Figure 721.5.1(7)].",
-      "asset": "2014-bc-7-p0087-figure-02.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1763,22 +1518,6 @@
       "researchClaimEligible": false
     },
     {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 95,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        163.16
-      ],
-      "caption": "[FIGURE 721.5.1(6)(c)]",
-      "asset": "2014-bc-7-p0095-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
       "kind": "unverified-table",
       "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
       "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
@@ -1793,22 +1532,6 @@
       "parserAgreement": 0.9084,
       "cellCoverage": 0.6939,
       "asset": "2014-bc-7-p0096-table-review-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 96,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        98.48
-      ],
-      "caption": "[FIGURE 721.5.1 (6)(c)]",
-      "asset": "2014-bc-7-p0096-figure-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1831,22 +1554,6 @@
       "researchClaimEligible": false
     },
     {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 97,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        98.48
-      ],
-      "caption": "[FIGURE 721.5.1 (6)(a)]",
-      "asset": "2014-bc-7-p0097-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
       "kind": "unverified-table",
       "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
       "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
@@ -1858,25 +1565,9 @@
         616.78
       ],
       "caption": "TABLE 721.5.1(10)",
-      "parserAgreement": 0.8992,
+      "parserAgreement": 0.9231,
       "cellCoverage": 0.6218,
       "asset": "2014-bc-7-p0098-table-review-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 98,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        99.32
-      ],
-      "caption": "[FIGURE 721 .5.1(6)(a)]",
-      "asset": "2014-bc-7-p0098-figure-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -1928,7 +1619,7 @@
         249.5
       ],
       "caption": "TABLE 721.6.2(3)",
-      "parserAgreement": 0.9677,
+      "parserAgreement": 0.9636,
       "cellCoverage": 0.7105,
       "asset": "2014-bc-7-p0101-table-review-01.png",
       "reviewRequired": true,
@@ -1946,7 +1637,7 @@
         424.87
       ],
       "caption": "TABLE 721.6.2(4)",
-      "parserAgreement": 0.9677,
+      "parserAgreement": 0.9636,
       "cellCoverage": 0.766,
       "asset": "2014-bc-7-p0101-table-review-02.png",
       "reviewRequired": true,
@@ -1959,44 +1650,25 @@
       "pdfPage": 102,
       "bbox": [
         36.0,
-        36.0,
+        229.51,
         576.0,
-        231.23
-      ],
-      "caption": "Z = Load factor, based on Figure 721.6.3(1).",
-      "asset": "2014-bc-7-p0102-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 102,
-      "bbox": [
-        36.0,
-        223.23,
-        576.0,
-        514.09
+        515.21
       ],
       "caption": "FIGURE 721 .6.3(1)",
-      "asset": "2014-bc-7-p0102-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
-      "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
-      "pdfPage": 102,
-      "bbox": [
-        36.0,
-        259.5,
-        576.0,
-        535.06
+      "asset": "2014-bc-7-p0102-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        186.75,
+        229.51,
+        424.65,
+        488.11
       ],
-      "caption": "K e = The effective length factor as noted in Figure 72 1.6.3(2).",
-      "asset": "2014-bc-7-p0102-figure-03.png",
+      "sourceEmbeddedImageBBox": [
+        186.75,
+        229.51,
+        424.65,
+        488.11
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -2007,12 +1679,25 @@
       "pdfPage": 103,
       "bbox": [
         36.0,
-        36.0,
+        54.0,
         576.0,
-        258.08
+        258.63
       ],
       "caption": "FIGURE 721.6.3(2)",
       "asset": "2014-bc-7-p0103-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        182.73,
+        54.0,
+        429.28,
+        232.55
+      ],
+      "sourceEmbeddedImageBBox": [
+        182.73,
+        54.0,
+        429.28,
+        232.55
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -2031,22 +1716,6 @@
       "parserAgreement": 0.9862,
       "cellCoverage": 0.7032,
       "asset": "2014-bc-8-p0004-table-review-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_11_Accessibility.pdf",
-      "sourceSHA256": "c2741d99aec838061b0f9071b0e29d8846432ad72c6056258246ed4cb7d39fd3",
-      "pdfPage": 8,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        147.83
-      ],
-      "caption": "or sleeping unit for a door without a closer as per Figure 404.2.3.2(f) of ICC A117.1, the minimum maneuvering clearance",
-      "asset": "2014-bc-11-p0008-figure-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -2152,7 +1821,7 @@
         260.69
       ],
       "caption": "TABLE 1505.1a,b",
-      "parserAgreement": 0.9974,
+      "parserAgreement": 0.9947,
       "cellCoverage": 0.6538,
       "asset": "2014-bc-15-p0005-table-review-01.png",
       "reviewRequired": true,
@@ -2170,7 +1839,7 @@
         708.82
       ],
       "caption": "TABLE 1507.2.7.1(1)",
-      "parserAgreement": 0.9966,
+      "parserAgreement": 0.9933,
       "cellCoverage": 0.7714,
       "asset": "2014-bc-15-p0006-table-review-01.png",
       "reviewRequired": true,
@@ -2296,7 +1965,7 @@
         257.69
       ],
       "caption": "TABLE 1507.7.6",
-      "parserAgreement": 0.9715,
+      "parserAgreement": 0.9759,
       "cellCoverage": 0.6786,
       "asset": "2014-bc-15-p0013-table-review-01.png",
       "reviewRequired": true,
@@ -2350,7 +2019,7 @@
         566.95
       ],
       "caption": "Table 1607.5",
-      "parserAgreement": 0.9827,
+      "parserAgreement": 0.9712,
       "cellCoverage": 0.7313,
       "asset": "2014-bc-16-p0014-table-review-01.png",
       "reviewRequired": true,
@@ -2368,7 +2037,7 @@
         181.82
       ],
       "caption": "TABLE 1607.6",
-      "parserAgreement": 0.9948,
+      "parserAgreement": 0.9922,
       "cellCoverage": 0.5965,
       "asset": "2014-bc-16-p0015-table-review-01.png",
       "reviewRequired": true,
@@ -2386,7 +2055,7 @@
         577.63
       ],
       "caption": "TABLE 1608.3.1",
-      "parserAgreement": 0.9798,
+      "parserAgreement": 0.9824,
       "cellCoverage": 0.6383,
       "asset": "2014-bc-16-p0020-table-review-01.png",
       "reviewRequired": true,
@@ -2417,60 +2086,15 @@
       "pdfPage": 24,
       "bbox": [
         36.0,
-        253.56,
-        576.0,
-        531.04
-      ],
-      "caption": "category includes flat open country, grasslands, and limited water surfaces per Figure 1609.4.3.",
-      "asset": "2014-bc-16-p0024-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_16_Structural_Design.pdf",
-      "sourceSHA256": "cdf599fabb0375f3121c7aefa6fc56f2998aca519f866fc6da4241224c367050",
-      "pdfPage": 24,
-      "bbox": [
-        36.0,
-        316.8,
+        74.28,
         576.0,
         594.28
       ],
       "caption": "Figure 1609.4.3 provides the exposure categories at the shore lines for wind directions approaching over the water within the city",
-      "asset": "2014-bc-16-p0024-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_16_Structural_Design.pdf",
-      "sourceSHA256": "cdf599fabb0375f3121c7aefa6fc56f2998aca519f866fc6da4241224c367050",
-      "pdfPage": 24,
-      "bbox": [
-        36.0,
-        413.07,
-        576.0,
-        690.55
-      ],
-      "caption": "Exposure C. Exposure C shall apply where it is shown in Figure 1609.4.3 or for all cases where Exposures B or D does not",
-      "asset": "2014-bc-16-p0024-figure-03.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_16_Structural_Design.pdf",
-      "sourceSHA256": "cdf599fabb0375f3121c7aefa6fc56f2998aca519f866fc6da4241224c367050",
-      "pdfPage": 31,
-      "bbox": [
-        36.0,
-        91.54,
-        576.0,
-        369.02
-      ],
-      "caption": "building surfaces as shown in Figure 1609.6.2.1. For the horizontal pressures (Zones A, B, C, D), p is the combination of the",
-      "asset": "2014-bc-16-p0031-figure-01.png",
+      "asset": "2014-bc-16-p0024-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -2481,12 +2105,25 @@
       "pdfPage": 32,
       "bbox": [
         36.0,
-        113.71,
+        72.0,
         576.0,
-        389.75
+        390.99
       ],
       "caption": "FIGURE 1609.6.2.1",
       "asset": "2014-bc-16-p0032-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        63.4,
+        72.0,
+        564.4,
+        340.5
+      ],
+      "sourceEmbeddedImageBBox": [
+        63.4,
+        72.0,
+        564.4,
+        340.5
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -2502,7 +2139,7 @@
         303.17
       ],
       "caption": "TABLE 1609.6.2.1(1)",
-      "parserAgreement": 0.9831,
+      "parserAgreement": 0.9718,
       "cellCoverage": 0.8425,
       "asset": "2014-bc-16-p0033-table-review-01.png",
       "reviewRequired": true,
@@ -2520,7 +2157,7 @@
         710.5
       ],
       "caption": "TABLE 1609.6.2.1(2)",
-      "parserAgreement": 0.8226,
+      "parserAgreement": 0.8182,
       "cellCoverage": 0.7974,
       "asset": "2014-bc-16-p0034-table-review-01.png",
       "reviewRequired": true,
@@ -2538,7 +2175,7 @@
         555.19
       ],
       "caption": "TABLE 1609.6.2.1(3)",
-      "parserAgreement": 0.8266,
+      "parserAgreement": 0.8222,
       "cellCoverage": 0.6641,
       "asset": "2014-bc-16-p0035-table-review-02.png",
       "reviewRequired": true,
@@ -2569,12 +2206,25 @@
       "pdfPage": 37,
       "bbox": [
         36.0,
-        215.37,
+        72.0,
         576.0,
-        491.41
+        492.65
       ],
       "caption": "FIGURE 1609.6.2.2",
       "asset": "2014-bc-16-p0037-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        93.35,
+        72.0,
+        525.35,
+        467.5
+      ],
+      "sourceEmbeddedImageBBox": [
+        93.35,
+        72.0,
+        525.35,
+        467.5
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -2626,7 +2276,7 @@
         422.95
       ],
       "caption": "TABLE 1613.5.6(1)",
-      "parserAgreement": 0.96,
+      "parserAgreement": 0.9547,
       "cellCoverage": 0.4918,
       "asset": "2014-bc-16-p0047-table-review-01.png",
       "reviewRequired": true,
@@ -2644,7 +2294,7 @@
         589.78
       ],
       "caption": "TABLE 1613.5.6(2)",
-      "parserAgreement": 0.96,
+      "parserAgreement": 0.9547,
       "cellCoverage": 0.4531,
       "asset": "2014-bc-16-p0047-table-review-02.png",
       "reviewRequired": true,
@@ -2705,13 +2355,6 @@
       "researchClaimEligible": false
     },
     {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_18_Soils_and_Foundations.pdf",
-      "pdfPage": 39,
-      "parserAgreement": 0.5793,
-      "reviewRequired": true
-    },
-    {
       "kind": "unverified-table",
       "sourcePDF": "2014CC_BC_Chapter_18_Soils_and_Foundations.pdf",
       "sourceSHA256": "3ef6d7841193c2fb0ae06ee3b3c38006b7d4366c1bf68e0c853bb5b5a3246d5c",
@@ -2723,7 +2366,7 @@
         541.28
       ],
       "caption": null,
-      "parserAgreement": 0.5793,
+      "parserAgreement": 0.8685,
       "cellCoverage": 0.2353,
       "asset": "2014-bc-18-p0039-table-review-01.png",
       "reviewRequired": true,
@@ -2741,7 +2384,7 @@
         494.64
       ],
       "caption": null,
-      "parserAgreement": 0.5793,
+      "parserAgreement": 0.8685,
       "cellCoverage": 0.4737,
       "asset": "2014-bc-18-p0039-table-review-02.png",
       "reviewRequired": true,
@@ -2756,26 +2399,13 @@
         36.0,
         36.0,
         576.0,
-        128.39
-      ],
-      "caption": "standard penetration resistance normalized to an energy of 60 percent efficiency (N ) at the site, as defined in Figure 1813.1, or",
-      "asset": "2014-bc-18-p0039-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_18_Soils_and_Foundations.pdf",
-      "sourceSHA256": "3ef6d7841193c2fb0ae06ee3b3c38006b7d4366c1bf68e0c853bb5b5a3246d5c",
-      "pdfPage": 39,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        205.16
+        214.28
       ],
       "caption": "FIGURE 1813.1",
-      "asset": "2014-bc-18-p0039-figure-02.png",
+      "asset": "2014-bc-18-p0039-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -2809,7 +2439,7 @@
         204.26
       ],
       "caption": "TABLE 1904.3",
-      "parserAgreement": 0.8722,
+      "parserAgreement": 0.9877,
       "cellCoverage": 0.8795,
       "asset": "2014-bc-19-p0003-table-review-01.png",
       "reviewRequired": true,
@@ -2827,7 +2457,7 @@
         378.17
       ],
       "caption": "TABLE 1904.4.2",
-      "parserAgreement": 0.8722,
+      "parserAgreement": 0.9877,
       "cellCoverage": 0.8169,
       "asset": "2014-bc-19-p0003-table-review-02.png",
       "reviewRequired": true,
@@ -2845,7 +2475,7 @@
         667.78
       ],
       "caption": "TABLE 1907.5.2.1",
-      "parserAgreement": 1.0,
+      "parserAgreement": 0.9928,
       "cellCoverage": 0.7742,
       "asset": "2014-bc-19-p0011-table-review-01.png",
       "reviewRequired": true,
@@ -2863,7 +2493,7 @@
         476.11
       ],
       "caption": "TABLE 1907.7.1",
-      "parserAgreement": 0.9841,
+      "parserAgreement": 0.9801,
       "cellCoverage": 0.8585,
       "asset": "2014-bc-19-p0012-table-review-01.png",
       "reviewRequired": true,
@@ -2881,7 +2511,7 @@
         655.78
       ],
       "caption": "TABLE 1911.2",
-      "parserAgreement": 0.8576,
+      "parserAgreement": 0.958,
       "cellCoverage": 0.8276,
       "asset": "2014-bc-19-p0018-table-review-01.png",
       "reviewRequired": true,
@@ -2963,63 +2593,28 @@
       "kind": "official-pdf-figure",
       "sourcePDF": "2014CC_BC_Chapter_21_Masonry.pdf",
       "sourceSHA256": "f14254a6f8b8213ece4fa9aee52410345bb4d742015ba05a84f1fa72fa3feb47",
-      "pdfPage": 14,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        310.22
-      ],
-      "caption": "in accordance with this section, Table 2111.1 and Figure 2111.1. All masonry fireplaces shall be installed, altered and maintained",
-      "asset": "2014-bc-21-p0014-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_21_Masonry.pdf",
-      "sourceSHA256": "f14254a6f8b8213ece4fa9aee52410345bb4d742015ba05a84f1fa72fa3feb47",
-      "pdfPage": 15,
-      "bbox": [
-        36.0,
-        420.57,
-        576.0,
-        696.13
-      ],
-      "caption": "a. This table provides a summary of major requirements for the construction of masonry chimneys and fireplaces. Letter refere nces are to Figure 2111.1, which",
-      "asset": "2014-bc-21-p0015-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_21_Masonry.pdf",
-      "sourceSHA256": "f14254a6f8b8213ece4fa9aee52410345bb4d742015ba05a84f1fa72fa3feb47",
       "pdfPage": 16,
       "bbox": [
         36.0,
-        395.06,
+        72.0,
         576.0,
-        670.62
+        671.26
       ],
       "caption": "FIGURE 2111.1",
       "asset": "2014-bc-21-p0016-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_21_Masonry.pdf",
-      "sourceSHA256": "f14254a6f8b8213ece4fa9aee52410345bb4d742015ba05a84f1fa72fa3feb47",
-      "pdfPage": 18,
-      "bbox": [
-        36.0,
-        346.83,
-        576.0,
-        624.31
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        68.4,
+        72.0,
+        557.45,
+        627.6
       ],
-      "caption": "permitted to abut the masonry fireplace sidewalls and hearth extension, in accordance with Figure 2111.11, provided",
-      "asset": "2014-bc-21-p0018-figure-01.png",
+      "sourceEmbeddedImageBBox": [
+        68.4,
+        72.0,
+        557.45,
+        627.6
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3030,12 +2625,25 @@
       "pdfPage": 19,
       "bbox": [
         36.0,
-        36.0,
+        72.0,
         576.0,
-        227.96
+        237.36
       ],
       "caption": "FIGURE 2111.11",
       "asset": "2014-bc-21-p0019-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        186.2,
+        72.0,
+        413.05,
+        193.6
+      ],
+      "sourceEmbeddedImageBBox": [
+        186.2,
+        72.0,
+        413.05,
+        193.6
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3051,25 +2659,9 @@
         637.54
       ],
       "caption": "TABLE 2113.16(1)",
-      "parserAgreement": 0.9924,
+      "parserAgreement": 0.9847,
       "cellCoverage": 0.587,
       "asset": "2014-bc-21-p0025-table-review-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_21_Masonry.pdf",
-      "sourceSHA256": "f14254a6f8b8213ece4fa9aee52410345bb4d742015ba05a84f1fa72fa3feb47",
-      "pdfPage": 25,
-      "bbox": [
-        36.0,
-        182.04,
-        576.0,
-        459.52
-      ],
-      "caption": "accordance with Figure 2113.16. A flue size providing at least the equivalent net cross-sectional area shall be used. Cross-",
-      "asset": "2014-bc-21-p0025-figure-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3080,28 +2672,25 @@
       "pdfPage": 27,
       "bbox": [
         36.0,
-        149.49,
+        113.3,
         576.0,
-        425.53
+        425.33
       ],
       "caption": "FIGURE 2113.16",
       "asset": "2014-bc-21-p0027-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_21_Masonry.pdf",
-      "sourceSHA256": "f14254a6f8b8213ece4fa9aee52410345bb4d742015ba05a84f1fa72fa3feb47",
-      "pdfPage": 28,
-      "bbox": [
-        36.0,
-        68.5,
-        576.0,
-        345.98
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        170.2,
+        113.3,
+        441.85,
+        396.9
       ],
-      "caption": "chimney sidewalls, in accordance with Figure 2113.19, provided such combustible trim or sheathing is a minimum of 12",
-      "asset": "2014-bc-21-p0028-figure-01.png",
+      "sourceEmbeddedImageBBox": [
+        170.2,
+        113.3,
+        441.85,
+        396.9
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3112,21 +2701,27 @@
       "pdfPage": 28,
       "bbox": [
         36.0,
-        392.24,
+        504.79,
         576.0,
-        668.28
+        682.36
       ],
       "caption": "FIGURE 2113.19",
-      "asset": "2014-bc-21-p0028-figure-02.png",
+      "asset": "2014-bc-21-p0028-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        184.5,
+        504.79,
+        420.7,
+        623.29
+      ],
+      "sourceEmbeddedImageBBox": [
+        184.5,
+        504.79,
+        420.7,
+        623.29
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
-    },
-    {
-      "kind": "low-parser-agreement",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "pdfPage": 31,
-      "parserAgreement": 0.6881,
-      "reviewRequired": true
     },
     {
       "kind": "unverified-table",
@@ -3140,7 +2735,7 @@
         609.34
       ],
       "caption": "TABLE 2306.7",
-      "parserAgreement": 0.6881,
+      "parserAgreement": 0.9046,
       "cellCoverage": 0.7313,
       "asset": "2014-bc-23-p0031-table-review-01.png",
       "reviewRequired": true,
@@ -3150,159 +2745,18 @@
       "kind": "official-pdf-figure",
       "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
       "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 40,
-      "bbox": [
-        36.0,
-        350.31,
-        576.0,
-        627.79
-      ],
-      "caption": "and amount of bracing as shown in Figure 2308.9.3, specified in Table 2308.9.3(1), and are in line or offset from each",
-      "asset": "2014-bc-23-p0040-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 45,
-      "bbox": [
-        36.0,
-        62.14,
-        576.0,
-        339.62
-      ],
-      "caption": "common or galvanized box nails in accordance with Figure 2308.9.3.2. The wood structural panel",
-      "asset": "2014-bc-23-p0045-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 45,
-      "bbox": [
-        36.0,
-        83.98,
-        576.0,
-        361.46
-      ],
-      "caption": "accordance with Figure 2308.9.3.2. A built-up header consisting of at least two 2 × 12s and fas-",
-      "asset": "2014-bc-23-p0045-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 75,
-      "bbox": [
-        36.0,
-        66.34,
-        576.0,
-        343.82
-      ],
-      "caption": "splice location (see Figure 2308.11.3.2). The metal tie shall have a minimum yield of 33,000 pounds per square",
-      "asset": "2014-bc-23-p0075-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 75,
-      "bbox": [
-        36.0,
-        439.7,
-        576.0,
-        717.18
-      ],
-      "caption": "common nails on each side of the header-joist intersection shall be provided (see Figure 2308.11.3.3). The",
-      "asset": "2014-bc-23-p0075-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 76,
-      "bbox": [
-        36.0,
-        432.5,
-        576.0,
-        709.98
-      ],
-      "caption": "Table 2308.12.4 as shown in Figure 2308.9.3. The sum of lengths of braced wall panels at each braced wall line shall",
-      "asset": "2014-bc-23-p0076-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
       "pdfPage": 77,
       "bbox": [
         36.0,
-        178.56,
-        576.0,
-        456.04
-      ],
-      "caption": "they are required, the structure shall be considered to be irregular (see Figure 2308.12.6(1)).",
-      "asset": "2014-bc-23-p0077-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 77,
-      "bbox": [
         36.0,
-        206.88,
         576.0,
         484.36
       ],
       "caption": "Figure 2308.12.6(2)) are permitted to support braced wall panels provided:",
-      "asset": "2014-bc-23-p0077-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 77,
-      "bbox": [
-        36.0,
-        387.87,
-        576.0,
-        665.35
-      ],
-      "caption": "considered to be irregular (see Figure 2308.12.6(3)).",
-      "asset": "2014-bc-23-p0077-figure-03.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 77,
-      "bbox": [
-        36.0,
-        416.19,
-        576.0,
-        693.67
-      ],
-      "caption": "feet (1829 mm) beyond a braced wall line (see Figure 2308.12.6(4)).",
-      "asset": "2014-bc-23-p0077-figure-04.png",
+      "asset": "2014-bc-23-p0077-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3319,6 +2773,9 @@
       ],
       "caption": "Figure 2308.12.6(6)).",
       "asset": "2014-bc-23-p0078-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3335,22 +2792,9 @@
       ],
       "caption": "Figure 2308.12.6(7)).",
       "asset": "2014-bc-23-p0078-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_23_Wood.pdf",
-      "sourceSHA256": "1d6eefdff49e35c23e4128e10ead2e011896c16b99a80dc1b460d78a1bfbba68",
-      "pdfPage": 78,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        254.27
-      ],
-      "caption": "are present, the structure shall be considered to be irregular (see Figure 2308.12.6(8)).",
-      "asset": "2014-bc-23-p0078-figure-03.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3420,7 +2864,7 @@
         525.67
       ],
       "caption": "TABLE 2609.4",
-      "parserAgreement": 0.9965,
+      "parserAgreement": 0.993,
       "cellCoverage": 0.7105,
       "asset": "2014-bc-26-p0009-table-review-01.png",
       "reviewRequired": true,
@@ -3428,81 +2872,30 @@
     },
     {
       "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_30_Elevators_and_Conveying_Systems.pdf",
-      "sourceSHA256": "4bc9a755ac8edc6c381c7f504d072062ee070e00083f814ead91c35c5a4a8386",
-      "pdfPage": 7,
-      "bbox": [
-        36.0,
-        425.9,
-        576.0,
-        703.38
-      ],
-      "caption": "the fire service access elevator lobby. The fire service access elevator symbol shall be designed as shown in Figure 3007.6.5",
-      "asset": "2014-bc-30-p0007-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_30_Elevators_and_Conveying_Systems.pdf",
-      "sourceSHA256": "4bc9a755ac8edc6c381c7f504d072062ee070e00083f814ead91c35c5a4a8386",
-      "pdfPage": 8,
-      "bbox": [
-        36.0,
-        57.49,
-        576.0,
-        331.49
-      ],
-      "caption": "FIGURE 3007.6.5",
-      "asset": "2014-bc-30-p0008-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
       "sourcePDF": "2014CC_BC_Chapter_33_Safeguards_During_Construction_or_Demo.pdf",
       "sourceSHA256": "121d7d978de556da2337cab9c3de6162bb85ecd7e81d7e4e007ac0d161ae5327",
       "pdfPage": 3,
       "bbox": [
         36.0,
-        45.59,
+        359.4,
         576.0,
-        323.07
-      ],
-      "caption": "4 inches (711 mm) wide and 4 feet (1219 mm) high, in accordance with Figure 3301.9.1.4(1).",
-      "asset": "2014-bc-33-p0003-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_33_Safeguards_During_Construction_or_Demo.pdf",
-      "sourceSHA256": "121d7d978de556da2337cab9c3de6162bb85ecd7e81d7e4e007ac0d161ae5327",
-      "pdfPage": 3,
-      "bbox": [
-        36.0,
-        84.23,
-        576.0,
-        361.71
-      ],
-      "caption": "mm) wide and 36.5 inches (927 mm) high, in accordance with Figure 3301.9.1.4(3).",
-      "asset": "2014-bc-33-p0003-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_33_Safeguards_During_Construction_or_Demo.pdf",
-      "sourceSHA256": "121d7d978de556da2337cab9c3de6162bb85ecd7e81d7e4e007ac0d161ae5327",
-      "pdfPage": 3,
-      "bbox": [
-        36.0,
-        353.71,
-        576.0,
-        649.42
+        650.66
       ],
       "caption": "FIGURE 3301.9.1.4(1)",
-      "asset": "2014-bc-33-p0003-figure-03.png",
+      "asset": "2014-bc-33-p0003-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        150.75,
+        359.4,
+        472.05,
+        630.2
+      ],
+      "sourceEmbeddedImageBBox": [
+        150.75,
+        359.4,
+        472.05,
+        630.2
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3513,12 +2906,25 @@
       "pdfPage": 4,
       "bbox": [
         36.0,
-        67.98,
+        72.0,
         576.0,
-        344.02
+        345.26
       ],
       "caption": "FIGURE 3301.9.1.4(2)",
       "asset": "2014-bc-33-p0004-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        125.4,
+        72.0,
+        497.3,
+        324.95
+      ],
+      "sourceEmbeddedImageBBox": [
+        125.4,
+        72.0,
+        497.3,
+        324.95
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3529,44 +2935,25 @@
       "pdfPage": 4,
       "bbox": [
         36.0,
-        337.38,
+        354.82,
         576.0,
-        613.42
+        614.54
       ],
       "caption": "FIGURE 3301.9.1.4(3)",
       "asset": "2014-bc-33-p0004-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_33_Safeguards_During_Construction_or_Demo.pdf",
-      "sourceSHA256": "121d7d978de556da2337cab9c3de6162bb85ecd7e81d7e4e007ac0d161ae5327",
-      "pdfPage": 5,
-      "bbox": [
-        36.0,
-        67.38,
-        576.0,
-        344.86
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        116.4,
+        354.82,
+        506.4,
+        594.22
       ],
-      "caption": "following information and be arranged in accordance with Figure 3301.9.2.1(1):",
-      "asset": "2014-bc-33-p0005-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_33_Safeguards_During_Construction_or_Demo.pdf",
-      "sourceSHA256": "121d7d978de556da2337cab9c3de6162bb85ecd7e81d7e4e007ac0d161ae5327",
-      "pdfPage": 5,
-      "bbox": [
-        36.0,
-        191.69,
-        576.0,
-        469.17
+      "sourceEmbeddedImageBBox": [
+        116.4,
+        354.82,
+        506.4,
+        594.22
       ],
-      "caption": "in accordance with Figure 3301.9.2.1(2).",
-      "asset": "2014-bc-33-p0005-figure-02.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3577,12 +2964,25 @@
       "pdfPage": 5,
       "bbox": [
         36.0,
-        374.34,
+        466.8,
         576.0,
-        650.38
+        651.5
       ],
       "caption": "FIGURE 3301.9.2.1(1)",
-      "asset": "2014-bc-33-p0005-figure-03.png",
+      "asset": "2014-bc-33-p0005-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        141.0,
+        466.8,
+        470.7,
+        631.41
+      ],
+      "sourceEmbeddedImageBBox": [
+        141.0,
+        466.8,
+        470.7,
+        631.41
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3593,28 +2993,25 @@
       "pdfPage": 6,
       "bbox": [
         36.0,
-        36.0,
+        72.0,
         576.0,
-        249.58
+        250.69
       ],
       "caption": "FIGURE 3301.9.2.1(2)",
       "asset": "2014-bc-33-p0006-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_33_Safeguards_During_Construction_or_Demo.pdf",
-      "sourceSHA256": "121d7d978de556da2337cab9c3de6162bb85ecd7e81d7e4e007ac0d161ae5327",
-      "pdfPage": 6,
-      "bbox": [
-        36.0,
-        105.07,
-        576.0,
-        382.55
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        155.25,
+        72.0,
+        467.54,
+        230.52
       ],
-      "caption": "information panel and the sidewalk shed parapet shall be posted in accordance with Figure 3301.9.2.2.",
-      "asset": "2014-bc-33-p0006-figure-02.png",
+      "sourceEmbeddedImageBBox": [
+        155.25,
+        72.0,
+        467.54,
+        230.52
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3625,12 +3022,25 @@
       "pdfPage": 6,
       "bbox": [
         36.0,
-        374.55,
+        380.22,
         576.0,
-        654.58
+        655.82
       ],
       "caption": "FIGURE 3301.9.2.2",
-      "asset": "2014-bc-33-p0006-figure-03.png",
+      "asset": "2014-bc-33-p0006-figure-02.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        141.0,
+        380.22,
+        506.85,
+        629.57
+      ],
+      "sourceEmbeddedImageBBox": [
+        141.0,
+        380.22,
+        506.85,
+        629.57
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3803,22 +3213,6 @@
       "researchClaimEligible": false
     },
     {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Chapter_35_Reference_Standards.pdf",
-      "sourceSHA256": "ca2b66bbf77a01e5b25d6fc53a1fbd481d68ea56982202227dac9bf47ba3dc0e",
-      "pdfPage": 6,
-      "bbox": [
-        36.0,
-        43.71,
-        576.0,
-        319.75
-      ],
-      "caption": "C 36/C 36M-03 Specification for Gypsum Wallboard . . . . . . . . . . . . . . . . .Figure 721.5.1(2), Figure 721.5.1(3), Table 2506.2, Table 2508.1",
-      "asset": "2014-bc-35-p0006-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
       "kind": "no-section-headings-detected",
       "sourcePDF": "2014CC_BC_Appendix_A_Reserved.pdf",
       "reviewRequired": true,
@@ -3843,12 +3237,25 @@
       "pdfPage": 4,
       "bbox": [
         36.0,
-        307.54,
+        36.2,
         756.0,
-        582.0
+        607.16
       ],
       "caption": "FIGURE D106.1(1)",
       "asset": "2014-bc-d-p0004-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        36.0,
+        36.2,
+        417.9,
+        549.64
+      ],
+      "sourceEmbeddedImageBBox": [
+        36.0,
+        36.2,
+        417.9,
+        549.64
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3859,12 +3266,25 @@
       "pdfPage": 5,
       "bbox": [
         36.0,
-        308.02,
-        756.0,
-        582.0
+        36.07,
+        781.47,
+        607.64
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0005-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        36.03,
+        36.07,
+        781.47,
+        544.32
+      ],
+      "sourceEmbeddedImageBBox": [
+        36.03,
+        36.07,
+        781.47,
+        544.32
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3875,12 +3295,25 @@
       "pdfPage": 6,
       "bbox": [
         36.0,
-        307.06,
+        36.31,
         756.0,
-        582.0
+        606.68
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0006-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        70.89,
+        36.31,
+        721.09,
+        568.89
+      ],
+      "sourceEmbeddedImageBBox": [
+        70.89,
+        36.31,
+        721.09,
+        568.89
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3891,12 +3324,25 @@
       "pdfPage": 7,
       "bbox": [
         36.0,
-        308.26,
+        35.98,
         756.0,
-        582.0
+        607.88
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0007-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        78.66,
+        35.98,
+        714.02,
+        567.83
+      ],
+      "sourceEmbeddedImageBBox": [
+        78.66,
+        35.98,
+        714.02,
+        567.83
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3907,12 +3353,25 @@
       "pdfPage": 8,
       "bbox": [
         36.0,
-        307.18,
+        35.98,
         756.0,
-        582.0
+        606.8
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0008-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        71.27,
+        35.98,
+        720.48,
+        568.28
+      ],
+      "sourceEmbeddedImageBBox": [
+        71.27,
+        35.98,
+        720.48,
+        568.28
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3923,12 +3382,25 @@
       "pdfPage": 9,
       "bbox": [
         36.0,
-        307.3,
-        756.0,
-        582.0
+        36.48,
+        757.92,
+        606.92
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0009-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        36.02,
+        36.48,
+        757.92,
+        541.43
+      ],
+      "sourceEmbeddedImageBBox": [
+        36.02,
+        36.48,
+        757.92,
+        541.43
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3939,12 +3411,25 @@
       "pdfPage": 10,
       "bbox": [
         36.0,
-        307.18,
+        36.69,
         756.0,
-        582.0
+        606.8
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0010-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        69.41,
+        36.69,
+        722.3,
+        565.19
+      ],
+      "sourceEmbeddedImageBBox": [
+        69.41,
+        36.69,
+        722.3,
+        565.19
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3955,12 +3440,25 @@
       "pdfPage": 11,
       "bbox": [
         36.0,
-        310.54,
+        36.0,
         756.0,
-        582.0
+        610.16
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0011-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        70.38,
+        36.0,
+        721.62,
+        567.25
+      ],
+      "sourceEmbeddedImageBBox": [
+        70.38,
+        36.0,
+        721.62,
+        567.25
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3971,12 +3469,25 @@
       "pdfPage": 12,
       "bbox": [
         36.0,
-        307.18,
+        36.3,
         756.0,
-        582.0
+        606.68
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0012-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        74.67,
+        36.3,
+        717.32,
+        567.3
+      ],
+      "sourceEmbeddedImageBBox": [
+        74.67,
+        36.3,
+        717.32,
+        567.3
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -3987,12 +3498,15 @@
       "pdfPage": 13,
       "bbox": [
         36.0,
-        306.46,
+        62.0,
         756.0,
         582.0
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0013-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4003,12 +3517,25 @@
       "pdfPage": 14,
       "bbox": [
         36.0,
-        309.7,
+        36.01,
         756.0,
-        582.0
+        609.32
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0014-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        66.99,
+        36.01,
+        725.54,
+        572.65
+      ],
+      "sourceEmbeddedImageBBox": [
+        66.99,
+        36.01,
+        725.54,
+        572.65
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4019,12 +3546,25 @@
       "pdfPage": 15,
       "bbox": [
         36.0,
-        306.46,
+        35.98,
         756.0,
-        582.0
+        606.08
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0015-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        65.82,
+        35.98,
+        726.78,
+        572.18
+      ],
+      "sourceEmbeddedImageBBox": [
+        65.82,
+        35.98,
+        726.78,
+        572.18
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4035,12 +3575,25 @@
       "pdfPage": 16,
       "bbox": [
         36.0,
-        307.42,
+        25.85,
         756.0,
-        582.0
+        607.04
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0016-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        150.4,
+        25.85,
+        727.05,
+        562.04
+      ],
+      "sourceEmbeddedImageBBox": [
+        150.4,
+        25.85,
+        727.05,
+        562.04
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4051,12 +3604,25 @@
       "pdfPage": 17,
       "bbox": [
         36.0,
-        308.26,
+        62.3,
         756.0,
-        582.0
+        607.88
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0017-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        341.7,
+        62.3,
+        740.0,
+        544.79
+      ],
+      "sourceEmbeddedImageBBox": [
+        341.7,
+        62.3,
+        740.0,
+        544.79
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4067,12 +3633,25 @@
       "pdfPage": 18,
       "bbox": [
         36.0,
-        306.46,
-        756.0,
-        582.0
+        55.3,
+        762.45,
+        606.08
       ],
       "caption": "FIGURE D106.1(1)-continued",
       "asset": "2014-bc-d-p0018-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        513.15,
+        55.3,
+        762.45,
+        566.3
+      ],
+      "sourceEmbeddedImageBBox": [
+        513.15,
+        55.3,
+        762.45,
+        566.3
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4083,12 +3662,25 @@
       "pdfPage": 19,
       "bbox": [
         36.0,
-        306.46,
+        45.19,
         756.0,
-        582.0
+        606.08
       ],
       "caption": "FIGURE D106.1(2)",
       "asset": "2014-bc-d-p0019-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        36.61,
+        45.19,
+        432.9,
+        556.69
+      ],
+      "sourceEmbeddedImageBBox": [
+        36.61,
+        45.19,
+        432.9,
+        556.69
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4099,12 +3691,25 @@
       "pdfPage": 20,
       "bbox": [
         36.0,
-        312.82,
+        45.21,
         756.0,
-        582.0
+        612.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0020-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        36.55,
+        45.21,
+        746.25,
+        587.45
+      ],
+      "sourceEmbeddedImageBBox": [
+        36.55,
+        45.21,
+        746.25,
+        587.45
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4115,12 +3720,15 @@
       "pdfPage": 21,
       "bbox": [
         36.0,
-        307.66,
+        62.0,
         756.0,
         582.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0021-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4131,12 +3739,25 @@
       "pdfPage": 22,
       "bbox": [
         36.0,
-        310.78,
+        45.43,
         756.0,
-        582.0
+        610.28
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0022-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        61.34,
+        45.43,
+        730.65,
+        573.23
+      ],
+      "sourceEmbeddedImageBBox": [
+        61.34,
+        45.43,
+        730.65,
+        573.23
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4147,12 +3768,25 @@
       "pdfPage": 23,
       "bbox": [
         36.0,
-        307.78,
+        45.71,
         756.0,
-        582.0
+        607.28
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0023-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        64.89,
+        45.71,
+        727.09,
+        565.84
+      ],
+      "sourceEmbeddedImageBBox": [
+        64.89,
+        45.71,
+        727.09,
+        565.84
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4163,12 +3797,25 @@
       "pdfPage": 24,
       "bbox": [
         36.0,
-        307.42,
+        45.44,
         756.0,
-        582.0
+        607.04
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0024-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        71.83,
+        45.44,
+        720.16,
+        551.8
+      ],
+      "sourceEmbeddedImageBBox": [
+        71.83,
+        45.44,
+        720.16,
+        551.8
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4179,12 +3826,25 @@
       "pdfPage": 25,
       "bbox": [
         36.0,
-        309.58,
+        45.75,
         756.0,
-        582.0
+        609.2
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0025-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        66.1,
+        45.75,
+        725.9,
+        569.4
+      ],
+      "sourceEmbeddedImageBBox": [
+        66.1,
+        45.75,
+        725.9,
+        569.4
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4195,12 +3855,25 @@
       "pdfPage": 26,
       "bbox": [
         36.0,
-        309.46,
+        45.64,
         756.0,
-        582.0
+        609.08
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0026-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        69.52,
+        45.64,
+        721.75,
+        564.94
+      ],
+      "sourceEmbeddedImageBBox": [
+        69.52,
+        45.64,
+        721.75,
+        564.94
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4211,12 +3884,25 @@
       "pdfPage": 27,
       "bbox": [
         36.0,
-        308.38,
+        45.19,
         756.0,
-        582.0
+        608.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0027-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        84.89,
+        45.19,
+        707.27,
+        574.89
+      ],
+      "sourceEmbeddedImageBBox": [
+        84.89,
+        45.19,
+        707.27,
+        574.89
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4227,12 +3913,25 @@
       "pdfPage": 28,
       "bbox": [
         36.0,
-        311.62,
+        45.36,
         756.0,
-        582.0
+        611.24
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0028-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        80.92,
+        45.36,
+        710.42,
+        575.54
+      ],
+      "sourceEmbeddedImageBBox": [
+        80.92,
+        45.36,
+        710.42,
+        575.54
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4243,12 +3942,25 @@
       "pdfPage": 29,
       "bbox": [
         36.0,
-        309.46,
+        45.41,
         756.0,
-        582.0
+        609.08
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0029-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        65.13,
+        45.41,
+        726.28,
+        574.09
+      ],
+      "sourceEmbeddedImageBBox": [
+        65.13,
+        45.41,
+        726.28,
+        574.09
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4259,12 +3971,25 @@
       "pdfPage": 30,
       "bbox": [
         36.0,
-        309.46,
+        45.24,
         756.0,
-        582.0
+        609.08
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0030-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        54.41,
+        45.24,
+        737.6,
+        572.29
+      ],
+      "sourceEmbeddedImageBBox": [
+        54.41,
+        45.24,
+        737.6,
+        572.29
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4275,12 +4000,25 @@
       "pdfPage": 31,
       "bbox": [
         36.0,
-        310.54,
+        45.19,
         756.0,
-        582.0
+        610.16
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0031-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        61.34,
+        45.19,
+        730.63,
+        567.54
+      ],
+      "sourceEmbeddedImageBBox": [
+        61.34,
+        45.19,
+        730.63,
+        567.54
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4291,12 +4029,25 @@
       "pdfPage": 32,
       "bbox": [
         36.0,
-        312.58,
+        45.85,
         756.0,
-        582.0
+        612.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0032-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        51.07,
+        45.85,
+        740.92,
+        572.4
+      ],
+      "sourceEmbeddedImageBBox": [
+        51.07,
+        45.85,
+        740.92,
+        572.4
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4307,12 +4058,25 @@
       "pdfPage": 33,
       "bbox": [
         36.0,
-        310.54,
+        45.7,
         756.0,
-        582.0
+        610.16
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0033-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        58.83,
+        45.7,
+        733.17,
+        569.0
+      ],
+      "sourceEmbeddedImageBBox": [
+        58.83,
+        45.7,
+        733.17,
+        569.0
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4323,12 +4087,25 @@
       "pdfPage": 34,
       "bbox": [
         36.0,
-        313.78,
+        45.41,
         756.0,
-        582.0
+        612.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0034-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        64.02,
+        45.41,
+        727.97,
+        582.89
+      ],
+      "sourceEmbeddedImageBBox": [
+        64.02,
+        45.41,
+        727.97,
+        582.89
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4339,12 +4116,25 @@
       "pdfPage": 35,
       "bbox": [
         36.0,
-        313.78,
+        45.19,
         756.0,
-        582.0
+        612.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0035-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        75.31,
+        45.19,
+        716.45,
+        560.99
+      ],
+      "sourceEmbeddedImageBBox": [
+        75.31,
+        45.19,
+        716.45,
+        560.99
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4355,12 +4145,25 @@
       "pdfPage": 36,
       "bbox": [
         36.0,
-        311.62,
+        45.84,
         756.0,
-        582.0
+        611.24
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0036-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        72.26,
+        45.84,
+        719.74,
+        575.04
+      ],
+      "sourceEmbeddedImageBBox": [
+        72.26,
+        45.84,
+        719.74,
+        575.04
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4371,12 +4174,25 @@
       "pdfPage": 37,
       "bbox": [
         36.0,
-        312.7,
+        45.65,
         756.0,
-        582.0
+        612.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0037-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        60.48,
+        45.65,
+        731.53,
+        565.75
+      ],
+      "sourceEmbeddedImageBBox": [
+        60.48,
+        45.65,
+        731.53,
+        565.75
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4387,12 +4203,15 @@
       "pdfPage": 38,
       "bbox": [
         36.0,
-        312.7,
+        62.0,
         756.0,
         582.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0038-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4403,12 +4222,25 @@
       "pdfPage": 39,
       "bbox": [
         36.0,
-        311.5,
+        45.2,
         756.0,
-        582.0
+        611.12
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0039-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        61.05,
+        45.2,
+        731.5,
+        557.74
+      ],
+      "sourceEmbeddedImageBBox": [
+        61.05,
+        45.2,
+        731.5,
+        557.74
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4419,12 +4251,25 @@
       "pdfPage": 40,
       "bbox": [
         36.0,
-        312.7,
+        45.56,
         756.0,
-        582.0
+        612.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0040-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        52.19,
+        45.56,
+        739.79,
+        576.39
+      ],
+      "sourceEmbeddedImageBBox": [
+        52.19,
+        45.56,
+        739.79,
+        576.39
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4435,12 +4280,25 @@
       "pdfPage": 41,
       "bbox": [
         36.0,
-        313.78,
+        45.2,
         756.0,
-        582.0
+        612.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0041-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        49.15,
+        45.2,
+        743.0,
+        574.85
+      ],
+      "sourceEmbeddedImageBBox": [
+        49.15,
+        45.2,
+        743.0,
+        574.85
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4451,12 +4309,25 @@
       "pdfPage": 42,
       "bbox": [
         36.0,
-        311.62,
+        45.18,
         756.0,
-        582.0
+        611.24
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0042-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        51.17,
+        45.18,
+        740.62,
+        569.98
+      ],
+      "sourceEmbeddedImageBBox": [
+        51.17,
+        45.18,
+        740.62,
+        569.98
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4467,12 +4338,25 @@
       "pdfPage": 43,
       "bbox": [
         36.0,
-        312.7,
+        45.19,
         756.0,
-        582.0
+        612.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0043-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        71.16,
+        45.19,
+        721.08,
+        597.49
+      ],
+      "sourceEmbeddedImageBBox": [
+        71.16,
+        45.19,
+        721.08,
+        597.49
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4483,12 +4367,25 @@
       "pdfPage": 44,
       "bbox": [
         36.0,
-        313.78,
+        45.7,
         756.0,
-        582.0
+        612.0
       ],
       "caption": "FIGURE D106.1(2)-continued",
       "asset": "2014-bc-d-p0044-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        115.25,
+        45.7,
+        676.2,
+        593.65
+      ],
+      "sourceEmbeddedImageBBox": [
+        115.25,
+        45.7,
+        676.2,
+        593.65
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4594,7 +4491,7 @@
         366.29
       ],
       "caption": "TABLE H112.6",
-      "parserAgreement": 0.9968,
+      "parserAgreement": 0.9936,
       "cellCoverage": 0.6,
       "asset": "2014-bc-h-p0005-table-review-01.png",
       "reviewRequired": true,
@@ -4613,56 +4510,8 @@
       "researchClaimEligible": false
     },
     {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Appendix_K_Elevators_&_Conveying_Systems.pdf",
-      "sourceSHA256": "13bb65224607e833185ba368d632c0b6e4b2118d0fb7edbf96984f83560d33ab",
-      "pdfPage": 48,
-      "bbox": [
-        36.0,
-        36.23,
-        576.0,
-        313.23
-      ],
-      "caption": "control space are in the open position. See Figure Q-2.",
-      "asset": "2014-bc-k-p0048-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Appendix_K_Elevators_&_Conveying_Systems.pdf",
-      "sourceSHA256": "13bb65224607e833185ba368d632c0b6e4b2118d0fb7edbf96984f83560d33ab",
-      "pdfPage": 53,
-      "bbox": [
-        36.0,
-        313.96,
-        576.0,
-        590.96
-      ],
-      "caption": "Delete and replace Figure Q-2 with the following new Figure Q-2:",
-      "asset": "2014-bc-k-p0053-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
       "kind": "no-section-headings-detected",
       "sourcePDF": "2014CC_BC_Appendix_L_Reserved.pdf",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Appendix_M_Supplementary_Requirements.pdf",
-      "sourceSHA256": "322621b566cbd6d7d5b43bf4664a738284b6a84f1f590e616fa2814a08fe49c7",
-      "pdfPage": 1,
-      "bbox": [
-        36.0,
-        217.8,
-        576.0,
-        495.28
-      ],
-      "caption": "constructed between two independently supported load-bearing stud walls. See Figure M103.1.",
-      "asset": "2014-bc-m-p0001-figure-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4673,12 +4522,25 @@
       "pdfPage": 2,
       "bbox": [
         36.0,
-        313.2,
+        48.0,
         756.0,
-        582.0
+        590.38
       ],
       "caption": "FIGURE M103(1)",
       "asset": "2014-bc-m-p0002-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        151.5,
+        48.0,
+        636.2,
+        555.8
+      ],
+      "sourceEmbeddedImageBBox": [
+        151.5,
+        48.0,
+        636.2,
+        555.8
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4695,12 +4557,25 @@
       "pdfPage": 3,
       "bbox": [
         36.0,
-        273.69,
+        103.57,
         576.0,
-        549.73
+        559.08
       ],
       "caption": "FIGURE P102.8.6",
       "asset": "2014-bc-p-p0003-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox-clipped-at-next-section",
+      "embeddedImageBBox": [
+        72.06,
+        103.57,
+        529.16,
+        559.08
+      ],
+      "sourceEmbeddedImageBBox": [
+        72.06,
+        103.57,
+        529.16,
+        585.93
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4735,6 +4610,9 @@
       ],
       "caption": "Figure 10.10.1 Delete.",
       "asset": "2014-bc-q-p0005-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4745,12 +4623,15 @@
       "pdfPage": 10,
       "bbox": [
         36.0,
-        430.58,
+        188.06,
         576.0,
         708.06
       ],
       "caption": "Figure A.6.2 (c) Delete the sprinkler control valve shown.",
       "asset": "2014-bc-q-p0010-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4767,6 +4648,9 @@
       ],
       "caption": "Figure A.6.3 (a) Delete.",
       "asset": "2014-bc-q-p0011-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4783,6 +4667,9 @@
       ],
       "caption": "Figure A.6.3 (b) Delete.",
       "asset": "2014-bc-q-p0011-figure-02.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4799,6 +4686,9 @@
       ],
       "caption": "Figure A.6.3 (c) Delete.",
       "asset": "2014-bc-q-p0011-figure-03.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4815,6 +4705,9 @@
       ],
       "caption": "Figure A.6.3 (d) Delete.",
       "asset": "2014-bc-q-p0011-figure-04.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4831,6 +4724,9 @@
       ],
       "caption": "Figure A.8.4.3.3(1) Delete.",
       "asset": "2014-bc-q-p0011-figure-05.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4841,12 +4737,15 @@
       "pdfPage": 11,
       "bbox": [
         36.0,
-        355.32,
+        189.23,
         576.0,
         632.8
       ],
       "caption": "Figure 6.3.2 Delete.",
       "asset": "2014-bc-q-p0011-figure-06.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4857,76 +4756,15 @@
       "pdfPage": 1,
       "bbox": [
         36.0,
-        68.74,
-        576.0,
-        346.22
-      ],
-      "caption": "R102.1 ASTM C 635, Figure 1. Delete Figure 1 and replace as follows:",
-      "asset": "2014-bc-r-p0001-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Appendix_R_Acoustical_Tile.pdf",
-      "sourceSHA256": "3f8bc80acb681e09046b33088945aa861345516ca591a9623753363a50f21667",
-      "pdfPage": 1,
-      "bbox": [
         36.0,
-        114.94,
-        576.0,
-        392.42
-      ],
-      "caption": "entire structural grid network (Figure 1A, 1B, and 1C). The carrying channels are suspended by hangers from the existing",
-      "asset": "2014-bc-r-p0001-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Appendix_R_Acoustical_Tile.pdf",
-      "sourceSHA256": "3f8bc80acb681e09046b33088945aa861345516ca591a9623753363a50f21667",
-      "pdfPage": 1,
-      "bbox": [
-        36.0,
-        194.52,
-        576.0,
-        472.0
-      ],
-      "caption": "(wood joists, steel bar joists, steel beams, concrete slabs, etc.) (Figure 1A, 1B, and 1C).",
-      "asset": "2014-bc-r-p0001-figure-03.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Appendix_R_Acoustical_Tile.pdf",
-      "sourceSHA256": "3f8bc80acb681e09046b33088945aa861345516ca591a9623753363a50f21667",
-      "pdfPage": 1,
-      "bbox": [
-        36.0,
-        223.2,
         576.0,
         500.68
       ],
-      "caption": "Figure 1A and Figure 1B. The main runners provide direct support for cross runners, and they may support lighting fix tures and",
-      "asset": "2014-bc-r-p0001-figure-04.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Appendix_R_Acoustical_Tile.pdf",
-      "sourceSHA256": "3f8bc80acb681e09046b33088945aa861345516ca591a9623753363a50f21667",
-      "pdfPage": 1,
-      "bbox": [
-        36.0,
-        256.56,
-        576.0,
-        534.04
-      ],
-      "caption": "channels (Figure 1A, 1B).",
-      "asset": "2014-bc-r-p0001-figure-05.png",
+      "caption": "Figure 1A and Figure 1B. The main runners provide direct support for cross runners, and they may support lighting fixtures and",
+      "asset": "2014-bc-r-p0001-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4937,28 +4775,25 @@
       "pdfPage": 2,
       "bbox": [
         36.0,
-        36.0,
+        258.6,
         576.0,
-        121.67
-      ],
-      "caption": "R103.3 ASTM C 636, Figure 1. Delete Figure 1 and replace as follows:",
-      "asset": "2014-bc-r-p0002-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Appendix_R_Acoustical_Tile.pdf",
-      "sourceSHA256": "3f8bc80acb681e09046b33088945aa861345516ca591a9623753363a50f21667",
-      "pdfPage": 2,
-      "bbox": [
-        36.0,
-        194.49,
-        576.0,
-        470.53
+        471.77
       ],
       "caption": "FIGURE 1A",
-      "asset": "2014-bc-r-p0002-figure-02.png",
+      "asset": "2014-bc-r-p0002-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        136.55,
+        258.6,
+        475.45,
+        437.4
+      ],
+      "sourceEmbeddedImageBBox": [
+        136.55,
+        258.6,
+        475.45,
+        437.4
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4969,12 +4804,25 @@
       "pdfPage": 2,
       "bbox": [
         36.0,
-        413.28,
+        495.35,
         576.0,
-        689.32
+        690.56
       ],
       "caption": "FIGURE 1B",
-      "asset": "2014-bc-r-p0002-figure-03.png",
+      "asset": "2014-bc-r-p0002-figure-02.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        132.25,
+        495.35,
+        479.75,
+        656.15
+      ],
+      "sourceEmbeddedImageBBox": [
+        132.25,
+        495.35,
+        479.75,
+        656.15
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -4985,12 +4833,25 @@
       "pdfPage": 3,
       "bbox": [
         36.0,
-        36.0,
+        72.0,
         576.0,
-        284.15
+        285.39
       ],
       "caption": "FIGURE 1C",
       "asset": "2014-bc-r-p0003-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        124.1,
+        72.0,
+        487.9,
+        251.05
+      ],
+      "sourceEmbeddedImageBBox": [
+        124.1,
+        72.0,
+        487.9,
+        251.05
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5001,12 +4862,25 @@
       "pdfPage": 4,
       "bbox": [
         36.0,
-        441.0,
+        71.9,
         576.0,
-        717.04
+        718.16
       ],
       "caption": "FIGURE 1A",
       "asset": "2014-bc-r-p0004-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        76.7,
+        71.9,
+        535.3,
+        689.15
+      ],
+      "sourceEmbeddedImageBBox": [
+        76.7,
+        71.9,
+        535.3,
+        689.15
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5017,28 +4891,25 @@
       "pdfPage": 5,
       "bbox": [
         36.0,
-        409.92,
+        72.0,
         576.0,
-        685.96
+        687.2
       ],
       "caption": "FIGURE 1B",
       "asset": "2014-bc-r-p0005-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_BC_Appendix_R_Acoustical_Tile.pdf",
-      "sourceSHA256": "3f8bc80acb681e09046b33088945aa861345516ca591a9623753363a50f21667",
-      "pdfPage": 6,
-      "bbox": [
-        36.0,
-        154.78,
-        576.0,
-        432.26
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        54.0,
+        72.0,
+        543.35,
+        631.2
       ],
-      "caption": "R103.12 ASTM C 636, Section 2.3.4. Delete Section 2.3.4 and Figure 2 and replace as follows:",
-      "asset": "2014-bc-r-p0006-figure-01.png",
+      "sourceEmbeddedImageBBox": [
+        54.0,
+        72.0,
+        543.35,
+        631.2
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5067,28 +4938,15 @@
       "pdfPage": 5,
       "bbox": [
         36.0,
-        255.12,
+        40.77,
         576.0,
-        532.6
-      ],
-      "caption": "inches (1524 mm) deep (see Figure 405.3.1).",
-      "asset": "2014-pc-4-p0005-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_Chapter4_Fixtures_Faucets_and_Fixture_Fittings.pdf",
-      "sourceSHA256": "f9735429561198a45abe25ec45fb80aaf49929d3483b6ae064ad20f93f99af07",
-      "pdfPage": 5,
-      "bbox": [
-        36.0,
-        273.69,
-        576.0,
-        549.73
+        560.77
       ],
       "caption": "FIGURE 405.3.1",
-      "asset": "2014-pc-4-p0005-figure-02.png",
+      "asset": "2014-pc-4-p0005-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5186,47 +5044,28 @@
       "kind": "official-pdf-figure",
       "sourcePDF": "2014CC_PC_Chapter6_Water_Supply_and_Distribution.pdf",
       "sourceSHA256": "3c2fd6b625723c0ecac7f7d7fd39f2bb5610f13d7261c1dba4e66cac5c711b14",
-      "pdfPage": 10,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        121.76
-      ],
-      "caption": "[See Figure 606.5.4 (Single Orifice/Multiple Orifice)]",
-      "asset": "2014-pc-6-p0010-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_Chapter6_Water_Supply_and_Distribution.pdf",
-      "sourceSHA256": "3c2fd6b625723c0ecac7f7d7fd39f2bb5610f13d7261c1dba4e66cac5c711b14",
-      "pdfPage": 10,
-      "bbox": [
-        36.0,
-        67.15,
-        576.0,
-        343.19
-      ],
-      "caption": "[See Figure 606.5.4 (Overflow Weir)]",
-      "asset": "2014-pc-6-p0010-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_Chapter6_Water_Supply_and_Distribution.pdf",
-      "sourceSHA256": "3c2fd6b625723c0ecac7f7d7fd39f2bb5610f13d7261c1dba4e66cac5c711b14",
       "pdfPage": 11,
       "bbox": [
         36.0,
-        234.57,
+        81.35,
         576.0,
-        510.61
+        520.97
       ],
       "caption": "FIGURE 606.5.4",
       "asset": "2014-pc-6-p0011-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        194.15,
+        81.35,
+        415.9,
+        468.5
+      ],
+      "sourceEmbeddedImageBBox": [
+        194.15,
+        81.35,
+        415.9,
+        468.5
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5242,7 +5081,7 @@
         228.26
       ],
       "caption": "TABLE 608.8.3",
-      "parserAgreement": 0.997,
+      "parserAgreement": 0.9909,
       "cellCoverage": 0.7551,
       "asset": "2014-pc-6-p0016-table-review-01.png",
       "reviewRequired": true,
@@ -5260,7 +5099,7 @@
         421.73
       ],
       "caption": "TABLE 608.17.1",
-      "parserAgreement": 0.9971,
+      "parserAgreement": 0.9913,
       "cellCoverage": 0.7451,
       "asset": "2014-pc-6-p0019-table-review-01.png",
       "reviewRequired": true,
@@ -5296,7 +5135,7 @@
         536.23
       ],
       "caption": "TABLE 704.1",
-      "parserAgreement": 0.9955,
+      "parserAgreement": 0.991,
       "cellCoverage": 0.5946,
       "asset": "2014-pc-7-p0005-table-review-01.png",
       "reviewRequired": true,
@@ -5309,28 +5148,25 @@
       "pdfPage": 6,
       "bbox": [
         36.0,
-        36.0,
+        240.95,
         576.0,
-        161.15
-      ],
-      "caption": "diameters downstream of the fitting in accordance with Figure 704.6(2).",
-      "asset": "2014-pc-7-p0006-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_Chapter7_Sanitary_Drainage.pdf",
-      "sourceSHA256": "965f81e2c20112fd9cd470e4a95ca5603a7b5f6070946fc87bc1eb01c336024e",
-      "pdfPage": 6,
-      "bbox": [
-        36.0,
-        234.27,
-        576.0,
-        547.33
+        568.17
       ],
       "caption": "FIGURE 704.6(2)",
-      "asset": "2014-pc-7-p0006-figure-02.png",
+      "asset": "2014-pc-7-p0006-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        194.05,
+        240.95,
+        411.7,
+        519.6
+      ],
+      "sourceEmbeddedImageBBox": [
+        194.05,
+        240.95,
+        411.7,
+        519.6
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5400,7 +5236,7 @@
         602.83
       ],
       "caption": "TABLE 709.1",
-      "parserAgreement": 0.9645,
+      "parserAgreement": 0.9543,
       "cellCoverage": 0.8627,
       "asset": "2014-pc-7-p0012-table-review-01.png",
       "reviewRequired": true,
@@ -5418,7 +5254,7 @@
         220.1
       ],
       "caption": "TABLE 709.2",
-      "parserAgreement": 0.972,
+      "parserAgreement": 0.9626,
       "cellCoverage": 0.5789,
       "asset": "2014-pc-7-p0013-table-review-01.png",
       "reviewRequired": true,
@@ -5436,7 +5272,7 @@
         673.66
       ],
       "caption": "TABLE 71 2.4.2",
-      "parserAgreement": 0.9945,
+      "parserAgreement": 0.9918,
       "cellCoverage": 0.5,
       "asset": "2014-pc-7-p0015-table-review-01.png",
       "reviewRequired": true,
@@ -5454,7 +5290,7 @@
         276.05
       ],
       "caption": "TABLE 713.11.1",
-      "parserAgreement": 0.9205,
+      "parserAgreement": 0.9573,
       "cellCoverage": 0.5172,
       "asset": "2014-pc-7-p0017-table-review-01.png",
       "reviewRequired": true,
@@ -5472,7 +5308,7 @@
         722.38
       ],
       "caption": "TABLE 713.11.3",
-      "parserAgreement": 0.9205,
+      "parserAgreement": 0.9573,
       "cellCoverage": 0.6629,
       "asset": "2014-pc-7-p0017-table-review-02.png",
       "reviewRequired": true,
@@ -5490,7 +5326,7 @@
         424.73
       ],
       "caption": "TABLE 908.3",
-      "parserAgreement": 0.9932,
+      "parserAgreement": 0.9898,
       "cellCoverage": 0.6429,
       "asset": "2014-pc-9-p0003-table-review-01.png",
       "reviewRequired": true,
@@ -5508,7 +5344,7 @@
         147.5
       ],
       "caption": null,
-      "parserAgreement": 1.0,
+      "parserAgreement": 0.9936,
       "cellCoverage": 0.6522,
       "asset": "2014-pc-9-p0005-table-review-01.png",
       "reviewRequired": true,
@@ -5525,8 +5361,8 @@
         563.14,
         533.47
       ],
-      "caption": "TABLE 916.5.1",
-      "parserAgreement": 0.9856,
+      "caption": null,
+      "parserAgreement": 0.982,
       "cellCoverage": 0.8642,
       "asset": "2014-pc-9-p0007-table-review-01.png",
       "reviewRequired": true,
@@ -5547,22 +5383,6 @@
       "parserAgreement": 0.9765,
       "cellCoverage": 0.8533,
       "asset": "2014-pc-9-p0009-table-review-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_Chapter11_Storm_Drainage.pdf",
-      "sourceSHA256": "d15a79509858dd90140dcfa32599ac29cb8b0fb4706fb95ab73c250dd58ef484",
-      "pdfPage": 1,
-      "bbox": [
-        36.0,
-        388.25,
-        576.0,
-        665.73
-      ],
-      "caption": "top of the curb level. See Figure 1101.5(1).",
-      "asset": "2014-pc-11-p0001-figure-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5609,12 +5429,25 @@
       "pdfPage": 15,
       "bbox": [
         36.0,
-        111.26,
+        81.41,
         576.0,
-        386.82
+        384.72
       ],
       "caption": "FIGURE 1114.4(2): DETAIL OF DRYWELL WITH SAND COLUMN",
       "asset": "2014-pc-11-p0015-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox-clipped-at-next-section",
+      "embeddedImageBBox": [
+        108.56,
+        81.41,
+        507.92,
+        384.72
+      ],
+      "sourceEmbeddedImageBBox": [
+        108.56,
+        81.41,
+        507.92,
+        395.65
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5655,70 +5488,6 @@
       "researchClaimEligible": false
     },
     {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_AppendixE_Sizing_of_Water_Piping_System.pdf",
-      "sourceSHA256": "0cf91cf191c43115f457f3d96f89fd5a8747031572c85e8dbbdaa62ada2ef095",
-      "pdfPage": 3,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        311.66
-      ],
-      "caption": "system is shown by Figure E103.3(1). To be determined are the pipe sizes for the service main and the cold and hot water",
-      "asset": "2014-pc-e-p0003-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_AppendixE_Sizing_of_Water_Piping_System.pdf",
-      "sourceSHA256": "0cf91cf191c43115f457f3d96f89fd5a8747031572c85e8dbbdaa62ada2ef095",
-      "pdfPage": 3,
-      "bbox": [
-        36.0,
-        102.58,
-        576.0,
-        380.06
-      ],
-      "caption": "fixture groups. After point B (see Figure E103.3(1)), separate consideration will be given to the hot and cold water",
-      "asset": "2014-pc-e-p0003-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_AppendixE_Sizing_of_Water_Piping_System.pdf",
-      "sourceSHA256": "0cf91cf191c43115f457f3d96f89fd5a8747031572c85e8dbbdaa62ada2ef095",
-      "pdfPage": 4,
-      "bbox": [
-        36.0,
-        64.54,
-        576.0,
-        342.02
-      ],
-      "caption": "the system. This figure is a guide to the pipe size that is chosen for each section, incorporating the total friction losses to",
-      "asset": "2014-pc-e-p0004-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_AppendixE_Sizing_of_Water_Piping_System.pdf",
-      "sourceSHA256": "0cf91cf191c43115f457f3d96f89fd5a8747031572c85e8dbbdaa62ada2ef095",
-      "pdfPage": 4,
-      "bbox": [
-        36.0,
-        300.81,
-        576.0,
-        580.12
-      ],
-      "caption": "For trial pipe size see Figure E 103.3(3) (Type L copper) based on 2.77 psi and a 108 gpm = 21/ inches. To",
-      "asset": "2014-pc-e-p0004-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
       "kind": "unverified-table",
       "sourcePDF": "2014CC_PC_AppendixE_Sizing_of_Water_Piping_System.pdf",
       "sourceSHA256": "0cf91cf191c43115f457f3d96f89fd5a8747031572c85e8dbbdaa62ada2ef095",
@@ -5729,26 +5498,10 @@
         563.02,
         329.33
       ],
-      "caption": "Step 7 Column 6: Select from Table E103.3(6) the equivalent lengths for the trial pipe size of fittings and valves on each pipe",
-      "parserAgreement": 0.966,
+      "caption": null,
+      "parserAgreement": 0.9578,
       "cellCoverage": 0.8264,
       "asset": "2014-pc-e-p0005-table-review-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_PC_AppendixE_Sizing_of_Water_Piping_System.pdf",
-      "sourceSHA256": "0cf91cf191c43115f457f3d96f89fd5a8747031572c85e8dbbdaa62ada2ef095",
-      "pdfPage": 5,
-      "bbox": [
-        36.0,
-        77.38,
-        576.0,
-        354.86
-      ],
-      "caption": "Step 9 Column 8: Select from Figure E103.3(3) the friction loss per 100 feet (30 480 mm) of pipe for the gallon-per-minute",
-      "asset": "2014-pc-e-p0005-figure-01.png",
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5759,12 +5512,25 @@
       "pdfPage": 7,
       "bbox": [
         36.0,
-        340.92,
+        141.25,
         576.0,
-        616.96
+        618.08
       ],
       "caption": "FIGURE E103.3(1)",
       "asset": "2014-pc-e-p0007-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        72.25,
+        141.25,
+        531.35,
+        582.35
+      ],
+      "sourceEmbeddedImageBBox": [
+        72.25,
+        141.25,
+        531.35,
+        582.35
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5775,12 +5541,15 @@
       "pdfPage": 8,
       "bbox": [
         36.0,
-        403.92,
+        159.96,
         576.0,
         679.96
       ],
       "caption": "FIGURE E103.3(2)",
       "asset": "2014-pc-e-p0008-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5791,12 +5560,15 @@
       "pdfPage": 9,
       "bbox": [
         36.0,
-        408.48,
+        164.52,
         576.0,
         684.52
       ],
       "caption": "FIGURE E103.3(3)",
       "asset": "2014-pc-e-p0009-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5807,12 +5579,25 @@
       "pdfPage": 10,
       "bbox": [
         36.0,
-        354.6,
+        165.1,
         576.0,
-        630.64
+        622.64
       ],
       "caption": "FIGURE E103.3(5)",
       "asset": "2014-pc-e-p0010-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        133.9,
+        165.1,
+        494.65,
+        613.7
+      ],
+      "sourceEmbeddedImageBBox": [
+        133.9,
+        165.1,
+        494.65,
+        613.7
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5823,12 +5608,15 @@
       "pdfPage": 11,
       "bbox": [
         36.0,
-        406.32,
+        162.36,
         576.0,
         682.36
       ],
       "caption": "FIGURE E103.3(6)",
       "asset": "2014-pc-e-p0011-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5839,12 +5627,15 @@
       "pdfPage": 12,
       "bbox": [
         36.0,
-        303.81,
+        59.85,
         576.0,
         579.85
       ],
       "caption": "FIGURE E103.3(7)",
       "asset": "2014-pc-e-p0012-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -5878,7 +5669,7 @@
         414.53
       ],
       "caption": "TABLE E103.3(6)",
-      "parserAgreement": 0.9634,
+      "parserAgreement": 0.956,
       "cellCoverage": 0.8704,
       "asset": "2014-pc-e-p0017-table-review-01.png",
       "reviewRequired": true,
@@ -5908,7 +5699,7 @@
         548.23
       ],
       "caption": "TABLE 305.4",
-      "parserAgreement": 0.9505,
+      "parserAgreement": 0.9431,
       "cellCoverage": 0.7253,
       "asset": "2014-mc-3-p0005-table-review-01.png",
       "reviewRequired": true,
@@ -5926,7 +5717,7 @@
         666.7
       ],
       "caption": "TABLE 308.6",
-      "parserAgreement": 0.9883,
+      "parserAgreement": 0.9854,
       "cellCoverage": 0.869,
       "asset": "2014-mc-3-p0009-table-review-01.png",
       "reviewRequired": true,
@@ -5962,7 +5753,7 @@
         373.85
       ],
       "caption": null,
-      "parserAgreement": 0.9619,
+      "parserAgreement": 0.9588,
       "cellCoverage": 0.6549,
       "asset": "2014-mc-4-p0006-table-review-01.png",
       "reviewRequired": true,
@@ -5980,7 +5771,7 @@
         334.13
       ],
       "caption": "TABLE 403.3.1.2",
-      "parserAgreement": 0.9374,
+      "parserAgreement": 0.9337,
       "cellCoverage": 0.7778,
       "asset": "2014-mc-4-p0007-table-review-01.png",
       "reviewRequired": true,
@@ -6077,22 +5868,6 @@
       "researchClaimEligible": false
     },
     {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_MC_Chapter7_Combustion_Air.pdf",
-      "sourceSHA256": "8c13f3f63a4d17a8f6ac21962fcfcd67bddfe68681099daccebc4a94ae86fde3",
-      "pdfPage": 2,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        150.47
-      ],
-      "caption": "connecting the spaces shall comply with Sections 702.3.1, 702.3.2 and Figure A-1 of Appendix A of this code.",
-      "asset": "2014-mc-7-p0002-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
       "kind": "unverified-table",
       "sourcePDF": "2014CC_MC_Chapter8_Chimney_and_Vents.pdf",
       "sourceSHA256": "ea6b3f72ef7f8512875151feb364e026fc134fa87c6bb6cc069bc6d189db6bab",
@@ -6158,7 +5933,7 @@
         773.38
       ],
       "caption": null,
-      "parserAgreement": 0.8447,
+      "parserAgreement": 0.9878,
       "cellCoverage": 0.7299,
       "asset": "2014-mc-11-p0003-table-review-01.png",
       "reviewRequired": true,
@@ -6176,7 +5951,7 @@
         279.53
       ],
       "caption": null,
-      "parserAgreement": 1.0,
+      "parserAgreement": 0.9972,
       "cellCoverage": 0.8768,
       "asset": "2014-mc-11-p0005-table-review-01.png",
       "reviewRequired": true,
@@ -6194,7 +5969,7 @@
         335.69
       ],
       "caption": "TABLE 1104.3.1",
-      "parserAgreement": 1.0,
+      "parserAgreement": 0.9921,
       "cellCoverage": 0.8378,
       "asset": "2014-mc-11-p0007-table-review-01.png",
       "reviewRequired": true,
@@ -6261,12 +6036,25 @@
       "pdfPage": 1,
       "bbox": [
         36.0,
-        154.53,
+        217.1,
         576.0,
-        430.09
+        430.73
       ],
       "caption": "FIGURE A-1",
       "asset": "2014-mc-a-p0001-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        206.65,
+        217.1,
+        386.65,
+        392.05
+      ],
+      "sourceEmbeddedImageBBox": [
+        206.65,
+        217.1,
+        386.65,
+        392.05
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6277,12 +6065,25 @@
       "pdfPage": 1,
       "bbox": [
         36.0,
-        426.38,
+        496.7,
         576.0,
-        701.94
+        702.6
       ],
       "caption": "FIGURE A-2",
       "asset": "2014-mc-a-p0001-figure-02.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        203.05,
+        496.7,
+        443.05,
+        667.55
+      ],
+      "sourceEmbeddedImageBBox": [
+        203.05,
+        496.7,
+        443.05,
+        667.55
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6293,12 +6094,25 @@
       "pdfPage": 2,
       "bbox": [
         36.0,
-        54.07,
+        87.35,
         576.0,
-        330.11
+        331.23
       ],
       "caption": "FIGURE A-3",
       "asset": "2014-mc-a-p0002-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        199.45,
+        87.35,
+        422.9,
+        288.0
+      ],
+      "sourceEmbeddedImageBBox": [
+        199.45,
+        87.35,
+        422.9,
+        288.0
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6309,12 +6123,25 @@
       "pdfPage": 2,
       "bbox": [
         36.0,
-        375.84,
+        397.3,
         576.0,
-        651.88
+        653.0
       ],
       "caption": "FIGURE A-4",
       "asset": "2014-mc-a-p0002-figure-02.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        199.45,
+        397.3,
+        421.45,
+        613.3
+      ],
+      "sourceEmbeddedImageBBox": [
+        199.45,
+        397.3,
+        421.45,
+        613.3
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6325,12 +6152,15 @@
       "pdfPage": 3,
       "bbox": [
         36.0,
-        83.01,
+        36.0,
         576.0,
-        358.57
+        367.21
       ],
       "caption": "FIGURE A-4.1",
       "asset": "2014-mc-a-p0003-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6341,12 +6171,15 @@
       "pdfPage": 4,
       "bbox": [
         36.0,
-        412.7,
+        176.9,
         576.0,
-        688.26
+        696.9
       ],
       "caption": "FIGURE A-5",
       "asset": "2014-mc-a-p0004-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6357,12 +6190,15 @@
       "pdfPage": 5,
       "bbox": [
         36.0,
-        340.8,
+        105.96,
         576.0,
-        616.87
+        625.96
       ],
       "caption": "FIGURE A-5—continued",
       "asset": "2014-mc-a-p0005-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6376,47 +6212,28 @@
       "kind": "official-pdf-figure",
       "sourcePDF": "2014CC_FGC_Chapter3_General_Regulations.pdf",
       "sourceSHA256": "8b36235ea4ea2e55769dac203846455c61384de4f6ff9840721bbf9e973fe901",
-      "pdfPage": 4,
-      "bbox": [
-        36.0,
-        421.11,
-        576.0,
-        698.59
-      ],
-      "caption": "Sections 304.5.3.1 and 304.5.3.2 (see Figure 304.5.3).",
-      "asset": "2014-fgc-3-p0004-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_FGC_Chapter3_General_Regulations.pdf",
-      "sourceSHA256": "8b36235ea4ea2e55769dac203846455c61384de4f6ff9840721bbf9e973fe901",
       "pdfPage": 5,
       "bbox": [
         36.0,
-        40.51,
+        251.4,
         576.0,
-        316.55
+        308.55
       ],
       "caption": "FIGURE 304.5.3",
       "asset": "2014-fgc-3-p0005-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_FGC_Chapter3_General_Regulations.pdf",
-      "sourceSHA256": "8b36235ea4ea2e55769dac203846455c61384de4f6ff9840721bbf9e973fe901",
-      "pdfPage": 5,
-      "bbox": [
-        36.0,
-        269.25,
-        576.0,
-        548.56
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        207.85,
+        251.4,
+        358.55,
+        281.4
       ],
-      "caption": "square inch per 2,000 Btu/h (1100 mm2/kW) of total input rating of all appliances in the enclosure (see Figure 304.6.1(3)).",
-      "asset": "2014-fgc-3-p0005-figure-02.png",
+      "sourceEmbeddedImageBBox": [
+        207.85,
+        251.4,
+        358.55,
+        281.4
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6427,12 +6244,25 @@
       "pdfPage": 6,
       "bbox": [
         36.0,
-        94.39,
+        79.8,
         576.0,
-        370.43
+        371.67
       ],
       "caption": "FIGURE 304.6.1(2)",
       "asset": "2014-fgc-3-p0006-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        180.7,
+        79.8,
+        418.1,
+        323.9
+      ],
+      "sourceEmbeddedImageBBox": [
+        180.7,
+        79.8,
+        418.1,
+        323.9
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6443,28 +6273,15 @@
       "pdfPage": 6,
       "bbox": [
         36.0,
-        127.27,
+        180.71,
         576.0,
-        403.31
+        420.71
       ],
       "caption": "FIGURE 304.6.1(1)",
       "asset": "2014-fgc-3-p0006-figure-02.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_FGC_Chapter3_General_Regulations.pdf",
-      "sourceSHA256": "8b36235ea4ea2e55769dac203846455c61384de4f6ff9840721bbf9e973fe901",
-      "pdfPage": 6,
-      "bbox": [
-        36.0,
-        136.51,
-        576.0,
-        412.58
-      ],
-      "caption": "ALL AIR FROM OUTDOORS—INLET AIR FROM VENTILATED FIGURE 304.6.1(3)",
-      "asset": "2014-fgc-3-p0006-figure-03.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6475,28 +6292,25 @@
       "pdfPage": 7,
       "bbox": [
         36.0,
-        36.0,
+        26.8,
         576.0,
-        267.8
+        277.83
       ],
       "caption": "FIGURE 304.6.2",
       "asset": "2014-fgc-3-p0007-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_FGC_Chapter3_General_Regulations.pdf",
-      "sourceSHA256": "8b36235ea4ea2e55769dac203846455c61384de4f6ff9840721bbf9e973fe901",
-      "pdfPage": 7,
-      "bbox": [
-        36.0,
-        68.02,
-        576.0,
-        345.5
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        158.6,
+        26.8,
+        390.3,
+        239.75
       ],
-      "caption": "to the outdoors or spaces that freely communicate with the outdoors (see Figure 3 04.6.2) and shall have a minimum free area of 1",
-      "asset": "2014-fgc-3-p0007-figure-02.png",
+      "sourceEmbeddedImageBBox": [
+        158.6,
+        26.8,
+        390.3,
+        239.75
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6507,12 +6321,15 @@
       "pdfPage": 13,
       "bbox": [
         36.0,
-        45.09,
+        36.0,
         576.0,
-        320.65
+        329.29
       ],
       "caption": "FIGURE 308.2(1)",
       "asset": "2014-fgc-3-p0013-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6523,12 +6340,25 @@
       "pdfPage": 13,
       "bbox": [
         36.0,
-        298.43,
+        343.1,
         576.0,
-        573.99
+        574.63
       ],
       "caption": "FIGURE 308.2(2)",
       "asset": "2014-fgc-3-p0013-figure-02.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        177.25,
+        343.1,
+        435.7,
+        537.5
+      ],
+      "sourceEmbeddedImageBBox": [
+        177.25,
+        343.1,
+        435.7,
+        537.5
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6539,12 +6369,25 @@
       "pdfPage": 14,
       "bbox": [
         36.0,
-        76.65,
+        80.15,
         576.0,
-        352.21
+        352.85
       ],
       "caption": "FIGURE 308.2(3)",
       "asset": "2014-fgc-3-p0014-figure-01.png",
+      "cropMethod": "embedded-pdf-image-bbox",
+      "embeddedImageBBox": [
+        191.5,
+        80.15,
+        423.35,
+        323.05
+      ],
+      "sourceEmbeddedImageBBox": [
+        191.5,
+        80.15,
+        423.35,
+        323.05
+      ],
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6632,7 +6475,7 @@
         488.11
       ],
       "caption": "TABLE 403.9.2",
-      "parserAgreement": 0.9922,
+      "parserAgreement": 0.9883,
       "cellCoverage": 0.7321,
       "asset": "2014-fgc-4-p0014-table-review-01.png",
       "reviewRequired": true,
@@ -6650,7 +6493,7 @@
         176.52
       ],
       "caption": "TABLE 406.7.1.1",
-      "parserAgreement": 1.0,
+      "parserAgreement": 0.9967,
       "cellCoverage": 0.8214,
       "asset": "2014-fgc-4-p0021-table-review-01.png",
       "reviewRequired": true,
@@ -6668,7 +6511,7 @@
         606.58
       ],
       "caption": "TABLE 409.1.1",
-      "parserAgreement": 0.9739,
+      "parserAgreement": 0.971,
       "cellCoverage": 0.7143,
       "asset": "2014-fgc-4-p0022-table-review-01.png",
       "reviewRequired": true,
@@ -6686,7 +6529,7 @@
         216.98
       ],
       "caption": "TABLE 415.1",
-      "parserAgreement": 0.9966,
+      "parserAgreement": 0.9932,
       "cellCoverage": 0.8387,
       "asset": "2014-fgc-4-p0026-table-review-01.png",
       "reviewRequired": true,
@@ -6703,8 +6546,8 @@
         436.03,
         604.87
       ],
-      "caption": "F = Value determined from table below.",
-      "parserAgreement": 0.9966,
+      "caption": null,
+      "parserAgreement": 0.9933,
       "cellCoverage": 0.878,
       "asset": "2014-fgc-5-p0007-table-review-01.png",
       "reviewRequired": true,
@@ -6719,26 +6562,13 @@
         36.0,
         36.0,
         576.0,
-        96.94
+        114.1
       ],
       "caption": "FIGURE 503.5.4",
       "asset": "2014-fgc-5-p0009-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_FGC_Chapter5_Chimneys_and_Vents.pdf",
-      "sourceSHA256": "bf8f8d8c5cfcf0d9be0b13c50bdee1415cccf443dbb11777a4f8180d595abf07",
-      "pdfPage": 10,
-      "bbox": [
-        36.0,
-        288.96,
-        576.0,
-        566.44
-      ],
-      "caption": "similar obstruction shall terminate above the roof in accordance with Figure 503.6.6.",
-      "asset": "2014-fgc-5-p0010-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6749,28 +6579,15 @@
       "pdfPage": 11,
       "bbox": [
         36.0,
-        373.32,
+        146.88,
         576.0,
-        649.36
+        666.88
       ],
       "caption": "FIGURE 503.6.4",
       "asset": "2014-fgc-5-p0011-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_FGC_Chapter5_Chimneys_and_Vents.pdf",
-      "sourceSHA256": "bf8f8d8c5cfcf0d9be0b13c50bdee1415cccf443dbb11777a4f8180d595abf07",
-      "pdfPage": 13,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        147.95
-      ],
-      "caption": "horizontal distance of 10 feet (3048 mm) (see Figure 503.5.4). An approved cap or roof assembly shall be attached to the terminus",
-      "asset": "2014-fgc-5-p0013-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -6811,22 +6628,6 @@
       "researchClaimEligible": false
     },
     {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_FGC_Chapter5_Chimneys_and_Vents.pdf",
-      "sourceSHA256": "bf8f8d8c5cfcf0d9be0b13c50bdee1415cccf443dbb11777a4f8180d595abf07",
-      "pdfPage": 33,
-      "bbox": [
-        36.0,
-        36.0,
-        576.0,
-        104.81
-      ],
-      "caption": "Note: See Figure B-19 in Appendix B for a map showing local 99 percent winter design temperatures in the United States.",
-      "asset": "2014-fgc-5-p0033-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
       "kind": "unverified-table",
       "sourcePDF": "2014CC_FGC_Chapter5_Chimneys_and_Vents.pdf",
       "sourceSHA256": "bf8f8d8c5cfcf0d9be0b13c50bdee1415cccf443dbb11777a4f8180d595abf07",
@@ -6848,31 +6649,18 @@
       "kind": "official-pdf-figure",
       "sourcePDF": "2014CC_FGC_Chapter5_Chimneys_and_Vents.pdf",
       "sourceSHA256": "bf8f8d8c5cfcf0d9be0b13c50bdee1415cccf443dbb11777a4f8180d595abf07",
-      "pdfPage": 35,
-      "bbox": [
-        36.0,
-        79.18,
-        576.0,
-        356.66
-      ],
-      "caption": "mm) of common vent connector manifold diameter (D) (see Figure 504.3.4).",
-      "asset": "2014-fgc-5-p0035-figure-01.png",
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "official-pdf-figure",
-      "sourcePDF": "2014CC_FGC_Chapter5_Chimneys_and_Vents.pdf",
-      "sourceSHA256": "bf8f8d8c5cfcf0d9be0b13c50bdee1415cccf443dbb11777a4f8180d595abf07",
       "pdfPage": 36,
       "bbox": [
         36.0,
         36.0,
         576.0,
-        98.26
+        109.42
       ],
       "caption": "FIGURE 504.3.4",
       "asset": "2014-fgc-5-p0036-figure-01.png",
+      "cropMethod": "caption-region-fallback",
+      "embeddedImageBBox": null,
+      "sourceEmbeddedImageBBox": null,
       "reviewRequired": true,
       "researchClaimEligible": false
     },
@@ -7088,27 +6876,13 @@
     },
     {
       "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_10_combined_instructions.pdf",
-      "sourceSHA256": "935825922fe9398687a8c6ff3f0867249cf7ebcc82d318a9197ff548bbb095d3",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_10_combined_instructions.pdf",
-      "status": "no-cited-section-match-review-required",
-      "unmatchedSectionNumbers": [
-        "3314.20"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
       "sourcePDF": "update_11_combined_instructions.pdf",
       "sourceSHA256": "d1d1ef61f86639171d4c0ae427387372e087aa86c520bbea2def83df379a2237",
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_11_combined_instructions.pdf",
       "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
-        "2111.1",
         "28-106.1.1",
-        "28-106.1.2",
-        "3303.5.4"
+        "28-106.1.2"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -7178,7 +6952,6 @@
       "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
         "28-315.9",
-        "403.1.3",
         "A117.1"
       ],
       "reviewRequired": true,
@@ -7404,10 +7177,7 @@
         "28-103.30",
         "28-105.12.9",
         "28-112.12",
-        "28-204.1.1",
-        "3310.10",
-        "3321.1",
-        "3321.2"
+        "28-204.1.1"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -7419,26 +7189,7 @@
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_32_combined_instructions.pdf",
       "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
-        "28-105.12.8",
-        "3301.13",
-        "3301.13.1",
-        "3301.13.10",
-        "3301.13.11",
-        "3301.13.12",
-        "3301.13.13",
-        "3301.13.14",
-        "3301.13.15",
-        "3301.13.16",
-        "3301.13.17",
-        "3301.13.2",
-        "3301.13.3",
-        "3301.13.4",
-        "3301.13.5",
-        "3301.13.6",
-        "3301.13.7",
-        "3301.13.8",
-        "3301.13.9",
-        "3301.3"
+        "28-105.12.8"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -7476,9 +7227,7 @@
       "unmatchedSectionNumbers": [
         "1008.1.3.5",
         "28-103.21.1",
-        "28-204.2",
-        "3321.1",
-        "3321.2"
+        "28-204.2"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -7525,18 +7274,14 @@
       "sourcePDF": "update_39_combined_instructions.pdf",
       "sourceSHA256": "da221e5ffa2542c866222d2028e3a7062446acce5248e1536393cd0f893ea024",
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_39_combined_instructions.pdf",
-      "status": "no-cited-section-match-review-required",
+      "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
-        "110.3.7",
         "1704.20.10",
         "28-104.8.4",
         "28-104.8.4.1",
         "28-104.8.4.2",
         "28-104.8.4.3",
-        "28-207.2",
-        "3301.3",
-        "3303.10.2",
-        "3303.10.3"
+        "28-207.2"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -7623,15 +7368,7 @@
         "28-401.15",
         "28-424.1",
         "28-424.2",
-        "28-424.3",
-        "3319.2",
-        "3319.2.1",
-        "3319.2.2",
-        "3319.2.3",
-        "3319.8.1",
-        "3319.8.2",
-        "3319.8.3",
-        "3319.8.8"
+        "28-424.3"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -7741,69 +7478,7 @@
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_50_combined_instructions.pdf",
       "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
-        "28-103.21.1",
-        "3321.1",
-        "3321.2"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_51_combined_instructions.pdf",
-      "sourceSHA256": "28dde4b7f99a647e242526e738b2c0b652d0db8e212d5e0329dcb551b2e959fc",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_51_combined_instructions.pdf",
-      "status": "no-cited-section-match-review-required",
-      "unmatchedSectionNumbers": [
-        "3319.13",
-        "3319.13.1",
-        "3319.13.2",
-        "3319.13.3"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_52_combined_instructions.pdf",
-      "sourceSHA256": "f32ade5da1fe1ef73cb430915e4176ee5f48c5d94dba95ab42b935528110d40a",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_52_combined_instructions.pdf",
-      "status": "no-cited-section-match-review-required",
-      "unmatchedSectionNumbers": [
-        "3319.11"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_53_combined_instructions.pdf",
-      "sourceSHA256": "2623412ced82f32040b222e60820cbb7a39f8b0574ca13c68f099e5cfe5c47bb",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_53_combined_instructions.pdf",
-      "status": "no-cited-section-match-review-required",
-      "unmatchedSectionNumbers": [
-        "3301.12",
-        "3301.12.1",
-        "3301.12.2",
-        "3301.12.3"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_54_combined_instructions.pdf",
-      "sourceSHA256": "0bafc21f0cfac20fcf99fc802916fafcfd59b52ff3c0668845d75f9ec6827b31",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_54_combined_instructions.pdf",
-      "status": "no-cited-section-match-review-required",
-      "unmatchedSectionNumbers": [
-        "3301.11",
-        "3301.11.1",
-        "3301.11.2",
-        "3301.11.3",
-        "3301.11.4",
-        "3301.11.5",
-        "3310.10.1"
+        "28-103.21.1"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -7841,21 +7516,7 @@
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_57_combined_instructions.pdf",
       "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
-        "28-312.8",
-        "907.2.11.5",
-        "Q107.1"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_58_combined_instructions.pdf",
-      "sourceSHA256": "263828a6e62cb53f3b47977750e09e9031620c9a54047ac69a0ee13a93642b0a",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_58_combined_instructions.pdf",
-      "status": "partial-citation-match-review-required",
-      "unmatchedSectionNumbers": [
-        "1109.2.4"
+        "28-312.8"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -7942,23 +7603,10 @@
       "sourcePDF": "update_64_combined_instructions.pdf",
       "sourceSHA256": "7767f4029c7d2629c46215282894130c1dd588e2ba84810892cea25ae27bcf95",
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_64_combined_instructions.pdf",
-      "status": "no-cited-section-match-review-required",
+      "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
         "28-319.1",
-        "28-319.2",
-        "3113.1",
-        "3113.10",
-        "3113.11",
-        "3113.12",
-        "3113.2",
-        "3113.3",
-        "3113.4",
-        "3113.5",
-        "3113.5.1",
-        "3113.6",
-        "3113.7",
-        "3113.8",
-        "3113.9"
+        "28-319.2"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -8021,32 +7669,6 @@
     },
     {
       "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_68_combined_instructions.pdf",
-      "sourceSHA256": "7382a2efe46ed9ca710e2803b5ac5720891def3c69aab58d872ddedbc271edf8",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_68_combined_instructions.pdf",
-      "status": "no-cited-section-match-review-required",
-      "unmatchedSectionNumbers": [
-        "3319.12",
-        "3319.12.1",
-        "3319.12.2"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_69_combined_instructions.pdf",
-      "sourceSHA256": "ac090eed7686c9b4749e8a9c96978af7cb6f6d433c39d44ab36b95fea9d4b07b",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_69_combined_instructions.pdf",
-      "status": "partial-citation-match-review-required",
-      "unmatchedSectionNumbers": [
-        "3319.13"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
       "sourcePDF": "update_71_combined_instructions.pdf",
       "sourceSHA256": "3db153fb84d3d470bd76c8d49955ad8a4c419d6e06a4bc76fc4836664bb58a8a",
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_71_combined_instructions.pdf",
@@ -8079,22 +7701,11 @@
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_73_combined_instructions.pdf",
       "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
-        "107.9.2",
-        "1305.11.1.2",
         "28-103.1",
         "28-103.1.1",
         "28-105.2",
         "28-105.4",
-        "28-109.1",
-        "903.2.11.9",
-        "903.3.1.1.1",
-        "903.3.3",
-        "904.2.1",
-        "907.1.1",
-        "907.1.1.1",
-        "908.10",
-        "908.11",
-        "917.1.1"
+        "28-109.1"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -8106,9 +7717,7 @@
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_75_combined_instructions.pdf",
       "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
-        "28-315.11",
-        "908.7.3",
-        "908.7.3.1"
+        "28-315.11"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -8213,19 +7822,6 @@
     },
     {
       "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_81_combined_instructions.pdf",
-      "sourceSHA256": "88ce752bf09802ca57b4a3caa21cbadc31f96b74f85bf538919ea8e686b63edd",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_81_combined_instructions.pdf",
-      "status": "partial-citation-match-review-required",
-      "unmatchedSectionNumbers": [
-        "1504.9",
-        "1511.2"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
       "sourcePDF": "update_82_combined_instructions.pdf",
       "sourceSHA256": "59a8c6973c0a0f3403bdb610e6786c77dc1c5b36a9d988ee22eab98cbf2684bd",
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_82_combined_instructions.pdf",
@@ -8278,17 +7874,6 @@
         "28-322.2",
         "28-322.3",
         "28-322.4",
-        "3114.1",
-        "3114.10",
-        "3114.11",
-        "3114.12",
-        "3114.2",
-        "3114.3",
-        "3114.4",
-        "3114.5",
-        "3114.6",
-        "3114.8",
-        "3114.9",
         "320.3.5",
         "320.3.7",
         "320.7",
@@ -8346,21 +7931,7 @@
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_86_combined_instructions.pdf",
       "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
-        "28-103.29",
-        "3301.13.12",
-        "3321.1"
-      ],
-      "reviewRequired": true,
-      "researchClaimEligible": false
-    },
-    {
-      "kind": "amendment-update-reconciliation",
-      "sourcePDF": "update_87_combined_instructions.pdf",
-      "sourceSHA256": "eeb7d73ab3d3d9506d2f5db52947654894a6f3754ebbddd1eaf23c399aeef700",
-      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_87_combined_instructions.pdf",
-      "status": "no-cited-section-match-review-required",
-      "unmatchedSectionNumbers": [
-        "3301.11.4"
+        "28-103.29"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false
@@ -8429,10 +8000,7 @@
       "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_9_combined_instructions.pdf",
       "status": "partial-citation-match-review-required",
       "unmatchedSectionNumbers": [
-        "28-315.2.3",
-        "903.2.2",
-        "903.2.2.1",
-        "903.2.2.2"
+        "28-315.2.3"
       ],
       "reviewRequired": true,
       "researchClaimEligible": false

@@ -316,7 +316,17 @@ def lines_from_page(page, page_number: int) -> list[Line]:
     result = []
     for row in rows:
         ordered = sorted(row, key=lambda item: float(item["x0"]))
-        text = normalized_space(" ".join(str(item["text"]) for item in ordered))
+        text_parts: list[str] = []
+        prior_x1: float | None = None
+        for item in ordered:
+            value = str(item["text"])
+            x0 = float(item["x0"])
+            separator = ""
+            if text_parts and prior_x1 is not None and x0 - prior_x1 > 1.25:
+                separator = " "
+            text_parts.append(separator + value)
+            prior_x1 = float(item["x1"])
+        text = normalized_space("".join(text_parts))
         if not text:
             continue
         x0 = min(float(item["x0"]) for item in ordered)
@@ -338,7 +348,13 @@ SECTION_LINE = re.compile(
 
 
 def section_heading(line: str, prefix: str) -> tuple[str, str, str] | None:
-    match = SECTION_LINE.match(normalized_space(line))
+    normalized = normalized_space(line)
+    # Consolidated DOB PDFs mark some amended headings with one or more
+    # leading asterisks. The marker is amendment metadata, not part of the
+    # section number, so retain the accompanying note in prose while parsing
+    # the marked legal heading as its own section.
+    normalized = re.sub(r"^\*+(?=[A-Z]?\d)", "", normalized)
+    match = SECTION_LINE.match(normalized)
     if not match:
         return None
     number = re.sub(r"\.\s+", ".", match.group("number")).upper()
@@ -399,7 +415,8 @@ def region_poppler_text(words: list[dict], bbox: tuple[float, float, float, floa
 def table_caption(lines: list[Line], bbox: tuple[float, float, float, float]) -> str | None:
     above = [
         line for line in lines
-        if 0 <= bbox[1] - line.bbox[3] <= 100 and re.search(r"\bTABLE\b", line.text, re.I)
+        if 0 <= bbox[1] - line.bbox[3] <= 100
+        and re.match(r"^\*?\s*TABLE\s+[A-Z0-9]", line.text, re.I)
     ]
     return above[-1].text if above else None
 
@@ -471,17 +488,56 @@ def table_payload(
     }
 
 
+def structured_table_html(table: dict) -> str:
+    cells_by_row: dict[int, list[dict]] = collections.defaultdict(list)
+    for cell in table.get("cells", []):
+        cells_by_row[int(cell.get("row", 0))].append(cell)
+    body_rows = []
+    for row_index in range(int(table.get("rowCount", 0))):
+        tag = "th" if row_index == 0 else "td"
+        row_cells = []
+        for cell in sorted(cells_by_row.get(row_index, []), key=lambda value: int(value.get("column", 0))):
+            attributes = []
+            if tag == "th":
+                attributes.append('scope="col"')
+            if int(cell.get("rowSpan", 1)) > 1:
+                attributes.append(f'rowspan="{int(cell["rowSpan"])}"')
+            if int(cell.get("columnSpan", 1)) > 1:
+                attributes.append(f'colspan="{int(cell["columnSpan"])}"')
+            attribute_text = f" {' '.join(attributes)}" if attributes else ""
+            row_cells.append(f"<{tag}{attribute_text}>{cell.get('html', '')}</{tag}>")
+        body_rows.append(f"<tr>{''.join(row_cells)}</tr>")
+    caption = table.get("caption")
+    caption_html = f"<caption>{html.escape(caption)}</caption>" if caption else ""
+    footnotes = "".join(
+        f"<p class=\"code-table-footnote\">{html.escape(value)}</p>"
+        for value in table.get("footnotes", [])
+        if value
+    )
+    return (
+        f'<table data-table-id="{html.escape(str(table.get("id", "")))}">'
+        f"{caption_html}<tbody>{''.join(body_rows)}</tbody></table>{footnotes}"
+    )
+
+
 def safe_asset_name(prefix: str, chapter: str, page: int, kind: str, ordinal: int) -> str:
     return f"2014-{prefix.lower()}-{chapter.lower()}-p{page:04d}-{kind}-{ordinal:02d}.png"
 
 
-def render_crop(page, bbox: tuple[float, float, float, float], path: Path) -> None:
+def render_crop(
+    page,
+    bbox: tuple[float, float, float, float],
+    path: Path,
+    *,
+    bottom_margin: float | None = None,
+) -> None:
     margin = 8
+    resolved_bottom_margin = margin if bottom_margin is None else bottom_margin
     cropped = page.crop((
         max(0, bbox[0] - margin),
         max(0, bbox[1] - margin),
         min(float(page.width), bbox[2] + margin),
-        min(float(page.height), bbox[3] + margin),
+        min(float(page.height), bbox[3] + resolved_bottom_margin),
     ))
     image = cropped.to_image(resolution=180, antialias=True)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -518,8 +574,25 @@ def sections_from_lines(source: SourcePDF, pages: list[list[Line]]) -> list[Sour
     sections: list[SourceSection] = []
     seen_numbers: set[str] = set()
     active: SourceSection | None = None
+    skip_banner_title = False
     for page_lines in pages:
         for line in page_lines:
+            normalized = normalized_space(line.text)
+            if re.fullmatch(
+                rf"\**SECTION\s+{re.escape(source.prefix)}\s+[A-Z0-9.-]+",
+                normalized,
+                re.I,
+            ):
+                skip_banner_title = True
+                continue
+            if skip_banner_title:
+                skip_banner_title = False
+                if (
+                    normalized
+                    and normalized.upper() == normalized
+                    and section_heading(normalized, source.prefix) is None
+                ):
+                    continue
             heading = section_heading(line.text, source.prefix)
             if heading:
                 number, title, inline_body = heading
@@ -544,21 +617,126 @@ def sections_from_lines(source: SourcePDF, pages: list[list[Line]]) -> list[Sour
     return sections
 
 
-def likely_figure_regions(lines: list[Line], page_width: float, page_height: float) -> list[tuple[str, tuple[float, float, float, float]]]:
+def likely_figure_regions(
+    page,
+    lines: list[Line],
+) -> list[tuple[str, tuple[float, float, float, float], str, list[float] | None, list[float] | None, float, list[int]]]:
     result = []
+    page_width = float(page.width)
+    page_height = float(page.height)
+    pdf_images = [
+        (
+            max(0.0, float(image.get("x0", 0))),
+            max(0.0, float(image.get("top", 0))),
+            min(page_width, float(image.get("x1", 0))),
+            min(page_height, float(image.get("bottom", 0))),
+        )
+        for image in page.images
+        if float(image.get("x1", 0)) > float(image.get("x0", 0))
+        and float(image.get("bottom", 0)) > float(image.get("top", 0))
+    ]
+    used_images: set[int] = set()
+    prior_figure_bottom = 36.0
     for index, line in enumerate(lines):
-        if not re.search(r"\bFIGURE\s+[A-Z0-9.-]+", line.text, re.I):
+        if not re.match(r"^\*?\s*FIGURE\s+[A-Z0-9.-]+", line.text, re.I):
             continue
-        previous_bottom = lines[index - 1].bbox[3] if index else max(36.0, line.bbox[1] - 260)
-        top = max(36.0, min(previous_bottom, line.bbox[1] - 260))
-        bottom = min(page_height - 30, line.bbox[3] + 8)
+        caption_bottom = line.bbox[3]
+        caption_line_indexes = [index]
+        for following_index, following in enumerate(lines[index + 1:index + 3], start=index + 1):
+            gap = following.bbox[1] - caption_bottom
+            if gap > 15 or not re.fullmatch(r"[A-Z0-9\s—–.,()/-]+", following.text):
+                break
+            caption_line_indexes.append(following_index)
+            caption_bottom = following.bbox[3]
+        candidates = []
+        for image_index, image_bbox in enumerate(pdf_images):
+            if image_index in used_images:
+                continue
+            _x0, top, _x1, bottom = image_bbox
+            if line.bbox[1] < top - 8 or line.bbox[1] > bottom + 42:
+                continue
+            distance = 0 if line.bbox[1] <= bottom else line.bbox[1] - bottom
+            candidates.append((distance, abs((top + bottom) / 2 - line.bbox[1]), image_index, image_bbox))
+        if candidates:
+            _distance, _center_distance, image_index, source_image_bbox = min(candidates)
+            used_images.add(image_index)
+            image_bbox = source_image_bbox
+            crop_method = "embedded-pdf-image-bbox"
+            # Some official PDFs give an embedded image a trailing white box
+            # that overlaps the first heading of the next legal section. Keep
+            # the complete figure and its caption, but do not rasterize that
+            # unrelated enacted text into the image shown by the Reader.
+            next_section_top = next((
+                following.bbox[1]
+                for following in lines[caption_line_indexes[-1] + 1:]
+                if SECTION_LINE.match(re.sub(r"^\*+(?=[A-Z]?\d)", "", normalized_space(following.text)))
+                and following.bbox[1] > caption_bottom
+                and following.bbox[1] < source_image_bbox[3]
+            ), None)
+            if next_section_top is not None:
+                clipped_bottom = max(caption_bottom, next_section_top - 2.0)
+                image_bbox = (
+                    source_image_bbox[0],
+                    source_image_bbox[1],
+                    source_image_bbox[2],
+                    clipped_bottom,
+                )
+                crop_method = "embedded-pdf-image-bbox-clipped-at-next-section"
+            top = max(0.0, image_bbox[1])
+            bottom = min(page_height, max(image_bbox[3], caption_bottom))
+            bbox = (
+                max(0.0, min(36.0, image_bbox[0], line.bbox[0])),
+                top,
+                min(page_width, max(page_width - 36.0, image_bbox[2], line.bbox[2])),
+                bottom,
+            )
+            result.append((
+                line.text,
+                bbox,
+                crop_method,
+                [round(value, 2) for value in image_bbox],
+                [round(value, 2) for value in source_image_bbox],
+                line.bbox[1],
+                caption_line_indexes,
+            ))
+            prior_figure_bottom = bottom
+            continue
+        bottom = min(page_height - 30, caption_bottom + 8)
+        top = max(36.0, prior_figure_bottom, bottom - 520)
         if bottom - top < 80:
             top = max(36.0, bottom - 240)
-        result.append((line.text, (36.0, top, page_width - 36.0, bottom)))
+        result.append((
+            line.text,
+            (36.0, top, page_width - 36.0, bottom),
+            "caption-region-fallback",
+            None,
+            None,
+            line.bbox[1],
+            caption_line_indexes,
+        ))
+        prior_figure_bottom = bottom
     return result
 
 
 def attach_block_for_page(sections: list[SourceSection], page_number: int, top: float, block: dict) -> bool:
+    caption = normalized_space(str(block.get("caption", "")))
+    caption_reference = re.search(
+        r"\b(?:FIGURE|TABLE)\s+([A-Z]?\d+(?:\.\d+)+)",
+        caption,
+        re.I,
+    )
+    if caption_reference:
+        referenced_number = caption_reference.group(1).upper()
+        referenced_section = next(
+            (
+                section for section in sections
+                if section.section_number.upper() == referenced_number
+            ),
+            None,
+        )
+        if referenced_section is not None:
+            referenced_section.blocks.append(block)
+            return True
     candidates = []
     for section in sections:
         page_lines = [line for line in section.lines if line.page == page_number and line.bbox[1] <= top]
@@ -604,7 +782,6 @@ def extract_source(
         for page_index, page in enumerate(pdf.pages):
             page_number = page_index + 1
             lines = lines_from_page(page, page_number)
-            page_lines.append(lines)
             primary_text = "\n".join(line.text for line in lines)
             secondary_text = poppler_pages[page_index] if page_index < len(poppler_pages) else ""
             agreement = parser_agreement(primary_text, secondary_text)
@@ -625,6 +802,7 @@ def extract_source(
                 })
 
             page_words = poppler_bbox[page_index] if page_index < len(poppler_bbox) else []
+            excluded_line_indexes: set[int] = set()
             table_candidates = page.find_tables() if re.search(r"\bTABLE\b|CONTINUED", primary_text, re.I) else []
             for table_offset, candidate in enumerate(table_candidates, start=1):
                 bbox = tuple(float(value) for value in candidate.bbox)
@@ -644,24 +822,38 @@ def extract_source(
                     and blank_count / cell_count <= 0.4
                 )
                 caption = table_caption(lines, bbox)
+                footnotes = table_footnotes(lines, bbox)
+                for line_index, line in enumerate(lines):
+                    line_center = (line.bbox[1] + line.bbox[3]) / 2
+                    inside_table = bbox[1] - 2 <= line_center <= bbox[3] + 2
+                    is_caption = bool(
+                        caption
+                        and line.text == caption
+                        and 0 <= bbox[1] - line.bbox[3] <= 100
+                    )
+                    is_footnote = line.text in footnotes and 0 <= line.bbox[1] - bbox[3] <= 135
+                    if inside_table or is_caption or is_footnote:
+                        excluded_line_indexes.add(line_index)
                 verified = rectangular and cell_coverage >= 0.88 and agreement >= 0.72
                 if verified:
                     table_id = f"{TABLE_ID_PREFIX}-{source.prefix.lower()}-{source.chapter_number.lower()}-p{page_number:04d}-{table_offset:02d}"
-                    structured_tables.append(table_payload(
+                    table = table_payload(
                         table_id,
                         rows,
                         caption,
-                        table_footnotes(lines, bbox),
+                        footnotes,
                         source,
                         source_hash,
                         page_number,
                         bbox,
-                    ))
+                    )
+                    structured_tables.append(table)
                     pending_visuals.append((page_number, bbox[1], {
                         "id": f"{table_id}-block",
                         "kind": "table",
                         "tableID": table_id,
                         "caption": caption,
+                        "html": structured_table_html(table),
                         "plainText": cell_text,
                         "reviewRequired": False,
                         "researchClaimEligible": True,
@@ -698,12 +890,26 @@ def extract_source(
                     "researchClaimEligible": False,
                 })
 
-            for figure_offset, (caption, bbox) in enumerate(
-                likely_figure_regions(lines, float(page.width), float(page.height)), start=1
+            for figure_offset, (
+                caption,
+                bbox,
+                crop_method,
+                embedded_image_bbox,
+                source_embedded_image_bbox,
+                caption_anchor,
+                caption_line_indexes,
+            ) in enumerate(
+                likely_figure_regions(page, lines), start=1
             ):
+                excluded_line_indexes.update(caption_line_indexes)
                 asset_name = safe_asset_name(source.prefix, source.chapter_number, page_number, "figure", figure_offset)
-                render_crop(page, bbox, assets_dir / asset_name)
-                pending_visuals.append((page_number, bbox[3], {
+                render_crop(
+                    page,
+                    bbox,
+                    assets_dir / asset_name,
+                    bottom_margin=(0 if crop_method.endswith("clipped-at-next-section") else None),
+                )
+                pending_visuals.append((page_number, caption_anchor, {
                     "id": f"{asset_name}-block",
                     "kind": "image",
                     "imageID": asset_name,
@@ -716,6 +922,9 @@ def extract_source(
                         "sourceSHA256": source_hash,
                         "pdfPage": page_number,
                         "bbox": [round(value, 2) for value in bbox],
+                        "cropMethod": crop_method,
+                        "embeddedImageBBox": embedded_image_bbox,
+                        "sourceEmbeddedImageBBox": source_embedded_image_bbox,
                     },
                 }))
                 discrepancies.append({
@@ -726,9 +935,16 @@ def extract_source(
                     "bbox": [round(value, 2) for value in bbox],
                     "caption": caption,
                     "asset": asset_name,
+                    "cropMethod": crop_method,
+                    "embeddedImageBBox": embedded_image_bbox,
+                    "sourceEmbeddedImageBBox": source_embedded_image_bbox,
                     "reviewRequired": True,
                     "researchClaimEligible": False,
                 })
+            page_lines.append([
+                line for line_index, line in enumerate(lines)
+                if line_index not in excluded_line_indexes
+            ])
 
     sections = sections_from_lines(source, page_lines)
     if not sections and "reserved" not in source.title.lower():
@@ -793,8 +1009,60 @@ def paragraph_html(text: str) -> str:
     )
 
 
+STRUCTURAL_LINE_START = re.compile(
+    r"^(?:"
+    r"\(?\d+[.)]\s+|"
+    r"[a-z][.)]\s+|"
+    r"[ivxlcdm]+[.)]\s+|"
+    r"[-•▪] ?\s*|"
+    r"Exceptions?\s*:|"
+    r"Notes?\s*:|"
+    r"For SI\s*:|"
+    r"\*+|"
+    r"(?:SECTION|CHAPTER)\s+[A-Z0-9]"
+    r")",
+    re.I,
+)
+
+
+def line_separator(previous: Line, current: Line) -> str:
+    """Distinguish PDF wrapping from authored structure.
+
+    The DOB PDFs expose every typeset row as a separate extracted line. Most of
+    those rows are soft wraps and must become spaces in Reader prose. Numbered
+    items, exceptions, notes, headings, and visibly separated paragraphs retain
+    a break. A section that crosses a PDF page is treated as continuous unless
+    the next line carries one of those structural markers.
+    """
+    if STRUCTURAL_LINE_START.match(current.text):
+        return "\n"
+    if previous.page != current.page:
+        return ""
+    previous_height = max(previous.bbox[3] - previous.bbox[1], 1.0)
+    current_height = max(current.bbox[3] - current.bbox[1], 1.0)
+    vertical_gap = current.bbox[1] - previous.bbox[3]
+    if vertical_gap > max(previous_height, current_height) * 0.8:
+        return "\n\n"
+    return ""
+
+
 def source_text(section: SourceSection) -> str:
-    return "\n".join(line.text for line in section.lines).strip()
+    if not section.lines:
+        return ""
+    result = section.lines[0].text.strip()
+    for previous, current in zip(section.lines, section.lines[1:]):
+        value = current.text.strip()
+        if not value:
+            continue
+        separator = line_separator(previous, current)
+        if separator:
+            result = result.rstrip() + separator + value
+            continue
+        if result.endswith("-") and value[0].islower():
+            result += value
+        else:
+            result = result.rstrip() + " " + value
+    return result.strip()
 
 
 def search_tokens(value: str) -> set[str]:
@@ -1080,6 +1348,17 @@ def build_package(
         "schemaVersion": 1,
         "tokens": {token: sorted(ids) for token, ids in sorted(token_index.items())},
     })
+    asset_files = sorted(path for path in (output / "assets").iterdir() if path.is_file())
+    image_manifest_items: dict[str, str] = {}
+    for asset_path in asset_files:
+        relative_path = f"assets/{asset_path.name}"
+        image_manifest_items[asset_path.name] = relative_path
+        image_manifest_items[asset_path.stem] = relative_path
+    write_json(output / "prepared" / "images.json", {
+        "schemaVersion": 1,
+        "storage": "bundled-local-assets",
+        "items": image_manifest_items,
+    })
     write_json(output / "source-manifest.json", {
         "schemaVersion": 1,
         "libraryID": LIBRARY_ID,
@@ -1182,6 +1461,7 @@ def validate_package(output: Path) -> dict:
     bundle = json.loads((output / "bundle.json").read_text(encoding="utf-8"))
     manifest = json.loads((output / "prepared" / "manifest.json").read_text(encoding="utf-8"))
     discrepancies = json.loads((output / "discrepancy-manifest.json").read_text(encoding="utf-8"))
+    image_manifest = json.loads((output / "prepared" / "images.json").read_text(encoding="utf-8"))
     section_files = list((output / "prepared" / "sections").glob("*.json"))
     chapter_files = list((output / "prepared" / "chapters").glob("*.json"))
     if len(bundle.get("chapters", [])) != len(chapter_files):
@@ -1190,21 +1470,89 @@ def validate_package(output: Path) -> dict:
         raise RuntimeError("Manifest/chapter file count mismatch.")
     if not section_files:
         raise RuntimeError("The generated corpus has no sections.")
+    tables_by_id = {
+        str(table.get("id")): table
+        for table in bundle.get("tables", [])
+        if table.get("id")
+    }
+    referenced_table_ids: set[str] = set()
+    referenced_image_ids: set[str] = set()
+    retained_structural_breaks = 0
     for path in section_files:
         section = json.loads(path.read_text(encoding="utf-8"))
         provenance = section.get("historicalConstructionCode", {})
         if not provenance.get("sourceSHA256") or not provenance.get("sourcePages"):
             raise RuntimeError(f"Missing page provenance: {path}")
+        official_text = str(section.get("officialText", ""))
+        code_prefix = re.escape(str(section.get("codePrefix", "")))
+        if re.search(rf"(?:^|\n)\*?SECTION\s+{code_prefix}\s+[A-Z0-9.-]+", official_text):
+            raise RuntimeError(f"Presentation-only section banner leaked into {path}")
+        text_lines = official_text.split("\n")
+        for line_index, line in enumerate(text_lines[1:], start=1):
+            if not line or not text_lines[line_index - 1]:
+                continue
+            if not STRUCTURAL_LINE_START.match(line):
+                raise RuntimeError(f"Unexpected physical PDF hard break in {path}: {line[:80]}")
+            retained_structural_breaks += 1
+        for block in section.get("blocks", []):
+            if block.get("kind") == "image":
+                image_id = str(block.get("imageID", ""))
+                if not image_id or "://" in image_id:
+                    raise RuntimeError(f"Image block is not a bundled local asset in {path}: {image_id}")
+                relative_path = image_manifest.get("items", {}).get(image_id)
+                if not relative_path or "://" in relative_path:
+                    raise RuntimeError(f"Image block is absent from the local image manifest in {path}: {image_id}")
+                asset_path = output / relative_path
+                if not asset_path.is_file() or asset_path.stat().st_size == 0:
+                    raise RuntimeError(f"Bundled image asset is missing or empty: {asset_path}")
+                referenced_image_ids.add(image_id)
+            if block.get("kind") != "table":
+                continue
+            table_id = str(block.get("tableID", ""))
+            if not table_id or table_id not in tables_by_id:
+                raise RuntimeError(f"Unresolved table block in {path}: {table_id or '(missing ID)'}")
+            if "<table" not in str(block.get("html", "")).lower():
+                raise RuntimeError(f"Table block lacks renderable HTML in {path}: {table_id}")
+            referenced_table_ids.add(table_id)
     for table in bundle.get("tables", []):
         if not table.get("officialPDFProvenance", {}).get("sourceSHA256"):
             raise RuntimeError(f"Table lacks official PDF provenance: {table.get('id')}")
+    unbound_table_ids = sorted(set(tables_by_id) - referenced_table_ids)
+    if unbound_table_ids:
+        raise RuntimeError(f"Structured tables are not bound to Reader sections: {unbound_table_ids[:5]}")
     if discrepancies.get("failClosed") is not True:
         raise RuntimeError("Discrepancy manifest is not fail-closed.")
+    figure_records = [
+        record for record in discrepancies.get("records", [])
+        if record.get("kind") == "official-pdf-figure"
+    ]
+    for record in figure_records:
+        asset = output / "assets" / str(record.get("asset", ""))
+        if not asset.is_file() or asset.stat().st_size == 0:
+            raise RuntimeError(f"Missing figure crop: {asset}")
+        embedded_bbox = record.get("embeddedImageBBox")
+        crop_bbox = record.get("bbox")
+        if embedded_bbox:
+            if (
+                crop_bbox[0] > embedded_bbox[0]
+                or crop_bbox[1] > embedded_bbox[1]
+                or crop_bbox[2] < embedded_bbox[2]
+                or crop_bbox[3] < embedded_bbox[3]
+            ):
+                raise RuntimeError(f"Figure crop excludes part of its embedded PDF image: {asset}")
     return {
         "chapters": len(chapter_files),
         "sections": len(section_files),
         "tables": len(bundle.get("tables", [])),
         "discrepancies": len(discrepancies.get("records", [])),
+        "renderableTableBindings": len(referenced_table_ids),
+        "figures": len(figure_records),
+        "bundledImageBindings": len(referenced_image_ids),
+        "embeddedImageFigureCrops": sum(
+            1 for record in figure_records
+            if str(record.get("cropMethod", "")).startswith("embedded-pdf-image-bbox")
+        ),
+        "retainedStructuralBreaks": retained_structural_breaks,
     }
 
 

@@ -25249,7 +25249,7 @@
       "footnotes": [
         "For SI: 1 ton = 2,000 pounds = 906 kg, 1 cubic foot = 0.02832 m3, 1 pound = 0.454 kg.",
         "a. For materials that are detonable, the distance to other buildings or lot lines shall be as specified in Table 415.3.1 based on trinitrotoluene (TNT) equivalence of the",
-        "b. “Maximum Allowable Quantity” means the maximum allowable quantity per control area set forth in Table 307. 1(1).",
+        "b. “Maximum Allowable Quantity” means the maximum allowable quantity per control area set forth in Table 307.1(1).",
         "c. Limited to Division 1.4 materials and articles, including articles packaged for shipment, that are not regulated as an explosive under Bureau of Alcohol, Tobacco and Firearms"
       ],
       "officialPDFProvenance": {
@@ -37701,6 +37701,1040 @@
       }
     },
     {
+      "id": "nyc-2014-table-bc-7-p0053-01",
+      "caption": null,
+      "sourceWorkbookPath": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
+      "sourceSheetName": "PDF page 53",
+      "sourceRange": "120.02,72.12,564.1,629.76",
+      "columnCount": 6,
+      "rowCount": 4,
+      "columnWidths": null,
+      "rowHeights": null,
+      "cells": [
+        {
+          "row": 0,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "15-1.6l, m",
+          "plainText": "15-1.6l, m",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2″ × 6″ fire-retardant-treated wood studs 16″ on center. Interior face has two layers of 5/8″ Type X gypsum with the base layer placed vertically and attached with 6d box nails 12″ on center. The face layer is placed horizontally and attached with 8d box nails 8” on center at joints and 12″ on center elsewhere. The exterior face has a base layer of 5/8″ Type X gypsum sheathing placed vertically with 6d box nails 8″ on center at joints and 12″ on center elsewhere. An approved building paper is next applied, followed by self-furred exterior lath attached with 21/2″, No. 12 gage galvanized roofing nails with a 3/8″ diameter head and spaced 6″ on center along each stud. Cement plaster consisting of a 1/2″ brown coat is then applied. The scratch coat is mixed in the proportion of 1:3 by weight, cement to sand with 10 pounds of hydrated lime and 3 pounds of approved additives or admixtures per sack of cement. The brown coat is mixed in the proportion of 1:4 by weight, cement to sand with the same amounts of hydrated lime and approved additives or admixtures used in the scratch coat.",
+          "plainText": "2″ × 6″ fire-retardant-treated wood studs 16″ on center. Interior face has two layers of 5/8″ Type X gypsum with the base layer placed vertically and attached with 6d box nails 12″ on center. The face layer is placed horizontally and attached with 8d box nails 8” on center at joints and 12″ on center elsewhere. The exterior face has a base layer of 5/8″ Type X gypsum sheathing placed vertically with 6d box nails 8″ on center at joints and 12″ on center elsewhere. An approved building paper is next applied, followed by self-furred exterior lath attached with 21/2″, No. 12 gage galvanized roofing nails with a 3/8″ diameter head and spaced 6″ on center along each stud. Cement plaster consisting of a 1/2″ brown coat is then applied. The scratch coat is mixed in the proportion of 1:3 by weight, cement to sand with 10 pounds of hydrated lime and 3 pounds of approved additives or admixtures per sack of cement. The brown coat is mixed in the proportion of 1:4 by weight, cement to sand with the same amounts of hydrated lime and approved additives or admixtures used in the scratch coat.",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "81/4",
+          "plainText": "81/4",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "15-1.7l, m",
+          "plainText": "15-1.7l, m",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2″ × 6″ wood studs 16″ on center. The exterior face has a layer of 5/8″ Type X gypsum sheathing placed vertically with 6d box nails 8″ on center at joints and 12″ on center elsewhere. An approved building paper is next applied, followed by 1″ by No. 18 gage self-furred exterior lath attached with 8d by 21/2″ long galvanized roofing nails spaced 6″ on center along each stud. Cement plaster consisting of a 1/2″ scratch coat, a bonding agent and a 1/2″ brown coat and a finish coat is then applied. The scratch coat is mixed in the proportion of 1:3 by weight, cement to sand with 10 pounds of hydrated lime and 3 pounds of approved additives or admixtures per sack of cement. The brown coat is mixed in the proportion of 1:4 by weight, cement to sand with the same amounts of hydrated lime and approved additives or admixtures used in the scratch coat. The interior is covered with 3/8″ gypsum lath with 1″ hexagonal mesh of 0.035 inch (No. 20 B.W. gage) woven wire lath furred out 5/16″ and 1″ perlite or vermiculite gypsum plaster. Lath nailed with 11/8″ by No. 13 gage by 19/64″ head plasterboard glued nails spaced 5″ on center. Mesh attached by 13/4″ by No. 12 gage by 3/8″ head nails with 3/8″ furrings, spaced 8″ on center. The plaster mix shall not exceed 100 pounds of gypsum to 21/2 cubic feet of aggregate.",
+          "plainText": "2″ × 6″ wood studs 16″ on center. The exterior face has a layer of 5/8″ Type X gypsum sheathing placed vertically with 6d box nails 8″ on center at joints and 12″ on center elsewhere. An approved building paper is next applied, followed by 1″ by No. 18 gage self-furred exterior lath attached with 8d by 21/2″ long galvanized roofing nails spaced 6″ on center along each stud. Cement plaster consisting of a 1/2″ scratch coat, a bonding agent and a 1/2″ brown coat and a finish coat is then applied. The scratch coat is mixed in the proportion of 1:3 by weight, cement to sand with 10 pounds of hydrated lime and 3 pounds of approved additives or admixtures per sack of cement. The brown coat is mixed in the proportion of 1:4 by weight, cement to sand with the same amounts of hydrated lime and approved additives or admixtures used in the scratch coat. The interior is covered with 3/8″ gypsum lath with 1″ hexagonal mesh of 0.035 inch (No. 20 B.W. gage) woven wire lath furred out 5/16″ and 1″ perlite or vermiculite gypsum plaster. Lath nailed with 11/8″ by No. 13 gage by 19/64″ head plasterboard glued nails spaced 5″ on center. Mesh attached by 13/4″ by No. 12 gage by 3/8″ head nails with 3/8″ furrings, spaced 8″ on center. The plaster mix shall not exceed 100 pounds of gypsum to 21/2 cubic feet of aggregate.",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "83/8",
+          "plainText": "83/8",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "15-1.8l, m",
+          "plainText": "15-1.8l, m",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2″ × 6″wood studs 16″ on center. The exterior face has a layer of 5/8″ Type X gypsum sheathing placed vertically with 6d box nails 8″ on center at joints and 12″ on center elsewhere. An approved building paper is next applied, followed by 11/2″ by No. 17 gage self-furred exterior lath attached with 8d by 21/2″ long galvanized roofing nails spaced 6″ on center along each stud. Cement plaster consisting of a 1/2″ scratch coat, and a 1/2″ brown coat is then applied. The plaster may be placed by machine. The scratch coat is mixed in the proportion of 1:4 by weight, plastic cement to sand. The brown coat is mixed in the proportion of 1:5 by weight, plastic cement to sand. The interior is covered with 3/8″ gypsum lath with 1″ hexagonal mesh of No. 20 gage woven wire lath furred out 5/16″ and 1″ perlite or vermiculite gypsum plaster. Lath nailed with 11/8″ by No. 13 gage by 19/64″ head plasterboard glued nails spaced 5″ on center. Mesh attached by 13/4″ by No. 12 gage by 3/8″ head nails with 3/8″ furrings, spaced 8″ on center. The plaster mix shall not exceed 100 pounds of gypsum to 21/2 cubic feet of aggregate.",
+          "plainText": "2″ × 6″wood studs 16″ on center. The exterior face has a layer of 5/8″ Type X gypsum sheathing placed vertically with 6d box nails 8″ on center at joints and 12″ on center elsewhere. An approved building paper is next applied, followed by 11/2″ by No. 17 gage self-furred exterior lath attached with 8d by 21/2″ long galvanized roofing nails spaced 6″ on center along each stud. Cement plaster consisting of a 1/2″ scratch coat, and a 1/2″ brown coat is then applied. The plaster may be placed by machine. The scratch coat is mixed in the proportion of 1:4 by weight, plastic cement to sand. The brown coat is mixed in the proportion of 1:5 by weight, plastic cement to sand. The interior is covered with 3/8″ gypsum lath with 1″ hexagonal mesh of No. 20 gage woven wire lath furred out 5/16″ and 1″ perlite or vermiculite gypsum plaster. Lath nailed with 11/8″ by No. 13 gage by 19/64″ head plasterboard glued nails spaced 5″ on center. Mesh attached by 13/4″ by No. 12 gage by 3/8″ head nails with 3/8″ furrings, spaced 8″ on center. The plaster mix shall not exceed 100 pounds of gypsum to 21/2 cubic feet of aggregate.",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "83/8",
+          "plainText": "83/8",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "15-1.9",
+          "plainText": "15-1.9",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "4″ No. 18 gage, nonload-bearing metal studs, 16″ on center, with 1″ portland cement lime plaster (measured from the back side of the 3/4-pound expanded metal lath) on the exterior surface. Interior surface to be covered with 1″ of gypsum plaster on 3/4-pound expanded metal lath proportioned by weight—1:2 for scratch coat, 1:3 for brown, gypsum to sand. Lath on one side of the partition fastened to 1/4 ″ diameter pencil rods supported by No. 20 gage metal clips, located 16&#x27; on center vertically, on each stud. 3″ thick mineral fiber insulating batts friction fitted between the studs.",
+          "plainText": "4″ No. 18 gage, nonload-bearing metal studs, 16″ on center, with 1″ portland cement lime plaster (measured from the back side of the 3/4-pound expanded metal lath) on the exterior surface. Interior surface to be covered with 1″ of gypsum plaster on 3/4-pound expanded metal lath proportioned by weight—1:2 for scratch coat, 1:3 for brown, gypsum to sand. Lath on one side of the partition fastened to 1/4 ″ diameter pencil rods supported by No. 20 gage metal clips, located 16' on center vertically, on each stud. 3″ thick mineral fiber insulating batts friction fitted between the studs.",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "61/2d",
+          "plainText": "61/2d",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        }
+      ],
+      "footnotes": [],
+      "officialPDFProvenance": {
+        "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2014/2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
+        "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
+        "pdfPage": 53,
+        "bbox": [
+          120.02,
+          72.12,
+          564.1,
+          629.76
+        ],
+        "extraction": "pdfplumber-grid verified against Poppler bbox text"
+      }
+    },
+    {
       "id": "nyc-2014-table-bc-7-p0055-01",
       "caption": null,
       "sourceWorkbookPath": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
@@ -39200,6 +40234,4652 @@
           72.12,
           564.1,
           523.15
+        ],
+        "extraction": "pdfplumber-grid verified against Poppler bbox text"
+      }
+    },
+    {
+      "id": "nyc-2014-table-bc-7-p0056-01",
+      "caption": "TABLE 720.1(3)",
+      "sourceWorkbookPath": "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
+      "sourceSheetName": "PDF page 56",
+      "sourceRange": "49.8,223.34,562.3,663.82",
+      "columnCount": 11,
+      "rowCount": 10,
+      "columnWidths": null,
+      "rowHeights": null,
+      "cells": [
+        {
+          "row": 0,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "FLOOR OR ROOF CONSTRUCTION",
+          "plainText": "FLOOR OR ROOF CONSTRUCTION",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "ITEM NUMBER",
+          "plainText": "ITEM NUMBER",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "CEILING CONSTRUCTION",
+          "plainText": "CEILING CONSTRUCTION",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "THICKNESS OF FLOOR OR ROOF SLAB (inches)",
+          "plainText": "THICKNESS OF FLOOR OR ROOF SLAB (inches)",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "MINIMUM THICKNESS OF CEILING (inches)",
+          "plainText": "MINIMUM THICKNESS OF CEILING (inches)",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 0,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": "#F3F4F6",
+          "textColorHex": null,
+          "isBold": true,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "4 hour",
+          "plainText": "4 hour",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3 hour",
+          "plainText": "3 hour",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2 hour",
+          "plainText": "2 hour",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "1 hour",
+          "plainText": "1 hour",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "4 hour",
+          "plainText": "4 hour",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3 hour",
+          "plainText": "3 hour",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2 hour",
+          "plainText": "2 hour",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 1,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "1 hour",
+          "plainText": "1 hour",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "1. Siliceous aggregate concrete",
+          "plainText": "1. Siliceous aggregate concrete",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "1-1.1",
+          "plainText": "1-1.1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "Slab (no ceiling required). Minimum cover over nonprestressed reinforcement shall not be less than 3/4inch.b",
+          "plainText": "Slab (no ceiling required). Minimum cover over nonprestressed reinforcement shall not be less than 3/4inch.b",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "7.0",
+          "plainText": "7.0",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "6.2",
+          "plainText": "6.2",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5.0",
+          "plainText": "5.0",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3.5",
+          "plainText": "3.5",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 2,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2. Carbonate aggregate concrete",
+          "plainText": "2. Carbonate aggregate concrete",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2-1.1",
+          "plainText": "2-1.1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "6.6",
+          "plainText": "6.6",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5.7",
+          "plainText": "5.7",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "4.6",
+          "plainText": "4.6",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3.2",
+          "plainText": "3.2",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 3,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3. Sand-lightweight concrete",
+          "plainText": "3. Sand-lightweight concrete",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3-1.1",
+          "plainText": "3-1.1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5.4",
+          "plainText": "5.4",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "4.6",
+          "plainText": "4.6",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3.8",
+          "plainText": "3.8",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2.7",
+          "plainText": "2.7",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 4,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "4. Lightweight concrete",
+          "plainText": "4. Lightweight concrete",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "4-1.1",
+          "plainText": "4-1.1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5.1",
+          "plainText": "5.1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "4.4",
+          "plainText": "4.4",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3.6",
+          "plainText": "3.6",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2.5",
+          "plainText": "2.5",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 5,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5. Reinforced concrete",
+          "plainText": "5. Reinforced concrete",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5-1.1",
+          "plainText": "5-1.1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "Slab with suspended ceiling of vermiculite gypsum plaster over metal lath attached to 3/4″ cold-rolled channels spaced 12 on center. ″ Ceiling located 6 minimum below joists. ″",
+          "plainText": "Slab with suspended ceiling of vermiculite gypsum plaster over metal lath attached to 3/4″ cold-rolled channels spaced 12 on center. ″ Ceiling located 6 minimum below joists. ″",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3",
+          "plainText": "3",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2",
+          "plainText": "2",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "1",
+          "plainText": "1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3/ 4",
+          "plainText": "3/ 4",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 6,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5-2.1",
+          "plainText": "5-2.1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3/8″ Type X gypsum wallboardc attached to 0.018 inch (No. 25 carbon sheet steel gage) by 7/8″ deep by 25/8″ hat-shaped galvanized steel channels with 1″- long No. 6 screws. The channels are spaced 24″ on center, span 35″ and are supported along their length at 35″ intervals by 0.033-inch (No. 21 galvanized sheet gage) galvanized steel flat strap hangers having formed edges that engage the lips of the channel. The strap hangers are attached to the side of the concrete joists with 5/32″ by 11/4″ long power- driven fasteners. The wallboard is installed with the long dimension perpendicular to the channels. All end joints occur on channels and supplementary channels are installed parallel to the main channels, 12″ each side, at end joint occurrences. The finished ceiling is located approximately 12″ below the soffit of the floor slab.",
+          "plainText": "3/8″ Type X gypsum wallboardc attached to 0.018 inch (No. 25 carbon sheet steel gage) by 7/8″ deep by 25/8″ hat-shaped galvanized steel channels with 1″- long No. 6 screws. The channels are spaced 24″ on center, span 35″ and are supported along their length at 35″ intervals by 0.033-inch (No. 21 galvanized sheet gage) galvanized steel flat strap hangers having formed edges that engage the lips of the channel. The strap hangers are attached to the side of the concrete joists with 5/32″ by 11/4″ long power- driven fasteners. The wallboard is installed with the long dimension perpendicular to the channels. All end joints occur on channels and supplementary channels are installed parallel to the main channels, 12″ each side, at end joint occurrences. The finished ceiling is located approximately 12″ below the soffit of the floor slab.",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "21 / 2",
+          "plainText": "21 / 2",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5/ 8",
+          "plainText": "5/ 8",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 7,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "6-1.1",
+          "plainText": "6-1.1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "Gypsum plaster on metal lath attached to the bottom cord with single No. 16 gage or doubled No. 18 gage wire ties spaced 6on center. Plaster ″ mixed 1:2 for scratch coat, 1:3 for brown coat, by weight, gypsum-to-sand aggregate for 2-hour system. For 3-hour system plaster is neat.",
+          "plainText": "Gypsum plaster on metal lath attached to the bottom cord with single No. 16 gage or doubled No. 18 gage wire ties spaced 6on center. Plaster ″ mixed 1:2 for scratch coat, 1:3 for brown coat, by weight, gypsum-to-sand aggregate for 2-hour system. For 3-hour system plaster is neat.",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "21/ 2",
+          "plainText": "21/ 2",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "21/4",
+          "plainText": "21/4",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "3/4",
+          "plainText": "3/4",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 8,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5/8",
+          "plainText": "5/8",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 0,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "",
+          "plainText": "",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 1,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "6-2.1",
+          "plainText": "6-2.1",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 2,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "Vermiculite gypsum plaster on metal lath attached to the bottom chord with single No. 16 gage or doubled 0.049-inch (No. 18 B.W. gage) wire ties 6″ on center.",
+          "plainText": "Vermiculite gypsum plaster on metal lath attached to the bottom chord with single No. 16 gage or doubled 0.049-inch (No. 18 B.W. gage) wire ties 6″ on center.",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 3,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 4,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "2",
+          "plainText": "2",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 5,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 6,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 7,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 8,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "5/ 8",
+          "plainText": "5/ 8",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 9,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        },
+        {
+          "row": 9,
+          "column": 10,
+          "rowSpan": 1,
+          "columnSpan": 1,
+          "html": "—",
+          "plainText": "—",
+          "borders": {
+            "top": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "right": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "bottom": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            },
+            "left": {
+              "isHidden": false,
+              "style": "solid",
+              "width": 1,
+              "colorHex": "#9CA3AF"
+            }
+          },
+          "horizontalAlignment": null,
+          "verticalAlignment": null,
+          "backgroundColorHex": null,
+          "textColorHex": null,
+          "isBold": null,
+          "isItalic": null,
+          "fontSize": null,
+          "isWrapped": true
+        }
+      ],
+      "footnotes": [],
+      "officialPDFProvenance": {
+        "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2014/2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
+        "sourceSHA256": "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62",
+        "pdfPage": 56,
+        "bbox": [
+          49.8,
+          223.34,
+          562.3,
+          663.82
         ],
         "extraction": "pdfplumber-grid verified against Poppler bbox text"
       }
@@ -41066,7 +46746,7 @@
       ],
       "footnotes": [
         "For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 pound = 0.454 kg, 1 cubic foot = 0.0283m3,",
-        "a. Staples with equivalent holding power and penetration shall be permitted to be used as alternate fasteners to n ails for attachment to wood"
+        "a. Staples with equivalent holding power and penetration shall be permitted to be used as alternate fasteners to nails for attachment to wood"
       ],
       "officialPDFProvenance": {
         "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2014/2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf",
@@ -161866,7 +167546,7 @@
         "b. The hammer energy indicated is the rated energy.",
         "c. Sustained driving resistance. Where piles are to bear in soft rock, the minimum driving resistance shall be maintained for the last 6 inches, unless a higher",
         "d. The tabulated values assume that the ratio of total weight of pile to weight of striking part of the hammer does not exceed 3.5. If a larger ratio is to be used, or",
-        "e. For intermediate values of pile capacity, minimum requirements for driving resistance may be determined by straight line inte rpolation."
+        "e. For intermediate values of pile capacity, minimum requirements for driving resistance may be determined by straight line interpolation."
       ],
       "officialPDFProvenance": {
         "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2014/2014CC_BC_Chapter_18_Soils_and_Foundations.pdf",
@@ -166191,7 +171871,7 @@
       ],
       "footnotes": [
         "For SI: 1 inch = 25.4 mm, 1 foot = 304.8 mm, 1 square foot = 0.0929m2, 1 degree = 0.017 rad.",
-        "a. This table provides a summary of major requirements for the construction of masonry chimneys and fireplaces. Letter refere nces are to Figure 2111.1, which"
+        "a. This table provides a summary of major requirements for the construction of masonry chimneys and fireplaces. Letter references are to Figure 2111.1, which"
       ],
       "officialPDFProvenance": {
         "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2014/2014CC_BC_Chapter_21_Masonry.pdf",
@@ -179427,7 +185107,7 @@
     },
     {
       "id": "nyc-2014-table-bc-k-p0030-01",
-      "caption": "Delete and revise Table N1 as follows:",
+      "caption": null,
       "sourceWorkbookPath": "2014CC_BC_Appendix_K_Elevators_&_Conveying_Systems.pdf",
       "sourceSheetName": "PDF page 30",
       "sourceRange": "54.0,533.23,549.12,734.62",
@@ -183569,7 +189249,7 @@
     },
     {
       "id": "nyc-2014-table-bc-q-p0030-01",
-      "caption": "in TIA/TSB-88C. The following table shows the DAQ descriptions as published in the document:",
+      "caption": null,
       "sourceWorkbookPath": "2014CC_BC_Appendix_Q_Modified_Standards.pdf",
       "sourceSheetName": "PDF page 30",
       "sourceRange": "93.02,509.47,519.1,690.34",
@@ -208070,7 +213750,6 @@
       "footnotes": [
         "For SI: 1 inch = 25.4 mm.",
         "a. Does not include branches of the building drain. Refer to Table 7 10.1(1).",
-        "b. Stacks shall be sized based on the total accumulated connected load at each story or branch interval. No soil or waste stack shall be smaller than any horizontal",
         "c. Sizing load based on design criteria."
       ],
       "officialPDFProvenance": {
@@ -258498,7 +264177,7 @@
         }
       ],
       "footnotes": [
-        "For SI: 1 inch = 25.4 mm, 1.0 Btu × h • °F= 0.144 W /m • K .",
+        "For SI: 1 inch = 25.4 mm, 1.0 Btu × h • °F= 0.144 W/m •K.",
         "a. Insulation material that is part of the wall pass-through system shall be noncombustible and shall have a thermal conductivity of 1.0 Btu × in/ft2 • h• °F or less.",
         "b. All clearances and thicknesses are minimums.",
         "c. Materials utilized to seal penetrations for the connector shall be non-combustible.",
@@ -281668,7 +287347,7 @@
     },
     {
       "id": "nyc-2014-table-fgc-3-p0012-01",
-      "caption": "TABLE 308.2a through k",
+      "caption": "TABLE 308.2athroughk",
       "sourceWorkbookPath": "2014CC_FGC_Chapter3_General_Regulations.pdf",
       "sourceSheetName": "PDF page 12",
       "sourceRange": "40.44,207.74,552.7,582.19",
@@ -287687,13 +293366,10 @@
       "footnotes": [
         "For SI: 1 inch = 25.4 mm, °C = [(°F - 32)/1.8], 1 pound per cubic foot = 16.02 kg/m3, 1 Btu per inch per square foot per hour per °F = 0.144 W/m2 K.",
         "a. Reduction of clearances from combustible materials shall not interfere with combustion air, draft hood clearance and relief, and accessibility of servicing.",
-        "b. All clearances shall be measured from the outer surface of the combustible material to the nearest point on the surface of the appliance, disregarding any intervening",
         "c. Spacers and ties shall be of noncombustible material. No spacer or tie shall be used directly opposite an appliance or connector.",
-        "d. For all clearance reduction systems using a ventilated airspace, adequate provision for air circulation shall be provided as described [see Figures 308.2(2) and",
         "e. There shall be at least 1 inch between clearance reduction systems and combustible walls and ceilings for reduction systems using ventilated airspace.",
         "f. Where a wall protector is mounted on a single flat wall away from corners, it shall have a minimum 1-inch air gap. To provide air circulation, the bottom and top",
         "g. Mineral wool batts (blanket or board) shall have a minimum density of 8 pounds per cubic foot and a minimum melting point of 1500°F.",
-        "h. Insulation material used as part of a clearance reduction system shall have a thermal conductivity of 1.0 Btu per inch per square foot p er hour per °F or less.",
         "i. There shall be at least 1 inch between the appliance and the protector. In no case shall the clearance between the appliance and the combustible surface be reduced"
       ],
       "officialPDFProvenance": {
@@ -452090,7 +457766,7 @@
   "nextCodeID": 2,
   "nextCodeSectionID": 6,
   "nextChapterID": 40000111,
-  "nextSectionID": 41009227,
+  "nextSectionID": 41009361,
   "lastStructuredImportPaths": [],
   "historicalConstructionCodeContract": {
     "libraryID": "nyc-2014-construction-codes",
@@ -452101,7 +457777,7 @@
     "baselineSourceURL": "https://www.nyc.gov/assets/buildings/local_laws/ll141of2013.pdf",
     "amendmentIndexURL": "https://www.nyc.gov/assets/buildings/building_code/AmendmentIndexCombined_2014.pdf",
     "applicabilityStatus": "prior-edition-case-specific",
-    "structuredTableCount": 145,
-    "reviewRequiredRecordCount": 518
+    "structuredTableCount": 147,
+    "reviewRequiredRecordCount": 410
   }
 }
