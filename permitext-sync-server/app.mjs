@@ -9113,7 +9113,14 @@ export async function openAIResearchWebSupport(question, userID, options = {}) {
   let usage = combinedResearchUsage();
   let summary = "";
   let sources = [];
-  let candidateOfficialURLs = [];
+  let candidateOfficialURLs = normalizeResearchWebSources(
+    (Array.isArray(options.candidateOfficialURLs) ? options.candidateOfficialURLs : [])
+      .map((url) => ({ url })),
+    { officialDomains: allowedDomains }
+  )
+    .filter((source) => source.sourceClassification === "official_guidance")
+    .map((source) => source.url)
+    .slice(0, 5);
   let lastFailure = null;
   let attemptCount = 0;
   const requestProvider = options.requestProvider || requestResearchProvider;
@@ -18903,6 +18910,9 @@ async function handleResearchConversationMessage(request, response) {
           retrievalQuery: question,
           model: modelRouting.configuration.webSupportModel,
           requireAttributableSources: allowOfficialGuidanceOnly,
+          candidateOfficialURLs: (evidencePackage.discovery?.outsideCurrentLibrary || [])
+            .map((source) => source?.sourceURL)
+            .filter(Boolean),
           signal: progressResponse.signal
         })
       : Promise.resolve(emptyWebSupport);

@@ -48,6 +48,7 @@ assert.deepEqual(
   ["nyc.gov", "rules.cityofnewyork.us"]
 );
 assert(researchSourcePolicyConfiguration({}).officialDomains.includes("ny.gov"));
+assert(researchSourcePolicyConfiguration({}).officialDomains.includes("ada.gov"));
 
 const sanitized = sanitizeResearchWebQuery(
   "Client: Acme Tower LLC; email lead@acme.example, call (212) 555-0199. " +

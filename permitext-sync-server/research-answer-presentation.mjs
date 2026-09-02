@@ -84,9 +84,10 @@ export function researchAnswerPresentationContract({ question, evidence = [] } =
 
   if (outsideAuthorityCue.test(text) && requirementsCue.test(text)) {
     return contractFor("external-authority-boundary", "conditional answer with separated authorities", [
-      "Identify which requested authority is present in the supplied evidence and which is not.",
+      "Identify which requested authority is established by enacted evidence or attributable official supporting material and which is still unresolved.",
+      "When attributable official supporting claims are supplied, summarize those exact claims and label their authority separately from the enacted Permitext code.",
       "Do not invent ratios, dimensions, or program rules from an unsupplied agency or standard.",
-      "Give responsive enacted-code requirements that are established, then request only the missing controlling source or program fact."
+      "Give responsive established requirements first, then request only the program type, controlling source, or project fact that remains missing."
     ]);
   }
 

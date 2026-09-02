@@ -2,7 +2,7 @@
 
 Date: September 2, 2026
 
-Status: **NO-COST AUTHORITATIVE BENCHMARK AND LOCKED LIVE PACKAGE IMPLEMENTED; LIVE MODEL CONFIRMATION NOT AUTHORIZED OR RUN**
+Status: **NO-COST AUTHORITATIVE BENCHMARK AND POST-RUN CORRECTIONS PASS; PRIOR LIVE RESULT REMAINS PARTIAL**
 
 ## Purpose
 
@@ -39,9 +39,33 @@ The machine-readable cases are in `permitext-sync-server/evals/research-product-
 - The generated Research prompt receives that presentation contract while retaining the stricter evidence, applicability, and safety rules.
 - The fixture verifies every required reference and selected phrase against the bundled 2022 Construction Codes, official 2014 corpus, or current Zoning Resolution.
 - The benchmark explicitly records that it authorizes no paid model call.
+- A current runtime regression resolves every example through the actual prepared
+  2022, 2014, or Zoning catalog and source body while replacing `fetch` with a
+  hard failure. It passes all seven conversations and nine ordered turns with
+  zero network attempts and zero paid-provider calls.
+- Title-only `Reserved` provisions are eligible only when the catalog title
+  itself ends in `Reserved`; arbitrary headings do not become legal evidence.
+- A format-only follow-up retains its active topic and source set, and the
+  C4-4D/R8A comparison retains all four required Zoning provisions.
+- When the user requests square feet and the exact evidence supplies square
+  inches, the answer contract and quality gate require transparent source-bound
+  arithmetic labeled as a derived conversion.
+- The OMH example routes to the official OMH regulations index and seeds that
+  page plus the official ADA site into supporting-web discovery. Only configured
+  official domains survive the seed filter; those sources remain supporting and
+  cannot silently become enacted Permitext evidence.
 
 ## Remaining acceptance
 
-The deterministic benchmark proves corpus routing, source phrases, edition separation, and answer-shape instructions. It does not prove that a live model will follow them on every turn. The distinct [locked live-confirmation package](./PERMITEXT_RESEARCH_PRODUCT_EXAMPLE_CONFIRMATION_PACKAGE_2026-09-02.md) now preserves exactly seven conversations and nine ordered turns, uses no separate paid judge, caps any later run at `$2`, and refuses provider access until the owner separately authorizes the exact committed package. It tests these examples once and does not repeat the prior 30-case Zoning cohort.
+The deterministic benchmark proves current corpus routing, source phrases,
+edition separation, follow-up continuity, requested-unit enforcement, official
+source seeding, and answer-shape instructions. It does not prove that a live
+model will follow them on every turn. The earlier [live-confirmation
+package](./PERMITEXT_RESEARCH_PRODUCT_EXAMPLE_CONFIRMATION_PACKAGE_2026-09-02.md)
+was consumed and its partial result remains immutable. It cannot authorize a
+retry or changed code. One distinct repaired package must be locked before any
+later live confirmation; that package must retain exactly seven conversations
+and nine ordered turns, one repetition, a `$2` cumulative ceiling, and no paid
+judge.
 
 No result from this benchmark enables public Zoning Research, changes pricing or included turns, authorizes a merge, push, deployment, Production action, TestFlight upload, or public release.

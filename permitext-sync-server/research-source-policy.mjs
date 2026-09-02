@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260902-supporting-web-v11";
+export const researchSourcePolicyVersion = "20260902-supporting-web-v12";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -24,6 +24,7 @@ export function canonicalResearchOfficialGuidanceNarrative(values = []) {
 }
 
 export const defaultResearchOfficialDomains = Object.freeze([
+  "ada.gov",
   "nyc.gov",
   "ny.gov",
   "rules.cityofnewyork.us"

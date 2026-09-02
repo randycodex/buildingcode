@@ -166,7 +166,16 @@ try {
         const omh = result.outsideCurrentLibrary.find((source) =>
           source.label === "NYS Office of Mental Health requirements"
         );
-        assert.equal(omh?.sourceURL, "https://omh.ny.gov/");
+        assert.equal(
+          omh?.sourceURL,
+          "https://omh.ny.gov/omhweb/policy_and_regulations/"
+        );
+        assert.equal(
+          result.outsideCurrentLibrary.find((source) =>
+            source.label === "federal accessibility requirements"
+          )?.sourceURL,
+          "https://www.ada.gov/"
+        );
         assert.equal(researchDiscoveryNeedsAutomaticWebSupport(result), true);
         const trigger = researchWebSupportTrigger({
           question: turn.question,
@@ -176,7 +185,9 @@ try {
         assert(trigger.reasons.includes("outside_library_support_needed"));
         assert(researchSourcePolicyConfiguration({}).officialDomains.includes("ny.gov"));
         assert.equal(
-          classifyResearchWebSource({ url: "https://omh.ny.gov/" }).sourceClassification,
+          classifyResearchWebSource({
+            url: "https://omh.ny.gov/omhweb/policy_and_regulations/"
+          }).sourceClassification,
           "official_guidance"
         );
       } else {

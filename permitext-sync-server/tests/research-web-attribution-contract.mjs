@@ -235,6 +235,10 @@ const semanticRetryResult = await openAIResearchWebSupport(
     apiKey: "test-only",
     model: "gpt-5.6-luna",
     requireAttributableSources: true,
+    candidateOfficialURLs: [
+      "https://www.nyc.gov/site/buildings/safety/boiler-compliance.page",
+      "https://not-official.example/unsafe"
+    ],
     policyConfiguration: { webSupportEnabled: true, officialDomains: ["nyc.gov"] },
     requestProvider: async ({ requestBody }) => {
       semanticRetryRequests.push(requestBody);
@@ -243,6 +247,11 @@ const semanticRetryResult = await openAIResearchWebSupport(
   }
 );
 assert.equal(semanticRetryRequests.length, 2);
+assert.match(
+  semanticRetryRequests[0].input,
+  /https:\/\/www\.nyc\.gov\/site\/buildings\/safety\/boiler-compliance\.page/
+);
+assert.doesNotMatch(semanticRetryRequests[0].input, /not-official\.example/);
 assert.match(semanticRetryRequests[1].input, /ATTRIBUTION RETRY/);
 assert.match(
   semanticRetryRequests[1].input,

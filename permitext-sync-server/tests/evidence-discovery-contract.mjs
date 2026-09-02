@@ -320,7 +320,7 @@ assert.deepEqual(
   ).map((item) => ({ sourceName: item.sourceName, sourceURL: item.sourceURL })),
   [{
     sourceName: "New York State Office of Mental Health",
-    sourceURL: "https://omh.ny.gov/"
+    sourceURL: "https://omh.ny.gov/omhweb/policy_and_regulations/"
   }]
 );
 

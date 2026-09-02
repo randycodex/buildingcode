@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260901-hybrid-candidates-v20";
+export const evidenceDiscoveryVersion = "20260902-official-source-seeds-v21";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -792,7 +792,7 @@ const outsideLibrarySignals = [
     pattern: /\b(?:NYS\s+)?Office of Mental Health\b|\bOMH\b/i,
     label: "NYS Office of Mental Health requirements",
     sourceName: "New York State Office of Mental Health",
-    sourceURL: "https://omh.ny.gov/"
+    sourceURL: "https://omh.ny.gov/omhweb/policy_and_regulations/"
   },
   {
     pattern: /\bHCR\b/i,

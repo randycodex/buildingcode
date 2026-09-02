@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "retrievalVersion": "20260901-hybrid-candidates-v20",
+  "retrievalVersion": "20260902-official-source-seeds-v21",
   "notes": "All retrieval cases remain drafts until a knowledgeable human reviews candidate-set completeness, rank expectations, and passage relevance. They inherit exact canonical evidence from the referenced Research evaluation case.",
   "coverageGaps": [
     "official agency interpretations outside the current library",
