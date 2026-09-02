@@ -27,7 +27,8 @@ for (const requiredBoundary of [
 
 assert.match(master, /PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30\.md/);
 assert.match(master, /PERMITEXT_RESEARCH_COMMERCIALIZATION_SEMANTIC_REVIEW_2026-08-30\.md/);
-assert.match(master, /1\. \[ \] Review the full branch diff/);
+assert.match(master, /1\. \[x\] Review the full branch diff/);
+assert.match(master, /PERMITEXT_BETA1_PRODUCTION_DEPLOYMENT_2026-09-02\.md/);
 assert.match(currentPlan, /PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30\.md/);
 assert.match(currentPlan, /PERMITEXT_RESEARCH_COMMERCIALIZATION_SEMANTIC_REVIEW_2026-08-30\.md/);
 assert.match(acceptance, /PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRITY_AUDIT_2026-08-30\.md/);

@@ -1,10 +1,12 @@
 # Permitext Research Commercialization — Current Plan
 
-Last updated: September 1, 2026
+Last updated: September 2, 2026
 
 Working branch: `codex/zoning-research-beta1`
 
 This is the current source of truth for the Research workstream. The parent Beta 1 plan is [PERMITEXT_BETA1_MASTER_PLAN.md](./PERMITEXT_BETA1_MASTER_PLAN.md).
+
+September 2 Production release update: exact commit `cb7918b453988a07d57a7834f5982d523d0e3901` is now on `main` and live in Production deployment `dpl_2i2iRQjwqkuQaQChbzR5MGh6j8EW`. The protected build passed live Stripe, automatic/exclusive tax, the `$7` per-user and `$100` system monthly Research cost caps, release identity, and the owner-accepted Vercel-alert plus daily-review monitoring path. Live health, exact policy hashes, AASA, public code routes, and an initial privacy-bounded log audit pass. Public Zoning Research remains fail closed pending exact-release web/iOS and physical-iPhone acceptance and the owner's final go/no-go. The controlled real Stripe purchase/refund and final account lifecycle also remain open. Evidence: [Production deployment record](./PERMITEXT_BETA1_PRODUCTION_DEPLOYMENT_2026-09-02.md).
 
 September 1 controlling Zoning update: the [Architecture V2.1 no-cost remediation](./PERMITEXT_ZONING_ARCHITECTURE_V21_NO_COST_RESULT_2026-09-01.md) is implemented. It converts the five retained judged failures into exact first-answer regression fixtures and represents the three unretained verifier-block answer shapes with explicitly labeled reconstructions, adds grouped and uncertainty-scoped obligations, enforces claim-specific source roles, and rejects narrow contradictory total-versus-allocation language. The frozen gate passes 30/30 with 24 generation-ready cases and the same six zero-model prerequisite boundaries; replay preserves all 16 accepted Architecture V2 answers and rejects all five observed semantic failures. Twelve preflight adversarial gates and the expanded focused mutation suite pass with credentials unset, zero provider/judge calls, and `$0` spend. This does not yet prove that the measured `42.9%` live repair rate has fallen. The Architecture V2 authorization remains consumed; one distinct V2.1 confirmation package is locked but not authorized; the 24,000-character candidate, public access, price/allowance changes, merge, push, and deployment remain disabled.
 
