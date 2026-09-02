@@ -56,6 +56,83 @@ ICC_2014_BUILDING_CODE_CHAPTER_10_URL = (
     "https://codes.iccsafe.org/content/NYNYCBC2014E1014/"
     "chapter-10-means-of-egress"
 )
+ICC_BC7_EXPECTED_TABLES = {
+    "705.8", "706.4", "707.3.9", "715.4", "715.5", "715.5.4", "716.3.2.1",
+    "720.1(1)", "720.1(2)", "720.1(3)", "721.2.1.1", "721.2.1.2(1)",
+    "721.2.1.2(2)", "721.2.1.4(1)", "721.2.1.4(2)", "721.2.2.1",
+    "721.2.3(1)", "721.2.3(2)", "721.2.3(3)", "721.2.3(4)",
+    "721.2.3(5)", "721.2.4", "721.3.2", "721.3.4", "721.3.5",
+    "721.4.1(1)", "721.4.1(2)", "721.4.1(3)", "721.4.1(4)",
+    "721.4.1(5)", "721.4.1(6)", "721.5.1(1)", "721.5.1(2)",
+    "721.5.1(3)", "721.5.1(4)", "721.5.1(5)", "721.5.1(6)",
+    "721.5.1(7)", "721.5.1(8)", "721.5.1(9)", "721.5.1(10)",
+    "721.6.2(1)", "721.6.2(2)", "721.6.2(3)", "721.6.2(4)",
+    "721.6.2(5)",
+}
+ICC_BC7_TABLE_PDF_PAGES = {
+    "705.8": [9, 10],
+    "706.4": [12],
+    "707.3.9": [15],
+    "715.4": [30],
+    "715.5": [33],
+    "715.5.4": [33, 34],
+    "716.3.2.1": [35],
+    "721.2.1.1": [64],
+    "721.2.1.2(1)": [66],
+    "721.2.1.2(2)": [66],
+    "721.2.1.4(1)": [67, 68],
+    "721.2.1.4(2)": [69],
+    "721.2.2.1": [70],
+    "721.2.3(1)": [73],
+    "721.2.3(2)": [74],
+    "721.2.3(3)": [74],
+    "721.2.3(4)": [74],
+    "721.2.3(5)": [75],
+    "721.2.4": [76],
+    "721.3.2": [77],
+    "721.3.4": [78],
+    "721.3.5": [78],
+    "721.4.1(1)": [79],
+    "721.4.1(2)": [79],
+    "721.4.1(3)": [79],
+    "721.4.1(4)": [80],
+    "721.4.1(5)": [80],
+    "721.4.1(6)": [80],
+    "721.5.1(1)": [88],
+    "721.5.1(2)": [89],
+    "721.5.1(3)": [89],
+    "721.5.1(4)": [90, 91],
+    "721.5.1(5)": [92, 93],
+    "721.5.1(6)": [94, 95],
+    "721.5.1(7)": [95],
+    "721.5.1(8)": [96],
+    "721.5.1(9)": [97],
+    "721.5.1(10)": [98],
+    "721.6.2(1)": [100],
+    "721.6.2(2)": [100],
+    "721.6.2(3)": [101],
+    "721.6.2(4)": [101],
+    "721.6.2(5)": [101],
+}
+ICC_BC7_SUPERSEDED_TABLE_IDS = {
+    "nyc-2014-table-bc-7-705-8",
+    "nyc-2014-table-bc-7-p0069-01",
+    "nyc-2014-table-bc-7-p0079-02",
+    "nyc-2014-table-bc-7-p0088-01",
+    "nyc-2014-table-bc-7-p0090-01",
+    "nyc-2014-table-bc-7-p0092-01",
+    "nyc-2014-table-bc-7-p0094-01",
+    "nyc-2014-table-bc-7-p0095-01",
+    "nyc-2014-table-bc-7-p0101-03",
+}
+ICC_BC7_SUPERSEDED_UNVERIFIED_ASSETS = {
+    "2014-bc-7-p0034-table-review-01.png",
+}
+ICC_BC7_DEFERRED_TABLE_PDF_PAGES = {
+    "720.1(1)": [46, 47, 48],
+    "720.1(2)": [49, 50, 51, 52, 53, 54, 55],
+    "720.1(3)": [56, 57, 58, 59, 60, 61, 62, 63],
+}
 ICC_BC10_TABLE_PDF_PAGES = {
     "1004.1.1": [5, 6],
     "1008.1.4.1": [14],
@@ -68,6 +145,18 @@ ICC_BC10_TABLE_PDF_PAGES = {
     "1028.6.2": [56],
     "1028.7": [56],
     "1028.10.1": [58],
+}
+ICC_SEMANTIC_CHAPTERS = {
+    "7": {
+        "sourceURL": ICC_2014_BUILDING_CODE_CHAPTER_7_URL,
+        "expectedTables": ICC_BC7_EXPECTED_TABLES,
+        "verifiedTablePages": ICC_BC7_TABLE_PDF_PAGES,
+    },
+    "10": {
+        "sourceURL": ICC_2014_BUILDING_CODE_CHAPTER_10_URL,
+        "expectedTables": set(ICC_BC10_TABLE_PDF_PAGES),
+        "verifiedTablePages": ICC_BC10_TABLE_PDF_PAGES,
+    },
 }
 CURATED_BC_705_7_TEXT = """Where protected openings are not limited by Section 705.8, the limitation on the rise of temperature on the unexposed surface of exterior walls as required by ASTM E 119 or UL 263 shall not apply. Where protected openings are limited by Section 705.8, the limitation on the rise of temperature on the unexposed surface of exterior walls as required by ASTM E 119 or UL 263 shall not apply provided that a correction is made for radiation from the unexposed exterior wall surface in accordance with the following formula:
 
@@ -452,6 +541,10 @@ def semantic_verification_tokens(value: str) -> list[str]:
     normalized = (value or "").replace("¼", " 1/4").replace("½", " 1/2").replace("¾", " 3/4")
     normalized = unicodedata.normalize("NFKD", normalized)
     normalized = normalized.replace("–", "-").replace("—", "-").replace("⁄", "/")
+    # Poppler commonly flattens a whole number plus a stacked fraction into
+    # ``11/2`` or ``33/4``.  Normalize that typography to the same token stream
+    # as ICC's semantic ``1 1/2`` or ``3 3/4`` representation.
+    normalized = re.sub(r"\b(\d+)([1-7])\s*/\s*([248])\b", r"\1 \2/\3", normalized)
     normalized = re.sub(
         r"(?<=\d)(?=[A-Za-z])|(?<=[A-Za-z])(?=\d)",
         " ",
@@ -460,10 +553,13 @@ def semantic_verification_tokens(value: str) -> list[str]:
     # Poppler joins occupancy labels to superscript table notes (Bc, R-2b),
     # while semantic HTML exposes the note in a separate <sup> element.
     normalized = re.sub(
-        r"\b([A-Z](?:-\d+)?)\s*([a-z])\b",
+        r"\b([A-Z]{1,4}(?:-\d+)?)\s*([a-z])\b",
         r"\1 \2",
         normalized,
     )
+    # pdfplumber can retain a subscript while joining it to the variable name
+    # (``dm``); semantic HTML exposes the same glyphs as ``d m``.
+    normalized = re.sub(r"\(([A-Za-z])\s*([A-Za-z])\)", r"( \1 \2 )", normalized)
     return re.findall(r"[a-z0-9]+", normalized.lower())
 
 
@@ -517,7 +613,10 @@ def html_vertical_alignment(value: str | None) -> str | None:
 
 
 def parse_icc_heading(value: str) -> tuple[str, str] | None:
-    match = re.match(r"^([A-Z]?\d+(?:\.\d+)+)\s+(.+)$", normalized_space(value))
+    match = re.match(
+        r"^[^A-Z0-9]*([A-Z]?\d+(?:\.\d+)+)\s+(.+)$",
+        normalized_space(value),
+    )
     if match is None:
         return None
     return match.group(1), match.group(2).strip()
@@ -593,7 +692,11 @@ def parse_icc_table_fragment(fragment: str) -> dict | None:
     parser.feed(fragment)
     parser.close()
     caption_text = normalized_space(" ".join(parser.caption_parts))
-    match = re.search(r"\bTABLE\s+([A-Z0-9.]+)\s*(.*)$", caption_text, re.I)
+    match = re.search(
+        r"\bTABLE\s+([A-Z0-9.]+(?:\([A-Z0-9]+\))?)\s*(.*)$",
+        caption_text,
+        re.I,
+    )
     if match is None or not parser.rows:
         return None
     reference = match.group(1).upper()
@@ -614,17 +717,26 @@ def parse_icc_table_fragment(fragment: str) -> dict | None:
 
 
 def load_icc_semantic_snapshot(source_dir: Path, source: SourcePDF) -> dict | None:
-    if source.prefix != "BC" or source.chapter_number != "10":
+    chapter_config = (
+        ICC_SEMANTIC_CHAPTERS.get(source.chapter_number)
+        if source.prefix == "BC"
+        else None
+    )
+    if chapter_config is None:
         return None
-    path = source_dir / "icc-html" / "bc-10.json"
+    path = source_dir / "icc-html" / f"bc-{source.chapter_number}.json"
     if not path.is_file():
         raise FileNotFoundError(
-            "Building Code Chapter 10 requires the independently captured ICC semantic "
+            f"Building Code Chapter {source.chapter_number} requires the independently captured ICC semantic "
             f"snapshot at {path}; refusing to rebuild a degraded PDF-only chapter."
         )
     document = json.loads(path.read_text(encoding="utf-8"))
-    if document.get("sourceURL") != ICC_2014_BUILDING_CODE_CHAPTER_10_URL:
-        raise RuntimeError(f"Unexpected ICC Chapter 10 snapshot URL: {document.get('sourceURL')}")
+    source_url = str(chapter_config["sourceURL"])
+    if document.get("sourceURL") != source_url:
+        raise RuntimeError(
+            f"Unexpected ICC Chapter {source.chapter_number} snapshot URL: "
+            f"{document.get('sourceURL')}"
+        )
     section_html: dict[str, dict] = {}
     tables: dict[str, dict] = {}
     for item in document.get("sections", []):
@@ -643,27 +755,35 @@ def load_icc_semantic_snapshot(source_dir: Path, source: SourcePDF) -> dict | No
                     "title": title,
                     "html": semantic_html,
                     "plainText": semantic_text,
-                    "anchorURL": f"{ICC_2014_BUILDING_CODE_CHAPTER_10_URL}#{section_number}",
+                    "anchorURL": f"{source_url}#{section_number}",
                 }
         if "<table" in fragment.lower():
             table = parse_icc_table_fragment(fragment)
             if table is None:
-                raise RuntimeError("ICC Chapter 10 snapshot contains an unparseable table fragment.")
+                raise RuntimeError(
+                    f"ICC Chapter {source.chapter_number} snapshot contains an unparseable table fragment."
+                )
+            table["sectionNumber"] = (
+                heading[0]
+                if heading is not None
+                else re.sub(r"\([A-Z0-9]+\)$", "", table["reference"], flags=re.I)
+            )
             if table["reference"] in tables:
                 raise RuntimeError(f"Duplicate ICC semantic table {table['reference']}")
             tables[table["reference"]] = table
-    expected_tables = set(ICC_BC10_TABLE_PDF_PAGES)
+    expected_tables = set(chapter_config["expectedTables"])
     if set(tables) != expected_tables:
         raise RuntimeError(
-            "ICC Chapter 10 table set mismatch: "
+            f"ICC Chapter {source.chapter_number} table set mismatch: "
             f"missing={sorted(expected_tables - set(tables))}, "
             f"unexpected={sorted(set(tables) - expected_tables)}"
         )
     return {
-        "sourceURL": ICC_2014_BUILDING_CODE_CHAPTER_10_URL,
+        "sourceURL": source_url,
         "sourceSHA256": sha256(path),
         "sectionHTML": section_html,
         "tables": tables,
+        "verifiedTablePages": chapter_config["verifiedTablePages"],
     }
 
 
@@ -1656,6 +1776,7 @@ def apply_curated_pdf_structure_overrides(
 def apply_icc_semantic_tables(
     source: SourcePDF,
     source_hash: str,
+    pdf_path: Path,
     sections: list[SourceSection],
     structured_tables: list[dict],
     discrepancies: list[dict],
@@ -1664,20 +1785,52 @@ def apply_icc_semantic_tables(
     semantic_snapshot: dict | None,
 ) -> dict:
     if semantic_snapshot is None:
-        return {"tableCount": 0, "correctedCellCount": 0}
+        return {"tableCount": 0, "correctedCellCount": 0, "deferredTableCount": 0}
 
-    prior_table_ids = {
-        str(table.get("id"))
-        for table in structured_tables
-        if table.get("sourceWorkbookPath") == source.file_name
-    }
-    prior_unverified_assets = {
-        str(record.get("asset"))
-        for record in discrepancies
-        if record.get("kind") == "unverified-table"
-        and record.get("sourcePDF") == source.file_name
-        and record.get("asset")
-    }
+    verified_table_pages = semantic_snapshot["verifiedTablePages"]
+
+    def caption_reference(value: object) -> str | None:
+        match = re.search(
+            r"\bTABLE\s+([A-Z0-9.]+(?:\([A-Z0-9]+\))?)",
+            normalized_space(str(value or "")),
+            re.I,
+        )
+        return match.group(1).upper() if match is not None else None
+
+    if source.chapter_number == "10":
+        prior_table_ids = {
+            str(table.get("id"))
+            for table in structured_tables
+            if table.get("sourceWorkbookPath") == source.file_name
+        }
+        prior_unverified_assets = {
+            str(record.get("asset"))
+            for record in discrepancies
+            if record.get("kind") == "unverified-table"
+            and record.get("sourcePDF") == source.file_name
+            and record.get("asset")
+        }
+    else:
+        prior_table_ids = {
+            str(table.get("id"))
+            for table in structured_tables
+            if table.get("sourceWorkbookPath") == source.file_name
+            and (
+                caption_reference(table.get("caption")) in verified_table_pages
+                or str(table.get("id")) in ICC_BC7_SUPERSEDED_TABLE_IDS
+            )
+        }
+        prior_unverified_assets = {
+            str(record.get("asset"))
+            for record in discrepancies
+            if record.get("kind") == "unverified-table"
+            and record.get("sourcePDF") == source.file_name
+            and record.get("asset")
+            and (
+                caption_reference(record.get("caption")) in verified_table_pages
+                or str(record.get("asset")) in ICC_BC7_SUPERSEDED_UNVERIFIED_ASSETS
+            )
+        }
     for section in sections:
         section.blocks = [
             block
@@ -1696,6 +1849,7 @@ def apply_icc_semantic_tables(
         if not (
             record.get("kind") == "unverified-table"
             and record.get("sourcePDF") == source.file_name
+            and str(record.get("asset")) in prior_unverified_assets
         )
     ]
     for asset_name in prior_unverified_assets:
@@ -1703,11 +1857,54 @@ def apply_icc_semantic_tables(
         if asset_path.is_file():
             asset_path.unlink()
 
+    deferred_table_pages = (
+        ICC_BC7_DEFERRED_TABLE_PDF_PAGES
+        if source.chapter_number == "7"
+        else {}
+    )
+    for reference, pdf_pages in deferred_table_pages.items():
+        semantic_table = semantic_snapshot["tables"][reference]
+        discrepancies.append({
+            "kind": "secondary-semantic-table-not-promoted",
+            "sourcePDF": source.file_name,
+            "sourceSHA256": source_hash,
+            "semanticHTMLSourceURL": semantic_snapshot["sourceURL"],
+            "semanticHTMLSourceSHA256": semantic_snapshot["sourceSHA256"],
+            "tableReference": reference,
+            "sectionNumber": semantic_table["sectionNumber"],
+            "pdfPages": pdf_pages,
+            "resolution": (
+                "Existing official-PDF table fragments and image fallbacks retained; "
+                "semantic grid did not pass complete dual-parser token reconciliation."
+            ),
+            "reviewRequired": True,
+            "researchClaimEligible": False,
+        })
+
+    pdfplumber_page_text: dict[int, str] = {}
+    required_pages = sorted({
+        page_number
+        for page_numbers in verified_table_pages.values()
+        for page_number in page_numbers
+    })
+    with pdfplumber.open(pdf_path) as pdf:
+        for page_number in required_pages:
+            if page_number < 1 or page_number > len(pdf.pages):
+                raise RuntimeError(
+                    f"Official PDF page map is invalid for Chapter {source.chapter_number}: "
+                    f"{page_number}"
+                )
+            pdfplumber_page_text[page_number] = (
+                pdf.pages[page_number - 1].extract_text(layout=True) or ""
+            )
+
     corrected_cell_count = 0
     for reference, source_table in semantic_snapshot["tables"].items():
+        if reference not in verified_table_pages:
+            continue
         table = json.loads(json.dumps(source_table))
         semantic_corrections = []
-        if reference == "1004.1.1":
+        if source.chapter_number == "10" and reference == "1004.1.1":
             official_capacity_note = (
                 "C*-capacity of all passenger vehicles that can be unloaded simultaneously."
             )
@@ -1728,14 +1925,14 @@ def apply_icc_semantic_tables(
                     line for line in target_section.lines
                     if not normalized_space(line.text).startswith("C*-capacity")
                 ]
-        if reference == "1018.1.1":
+        if source.chapter_number == "10" and reference == "1018.1.1":
             semantic_corrections.append({
                 "part": "required fire-resistance rating heading",
                 "semanticHTMLValue": "columnSpan 3",
                 "officialPDFValue": "columnSpan 2",
                 "resolution": "official NYC DOB PDF and two child headings control",
             })
-        if reference == "1028.10.1":
+        if source.chapter_number == "10" and reference == "1028.10.1":
             cells_by_row: dict[int, list[dict]] = collections.defaultdict(list)
             for cell in table["cells"]:
                 cells_by_row[int(cell["row"])].append(cell)
@@ -1762,13 +1959,58 @@ def apply_icc_semantic_tables(
                 raise RuntimeError(
                     "Expected ICC Table 1028.10.1 value 7 was not found for official-PDF correction."
                 )
+        if source.chapter_number == "7" and reference == "721.4.1(1)":
+            incorrect = next(
+                (
+                    value for value in table["footnotes"]
+                    if "solidmaterial" in value
+                ),
+                None,
+            )
+            if incorrect is None:
+                raise RuntimeError(
+                    "Expected ICC Table 721.4.1(1) joined word was not found for official-PDF correction."
+                )
+            corrected = incorrect.replace("solidmaterial", "solid material")
+            table["footnotes"][table["footnotes"].index(incorrect)] = corrected
+            semantic_corrections.append({
+                "part": "table footnote c",
+                "semanticHTMLValue": "solidmaterial",
+                "officialPDFValue": "solid material",
+                "resolution": "official NYC DOB PDF controls",
+            })
+        if source.chapter_number == "7" and reference == "721.5.1(7)":
+            incorrect = next(
+                (cell for cell in table["cells"] if cell.get("plainText") == "× l8"),
+                None,
+            )
+            if incorrect is None:
+                raise RuntimeError(
+                    "Expected ICC Table 721.5.1(7) value × l8 was not found for official-PDF correction."
+                )
+            incorrect["plainText"] = "× 18"
+            incorrect["html"] = "× 18"
+            corrected_cell_count += 1
+            semantic_corrections.append({
+                "cell": "W8 structural shape row",
+                "semanticHTMLValue": "× l8",
+                "officialPDFValue": "× 18",
+                "resolution": "official NYC DOB PDF controls",
+            })
 
-        pdf_pages = ICC_BC10_TABLE_PDF_PAGES[reference]
+        pdf_pages = verified_table_pages[reference]
         if any(page_number < 1 or page_number > len(poppler_pages) for page_number in pdf_pages):
             raise RuntimeError(f"Official PDF page map is invalid for Table {reference}: {pdf_pages}")
-        official_counter = collections.Counter(semantic_verification_tokens(" ".join(
+        poppler_counter = collections.Counter(semantic_verification_tokens(" ".join(
             poppler_pages[page_number - 1] for page_number in pdf_pages
         )))
+        pdfplumber_counter = collections.Counter(semantic_verification_tokens(" ".join(
+            pdfplumber_page_text[page_number] for page_number in pdf_pages
+        )))
+        # The two independent extractors flatten stacked fractions and
+        # subscripts differently.  A token must be present in at least one
+        # official-PDF extraction; the maximum count prevents double-counting.
+        official_counter = poppler_counter | pdfplumber_counter
         semantic_values = [
             str(cell.get("plainText", ""))
             for cell in table["cells"]
@@ -1793,7 +2035,8 @@ def apply_icc_semantic_tables(
                     f"{cell.get('plainText')}"
                 )
 
-        table_id = f"{TABLE_ID_PREFIX}-bc-10-{reference.replace('.', '-')}"
+        reference_slug = re.sub(r"[^a-z0-9]+", "-", reference.lower()).strip("-")
+        table_id = f"{TABLE_ID_PREFIX}-bc-{source.chapter_number}-{reference_slug}"
         table.update({
             "id": table_id,
             "sourceWorkbookPath": source.file_name,
@@ -1809,7 +2052,7 @@ def apply_icc_semantic_tables(
                 "pdfPages": pdf_pages,
                 "extraction": (
                     "ICC semantic grid independently reconciled cell-by-cell and as a complete "
-                    "token set against Poppler text from the official NYC DOB PDF"
+                    "token set against Poppler and pdfplumber text from the official NYC DOB PDF"
                 ),
             },
             "htmlStructureReference": {
@@ -1823,7 +2066,10 @@ def apply_icc_semantic_tables(
         })
         structured_tables.append(table)
         target = next(
-            (section for section in sections if section.section_number == reference),
+            (
+                section for section in sections
+                if section.section_number == table["sectionNumber"]
+            ),
             None,
         )
         if target is None:
@@ -1846,8 +2092,9 @@ def apply_icc_semantic_tables(
             "htmlStructureReference": table["htmlStructureReference"],
         })
     return {
-        "tableCount": len(semantic_snapshot["tables"]),
+        "tableCount": len(verified_table_pages),
         "correctedCellCount": corrected_cell_count,
+        "deferredTableCount": len(deferred_table_pages),
     }
 
 
@@ -2207,6 +2454,7 @@ def extract_source(
     semantic_table_summary = apply_icc_semantic_tables(
         source,
         source_hash,
+        pdf_path,
         sections,
         structured_tables,
         discrepancies,
@@ -2247,6 +2495,7 @@ def extract_source(
                 "sourceSHA256": semantic_snapshot["sourceSHA256"],
                 "role": "secondary semantic structure reference",
                 "verifiedStructuredTableCount": semantic_table_summary["tableCount"],
+                "deferredSemanticTableCount": semantic_table_summary["deferredTableCount"],
                 "officialPDFCorrectedCellCount": semantic_table_summary["correctedCellCount"],
                 "officialPDFRecoveredSectionTextCount": recovered_semantic_section_count,
                 "verifiedSectionHTMLCount": 0,
@@ -3112,6 +3361,52 @@ def validate_package(output: Path) -> dict:
         ]
         if "17" not in table_1028_values or table_1028_values.count("7") != 0:
             raise RuntimeError("Table 1028.10.1 did not retain the official-PDF value 17 correction.")
+    has_bc7 = any(
+        chapter.get("codePrefix") == "BC" and str(chapter.get("chapterNumber")) == "7"
+        for chapter in manifest.get("chapters", [])
+    )
+    if has_bc7:
+        expected_bc7_ids = {
+            f"{TABLE_ID_PREFIX}-bc-7-"
+            + re.sub(r"[^a-z0-9]+", "-", reference.lower()).strip("-")
+            for reference in ICC_BC7_TABLE_PDF_PAGES
+        }
+        bc7_semantic_tables = {
+            str(table.get("id")): table
+            for table in bundle.get("tables", [])
+            if str(table.get("id", "")) in expected_bc7_ids
+        }
+        if set(bc7_semantic_tables) != expected_bc7_ids:
+            raise RuntimeError(
+                "Chapter 7 verified native table set mismatch: "
+                f"missing={sorted(expected_bc7_ids - set(bc7_semantic_tables))}, "
+                f"unexpected={sorted(set(bc7_semantic_tables) - expected_bc7_ids)}"
+            )
+        table_705_8 = bc7_semantic_tables[f"{TABLE_ID_PREFIX}-bc-7-705-8"]
+        if int(table_705_8.get("rowCount", 0)) != 25:
+            raise RuntimeError("Table 705.8 must be one complete 25-row native table.")
+        deferred_bc7_tables = ICC_BC7_EXPECTED_TABLES - set(ICC_BC7_TABLE_PDF_PAGES)
+        retained_deferred_references = {
+            str(record.get("tableReference")).upper()
+            for record in discrepancies.get("records", [])
+            if record.get("kind") == "secondary-semantic-table-not-promoted"
+            and record.get("tableReference")
+        } | {
+            match.group(1).upper()
+            for record in discrepancies.get("records", [])
+            if record.get("kind") == "unverified-table"
+            for match in [re.search(
+                r"\bTABLE\s+([A-Z0-9.]+(?:\([A-Z0-9]+\))?)",
+                normalized_space(str(record.get("caption") or "")),
+                re.I,
+            )]
+            if match is not None
+        }
+        if not deferred_bc7_tables.issubset(retained_deferred_references):
+            raise RuntimeError(
+                "Unreconciled Chapter 7 tables lost their fail-closed image fallbacks: "
+                f"{sorted(deferred_bc7_tables - retained_deferred_references)}"
+            )
     unbound_table_ids = sorted(set(tables_by_id) - referenced_table_ids)
     if unbound_table_ids:
         raise RuntimeError(f"Structured tables are not bound to Reader sections: {unbound_table_ids[:5]}")

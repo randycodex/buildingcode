@@ -77,9 +77,29 @@ assert.equal(meansOfEgressChapter.semanticHTML.officialPDFCorrectedCellCount, 1)
 assert.equal(meansOfEgressChapter.semanticHTML.officialPDFRecoveredSectionTextCount, 2);
 assert(meansOfEgressChapter.semanticHTML.verifiedSectionHTMLCount > 300);
 assert(meansOfEgressChapter.semanticHTML.fallbackSectionHTMLCount > 0);
-assert.equal(source.secondaryHTMLReferences.length, 1);
+const fireResistanceChapter = source.chapterPDFs.find((record) =>
+  record.fileName === "2014CC_BC_Chapter_7_Fire-Resistance-Rated_Construction.pdf"
+);
+assert(fireResistanceChapter, "The official DOB Building Code Chapter 7 PDF is missing.");
 assert.equal(
-  source.secondaryHTMLReferences[0].sourceURL,
+  fireResistanceChapter.sourceSHA256,
+  "f943f5ff2ed95d15528e81e030066857b49c09f76bcac1718f81e616a3fcfd62"
+);
+assert.equal(fireResistanceChapter.semanticHTML.publisher, "International Code Council");
+assert.equal(fireResistanceChapter.semanticHTML.role, "secondary semantic structure reference");
+assert.equal(fireResistanceChapter.semanticHTML.verifiedStructuredTableCount, 43);
+assert.equal(fireResistanceChapter.semanticHTML.deferredSemanticTableCount, 3);
+assert.equal(fireResistanceChapter.semanticHTML.officialPDFCorrectedCellCount, 1);
+assert.equal(fireResistanceChapter.semanticHTML.officialPDFRecoveredSectionTextCount, 2);
+assert(fireResistanceChapter.semanticHTML.verifiedSectionHTMLCount > 300);
+assert(fireResistanceChapter.semanticHTML.fallbackSectionHTMLCount > 0);
+assert.equal(source.secondaryHTMLReferences.length, 2);
+assert.equal(
+  source.secondaryHTMLReferences.find((record) => record.sourceURL.includes("chapter-7-"))?.sourceURL,
+  "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-7-fire-and-smoke-protection-features"
+);
+assert.equal(
+  source.secondaryHTMLReferences.find((record) => record.sourceURL.includes("chapter-10-"))?.sourceURL,
   "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-10-means-of-egress"
 );
 assert.equal(
@@ -90,6 +110,30 @@ assert.equal(
 assert.match(
   meansOfEgressChapterHTML,
   /data-table-id="nyc-2014-table-bc-10-1004-1-1"/
+);
+const table7058HTML = fireResistanceChapterHTML.match(
+  /<table data-table-id="nyc-2014-table-bc-7-705-8">[\s\S]*?<\/table>/
+)?.[0];
+assert(table7058HTML, "Verified native Table 705.8 is missing from Building Code Chapter 7.");
+assert.equal(
+  (table7058HTML.match(/<tr>/g) || []).length,
+  25,
+  "Table 705.8 must retain its complete header and 24 enacted data rows."
+);
+assert.match(table7058HTML, /rowspan="3">0 to less than 3/);
+assert.match(table7058HTML, /<td rowspan="3">30 or greater<\/td>/);
+assert.deepEqual(
+  discrepancies.records
+    .filter((record) => record.kind === "secondary-semantic-table-not-promoted")
+    .map((record) => record.tableReference),
+  ["720.1(1)", "720.1(2)", "720.1(3)"],
+  "Only the three unresolved Section 720 semantic tables may remain deferred."
+);
+assert(
+  discrepancies.records
+    .filter((record) => record.kind === "secondary-semantic-table-not-promoted")
+    .every((record) => record.researchClaimEligible === false && record.reviewRequired === true),
+  "Deferred semantic tables must remain fail-closed for Research."
 );
 assert.match(
   fireResistanceChapterHTML,
@@ -448,8 +492,8 @@ for (const table of bundle.tables) {
   assert.match(table.officialPDFProvenance.sourceSHA256, /^[a-f0-9]{64}$/);
   if (table.id === "nyc-2014-table-bc-7-705-8") {
     assert.deepEqual(table.officialPDFProvenance.pdfPages, [9, 10]);
-    assert.match(table.officialPDFProvenance.extraction, /verified cell-by-cell/i);
-  } else if (table.id.startsWith("nyc-2014-table-bc-10-")) {
+  }
+  if (table.htmlStructureReference?.publisher === "International Code Council") {
     assert(Array.isArray(table.officialPDFProvenance.pdfPages));
     assert.match(table.officialPDFProvenance.extraction, /ICC semantic grid independently reconciled/i);
     assert.equal(table.htmlStructureReference.publisher, "International Code Council");

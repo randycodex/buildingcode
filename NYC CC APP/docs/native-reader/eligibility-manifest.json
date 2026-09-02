@@ -53,7 +53,7 @@
 
       ],
       "relativePath" : "2014-construction-codes/chapters/bc-10.html",
-      "sourceSHA256" : "ddcbda48e6e3a3b1d4fffbfb5743c109d5ec9bc4792b7b43f6f1d4c140784d68",
+      "sourceSHA256" : "939f7b5889607b5150b247812ddc935f003edcec6e89ac6c715ca8ebc836993b",
       "state" : "native"
     },
     {
@@ -301,7 +301,7 @@
 
       ],
       "relativePath" : "2014-construction-codes/chapters/bc-7.html",
-      "sourceSHA256" : "93d847e12e8c1a06449e9d2875686fe93c9c46ec93ec136ac881a91ef5d6b6df",
+      "sourceSHA256" : "ed229b207afc7ca9b901cae6596ab1769ecbfe85108244abe3673054faceca87",
       "state" : "native"
     },
     {
@@ -4593,7 +4593,7 @@
       "state" : "nativeWithTableFallback"
     }
   ],
-  "corpusSHA256" : "a67a33c966052c0a0296e04d4d023f07c17681beda8ae213c6d9e3b19eb8fef8",
+  "corpusSHA256" : "0aaf434336facb0f03c61293b3d9af11c33816f8cf3d210d5131f7ef39be1dee",
   "parserSchemaVersion" : "native-reader-document-v3",
   "schemaVersion" : 3
 }

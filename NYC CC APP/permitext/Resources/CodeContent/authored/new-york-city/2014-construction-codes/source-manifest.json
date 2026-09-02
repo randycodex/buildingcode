@@ -3132,7 +3132,18 @@
           "popplerTextSHA256": "6758419d52141ccb927d18e687db84794bc46a6b93112904b7927eaf5e84d842"
         }
       ],
-      "semanticHTML": null
+      "semanticHTML": {
+        "publisher": "International Code Council",
+        "sourceURL": "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-7-fire-and-smoke-protection-features",
+        "sourceSHA256": "608fbd9853e25ddb8f14e5a104249dbc9c8c95048719dc5326dfb294fe766553",
+        "role": "secondary semantic structure reference",
+        "verifiedStructuredTableCount": 43,
+        "deferredSemanticTableCount": 3,
+        "officialPDFCorrectedCellCount": 1,
+        "officialPDFRecoveredSectionTextCount": 2,
+        "verifiedSectionHTMLCount": 377,
+        "fallbackSectionHTMLCount": 72
+      }
     },
     {
       "fileName": "2014CC_BC_Chapter_8_Interior_Finishes.pdf",
@@ -4069,13 +4080,14 @@
       "semanticHTML": {
         "publisher": "International Code Council",
         "sourceURL": "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-10-means-of-egress",
-        "sourceSHA256": "d94a1e5d394b843052a14edac54802f088c6409c5e458327a12fbe8ec2153e45",
+        "sourceSHA256": "486c8cdc41b1d32b2614881ce8cc39b6047e744672d0df2c5591e867a6ff432f",
         "role": "secondary semantic structure reference",
         "verifiedStructuredTableCount": 11,
+        "deferredSemanticTableCount": 0,
         "officialPDFCorrectedCellCount": 1,
         "officialPDFRecoveredSectionTextCount": 2,
-        "verifiedSectionHTMLCount": 377,
-        "fallbackSectionHTMLCount": 24
+        "verifiedSectionHTMLCount": 380,
+        "fallbackSectionHTMLCount": 21
       }
     },
     {
@@ -13852,14 +13864,27 @@
   "secondaryHTMLReferences": [
     {
       "publisher": "International Code Council",
-      "sourceURL": "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-10-means-of-egress",
-      "sourceSHA256": "d94a1e5d394b843052a14edac54802f088c6409c5e458327a12fbe8ec2153e45",
+      "sourceURL": "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-7-fire-and-smoke-protection-features",
+      "sourceSHA256": "608fbd9853e25ddb8f14e5a104249dbc9c8c95048719dc5326dfb294fe766553",
       "role": "secondary semantic structure reference",
-      "verifiedStructuredTableCount": 11,
+      "verifiedStructuredTableCount": 43,
+      "deferredSemanticTableCount": 3,
       "officialPDFCorrectedCellCount": 1,
       "officialPDFRecoveredSectionTextCount": 2,
       "verifiedSectionHTMLCount": 377,
-      "fallbackSectionHTMLCount": 24
+      "fallbackSectionHTMLCount": 72
+    },
+    {
+      "publisher": "International Code Council",
+      "sourceURL": "https://codes.iccsafe.org/content/NYNYCBC2014E1014/chapter-10-means-of-egress",
+      "sourceSHA256": "486c8cdc41b1d32b2614881ce8cc39b6047e744672d0df2c5591e867a6ff432f",
+      "role": "secondary semantic structure reference",
+      "verifiedStructuredTableCount": 11,
+      "deferredSemanticTableCount": 0,
+      "officialPDFCorrectedCellCount": 1,
+      "officialPDFRecoveredSectionTextCount": 2,
+      "verifiedSectionHTMLCount": 380,
+      "fallbackSectionHTMLCount": 21
     }
   ],
   "prohibitedSources": [
@@ -13871,7 +13896,7 @@
       "Poppler pdftotext"
     ],
     "chapterPDFCount": 111,
-    "structuredTableCount": 158,
-    "discrepancyCount": 433
+    "structuredTableCount": 192,
+    "discrepancyCount": 470
   }
 }

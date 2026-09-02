@@ -31,7 +31,7 @@ export function syncCodeVersion(value) {
   if (
     normalized === "nyc-zoning-resolution" ||
     normalized === "nyc zoning resolution" ||
-    normalized === "nyc zoning resolution — text through 2026-07-16" ||
+    normalized.startsWith("nyc zoning resolution — text through ") ||
     normalized === zoningSyncCodeVersion.toLocaleLowerCase("en-US")
   ) return zoningSyncCodeVersion;
   if (

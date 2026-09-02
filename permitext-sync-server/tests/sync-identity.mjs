@@ -26,6 +26,10 @@ assert.equal(
   syncCodeVersion("NYC Zoning Resolution — text through 2026-07-16"),
   zoningSyncCodeVersion
 );
+assert.equal(
+  syncCodeVersion("NYC Zoning Resolution — text through 2026-08-13"),
+  zoningSyncCodeVersion
+);
 assert.equal(syncCodeVersionForPrefix("ZR"), zoningSyncCodeVersion);
 assert.equal(syncCodeVersionForPrefix("zr"), zoningSyncCodeVersion);
 assert.equal(syncCodeVersionForPrefix("BC"), defaultSyncCodeVersion);

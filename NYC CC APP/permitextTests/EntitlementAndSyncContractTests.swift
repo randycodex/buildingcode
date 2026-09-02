@@ -921,7 +921,8 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
     @MainActor
     func testDeepLinksResolveTheirCodeVersionFromBundledSectionMetadata() throws {
-        let versions = BundleDatabaseLocator().availableCodeVersions()
+        let versions = BundleDatabaseLocator(defaults: isolatedEntitlementDefaults())
+            .availableCodeVersions()
         let construction = try XCTUnwrap(versions.first {
             UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
         })
@@ -2674,6 +2675,21 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(
             UserContentSyncCodeVersion.local(UserContentSyncCodeVersion.canonicalNYC2022),
             UserContentSyncCodeVersion.localNYC2022
+        )
+    }
+
+    func testNYCZoningSyncAliasesRemainStableAcrossCorpusDates() {
+        XCTAssertEqual(
+            UserContentSyncCodeVersion.server("NYC Zoning Resolution — text through 2026-08-13"),
+            UserContentSyncCodeVersion.canonicalNYCZoning
+        )
+        XCTAssertEqual(
+            UserContentSyncCodeVersion.server("NYC Zoning Resolution — text through 2026-07-16"),
+            UserContentSyncCodeVersion.canonicalNYCZoning
+        )
+        XCTAssertEqual(
+            UserContentSyncCodeVersion.local(UserContentSyncCodeVersion.canonicalNYCZoning),
+            UserContentSyncCodeVersion.localNYCZoning
         )
     }
 
@@ -5478,8 +5494,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             mediaCount += document.blocks.flatMap(\.media).count
         }
 
-        XCTAssertEqual(tableCount, 158)
-        XCTAssertEqual(mediaCount, 319)
+        XCTAssertEqual(tableCount, 192)
+        XCTAssertEqual(mediaCount, 285)
 
         let chapter10Path = "2014-construction-codes/chapters/bc-10.html"
         let resolvedChapter10Route = await store.debugValidatedRoute(
@@ -5502,8 +5518,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         )
         let chapter7Route = try XCTUnwrap(resolvedChapter7Route)
         let chapter7 = try await store.loadDocument(for: chapter7Route)
-        XCTAssertEqual(chapter7.allTables.count, 14)
-        XCTAssertEqual(chapter7.blocks.flatMap(\.media).count, 55)
+        XCTAssertEqual(chapter7.allTables.count, 48)
+        XCTAssertEqual(chapter7.blocks.flatMap(\.media).count, 21)
         XCTAssertTrue(chapter7.allTables.contains { table in
             table.rowCount == 25
                 && table.columnCount == 3
@@ -5701,8 +5717,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
             previousPaths = paths
         }
 
-        XCTAssertEqual(observedTiers, [.textOnly, .media, .isolatedTableFallback])
-        XCTAssertEqual(rolloutCounts, [287, 312, 312, 463])
+        XCTAssertEqual(observedTiers, [.textOnly, .media, .nativeTable, .isolatedTableFallback])
+        XCTAssertEqual(rolloutCounts, [341, 382, 423, 574])
         let allValidatedPaths = await store.debugValidatedSourcePaths()
         XCTAssertEqual(
             previousPaths,
@@ -5724,6 +5740,7 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         let observedTiers: Set<NativeReaderRolloutTier> = [
             .textOnly,
             .media,
+            .nativeTable,
             .isolatedTableFallback
         ]
         XCTAssertEqual(Set(representativePathByTier.keys), observedTiers)

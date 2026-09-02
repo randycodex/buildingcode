@@ -435,7 +435,7 @@ enum UserContentSyncCodeVersion {
     static let localNYC2014 = "2014 NYC Construction Codes - DOB consolidated archive"
     static let canonicalNYCZoning =
         "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1"
-    static let localNYCZoning = "NYC Zoning Resolution — text through 2026-07-16"
+    static let localNYCZoning = "NYC Zoning Resolution — text through 2026-08-13"
     static let canonicalNYCExistingBuilding =
         "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1"
     static let localNYCExistingBuilding =
@@ -502,7 +502,8 @@ enum UserContentSyncCodeVersion {
     }
 
     private static func isNYCZoningAlias(_ value: String) -> Bool {
-        nycZoningAliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
+        nycZoningAliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame } ||
+            value.lowercased().hasPrefix("nyc zoning resolution — text through ")
     }
 
     private static func isNYCExistingBuildingAlias(_ value: String) -> Bool {
