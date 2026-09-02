@@ -89,6 +89,8 @@ assert.match(serverSource, /Ordinary internal corpus exclusions are not user-fac
 assert.match(serverSource, /When the question names a code edition or year, verify every legal claim/);
 assert.match(serverSource, /Never borrow similarly numbered text from another edition/);
 assert.match(serverSource, /fail with wrong_attribution if any legal claim or human-readable section reference is taken from another edition/);
+assert.match(serverSource, /codeVersion: source\.codeVersion \|\| defaultSyncCodeVersion/);
+assert.match(serverSource, /researchCorpusByPrefix\(registry, source\?\.codePrefix, source\)/);
 assert.doesNotMatch(serverSource, /`EXCLUDED_CORPORA:/);
 assert.match(clientSource, /function appendResearchAnswerNarrative\(container, result\)/);
 assert.match(clientSource, /function researchAnswerTable\(block\)/);
@@ -99,6 +101,7 @@ assert.match(nativeResearchSource, /private struct ResearchFormattedNarrative: V
 assert.match(nativeResearchSource, /case table\(header: \[String\], rows: \[\[String\]\]\)/);
 assert.match(nativeResearchSource, /AttributedString\(markdown: value\)/);
 assert.match(nativeResearchSource, /ResearchFormattedNarrative\(text: primaryNarrative\)/);
+assert.match(nativeResearchSource, /codeVersion: citation\.codeVersion/);
 assert.match(clientSource, /text\.split\(\/\\n\\s\*\\n\/\)/);
 assert.match(clientSource, /list\.className = "research-answer-list"/);
 assert.doesNotMatch(clientSource, /card\.append\(answer, explanation\)/);

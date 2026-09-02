@@ -460,7 +460,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     #if DEBUG
-    static func preview() -> CodeLibraryViewModel {
+    static func preview(includeHistoricalConstruction: Bool = false) -> CodeLibraryViewModel {
         let model = CodeLibraryViewModel(loadsInitialContent: false)
         let version = BundledCodeVersion(
             fileName: "preview-authored-content",
@@ -472,10 +472,22 @@ final class CodeLibraryViewModel: ObservableObject {
             jurisdictionName: "New York City",
             authoredHTMLBundlePath: nil
         )
+        let historicalVersion = BundledCodeVersion(
+            fileName: "preview-authored-content-2014",
+            fileURL: URL(fileURLWithPath: "/dev/null"),
+            codeVersion: UserContentSyncCodeVersion.localNYC2014,
+            contentKind: .authored,
+            authoredCodeID: 41,
+            jurisdictionID: 1,
+            jurisdictionName: "New York City",
+            authoredHTMLBundlePath: nil
+        )
         let buildingSectionID: Int64 = 1
         let plumbingSectionID: Int64 = 2
 
-        model.availableVersions = [version]
+        model.availableVersions = includeHistoricalConstruction
+            ? [version, historicalVersion]
+            : [version]
         model.availableJurisdictions = [
             BundledJurisdiction(id: "new-york-city", jurisdictionID: 1, name: "New York City")
         ]

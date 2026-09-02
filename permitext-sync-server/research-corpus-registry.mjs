@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20260901-2014-construction-corpus-v1";
+export const researchCorpusRegistryVersion = "20260902-edition-identity-routing-v2";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -16,6 +16,8 @@ const projectDependentZoningCue = /\b(?:parking|floor\s+area|FAR|permitted\s+use
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\s*(?:§\s*)?[A-Z]?\d/i;
 const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas)\s+Code\b|\b(?:BC|AC|PC|MC|FGC)14\b/i;
 const historicalBuildingCue = /\b1968\s+(?:NYC\s+)?Building\s+Code\b|\bBC68\b/i;
+const historical2014FollowUpCue = /\b(?:the\s+)?2014(?:\s+(?:edition|code))?\b/i;
+const current2022FollowUpCue = /\b(?:the\s+)?2022(?:\s+(?:edition|code))?\b/i;
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -149,6 +151,13 @@ export function routeResearchCorpora({
     : createResearchCorpusRegistry();
   const currentQuestion = compactText(question);
   if (!currentQuestion) throw new Error("Research corpus routing requires a question.");
+  const conversationContext = recentUserContext(previousMessages);
+  const followsConstructionConversation = constructionCue.test(conversationContext) ||
+    historical2014ConstructionCue.test(conversationContext);
+  const shorthand2014Requested = followsConstructionConversation &&
+    historical2014FollowUpCue.test(currentQuestion);
+  const shorthand2022Requested = followsConstructionConversation &&
+    current2022FollowUpCue.test(currentQuestion);
   const projectHasZoningContext = (Array.isArray(projectFacts) ? projectFacts : [])
     .some((fact) => /^(?:Zoning Fact|NYC Planning Fact)\s+—\s+(?:Zoning District|Zoning Map|BBL|Block|Tax Lot)/i.test(compactText(fact)));
   const projectZoningRequested = projectHasZoningContext && projectDependentZoningCue.test(currentQuestion);
@@ -159,17 +168,20 @@ export function routeResearchCorpora({
     futureExistingBuildingCue,
     historical2014ConstructionCue,
     historicalBuildingCue
-  ].some((pattern) => pattern.test(currentQuestion)) || projectZoningRequested;
+  ].some((pattern) => pattern.test(currentQuestion)) ||
+    shorthand2014Requested ||
+    shorthand2022Requested ||
+    projectZoningRequested;
   const context = currentHasCorpusCue
     ? currentQuestion
-    : [currentQuestion, recentUserContext(previousMessages)].filter(Boolean).join("\n");
+    : [currentQuestion, conversationContext].filter(Boolean).join("\n");
   const futureRequested = futureExistingBuildingCue.test(context);
-  const historical2014Requested = historical2014ConstructionCue.test(context);
+  const historical2014Requested = historical2014ConstructionCue.test(context) || shorthand2014Requested;
   const historicalRequested = historicalBuildingCue.test(context);
   const buildingCodeOnlyScope =
     /\bbased only on (?:the )?(?:selected )?Building Code passages\b/i.test(currentQuestion);
-  const explicitCurrentConstructionCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b2022\s+(?:NYC\s+)?(?:Building|Construction|Plumbing|Mechanical|Fuel\s+Gas)\s+Code\b/i.test(context);
-  const constructionRequested = constructionCue.test(context) &&
+  const explicitCurrentConstructionCue = shorthand2022Requested || /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b2022\s+(?:NYC\s+)?(?:Building|Construction|Plumbing|Mechanical|Fuel\s+Gas)\s+Code\b/i.test(context);
+  const constructionRequested = (constructionCue.test(context) || shorthand2022Requested) &&
     (!futureRequested && !historical2014Requested && !historicalRequested || explicitCurrentConstructionCue);
   const fireRequested = fireCue.test(context);
   const zoningRequested = !buildingCodeOnlyScope && (zoningCue.test(context) || projectZoningRequested);
@@ -232,9 +244,32 @@ export function routeResearchCorpora({
   };
 }
 
-export function researchCorpusByPrefix(registry, prefix) {
+export function researchCorpusByPrefix(registry, prefix, sourceIdentity = null) {
   const normalized = compactText(prefix).toUpperCase();
-  return (Array.isArray(registry) ? registry : []).find((corpus) =>
+  const candidates = (Array.isArray(registry) ? registry : []).filter((corpus) =>
     corpus.codePrefixes.includes(normalized)
-  ) || null;
+  );
+  const identityValues = typeof sourceIdentity === "string"
+    ? [sourceIdentity]
+    : [
+        sourceIdentity?.corpusID,
+        sourceIdentity?.id,
+        sourceIdentity?.codeVersion,
+        sourceIdentity?.codeEdition,
+        sourceIdentity?.corpusLabel
+      ];
+  const normalizedIdentities = new Set(
+    identityValues.map((value) => compactText(value).toLocaleLowerCase("en-US")).filter(Boolean)
+  );
+  if (normalizedIdentities.size) {
+    const exact = candidates.find((corpus) => [
+      corpus.id,
+      corpus.label,
+      corpus.codeEdition,
+      corpus.codeVersion,
+      ...(corpus.aliases || [])
+    ].some((value) => normalizedIdentities.has(compactText(value).toLocaleLowerCase("en-US"))));
+    if (exact) return exact;
+  }
+  return candidates[0] || null;
 }

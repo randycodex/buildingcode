@@ -7613,7 +7613,7 @@ async function researchCorpusPlanForTurn({
   });
   const pinnedCorpusIDs = Array.from(new Set(
     (Array.isArray(pinnedEvidence) ? pinnedEvidence : [])
-      .map((source) => researchCorpusByPrefix(registry, source?.codePrefix)?.id)
+      .map((source) => researchCorpusByPrefix(registry, source?.codePrefix, source)?.id)
       .filter(Boolean)
   ));
   const defaultConstructionOnly = routed.selected.length === 1 &&

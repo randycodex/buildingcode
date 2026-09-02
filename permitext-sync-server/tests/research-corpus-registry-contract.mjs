@@ -41,6 +41,34 @@ assert.deepEqual(
 );
 assert.equal(explicit2014.selected[0].applicabilityStatus, "prior-edition-case-specific");
 
+const shorthand2014 = routeResearchCorpora({
+  question: "What about 2014?",
+  previousMessages: [{
+    role: "user",
+    question: "What are the requirements for designing a ramp under the NYC Building Code?"
+  }],
+  registry
+});
+assert.deepEqual(
+  shorthand2014.selected.map((corpus) => corpus.id),
+  ["nyc-2014-construction-codes"],
+  "A conversational 2014 follow-up must switch the active Construction Code edition without adding 2022."
+);
+
+const shorthand2022 = routeResearchCorpora({
+  question: "Use the 2022 edition instead.",
+  previousMessages: [{
+    role: "user",
+    question: "Under the 2014 NYC Building Code, what are the ramp requirements?"
+  }],
+  registry
+});
+assert.deepEqual(
+  shorthand2022.selected.map((corpus) => corpus.id),
+  ["nyc-2022-construction-codes"],
+  "A conversational 2022 follow-up must switch back to the current Construction Code without retaining 2014."
+);
+
 const configured2014 = routeResearchCorpora({
   question: "What does the selected code require?",
   projectCodeVersion: "nyc-2014",
@@ -223,6 +251,19 @@ assert.deepEqual(
 
 assert.equal(researchCorpusByPrefix(registry, "FC")?.id, "nyc-2022-fire-code");
 assert.equal(researchCorpusByPrefix(registry, "ZR")?.automaticResearchEligible, false);
+assert.equal(
+  researchCorpusByPrefix(registry, "BC", {
+    codeVersion: "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1"
+  })?.id,
+  "nyc-2014-construction-codes",
+  "Pinned 2014 evidence must resolve by its exact version identity instead of the ambiguous BC prefix."
+);
+assert.equal(
+  researchCorpusByPrefix(registry, "BC", {
+    corpusID: "nyc-2022-construction-codes"
+  })?.id,
+  "nyc-2022-construction-codes"
+);
 
 const fireCorpus = researchCorpusByPrefix(registry, "FC");
 const fireCatalog = (await enactedSectionCatalog())

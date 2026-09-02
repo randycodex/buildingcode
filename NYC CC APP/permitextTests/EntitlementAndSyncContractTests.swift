@@ -5150,6 +5150,23 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(model.selectedTab, .search)
     }
 
+    @MainActor
+    func testResearchCitationNavigationSelectsExact2014VersionSectionAndSearch() {
+        let model = CodeLibraryViewModel.preview(includeHistoricalConstruction: true)
+
+        model.openResearchCitation(
+            sectionID: 41_002_646,
+            codeVersion: UserContentSyncCodeVersion.canonicalNYC2014
+        )
+
+        XCTAssertEqual(
+            model.selectedVersion.map { UserContentSyncCodeVersion.server($0.codeVersion) },
+            Optional(UserContentSyncCodeVersion.canonicalNYC2014)
+        )
+        XCTAssertEqual(model.pendingDeepLinkedSectionID, 41_002_646)
+        XCTAssertEqual(model.selectedTab, .search)
+    }
+
     func testNativeNotebookSimpleDocumentRoundTripsWithoutLosingReferencesOrImages() throws {
         let document = NotebookDocument(document: [
             NotebookBlock.textBlock(type: "heading", text: "Finding", level: 2),
