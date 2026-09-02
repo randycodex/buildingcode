@@ -330,6 +330,19 @@ import {
   isExistingBuildingSectionID
 } from "./existing-building-content.mjs";
 import {
+  historicalConstructionChapter,
+  historicalConstructionChapterIndex,
+  historicalConstructionCodePrefixes,
+  historicalConstructionContentMetadata,
+  historicalConstructionSearchIndex,
+  historicalConstructionSection,
+  historicalConstructionSectionCatalog,
+  historicalConstructionSectionSummary,
+  historicalConstructionSyncCodeVersion,
+  isHistoricalConstructionChapterID,
+  isHistoricalConstructionSectionID
+} from "./historical-construction-content.mjs";
+import {
   enactedChapter,
   enactedChapterByAnyID,
   enactedChapterIndex,
@@ -7674,6 +7687,10 @@ async function researchCorpusResources(corpusPlan) {
       if (corpus.id === "nyc-2022-construction-codes") {
         catalogs.push((await sectionCatalog()).map((section) => researchCatalogEntry(section, corpus)));
         indexes.push(await shippedSearchIndex());
+      } else if (corpus.id === "nyc-2014-construction-codes") {
+        catalogs.push((await historicalConstructionSectionCatalog())
+          .map((section) => researchCatalogEntry(section, corpus)));
+        indexes.push(await historicalConstructionSearchIndex());
       } else if (corpus.id === "nyc-2022-fire-code") {
         catalogs.push((await enactedSectionCatalog())
           .filter((section) => section.codePrefix === "FC")
@@ -7698,6 +7715,16 @@ async function researchCorpusResources(corpusPlan) {
 }
 
 async function researchBodyForCatalogSection(section) {
+  if (
+    section?.corpusID === "nyc-2014-construction-codes" ||
+    isHistoricalConstructionSectionID(section?.id)
+  ) {
+    const body = await historicalConstructionSection(section.id) || { blocks: [] };
+    return {
+      ...body,
+      blocks: (body.blocks || []).filter((block) => block.researchClaimEligible !== false)
+    };
+  }
   if (section?.corpusID === "nyc-existing-building-code-2027" || isExistingBuildingSectionID(section?.id)) {
     return await existingBuildingSection(section.id) || { blocks: [] };
   }
@@ -7908,7 +7935,10 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
     let canonicalText;
     let text;
     try {
-      if (isEnactedCodeSectionID(requestedID)) {
+      if (isHistoricalConstructionSectionID(requestedID)) {
+        corpus = registry.find((candidate) => candidate.id === "nyc-2014-construction-codes");
+        summary = await historicalConstructionSectionSummary(requestedID);
+      } else if (isEnactedCodeSectionID(requestedID)) {
         summary = await enactedSectionSummary(requestedID);
       } else if (isExistingBuildingSectionID(requestedID)) {
         summary = await existingBuildingSectionSummary(requestedID);
@@ -8439,7 +8469,7 @@ export function deterministicResearchEvidenceAnalysisForTurn(
     exceptions: itemsFor((source) => isMaterial(source) && hasFunction(source, "exception")),
     conditions: [],
     limitations: itemsFor((source) =>
-      ["historical", "future-effective"].includes(source?.applicabilityStatus) ||
+      ["historical", "prior-edition-case-specific", "future-effective"].includes(source?.applicabilityStatus) ||
       ["contextual", "irrelevant"].includes(source?.evidencePriority?.evidenceRole) ||
       source?.evidencePriority?.topicRouteRelationship === "collateral"
     ),
@@ -8520,7 +8550,7 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     instructions: [
       "Organize the supplied enacted evidence into a compact internal legal-research map before a separate model writes the user-facing answer.",
       "Retrieval relevance does not establish legal applicability. Identify controlling provisions only when the supplied text supports that role.",
-      "Classify historical and future-effective evidence as an applicability limitation unless supplied enacted evidence establishes why it governs the project at issue.",
+      "Classify historical, prior-edition case-specific, and future-effective evidence as an applicability limitation unless supplied enacted evidence establishes why it governs the project at issue.",
       "Treat evidence labeled contextual only as the subject of a relevance comparison. Do not place it among controlling provisions or general rules, and do not treat evidence labeled irrelevant as answer support.",
       "Treat evidence labeled with a collateral topic route as internally reviewed material matched only by a supplied project fact. Do not classify it as controlling or a general rule for the current question unless the question expressly asks that separate legal topic.",
       "Separate general rules, exceptions, conditions, limitations, definitions, cross-references, tables, known project facts, unresolved project facts, and evidence limitations.",
@@ -9754,7 +9784,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Do not hide distinct missing inputs inside a phrase such as full design, additional evidence, other requirements, or applicable approvals. When they are material, name the unresolved inputs—for example detector quantity, airflow rate, system capacity, existing approved occupancy records, filing or approval status, or a referenced electrical, emergency-power, testing, monitoring, or Fire Department condition—without claiming that an unsupplied authority imposes a requirement.",
         "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
         "When the user supplied enacted passages, automatically discovered evidence labeled supporting is optional review context. Do not cite or discuss it unless it is materially necessary to answer the exact question or qualify a conclusion supported by the selected passages.",
-        "Evidence labeled historical or future-effective is available only because the user explicitly pinned it. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence.",
+        "Evidence labeled historical, prior-edition case-specific, or future-effective is available only because the user explicitly selected that edition or evidence. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence. For the 2014 Construction Codes, identify the prior edition and say that applicability is project-specific and may depend on the application filing date.",
         "When the question names a code edition or year, use only evidence from that exact edition for legal claims and human-readable section references. Never borrow a similarly numbered current-edition provision or silently substitute another edition. If the requested edition is unavailable, identify that boundary and do not present current text as the historical rule.",
         "Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic.",
         "For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not replace it with, or import a sibling table row, exception, or rule from, broader section context.",
@@ -10047,7 +10077,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
       "For an open-ended design-requirements question, fail with missed_material_conclusion when the supplied enacted evidence contains multiple directly responsive dimensional or configuration rules but the answer withholds those usable baseline rules, lets a narrow exception or specialized type dominate the answer, or says those requirements are unavailable merely because a referenced standard is not supplied.",
-      "Fail with missed_material_conclusion if cited historical or future-effective evidence is not expressly identified as historical or not yet effective, or if the answer silently presents it as ordinary current law.",
+      "Fail with missed_material_conclusion if cited historical, prior-edition case-specific, or future-effective evidence is not expressly identified with its applicability status, or if the answer silently presents it as ordinary current law. A 2014 Construction Codes answer must identify the prior edition and state that applicability is project-specific and may depend on the application filing date.",
       "When the question names a code edition or year, fail with wrong_attribution if any legal claim or human-readable section reference is taken from another edition, if a similarly numbered current provision is presented as historical text, or if the answer silently substitutes a different edition. If the requested edition is unavailable, require the answer to say so instead of reconstructing the historical rule from current evidence.",
       "Fail an answer that introduces a collateral code example or citation that does not materially qualify the requested conclusion and was not requested by the user.",
       "Fail with irrelevant_citation when the answer cites evidence labeled with a collateral topic route merely because a supplied project fact matched that separate code topic. Such evidence may be reviewed internally without appearing in the answer.",
@@ -20465,6 +20495,7 @@ async function handleCodeLibraries(_request, response) {
       effectiveDate: "2022-11-07",
       researchEligibility: true
     },
+    await historicalConstructionContentMetadata(),
     await zoningContentMetadata(),
     await existingBuildingContentMetadata(),
     ...await enactedContentMetadata()
@@ -20536,14 +20567,18 @@ export function canonicalConstructionNavigationChapters(chapters = []) {
 async function handleCodeChapters(request, response) {
   const url = requestURL(request);
   const codePrefix = url.searchParams.get("code")?.trim().toUpperCase();
+  const requestedVersion = canonicalCodeVersion(url.searchParams.get("version") || "");
+  const historical2014Requested = requestedVersion === historicalConstructionSyncCodeVersion;
   const startupView = url.searchParams.get("view") === "startup";
-  const chapters = [
-    ...([zoningCodePrefix, existingBuildingCodePrefix].includes(codePrefix) ||
-      enactedCodePrefixes.has(codePrefix) ? [] : await chapterIndex()),
-    ...(codePrefix && codePrefix !== zoningCodePrefix ? [] : await zoningChapterIndex()),
-    ...(codePrefix && codePrefix !== existingBuildingCodePrefix ? [] : await existingBuildingChapterIndex()),
-    ...(codePrefix && !enactedCodePrefixes.has(codePrefix) ? [] : await enactedNavigationChapterIndex())
-  ].map(withNavigationHierarchy);
+  const chapters = historical2014Requested
+    ? (await historicalConstructionChapterIndex()).map(withNavigationHierarchy)
+    : [
+        ...([zoningCodePrefix, existingBuildingCodePrefix].includes(codePrefix) ||
+          enactedCodePrefixes.has(codePrefix) ? [] : await chapterIndex()),
+        ...(codePrefix && codePrefix !== zoningCodePrefix ? [] : await zoningChapterIndex()),
+        ...(codePrefix && codePrefix !== existingBuildingCodePrefix ? [] : await existingBuildingChapterIndex()),
+        ...(codePrefix && !enactedCodePrefixes.has(codePrefix) ? [] : await enactedNavigationChapterIndex())
+      ].map(withNavigationHierarchy);
   const selectedChapters = codePrefix
     ? chapters.filter((chapter) => chapter.codePrefix === codePrefix)
     : chapters;
@@ -20685,6 +20720,40 @@ async function handleCodeChapter(request, path, response) {
         chapterNumber: summary.chapterNumber,
         displayTitle: summary.displayTitle,
         fullTitle: summary.fullTitle,
+        groups: chapter.groups || [],
+        sections: hydrated.sections,
+        ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
+      }
+    });
+    return;
+  }
+  if (isHistoricalConstructionChapterID(chapterID)) {
+    const [chapter, chapterSummary] = await Promise.all([
+      historicalConstructionChapter(chapterID),
+      historicalConstructionChapterIndex().then((entries) =>
+        entries.find((entry) => String(entry.id) === chapterID)
+      )
+    ]);
+    if (!chapter || !chapterSummary) {
+      sendNotFound(response);
+      return;
+    }
+    const sections = flattenChapterSections(chapter);
+    const hydrated = await chapterSectionsWithRequestedBodies(
+      request,
+      sections,
+      (section) => historicalConstructionSection(section.id)
+    );
+    sendJSON(response, 200, {
+      chapter: {
+        id: chapter.chapterID,
+        codePrefix: chapterSummary.codePrefix,
+        codeSectionID: chapterSummary.codeSectionID,
+        codeVersion: historicalConstructionSyncCodeVersion,
+        chapterNumber: chapter.chapterNumber,
+        displayTitle: chapterSummary.displayTitle,
+        fullTitle: chapterSummary.fullTitle,
+        applicabilityStatus: "prior-edition-case-specific",
         groups: chapter.groups || [],
         sections: hydrated.sections,
         ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
@@ -20845,6 +20914,31 @@ async function handleCodeSection(path, response) {
     });
     return;
   }
+  if (isHistoricalConstructionSectionID(sectionID)) {
+    const [summary, body] = await Promise.all([
+      historicalConstructionSectionSummary(sectionID),
+      historicalConstructionSection(sectionID)
+    ]);
+    if (!summary || !body) {
+      sendNotFound(response);
+      return;
+    }
+    sendJSON(response, 200, {
+      section: {
+        ...body,
+        chapterID: summary.chapterID,
+        chapterNumber: summary.chapterNumber,
+        codePrefix: summary.codePrefix,
+        codeVersion: historicalConstructionSyncCodeVersion,
+        applicabilityStatus: "prior-edition-case-specific",
+        sectionID: Number(summary.id),
+        sectionNumber: summary.sectionNumber,
+        title: summary.title,
+        webSectionID: null
+      }
+    });
+    return;
+  }
   if (isZoningSectionID(sectionID)) {
     const [summary, body] = await Promise.all([
       zoningSectionSummary(sectionID),
@@ -20968,6 +21062,7 @@ export async function allSectionCatalogByID() {
   }
   cachedAllSectionCatalogByIDPromise = Promise.all([
     sectionCatalog(),
+    historicalConstructionSectionCatalog(),
     zoningSectionCatalog(),
     existingBuildingSectionCatalog(),
     enactedSectionCatalog()
@@ -21006,6 +21101,12 @@ export function candidateSectionIDs(index, queryTokens, normalizedQuery, query) 
 }
 
 async function searchableSectionBody(section) {
+  if (
+    historicalConstructionCodePrefixes.includes(section.codePrefix) &&
+    isHistoricalConstructionSectionID(section.id)
+  ) {
+    return await historicalConstructionSection(section.id) || { blocks: [] };
+  }
   if (
     enactedCodePrefixes.has(section.codePrefix) ||
     isEnactedCodeSectionID(section.id)
@@ -21144,6 +21245,8 @@ async function handleCodeSearch(request, response) {
     ? requestedCandidateOffset
     : 0;
   const exactCursorMode = exactMatch && candidateOffsetParameter !== null;
+  const requestedVersion = canonicalCodeVersion(url.searchParams.get("version") || "");
+  const historical2014Requested = requestedVersion === historicalConstructionSyncCodeVersion;
   const codeFilter = new Set(
     (url.searchParams.get("code") || url.searchParams.get("codes") || "")
       .split(",")
@@ -21177,10 +21280,13 @@ async function handleCodeSearch(request, response) {
     return;
   }
 
-  const includeConstruction = codeFilter.size === 0 || [...codeFilter].some((prefix) =>
-    ![zoningCodePrefix, existingBuildingCodePrefix].includes(prefix) &&
-    !enactedCodePrefixes.has(prefix)
+  const includeConstruction = !historical2014Requested && (
+    codeFilter.size === 0 || [...codeFilter].some((prefix) =>
+      ![zoningCodePrefix, existingBuildingCodePrefix].includes(prefix) &&
+      !enactedCodePrefixes.has(prefix)
+    )
   );
+  const includeHistorical2014 = historical2014Requested;
   const includeZoning = codeFilter.size === 0 || codeFilter.has(zoningCodePrefix);
   const includeExistingBuilding =
     codeFilter.size === 0 || codeFilter.has(existingBuildingCodePrefix);
@@ -21191,6 +21297,14 @@ async function handleCodeSearch(request, response) {
     const index = await shippedSearchIndex();
     const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
     candidates.push(...(await sectionCatalog()).filter((section) =>
+      candidateIDs.has(section.id) &&
+      (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
+    ));
+  }
+  if (includeHistorical2014) {
+    const index = await historicalConstructionSearchIndex();
+    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
+    candidates.push(...(await historicalConstructionSectionCatalog()).filter((section) =>
       candidateIDs.has(section.id) &&
       (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
     ));
@@ -23135,15 +23249,19 @@ async function canonicalizeSectionRecord(kind, record) {
       folderClientID: syncProjectIdentity(record.folderClientID, record.userID) || null
     };
   }
-  const canonicalID = await canonicalSectionIDFor({
-    codePrefix: record.codePrefix || "BC",
-    chapterNumber: record.chapterNumber,
-    sectionNumber: record.sectionNumber,
-    sectionID: record.sectionID,
-    allowLegacySectionID: kind === "annotation" &&
-      !record.webSectionID &&
-      /^\d+-html-\d+$/i.test(normalizedBlockID(record.blockID) || "")
-  });
+  const historicalSectionID = codeVersion === historicalConstructionSyncCodeVersion &&
+    isHistoricalConstructionSectionID(record.sectionID)
+    ? Number(record.sectionID)
+    : null;
+  const canonicalID = historicalSectionID || await canonicalSectionIDFor({
+      codePrefix: record.codePrefix || "BC",
+      chapterNumber: record.chapterNumber,
+      sectionNumber: record.sectionNumber,
+      sectionID: record.sectionID,
+      allowLegacySectionID: kind === "annotation" &&
+        !record.webSectionID &&
+        /^\d+-html-\d+$/i.test(normalizedBlockID(record.blockID) || "")
+    });
   const normalized = {
     ...record,
     codeVersion,
@@ -23227,6 +23345,12 @@ function canonicalCodeVersion(value) {
     normalized === "2022 construction codes" ||
     normalized === defaultSyncCodeVersion.toLocaleLowerCase("en-US")
   ) return defaultSyncCodeVersion;
+  if (
+    normalized === "nyc-2014" ||
+    normalized === "2014 construction codes" ||
+    normalized === "2014 nyc construction codes" ||
+    normalized === historicalConstructionSyncCodeVersion.toLocaleLowerCase("en-US")
+  ) return historicalConstructionSyncCodeVersion;
   if (
     normalized === "nyc-zoning-resolution" ||
     normalized === "nyc zoning resolution" ||

@@ -430,6 +430,9 @@ struct ServerEntitlementRecord: Codable, Hashable, Sendable {
 enum UserContentSyncCodeVersion {
     static let canonicalNYC2022 = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
     static let localNYC2022 = "2022 CONSTRUCTION CODES"
+    static let canonicalNYC2014 =
+        "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1"
+    static let localNYC2014 = "2014 NYC Construction Codes - DOB consolidated archive"
     static let canonicalNYCZoning =
         "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1"
     static let localNYCZoning = "NYC Zoning Resolution — text through 2026-07-16"
@@ -447,6 +450,7 @@ enum UserContentSyncCodeVersion {
         "2025 NYC Energy Conservation and Electrical Codes"
     static let allCanonicalNYC = [
         canonicalNYC2022,
+        canonicalNYC2014,
         canonicalNYCZoning,
         canonicalNYCExistingBuilding,
         canonicalNYCEnactedAdministrative,
@@ -457,6 +461,13 @@ enum UserContentSyncCodeVersion {
         "nyc-2022",
         "2022 Construction Codes",
         canonicalNYC2022
+    ]
+    private static let nyc2014Aliases = [
+        "nyc-2014",
+        "2014 Construction Codes",
+        "2014 NYC Construction Codes",
+        localNYC2014,
+        canonicalNYC2014
     ]
     private static let nycZoningAliases = [
         "nyc-zoning-resolution",
@@ -486,6 +497,10 @@ enum UserContentSyncCodeVersion {
         nyc2022Aliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
     }
 
+    private static func isNYC2014Alias(_ value: String) -> Bool {
+        nyc2014Aliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
+    }
+
     private static func isNYCZoningAlias(_ value: String) -> Bool {
         nycZoningAliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
     }
@@ -505,6 +520,7 @@ enum UserContentSyncCodeVersion {
     static func server(_ value: String) -> String {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
         if candidate.isEmpty || isNYC2022Alias(candidate) { return canonicalNYC2022 }
+        if isNYC2014Alias(candidate) { return canonicalNYC2014 }
         if isNYCZoningAlias(candidate) { return canonicalNYCZoning }
         if isNYCExistingBuildingAlias(candidate) { return canonicalNYCExistingBuilding }
         if isNYCEnactedAdministrativeAlias(candidate) { return canonicalNYCEnactedAdministrative }
@@ -515,6 +531,7 @@ enum UserContentSyncCodeVersion {
     static func local(_ value: String) -> String {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
         if candidate.isEmpty || isNYC2022Alias(candidate) { return localNYC2022 }
+        if isNYC2014Alias(candidate) { return localNYC2014 }
         if isNYCZoningAlias(candidate) { return localNYCZoning }
         if isNYCExistingBuildingAlias(candidate) { return localNYCExistingBuilding }
         if isNYCEnactedAdministrativeAlias(candidate) { return localNYCEnactedAdministrative }
@@ -526,6 +543,15 @@ enum UserContentSyncCodeVersion {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
         if candidate.isEmpty || isNYC2022Alias(candidate) {
             return [localNYC2022, "2022 Construction Codes", "nyc-2022", canonicalNYC2022]
+        }
+        if isNYC2014Alias(candidate) {
+            return [
+                localNYC2014,
+                "2014 NYC Construction Codes",
+                "2014 Construction Codes",
+                "nyc-2014",
+                canonicalNYC2014
+            ]
         }
         if isNYCZoningAlias(candidate) {
             return [localNYCZoning, "NYC Zoning Resolution", "nyc-zoning-resolution", canonicalNYCZoning]
@@ -4698,11 +4724,12 @@ enum ProjectEvidenceOrganizer {
     private static func versionRank(_ codeVersion: String) -> Int {
         switch UserContentSyncCodeVersion.server(codeVersion) {
         case UserContentSyncCodeVersion.canonicalNYC2022: return 0
-        case UserContentSyncCodeVersion.canonicalNYC2025Specialty: return 1
-        case UserContentSyncCodeVersion.canonicalNYCExistingBuilding: return 2
-        case UserContentSyncCodeVersion.canonicalNYCEnactedAdministrative: return 3
-        case UserContentSyncCodeVersion.canonicalNYCZoning: return 4
-        default: return 5
+        case UserContentSyncCodeVersion.canonicalNYC2014: return 1
+        case UserContentSyncCodeVersion.canonicalNYC2025Specialty: return 2
+        case UserContentSyncCodeVersion.canonicalNYCExistingBuilding: return 3
+        case UserContentSyncCodeVersion.canonicalNYCEnactedAdministrative: return 4
+        case UserContentSyncCodeVersion.canonicalNYCZoning: return 5
+        default: return 6
         }
     }
 

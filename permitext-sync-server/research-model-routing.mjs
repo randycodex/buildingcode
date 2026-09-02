@@ -106,7 +106,7 @@ function evidenceNeedsAccurateModel(source) {
   if ((source.visualSources || []).length) return true;
   if (!["", "governing"].includes(normalized(source.evidencePriority?.evidenceRole))) return true;
   if (source.evidencePriority?.topicRouteRelationship === "collateral") return true;
-  if (["historical", "future-effective"].includes(source.applicabilityStatus)) return true;
+  if (["historical", "prior-edition-case-specific", "future-effective"].includes(source.applicabilityStatus)) return true;
   if (source.canonicalContextResolved === false || source.canonicalContextComplete === false || source.truncated === true) return true;
   const text = `${source.title || ""}\n${source.text || ""}`;
   return /\b(?:table|figure|exception|exceptions)\b/i.test(text);
@@ -155,7 +155,7 @@ export function routeResearchAnswerModel({
   if (evidence.some(evidenceNeedsAccurateModel) && !isBoundedCitationLookup) reasons.push("complex_evidence_form");
   if ((codeBasis?.searchedCorpora || []).length > 1 && !isBoundedCitationLookup) reasons.push("multiple_corpora");
   if (isBoundedCitationLookup && evidence.some((source) =>
-    (source.visualSources || []).length || ["historical", "future-effective"].includes(source.applicabilityStatus)
+    (source.visualSources || []).length || ["historical", "prior-edition-case-specific", "future-effective"].includes(source.applicabilityStatus)
   )) reasons.push("high_risk_citation_evidence");
   if ([...(codeBasis?.searchedCorpora || []), ...(codeBasis?.pinnedCorpora || [])]
     .some((corpus) => /zoning/i.test(`${corpus?.id || ""} ${corpus?.label || ""}`))) {

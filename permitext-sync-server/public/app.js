@@ -19,11 +19,12 @@ import {
 } from "./research-progress.js?v=20260826-research-request-recovery-v121";
 import {
   defaultSyncCodeVersion,
+  historicalConstructionSyncCodeVersion,
   syncCodeVersion,
   syncCodeVersionForPrefix,
   syncProjectIdentity,
   syncMutationRecordID
-} from "./sync-identity.js?v=20260728-enacted-code-expansion-v6";
+} from "./sync-identity.js?v=20260901-2014-code-v7";
 import {
   annotationAfterBulkClears,
   bulkClearKey,
@@ -59,7 +60,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260901-research-answer-format-v15";
+} from "./offline-storage.js?v=20260901-2014-code-v17";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -94,7 +95,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260901-research-answer-format-v15";
+} from "./research-intent-state.js?v=20260901-2014-code-v17";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -315,6 +316,11 @@ const codeOptions = [
   { prefix: "PC", label: "Plumbing Code", theme: "plumbing", group: "2022 Construction Codes" },
   { prefix: "MC", label: "Mechanical Code", theme: "mechanical", group: "2022 Construction Codes" },
   { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas", group: "2022 Construction Codes" },
+  { prefix: "BC", codeVersion: historicalConstructionSyncCodeVersion, label: "Building Code (2014)", theme: "building", group: "2014 Construction Codes (Historical)" },
+  { prefix: "AC", codeVersion: historicalConstructionSyncCodeVersion, label: "General Administrative Provisions (2014)", theme: "administrative", group: "2014 Construction Codes (Historical)" },
+  { prefix: "PC", codeVersion: historicalConstructionSyncCodeVersion, label: "Plumbing Code (2014)", theme: "plumbing", group: "2014 Construction Codes (Historical)" },
+  { prefix: "MC", codeVersion: historicalConstructionSyncCodeVersion, label: "Mechanical Code (2014)", theme: "mechanical", group: "2014 Construction Codes (Historical)" },
+  { prefix: "FGC", codeVersion: historicalConstructionSyncCodeVersion, label: "Fuel Gas Code (2014)", theme: "fuel-gas", group: "2014 Construction Codes (Historical)" },
   { prefix: "ECC", label: "Energy Conservation Code (2025)", theme: "energy", group: "2025 Codes" },
   { prefix: "EC", label: "Electrical Code — NYC amendments (2025)", theme: "electrical", group: "2025 Codes" },
   {
@@ -339,7 +345,7 @@ function researchCodeEdition(source = {}) {
   if (explicit) return explicit;
   const codePrefix = String(source.codePrefix || "").trim().toUpperCase();
   if (codePrefix === "BC68") return "1968";
-  const option = codeOptions.find((candidate) => candidate.prefix === codePrefix);
+  const option = codeOptionFor(codePrefix, source.codeVersion || source.sourceLibraryVersion);
   const candidates = [option?.label, option?.group, source.codeVersion, source.sourceLibraryVersion];
   for (const candidate of candidates) {
     const match = String(candidate || "").match(/\b(?:19|20)\d{2}\b/);
@@ -3965,15 +3971,40 @@ function setUtilityButtonStates() {
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
 }
 
-function codeOptionFor(prefix = "BC") {
-  return codeOptions.find((option) => option.prefix === prefix) || codeOptions[0];
+function codeOptionVersion(option) {
+  return syncCodeVersion(option?.codeVersion || syncCodeVersionForPrefix(option?.prefix || "BC"));
 }
 
-function codeDisplayLabel(prefix = "BC") {
-  return codeOptionFor(prefix).label;
+function codeOptionValue(option) {
+  return `${codeOptionVersion(option)}::${option?.prefix || "BC"}`;
 }
 
-function codeTrustProfile(prefix = "BC") {
+function codeOptionFor(prefix = "BC", codeVersion = "") {
+  const normalizedPrefix = String(prefix || "BC").toUpperCase();
+  const normalizedVersion = syncCodeVersion(codeVersion || syncCodeVersionForPrefix(normalizedPrefix));
+  return codeOptions.find((option) =>
+    option.prefix === normalizedPrefix && codeOptionVersion(option) === normalizedVersion
+  ) || codeOptions.find((option) => option.prefix === normalizedPrefix) || codeOptions[0];
+}
+
+function codeDisplayLabel(prefix = "BC", codeVersion = "") {
+  return codeOptionFor(prefix, codeVersion).label;
+}
+
+function codeTrustProfile(prefix = "BC", codeVersion = "") {
+  if (syncCodeVersion(codeVersion || syncCodeVersionForPrefix(prefix)) === historicalConstructionSyncCodeVersion) {
+    return {
+      statusKind: "prior-edition-case-specific",
+      statusLabel: "Prior 2014 edition",
+      editionLabel: "2014 NYC Construction Codes",
+      authority: "New York City Department of Buildings",
+      sourceLabel: "official NYC 2014 Construction Codes",
+      sourceURL: "https://www.nyc.gov/site/buildings/codes/2014-construction-codes.page",
+      boundary: "Applicability is project-specific and may depend on the application filing date. Permitext uses the official DOB consolidated archive and flags unresolved extraction discrepancies for review.",
+      verificationLabel: "Official source package checked",
+      verifiedOn: "2026-09-01"
+    };
+  }
   const normalizedPrefix = String(prefix || "BC").toUpperCase();
   return codeTrustProfiles.find((profile) => profile.codePrefix === normalizedPrefix) || null;
 }
@@ -4003,7 +4034,7 @@ function codeTrustCurrencyLabel(profile) {
 
 function renderReaderTrust(panel, reader) {
   const trust = panel.querySelector(".reader-trust");
-  const profile = codeTrustProfile(reader.codePrefix);
+  const profile = codeTrustProfile(reader.codePrefix, reader.codeVersion);
   if (!trust || !profile) {
     if (trust) trust.hidden = true;
     return;
@@ -4509,17 +4540,22 @@ function reportClientError(kind, error, details = {}) {
   }).catch(() => {});
 }
 
-async function fetchChapterList(codePrefix = "BC") {
-  const cacheKey = codePrefix || "BC";
+async function fetchChapterList(codePrefix = "BC", codeVersion = "") {
+  const prefix = codePrefix || "BC";
+  const version = syncCodeVersion(codeVersion || syncCodeVersionForPrefix(prefix));
+  const cacheKey = `${version}:${prefix}`;
   return cacheRetryablePromise(
     chapterListCache,
     cacheKey,
-    () => api(`/code/chapters?code=${encodeURIComponent(cacheKey)}`).then((payload) => payload.chapters || [])
+    () => {
+      const params = new URLSearchParams({ code: prefix, version });
+      return api(`/code/chapters?${params}`).then((payload) => payload.chapters || []);
+    }
   );
 }
 
-async function firstChapterIDForCode(codePrefix = "BC") {
-  const chapterList = await fetchChapterList(codePrefix || "BC");
+async function firstChapterIDForCode(codePrefix = "BC", codeVersion = "") {
+  const chapterList = await fetchChapterList(codePrefix || "BC", codeVersion);
   return chapterList[0]?.id || "";
 }
 
@@ -5507,8 +5543,8 @@ function sectionTitleWithoutNumber(section) {
   return stripLeadingSectionNumber(title, number) || title;
 }
 
-function codeLabel(prefix) {
-  return codeOptions.find((option) => option.prefix === prefix)?.label || "Building Code";
+function codeLabel(prefix, codeVersion = "") {
+  return codeOptionFor(prefix, codeVersion)?.label || "Building Code";
 }
 
 function codeTheme(prefix) {
@@ -5550,16 +5586,21 @@ function populateCodeSelect(panel, reader) {
     group.label = groupLabel;
     codes.forEach((code) => {
       const option = document.createElement("option");
-      option.value = code.prefix;
+      option.value = codeOptionValue(code);
       option.textContent = code.label;
       group.append(option);
     });
     codeSelect.append(group);
   });
-  codeSelect.value = reader.codePrefix;
+  const selectedCode = codeOptionFor(reader.codePrefix, reader.codeVersion);
+  codeSelect.value = codeOptionValue(selectedCode);
   codeSelect.setAttribute("aria-label", "Code section");
-  codeSelect.title = codeLabel(reader.codePrefix);
+  codeSelect.title = selectedCode.label;
   resizeCodeSelect(codeSelect);
+}
+
+function readerCodeSelectionKey(reader) {
+  return codeOptionValue(codeOptionFor(reader?.codePrefix || "BC", reader?.codeVersion || ""));
 }
 
 function closeActiveCustomSelect() {
@@ -5608,7 +5649,7 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
   if (chapterSelect) chapterSelect.value = reader.chapterID;
   if (chapterChanged) {
     state.recentChaptersByCode = state.recentChaptersByCode || {};
-    if (reader.chapterID) state.recentChaptersByCode[reader.codePrefix || "BC"] = reader.chapterID;
+    if (reader.chapterID) state.recentChaptersByCode[readerCodeSelectionKey(reader)] = reader.chapterID;
   }
   if (sectionID) {
     reader.sectionID = String(sectionID);
@@ -11747,7 +11788,7 @@ async function populateReaderSelectors(panel, reader) {
   clear(sectionSelect);
   reader.codePrefix = reader.codePrefix || "BC";
 
-  const readerChapters = await fetchChapterList(reader.codePrefix);
+  const readerChapters = await fetchChapterList(reader.codePrefix, reader.codeVersion);
   if (!reader.chapterID) {
     reader.chapterID = readerChapters[0]?.id || "";
   } else {
@@ -13124,8 +13165,14 @@ function inlineReferenceSearchResult(results, codePrefix, sectionNumber) {
     )[0] || null;
 }
 
-async function resolveInlineCodeSection(codePrefix, sectionNumber) {
-  const payload = await api(`/code/search?q=${encodeURIComponent(sectionNumber)}&code=${encodeURIComponent(codePrefix)}&limit=25`);
+async function resolveInlineCodeSection(codePrefix, sectionNumber, codeVersion = "") {
+  const params = new URLSearchParams({
+    q: sectionNumber,
+    code: codePrefix,
+    limit: "25",
+    version: syncCodeVersion(codeVersion || syncCodeVersionForPrefix(codePrefix))
+  });
+  const payload = await api(`/code/search?${params}`);
   return inlineReferenceSearchResult(payload.results, codePrefix, sectionNumber);
 }
 
@@ -13171,7 +13218,7 @@ async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigge
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
-    const result = await resolveInlineCodeSection(normalizedPrefix, sectionNumber);
+    const result = await resolveInlineCodeSection(normalizedPrefix, sectionNumber, reader.codeVersion);
     if (!result) {
       trigger.title = `Section ${sectionNumber} was not found in ${normalizedPrefix}.`;
       return;
@@ -13196,7 +13243,10 @@ async function openStructuredCodeReference(reader, anchor, trigger) {
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
-    const chapter = chapters.find((item) =>
+    const referenceChapters = reader.codeVersion === historicalConstructionSyncCodeVersion
+      ? await fetchChapterList(target.codePrefix, reader.codeVersion)
+      : chapters;
+    const chapter = referenceChapters.find((item) =>
       String(item.codePrefix || "").toUpperCase() === target.codePrefix &&
       String(item.chapterNumber || "").trim().toUpperCase() === target.chapterNumber
     );
@@ -13206,6 +13256,7 @@ async function openStructuredCodeReference(reader, anchor, trigger) {
     }
     await openReferenceInAdjacentReader(reader, {
       codePrefix: target.codePrefix,
+      codeVersion: reader.codeVersion,
       chapterID: chapter.id,
       chapterNumber: chapter.chapterNumber,
       sectionID: "",
@@ -13523,10 +13574,12 @@ async function renderReader(reader, options = {}) {
     typographyToggle.setAttribute("aria-label", typographyToggle.title);
   });
   codeSelect.addEventListener("change", async () => {
-    reader.codePrefix = codeSelect.value || "BC";
-    reader.codeVersion = syncCodeVersionForPrefix(reader.codePrefix);
+    const selectedCode = codeOptions.find((option) => codeOptionValue(option) === codeSelect.value) || codeOptions[0];
+    reader.codePrefix = selectedCode.prefix;
+    reader.codeVersion = codeOptionVersion(selectedCode);
     applyCodeTheme(panel, reader);
-    reader.chapterID = await firstChapterIDForCode(reader.codePrefix);
+    renderReaderTrust(panel, reader);
+    reader.chapterID = await firstChapterIDForCode(reader.codePrefix, reader.codeVersion);
     reader.sectionID = "";
     reader.sectionNumber = "";
     reader.title = "Reader";
@@ -13590,7 +13643,7 @@ async function renderReader(reader, options = {}) {
     reader.chapterID = chapterSelect.value;
     state.recentChaptersByCode = state.recentChaptersByCode || {};
     if (reader.chapterID) {
-      state.recentChaptersByCode[reader.codePrefix || "BC"] = reader.chapterID;
+      state.recentChaptersByCode[readerCodeSelectionKey(reader)] = reader.chapterID;
     }
     reader.sectionID = "";
     reader.sectionNumber = "";
@@ -15151,6 +15204,7 @@ function researchApplicabilityStatusLabel(value) {
   const status = String(value || "").trim().toLowerCase();
   if (status === "current-enacted-edition") return "Current enacted edition";
   if (status === "historical") return "Historical";
+  if (status === "prior-edition-case-specific") return "Prior edition — applicability is project-specific";
   if (status === "future-effective") return "Future effective";
   if (!status) return "Applicability status not provided";
   return status.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());

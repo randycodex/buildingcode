@@ -545,7 +545,11 @@ final class CodeLibraryViewModel: ObservableObject {
             let continuityContext = self.continuityStore.load()
             let storedSelection = continuityContext.selectedVersionFileName.isEmpty ? nil : continuityContext.selectedVersionFileName
             let storedJurisdiction = continuityContext.selectedJurisdictionKey.isEmpty ? nil : continuityContext.selectedJurisdictionKey
-            let authoredSelection = availableVersions.first(where: { $0.contentKind == .authored })?.fileName
+            let authoredSelection = availableVersions.first(where: {
+                $0.contentKind == .authored &&
+                    UserContentSyncCodeVersion.server($0.codeVersion) ==
+                    UserContentSyncCodeVersion.canonicalNYC2022
+            })?.fileName ?? availableVersions.first(where: { $0.contentKind == .authored })?.fileName
             let defaultJurisdictionKey = storedJurisdiction
                 .flatMap { stored in
                     self.availableJurisdictions.first(where: { $0.id == stored })?.id

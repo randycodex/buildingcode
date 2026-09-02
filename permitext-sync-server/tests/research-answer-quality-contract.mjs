@@ -112,6 +112,31 @@ const disclosedFuture = evaluateResearchAnswerQuality({
 });
 assert.equal(disclosedFuture.pass, true);
 
+const priorEditionEvidence = [{
+  ...source("prior-2014-bc", "715.4.7.1", "governing", "aligned"),
+  applicabilityStatus: "prior-edition-case-specific"
+}];
+const undisclosedPriorEdition = evaluateResearchAnswerQuality({
+  evidence: priorEditionEvidence,
+  answer: {
+    answerText: "BC 715.4.7.1 limits the vision panel to 100 square inches in this condition.",
+    supportedPoints: [{ sourceIDs: ["prior-2014-bc"] }],
+    citations: [{ sourceIDs: ["prior-2014-bc"] }]
+  }
+});
+assert.equal(undisclosedPriorEdition.pass, false);
+assert.deepEqual(undisclosedPriorEdition.missingApplicabilityDisclosureSourceIDs, ["prior-2014-bc"]);
+
+const disclosedPriorEdition = evaluateResearchAnswerQuality({
+  evidence: priorEditionEvidence,
+  answer: {
+    answerText: "Under the prior 2014 NYC Building Code, BC 715.4.7.1 limits the vision panel to 100 square inches in this condition. Applicability is project-specific and may depend on the application filing date.",
+    supportedPoints: [{ sourceIDs: ["prior-2014-bc"] }],
+    citations: [{ sourceIDs: ["prior-2014-bc"] }]
+  }
+});
+assert.equal(disclosedPriorEdition.pass, true);
+
 const r7aHeightEvidence = [{
   ...source("zr-r7a-height-table", "23-432", "governing", "aligned"),
   codePrefix: "ZR",

@@ -38,6 +38,16 @@ assert(
 );
 assert(!app.includes("nested <option"), "Do not attempt nested native options.");
 assert(app.includes("navigationChapterID"), "Reader does not preserve navigation chapter identity.");
+assert(
+  app.includes('group: "2014 Construction Codes (Historical)"') &&
+    app.includes("historicalConstructionSyncCodeVersion"),
+  "The web Reader does not expose the historical 2014 Construction Codes as a separate edition."
+);
+assert(
+  app.includes("const params = new URLSearchParams({ code: prefix, version })") &&
+    app.includes("readerCodeSelectionKey(reader)"),
+  "Reader chapter requests and recents must distinguish the 2014 and 2022 editions that share code prefixes."
+);
 assert(styles.includes(".reader-nav-tree"), "Tree menu styles are missing.");
 assert(styles.includes(".reader-nav-chapter"), "Chapter row styles are missing.");
 assert(styles.includes(".reader-nav-section"), "Section row styles are missing.");

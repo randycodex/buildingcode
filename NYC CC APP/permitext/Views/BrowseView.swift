@@ -3,6 +3,7 @@ import UIKit
 
 enum ReaderCodeMenuSectionTitle {
     static let construction2022 = "2022 Construction Codes"
+    static let construction2014 = "2014 Construction Codes (Historical)"
     static let codes2025 = "2025 Codes"
     static let existingAndHistorical = "Existing and Historical Building Codes"
     static let fireAndHousing = "Fire and Housing"
@@ -239,6 +240,15 @@ struct BrowseView: View {
                         }
                     }
 
+                    Section(ReaderCodeMenuSectionTitle.construction2014) {
+                        ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
+                            readerCodePickerButton(
+                                version: historicalConstructionCodeVersion,
+                                codeSectionName: codeSectionName
+                            )
+                        }
+                    }
+
                     Section(ReaderCodeMenuSectionTitle.codes2025) {
                         readerCodePickerButton(
                             version: specialtyCodeVersion,
@@ -325,7 +335,15 @@ struct BrowseView: View {
 
     private var constructionCodeVersion: BundledCodeVersion? {
         library.availableVersions.first { version in
-            version.codeVersion.localizedCaseInsensitiveContains("construction")
+            UserContentSyncCodeVersion.server(version.codeVersion) ==
+                UserContentSyncCodeVersion.canonicalNYC2022
+        }
+    }
+
+    private var historicalConstructionCodeVersion: BundledCodeVersion? {
+        library.availableVersions.first { version in
+            UserContentSyncCodeVersion.server(version.codeVersion) ==
+                UserContentSyncCodeVersion.canonicalNYC2014
         }
     }
 

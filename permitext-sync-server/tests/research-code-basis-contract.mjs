@@ -73,16 +73,26 @@ assert.deepEqual(unavailableZoning.unavailableCorpora.map((corpus) => corpus.id)
 assert.match(unavailableZoning.disclosure, /Zoning Resolution unavailable for Research/);
 assert.match(unavailableZoning.limitation, /was not searched.*approval/i);
 
-const unsupportedProjectDefault = resolveResearchCodeBasis({
+const historicalProjectPlan = routeResearchCorpora({
+  question: "What does the selected code require?",
+  projectCodeVersion: "2014 NYC Construction Codes",
+  registry
+});
+const historicalProjectDefault = resolveResearchCodeBasis({
   projectID: "project-3",
   projectCodeVersion: "2014 NYC Construction Codes",
   availableCorpora: registry,
-  corpusPlan: constructionPlan,
+  corpusPlan: historicalProjectPlan,
   resolvedAt
 });
-assert.equal(unsupportedProjectDefault.projectCodeVersionSupported, false);
-assert.match(unsupportedProjectDefault.disclosure, /Project version unavailable/);
-assert.match(unsupportedProjectDefault.limitation, /did not retrieve.*configured version/i);
+assert.equal(historicalProjectDefault.projectCodeVersionSupported, true);
+assert.equal(historicalProjectDefault.projectCodeVersionRetrieved, true);
+assert.deepEqual(
+  historicalProjectDefault.searchedCorpora.map((corpus) => corpus.id),
+  ["nyc-2014-construction-codes"]
+);
+assert.match(historicalProjectDefault.disclosure, /Project default applied/);
+assert.equal(historicalProjectDefault.limitation, null);
 
 const existingBuildingCorpus = registry.find((corpus) => corpus.id === "nyc-existing-building-code-2027");
 const explicitFutureBasis = resolveResearchCodeBasis({

@@ -28,6 +28,7 @@ const mimeByExtension = Object.freeze({
 
 const preferredRootOrder = Object.freeze([
   "2022-construction-codes",
+  "2014-construction-codes",
   "2026-zoning-resolution",
   "2026-existing-building-code",
   "2025-specialty-codes",

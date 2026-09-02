@@ -69,6 +69,7 @@ const governingCurrentExactEvidence = [{
 assert.equal(researchEvidenceSupportsBoundedCitationFastPath(governingCurrentExactEvidence), true);
 for (const unsafeEvidence of [
   [{ ...governingCurrentExactEvidence[0], applicabilityStatus: "historical" }],
+  [{ ...governingCurrentExactEvidence[0], applicabilityStatus: "prior-edition-case-specific" }],
   [{ ...governingCurrentExactEvidence[0], applicabilityStatus: "future-effective" }],
   [{ ...governingCurrentExactEvidence[0], evidencePriority: { evidenceRole: "contextual" } }],
   [{ ...governingCurrentExactEvidence[0], evidencePriority: { evidenceRole: "irrelevant" } }],
@@ -76,6 +77,18 @@ for (const unsafeEvidence of [
 ]) {
   assert.equal(researchEvidenceSupportsBoundedCitationFastPath(unsafeEvidence), false);
 }
+const priorEditionLookup = routeResearchAnswerModel({
+  question: "What does the 2014 NYC Building Code Section 715.4.7.1 state?",
+  evidence: [{
+    ...governingCurrentExactEvidence[0],
+    sectionNumber: "715.4.7.1",
+    applicabilityStatus: "prior-edition-case-specific"
+  }],
+  boundedCitationLookup: true,
+  environment
+});
+assert.equal(priorEditionLookup.tier, "accurate");
+assert.ok(priorEditionLookup.reasons.includes("high_risk_citation_evidence"));
 const unmatchedBoundedEvidence = [{ sourceID: "bc-101-2", codePrefix: "BC", sectionNumber: "101.2" }];
 assert.deepEqual(
   researchEvidenceForBoundedCitationLookup(

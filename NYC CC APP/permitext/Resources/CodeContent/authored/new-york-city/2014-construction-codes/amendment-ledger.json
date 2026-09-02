@@ -1,0 +1,2730 @@
+{
+  "schemaVersion": 1,
+  "status": "reference-and-reconciliation",
+  "rule": "DOB consolidated chapter PDFs control. Amendment records are checked against that text and are not replayed as blind replacements.",
+  "amendmentIndexURL": "https://www.nyc.gov/assets/buildings/building_code/AmendmentIndexCombined_2014.pdf",
+  "amendmentIndexSHA256": "d7752038339c97f62ec74965cfe5084b0aa4f2618e1063ffb526ac89b00df8cb",
+  "updatePageURL": "https://www.nyc.gov/site/buildings/codes/2014-construction-codes-updates.page",
+  "updatePackets": [
+    {
+      "title": "Update 10 – Chapter 520 of the Laws of NYS, 2015",
+      "fileName": "update_10_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_10_combined_instructions.pdf",
+      "sourceSHA256": "935825922fe9398687a8c6ff3f0867249cf7ebcc82d318a9197ff548bbb095d3",
+      "bytes": 20763,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "3314.20"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "3314.20"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 11 – LL 38/15",
+      "fileName": "update_11_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_11_combined_instructions.pdf",
+      "sourceSHA256": "d1d1ef61f86639171d4c0ae427387372e087aa86c520bbea2def83df379a2237",
+      "bytes": 31233,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "2111.1",
+        "28-106.1.1",
+        "28-106.1.2",
+        "28-106.3",
+        "28-106.4",
+        "3303.5.4",
+        "901.3",
+        "901.4",
+        "901.5",
+        "901.6",
+        "901.7"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-106.3",
+        "AC 28-106.4",
+        "BC 901.3",
+        "BC 901.4",
+        "BC 901.5",
+        "BC 901.6",
+        "BC 901.7",
+        "PC 901.3",
+        "PC 901.4",
+        "PC 901.5",
+        "PC 901.6"
+      ],
+      "unmatchedSectionNumbers": [
+        "2111.1",
+        "28-106.1.1",
+        "28-106.1.2",
+        "3303.5.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 12 – LL 10/16",
+      "fileName": "update_12_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_12_combined_instructions.pdf",
+      "sourceSHA256": "ffd09fbecec7663b3a7473cf06fe7311f0efb341f2beee788916d32c3893501c",
+      "bytes": 21507,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.11",
+        "28-104.2.7.1",
+        "28-104.2.8"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-103.11",
+        "28-104.2.7.1",
+        "28-104.2.8"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 13 – LL 56/16",
+      "fileName": "update_13_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_13_combined_instructions.pdf",
+      "sourceSHA256": "fb7fd529da8dbc0c378ff04b596ebab780c0d577e68131d67c1570c9ed045f12",
+      "bytes": 170479,
+      "reconciliationStatus": "all-cited-sections-present-in-consolidated-archive",
+      "referencedSectionNumbers": [
+        "28-112.2"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-112.2"
+      ],
+      "unmatchedSectionNumbers": [],
+      "reviewRequired": false
+    },
+    {
+      "title": "Update 14 – LL 101/15",
+      "fileName": "update_14_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_14_combined_instructions.pdf",
+      "sourceSHA256": "89070994ada43d311d059199002c051fda8945b4585ba3c7d60c5441e347cf19",
+      "bytes": 22557,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-219.4"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-219.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 15 – LL 59/16 & 54/16",
+      "fileName": "update_15_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_15_combined_instructions.pdf",
+      "sourceSHA256": "5996286d97e18be79929065394da51131425df4ea36271e3a1e335e86377468c",
+      "bytes": 83060,
+      "reconciliationStatus": "all-cited-sections-present-in-consolidated-archive",
+      "referencedSectionNumbers": [
+        "28-202.1",
+        "28-203.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-202.1",
+        "AC 28-203.1"
+      ],
+      "unmatchedSectionNumbers": [],
+      "reviewRequired": false
+    },
+    {
+      "title": "Update 16 – LL 105/16, LL 106/16 & LL 107/16",
+      "fileName": "update_16_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_16_combined_instructions.pdf",
+      "sourceSHA256": "2392127cdb3b1ec2532c7eb4b590bf31e7f3396fec3cb9c6f481e2e3a291294a",
+      "bytes": 118241,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-501.1.2",
+        "28-504.1",
+        "28-504.1.1",
+        "28-504.1.2",
+        "28-504.1.2.1",
+        "28-504.1.2.2",
+        "28-504.1.2.3",
+        "28-504.1.2.4",
+        "28-504.1.3",
+        "28-504.1.4",
+        "28-504.1.4.1",
+        "28-504.1.4.2",
+        "28-504.1.4.3",
+        "28-504.1.5",
+        "28-504.2",
+        "28-504.3",
+        "28-504.4",
+        "28-504.5",
+        "28-504.6",
+        "28-504.7",
+        "28-504.8",
+        "304.8"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-501.1.2",
+        "FGC 304.8",
+        "MC 304.8"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-504.1",
+        "28-504.1.1",
+        "28-504.1.2",
+        "28-504.1.2.1",
+        "28-504.1.2.2",
+        "28-504.1.2.3",
+        "28-504.1.2.4",
+        "28-504.1.3",
+        "28-504.1.4",
+        "28-504.1.4.1",
+        "28-504.1.4.2",
+        "28-504.1.4.3",
+        "28-504.1.5",
+        "28-504.2",
+        "28-504.3",
+        "28-504.4",
+        "28-504.5",
+        "28-504.6",
+        "28-504.7",
+        "28-504.8"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 17 – LL 79/16",
+      "fileName": "update_17_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_17_combined_instructions.pdf",
+      "sourceSHA256": "47c64eb6aea3b51a113fdcc9aa21d46a01fc5c107057f764dcd1e47262aeb333",
+      "bytes": 164301,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "1110.2",
+        "28-315.9",
+        "303.1",
+        "403.1",
+        "403.1.3",
+        "403.2.1",
+        "403.4",
+        "703.2",
+        "703.3",
+        "703.4",
+        "A117.1"
+      ],
+      "matchedCorpusSections": [
+        "BC 303.1",
+        "BC 403.1",
+        "BC 403.2.1",
+        "BC 403.4",
+        "BC 703.2",
+        "BC 703.3",
+        "BC 703.4",
+        "FGC 303.1",
+        "FGC 403.1",
+        "FGC 403.4",
+        "MC 303.1",
+        "MC 403.1",
+        "MC 403.2.1",
+        "MC 403.4",
+        "PC 1110.2",
+        "PC 303.1",
+        "PC 403.1",
+        "PC 703.2",
+        "PC 703.3",
+        "PC 703.4"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-315.9",
+        "403.1.3",
+        "A117.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 18 – LL 132/16",
+      "fileName": "update_18_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_18_combined_instructions.pdf",
+      "sourceSHA256": "25e4047bcfe6837faca449e0aa41bc0d91b2d22d2ec9c5041f8fe1285a9b0b6c",
+      "bytes": 38192,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-311.2",
+        "28-311.3",
+        "28-311.5",
+        "28-315.3.1",
+        "28-315.3.2"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-311.2",
+        "28-311.3",
+        "28-311.5",
+        "28-315.3.1",
+        "28-315.3.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 19 – LL 133/16",
+      "fileName": "update_19_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_19_combined_instructions.pdf",
+      "sourceSHA256": "12b2413e3c936d071b793986dda25b8af7e9c6bbe5f01c1301978c500bd137d1",
+      "bytes": 192284,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-204.2",
+        "28-309.11",
+        "28-309.2",
+        "28-309.4",
+        "28-309.4.1",
+        "28-309.4.1.1",
+        "28-309.4.1.2",
+        "28-309.4.1.3",
+        "28-309.4.1.4",
+        "28-309.4.2",
+        "28-309.4.3",
+        "28-309.5.1",
+        "28-309.7",
+        "28-309.8",
+        "28-309.9",
+        "309.4.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-309.7"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-204.2",
+        "28-309.11",
+        "28-309.2",
+        "28-309.4",
+        "28-309.4.1",
+        "28-309.4.1.1",
+        "28-309.4.1.2",
+        "28-309.4.1.3",
+        "28-309.4.1.4",
+        "28-309.4.2",
+        "28-309.4.3",
+        "28-309.5.1",
+        "28-309.8",
+        "28-309.9",
+        "309.4.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 1: Ministerial Administrative Correction",
+      "fileName": "update_1_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_1_combined_instructions.pdf",
+      "sourceSHA256": "a903d79749865f33c04f7e5fecf2855c6214639cbc84b8e6685293487e85a99c",
+      "bytes": 1284194,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-601.1",
+        "28-601.2",
+        "28-701.1",
+        "28-701.2",
+        "28-801.1",
+        "28-801.2",
+        "28-901.1",
+        "28-901.2",
+        "513.6.2",
+        "908.7.2"
+      ],
+      "matchedCorpusSections": [
+        "BC 908.7.2",
+        "MC 513.6.2"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-601.1",
+        "28-601.2",
+        "28-701.1",
+        "28-701.2",
+        "28-801.1",
+        "28-801.2",
+        "28-901.1",
+        "28-901.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 20 – LL 134/16",
+      "fileName": "update_20_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_20_combined_instructions.pdf",
+      "sourceSHA256": "4981bd06a167137e5e66f3e72b871d6a0c96ce78d668047802fcd3d4cff65ca0",
+      "bytes": 39170,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-310.2",
+        "28-310.3",
+        "28-315.3.1"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-310.2",
+        "28-310.3",
+        "28-315.3.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 21 – LL 150/16",
+      "fileName": "update_21_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_21_combined_instructions.pdf",
+      "sourceSHA256": "51452c06c0229b95df812980453d6bad715fa46ae76792ec8e4231243a8951eb",
+      "bytes": 100915,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "101.2",
+        "28-423.1",
+        "28-423.2",
+        "28-423.2.1",
+        "28-423.2.2",
+        "28-423.2.3",
+        "28-423.3",
+        "28-423.3.1",
+        "28-423.3.2",
+        "28-423.4"
+      ],
+      "matchedCorpusSections": [
+        "BC 101.2",
+        "FGC 101.2",
+        "MC 101.2",
+        "PC 101.2"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-423.1",
+        "28-423.2",
+        "28-423.2.1",
+        "28-423.2.2",
+        "28-423.2.3",
+        "28-423.3",
+        "28-423.3.1",
+        "28-423.3.2",
+        "28-423.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 22 – LL 152/16",
+      "fileName": "update_22_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_22_combined_instructions.pdf",
+      "sourceSHA256": "eb016d0cb3ed17475a20584ed12112fb89054cb8a1b9fd150ca425c89069e0ed",
+      "bytes": 99354,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "255.3",
+        "28-318.1",
+        "28-318.2",
+        "28-318.3",
+        "28-318.3.1",
+        "28-318.3.2",
+        "28-318.3.3",
+        "28-318.3.4",
+        "28-318.4",
+        "28-318.5"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "255.3",
+        "28-318.1",
+        "28-318.2",
+        "28-318.3",
+        "28-318.3.1",
+        "28-318.3.2",
+        "28-318.3.3",
+        "28-318.3.4",
+        "28-318.4",
+        "28-318.5"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 23 – LL 154/16",
+      "fileName": "update_23_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_23_combined_instructions.pdf",
+      "sourceSHA256": "5ad7bab70c7ee96bc3f0fd5754f300ee2cf4d4c1f41299b6f50cf373f680635b",
+      "bytes": 25051,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-119.4"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-119.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 24 – LL 159/16",
+      "fileName": "update_24_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_24_combined_instructions.pdf",
+      "sourceSHA256": "71edfed9eb248d95536709ea53e71ddf60cf4be62722f808bf1694ed16ba830a",
+      "bytes": 96646,
+      "reconciliationStatus": "all-cited-sections-present-in-consolidated-archive",
+      "referencedSectionNumbers": [
+        "105.2",
+        "28-119.1",
+        "28-201.2.1",
+        "28-210.1",
+        "28-210.2",
+        "28-210.3",
+        "28-211.1",
+        "28-401.9",
+        "28-404.1",
+        "28-410.1",
+        "3303.4.5",
+        "3303.4.6",
+        "3314.4",
+        "3314.4.3.1",
+        "3314.4.5",
+        "3314.4.6",
+        "406.6.2",
+        "406.6.2.1",
+        "406.6.2.2",
+        "406.6.3",
+        "408.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-119.1",
+        "AC 28-201.2.1",
+        "AC 28-210.1",
+        "AC 28-210.2",
+        "AC 28-210.3",
+        "AC 28-211.1",
+        "AC 28-401.9",
+        "AC 28-404.1",
+        "AC 28-410.1",
+        "BC 105.2",
+        "BC 3303.4.5",
+        "BC 3303.4.6",
+        "BC 3314.4",
+        "BC 3314.4.3.1",
+        "BC 3314.4.5",
+        "BC 3314.4.6",
+        "BC 406.6.2",
+        "BC 406.6.3",
+        "BC 408.1",
+        "FGC 105.2",
+        "FGC 406.6.2",
+        "FGC 406.6.2.1",
+        "FGC 406.6.2.2",
+        "FGC 406.6.3",
+        "FGC 408.1",
+        "MC 105.2",
+        "PC 105.2",
+        "PC 408.1"
+      ],
+      "unmatchedSectionNumbers": [],
+      "reviewRequired": false
+    },
+    {
+      "title": "Update 25 – LL 78/17",
+      "fileName": "update_25_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_25_combined_instructions.pdf",
+      "sourceSHA256": "f1424e2658b5ea014fe95dc379b64cdb78c45f05e997e720e8b2adad350d89ad",
+      "bytes": 156711,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "105.2",
+        "28-103.21",
+        "28-103.21.1",
+        "28-119.1",
+        "28-201.2.1",
+        "28-202.1",
+        "28-210.1",
+        "28-210.2",
+        "28-210.3",
+        "28-211.1",
+        "28-401.9",
+        "28-404.1",
+        "28-408.1",
+        "28-410.1",
+        "3303.4.5",
+        "3303.4.6",
+        "3314.4",
+        "3314.4.3.1",
+        "3314.4.5",
+        "3314.4.6",
+        "406.6.2",
+        "406.6.2.1",
+        "406.6.2.2",
+        "406.6.3",
+        "408.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-119.1",
+        "AC 28-201.2.1",
+        "AC 28-202.1",
+        "AC 28-210.1",
+        "AC 28-210.2",
+        "AC 28-210.3",
+        "AC 28-211.1",
+        "AC 28-401.9",
+        "AC 28-404.1",
+        "AC 28-408.1",
+        "AC 28-410.1",
+        "BC 105.2",
+        "BC 3303.4.5",
+        "BC 3303.4.6",
+        "BC 3314.4",
+        "BC 3314.4.3.1",
+        "BC 3314.4.5",
+        "BC 3314.4.6",
+        "BC 406.6.2",
+        "BC 406.6.3",
+        "BC 408.1",
+        "FGC 105.2",
+        "FGC 406.6.2",
+        "FGC 406.6.2.1",
+        "FGC 406.6.2.2",
+        "FGC 406.6.3",
+        "FGC 408.1",
+        "MC 105.2",
+        "PC 105.2",
+        "PC 408.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-103.21",
+        "28-103.21.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 26 – LL 87/17",
+      "fileName": "update_26_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_26_combined_instructions.pdf",
+      "sourceSHA256": "ede98af1701a0411661d16408b4e4f9f3c64ff26462e095c575245fa738676be",
+      "bytes": 92015,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-201.2.1",
+        "28-210.3",
+        "28-210.3.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-201.2.1",
+        "AC 28-210.3"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-210.3.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 27 – LL 46/17",
+      "fileName": "update_27_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_27_combined_instructions.pdf",
+      "sourceSHA256": "a9ab6fd3f82b369fa823c887e75d23c8643f060aea51266d7e56fb8c920b7e63",
+      "bytes": 98839,
+      "reconciliationStatus": "all-cited-sections-present-in-consolidated-archive",
+      "referencedSectionNumbers": [
+        "105.2",
+        "28-119.1",
+        "28-201.2.1",
+        "28-210.1",
+        "28-210.2",
+        "28-210.3",
+        "28-211.1",
+        "28-401.9",
+        "28-404.1",
+        "3303.4.5",
+        "3303.4.6",
+        "3314.4",
+        "3314.4.3.1",
+        "3314.4.5",
+        "3314.4.6",
+        "406.6.2",
+        "406.6.2.1",
+        "406.6.2.2",
+        "406.6.3"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-119.1",
+        "AC 28-201.2.1",
+        "AC 28-210.1",
+        "AC 28-210.2",
+        "AC 28-210.3",
+        "AC 28-211.1",
+        "AC 28-401.9",
+        "AC 28-404.1",
+        "BC 105.2",
+        "BC 3303.4.5",
+        "BC 3303.4.6",
+        "BC 3314.4",
+        "BC 3314.4.3.1",
+        "BC 3314.4.5",
+        "BC 3314.4.6",
+        "BC 406.6.2",
+        "BC 406.6.3",
+        "FGC 105.2",
+        "FGC 406.6.2",
+        "FGC 406.6.2.1",
+        "FGC 406.6.2.2",
+        "FGC 406.6.3",
+        "MC 105.2",
+        "PC 105.2"
+      ],
+      "unmatchedSectionNumbers": [],
+      "reviewRequired": false
+    },
+    {
+      "title": "Update 28 – LL 68/17",
+      "fileName": "update_28_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_28_combined_instructions.pdf",
+      "sourceSHA256": "3106c25fdfda477b886e942356bf2d6a809f0a25ca62bad98e1b1342ce707cfe",
+      "bytes": 24993,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.26",
+        "3310.10.2"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-103.26",
+        "3310.10.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 29 – LL 80/17",
+      "fileName": "update_29_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_29_combined_instructions.pdf",
+      "sourceSHA256": "18ee9fd21c71197470c9976df4466e72e3c053158d820b8810d796cb86fc0fdc",
+      "bytes": 28805,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-405.3.2",
+        "28-405.3.2.1",
+        "28-405.3.2.2"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-405.3.2",
+        "28-405.3.2.1",
+        "28-405.3.2.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 2: 1 RCNY 3616-04",
+      "fileName": "update_2_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_2_combined_instructions.pdf",
+      "sourceSHA256": "bbadfe865a5faab7be5fc966b8d4a18c000e834a683498562e27dc5191ec18d1",
+      "bytes": 215151,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "1008.4.4",
+        "28-103.19",
+        "760.41",
+        "907.2.1.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-103.19",
+        "BC 907.2.1.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "1008.4.4",
+        "760.41"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 30 – LL 94/17",
+      "fileName": "update_30_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_30_combined_instructions.pdf",
+      "sourceSHA256": "f14bd757d0603d55619415c0e3f7945abb8a65e5307b37c36592b82d2026b5ad",
+      "bytes": 39274,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.21.1",
+        "28-202.1",
+        "28-204.6",
+        "28-210.1",
+        "28-210.1.1",
+        "28-408.1",
+        "410.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-202.1",
+        "AC 28-210.1",
+        "AC 28-408.1",
+        "BC 410.1",
+        "FGC 410.1",
+        "PC 410.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-103.21.1",
+        "28-204.6",
+        "28-210.1.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 31 – LL 196/17",
+      "fileName": "update_31_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_31_combined_instructions.pdf",
+      "sourceSHA256": "08c33de95e4c04660e1553f2e941bc4531663f2f5da2b6fc4be26de35a10d35c",
+      "bytes": 305933,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "105.2",
+        "28-103.21.1",
+        "28-103.28",
+        "28-103.29",
+        "28-103.30",
+        "28-105.12.9",
+        "28-112.12",
+        "28-119.1",
+        "28-201.2.1",
+        "28-202.1",
+        "28-204.1.1",
+        "28-210.1",
+        "28-210.2",
+        "28-210.3",
+        "28-211.1",
+        "28-401.9",
+        "28-404.1",
+        "28-408.1",
+        "28-410.1",
+        "3302.1",
+        "3303.4.5",
+        "3303.4.6",
+        "3310.10",
+        "3314.4",
+        "3314.4.3.1",
+        "3314.4.5",
+        "3314.4.6",
+        "3321.1",
+        "3321.2",
+        "406.6.2",
+        "406.6.2.1",
+        "406.6.2.2",
+        "406.6.3"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-119.1",
+        "AC 28-201.2.1",
+        "AC 28-202.1",
+        "AC 28-210.1",
+        "AC 28-210.2",
+        "AC 28-210.3",
+        "AC 28-211.1",
+        "AC 28-401.9",
+        "AC 28-404.1",
+        "AC 28-408.1",
+        "AC 28-410.1",
+        "BC 105.2",
+        "BC 3302.1",
+        "BC 3303.4.5",
+        "BC 3303.4.6",
+        "BC 3314.4",
+        "BC 3314.4.3.1",
+        "BC 3314.4.5",
+        "BC 3314.4.6",
+        "BC 406.6.2",
+        "BC 406.6.3",
+        "FGC 105.2",
+        "FGC 406.6.2",
+        "FGC 406.6.2.1",
+        "FGC 406.6.2.2",
+        "FGC 406.6.3",
+        "MC 105.2",
+        "PC 105.2"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-103.21.1",
+        "28-103.28",
+        "28-103.29",
+        "28-103.30",
+        "28-105.12.9",
+        "28-112.12",
+        "28-204.1.1",
+        "3310.10",
+        "3321.1",
+        "3321.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 32 – LL 81/17",
+      "fileName": "update_32_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_32_combined_instructions.pdf",
+      "sourceSHA256": "4af63a1c83566bc9d5508a78c3b9233a3b4065d4a2c67d6340874d91dd245b02",
+      "bytes": 178075,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-105.12.8",
+        "28-401.19",
+        "28-401.20",
+        "3301.13",
+        "3301.13.1",
+        "3301.13.10",
+        "3301.13.11",
+        "3301.13.12",
+        "3301.13.13",
+        "3301.13.14",
+        "3301.13.15",
+        "3301.13.16",
+        "3301.13.17",
+        "3301.13.2",
+        "3301.13.3",
+        "3301.13.4",
+        "3301.13.5",
+        "3301.13.6",
+        "3301.13.7",
+        "3301.13.8",
+        "3301.13.9",
+        "3301.3",
+        "3310.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-401.19",
+        "AC 28-401.20",
+        "BC 3310.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-105.12.8",
+        "3301.13",
+        "3301.13.1",
+        "3301.13.10",
+        "3301.13.11",
+        "3301.13.12",
+        "3301.13.13",
+        "3301.13.14",
+        "3301.13.15",
+        "3301.13.16",
+        "3301.13.17",
+        "3301.13.2",
+        "3301.13.3",
+        "3301.13.4",
+        "3301.13.5",
+        "3301.13.6",
+        "3301.13.7",
+        "3301.13.8",
+        "3301.13.9",
+        "3301.3"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 33 – LL 80/17",
+      "fileName": "update_33_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_33_combined_instructions.pdf",
+      "sourceSHA256": "77f002bd285641a5a0030d05f903cdfd1c808987803cb1b2e59b0d08f7d6a19e",
+      "bytes": 90823,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-405.2"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-405.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 34 – LL 224/17",
+      "fileName": "update_34_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_34_combined_instructions.pdf",
+      "sourceSHA256": "a9b529e6dc9a883a21df81d8d667737e7eedee73d50959217fc9523debfd702a",
+      "bytes": 79287,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.31",
+        "3310.5"
+      ],
+      "matchedCorpusSections": [
+        "BC 3310.5"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-103.31"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 35 – LL 250/17",
+      "fileName": "update_35_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_35_combined_instructions.pdf",
+      "sourceSHA256": "12a17d617d965c29f7f966c33cb9b61ae8c698efe3a113a766e1cc05ef0d3402",
+      "bytes": 97449,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "1008.1.3.5",
+        "28-103.21.1",
+        "28-201.2.2",
+        "28-202.1",
+        "28-204.2",
+        "28-210.1",
+        "28-210.2",
+        "28-217.1",
+        "28-408.1",
+        "3314.1.1",
+        "3321.1",
+        "3321.2",
+        "410.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-201.2.2",
+        "AC 28-202.1",
+        "AC 28-210.1",
+        "AC 28-210.2",
+        "AC 28-217.1",
+        "AC 28-408.1",
+        "BC 3314.1.1",
+        "BC 410.1",
+        "FGC 410.1",
+        "PC 410.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "1008.1.3.5",
+        "28-103.21.1",
+        "28-204.2",
+        "3321.1",
+        "3321.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 36 – LL 149/17",
+      "fileName": "update_36_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_36_combined_instructions.pdf",
+      "sourceSHA256": "bda2c5ec16d7a58231f62c377ffa2b7a9926e47e74f73cac80d7c0a9ddf21600",
+      "bytes": 166816,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-104.2.1",
+        "28-105.5.1",
+        "28-116.2.4.2"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-105.5.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-104.2.1",
+        "28-116.2.4.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 37 – LL 150/17",
+      "fileName": "update_37_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_37_combined_instructions.pdf",
+      "sourceSHA256": "47cdad47929b49bead2944594ce0bc012950bbf21b9099a8af1bfb597ae8246b",
+      "bytes": 26236,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-207.4"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-207.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 38 – LL 153/17",
+      "fileName": "update_38_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_38_combined_instructions.pdf",
+      "sourceSHA256": "ccb6c677a687e4feaa826817003719a60224cf9ceb8bd9a7d8710b6d116adf0d",
+      "bytes": 27773,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-204.6",
+        "28-210.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-210.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-204.6"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 39 – LL 154/17",
+      "fileName": "update_39_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_39_combined_instructions.pdf",
+      "sourceSHA256": "da221e5ffa2542c866222d2028e3a7062446acce5248e1536393cd0f893ea024",
+      "bytes": 167304,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "110.3.7",
+        "1704.20.10",
+        "28-104.8.4",
+        "28-104.8.4.1",
+        "28-104.8.4.2",
+        "28-104.8.4.3",
+        "28-207.2",
+        "3301.3",
+        "3303.10.2",
+        "3303.10.3"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "110.3.7",
+        "1704.20.10",
+        "28-104.8.4",
+        "28-104.8.4.1",
+        "28-104.8.4.2",
+        "28-104.8.4.3",
+        "28-207.2",
+        "3301.3",
+        "3303.10.2",
+        "3303.10.3"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 3: LL 77/15",
+      "fileName": "update_3_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_3_combined_instructions.pdf",
+      "sourceSHA256": "2feffcfdc7f7f3997ac5a2725f09d56a1e30d54d24c5e9dbe9f367ae39e60d30",
+      "bytes": 85925,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-317.1",
+        "28-317.2",
+        "28-317.3",
+        "28-317.3.1",
+        "28-317.4",
+        "28-317.5",
+        "28-317.6",
+        "28-317.7"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-317.1",
+        "28-317.2",
+        "28-317.3",
+        "28-317.3.1",
+        "28-317.4",
+        "28-317.5",
+        "28-317.6",
+        "28-317.7"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 40 – LL 155/17",
+      "fileName": "update_40_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_40_combined_instructions.pdf",
+      "sourceSHA256": "48a9282b826a7384819c9f0a75442a127f2eb626fbc468ad41662d401b3e1c44",
+      "bytes": 26722,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-213.5",
+        "28-213.5.1",
+        "28-213.5.2",
+        "28-213.5.3"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-213.5",
+        "28-213.5.1",
+        "28-213.5.2",
+        "28-213.5.3"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 41 – LL 156/17",
+      "fileName": "update_41_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_41_combined_instructions.pdf",
+      "sourceSHA256": "8a9d442df4cc427e4c69420df47108f8c598cb085228c5767e46d61b7ce7522e",
+      "bytes": 23379,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-213.1.1",
+        "28-213.1.2"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-213.1.1",
+        "28-213.1.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 42 – LL 157/17",
+      "fileName": "update_42_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_42_combined_instructions.pdf",
+      "sourceSHA256": "3130826af11b41cc029d8ee954200680e17a6e572dd148b16e9088f027f9fdba",
+      "bytes": 20885,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-207.2.6"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-207.2.6"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 43 – LL 160/17",
+      "fileName": "update_43_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_43_combined_instructions.pdf",
+      "sourceSHA256": "5b0b6d221d9c8dca83974ff8191dbd498106a81e727e4d4c9450fa2f15cd8ef3",
+      "bytes": 214112,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-105.1.2",
+        "28-105.5.2",
+        "28-105.5.2.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-105.5.2.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-105.1.2",
+        "28-105.5.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 44 – LL 14/18",
+      "fileName": "update_44_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_44_combined_instructions.pdf",
+      "sourceSHA256": "e9f6a3939e608c1431a6e684a3ad130e83a1491e9d03b44c0825d5e0b05d541c",
+      "bytes": 322625,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-401.15",
+        "28-424.1",
+        "28-424.2",
+        "28-424.3",
+        "3316.9.1",
+        "3316.9.2",
+        "3319.2",
+        "3319.2.1",
+        "3319.2.2",
+        "3319.2.3",
+        "3319.8.1",
+        "3319.8.2",
+        "3319.8.3",
+        "3319.8.8"
+      ],
+      "matchedCorpusSections": [
+        "BC 3316.9.1",
+        "BC 3316.9.2"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-401.15",
+        "28-424.1",
+        "28-424.2",
+        "28-424.3",
+        "3319.2",
+        "3319.2.1",
+        "3319.2.2",
+        "3319.2.3",
+        "3319.8.1",
+        "3319.8.2",
+        "3319.8.3",
+        "3319.8.8"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 45 – LL 32/18",
+      "fileName": "update_45_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_45_combined_instructions.pdf",
+      "sourceSHA256": "145c2e45c579f416c5d7eeeba419108a0eca433b7d53a0fdc69f859f716c2a0b",
+      "bytes": 173406,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "1001.3.2",
+        "224.1",
+        "28-1001.1.1",
+        "28-1001.3.1",
+        "28-1001.3.2",
+        "28-1001.3.3",
+        "28-1001.3.4"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "1001.3.2",
+        "224.1",
+        "28-1001.1.1",
+        "28-1001.3.1",
+        "28-1001.3.2",
+        "28-1001.3.3",
+        "28-1001.3.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 46 – LL 33/18",
+      "fileName": "update_46_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_46_combined_instructions.pdf",
+      "sourceSHA256": "9e8a51392a99eefd5c9467cb5e53e4c48c7572e9a4c08d6e5ab18ebba5e06765",
+      "bytes": 171908,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "1008.1.3.5",
+        "28-201.2.2",
+        "28-204.2",
+        "28-210.1",
+        "28-210.2",
+        "28-217.1",
+        "28-309.12",
+        "28-309.12.1",
+        "28-309.12.2",
+        "28-309.12.3",
+        "28-309.12.4",
+        "28-309.12.5",
+        "28-309.8",
+        "3314.1.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-201.2.2",
+        "AC 28-210.1",
+        "AC 28-210.2",
+        "AC 28-217.1",
+        "BC 3314.1.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "1008.1.3.5",
+        "28-204.2",
+        "28-309.12",
+        "28-309.12.1",
+        "28-309.12.2",
+        "28-309.12.3",
+        "28-309.12.4",
+        "28-309.12.5",
+        "28-309.8"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 47 – LL 151/16",
+      "fileName": "update_47_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_47_combined_instructions.pdf",
+      "sourceSHA256": "6f999fdbe44c532380261fc4aca5cee0635a474aae05f52f0c170d8876f97557",
+      "bytes": 28491,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-116.2.4",
+        "28-116.2.4.1",
+        "28-116.2.4.2",
+        "28-116.2.4.3"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-116.2.4.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-116.2.4",
+        "28-116.2.4.2",
+        "28-116.2.4.3"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 48 – LL 188/17",
+      "fileName": "update_48_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_48_combined_instructions.pdf",
+      "sourceSHA256": "f66bc82357bb1fc77ebbb050e61b12973ed9185d225f1091991765df1077aa66",
+      "bytes": 30489,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "103.26.2",
+        "28-103.26.2",
+        "28-103.27",
+        "28-103.27.1",
+        "28-103.27.2",
+        "28-103.27.3",
+        "28-103.27.4",
+        "28-103.27.5"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "103.26.2",
+        "28-103.26.2",
+        "28-103.27",
+        "28-103.27.1",
+        "28-103.27.2",
+        "28-103.27.3",
+        "28-103.27.4",
+        "28-103.27.5"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 49 – LL 196/17",
+      "fileName": "update_49_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_49_combined_instructions.pdf",
+      "sourceSHA256": "6245584b1428e669c03ee1e7e7bd59a1c19f1a2717b071fca57a856756b44eec",
+      "bytes": 29797,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "3310.10.2",
+        "3310.10.2.1",
+        "3310.10.2.2",
+        "3310.10.2.3"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "3310.10.2",
+        "3310.10.2.1",
+        "3310.10.2.2",
+        "3310.10.2.3"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 4: 1 RCNY 3610-03",
+      "fileName": "update_4_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_4_combined_instructions.pdf",
+      "sourceSHA256": "a6ed1522ced84ab3a21a48187414429e9d7305c7df5d59b26b35f78868a8c9aa",
+      "bytes": 228785,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.19",
+        "A117.1",
+        "K101.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-103.19",
+        "BC K101.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "A117.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 50 – LL 203/17",
+      "fileName": "update_50_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_50_combined_instructions.pdf",
+      "sourceSHA256": "f9d66891df6f589e0498583cd5830e6a1b7460d4ffe47de64ce913fc074f5d4c",
+      "bytes": 96972,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.21.1",
+        "28-202.1",
+        "28-203.1",
+        "28-210.1",
+        "28-408.1",
+        "28-410.1",
+        "3321.1",
+        "3321.2"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-202.1",
+        "AC 28-203.1",
+        "AC 28-210.1",
+        "AC 28-408.1",
+        "AC 28-410.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-103.21.1",
+        "3321.1",
+        "3321.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 51 – LL 13/18",
+      "fileName": "update_51_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_51_combined_instructions.pdf",
+      "sourceSHA256": "28dde4b7f99a647e242526e738b2c0b652d0db8e212d5e0329dcb551b2e959fc",
+      "bytes": 160751,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "3319.13",
+        "3319.13.1",
+        "3319.13.2",
+        "3319.13.3"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "3319.13",
+        "3319.13.1",
+        "3319.13.2",
+        "3319.13.3"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 52 – LL 77/17",
+      "fileName": "update_52_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_52_combined_instructions.pdf",
+      "sourceSHA256": "f32ade5da1fe1ef73cb430915e4176ee5f48c5d94dba95ab42b935528110d40a",
+      "bytes": 25775,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "3319.11"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "3319.11"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 53 – LL 204/17",
+      "fileName": "update_53_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_53_combined_instructions.pdf",
+      "sourceSHA256": "2623412ced82f32040b222e60820cbb7a39f8b0574ca13c68f099e5cfe5c47bb",
+      "bytes": 87922,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "3301.12",
+        "3301.12.1",
+        "3301.12.2",
+        "3301.12.3"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "3301.12",
+        "3301.12.1",
+        "3301.12.2",
+        "3301.12.3"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 54 – LL 206/17",
+      "fileName": "update_54_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_54_combined_instructions.pdf",
+      "sourceSHA256": "0bafc21f0cfac20fcf99fc802916fafcfd59b52ff3c0668845d75f9ec6827b31",
+      "bytes": 91325,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "3301.11",
+        "3301.11.1",
+        "3301.11.2",
+        "3301.11.3",
+        "3301.11.4",
+        "3301.11.5",
+        "3310.10.1"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "3301.11",
+        "3301.11.1",
+        "3301.11.2",
+        "3301.11.3",
+        "3301.11.4",
+        "3301.11.5",
+        "3310.10.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 55 – LL 205/17",
+      "fileName": "update_55_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_55_combined_instructions.pdf",
+      "sourceSHA256": "f70378c000f5588d3e85d63ad84f958454191ec04d9bea99760b1ccb6494f14c",
+      "bytes": 31149,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "202.3",
+        "28-202.1",
+        "28-202.3",
+        "28-202.3.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-202.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "202.3",
+        "28-202.3",
+        "28-202.3.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 56 – LL 111/18",
+      "fileName": "update_56_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_56_combined_instructions.pdf",
+      "sourceSHA256": "6462ae70c232d5e6c12650c49a7222039b34c4c2bf1abf2be9450b1dcd66a828",
+      "bytes": 28845,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-315.10"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-315.10"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 57 – LL 113/18",
+      "fileName": "update_57_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_57_combined_instructions.pdf",
+      "sourceSHA256": "2612451a0b65c319403b12ed8d0194bbfe57dc94afad7a0acc6347a0af3866d8",
+      "bytes": 112621,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.19",
+        "28-312.8",
+        "907.2.11.5",
+        "Q107.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-103.19"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-312.8",
+        "907.2.11.5",
+        "Q107.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 58 – LL 34/18",
+      "fileName": "update_58_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_58_combined_instructions.pdf",
+      "sourceSHA256": "263828a6e62cb53f3b47977750e09e9031620c9a54047ac69a0ee13a93642b0a",
+      "bytes": 24884,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "1109.2.4",
+        "603.5"
+      ],
+      "matchedCorpusSections": [
+        "MC 603.5",
+        "PC 603.5"
+      ],
+      "unmatchedSectionNumbers": [
+        "1109.2.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 59 – LL 70/18",
+      "fileName": "update_59_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_59_combined_instructions.pdf",
+      "sourceSHA256": "1eb191cfc70237b6efaefc0ddc22a7ae273f9adc44126daf23b7c1ab4fb6c9a1",
+      "bytes": 34702,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-202.1",
+        "28-202.4",
+        "28-202.4.1",
+        "28-210.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-202.1",
+        "AC 28-210.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-202.4",
+        "28-202.4.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 5: LL 47/15",
+      "fileName": "update_5_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_5_combined_instructions.pdf",
+      "sourceSHA256": "150478fc0eff39faa6d5ffeb31d11565e3b0a4c118af3ed4af80ee8ec1929370",
+      "bytes": 28604,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-304.10",
+        "28-304.10.1",
+        "28-304.10.2"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-304.10",
+        "28-304.10.1",
+        "28-304.10.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 60 – NYS Laws of 2018 - Chapter 217",
+      "fileName": "update_60_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_60_combined_instructions.pdf",
+      "sourceSHA256": "25ef172f389eba4920cb1c11f9e6665426c27d35535d91a1ccb9f0183e60d352",
+      "bytes": 31922,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-104.2",
+        "28-105.12.7.1",
+        "28-105.4.1",
+        "28-105.5"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-105.4.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-104.2",
+        "28-105.12.7.1",
+        "28-105.5"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 61 – LL 158/17",
+      "fileName": "update_61_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_61_combined_instructions.pdf",
+      "sourceSHA256": "fba7771e63bb5a472cd3961078f36a278ec1524a7c6fff57d5a342c08476e3b9",
+      "bytes": 38136,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.27",
+        "28-104.2.1",
+        "28-104.2.7.1",
+        "28-105.11",
+        "28-213.6",
+        "28-213.7",
+        "3301.9.1",
+        "3301.9.5"
+      ],
+      "matchedCorpusSections": [
+        "BC 3301.9.1",
+        "BC 3301.9.5"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-103.27",
+        "28-104.2.1",
+        "28-104.2.7.1",
+        "28-105.11",
+        "28-213.6",
+        "28-213.7"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 62 – LL 1/18",
+      "fileName": "update_62_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_62_combined_instructions.pdf",
+      "sourceSHA256": "88a5046698286de2cbbf7b23828e4d05db8416d083874ffa44067f14dea34b2f",
+      "bytes": 104744,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-505.1",
+        "28-505.2",
+        "28-505.3",
+        "28-505.4",
+        "28-505.5",
+        "28-505.6",
+        "28-505.7",
+        "28-505.8"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-505.1",
+        "28-505.2",
+        "28-505.3",
+        "28-505.4",
+        "28-505.5",
+        "28-505.6",
+        "28-505.7",
+        "28-505.8"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 63 – 1 RCNY 3610-05",
+      "fileName": "update_63_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_63_combined_instructions.pdf",
+      "sourceSHA256": "2bce3de4aa3a8d8f4f295f6394e48b8a890b3ed9132ca901d345fb4b7dabd15d",
+      "bytes": 26805,
+      "reconciliationStatus": "all-cited-sections-present-in-consolidated-archive",
+      "referencedSectionNumbers": [
+        "28-103.19",
+        "K101.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-103.19",
+        "BC K101.1"
+      ],
+      "unmatchedSectionNumbers": [],
+      "reviewRequired": false
+    },
+    {
+      "title": "Update 64 – LL 105/18",
+      "fileName": "update_64_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_64_combined_instructions.pdf",
+      "sourceSHA256": "7767f4029c7d2629c46215282894130c1dd588e2ba84810892cea25ae27bcf95",
+      "bytes": 34220,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-319.1",
+        "28-319.2",
+        "3113.1",
+        "3113.10",
+        "3113.11",
+        "3113.12",
+        "3113.2",
+        "3113.3",
+        "3113.4",
+        "3113.5",
+        "3113.5.1",
+        "3113.6",
+        "3113.7",
+        "3113.8",
+        "3113.9"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-319.1",
+        "28-319.2",
+        "3113.1",
+        "3113.10",
+        "3113.11",
+        "3113.12",
+        "3113.2",
+        "3113.3",
+        "3113.4",
+        "3113.5",
+        "3113.5.1",
+        "3113.6",
+        "3113.7",
+        "3113.8",
+        "3113.9"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 65 – LL 106/18",
+      "fileName": "update_65_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_65_combined_instructions.pdf",
+      "sourceSHA256": "9b5750f23a538be23707d2fcd5ca6cbe6f3a341084babd66e1a605a5e43305ee",
+      "bytes": 31622,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-308.1",
+        "28-308.4.1"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-308.1",
+        "28-308.4.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 66 – LL 233/17",
+      "fileName": "update_66_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_66_combined_instructions.pdf",
+      "sourceSHA256": "08d725344f91e7369681285528e19f8ffee838d5ba6257dc9473d2045a05c16f",
+      "bytes": 42027,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-101.5",
+        "28-103.26.2",
+        "28-103.27",
+        "28-103.27.1",
+        "28-103.27.2",
+        "28-103.27.3",
+        "28-103.27.4",
+        "28-103.27.5",
+        "28-103.30",
+        "28-103.30.1",
+        "28-103.30.2",
+        "28-103.30.3",
+        "28-103.30.4",
+        "28-103.30.5",
+        "28-103.31",
+        "28-103.31.1",
+        "28-103.31.2",
+        "28-103.31.3",
+        "28-103.31.4"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-101.5",
+        "28-103.26.2",
+        "28-103.27",
+        "28-103.27.1",
+        "28-103.27.2",
+        "28-103.27.3",
+        "28-103.27.4",
+        "28-103.27.5",
+        "28-103.30",
+        "28-103.30.1",
+        "28-103.30.2",
+        "28-103.30.3",
+        "28-103.30.4",
+        "28-103.30.5",
+        "28-103.31",
+        "28-103.31.1",
+        "28-103.31.2",
+        "28-103.31.3",
+        "28-103.31.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 67 – LL 190/18",
+      "fileName": "update_67_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_67_combined_instructions.pdf",
+      "sourceSHA256": "4d8a4222ec8183956c52a1a4d29cdbea0c443d833333ddcb6872bc2442b316fb",
+      "bytes": 29891,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.32",
+        "28-103.32.1",
+        "403.2.1",
+        "403.4"
+      ],
+      "matchedCorpusSections": [
+        "BC 403.2.1",
+        "BC 403.4",
+        "FGC 403.4",
+        "MC 403.2.1",
+        "MC 403.4"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-103.32",
+        "28-103.32.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 68 – LL 79/17",
+      "fileName": "update_68_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_68_combined_instructions.pdf",
+      "sourceSHA256": "7382a2efe46ed9ca710e2803b5ac5720891def3c69aab58d872ddedbc271edf8",
+      "bytes": 27657,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "3319.12",
+        "3319.12.1",
+        "3319.12.2"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "3319.12",
+        "3319.12.1",
+        "3319.12.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 69 – LL 3/18",
+      "fileName": "update_69_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_69_combined_instructions.pdf",
+      "sourceSHA256": "ac090eed7686c9b4749e8a9c96978af7cb6f6d433c39d44ab36b95fea9d4b07b",
+      "bytes": 31946,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "3302.1",
+        "3319.13",
+        "3319.5"
+      ],
+      "matchedCorpusSections": [
+        "BC 3302.1",
+        "BC 3319.5"
+      ],
+      "unmatchedSectionNumbers": [
+        "3319.13"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 6 – 1 RCNY 3616-04",
+      "fileName": "update_6_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_6_combined_instructions.pdf",
+      "sourceSHA256": "b59ef280a20b5b73b710c98a86e220a22d5ba8b97f27b2d636066f3300fae70e",
+      "bytes": 158961,
+      "reconciliationStatus": "all-cited-sections-present-in-consolidated-archive",
+      "referencedSectionNumbers": [
+        "28-103.19"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-103.19"
+      ],
+      "unmatchedSectionNumbers": [],
+      "reviewRequired": false
+    },
+    {
+      "title": "Update 70 – LL 65/18",
+      "fileName": "update_70_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_70_combined_instructions.pdf",
+      "sourceSHA256": "a6652d31d777ebbd0ffcb2345eb28d791ea2848aec02852d19cb5375342a360c",
+      "bytes": 92635,
+      "reconciliationStatus": "all-cited-sections-present-in-consolidated-archive",
+      "referencedSectionNumbers": [
+        "3304.3.3"
+      ],
+      "matchedCorpusSections": [
+        "BC 3304.3.3"
+      ],
+      "unmatchedSectionNumbers": [],
+      "reviewRequired": false
+    },
+    {
+      "title": "Update 71 – LL 28/19",
+      "fileName": "update_71_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_71_combined_instructions.pdf",
+      "sourceSHA256": "3db153fb84d3d470bd76c8d49955ad8a4c419d6e06a4bc76fc4836664bb58a8a",
+      "bytes": 25463,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-213.1"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-213.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 72 – LL 95/19",
+      "fileName": "update_72_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_72_combined_instructions.pdf",
+      "sourceSHA256": "0acb824b482907ff00b402a747f0fdd2d114a84dc6d446af1af122feb303645a",
+      "bytes": 22066,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-309.12",
+        "28-309.12.1",
+        "28-309.12.2",
+        "28-309.8"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-309.12",
+        "28-309.12.1",
+        "28-309.12.2",
+        "28-309.8"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 73 – LL 195/18",
+      "fileName": "update_73_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_73_combined_instructions.pdf",
+      "sourceSHA256": "158d46502fe526fb7e6ab5a8f2a0bc46050133711f4aecc23146d1f3832584d9",
+      "bytes": 90888,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "103.4",
+        "106.8",
+        "107.9.2",
+        "1305.11.1.2",
+        "28-103.1",
+        "28-103.1.1",
+        "28-105.2",
+        "28-105.4",
+        "28-109.1",
+        "28-109.2",
+        "402.3",
+        "903.1.1",
+        "903.2.11.9",
+        "903.3.1.1.1",
+        "903.3.3",
+        "904.1.1",
+        "904.11",
+        "904.2",
+        "904.2.1",
+        "907.1",
+        "907.1.1",
+        "907.1.1.1",
+        "907.2",
+        "908.10",
+        "908.11",
+        "917.1.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-109.2",
+        "BC 904.1.1",
+        "BC 904.11",
+        "BC 907.2",
+        "FGC 103.4",
+        "FGC 106.8",
+        "FGC 402.3",
+        "MC 402.3",
+        "MC 907.1",
+        "MC 907.2",
+        "PC 106.8",
+        "PC 402.3",
+        "PC 903.1.1",
+        "PC 904.2",
+        "PC 907.1",
+        "PC 907.2"
+      ],
+      "unmatchedSectionNumbers": [
+        "107.9.2",
+        "1305.11.1.2",
+        "28-103.1",
+        "28-103.1.1",
+        "28-105.2",
+        "28-105.4",
+        "28-109.1",
+        "903.2.11.9",
+        "903.3.1.1.1",
+        "903.3.3",
+        "904.2.1",
+        "907.1.1",
+        "907.1.1.1",
+        "908.10",
+        "908.11",
+        "917.1.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 74 – LL 119/19",
+      "fileName": "update_74_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_74_combined_instructions.pdf",
+      "sourceSHA256": "a80e23c40379fae73eb125f1bd4171f7e9e6e7d79ce72bd04110cf1514ccb507",
+      "bytes": 23856,
+      "reconciliationStatus": "all-cited-sections-present-in-consolidated-archive",
+      "referencedSectionNumbers": [
+        "3302.1"
+      ],
+      "matchedCorpusSections": [
+        "BC 3302.1"
+      ],
+      "unmatchedSectionNumbers": [],
+      "reviewRequired": false
+    },
+    {
+      "title": "Update 75 – LL 191/18",
+      "fileName": "update_75_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_75_combined_instructions.pdf",
+      "sourceSHA256": "3390d01542d15317f52e37f1fb4e06e39834397ced9a48bb17a835d27c2b8b7b",
+      "bytes": 32252,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-315.11",
+        "303.1",
+        "908.7.3",
+        "908.7.3.1"
+      ],
+      "matchedCorpusSections": [
+        "BC 303.1",
+        "FGC 303.1",
+        "MC 303.1",
+        "PC 303.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-315.11",
+        "908.7.3",
+        "908.7.3.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 76 – LL 108/19",
+      "fileName": "update_76_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_76_combined_instructions.pdf",
+      "sourceSHA256": "96667d9c5b104d7b42d3d4da318b3c3fe0aac9ff90f1234b5c354883012f6b6c",
+      "bytes": 31211,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-104.2.1.2",
+        "28-104.2.1.3.2",
+        "28-104.2.1.3.2.2",
+        "28-104.2.1.4"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-104.2.1.2",
+        "28-104.2.1.3.2",
+        "28-104.2.1.3.2.2",
+        "28-104.2.1.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 77 – LL 93/19, LL 59/19, & LL 105/19",
+      "fileName": "update_77_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_77_combined_instructions.pdf",
+      "sourceSHA256": "15a50ea242c1728477b90ff0608f23b7c5c86137cc94ef59571ae22051fff0ea",
+      "bytes": 395176,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "1502.1",
+        "28-103.21",
+        "28-103.21.1",
+        "28-103.22",
+        "28-103.23",
+        "28-103.24",
+        "28-103.25",
+        "28-103.26",
+        "28-103.26.2",
+        "28-103.27",
+        "28-103.28",
+        "28-103.29",
+        "28-103.29.1",
+        "28-103.30",
+        "28-103.30.1",
+        "28-103.30.2",
+        "28-103.30.3",
+        "28-103.30.4",
+        "28-103.30.5",
+        "28-103.31",
+        "28-103.31.2",
+        "28-103.31.4",
+        "28-103.32",
+        "28-103.32.1",
+        "28-103.33",
+        "28-103.33.1",
+        "28-103.33.2",
+        "28-103.33.3",
+        "28-103.33.4",
+        "28-103.33.4.1",
+        "28-103.35",
+        "28-104.2",
+        "28-104.2.1",
+        "28-104.2.1.1",
+        "28-104.2.1.2",
+        "28-104.2.1.3",
+        "28-104.2.1.3.1",
+        "28-104.2.1.3.2",
+        "28-104.2.1.3.2.1",
+        "28-104.2.1.3.2.2",
+        "28-104.2.1.3.2.3",
+        "28-104.2.1.4",
+        "28-104.2.1.5",
+        "28-104.2.1.6",
+        "3310.10.2",
+        "3310.5",
+        "403.2.1",
+        "403.4"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-103.23",
+        "AC 28-103.24",
+        "AC 28-104.2.1.1",
+        "AC 28-104.2.1.3",
+        "AC 28-104.2.1.3.1",
+        "AC 28-104.2.1.3.2.1",
+        "AC 28-104.2.1.3.2.3",
+        "AC 28-104.2.1.5",
+        "AC 28-104.2.1.6",
+        "BC 1502.1",
+        "BC 3310.5",
+        "BC 403.2.1",
+        "BC 403.4",
+        "FGC 403.4",
+        "MC 403.2.1",
+        "MC 403.4"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-103.21",
+        "28-103.21.1",
+        "28-103.22",
+        "28-103.25",
+        "28-103.26",
+        "28-103.26.2",
+        "28-103.27",
+        "28-103.28",
+        "28-103.29",
+        "28-103.29.1",
+        "28-103.30",
+        "28-103.30.1",
+        "28-103.30.2",
+        "28-103.30.3",
+        "28-103.30.4",
+        "28-103.30.5",
+        "28-103.31",
+        "28-103.31.2",
+        "28-103.31.4",
+        "28-103.32",
+        "28-103.32.1",
+        "28-103.33",
+        "28-103.33.1",
+        "28-103.33.2",
+        "28-103.33.3",
+        "28-103.33.4",
+        "28-103.33.4.1",
+        "28-103.35",
+        "28-104.2",
+        "28-104.2.1",
+        "28-104.2.1.2",
+        "28-104.2.1.3.2",
+        "28-104.2.1.3.2.2",
+        "28-104.2.1.4",
+        "3310.10.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 78 – LL 62/19",
+      "fileName": "update_78_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_78_combined_instructions.pdf",
+      "sourceSHA256": "d7b7fd44a6d1effd11037664c7fece7c5a04d05a0ab34c38fed02931a8d5eb89",
+      "bytes": 27570,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-105.10.1",
+        "28-207.2"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-105.10.1",
+        "28-207.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 79 – LL 111/19",
+      "fileName": "update_79_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_79_combined_instructions.pdf",
+      "sourceSHA256": "58fbbc248d18da923a45c925d0d48482924b03afb8989b5f02b9c79ce900f361",
+      "bytes": 25435,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-105.12.11"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-105.12.11"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 7 – 1 RCNY 3610-04",
+      "fileName": "update_7_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_7_combined_instructions.pdf",
+      "sourceSHA256": "447cbe0a3d6f41ef05cc7c948fc7a83d2952396bc70d2a713124918059c29fd0",
+      "bytes": 105276,
+      "reconciliationStatus": "all-cited-sections-present-in-consolidated-archive",
+      "referencedSectionNumbers": [
+        "28-103.19",
+        "3001.2",
+        "K101.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-103.19",
+        "BC 3001.2",
+        "BC K101.1"
+      ],
+      "unmatchedSectionNumbers": [],
+      "reviewRequired": false
+    },
+    {
+      "title": "Update 80 – LL 76/19",
+      "fileName": "update_80_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_80_combined_instructions.pdf",
+      "sourceSHA256": "e044c13f6c6c7860a015e9c7de7d21b727b40b3f2d39c4f17b9c0e273873a2a9",
+      "bytes": 21140,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-317.5"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-317.5"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 81 – LL 92/19 & LL 94/19",
+      "fileName": "update_81_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_81_combined_instructions.pdf",
+      "sourceSHA256": "88ce752bf09802ca57b4a3caa21cbadc31f96b74f85bf538919ea8e686b63edd",
+      "bytes": 37183,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "1502.1",
+        "1504.9",
+        "1510.1",
+        "1510.6",
+        "1511.1",
+        "1511.1.1",
+        "1511.2",
+        "28-101.4.3"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-101.4.3",
+        "BC 1502.1",
+        "BC 1510.1",
+        "BC 1510.6",
+        "BC 1511.1",
+        "BC 1511.1.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "1504.9",
+        "1511.2"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 82 – LL 97/19, LL 98/19, & LL 147/19",
+      "fileName": "update_82_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_82_combined_instructions.pdf",
+      "sourceSHA256": "59a8c6973c0a0f3403bdb610e6786c77dc1c5b36a9d988ee22eab98cbf2684bd",
+      "bytes": 101639,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "2322.5",
+        "28-308.2",
+        "28-310.3",
+        "28-320.1",
+        "28-320.10",
+        "28-320.11",
+        "28-320.2",
+        "28-320.2.1",
+        "28-320.3",
+        "28-320.3.1",
+        "28-320.3.1.1",
+        "28-320.3.10",
+        "28-320.3.2",
+        "28-320.3.2.1",
+        "28-320.3.4",
+        "28-320.3.5",
+        "28-320.3.6",
+        "28-320.3.6.1",
+        "28-320.3.6.2",
+        "28-320.3.6.3",
+        "28-320.3.7",
+        "28-320.3.7.1",
+        "28-320.3.8",
+        "28-320.3.9",
+        "28-320.4",
+        "28-320.5",
+        "28-320.6",
+        "28-320.6.1",
+        "28-320.6.2",
+        "28-320.6.3",
+        "28-320.6.4",
+        "28-320.7",
+        "28-320.7.1",
+        "28-320.7.2",
+        "28-320.8",
+        "28-320.8.1",
+        "28-320.8.1.1",
+        "28-320.8.2",
+        "28-320.9",
+        "28-321.1",
+        "28-321.2",
+        "28-321.2.1",
+        "28-321.2.2",
+        "28-321.3",
+        "28-321.3.1",
+        "28-321.3.2",
+        "28-322.1",
+        "28-322.2",
+        "28-322.3",
+        "28-322.4",
+        "3114.1",
+        "3114.10",
+        "3114.11",
+        "3114.12",
+        "3114.2",
+        "3114.3",
+        "3114.4",
+        "3114.5",
+        "3114.6",
+        "3114.8",
+        "3114.9",
+        "320.3.5",
+        "320.3.7",
+        "320.7",
+        "321.3.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-308.2",
+        "AC 28-320.5",
+        "AC 28-322.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "2322.5",
+        "28-310.3",
+        "28-320.1",
+        "28-320.10",
+        "28-320.11",
+        "28-320.2",
+        "28-320.2.1",
+        "28-320.3",
+        "28-320.3.1",
+        "28-320.3.1.1",
+        "28-320.3.10",
+        "28-320.3.2",
+        "28-320.3.2.1",
+        "28-320.3.4",
+        "28-320.3.5",
+        "28-320.3.6",
+        "28-320.3.6.1",
+        "28-320.3.6.2",
+        "28-320.3.6.3",
+        "28-320.3.7",
+        "28-320.3.7.1",
+        "28-320.3.8",
+        "28-320.3.9",
+        "28-320.4",
+        "28-320.6",
+        "28-320.6.1",
+        "28-320.6.2",
+        "28-320.6.3",
+        "28-320.6.4",
+        "28-320.7",
+        "28-320.7.1",
+        "28-320.7.2",
+        "28-320.8",
+        "28-320.8.1",
+        "28-320.8.1.1",
+        "28-320.8.2",
+        "28-320.9",
+        "28-321.1",
+        "28-321.2",
+        "28-321.2.1",
+        "28-321.2.2",
+        "28-321.3",
+        "28-321.3.1",
+        "28-321.3.2",
+        "28-322.2",
+        "28-322.3",
+        "28-322.4",
+        "3114.1",
+        "3114.10",
+        "3114.11",
+        "3114.12",
+        "3114.2",
+        "3114.3",
+        "3114.4",
+        "3114.5",
+        "3114.6",
+        "3114.8",
+        "3114.9",
+        "320.3.5",
+        "320.3.7",
+        "320.7",
+        "321.3.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 83 – LL 107/19",
+      "fileName": "update_83_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_83_combined_instructions.pdf",
+      "sourceSHA256": "ce9921714e03ee03e3cece89d3bf6456dc01e6a17ad07b4cf897660d15016c2d",
+      "bytes": 22635,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "211.1",
+        "28-105.1",
+        "28-211.1",
+        "28-211.1.3",
+        "28-211.1.4",
+        "28-211.3",
+        "28-211.3.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-105.1",
+        "AC 28-211.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "211.1",
+        "28-211.1.3",
+        "28-211.1.4",
+        "28-211.3",
+        "28-211.3.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 84 – LL 110/19",
+      "fileName": "update_84_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_84_combined_instructions.pdf",
+      "sourceSHA256": "dd35d4813d870cdb317c5c3adaf4dadb152460824b3c2eea93460c3639c8b8d7",
+      "bytes": 23289,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-204.1.2",
+        "28-204.1.3"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-204.1.2",
+        "28-204.1.3"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 85 – LL 114/19",
+      "fileName": "update_85_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_85_combined_instructions.pdf",
+      "sourceSHA256": "dcfab3a60c8583cec6acde8be6c88613daf9b74fe33890a961fc96eda8e68dc4",
+      "bytes": 25023,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-105.1.4",
+        "28-105.1.5",
+        "412.1"
+      ],
+      "matchedCorpusSections": [
+        "BC 412.1",
+        "FGC 412.1",
+        "PC 412.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-105.1.4",
+        "28-105.1.5"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 86 – LL 219/19",
+      "fileName": "update_86_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_86_combined_instructions.pdf",
+      "sourceSHA256": "e2c0ab61d59ffd70a912a240ad5c3331b1716283eb93a921b1450a0037b3ddbf",
+      "bytes": 204168,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.29",
+        "3301.13.12",
+        "3302.1",
+        "3321.1"
+      ],
+      "matchedCorpusSections": [
+        "BC 3302.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-103.29",
+        "3301.13.12",
+        "3321.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 87 – LL 10/20",
+      "fileName": "update_87_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_87_combined_instructions.pdf",
+      "sourceSHA256": "eeb7d73ab3d3d9506d2f5db52947654894a6f3754ebbddd1eaf23c399aeef700",
+      "bytes": 24660,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "3301.11.4"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "3301.11.4"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 88 – LL 115/19",
+      "fileName": "update_88_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_88_combined_instructions.pdf",
+      "sourceSHA256": "f6cde72076cc7e3a933da3b14ba4a601562b99a0b776a938a77a58675508d295",
+      "bytes": 26013,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-116.2.1",
+        "28-116.2.1.1"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-116.2.1",
+        "28-116.2.1.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 89 – LL 122/19",
+      "fileName": "update_89_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_89_combined_instructions.pdf",
+      "sourceSHA256": "a71cac74af5e3b8f1a77831fc600da009ebe65e432dc1a7f2076052e8b07ba55",
+      "bytes": 35189,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "1108.2.7",
+        "1110.1",
+        "1110.2",
+        "1110.3",
+        "28-201.2.3",
+        "28-313.1",
+        "28-313.3",
+        "28-313.3.1",
+        "28-313.3.2",
+        "28-313.3.3",
+        "28-315.6.3",
+        "313.2",
+        "A117.1"
+      ],
+      "matchedCorpusSections": [
+        "AC 28-313.1",
+        "BC 1110.1",
+        "PC 1110.1",
+        "PC 1110.2",
+        "PC 1110.3"
+      ],
+      "unmatchedSectionNumbers": [
+        "1108.2.7",
+        "28-201.2.3",
+        "28-313.3",
+        "28-313.3.1",
+        "28-313.3.2",
+        "28-313.3.3",
+        "28-315.6.3",
+        "313.2",
+        "A117.1"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 8 – LL 45/15",
+      "fileName": "update_8_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_8_combined_instructions.pdf",
+      "sourceSHA256": "d144982791586594c16534f11302f0e429c1c1432b748300d5280a05bf849ab7",
+      "bytes": 25653,
+      "reconciliationStatus": "no-cited-section-match-review-required",
+      "referencedSectionNumbers": [
+        "28-103.25"
+      ],
+      "matchedCorpusSections": [],
+      "unmatchedSectionNumbers": [
+        "28-103.25"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 90 – LL 104/19",
+      "fileName": "update_90_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_90_combined_instructions.pdf",
+      "sourceSHA256": "1db36a60de0b0f9cdeaf829f1403b1e426ae9b2663a111bb5f99d22a07348c1f",
+      "bytes": 83780,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-105.1.3",
+        "412.1"
+      ],
+      "matchedCorpusSections": [
+        "BC 412.1",
+        "FGC 412.1",
+        "PC 412.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-105.1.3"
+      ],
+      "reviewRequired": true
+    },
+    {
+      "title": "Update 9 – LL 78/15",
+      "fileName": "update_9_combined_instructions.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/building_code/update_9_combined_instructions.pdf",
+      "sourceSHA256": "646349c28750414582ec23806c103867db6813bff7fd82335ddca77cee1a2d6a",
+      "bytes": 100252,
+      "reconciliationStatus": "partial-citation-match-review-required",
+      "referencedSectionNumbers": [
+        "28-315.2.3",
+        "304.1",
+        "903.2.2",
+        "903.2.2.1",
+        "903.2.2.2"
+      ],
+      "matchedCorpusSections": [
+        "BC 304.1",
+        "FGC 304.1",
+        "MC 304.1",
+        "PC 304.1"
+      ],
+      "unmatchedSectionNumbers": [
+        "28-315.2.3",
+        "903.2.2",
+        "903.2.2.1",
+        "903.2.2.2"
+      ],
+      "reviewRequired": true
+    }
+  ],
+  "baselineLocalLaw": {
+    "name": "Local Law 141 of 2013",
+    "sourceURL": "https://www.nyc.gov/assets/buildings/local_laws/ll141of2013.pdf",
+    "sourceSHA256": "64835e76686e7bb5918a1d3c2f8648a6fbca8d7f1add1cf4d23b06b52c351a74"
+  }
+}

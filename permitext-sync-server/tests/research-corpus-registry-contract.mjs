@@ -30,6 +30,33 @@ const ordinary = routeResearchCorpora({
 });
 assert.deepEqual(ordinary.selected.map((corpus) => corpus.id), ["nyc-2022-construction-codes"]);
 
+const explicit2014 = routeResearchCorpora({
+  question: "Under the 2014 NYC Building Code, what is the maximum vision-panel area?",
+  registry
+});
+assert.deepEqual(
+  explicit2014.selected.map((corpus) => corpus.id),
+  ["nyc-2014-construction-codes"],
+  "An exact 2014 edition request must use the official historical corpus without mixing in 2022."
+);
+assert.equal(explicit2014.selected[0].applicabilityStatus, "prior-edition-case-specific");
+
+const configured2014 = routeResearchCorpora({
+  question: "What does the selected code require?",
+  projectCodeVersion: "nyc-2014",
+  registry
+});
+assert.deepEqual(configured2014.selected.map((corpus) => corpus.id), ["nyc-2014-construction-codes"]);
+
+const editionComparison = routeResearchCorpora({
+  question: "Compare the 2014 NYC Building Code with the 2022 NYC Building Code.",
+  registry
+});
+assert.deepEqual(editionComparison.selected.map((corpus) => corpus.id), [
+  "nyc-2022-construction-codes",
+  "nyc-2014-construction-codes"
+]);
+
 const fire = routeResearchCorpora({
   question: "Under FC 503, what fire apparatus access is required?",
   registry

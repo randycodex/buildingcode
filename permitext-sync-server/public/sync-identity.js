@@ -1,4 +1,6 @@
 export const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
+export const historicalConstructionSyncCodeVersion =
+  "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1";
 export const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 export const existingBuildingSyncCodeVersion =
   "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1";
@@ -20,6 +22,12 @@ export function syncCodeVersion(value) {
     normalized === "2022 construction codes" ||
     normalized === defaultSyncCodeVersion.toLocaleLowerCase("en-US")
   ) return defaultSyncCodeVersion;
+  if (
+    normalized === "nyc-2014" ||
+    normalized === "2014 construction codes" ||
+    normalized === "2014 nyc construction codes" ||
+    normalized === historicalConstructionSyncCodeVersion.toLocaleLowerCase("en-US")
+  ) return historicalConstructionSyncCodeVersion;
   if (
     normalized === "nyc-zoning-resolution" ||
     normalized === "nyc zoning resolution" ||

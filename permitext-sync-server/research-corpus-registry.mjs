@@ -1,7 +1,9 @@
-export const researchCorpusRegistryVersion = "20260830-zoning-edition-boundary-v3";
+export const researchCorpusRegistryVersion = "20260901-2014-construction-corpus-v1";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
+const historicalConstructionCodeVersion =
+  "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1";
 const enactedAdministrativeCodeVersion =
   "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1";
 const zoningCodeVersion =
@@ -12,7 +14,8 @@ const fireCue = /\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\
 const zoningCue = /\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\b(?:Sections?|Table|§{1,2})\s+\d{1,3}-\d{2,4}\b|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability)\b|\b(?:special\s+purpose|special)\s+district\b|\boff[-\s]street\s+parking\b|\bparking\s+(?:requirement|required|spaces?|waiver|reduction)\b|\b(?:floor\s+area\s+ratio|FAR|use\s+group|lot\s+coverage|development\s+rights?)\b|\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i;
 const projectDependentZoningCue = /\b(?:parking|floor\s+area|FAR|permitted\s+use|use\s+permitted|bulk|setback|yard|lot\s+coverage|development\s+rights?)\b/i;
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\s*(?:§\s*)?[A-Z]?\d/i;
-const historicalBuildingCue = /\b(?:1968|prior|historical)\s+(?:NYC\s+)?Building\s+Code\b|\bBC68\b/i;
+const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas)\s+Code\b|\b(?:BC|AC|PC|MC|FGC)14\b/i;
+const historicalBuildingCue = /\b1968\s+(?:NYC\s+)?Building\s+Code\b|\bBC68\b/i;
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -65,6 +68,18 @@ export function createResearchCorpusRegistry({
       automaticResearchEligible: true,
       optInRequired: false,
       aliases: ["nyc-fire-code", "2022 fire code", "fire code"]
+    }),
+    immutableCorpus({
+      id: "nyc-2014-construction-codes",
+      label: "2014 NYC Construction Codes",
+      codeEdition: "2014 NYC Construction Codes — DOB consolidated archive",
+      codeVersion: historicalConstructionCodeVersion,
+      codeYear: 2014,
+      codePrefixes: ["AC", "BC", "FGC", "MC", "PC"],
+      applicabilityStatus: "prior-edition-case-specific",
+      automaticResearchEligible: true,
+      optInRequired: false,
+      aliases: ["nyc-2014", "2014 construction codes", "2014 building code"]
     }),
     immutableCorpus({
       id: "nyc-zoning-resolution",
@@ -142,18 +157,20 @@ export function routeResearchCorpora({
     fireCue,
     zoningCue,
     futureExistingBuildingCue,
+    historical2014ConstructionCue,
     historicalBuildingCue
   ].some((pattern) => pattern.test(currentQuestion)) || projectZoningRequested;
   const context = currentHasCorpusCue
     ? currentQuestion
     : [currentQuestion, recentUserContext(previousMessages)].filter(Boolean).join("\n");
   const futureRequested = futureExistingBuildingCue.test(context);
+  const historical2014Requested = historical2014ConstructionCue.test(context);
   const historicalRequested = historicalBuildingCue.test(context);
   const buildingCodeOnlyScope =
     /\bbased only on (?:the )?(?:selected )?Building Code passages\b/i.test(currentQuestion);
   const explicitCurrentConstructionCue = /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b2022\s+(?:NYC\s+)?(?:Building|Construction|Plumbing|Mechanical|Fuel\s+Gas)\s+Code\b/i.test(context);
   const constructionRequested = constructionCue.test(context) &&
-    (!futureRequested && !historicalRequested || explicitCurrentConstructionCue);
+    (!futureRequested && !historical2014Requested && !historicalRequested || explicitCurrentConstructionCue);
   const fireRequested = fireCue.test(context);
   const zoningRequested = !buildingCodeOnlyScope && (zoningCue.test(context) || projectZoningRequested);
   const requestedIDs = new Map();
@@ -166,6 +183,9 @@ export function routeResearchCorpora({
     );
   }
   if (futureRequested) requestedIDs.set("nyc-existing-building-code-2027", "future-effective EBC cue");
+  if (historical2014Requested) {
+    requestedIDs.set("nyc-2014-construction-codes", "explicit 2014 Construction Code cue");
+  }
   if (historicalRequested) requestedIDs.set("nyc-1968-building-code", "historical-code cue");
   if (!requestedIDs.size) {
     const configuredVersion = compactText(projectCodeVersion).toLocaleLowerCase("en-US");

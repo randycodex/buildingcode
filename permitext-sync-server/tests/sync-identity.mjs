@@ -3,6 +3,7 @@ import {
   defaultSyncCodeVersion,
   enactedAdministrativeSyncCodeVersion,
   existingBuildingSyncCodeVersion,
+  historicalConstructionSyncCodeVersion,
   specialtyCodesSyncCodeVersion,
   syncCodeVersion,
   syncCodeVersionForPrefix,
@@ -17,6 +18,8 @@ assert.equal(syncCodeVersion("nyc-2022"), defaultSyncCodeVersion);
 assert.equal(syncCodeVersion("2022 Construction Codes"), defaultSyncCodeVersion);
 assert.equal(syncCodeVersion("2022 CONSTRUCTION CODES"), defaultSyncCodeVersion);
 assert.equal(syncCodeVersion(defaultSyncCodeVersion), defaultSyncCodeVersion);
+assert.equal(syncCodeVersion("nyc-2014"), historicalConstructionSyncCodeVersion);
+assert.equal(syncCodeVersion("2014 Construction Codes"), historicalConstructionSyncCodeVersion);
 assert.equal(syncCodeVersion("nyc-zoning-resolution"), zoningSyncCodeVersion);
 assert.equal(syncCodeVersion("NYC Zoning Resolution"), zoningSyncCodeVersion);
 assert.equal(

@@ -200,6 +200,11 @@ function disclosesApplicability(source, answerText) {
   if (source.applicabilityStatus === "historical") {
     return /\b(?:historical|prior[- ]code|1968\s+(?:NYC\s+)?Building\s+Code)\b/i.test(answerText);
   }
+  if (source.applicabilityStatus === "prior-edition-case-specific") {
+    const identifiesPriorEdition = /\b(?:2014\s+(?:NYC\s+)?(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas)\s+Code|prior[- ](?:code|edition)|historical)\b/i.test(answerText);
+    const statesCaseSpecificBoundary = /\b(?:project[- ]specific|applicab(?:ility|le)\s+(?:is\s+)?(?:depends|dependent|must\s+be\s+(?:determined|confirmed))|depends\s+on\s+(?:the\s+)?(?:project|filing|application)|filing\s+date)\b/i.test(answerText);
+    return identifiesPriorEdition && statesCaseSpecificBoundary;
+  }
   return true;
 }
 
@@ -740,7 +745,7 @@ export function researchAnswerQualityRevisionIssues(result) {
   if (result.missingApplicabilityDisclosureSourceIDs?.length) {
     issues.push({
       type: "missed_material_conclusion",
-      detail: `State the historical or future-effective applicability status for explicitly selected evidence before relying on it: ${references(result.missingApplicabilityDisclosureSourceIDs, result.sources)}.`
+      detail: `State the historical, prior-edition case-specific, or future-effective applicability status for explicitly selected evidence before relying on it: ${references(result.missingApplicabilityDisclosureSourceIDs, result.sources)}.`
     });
   }
   if (result.missingParallelTableCategorySourceIDs?.length) {
