@@ -130,21 +130,21 @@ Do not include the taxpayer identification number, residential address, or certi
 ## Monitoring delivery
 
 Gate ID: `monitoring-delivery`
-Status: **OPEN**
+Status: **OWNER-ACCEPTED BOUNDED ALTERNATIVE; EXACT-RELEASE VERIFICATION OPEN**
 Release-bound: **yes**
 
-- Production health-failure detection:
-- Production 5xx/client-error delivery:
-- Stripe/Apple billing-webhook failure delivery:
-- Database/storage failure delivery:
-- Research spend rejection delivery:
-- Research p95 latency delivery or accepted bounded daily alternative:
-- Named owner received the actual configured notification:
-- `PERMITEXT_MONITORING_PROVIDER` matches retained delivery evidence:
-- Privacy-bounded Production log audit passed after the exercise:
-- Redacted evidence and timestamp:
+- Production health-failure detection: accepted daily privacy-bounded log audit with direct `/health` fallback when no health request appears in the sampled window.
+- Production 5xx/client-error delivery: live Vercel 5xx anomaly rule plus accepted daily audit; anomaly-specific rule delivery has not been demonstrated.
+- Stripe/Apple billing-webhook failure delivery: accepted daily audit; not represented as immediate warning delivery.
+- Database/storage failure delivery: accepted daily audit; the September 2 audit retained one privacy-bounded transient 503 finding and subsequent healthy direct check.
+- Research spend rejection delivery: accepted daily audit; not represented as immediate warning delivery.
+- Research p95 latency delivery or accepted bounded daily alternative: accepted bounded daily alternative.
+- Named owner received the actual configured notification: generic Vercel web delivery was observed and owner web/email subscriptions are checked; anomaly-specific and email delivery remain unproven.
+- `PERMITEXT_MONITORING_PROVIDER` matches retained delivery evidence: `vercel-observability-daily-review` was staged in Vercel Production after explicit owner acceptance.
+- Privacy-bounded Production log audit passed after the exercise: exact-release post-deployment audit remains open.
+- Redacted evidence and timestamp: [Production monitoring audit evidence](./PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md), owner acceptance September 2, 2026 at approximately 6:52 PM EDT.
 
-Dashboard configuration and generic notification delivery alone do not prove each missing category.
+This accepted Beta 1 alternative does not claim immediate delivery for every category. Keep this release-bound gate open in the machine record until the exact deployed release reports the marker and its post-deployment privacy-bounded audit or direct-health fallback is retained.
 
 ## Spend notification and hard stop
 

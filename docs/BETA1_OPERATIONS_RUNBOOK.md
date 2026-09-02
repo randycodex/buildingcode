@@ -27,14 +27,14 @@ Permitext emits structured Vercel runtime events for:
 
 Client reports remove email addresses, bearer credentials, sensitive query values, and URL query strings before logging. They contain a stable fingerprint, release ID, route, source path, and line/column where available.
 
-The no-provider end-to-end rehearsal in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md) proves these structured events through the local HTTP server, including configured-threshold latency classification and a deliberate 5xx. The privacy-bounded live-log review in [PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md](./PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md) then checks observed Production health, errors, billing, database, Research spend, and p95 signals without emitting raw log or customer/provider identifiers. Neither is immediate external delivery, so anomaly-specific delivery remains an open production-alert gate.
+The no-provider end-to-end rehearsal in [PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md](./PERMITEXT_LOCAL_MONITORING_SIGNAL_EVIDENCE_2026-08-28.md) proves these structured events through the local HTTP server, including configured-threshold latency classification and a deliberate 5xx. The privacy-bounded live-log review in [PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md](./PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md) then checks observed Production health, errors, billing, database, Research spend, and p95 signals without emitting raw log or customer/provider identifiers. Neither is immediate external delivery. On September 2 the owner explicitly accepted the live included Vercel rules plus daily privacy-bounded review as the bounded Beta 1 alternative, while retaining anomaly-specific delivery as a post-Beta improvement opportunity.
 
 `GET /health` reports whether release identity and an external monitoring provider are marked configured. Before public access, configure one of these production paths:
 
 1. Vercel Observability alerts and daily runtime-log review; or
 2. a Vercel Log Drain or error-monitoring integration with alert delivery.
 
-After the alert path has actually delivered a test notification, set `PERMITEXT_MONITORING_PROVIDER` to the configured provider name. The environment value is evidence of the completed dashboard step, not a substitute for it.
+After the alert path has actually delivered a test notification, or after the owner explicitly accepts and records the bounded daily-review alternative for Beta 1, set `PERMITEXT_MONITORING_PROVIDER` to the configured operating-path name. The environment value is evidence of the completed dashboard or operating-acceptance step, not a substitute for it. The accepted Beta 1 value is `vercel-observability-daily-review`; it does not claim immediate delivery for every warning.
 
 Minimum alerts:
 

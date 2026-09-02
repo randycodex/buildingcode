@@ -57,7 +57,7 @@ Current development branch: `codex/zoning-research-beta1`
 
 ## Status dashboard
 
-Checklist snapshot: **153 completed, 24 open** across the full file: 13 main open items plus the separately tracked 11-step final merge, deployment, TestFlight, and release sequence. Those 11 release substeps remain outside the 13 main-item count and have not been authorized on this branch.
+Checklist snapshot: **154 completed, 23 open** across the full file: 12 main open items plus the separately tracked 11-step final merge, deployment, TestFlight, and release sequence. Those 11 release substeps remain outside the 12 main-item count and are now authorized for controlled execution, while public Beta activation remains separately gated.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -265,7 +265,7 @@ Tax and optional professional reference: [PERMITEXT_BETA1_PROFESSIONAL_REVIEW_PA
 - [x] A named support and urgent-alert owner and support address are documented.
 - [x] Upgrade the commercial production service from Vercel Hobby to Vercel Pro.
 - [x] Configure and live-verify the included Permitext-scoped Vercel 5xx-anomaly and infrastructure-usage-anomaly rules with owner email/web subscriptions.
-- [ ] Complete the remaining monitoring delivery gate for health, 5xx/client failures, billing webhooks, database failures, Research spend, and p95 latency. The permanent no-cost Production-log auditor and active daily privacy-bounded guard cover observed instances of every category; anomaly-specific or immediate external delivery remains open, and the Production build now fails closed while external monitoring is not truthfully marked configured.
+- [x] Obtain explicit owner acceptance of the bounded Beta 1 monitoring alternative: the live included Vercel 5xx/usage anomaly rules plus active daily privacy-bounded Production-log review. On September 2 the owner accepted that this is not immediate delivery for every Permitext-specific warning, and `PERMITEXT_MONITORING_PROVIDER=vercel-observability-daily-review` was staged in Production. Exact-release `/health` and post-deployment audit evidence remain part of the release-bound acceptance gate; anomaly-specific delivery remains a post-Beta improvement opportunity.
 - [x] Configure a $20 Vercel on-demand spend amount, standard spend notifications, and automatic Production pause for all projects on the team.
 - [x] Complete a read-only [backend provider capacity and upgrade audit](./PERMITEXT_BACKEND_PROVIDER_CAPACITY_AUDIT_2026-08-29.md); no additional upgrade is currently required, and conservative Neon, Clerk, Vercel/Blob, OpenAI, Stripe, and Apple review thresholds are recorded.
 - [x] Prepare a fail-closed [spend-control acceptance record](./BETA1_SPEND_CONTROL_ACCEPTANCE_RECORD.md) that separates delivered notification, isolated 503/recovery, and automatic-threshold evidence and forbids spending or lowering the budget merely to trigger the gate.

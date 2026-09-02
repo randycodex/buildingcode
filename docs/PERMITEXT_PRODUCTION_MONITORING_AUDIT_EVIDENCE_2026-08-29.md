@@ -77,6 +77,14 @@ Exit codes:
 
 Invalid input takes precedence over other exit states. The report remains aggregate-only even when the source contains sensitive strings; the permanent contract test inserts synthetic emails, credentials, fingerprints, subscription IDs, and user/operation identifiers and asserts that none appear in serialized output.
 
-## Remaining gate
+## Owner acceptance of the bounded Beta 1 alternative
 
-Before public paid Beta, retain an actual anomaly-specific delivered event or explicitly accept documented daily review for warning-level signals, and safely exercise the configured spend notification/automatic-pause behavior. Do not set `PERMITEXT_MONITORING_PROVIDER` merely because the audit or deploy guard exists; the guard intentionally remains red until that evidence is complete.
+On September 2, 2026 at approximately 6:52 PM EDT, the owner explicitly stated: "I accept daily-review monitoring for Beta 1." This accepts the documented no-additional-cost monitoring arrangement for the limited Beta: the two live Permitext-scoped Vercel anomaly rules with owner web/email subscriptions, generic Vercel notification delivery already observed, and the active daily privacy-bounded Production-log review. The owner accepts that the daily review is not immediate delivery for every Permitext-specific warning and that anomaly-specific delivery has not been demonstrated.
+
+After that acceptance, `PERMITEXT_MONITORING_PROVIDER` was added to Vercel Production as the hidden value `vercel-observability-daily-review`. A fresh secret-free environment-name audit found 69 variables and all 28 required groups present. This marker records the accepted operating arrangement; it does not create a Log Drain, paid monitoring integration, or stronger delivery claim.
+
+The daily audit must remain active during Beta 1, run after each Production release or incident report, and require a direct `/health` fallback when its 24-hour log window contains no health request. Actionable findings still require owner review. The separate spend-notification and automatic-pause exercise remains open and must not be manufactured by buying usage or lowering the team budget.
+
+## Remaining verification
+
+The bounded monitoring-path decision is complete. After the exact release is deployed, retain a clean privacy-bounded Production-log audit or the documented direct-health fallback and confirm `/health` reports the configured monitoring marker. Anomaly-specific delivery and stronger real-time warning coverage remain honest post-Beta improvement opportunities rather than claims of this acceptance.
