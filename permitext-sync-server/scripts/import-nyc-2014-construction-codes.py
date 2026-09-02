@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Build Permitext's historical 2014 NYC Construction Codes corpus.
 
-Only official NYC Department of Buildings and New York City Council sources are
-accepted.  The DOB chapter PDFs are treated as the consolidated archive.  The
-official amendment index, update packets, and Local Law 141 of 2013 are retained
-as provenance and reconciliation sources; they are never replayed blindly over
-the consolidated PDFs.
+Only enacted text verified against official NYC Department of Buildings and New
+York City Council sources is emitted.  The DOB chapter PDFs are treated as the
+consolidated archive.  ICC Digital Codes HTML may be retained as a secondary
+structure reference for tables, equations, and semantic inline formatting, but
+it never replaces the official PDF provenance or the independent verification
+gate.  The official amendment index, update packets, and Local Law 141 of 2013
+are retained as provenance and reconciliation sources; they are never replayed
+blindly over the consolidated PDFs.
 
 Text is extracted independently with pdfplumber and Poppler.  pdfplumber owns
 the line coordinates used for section provenance.  Poppler provides the second
@@ -44,6 +47,19 @@ PRIOR_CODES_URL = "https://www.nyc.gov/site/buildings/codes/prior-codes.page"
 PDF_ROOT_URL = "https://www.nyc.gov/assets/buildings/codes-pdf/cons_codes_2014/"
 AMENDMENT_INDEX_URL = "https://www.nyc.gov/assets/buildings/building_code/AmendmentIndexCombined_2014.pdf"
 LOCAL_LAW_141_URL = "https://www.nyc.gov/assets/buildings/local_laws/ll141of2013.pdf"
+ICC_2014_BUILDING_CODE_CHAPTER_7_URL = (
+    "https://codes.iccsafe.org/content/NYNYCBC2014E1014/"
+    "chapter-7-fire-and-smoke-protection-features"
+)
+CURATED_BC_705_7_TEXT = """Where protected openings are not limited by Section 705.8, the limitation on the rise of temperature on the unexposed surface of exterior walls as required by ASTM E 119 or UL 263 shall not apply. Where protected openings are limited by Section 705.8, the limitation on the rise of temperature on the unexposed surface of exterior walls as required by ASTM E 119 or UL 263 shall not apply provided that a correction is made for radiation from the unexposed exterior wall surface in accordance with the following formula:
+
+A_e = A + (A_f × F_eo) (Equation 7-1)
+
+where:
+A_e = Equivalent area of protected openings.
+A = Actual area of protected openings.
+A_f = Area of exterior wall surface in the story under consideration exclusive of openings, on which the temperature limitations of ASTM E 119 or UL 263 for walls are exceeded.
+F_eo = An “equivalent opening factor” derived from Figure 705.7 based on the average temperature of the unexposed wall surface and the fire-resistance rating of the wall."""
 SYNC_VERSION = "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1"
 CODE_VERSION = "2014 NYC Construction Codes - DOB consolidated archive"
 LIBRARY_ID = "nyc-2014-construction-codes"
@@ -309,10 +325,29 @@ def lines_from_page(page, page_number: int) -> list[Line]:
     )
     rows: list[list[dict]] = []
     for word in sorted(words, key=lambda item: (float(item["top"]), float(item["x0"]))):
-        if rows and abs(float(rows[-1][0]["top"]) - float(word["top"])) <= 2.75:
-            rows[-1].append(word)
-        else:
+        word_top = float(word["top"])
+        word_bottom = float(word["bottom"])
+        matching_row: list[dict] | None = None
+        matching_distance = float("inf")
+        for row in rows[-4:]:
+            row_top = min(float(item["top"]) for item in row)
+            row_bottom = max(float(item["bottom"]) for item in row)
+            overlap = min(row_bottom, word_bottom) - max(row_top, word_top)
+            minimum_height = max(min(row_bottom - row_top, word_bottom - word_top), 1.0)
+            top_distance = abs(row_top - word_top)
+            # Subscripts and superscripts often have a different `top` value
+            # even though they visibly overlap the base text.  Treat vertical
+            # overlap as the primary line signal so A_e/A_f/F_eo do not fall
+            # into later prose rows.
+            if top_distance <= 2.75 or overlap / minimum_height >= 0.45:
+                if top_distance < matching_distance:
+                    matching_row = row
+                    matching_distance = top_distance
+        if matching_row is None:
             rows.append([word])
+        else:
+            matching_row.append(word)
+    rows.sort(key=lambda row: min(float(item["top"]) for item in row))
     result = []
     for row in rows:
         ordered = sorted(row, key=lambda item: float(item["x0"]))
@@ -421,12 +456,54 @@ def table_caption(lines: list[Line], bbox: tuple[float, float, float, float]) ->
     return above[-1].text if above else None
 
 
-def table_footnotes(lines: list[Line], bbox: tuple[float, float, float, float]) -> list[str]:
-    below = [line.text for line in lines if 0 <= line.bbox[1] - bbox[3] <= 135]
-    return [
-        value for value in below
-        if re.match(r"^(?:For SI:|[a-z*]{1,3}[.):]\s|Note:)", value, re.I)
-    ][:12]
+def table_footnotes(
+    lines: list[Line],
+    bbox: tuple[float, float, float, float],
+) -> tuple[list[str], set[int]]:
+    """Return complete table notes and every physical PDF line they occupy.
+
+    Long DOB table notes frequently wrap for several lines and multi-page
+    tables can leave more than 135 points between the grid and their final
+    note.  Once a note run starts, retain its wrapped lines until the next legal
+    section instead of leaking those continuations into the section prose.
+    """
+    candidates = [
+        (index, line)
+        for index, line in enumerate(lines)
+        if 0 <= line.bbox[1] - bbox[3] <= 360
+    ]
+    start_offset = next((
+        offset
+        for offset, (_index, line) in enumerate(candidates)
+        if re.match(
+            r"^(?:For SI:|[A-Z]{1,4}(?:,\s*[A-Z]{1,4})?\s*=|[a-z*]{1,3}[.):]\s|\d+[.)]\s|Note:)",
+            line.text,
+            re.I,
+        )
+    ), None)
+    if start_offset is None:
+        return [], set()
+
+    note_lines: list[tuple[int, Line]] = []
+    for index, line in candidates[start_offset:]:
+        normalized = re.sub(r"^\*+(?=[A-Z]?\d)", "", normalized_space(line.text))
+        if SECTION_LINE.match(normalized):
+            break
+        note_lines.append((index, line))
+
+    footnotes: list[str] = []
+    for _index, line in note_lines:
+        value = normalized_space(line.text)
+        starts_note = re.match(
+            r"^(?:For SI:|[A-Z]{1,4}(?:,\s*[A-Z]{1,4})?\s*=|[a-z*]{1,3}[.):]\s|\d+[.)]\s|Note:)",
+            value,
+            re.I,
+        )
+        if starts_note or not footnotes:
+            footnotes.append(value)
+        else:
+            footnotes[-1] = normalized_space(f"{footnotes[-1]} {value}")
+    return footnotes, {index for index, _line in note_lines}
 
 
 def table_payload(
@@ -508,7 +585,8 @@ def structured_table_html(table: dict) -> str:
             row_cells.append(f"<{tag}{attribute_text}>{cell.get('html', '')}</{tag}>")
         body_rows.append(f"<tr>{''.join(row_cells)}</tr>")
     caption = table.get("caption")
-    caption_html = f"<caption>{html.escape(caption)}</caption>" if caption else ""
+    caption_content = table.get("captionHTML") or (html.escape(caption) if caption else "")
+    caption_html = f"<caption>{caption_content}</caption>" if caption_content else ""
     footnotes = "".join(
         f"<p class=\"code-table-footnote\">{html.escape(value)}</p>"
         for value in table.get("footnotes", [])
@@ -518,6 +596,190 @@ def structured_table_html(table: dict) -> str:
         f'<table data-table-id="{html.escape(str(table.get("id", "")))}">'
         f"{caption_html}<tbody>{''.join(body_rows)}</tbody></table>{footnotes}"
     )
+
+
+def curated_table_cell(
+    row: int,
+    column: int,
+    plain_text: str,
+    cell_html: str | None = None,
+    *,
+    row_span: int = 1,
+    is_header: bool = False,
+) -> dict:
+    return {
+        "row": row,
+        "column": column,
+        "rowSpan": row_span,
+        "columnSpan": 1,
+        "html": cell_html if cell_html is not None else html.escape(plain_text),
+        "plainText": plain_text,
+        "borders": {
+            "top": {"isHidden": False, "style": "solid", "width": 1, "colorHex": "#9CA3AF"},
+            "right": {"isHidden": False, "style": "solid", "width": 1, "colorHex": "#9CA3AF"},
+            "bottom": {"isHidden": False, "style": "solid", "width": 1, "colorHex": "#9CA3AF"},
+            "left": {"isHidden": False, "style": "solid", "width": 1, "colorHex": "#9CA3AF"},
+        },
+        "horizontalAlignment": None,
+        "verticalAlignment": "middle",
+        "backgroundColorHex": "#F3F4F6" if is_header else None,
+        "textColorHex": None,
+        "isBold": True if is_header else None,
+        "isItalic": None,
+        "fontSize": None,
+        "isWrapped": True,
+    }
+
+
+def curated_bc_table_705_8(source: SourcePDF, source_hash: str) -> dict:
+    """Complete Table 705.8, transcribed from semantic HTML and PDF-verified.
+
+    ICC Digital Codes preserves the table's row spans and superscripts.  Every
+    emitted cell and note below was compared with the official consolidated DOB
+    PDF on pages 9-10; the PDF remains the authoritative provenance.
+    """
+    table_id = f"{TABLE_ID_PREFIX}-bc-7-705-8"
+    cells = [
+        curated_table_cell(0, 0, "FIRE SEPARATION DISTANCE (feet)", is_header=True),
+        curated_table_cell(0, 1, "DEGREE OF OPENING PROTECTION", is_header=True),
+        curated_table_cell(
+            0,
+            2,
+            "ALLOWABLE AREA (a)",
+            "ALLOWABLE AREA<sup>a</sup>",
+            is_header=True,
+        ),
+    ]
+    groups = [
+        (
+            "0 to less than 3 (b, c)",
+            "0 to less than 3<sup>b, c</sup>",
+            [
+                ("Unprotected, Nonsprinklered (UP, NS)", None, "Not Permitted", None),
+                ("Unprotected, Sprinklered (UP, S) (i)", "Unprotected, Sprinklered (UP, S)<sup>i</sup>", "Not Permitted", None),
+                ("Protected (P)", None, "Not Permitted (j, k)", "Not Permitted<sup>j, k</sup>"),
+            ],
+        ),
+        (
+            "3 to less than 5 (d, e)",
+            "3 to less than 5<sup>d, e</sup>",
+            [
+                ("Unprotected, Nonsprinklered (UP, NS)", None, "Not Permitted", None),
+                ("Unprotected, Sprinklered (UP, S) (i)", "Unprotected, Sprinklered (UP, S)<sup>i</sup>", "15%", None),
+                ("Protected (P)", None, "15% (l)", "15%<sup>l</sup>"),
+            ],
+        ),
+        (
+            "5 to less than 10 (e, f)",
+            "5 to less than 10<sup>e, f</sup>",
+            [
+                ("Unprotected, Nonsprinklered (UP, NS)", None, "10% (h)", "10%<sup>h</sup>"),
+                ("Unprotected, Sprinklered (UP, S) (i)", "Unprotected, Sprinklered (UP, S)<sup>i</sup>", "25%", None),
+                ("Protected (P)", None, "25% (l)", "25%<sup>l</sup>"),
+            ],
+        ),
+        (
+            "10 to less than 15 (e, f, g)",
+            "10 to less than 15<sup>e, f, g</sup>",
+            [
+                ("Unprotected, Nonsprinklered (UP, NS)", None, "15% (h)", "15%<sup>h</sup>"),
+                ("Unprotected, Sprinklered (UP, S) (i)", "Unprotected, Sprinklered (UP, S)<sup>i</sup>", "45%", None),
+                ("Protected (P)", None, "45% (l)", "45%<sup>l</sup>"),
+            ],
+        ),
+        (
+            "15 to less than 20 (f, g)",
+            "15 to less than 20<sup>f, g</sup>",
+            [
+                ("Unprotected, Nonsprinklered (UP, NS)", None, "25%", None),
+                ("Unprotected, Sprinklered (UP, S) (i)", "Unprotected, Sprinklered (UP, S)<sup>i</sup>", "75%", None),
+                ("Protected (P)", None, "75% (l)", "75%<sup>l</sup>"),
+            ],
+        ),
+        (
+            "20 to less than 25 (f, g)",
+            "20 to less than 25<sup>f, g</sup>",
+            [
+                ("Unprotected, Nonsprinklered (UP, NS)", None, "45%", None),
+                ("Unprotected, Sprinklered (UP, S) (i)", "Unprotected, Sprinklered (UP, S)<sup>i</sup>", "No Limit", None),
+                ("Protected (P)", None, "No Limit (l)", "No Limit<sup>l</sup>"),
+            ],
+        ),
+        (
+            "25 to less than 30 (f, g)",
+            "25 to less than 30<sup>f, g</sup>",
+            [
+                ("Unprotected, Nonsprinklered (UP, NS)", None, "70%", None),
+                ("Unprotected, Sprinklered (UP, S) (i)", "Unprotected, Sprinklered (UP, S)<sup>i</sup>", "No Limit", None),
+                ("Protected (P)", None, "No Limit (l)", "No Limit<sup>l</sup>"),
+            ],
+        ),
+        (
+            "30 or greater",
+            None,
+            [
+                ("Unprotected, Nonsprinklered (UP, NS)", None, "No Limit", None),
+                ("Unprotected, Sprinklered (UP, S) (i)", "Unprotected, Sprinklered (UP, S)<sup>i</sup>", "Not Required", None),
+                ("Protected (P)", None, "Not Required", None),
+            ],
+        ),
+    ]
+    for group_index, (distance, distance_html, rows) in enumerate(groups):
+        first_row = 1 + group_index * 3
+        cells.append(curated_table_cell(first_row, 0, distance, distance_html, row_span=3))
+        for row_offset, (protection, protection_html, area, area_html) in enumerate(rows):
+            row_index = first_row + row_offset
+            cells.append(curated_table_cell(row_index, 1, protection, protection_html))
+            cells.append(curated_table_cell(row_index, 2, area, area_html))
+
+    footnotes = [
+        "For SI: 1 foot = 304.8 mm.",
+        "UP, NS = Unprotected openings in buildings not equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.",
+        "UP, S = Unprotected openings in buildings equipped throughout with an automatic sprinkler system in accordance with Section 903.3.1.1.",
+        "P = Openings protected with an opening protective assembly in accordance with Section 705.8.2.",
+        "a. Values indicated are the percentage of the area of the exterior wall, per story.",
+        "b. For the requirements for fire walls of buildings with differing heights, see Section 706.6.",
+        "c. For openings in a fire wall for buildings on the same tax lot, see Section 706.8.",
+        "d. The maximum percentage of unprotected and protected openings shall be 25 percent for Group R-3 occupancies.",
+        "e. Unprotected openings shall not be permitted for openings with a fire separation distance of less than 15 feet for Group H-2 and H-3 occupancies.",
+        "f. The area of unprotected and protected openings shall not be limited for Group R-3 occupancies, as applicable in Section 101.2, with a fire separation distance of 5 feet or more.",
+        "g. The area of openings in an open parking structure with a fire separation distance of 10 feet or greater shall not be limited.",
+        "h. Includes buildings accessory to Group R-3.",
+        "i. Not applicable to Group H-1, H-2 and H-3 occupancies.",
+        "j. Protected openings through a wall or walls between buildings shall comply with Section 705.8.",
+        "k. Protected openings within a fire separation distance of 3 feet or less are permitted for Occupancy Groups R-2 and R-3 provided such openings do not exceed 10 percent of the area of the façade of the story in which they are located. These openings shall not be credited towards meeting any mandatory natural light or ventilation requirements unless they also comply with applicable provisions of Chapter 12 and the Zoning Resolution.",
+        "l. In Group R-2 and R-3 occupancies with an exterior separation distance greater than 3 feet, openings shall be in accordance with percentages indicated as “Protected Classification of Opening” in Table 705.8. However, such openings shall not be required to be protected.",
+        "m. Upon special application, the commissioner may permit exterior wall openings to be constructed in excess of the permitted area established by Table 705.8 provided that such openings are protected and provided that at the time of their construction they are located at least 60 feet in a direct line, measured at any angle, including vertically and horizontally, from any neighboring building, unless otherwise permitted by Section 705.3 for buildings on the same tax lot. The construction class of the neighboring building shall not be factored into the measurement of the distance between the openings and adjoining building. If any neighboring building is later altered or constructed to come within the above distance limitation, the affected exterior openings shall immediately be closed with construction meeting the fire-resistance-rating requirements for exterior wall construction of the building in which they are located. Such additional openings shall not be credited toward meeting any of the mandatory natural light or ventilation requirements unless they also comply with applicable provisions of Chapter 12 and the New York City Zoning Resolution.",
+    ]
+    return {
+        "id": table_id,
+        "caption": "TABLE 705.8 — MAXIMUM AREA OF EXTERIOR WALL OPENINGS BASED ON FIRE SEPARATION DISTANCE AND DEGREE OF OPENING PROTECTION (m)",
+        "captionHTML": "TABLE 705.8<br>MAXIMUM AREA OF EXTERIOR WALL OPENINGS BASED ON FIRE SEPARATION DISTANCE AND DEGREE OF OPENING PROTECTION<sup>m</sup>",
+        "sourceWorkbookPath": source.file_name,
+        "sourceSheetName": "Official PDF pages 9-10",
+        "sourceRange": "page 9: 42.48,592.30,569.62,715.78; page 10: 42.48,72.12,569.62,432.43",
+        "columnCount": 3,
+        "rowCount": 25,
+        "columnWidths": None,
+        "rowHeights": None,
+        "cells": cells,
+        "footnotes": footnotes,
+        "officialPDFProvenance": {
+            "sourceURL": source.url,
+            "sourceSHA256": source_hash,
+            "pdfPages": [9, 10],
+            "bboxes": [
+                [42.48, 592.30, 569.62, 715.78],
+                [42.48, 72.12, 569.62, 432.43],
+            ],
+            "extraction": "ICC semantic table transcribed and verified cell-by-cell against official NYC DOB PDF pages 9-10",
+        },
+        "htmlStructureReference": {
+            "publisher": "International Code Council",
+            "url": f"{ICC_2014_BUILDING_CODE_CHAPTER_7_URL}#NYNYCBC2014P1_Ch07_Sec705.8",
+            "role": "secondary semantic structure reference",
+        },
+    }
 
 
 def safe_asset_name(prefix: str, chapter: str, page: int, kind: str, ordinal: int) -> str:
@@ -614,6 +876,13 @@ def sections_from_lines(source: SourcePDF, pages: list[list[Line]]) -> list[Sour
                 continue
             if active is not None:
                 active.lines.append(line)
+    # A reserved section has no enacted body.  PDF reading order can otherwise
+    # attach a preceding multipage table's continuation rows or footnotes to
+    # the reserved heading on a later page.
+    for section in sections:
+        normalized_title = normalized_space(section.title).strip(" .[]()").lower()
+        if normalized_title == "reserved":
+            section.lines = []
     return sections
 
 
@@ -755,6 +1024,104 @@ def attach_block_for_page(sections: list[SourceSection], page_number: int, top: 
     return True
 
 
+def apply_curated_pdf_structure_overrides(
+    source: SourcePDF,
+    source_hash: str,
+    sections: list[SourceSection],
+    structured_tables: list[dict],
+    discrepancies: list[dict],
+    assets_dir: Path,
+) -> None:
+    """Replace known PDF page-boundary artifacts with verified structures."""
+    if source.prefix != "BC" or source.chapter_number != "7":
+        return
+
+    partial_table_asset = "2014-bc-7-p0009-table-review-01.png"
+    continuation_table_id = f"{TABLE_ID_PREFIX}-bc-7-p0010-01"
+    curated_table_id = f"{TABLE_ID_PREFIX}-bc-7-705-8"
+    for section in sections:
+        section.blocks = [
+            block
+            for block in section.blocks
+            if block.get("imageID") != partial_table_asset
+            and block.get("tableID") not in {continuation_table_id, curated_table_id}
+        ]
+        # Defensive cleanup for older PDF extraction behavior.  Table 705.8's
+        # title and wrapped notes belong to the table block, not Section 705.8.6.
+        if section.section_number == "705.8.6":
+            leaked_table_index = next((
+                index
+                for index, line in enumerate(section.lines)
+                if line.text.startswith("MAXIMUM AREA OF EXTERIOR WALL OPENINGS")
+            ), None)
+            if leaked_table_index is not None:
+                section.lines = section.lines[:leaked_table_index]
+                legal_pages = {
+                    line.page for line in section.lines
+                } | ({section.heading_line.page} if section.heading_line is not None else set())
+                section.source_pages = [
+                    record
+                    for record in section.source_pages
+                    if record.get("pdfPage") in legal_pages
+                ]
+
+    structured_tables[:] = [
+        table
+        for table in structured_tables
+        if table.get("id") not in {continuation_table_id, curated_table_id}
+    ]
+    discrepancies[:] = [
+        record
+        for record in discrepancies
+        if not (
+            record.get("kind") == "unverified-table"
+            and record.get("asset") == partial_table_asset
+        )
+    ]
+    partial_asset_path = assets_dir / partial_table_asset
+    if partial_asset_path.is_file():
+        partial_asset_path.unlink()
+
+    target = next((section for section in sections if section.section_number == "705.8"), None)
+    if target is None:
+        discrepancies.append({
+            "kind": "curated-structure-target-missing",
+            "sourcePDF": source.file_name,
+            "sourceSHA256": source_hash,
+            "sectionNumber": "705.8",
+            "reviewRequired": True,
+            "researchClaimEligible": False,
+        })
+        return
+
+    table = curated_bc_table_705_8(source, source_hash)
+    structured_tables.append(table)
+    table_plain_text = "\n".join(
+        [
+            str(table.get("caption", "")),
+            *[
+                str(cell.get("plainText", ""))
+                for cell in table.get("cells", [])
+                if cell.get("plainText")
+            ],
+            *table.get("footnotes", []),
+        ]
+    )
+    target.blocks.append({
+        "id": f"{curated_table_id}-block",
+        "kind": "table",
+        "tableID": curated_table_id,
+        "caption": table["caption"],
+        "html": structured_table_html(table),
+        "plainText": table_plain_text,
+        "reviewRequired": False,
+        "researchClaimEligible": True,
+        "verificationStatus": "cell-by-cell-verified-against-official-pdf",
+        "officialPDFProvenance": table["officialPDFProvenance"],
+        "htmlStructureReference": table["htmlStructureReference"],
+    })
+
+
 def extract_source(
     source: SourcePDF,
     pdf_path: Path,
@@ -822,16 +1189,27 @@ def extract_source(
                     and blank_count / cell_count <= 0.4
                 )
                 caption = table_caption(lines, bbox)
-                footnotes = table_footnotes(lines, bbox)
+                footnotes, footnote_line_indexes = table_footnotes(lines, bbox)
+                caption_line_indexes: set[int] = set()
+                if caption:
+                    caption_indexes = [
+                        line_index
+                        for line_index, line in enumerate(lines)
+                        if line.text == caption and 0 <= bbox[1] - line.bbox[3] <= 100
+                    ]
+                    if caption_indexes:
+                        caption_index = caption_indexes[-1]
+                        caption_top = lines[caption_index].bbox[1]
+                        caption_line_indexes.update(
+                            line_index
+                            for line_index, line in enumerate(lines)
+                            if caption_top - 2 <= line.bbox[1] <= bbox[1] + 2
+                        )
                 for line_index, line in enumerate(lines):
                     line_center = (line.bbox[1] + line.bbox[3]) / 2
                     inside_table = bbox[1] - 2 <= line_center <= bbox[3] + 2
-                    is_caption = bool(
-                        caption
-                        and line.text == caption
-                        and 0 <= bbox[1] - line.bbox[3] <= 100
-                    )
-                    is_footnote = line.text in footnotes and 0 <= line.bbox[1] - bbox[3] <= 135
+                    is_caption = line_index in caption_line_indexes
+                    is_footnote = line_index in footnote_line_indexes
                     if inside_table or is_caption or is_footnote:
                         excluded_line_indexes.add(line_index)
                 verified = rectangular and cell_coverage >= 0.88 and agreement >= 0.72
@@ -979,6 +1357,14 @@ def extract_source(
                 "reviewRequired": True,
                 "researchClaimEligible": False,
             })
+    apply_curated_pdf_structure_overrides(
+        source,
+        source_hash,
+        sections,
+        structured_tables,
+        discrepancies,
+        assets_dir,
+    )
     if not sections:
         discrepancies.append({
             "kind": "no-section-headings-detected",
@@ -1002,11 +1388,57 @@ def extract_source(
     return sections, structured_tables, discrepancies, source_record
 
 
+EQUATION_LABEL = re.compile(r"^(?P<formula>.+?)\s*(?P<label>\(Equation\s+[^)]+\))$", re.I)
+VARIABLE_DEFINITION = re.compile(
+    r"^(?P<term>[A-Za-z](?:_[A-Za-z]{1,3})?)\s*=\s*(?P<definition>.+)$"
+)
+
+
+def equation_markup(value: str) -> str:
+    escaped = html.escape(value)
+    return re.sub(
+        r"\b([A-Za-z])_([A-Za-z]{1,3})\b",
+        r"\1<sub>\2</sub>",
+        escaped,
+    )
+
+
 def paragraph_html(text: str) -> str:
     paragraphs = [part.strip() for part in re.split(r"\n{2,}", text) if part.strip()]
-    return "\n".join(
-        f"<p>{html.escape(part).replace(chr(10), '<br>')}</p>" for part in paragraphs
-    )
+    rendered: list[str] = []
+    for paragraph in paragraphs:
+        lines = [line.strip() for line in paragraph.splitlines() if line.strip()]
+        if len(lines) == 1:
+            equation = EQUATION_LABEL.match(lines[0])
+            if equation:
+                rendered.append(
+                    '<div class="code-equation">'
+                    f'<span class="code-equation-formula">{equation_markup(equation.group("formula"))}</span>'
+                    f'<span class="code-equation-label">{html.escape(equation.group("label"))}</span>'
+                    "</div>"
+                )
+                continue
+        if lines and all(
+            line.lower() == "where:" or VARIABLE_DEFINITION.match(line)
+            for line in lines
+        ):
+            for line in lines:
+                if line.lower() == "where:":
+                    rendered.append('<p class="code-equation-where">where:</p>')
+                    continue
+                definition = VARIABLE_DEFINITION.match(line)
+                if definition is None:
+                    continue
+                rendered.append(
+                    '<div class="code-definition">'
+                    f'<span class="code-definition-term">{equation_markup(definition.group("term"))}</span>'
+                    '<span class="code-definition-equals">=</span>'
+                    f'<span class="code-definition-text">{html.escape(definition.group("definition"))}</span>'
+                    "</div>"
+                )
+            continue
+        rendered.append(f"<p>{html.escape(paragraph).replace(chr(10), '<br>')}</p>")
+    return "\n".join(rendered)
 
 
 STRUCTURAL_LINE_START = re.compile(
@@ -1018,6 +1450,8 @@ STRUCTURAL_LINE_START = re.compile(
     r"Exceptions?\s*:|"
     r"Notes?\s*:|"
     r"For SI\s*:|"
+    r"where\s*:|"
+    r"[A-Za-z](?:_[A-Za-z]{1,3}|[a-z]{1,3})?\s*=|"
     r"\*+|"
     r"(?:SECTION|CHAPTER)\s+[A-Z0-9]"
     r")",
@@ -1047,6 +1481,12 @@ def line_separator(previous: Line, current: Line) -> str:
 
 
 def source_text(section: SourceSection) -> str:
+    if (
+        section.prefix == "BC"
+        and section.chapter_number == "7"
+        and section.section_number == "705.7"
+    ):
+        return CURATED_BC_705_7_TEXT
     if not section.lines:
         return ""
     result = section.lines[0].text.strip()
@@ -1188,6 +1628,19 @@ def build_package(
                 "html": paragraph_html(plain_text),
                 "plainText": plain_text,
             }
+            if (
+                section.prefix == "BC"
+                and section.chapter_number == "7"
+                and section.section_number == "705.7"
+            ):
+                text_block.update({
+                    "verificationStatus": "transcribed-and-verified-against-official-pdf",
+                    "htmlStructureReference": {
+                        "publisher": "International Code Council",
+                        "url": f"{ICC_2014_BUILDING_CODE_CHAPTER_7_URL}#NYNYCBC2014P1_Ch07_Sec705.7",
+                        "role": "secondary semantic structure reference",
+                    },
+                })
             blocks = [text_block, *section.blocks]
             detail = {
                 "schemaVersion": 2,

@@ -380,7 +380,7 @@ async function main() {
     assert(webRoot.text.includes('id="toggle-analysis"'), "Web workspace omitted the global Research chat button.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260725-visual-inventory-v13"),
+      webRoot.text.includes("20260901-2014-code-assets-v14"),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -3182,13 +3182,13 @@ async function main() {
         trustProfilesByPrefix.get("EBC")?.effectiveDate === "2027-07-17" &&
         trustProfilesByPrefix.get("BC68")?.statusKind === "historical" &&
         trustProfilesByPrefix.get("ZR")?.statusKind === "continuously-amended" &&
-        /2026-07-16/.test(trustProfilesByPrefix.get("ZR")?.currentThrough || ""),
+        /2026-08-13/.test(trustProfilesByPrefix.get("ZR")?.currentThrough || ""),
       "Normalized trust metadata lost a material legal status distinction."
     );
     const zoningLibrary = codeLibraries.json.libraries.find((library) => library.id === "nyc-zoning-resolution");
     assert(zoningLibrary, "Code-library metadata omitted the Zoning Resolution.");
     assert(zoningLibrary.syncCodeVersion === zoningSyncCodeVersion, "Zoning library returned the wrong sync identity.");
-    assert(zoningLibrary.textChangesThrough === "2026-07-16", "Zoning library returned the wrong source cutoff.");
+    assert(zoningLibrary.textChangesThrough === "2026-08-13", "Zoning library returned the wrong source cutoff.");
     assert(zoningLibrary.researchEligibility === false, "Zoning Research was enabled before its approval gate.");
     const existingBuildingLibrary = codeLibraries.json.libraries.find(
       (library) => library.id === "nyc-existing-building-code"

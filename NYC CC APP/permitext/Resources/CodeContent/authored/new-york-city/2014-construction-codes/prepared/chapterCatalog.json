@@ -39944,7 +39944,7 @@
       "codeVersion": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
       "chapterNumber": "16",
       "sectionNumber": "1613.5.3",
-      "title": "Site coefficients and risk-targeted maximum considered earthquake (MCE ) spectral response acceleration parameters.",
+      "title": "Site coefficients and risk-targeted maximum considered earthquake (MCER) spectral response acceleration parameters.",
       "headerLine": "SECTION BC 1613",
       "headingLine": "STRUCTURAL DESIGN"
     },
@@ -46784,7 +46784,7 @@
       "codeVersion": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
       "chapterNumber": "19",
       "sectionNumber": "1905.1.3",
-      "title": "Basis of f' .",
+      "title": "Basis of f'c .",
       "headerLine": "SECTION BC 1905",
       "headingLine": "CONCRETE"
     },
@@ -49952,7 +49952,7 @@
       "codeVersion": "CodeContent/authored/new-york-city/2014-construction-codes/bundle.json#1",
       "chapterNumber": "21",
       "sectionNumber": "2105.2.1",
-      "title": "Compliance with f’ and f’ .",
+      "title": "Compliance with f’m and f’AAC.",
       "headerLine": "SECTION BC 2105",
       "headingLine": "MASONRY"
     },

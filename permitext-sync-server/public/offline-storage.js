@@ -9,26 +9,26 @@ const notebookImagesStoreName = "notebook-images";
 const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v755";
-const shellAssetVersion = "20260901-2014-code-v17";
-const offlineAssetVersion = "20260725-visual-inventory-v13";
+const shellCacheName = "permitext-pro-shell-v756";
+const shellAssetVersion = "20260901-2014-code-v18";
+const offlineAssetVersion = "20260901-2014-code-assets-v14";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
   "/",
-  "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
+  "/web/manifest.webmanifest?v=20260901-2014-code-assets-v14",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260901-2014-code-v17",
+  "/web/styles.css?v=20260901-2014-code-v18",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260901-2014-code-v17",
+  "/web/app.js?v=20260901-2014-code-v18",
   "/web/settings-copy.js?v=20260830-stripe-tax-copy-v4",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260826-research-request-recovery-v121",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260901-2014-code-v17",
-  "/web/research-intent-state.js?v=20260901-2014-code-v17",
+  "/web/offline-storage.js?v=20260901-2014-code-v18",
+  "/web/research-intent-state.js?v=20260901-2014-code-v18",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260811-research-columns-v3",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",

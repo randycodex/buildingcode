@@ -191,14 +191,14 @@
           "pdfPage": 24,
           "printedPageLabel": null,
           "parserAgreement": 0.9928,
-          "pdfplumberTextSHA256": "7f9e37af16b564a8d73d1e83ecb5ce64bd68c91f3183d35900dabe20f6cb1182",
+          "pdfplumberTextSHA256": "ba78fabdd925376ce41c04dbeaad93833576aac2500cd14ae447cc156b22cb4d",
           "popplerTextSHA256": "19a9896f0accce4adbe90c4c2c32733c2d7ce1e042719e2a5485d5cbc42dd92e"
         },
         {
           "pdfPage": 25,
           "printedPageLabel": "2",
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "abfc3e74912be4bad874b0fc6e4c3607b2efd3b5454e7eb9e849dcbe1007a705",
+          "pdfplumberTextSHA256": "f009b25ed1b784296333fba4935cdca75b4bce43ba8e4857c2c8f2789543dbf2",
           "popplerTextSHA256": "14ab6f561ac5314bf11e85cd5429b3c1109993cb2961cbc970ce356bb7012934"
         },
         {
@@ -338,14 +338,14 @@
           "pdfPage": 45,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "d34d89b0526d680c9448b56f5f830491849ff60f091cb63a3125ef8d64cde516",
+          "pdfplumberTextSHA256": "d08f7d21a6f6bc95f2d3255dd825727bd052d60d538454958e79787ccef59de1",
           "popplerTextSHA256": "e69f91445ef81da2a09f5e95b04fe005f7925b27f9d3bf41feec1506218691e5"
         },
         {
           "pdfPage": 46,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "1c1dcaf0fc47507bcaf7e86372a7913781fc60ee494602086a4364afea7de744",
+          "pdfplumberTextSHA256": "1a61c7568c0db0cb4e8443988901b53dbf418f59c00af7591d69101b4a70e3f3",
           "popplerTextSHA256": "fa7f8acdbf9d5b24d7a089b3cb70478ac42e5cef99ca29c54eb61c367d4808fc"
         },
         {
@@ -724,7 +724,7 @@
       "bytes": 601458,
       "pageCount": 47,
       "sectionCount": 139,
-      "minimumParserAgreement": 0.9415,
+      "minimumParserAgreement": 1.0,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -953,43 +953,43 @@
         {
           "pdfPage": 33,
           "printedPageLabel": null,
-          "parserAgreement": 0.985,
-          "pdfplumberTextSHA256": "353bee8af205e29af59cf6813beff23a8b496bded35a3ba8f748cca1f6ba7368",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "bde487ef5faf62e8225756fc0f89594f41ec68c3fcd131c8cbbbb3dc6f251464",
           "popplerTextSHA256": "98e5798a7d2cc97d8af3c772ebfdcc4b755eca1745766c789faed0f1551e4ce3"
         },
         {
           "pdfPage": 34,
           "printedPageLabel": null,
-          "parserAgreement": 0.996,
-          "pdfplumberTextSHA256": "e6bbdad65478d591992b0d4f14597010fbc2e94239620ef97c653cfa24924ff0",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "f3dd3f81b25e7e4185ff36eb948d4ba4af3ccc0b62fb5a3405d8313946fb8da5",
           "popplerTextSHA256": "c779a38862a913df3339f217b2755f2d836d578f770e99fee8102ca786d68418"
         },
         {
           "pdfPage": 35,
           "printedPageLabel": null,
-          "parserAgreement": 0.992,
-          "pdfplumberTextSHA256": "8f27fd6550bea411258767882b489440aea24dcb18603a2730a4bce47af42cf5",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "858b1f237bc056444c2919429da6fce555d634c694aa9c95db022b63481bb376",
           "popplerTextSHA256": "4b1a5b2aa68e2082118453245851454769810bc83bc4d988cd6486290a08a232"
         },
         {
           "pdfPage": 36,
           "printedPageLabel": null,
-          "parserAgreement": 0.9415,
-          "pdfplumberTextSHA256": "1ad701520b24a0cfc9e61422e7b11f9fb963ea16ad99fec30b3c4fee784ac34e",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "c8b8b065abace9e1d5899ebd63262c0ba44505f98b714772d27ca8b141ee9d70",
           "popplerTextSHA256": "779f20af92086bffa06b317f1173e8b98080009de21ff5c9da431ed9c315a0e2"
         },
         {
           "pdfPage": 37,
           "printedPageLabel": null,
-          "parserAgreement": 0.9614,
-          "pdfplumberTextSHA256": "9a6f3e528188181679e9a668d94bb816989cfb872b9faf83d8bee7105e3d919c",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "91ceb2e9e8820fb8526201f3e9f7942dc92000dde458295cc5736ab66b7481f3",
           "popplerTextSHA256": "fdb4e3dc65466dcc2ef007ef56243f389a37f40216f80dc37186aa01f61e9432"
         },
         {
           "pdfPage": 38,
           "printedPageLabel": null,
-          "parserAgreement": 0.9928,
-          "pdfplumberTextSHA256": "558bdb15e58dd95708be8e8a21b6f3c6a4ebce1f3b70349ad10461989720bd6b",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "ed50612de6dbe5cf9ce11851b56208f0477d8de86c55ef0dacaaae02fb1d3d8c",
           "popplerTextSHA256": "37b5637f96563123717e42ccce6ba6f0f3731d443a45e065ed718911f644b90f"
         },
         {
@@ -1094,14 +1094,14 @@
           "pdfPage": 4,
           "printedPageLabel": "31",
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "b5aa7a57fecb8a3e3479dd7ce1a43f6c10f6c5b74f1e4277c30452d2a962f64e",
+          "pdfplumberTextSHA256": "5cddd18d004c033e74653ee1b0e69ee8967a00a03d05cbf4b2d31afad669e961",
           "popplerTextSHA256": "5c543fd7fd6ce6ba3404de924c70f0e2905bff1079bacc586a061a4f5b7ce784"
         },
         {
           "pdfPage": 5,
           "printedPageLabel": "14",
           "parserAgreement": 0.9858,
-          "pdfplumberTextSHA256": "84862261d77e7a91c50b65e1783303002ef1b45e875226fe396a9caf0d48f36d",
+          "pdfplumberTextSHA256": "b0b247b9982466c40602c1ac4b1884698cfad105825cd1e0b9f82cc441ac176f",
           "popplerTextSHA256": "2d41997c01ad16b09a8ae8c8a0f429d1a7c94ed0956bbb3bef82226586a1018a"
         },
         {
@@ -1597,8 +1597,8 @@
         {
           "pdfPage": 18,
           "printedPageLabel": null,
-          "parserAgreement": 0.9906,
-          "pdfplumberTextSHA256": "b684e4461b9b0b3fb0ce90b5f4c3214bfe42d80a4f215a675dcda8067b27591b",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "72ad7e0a63cee0bcdc57f7469f49664137cb5ff7a9149e241b7ffd2934608683",
           "popplerTextSHA256": "50e8e87f4c81bd36780f9b18ef0643b33ec555b65b60d99477f4a8c5c1fca0cc"
         },
         {
@@ -1647,7 +1647,7 @@
           "pdfPage": 25,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "757c3c7834f27a8276545f35f36be91e002038ad3938d368e56198fda8334d5c",
+          "pdfplumberTextSHA256": "05e612a5f3d97089069ff15df40adebae56c50ce0869d8059a905ac53c7b2701",
           "popplerTextSHA256": "ffa289d06979bb5244ff6475f96fe452029663a1d1e6d71b3a9abe02f518ad05"
         },
         {
@@ -1697,7 +1697,7 @@
       "bytes": 461085,
       "pageCount": 20,
       "sectionCount": 40,
-      "minimumParserAgreement": 0.948,
+      "minimumParserAgreement": 0.9071,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -1737,22 +1737,22 @@
         {
           "pdfPage": 6,
           "printedPageLabel": "2008",
-          "parserAgreement": 0.948,
-          "pdfplumberTextSHA256": "87fe2163f70f58590f8dce43b7da6ae445e0ace1cc90520e9e4f33831e6fa958",
+          "parserAgreement": 0.9071,
+          "pdfplumberTextSHA256": "6a0be36d46277b058de15b782e9676fc745447a98cafad7c6a00e66c9f67cf09",
           "popplerTextSHA256": "3eda8bc1ff37d12cc6e1760329558fb8f86682795a31b413eeacc920e272b00c"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": null,
-          "parserAgreement": 0.9902,
-          "pdfplumberTextSHA256": "bfbeea82042d9ae2bc4ecdba7f06e47fb57644dc37f8bf0bd4ff93f67acdf7d5",
+          "parserAgreement": 0.9631,
+          "pdfplumberTextSHA256": "4c102e324a33057efbb7c5bd0ea994987a6658d4e1c41c076e3c8d744241f6b7",
           "popplerTextSHA256": "46f5fd00c525d40cc3d8e703c92c14275754eb41cac521f9f593343342cb4e8e"
         },
         {
           "pdfPage": 8,
           "printedPageLabel": null,
-          "parserAgreement": 0.9825,
-          "pdfplumberTextSHA256": "6e9aec04c62981df90ac78a2496770fa1483089a41e00934bc62f73a8d573cc7",
+          "parserAgreement": 0.9716,
+          "pdfplumberTextSHA256": "06fd2459dead61e24ca11f239616951f5f7954547a793ed318823987a85bd866",
           "popplerTextSHA256": "0cabf1956113e7dc5acc526744c0ce5c57ac16254b892aa7e998f125aa5846d4"
         },
         {
@@ -1779,15 +1779,15 @@
         {
           "pdfPage": 12,
           "printedPageLabel": null,
-          "parserAgreement": 0.9961,
-          "pdfplumberTextSHA256": "01743e2b8f0ba1a3935b46f90e548d3461d0293ba6073bd4047e50eb15f17af4",
+          "parserAgreement": 0.9921,
+          "pdfplumberTextSHA256": "bfd3c16b11a4892b7316b5f87716be5de3aa164c1005c12931e3091660a9234c",
           "popplerTextSHA256": "15f8d589ea12384863d7fe4fa2e0d99c57a30cee3b5e4c291273ad57e5544f20"
         },
         {
           "pdfPage": 13,
           "printedPageLabel": "H-3",
-          "parserAgreement": 0.9971,
-          "pdfplumberTextSHA256": "5f543cffa246cb36848b0a27f9cf3cbec71cab4221886007c94af433b7333a3e",
+          "parserAgreement": 0.9942,
+          "pdfplumberTextSHA256": "a3ebe5caaaa634fd30c8b94dbda4bc002705a17617b0b037e2c96d164cf3955e",
           "popplerTextSHA256": "a3bff547758950a3bb8b8a744dd57688ab931e3f4ed42d483ac9813cd3ade707"
         },
         {
@@ -1885,7 +1885,7 @@
           "pdfPage": 5,
           "printedPageLabel": "420",
           "parserAgreement": 0.9894,
-          "pdfplumberTextSHA256": "c5fc14d5a0c7fdff0c3973d2ea962e84ae2bdcc5086f5d8d3e59319095b0d66d",
+          "pdfplumberTextSHA256": "4d830769e12800ba92710f3888e9bd7659287069c33b8ef4fc4cef262682510c",
           "popplerTextSHA256": "92f0fcd44140d29e1a59f3d023d318623c392fd8a99d78914321daef623485b1"
         },
         {
@@ -1982,8 +1982,8 @@
         {
           "pdfPage": 19,
           "printedPageLabel": null,
-          "parserAgreement": 0.9868,
-          "pdfplumberTextSHA256": "0cebd1c075887bacae8e9bd4fca86fa43ecb4ac8ae497b8df09bdcb48c018968",
+          "parserAgreement": 0.988,
+          "pdfplumberTextSHA256": "c36d5136bf7530a5468edef6538a48ff8654cda62dc9a134cdf7191261757cf8",
           "popplerTextSHA256": "2d6bf69e286682c1a43f91537ce9a0b729fef287b3d98119ece0b889b529d895"
         },
         {
@@ -2039,35 +2039,35 @@
           "pdfPage": 27,
           "printedPageLabel": "715",
           "parserAgreement": 0.9911,
-          "pdfplumberTextSHA256": "ea9e1a5a8139f4078d15443bae0de9fe76948cc88cf9b76ae7c1a7bdfb805bef",
+          "pdfplumberTextSHA256": "00e4ef7288299434b657765aa2262cc52414714433681997b69267b03349a228",
           "popplerTextSHA256": "b7e354af0dfd6c6af04a38c917da3dd8efc2b47414c36cdc99bf82c9e76609f6"
         },
         {
           "pdfPage": 28,
           "printedPageLabel": "414",
           "parserAgreement": 0.9912,
-          "pdfplumberTextSHA256": "42ea4dc1d216e8ee62a29b7e7bb517fdf0c7a8847d7a30755ee9cea66ec51e61",
+          "pdfplumberTextSHA256": "15cc737a1963803d6ff24ca00c06a29a87e8fe3c0cdf382324ef880eb42b696b",
           "popplerTextSHA256": "b05f1a7e6e4c2d6e100a5199fc4dc5f4b56c7691409112f001eb65f7f32aecc4"
         },
         {
           "pdfPage": 29,
           "printedPageLabel": null,
           "parserAgreement": 0.9936,
-          "pdfplumberTextSHA256": "c0b4e08b735ae76f6b18297e1186bf428f05257af3415089b8717dcb9d911381",
+          "pdfplumberTextSHA256": "305de775ef77d1342383a11798fec4026d4503c5175b6b1610b9427294e958a9",
           "popplerTextSHA256": "f652ced38967e68ab04cf1008fed6d5267e42c4d9fe0dacf5592de8ba1911489"
         },
         {
           "pdfPage": 30,
           "printedPageLabel": "3",
           "parserAgreement": 0.9532,
-          "pdfplumberTextSHA256": "1213b6522335cb37333ce61cfa3a8622249392fed5ac48a246cabc3d46e1e545",
+          "pdfplumberTextSHA256": "ad607b4a5c5668a9d6ebc512befaf22de574ff255e57d400d01419dba84c1e76",
           "popplerTextSHA256": "8ee4a4fcc27dfe23654f29763f07119a86815f333d6f4298d55dc73a85fac0d4"
         },
         {
           "pdfPage": 31,
           "printedPageLabel": "1",
           "parserAgreement": 0.9717,
-          "pdfplumberTextSHA256": "027946bb304c1228389e8d09ffdf1c629ae18453e461a1e55bd39b6edbc3461c",
+          "pdfplumberTextSHA256": "e5b58a442c6d22c76b30e6ce6ecb199c44c60a3d656c038a7533a638141c7ac3",
           "popplerTextSHA256": "fe75d73adcec51a15ca437efcf4e5219d2439c5a030fd81d1c1275b395f811ba"
         },
         {
@@ -2081,7 +2081,7 @@
           "pdfPage": 33,
           "printedPageLabel": null,
           "parserAgreement": 0.9234,
-          "pdfplumberTextSHA256": "cdd720e621b783c4adece6f9e80df3c6b80f78bcde3510d2f0993f6a8be72e41",
+          "pdfplumberTextSHA256": "a578e4774db672c8df73755569c7011ddadf0d1ee5e78c38f9e9293152484d1b",
           "popplerTextSHA256": "72e2ca3a0fc63c6bb3844a5878170abf4b32bfeef65b6053909b34154e0c8731"
         },
         {
@@ -2109,14 +2109,14 @@
           "pdfPage": 37,
           "printedPageLabel": null,
           "parserAgreement": 0.9829,
-          "pdfplumberTextSHA256": "a96b058c081a91a774f53aaba5bd6a06a2504c3e7efbbc8092e759248c0dab06",
+          "pdfplumberTextSHA256": "a95989ae20fe4ceb48bcc3d9e2c0a7515a2792af92dc0d68f27ac4b5f9ee290d",
           "popplerTextSHA256": "6f91848c3b8f558f9b572e78ba3f549737b2ab7774f1815ea75047446797a52a"
         },
         {
           "pdfPage": 38,
           "printedPageLabel": null,
-          "parserAgreement": 0.9838,
-          "pdfplumberTextSHA256": "68478ea084e1dc9fa9c74a7ea112b1f45acf7db724e35da86bba4887ea1060ad",
+          "parserAgreement": 0.9676,
+          "pdfplumberTextSHA256": "a9518f8af2fef4b9aac4ca30eaf389183cbb6eab637da78bf8acf867a83d2bf0",
           "popplerTextSHA256": "6256b1874a622808388224f6e79c24950452292f329e4e5c064ea354033b7e93"
         },
         {
@@ -2136,8 +2136,8 @@
         {
           "pdfPage": 41,
           "printedPageLabel": "8115",
-          "parserAgreement": 0.9721,
-          "pdfplumberTextSHA256": "e05ab60dfebcf400c9f60392422bc1c185083a224b24772b040523d98888aba0",
+          "parserAgreement": 0.9628,
+          "pdfplumberTextSHA256": "fc295eb38ab9e303d9cb98370f4fdc24aded60ee2dc3f7cbfa77bb024eced731",
           "popplerTextSHA256": "76aa74f90f5eee3ca8dfc70b3292f15952945001d70918b5a90acf0068e92872"
         },
         {
@@ -2236,7 +2236,7 @@
       "bytes": 445335,
       "pageCount": 14,
       "sectionCount": 84,
-      "minimumParserAgreement": 0.9828,
+      "minimumParserAgreement": 0.9819,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -2256,35 +2256,35 @@
           "pdfPage": 3,
           "printedPageLabel": null,
           "parserAgreement": 0.9969,
-          "pdfplumberTextSHA256": "563ffae431a02b8c7248983e79d7be359bfc75793226f827e7fabcf52d31a4f4",
+          "pdfplumberTextSHA256": "43f77b49b2f3599bcf495286dac49031daa2c633d983bf3e9825ff8b8564ac8b",
           "popplerTextSHA256": "ff381812df8f2ea66fb3747b9034287a92972355f56a2f3a6d1666d736ebd072"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 0.9948,
-          "pdfplumberTextSHA256": "778d152436479dc3fe2b58102d9a840a968ea21aa398e6413868b61a757f9823",
+          "pdfplumberTextSHA256": "dbc1b6973f77db1bdcfbabfa2119b83ab1f44f4175159383ed4794820fc3329c",
           "popplerTextSHA256": "0d48352e80340064311d1b5d09d61cc2f09637056bc39d7b18197c493eeac60b"
         },
         {
           "pdfPage": 5,
           "printedPageLabel": null,
-          "parserAgreement": 0.9828,
-          "pdfplumberTextSHA256": "1fb2323df77944e4ab0ef9c05a90a52331e300d0386aa55d274d8442085c4ab6",
+          "parserAgreement": 0.9884,
+          "pdfplumberTextSHA256": "9e5a7176310b47330cc3ce5806261dfe571b1f55c108617fd05c37c2dd08daf8",
           "popplerTextSHA256": "69441e51ec26ed44e9f59156515d6dc56bf0d92956f4a353c91c547bf1adbda2"
         },
         {
           "pdfPage": 6,
           "printedPageLabel": "6",
-          "parserAgreement": 0.9838,
-          "pdfplumberTextSHA256": "21cbbb1786ceda1b20405334fdc4489da7b1adcc824b0d9a44c24a1d9ac9a3c0",
+          "parserAgreement": 0.9824,
+          "pdfplumberTextSHA256": "06bed3a187109bbbfdde33747ea33aee274f03762918ff78cca08e13b69be4fa",
           "popplerTextSHA256": "6ba81788cea6f4f8070419db3caed0429a67ebddf37976ded3716d4ec07f26bc"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": "3",
-          "parserAgreement": 0.9962,
-          "pdfplumberTextSHA256": "b98d7f2fb32f6a7c46dc82846f4a54157e192fcd4e9fc0a7dc79fa9a124ad72e",
+          "parserAgreement": 0.9975,
+          "pdfplumberTextSHA256": "20d1200a3fc31b16107a3e4d66e1a4789347d1a28bf6a7119a29b7fa1da12cb1",
           "popplerTextSHA256": "843c2a4ff180285fcdaad0c164aa4d81e678c0474fa55e4182617fb4027d4163"
         },
         {
@@ -2311,8 +2311,8 @@
         {
           "pdfPage": 11,
           "printedPageLabel": "509",
-          "parserAgreement": 0.9964,
-          "pdfplumberTextSHA256": "fc04d7e891f635a340f17a1a5f36469b242810093120471525970ab7a27f8a67",
+          "parserAgreement": 0.9819,
+          "pdfplumberTextSHA256": "02b9c10b50ea82db952cc89ae57a782b72aced2930ce038ac6df7a7b8e583287",
           "popplerTextSHA256": "b22557c50c4890695dda18e171234ca2bed07daf85440209bb15612dc7a6655d"
         },
         {
@@ -2326,7 +2326,7 @@
           "pdfPage": 13,
           "printedPageLabel": "712",
           "parserAgreement": 0.9906,
-          "pdfplumberTextSHA256": "eb91196143212c3fde96127b8e3203d36100cc722f424f2e5b78049c3955fa0b",
+          "pdfplumberTextSHA256": "3a21ebfb65c505e86b9599ac3df79069ac56234e31126e8a22d91b7fabcdf707",
           "popplerTextSHA256": "c0cd1d38651f982e111b57c322368d6e7a14b59a6f303b01faa4348a27e95be5"
         },
         {
@@ -2353,8 +2353,8 @@
         {
           "pdfPage": 1,
           "printedPageLabel": null,
-          "parserAgreement": 0.9855,
-          "pdfplumberTextSHA256": "f9ac3a1b05f76521c51e20eccbf6c411e559f694f4938aeb07514b1e76030cd6",
+          "parserAgreement": 0.971,
+          "pdfplumberTextSHA256": "3a3eb822ce24080aaa3ca685fec4af74c9b6a0d6cf30b134de6c986f76ca7eb2",
           "popplerTextSHA256": "6c35a565d94bddbf72efb083e06f8812b0e2c1ae4e4e58d749e710959c77dfe9"
         },
         {
@@ -2368,14 +2368,14 @@
           "pdfPage": 3,
           "printedPageLabel": null,
           "parserAgreement": 0.9362,
-          "pdfplumberTextSHA256": "d7f504b3bf99c77cc8ed838d2f48774aea73b1cc57119d3aa8005b4837a12315",
+          "pdfplumberTextSHA256": "418ebec0f5c5ea147038c0c088c1af76a214f662900f3ca98a6f82f683c63d85",
           "popplerTextSHA256": "3f939cfff2014da161f0fca7791930d6ef02071d257afa249e94b61b45346cb7"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": null,
-          "parserAgreement": 0.9903,
-          "pdfplumberTextSHA256": "12abb620b4c668cd8e0da43fcfa0f8d9e276ddce3e9097ca574674b27e7ab60d",
+          "parserAgreement": 0.9922,
+          "pdfplumberTextSHA256": "8dfa8ba68eafa6f6c6ac67dee441f180d5cdc22244ce2de498683c78e3dae4a4",
           "popplerTextSHA256": "995f40775a505746198613fa06f8054d1b5487f4f1e7e424657f61796e710ebf"
         },
         {
@@ -2397,7 +2397,7 @@
       "bytes": 2151656,
       "pageCount": 103,
       "sectionCount": 449,
-      "minimumParserAgreement": 0.8819,
+      "minimumParserAgreement": 0.6633,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -2437,15 +2437,15 @@
         {
           "pdfPage": 6,
           "printedPageLabel": null,
-          "parserAgreement": 0.9971,
-          "pdfplumberTextSHA256": "f4fdabf2824fa40f4762a3a86edd5e8ccb23dc76ebd368e0f4e1f6ee42b83b86",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "a2573236770cb4ba92510a6fa77c16109c6f59b720e5ab6f17663ce072cfe3a5",
           "popplerTextSHA256": "b79f75f845f70fff0391ccf102a8e04d758bdae8f1d4fcf6f2f6c3d500c0e177"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": null,
           "parserAgreement": 0.9934,
-          "pdfplumberTextSHA256": "8837a861297f2f2e332df53d428769270e5e29eb8cc0b6ffaa422a4efdfbfde3",
+          "pdfplumberTextSHA256": "73db941a7dc5bf9f9f480f244960fd40ea4125af5f4d2d7c7db9a71b0764bbca",
           "popplerTextSHA256": "d3beaf33d99a87b4b7aee2028c567916a69fc27e70d3a70dcb6765f7ce1980c0"
         },
         {
@@ -2458,8 +2458,8 @@
         {
           "pdfPage": 9,
           "printedPageLabel": null,
-          "parserAgreement": 0.967,
-          "pdfplumberTextSHA256": "02b4d1235a22da8c3754d2938de38e6528e299259c519b787a1c205237d1cf46",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "72246b3b0bf9912bff0c76a718da0a30d7155c46efa0bb99b4e556a168cb7eeb",
           "popplerTextSHA256": "e232bc049751ef33d9e785ade77d2589176aeb2f5bf6793068fa38847fb65808"
         },
         {
@@ -2536,7 +2536,7 @@
           "pdfPage": 20,
           "printedPageLabel": null,
           "parserAgreement": 0.9969,
-          "pdfplumberTextSHA256": "099ff183af414cc71eb58e628dea3dc85d1874d9ad317140937e22f2f4c83154",
+          "pdfplumberTextSHA256": "3655b8f311e7a9f898f165913095b4cd376041c86ee920964c5d5120ebe62ca9",
           "popplerTextSHA256": "6f08d7c619cdc78861175c389c03d2f8b7b3580e434fea8dfc04e79bbfc0ec0b"
         },
         {
@@ -2578,14 +2578,14 @@
           "pdfPage": 26,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "61d429113c2848a7a92591f0c7b2638532016c12181a67082fa9a3ee0229e021",
+          "pdfplumberTextSHA256": "070808a42d5100107ab0d02c5c221f31b9ca9df95385a6dfff4a358c5698d62d",
           "popplerTextSHA256": "9ddeb800e81aa08df7a2bd70cecb9e25c1389bd25611384067c515486424bdd7"
         },
         {
           "pdfPage": 27,
           "printedPageLabel": null,
           "parserAgreement": 0.9943,
-          "pdfplumberTextSHA256": "4c4428a5296ed17840f8c2addd9d92e7f0b826ad9f577ef8a61903890c9cf6ed",
+          "pdfplumberTextSHA256": "67d6af4c4db33b8af1425953ef439e3017e0f6838dbfaa9696dd7321b25ee715",
           "popplerTextSHA256": "efd780ed775c146c714ab5ab581c94022150a0f27e66125f09e89b4e702da631"
         },
         {
@@ -2605,8 +2605,8 @@
         {
           "pdfPage": 30,
           "printedPageLabel": null,
-          "parserAgreement": 0.9961,
-          "pdfplumberTextSHA256": "f50957be10385488ece7f65e922caa6380a89b64539f00a9d494bfc3efda1150",
+          "parserAgreement": 0.9921,
+          "pdfplumberTextSHA256": "3a224ef5be2f36d253a801f9026f43acaed429a6cc9d32357ff016db1f233799",
           "popplerTextSHA256": "a53c03b5e341aa6a9f8f955d01ec09e9b80b09003bec699443c94304b2e6305c"
         },
         {
@@ -2626,22 +2626,22 @@
         {
           "pdfPage": 33,
           "printedPageLabel": null,
-          "parserAgreement": 0.9879,
-          "pdfplumberTextSHA256": "aa168a96aefe6a889fe2377d819937538d46d65cc0546b769e1d5d04861b9374",
+          "parserAgreement": 0.9959,
+          "pdfplumberTextSHA256": "23cc47cd49cac40fad3f3e407eead00002ee770e726ddfe8b4c234172779fb21",
           "popplerTextSHA256": "72a63224be1a76f5540d843b065e1a261b88c7cce19aabcd14fafb4e8dbe4c8f"
         },
         {
           "pdfPage": 34,
           "printedPageLabel": null,
           "parserAgreement": 0.9926,
-          "pdfplumberTextSHA256": "c2f61a705cc118d14dfbb54bffefa36ee564944bdb8afdb723f911f78bbd48c9",
+          "pdfplumberTextSHA256": "1d9be3acd130a006066db5a419d99d2a552159d725f34617ec2bb5ac1d8f6f6e",
           "popplerTextSHA256": "baae294ae0e42adfb2ddceec4cf73fa42a1c132ad53fbd0d544a73473a0243f3"
         },
         {
           "pdfPage": 35,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "b262e395925781151a78ac0874def98d70b364e78f09e9b330f4eb2eb5273ae4",
+          "pdfplumberTextSHA256": "8062aecaf2f91aa140a6710c193f1598bb88a36b16cfc05e528963ec860d9a81",
           "popplerTextSHA256": "a679970426ba881d021aeaa4d23959a8199d3c5cd9078911dc785bfc4d2e8de8"
         },
         {
@@ -2717,120 +2717,120 @@
         {
           "pdfPage": 46,
           "printedPageLabel": null,
-          "parserAgreement": 0.9176,
-          "pdfplumberTextSHA256": "f51ce40a2337d3d81011e8afa75b8fb6301415acd47a521507fc7be102cf09a7",
+          "parserAgreement": 0.7298,
+          "pdfplumberTextSHA256": "c7f5f46b8c4054771125967322425d3816ff5d7fc933adfca250e09f82edfead",
           "popplerTextSHA256": "d8d0905464814c32e1dc1954a75e455e3dace7a86e2bfe3c834cd69672d75466"
         },
         {
           "pdfPage": 47,
           "printedPageLabel": null,
-          "parserAgreement": 0.9783,
-          "pdfplumberTextSHA256": "1469dc13cd58f23d05f9492d8582959f8247e5a981ea52651211d3fc4d4e4791",
+          "parserAgreement": 0.8724,
+          "pdfplumberTextSHA256": "f46f458e6c4a75f83f1c6a7d4d91e6913f00dcfeb487907bbc1513fa8ac5e4a7",
           "popplerTextSHA256": "955272b7c6fd2fe6c302bc8758d1a6dd720a4d0d078b19031cc13b01f499e347"
         },
         {
           "pdfPage": 48,
           "printedPageLabel": null,
-          "parserAgreement": 0.9295,
-          "pdfplumberTextSHA256": "5e9e8e62b26d16d6ae1b8fcf322c3b7458c50931d26faabcc3f7b38c7276c85d",
+          "parserAgreement": 0.7123,
+          "pdfplumberTextSHA256": "fb6876c33f10b4335b03dd9b2ab7f36a24f96895db3db901478f2d8415596224",
           "popplerTextSHA256": "2bfff91d9cbe6d6fec686ba9b2141769a45153c93f802ebca295df360ec3295a"
         },
         {
           "pdfPage": 49,
           "printedPageLabel": null,
-          "parserAgreement": 0.9699,
-          "pdfplumberTextSHA256": "335c7c06efc676c178822fcd373ea86bf3b0d4706a158e0a0f633d3c3e5a7302",
+          "parserAgreement": 0.9151,
+          "pdfplumberTextSHA256": "a887aba0b094fa910a76c6df6472d76e4c4ab47fd98ba743af8294f1a0bf802c",
           "popplerTextSHA256": "602e50d74e45c32c6e21701c8acdf760edaf769b9c82bd94509ad065d2dde7d1"
         },
         {
           "pdfPage": 50,
           "printedPageLabel": null,
-          "parserAgreement": 0.9892,
-          "pdfplumberTextSHA256": "d52410095780d1cb73a47ccdf87fe18456da1cb0bccbdf751f46af6751f1c22f",
+          "parserAgreement": 0.816,
+          "pdfplumberTextSHA256": "c586bd25d1183259909b263e51cca97ed49dd84e38283d6e06bb06fb80964630",
           "popplerTextSHA256": "ad3009c36651f6e8c645fa7cfdfcc63296d397626d313a55469a6eb0bf41d5ed"
         },
         {
           "pdfPage": 51,
           "printedPageLabel": null,
-          "parserAgreement": 0.9483,
-          "pdfplumberTextSHA256": "04b004b885c029d5381669a3e810c7a2758a5f68b8cb0275077f95f59a2a916d",
+          "parserAgreement": 0.7025,
+          "pdfplumberTextSHA256": "bd1ff32b41df2c46806aed0aba31019e0691a913cdbcd432e8bac2c83b5b986b",
           "popplerTextSHA256": "9f1ff0af700774448f3f06f20dc0d3ae8d55ab57cdc6cbaa87ef8bb67e830552"
         },
         {
           "pdfPage": 52,
           "printedPageLabel": null,
-          "parserAgreement": 0.9116,
-          "pdfplumberTextSHA256": "3f4971036334f54e299306b46238e644bce48aa3fa27de8f0be02fe0404732f3",
+          "parserAgreement": 0.6633,
+          "pdfplumberTextSHA256": "ba527936ef60e0938f19d534093541ca3e7859103ff1ff47284727312f0df6cb",
           "popplerTextSHA256": "c438a351f19cc00489884be1d3361bbd1647afc65f0006ec7746e0c1f418252a"
         },
         {
           "pdfPage": 53,
           "printedPageLabel": null,
-          "parserAgreement": 0.9667,
-          "pdfplumberTextSHA256": "249e1e9c47d13021d7d9d05f27ff01a864c6f92c5798424810ff323dd2bca402",
+          "parserAgreement": 0.8582,
+          "pdfplumberTextSHA256": "0d2e38107fdb127cda652f6e79d823b39862d68759b33d8056ea40a04d1de867",
           "popplerTextSHA256": "6e073890d0ea347ba6547b7b1fe38243649310ee0bba647143d42f139fd792cb"
         },
         {
           "pdfPage": 54,
           "printedPageLabel": null,
-          "parserAgreement": 0.9596,
-          "pdfplumberTextSHA256": "50b230f92c3c4ccacd4a3815782df667adc40e4c33b669cf1fe61b415d037987",
+          "parserAgreement": 0.8395,
+          "pdfplumberTextSHA256": "a410f7dbf1e828f32a9bcc7fc2d82d8efcdde0bef9538821efab4b517f322083",
           "popplerTextSHA256": "5992f27277357716a4ed2936b4f75385f362d42b6504d45b37f9c7bf0144bec5"
         },
         {
           "pdfPage": 55,
           "printedPageLabel": null,
-          "parserAgreement": 0.9897,
-          "pdfplumberTextSHA256": "8c1956568f576e138c1aaa4e0cefd97ec76eeda134246e22a60cc11eb1022b82",
+          "parserAgreement": 0.96,
+          "pdfplumberTextSHA256": "b83d37b9455e65f70fc3b2733b5150e8956a782d4eddfbf64022322102cc011a",
           "popplerTextSHA256": "8357e76b1587bca64abc41294c5156f2b84d156494a380825f6abd622013b303"
         },
         {
           "pdfPage": 56,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "8a4a358f420f9ac0d790aa42072b5372a840f33c0aa44e5f33f3be538637b7a7",
+          "parserAgreement": 0.9226,
+          "pdfplumberTextSHA256": "5db647cc26fa21886365a202020ae757b77dbe9c50175415b3dd57b427038d67",
           "popplerTextSHA256": "90a19fcb39f675a1cd589f97cef9dffb038af929dd7da44464fa51d459ee6cd1"
         },
         {
           "pdfPage": 57,
           "printedPageLabel": null,
-          "parserAgreement": 0.9546,
-          "pdfplumberTextSHA256": "3541b087bd190b92ef8eb7f346760887f90182627734909f9725103d460c14d9",
+          "parserAgreement": 0.6673,
+          "pdfplumberTextSHA256": "7e924c2406a622be53b553be52043c2dbaa96f3034b85c6af005e48b50350e30",
           "popplerTextSHA256": "1514976fbdbb1b38eda8fe31d26834c1d4847893cde3937adc0517ae5af6ffdc"
         },
         {
           "pdfPage": 58,
           "printedPageLabel": null,
-          "parserAgreement": 0.9689,
-          "pdfplumberTextSHA256": "7d1acf0677995510b68f27f1a05f8f0a93ef2834cfe45b89717b2f8664e7e2cb",
+          "parserAgreement": 0.7802,
+          "pdfplumberTextSHA256": "0dc103185e41d078fe68a0ba878443b036b0816432dd34734991b81d9d80473c",
           "popplerTextSHA256": "9cb30bcc252803ba0dddee3b4487fd3e7f91fd48cba79a7d73f282c238a99333"
         },
         {
           "pdfPage": 59,
           "printedPageLabel": null,
-          "parserAgreement": 0.9597,
-          "pdfplumberTextSHA256": "7b28c7a1c317a740dd23efc16ad0e240cdb9c6c3aa45240fb9a9f20ac6fcc81d",
+          "parserAgreement": 0.7632,
+          "pdfplumberTextSHA256": "886b30f71121ca409b723cef068e2e7d6222c359c4a5047db934a9b38265ee0c",
           "popplerTextSHA256": "931acd070cd7869c4a8246a3fcb522c6e8c4f84765498303c603b69cecc62470"
         },
         {
           "pdfPage": 60,
           "printedPageLabel": null,
-          "parserAgreement": 0.9864,
-          "pdfplumberTextSHA256": "b6ef14d9441f1d58d57b930af13ea3b03ea9ae5ca3546a78c3459818d19befb1",
+          "parserAgreement": 0.7982,
+          "pdfplumberTextSHA256": "7e7fee9b1201a4cf7ba432e55b024f45a02b6e9f9107630e833b567936f6ba96",
           "popplerTextSHA256": "8a6ce554bf090237df5368ff0addc006bf7cf6bbd88e6f27a15b1348ba5082a1"
         },
         {
           "pdfPage": 61,
           "printedPageLabel": null,
-          "parserAgreement": 0.9897,
-          "pdfplumberTextSHA256": "1d43f084acda47aa7ac1bcb3346d509b5bb1d9f7bcf147ec06612d0f7250ed28",
+          "parserAgreement": 0.811,
+          "pdfplumberTextSHA256": "582b252bb8478a8f523917bd6ab02542d3e61ae1ee0e6c45fee8bde932452ec9",
           "popplerTextSHA256": "530404f445336a76650a85460ae060eb9ad342b2faed61d307d6d2ec10e8480a"
         },
         {
           "pdfPage": 62,
           "printedPageLabel": null,
-          "parserAgreement": 0.9948,
-          "pdfplumberTextSHA256": "51a735474db2515e96627665253a9bb07ff3c052c20f66e091f790e4508a4e64",
+          "parserAgreement": 0.8351,
+          "pdfplumberTextSHA256": "99c272e5d63afbb7686dbcae5ac2a34f07b5d7bff35c4816d3e3085fd538b5aa",
           "popplerTextSHA256": "834b0a75cfacfa0f9c29b2784c5ab17bf42322816fdf118a1084e7af452e2e4a"
         },
         {
@@ -2844,21 +2844,21 @@
           "pdfPage": 64,
           "printedPageLabel": null,
           "parserAgreement": 0.9962,
-          "pdfplumberTextSHA256": "3989547ed94fe75c0df5224968ed64f397fcfa404f00d2b5906e5e067202069b",
+          "pdfplumberTextSHA256": "5737c830ed23004151cef2036fdae74297864fa513c8b566c723663ff72119ae",
           "popplerTextSHA256": "63e717f3a3278e36d86077e404b158b0c4d3251f756cfa39e10b0aa5992373e7"
         },
         {
           "pdfPage": 65,
           "printedPageLabel": null,
-          "parserAgreement": 0.8819,
-          "pdfplumberTextSHA256": "2594daa716f2980552e90c8ebb3c684b3985a6c80eedb56ff2a4598ac202fcf3",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "fc65a77ea8a7edc58f97ca352bb78a951bbd18fc3415bdc32afb464df02a71d8",
           "popplerTextSHA256": "793d06cb4c5694450ed98d20d72f2afcf84f8c000a2ddd86170e41f5e49d9ea7"
         },
         {
           "pdfPage": 66,
           "printedPageLabel": null,
-          "parserAgreement": 0.9379,
-          "pdfplumberTextSHA256": "97fb8d250f8748910f3b65765af02b07fa6ff4678b6cf35ca88124da548efb27",
+          "parserAgreement": 0.8978,
+          "pdfplumberTextSHA256": "1dc5775bb1f2362d0cf93356aae69783f81d26b944373e73f406fb46757c504f",
           "popplerTextSHA256": "8c3544609ea56ce152cded654bd1f467ae0c3b39db49cc67580b3df448bdc6b7"
         },
         {
@@ -2872,21 +2872,21 @@
           "pdfPage": 68,
           "printedPageLabel": null,
           "parserAgreement": 0.969,
-          "pdfplumberTextSHA256": "eb09926450529db2cf82fb38d72f815475d943dd37d320e7bd6710264dfce68a",
+          "pdfplumberTextSHA256": "ea20e835d5bf0cd0fa9736fcca3fdebbf08e23854538df319845d0177f8165b9",
           "popplerTextSHA256": "55e47db51b41df728cfd4cc36916255fd3cc255c2b61e50a6eecb662f6ddbfd7"
         },
         {
           "pdfPage": 69,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "7a1d2eaa55d411b2fae019305d861bf762869bc2b8d243aaf1094f9beb764dd2",
+          "pdfplumberTextSHA256": "d266e511da65c4c131ad40b98459f2cb352ecf966be56d52312643768860ec18",
           "popplerTextSHA256": "52acc4059782ae90aa13a4c30d06eb27edb24887cfb772f9ec8574ecd335e2a0"
         },
         {
           "pdfPage": 70,
           "printedPageLabel": null,
-          "parserAgreement": 0.9925,
-          "pdfplumberTextSHA256": "3f8ca807d39d96f08b9055d911bfcff7d2146de34fa2a2782f75add7531427da",
+          "parserAgreement": 0.9699,
+          "pdfplumberTextSHA256": "5ee0a6dcf712d6c2857d2e461a2abae7c6ad832c3168ba35fbe585fa256a647e",
           "popplerTextSHA256": "2e44fe3d238fbbcde1d17dc844053340fb913f9eba7a49a8215c37b880395d3f"
         },
         {
@@ -2907,63 +2907,63 @@
           "pdfPage": 73,
           "printedPageLabel": null,
           "parserAgreement": 0.9782,
-          "pdfplumberTextSHA256": "f947c2a3dd75d29126e1ec794f01c001feb96cebf3324b54172ea9ade295b741",
+          "pdfplumberTextSHA256": "8227c843d9968f5681f15fcf77d46990109e6144d3aa5066af0cc3d71dc5cd4f",
           "popplerTextSHA256": "a4189b8f3a2a1387fa844365be47424c3b793c0daf7b2bd1f6cfc480fcf3bcbf"
         },
         {
           "pdfPage": 74,
           "printedPageLabel": null,
-          "parserAgreement": 0.9065,
-          "pdfplumberTextSHA256": "59b2486b3497fa089d82b7c18ff71a779486ec032856d609cc29c835351720c3",
+          "parserAgreement": 0.8827,
+          "pdfplumberTextSHA256": "64515adb5144668facea08f4d8da855194c3408305c234091ce0cbb0b922798d",
           "popplerTextSHA256": "6a2a09d79e6680d6c51d2f2a8b6d42e203285a3e4c56433575298bea68f6ff3a"
         },
         {
           "pdfPage": 75,
           "printedPageLabel": null,
-          "parserAgreement": 0.9487,
-          "pdfplumberTextSHA256": "030d996b4b5812c5c87a4f293a048f7a0320b7b2069d53961b9e7970f005ce04",
+          "parserAgreement": 0.9387,
+          "pdfplumberTextSHA256": "a39fef778d565e50ca4b0e0d33254750f05113dc4ab7aeaed9e184f0871415f8",
           "popplerTextSHA256": "c1af8cec9571f80d8f1eecd941eb17f4e83bcc454a30a4bc822ad7cc0c5670ba"
         },
         {
           "pdfPage": 76,
           "printedPageLabel": null,
-          "parserAgreement": 0.9768,
-          "pdfplumberTextSHA256": "e30ad21871f66dbe86436f93112cd0f2979983a88863c00e082bd2aa1668356c",
+          "parserAgreement": 0.9722,
+          "pdfplumberTextSHA256": "5ef70da8d95ff035ed475680794ca6f29e7b7917b3a8971d59722e4055c6c6fe",
           "popplerTextSHA256": "9203ed836d698aba0128380f25adeb6d2483ea652f382024ebc9261c328c44d4"
         },
         {
           "pdfPage": 77,
           "printedPageLabel": null,
-          "parserAgreement": 0.9889,
-          "pdfplumberTextSHA256": "13f30caaffab6d014543b796d376c4dc8009e82ee6558aff6907bc505712baee",
+          "parserAgreement": 0.9833,
+          "pdfplumberTextSHA256": "ef94373af1f2c5c2dad885fedd03c38bc65ddf03af542b57554a544af97a9c80",
           "popplerTextSHA256": "bc03b1f4cfe2c12bea2577e79844632502641a3eab4310bf34f476f6826269e0"
         },
         {
           "pdfPage": 78,
           "printedPageLabel": null,
-          "parserAgreement": 0.957,
-          "pdfplumberTextSHA256": "53a8503dfc29ca826e872065a1fe78822f5867ee804da5e999f94414a54fff0d",
+          "parserAgreement": 0.9617,
+          "pdfplumberTextSHA256": "0552dd2eddb21d4f3833dfca5a25405b9ae7d8a157b0a774802887134e57809c",
           "popplerTextSHA256": "7b77a96afeac024062941fa3090b074ffe514452ad39a24d7c75ea4de4e2eb7e"
         },
         {
           "pdfPage": 79,
           "printedPageLabel": null,
-          "parserAgreement": 0.9707,
-          "pdfplumberTextSHA256": "c2a3fb3a7b7652dcb3847db7cc673741590670c149860125c2aa798479eb684b",
+          "parserAgreement": 0.9749,
+          "pdfplumberTextSHA256": "4d908dc547c151924a9c9889434b0964eb8725b09b1435478f82bbd1033cf565",
           "popplerTextSHA256": "bea19054993584b11aca7d0f4e98703a178315a28f2e437e5d33ed9310746dcf"
         },
         {
           "pdfPage": 80,
           "printedPageLabel": null,
-          "parserAgreement": 0.9565,
-          "pdfplumberTextSHA256": "5d623c9d7302a8882ba5d0ff5a4f5239e3ef51fd218ca0ac88bd323c95e05b68",
+          "parserAgreement": 0.9634,
+          "pdfplumberTextSHA256": "e9a5e68f9e3ee5784dfa3b23109d4aeabc18852cdd8f817a6d99d6e25971294f",
           "popplerTextSHA256": "c234c8daedac01b58aa4ff7eefd0b8345b0021e0a78942b59f1c6a98cae3bb84"
         },
         {
           "pdfPage": 81,
           "printedPageLabel": null,
-          "parserAgreement": 0.9577,
-          "pdfplumberTextSHA256": "b03f5aad53345f9e1b0092096e1c900d67e6db6169369bdf3a213ec60f51cfcd",
+          "parserAgreement": 0.9754,
+          "pdfplumberTextSHA256": "b3ac501f543d08b166e1d14e6ed2f6a2ff24c1d3615bc0861f844a1fedd43d6e",
           "popplerTextSHA256": "939bb3bb5ddbb57557b56aeb14b04beeb76b72a5dc54798552a480ebc92ad7d3"
         },
         {
@@ -2977,7 +2977,7 @@
           "pdfPage": 83,
           "printedPageLabel": null,
           "parserAgreement": 0.9945,
-          "pdfplumberTextSHA256": "e0255fd389b179f01b86950a2ecde34fe49f0ede17da5e5696afd95fad2918bb",
+          "pdfplumberTextSHA256": "5f8c6614d56884e9701b4b26d1e8d30927e4e345d21d38c8e58b47fd8b9d1f36",
           "popplerTextSHA256": "c291e641dcf71554457386bf22648b212823d3a47e42afed72446f595300bd2c"
         },
         {
@@ -2990,22 +2990,22 @@
         {
           "pdfPage": 85,
           "printedPageLabel": null,
-          "parserAgreement": 0.9788,
-          "pdfplumberTextSHA256": "10d0d6961f633063adb15073b1abaa0a75e1e421517d726eb6597ed010d94497",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "871095137fea0d98df6faaa9a5bfc815f41b95d68619ea7dd1c818cccc9be73a",
           "popplerTextSHA256": "e1c2472d51ad21f3661082a73d3bfa168e1cbf8beb810127953ea3890ce186c7"
         },
         {
           "pdfPage": 86,
           "printedPageLabel": null,
-          "parserAgreement": 0.9352,
-          "pdfplumberTextSHA256": "d8a0a0b6e549020a15a125bb8b987ad32749d2563bcae889e57d98d658960d7c",
+          "parserAgreement": 0.9858,
+          "pdfplumberTextSHA256": "ba9e0f42529c63f8fb526d4790e91832f31c054f7f38c5fb1764c56b87962b33",
           "popplerTextSHA256": "0532bdec97f5c9c04e04b91b170f3c1ba30e0e95423ff6db5be4605147eb346c"
         },
         {
           "pdfPage": 87,
           "printedPageLabel": null,
-          "parserAgreement": 0.9654,
-          "pdfplumberTextSHA256": "50461723cf2aec0885b4e49d4562cc00e80f5c86edb8bac706ecb1e56ad6cf71",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "5c03ddfcecb8adf35e5a1734d55bb6c2e49f0abb46c26233c2a2141bb8d2ecd4",
           "popplerTextSHA256": "07e1090fa4264b4c60805564945ff91ce3f762d1edfe43d5ed02e1c446fd7756"
         },
         {
@@ -3018,8 +3018,8 @@
         {
           "pdfPage": 89,
           "printedPageLabel": null,
-          "parserAgreement": 0.9222,
-          "pdfplumberTextSHA256": "e6ee5bb1446c353862ffbb616a8099f485bcacbb94e726d89166fe3ddcbf7dec",
+          "parserAgreement": 0.9401,
+          "pdfplumberTextSHA256": "ad34d07cdadc02bf3f0ca42ad99ab6a36d9c4eeb62ba6c3b1d41d30dd0c09b5b",
           "popplerTextSHA256": "086c9878ce832cb2c1cd8e7b90eed6554521b313e405a5f790aa6ea88dec5511"
         },
         {
@@ -3039,50 +3039,50 @@
         {
           "pdfPage": 92,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "f78e5cfcbf7ae9788cf8fac660ee3f76e8bdf53347ab40aba96d87b7ac02a623",
+          "parserAgreement": 0.9959,
+          "pdfplumberTextSHA256": "c9255f3b132cfabe606e703223131afddab856fc4d454be1d0722172ba8f3365",
           "popplerTextSHA256": "dc820d83fcdd379c71c2cd0abadc802a0ea386dfc496c4a0869208276f7ec032"
         },
         {
           "pdfPage": 93,
           "printedPageLabel": null,
-          "parserAgreement": 0.9906,
-          "pdfplumberTextSHA256": "fd968df7f331458bea38c246221a8e4e081e24d839086fc827c275a091aa5a49",
+          "parserAgreement": 0.9671,
+          "pdfplumberTextSHA256": "b7ba37a7b80705eab9f7110ad44baccc0736a730bf107eed3ceda2a386c1b791",
           "popplerTextSHA256": "bfaede4beb387895b67dc9b8a7553622b5d9e0deaffe4e6b11bdbbf0bcb51361"
         },
         {
           "pdfPage": 94,
           "printedPageLabel": null,
-          "parserAgreement": 0.9964,
-          "pdfplumberTextSHA256": "ab07f9e9802b432fb7bb954da2d285c629700d845549c3d2d30b0fb984da1fa7",
+          "parserAgreement": 0.9911,
+          "pdfplumberTextSHA256": "6952d76f059d09c2b895a406d6005ad99b3e63cb0b278bfd053145c92d1a4ac0",
           "popplerTextSHA256": "85a7cde708b8136a32d66659494ef63169694fd6d22fcfe5621ecf1d67eedc76"
         },
         {
           "pdfPage": 95,
           "printedPageLabel": null,
-          "parserAgreement": 0.9052,
-          "pdfplumberTextSHA256": "3ff3bbcf50ed23481f58d3a3c71ac63d48504b8185463468a75ebb1e43a74d6e",
+          "parserAgreement": 0.8863,
+          "pdfplumberTextSHA256": "cc2a420d7c24700a0579e8d79f99461f3ec22e64c8571cfce4b779ef6c0667f9",
           "popplerTextSHA256": "d8428dbb6b658f1f6fc342c7f1d671c38db1400f834efbb9f6ff6d86ff03c0dc"
         },
         {
           "pdfPage": 96,
           "printedPageLabel": null,
-          "parserAgreement": 0.9084,
-          "pdfplumberTextSHA256": "d0255b6abc9eb223f1751aa527ffbb92b68cdb3d4c6cef5d5fee883e1e2efcf7",
+          "parserAgreement": 0.8931,
+          "pdfplumberTextSHA256": "10afdcbb9499bc9454f7e71c8f4a20fd5999a45f16a84ec8579c41f605952767",
           "popplerTextSHA256": "3692a640ee75da87d720d3cecd5b86d04477c7e03998f1bf84a417aa5b576dd4"
         },
         {
           "pdfPage": 97,
           "printedPageLabel": null,
-          "parserAgreement": 0.9037,
-          "pdfplumberTextSHA256": "262ca023c3aa6fd46d456864975e1e6c7fdd8a0930f5076af799c23515928e2f",
+          "parserAgreement": 0.893,
+          "pdfplumberTextSHA256": "c69cd55450f14689502d764e45b0517492a24575d45333336a08c644e6edbb03",
           "popplerTextSHA256": "576cf6b1ca1ed6dff364307c182465c8c9bfad5f09bebc9918aa89e9c9fb889f"
         },
         {
           "pdfPage": 98,
           "printedPageLabel": null,
-          "parserAgreement": 0.9231,
-          "pdfplumberTextSHA256": "fa0b6aca4424254db2c96aad06337cfd74d858494a91cd9dec94b2360c31090e",
+          "parserAgreement": 0.9145,
+          "pdfplumberTextSHA256": "470ace3ba45bc1fa941fcacc4f94fda0c8497263c46ebd4beffc5281732c9d74",
           "popplerTextSHA256": "235df9ee78878949c3351c3ad41473c4cbc872ee5a7ffc54b3e05342e69c1e3f"
         },
         {
@@ -3095,15 +3095,15 @@
         {
           "pdfPage": 100,
           "printedPageLabel": null,
-          "parserAgreement": 0.991,
-          "pdfplumberTextSHA256": "be773a0f6bc35438141abc4d0b7b5ff2a55d12915a759a5d39c54fba2cbe4dad",
+          "parserAgreement": 0.994,
+          "pdfplumberTextSHA256": "028f917fa6255945cfd3b129381d0409c20cf91f4bea74e45f0f3e584f6f2b9a",
           "popplerTextSHA256": "7880a506a654ccf8872c12d43a63ef315cd68c708fea712358d93d4b4c6f40f5"
         },
         {
           "pdfPage": 101,
           "printedPageLabel": null,
-          "parserAgreement": 0.9636,
-          "pdfplumberTextSHA256": "c45d9166e22c0f35100c7a78c9a420341b6f2b8ac0a41dc5e32552a6a3c4e02d",
+          "parserAgreement": 0.9596,
+          "pdfplumberTextSHA256": "df8b9d0eee55f927666f85e70fccf0be68a06c011d2b482cc16f26b60b49bd79",
           "popplerTextSHA256": "8abd0b1e0a81c774d413614c1722cce5b5a685e955c2f0bab14e51f448c48c23"
         },
         {
@@ -3159,7 +3159,7 @@
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 0.9862,
-          "pdfplumberTextSHA256": "ada467184d2b06114e96376d7108f90367736c60c989a78d802d6b9b604af5cc",
+          "pdfplumberTextSHA256": "718dc925f33d850ed4a40e864f00770de9e031eb12034b9fd98150c85c795054",
           "popplerTextSHA256": "7cde90159ec93715827f46054d83890d870082de1248db5a741e90b0e791a4da"
         },
         {
@@ -3188,7 +3188,7 @@
       "bytes": 763157,
       "pageCount": 58,
       "sectionCount": 464,
-      "minimumParserAgreement": 0.9585,
+      "minimumParserAgreement": 0.9557,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -3207,8 +3207,8 @@
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "bae4b81ef4cada71d8b1e46305606baa70c8061f72ff3fcb2c49cb8e08b14c90",
+          "parserAgreement": 0.9969,
+          "pdfplumberTextSHA256": "6c7789157c40cfe9520c80673000fb98e764fe0f28b9915aa4f940e25a0a5faf",
           "popplerTextSHA256": "f88eb873af15c4ab59f497af86c47f7add3190f5e547bfe7791fd854ac17592d"
         },
         {
@@ -3487,29 +3487,29 @@
         {
           "pdfPage": 43,
           "printedPageLabel": null,
-          "parserAgreement": 0.9912,
-          "pdfplumberTextSHA256": "228c1292a0b41eefe2f7d4820b5407b03f9b8e26c40b4eac9beb9e8e1c2cd9bf",
+          "parserAgreement": 0.9823,
+          "pdfplumberTextSHA256": "4d676612ecc22dc16e0e95210d7b70786f4037882e4d9611688e13ab3da32e1f",
           "popplerTextSHA256": "6f54b3f02c3f14c2fb8fcd7356c990df3798049ff252ed64975a8a56034c78be"
         },
         {
           "pdfPage": 44,
           "printedPageLabel": null,
-          "parserAgreement": 0.9748,
-          "pdfplumberTextSHA256": "daaf72b46bfd2e1420b3f67465ccef460f117cbaa8eed86be53c0d293893befc",
+          "parserAgreement": 0.9767,
+          "pdfplumberTextSHA256": "23927e3e38fb0f41d29ad0bf26146ffaaa45a5aedac43cbb6811f8a40581acf5",
           "popplerTextSHA256": "f3ea612753ebf767731c90074e839195d698424efde1fde49e863b50b2a8f961"
         },
         {
           "pdfPage": 45,
           "printedPageLabel": null,
-          "parserAgreement": 0.9742,
-          "pdfplumberTextSHA256": "96343a1e1d3a9f7d8646b11dade2fa911475415dd2bfbdda371a56c0dc241a21",
+          "parserAgreement": 0.9908,
+          "pdfplumberTextSHA256": "de9ef453e4d6585b9143d59e0cb3882a21c11306f7e40e09c77c3a0abc274757",
           "popplerTextSHA256": "d705cef45aa25403f2a9c36fbe2f277cd65d6626eb9dc59a13bc1fcb2bc3ce0d"
         },
         {
           "pdfPage": 46,
           "printedPageLabel": null,
-          "parserAgreement": 0.9942,
-          "pdfplumberTextSHA256": "81750e0a51125ebcf599745fa4a56084601b2865c02751bf754b5e40df2f987f",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "0aa5fa07811cf4f2ccb26c776b0bda19ccf135ef2d3d5ff70fec25a7ba26e035",
           "popplerTextSHA256": "744f49c7907ff31b6158c31be780e31058f1e73e86aaade6b3b7118e1fa140f9"
         },
         {
@@ -3550,8 +3550,8 @@
         {
           "pdfPage": 52,
           "printedPageLabel": null,
-          "parserAgreement": 0.9585,
-          "pdfplumberTextSHA256": "f51dc6736755f32024089f8fee3f61adea29f0a97665bf304a20aaf4f374ff20",
+          "parserAgreement": 0.9557,
+          "pdfplumberTextSHA256": "5b5441f021a79215787874ce644b96eed3570bf695c53e81a956399a5769a71d",
           "popplerTextSHA256": "52e311dfd83c65c8b4f769dc4dcf777110bc54bf80efe4812c5edf15c5a054b9"
         },
         {
@@ -3817,7 +3817,7 @@
           "pdfPage": 6,
           "printedPageLabel": null,
           "parserAgreement": 0.9966,
-          "pdfplumberTextSHA256": "bd7e8133348f4ce3241fcc2037a8c387e38a81bc0e57bb5572f5ed16d3f72629",
+          "pdfplumberTextSHA256": "14f25ac9f01a43aa33fea1c3668da55aafb827252fab29f9f9ab5f61f306c41e",
           "popplerTextSHA256": "fcec92bbce153a4b05d5ff1b243f5c379b7a09dc24bcdc648fae86b85ef58a36"
         },
         {
@@ -3845,7 +3845,7 @@
           "pdfPage": 10,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "dff04211a594fbf447735479bcb0e76bd8580778bae69ef991ce632ed9ea96ed",
+          "pdfplumberTextSHA256": "4768be66f22e325fe529bb5a20c5971c029ea1ae70b9790d48a73b054080f7ab",
           "popplerTextSHA256": "795ebe2366e6536a5c3440db116a52b043c520b4f8edad089cd09b8589fc4b14"
         },
         {
@@ -3950,14 +3950,14 @@
           "pdfPage": 6,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "9169ff484762f2c7f87738970fe4f27aceb2a92c9b2be5a3c0b08cc4327b2ee8",
+          "pdfplumberTextSHA256": "1846cca2065976633a47c70676dfad0b792e63cefea24540eb1e4b914a989dd4",
           "popplerTextSHA256": "0db5960018ca4ad32d5fe5e11dbdd5cc33425ea510d7633f972b02cf2a4e5161"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": null,
           "parserAgreement": 0.9877,
-          "pdfplumberTextSHA256": "486596c69cf59a2f9ff60d6c52c144c6c448a731de490ef127d9358ec9578423",
+          "pdfplumberTextSHA256": "f0b287b185a66a08cf6d08e82058df18792d89e878f87741c88fd4d6b6ce1f0a",
           "popplerTextSHA256": "8048203f98889edbfd1fc8fed3cdb056fcef02fcceed84dd799f0e04e2560ee5"
         },
         {
@@ -3970,8 +3970,8 @@
         {
           "pdfPage": 9,
           "printedPageLabel": null,
-          "parserAgreement": 0.9967,
-          "pdfplumberTextSHA256": "76ecef9eb02212b08152f7af335b6064ccb6e581ac745aa3d190511433dea712",
+          "parserAgreement": 0.9978,
+          "pdfplumberTextSHA256": "270c01678fa006d0f9553ec9cf7b6768a8ded04f8c5326d0e54f8f28aa8b7776",
           "popplerTextSHA256": "db1289fb582fc06a99c70c722531a2a02c7bf8179b1e562183e9ae20d2f862f4"
         },
         {
@@ -3985,7 +3985,7 @@
           "pdfPage": 11,
           "printedPageLabel": null,
           "parserAgreement": 0.9898,
-          "pdfplumberTextSHA256": "4b5590bb183f99f31480eca87ee340d24b2a43f0aef1780242a28135ef3789e8",
+          "pdfplumberTextSHA256": "b4ee191397b9d0de2986e562a07808ceb3041f03a5c295d915e6a40bb6858e9e",
           "popplerTextSHA256": "2cbf2469fd36e6b5c0cbfec20f126af2c1369a8e899dbaebd1957eedbcfcc430"
         },
         {
@@ -4021,7 +4021,7 @@
       "bytes": 476646,
       "pageCount": 22,
       "sectionCount": 176,
-      "minimumParserAgreement": 0.9759,
+      "minimumParserAgreement": 0.947,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -4048,7 +4048,7 @@
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 0.9963,
-          "pdfplumberTextSHA256": "5492f842d6f446c4fa7c12cd4c3fbcaf6cbed9c5c7222aca3a77664dd448db4f",
+          "pdfplumberTextSHA256": "aeeec1e4b7cb3ec4c6bdb2c0e8820dce55d1781f2aa08f88bee701efe95e81c3",
           "popplerTextSHA256": "32d7ab60286fe501fcfc88a5a913112dd827d50d93fe69f39b358acdd75ef640"
         },
         {
@@ -4090,14 +4090,14 @@
           "pdfPage": 10,
           "printedPageLabel": null,
           "parserAgreement": 0.9883,
-          "pdfplumberTextSHA256": "583a88cbaa3fdb363898d87ac3a78f36fee78c1e3685f1460341c2370e3bdb0d",
+          "pdfplumberTextSHA256": "3c09919cfa89d1d94469f8c0cb87b25b0e32355d143998ead25ac41cfd91d7f1",
           "popplerTextSHA256": "37b3839d3e07b7682b54dfd3956a23f1dbcd0298e9f581e0bd4f32f0939c337c"
         },
         {
           "pdfPage": 11,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "fcd2516aac8da000922f4c671c3aa7b8288fced448e4af0ed87c659b94eed2eb",
+          "parserAgreement": 0.9796,
+          "pdfplumberTextSHA256": "987069998da80bc453edfc227931152e2be4555713fe20cb32197d30d2fa976b",
           "popplerTextSHA256": "13f5b64ceb9b8235abdfbe5b6dc5492f44312a5977c6a3ce16e6a1826613c803"
         },
         {
@@ -4111,28 +4111,28 @@
           "pdfPage": 13,
           "printedPageLabel": null,
           "parserAgreement": 0.9759,
-          "pdfplumberTextSHA256": "b0ee290e4201e09c2081e1cf7d205912abc6e1ed5121b0a1d9b7ec953fbb7466",
+          "pdfplumberTextSHA256": "16b227f8825db6a230668f34c565bd0d8f3fef9cff129593c2b2cb08dcd2804e",
           "popplerTextSHA256": "5f23724c7bdf1af36bfeed0b95a7d2524c0b6277ff02a3b9455cd7a6fee67289"
         },
         {
           "pdfPage": 14,
           "printedPageLabel": null,
-          "parserAgreement": 0.9968,
-          "pdfplumberTextSHA256": "970fcb00be3759a45c4dfddb019e05c971fed817f12b5af7c360de2e41714aae",
+          "parserAgreement": 0.947,
+          "pdfplumberTextSHA256": "729a8674908487d1ee8c7552a14ee18071bf510d6cf4e4372c3e5c99a1678173",
           "popplerTextSHA256": "dea6c2b00d616d3b9ee437c2ca03818d40612614976ac140ab28c5ff7f36bc9b"
         },
         {
           "pdfPage": 15,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "3fb130c23dbfb54df734fc5bd4b41844411d5fbc0a4e761f9d624a328913bcc3",
+          "pdfplumberTextSHA256": "9ac53b445df5c52adaa443882421f3c2cc90bdbab4b5dbd43867db382e0032e1",
           "popplerTextSHA256": "ac5b0a1e9f1adefb97b4103cb17e0d6a931bcc7d02c5a28df65354cf5bcb9c3b"
         },
         {
           "pdfPage": 16,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "7d01a100e11942d0c380a7d77fac0a2f283c3fca8c329e73e414fc0a52e5e574",
+          "parserAgreement": 0.9881,
+          "pdfplumberTextSHA256": "88900789cd52b8aa9d56c30537223386247bf0ab4bb20cc2563a1e86566fa034",
           "popplerTextSHA256": "d05b8b09b4f35c451b5425c8f1b28b26203d3eabb38d1938c912616117782cff"
         },
         {
@@ -4208,15 +4208,15 @@
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 0.9899,
-          "pdfplumberTextSHA256": "9c628d91bb2052fc0987d397f03d1998d838a7cf8f1110739152cbf5893f846a",
+          "parserAgreement": 0.9919,
+          "pdfplumberTextSHA256": "d24ad044eebd982fede66c09cb2aafb1922d43c262d0894a5d4209af3c83f554",
           "popplerTextSHA256": "069ca87f3c2ed9f679853949001712d333f2bef72ead4ff08fa9e65662d29926"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 0.987,
-          "pdfplumberTextSHA256": "f0f63f934d284aa62521d1fc9263ed12c79dd01ea05055950ee535c75d960719",
+          "pdfplumberTextSHA256": "f084d9e349e12e858db4d81223d08f24ea6babda58492e3e9334b5b7e7a158a4",
           "popplerTextSHA256": "8d9fd76a4e5e5803ac7d1aefd3114642d58939555805f1b8be75cac8ae5a953b"
         },
         {
@@ -4229,8 +4229,8 @@
         {
           "pdfPage": 6,
           "printedPageLabel": null,
-          "parserAgreement": 0.9944,
-          "pdfplumberTextSHA256": "d427cfe2409c5b3ababb1270cac10026abd2c9084268b99de7f0069960a08b11",
+          "parserAgreement": 0.9887,
+          "pdfplumberTextSHA256": "dfd56abd0ba2640e1e8abc2bf9b3bc37d184a24a6e21a35b52f86c0f47ef0944",
           "popplerTextSHA256": "712c1cf2462b79bb60578a640075f642fd4eb6fbec3e37a3c00368c124dea6c3"
         },
         {
@@ -4250,22 +4250,22 @@
         {
           "pdfPage": 9,
           "printedPageLabel": null,
-          "parserAgreement": 0.949,
-          "pdfplumberTextSHA256": "0211d6a2c21ab66a185eaa7159dd175c567017ce78807d7f13573150ec667cf3",
+          "parserAgreement": 0.9716,
+          "pdfplumberTextSHA256": "9dcb04276bfad66a14221afd39050ca87fdba073c667f07f31c37b69328c691f",
           "popplerTextSHA256": "4dd9c6201a361678bc8e6f6ec3f3db8e795a46dc777a2466b894f3a45ea88069"
         },
         {
           "pdfPage": 10,
           "printedPageLabel": null,
-          "parserAgreement": 0.9179,
-          "pdfplumberTextSHA256": "9dea7961047fa0080942ae9bb50861cd881cef7961dd3c95ef44ba67fcc741fe",
+          "parserAgreement": 0.9889,
+          "pdfplumberTextSHA256": "c92a1c767ed74768a2dd9ed81fb0e723ccec8c674c1440f3a418d89c28f64a71",
           "popplerTextSHA256": "97a1ee9680d009c2b1d5a39616684c4ad0733c23ebcc7a6a58e59baad37e8bce"
         },
         {
           "pdfPage": 11,
           "printedPageLabel": null,
-          "parserAgreement": 0.9643,
-          "pdfplumberTextSHA256": "92197026bcdf915bc161fcec4606dad704e972bc10a71e5f9b13bde39c3cc56d",
+          "parserAgreement": 0.9686,
+          "pdfplumberTextSHA256": "96d5cc83ad0b34f541b8dbcb8bad2eb73fe9f9e782163687fdd481c7860932f0",
           "popplerTextSHA256": "e0bd0465d13f2abb7e719481ef37f2b277cfe45ce5ac61411b2690764eaf7886"
         },
         {
@@ -4299,43 +4299,43 @@
         {
           "pdfPage": 16,
           "printedPageLabel": null,
-          "parserAgreement": 0.9765,
-          "pdfplumberTextSHA256": "a6f213e873ac782a1c6979972a9a5e12c42fd4d32a0fa5510b214dcfdb262036",
+          "parserAgreement": 0.9792,
+          "pdfplumberTextSHA256": "82199386953eab845f1a35f62584d1e1ec92e23e99045185f3086061b708f0e3",
           "popplerTextSHA256": "ef7572ce335cf8ac472a221633f9e2d11f85e180ed6504efe22a937fbe725122"
         },
         {
           "pdfPage": 17,
           "printedPageLabel": null,
-          "parserAgreement": 0.9909,
-          "pdfplumberTextSHA256": "93cb9d2d7c0f5ec471c1751c09d747f5b95cecfc2e5a9b11c060f927bec7b34a",
+          "parserAgreement": 0.9927,
+          "pdfplumberTextSHA256": "26a35e02d80d7798769ec4b162e0edf46295cd5dda036e82822a2ac1588d9ba0",
           "popplerTextSHA256": "c289358a226fd31d68e0cb4b4b903f6dd16f51891d42d7ee399d34c6d8e6f7c7"
         },
         {
           "pdfPage": 18,
           "printedPageLabel": null,
-          "parserAgreement": 0.9526,
-          "pdfplumberTextSHA256": "5ecf177bb1f4115483361065a7b387930f94816779541130c172587f41c26acc",
+          "parserAgreement": 0.9856,
+          "pdfplumberTextSHA256": "8d36e31e46a05d72cf20e6773e73232a413aba5707e5a3a682e29d33a9fbcf29",
           "popplerTextSHA256": "3ca34ac4c7f19f741a89d67479a95cc1e296af4d3b2da1b75b7f261f9bb714f8"
         },
         {
           "pdfPage": 19,
           "printedPageLabel": null,
-          "parserAgreement": 0.9619,
-          "pdfplumberTextSHA256": "39af7533656041e16974f05fe142a67d7a1d9345f29438d72b87d444015a5841",
+          "parserAgreement": 0.9631,
+          "pdfplumberTextSHA256": "1aa1f4665cb0e98db0f3a1d5e6459e26183ae060095ceadef6244b029f334356",
           "popplerTextSHA256": "677659aed3f1e6b7ad48bf3fa489ab327b72bf7a0f368f628e7eb8174131a2a0"
         },
         {
           "pdfPage": 20,
           "printedPageLabel": null,
-          "parserAgreement": 0.9824,
-          "pdfplumberTextSHA256": "8af5e5956db290e15506f6665f7cea237cc021080a1638a4cf69c351c0b8b7ae",
+          "parserAgreement": 0.9946,
+          "pdfplumberTextSHA256": "413aed7b4ac7de732f30496aaf56b04d32a7249813fcc5c8bd0db39bc3cdee2b",
           "popplerTextSHA256": "3dfa249610cb926a8c0cc3804684324cdba796851a14f0ebe3672b942084433a"
         },
         {
           "pdfPage": 21,
           "printedPageLabel": null,
-          "parserAgreement": 0.963,
-          "pdfplumberTextSHA256": "6b6de709c3fe5e3a4b8783e0bb700dc30e11dbee6e9df3dd90fa3ec5ca554897",
+          "parserAgreement": 0.9337,
+          "pdfplumberTextSHA256": "2d9b999514ff32a43dca353155d9610e7b39849280d451e1bf7eda2d55b6a008",
           "popplerTextSHA256": "0a5fe9935e2de7b067c00cc9dc50f0222a3f64e27ae4a6c76ee31fba0575c70f"
         },
         {
@@ -4348,15 +4348,15 @@
         {
           "pdfPage": 23,
           "printedPageLabel": null,
-          "parserAgreement": 0.9569,
-          "pdfplumberTextSHA256": "1ffdeacaa1a1276058f29992b6f910ac3baedbc6ac770d6ed52ef808973561c1",
+          "parserAgreement": 0.9838,
+          "pdfplumberTextSHA256": "bf68e6147fd4fd30bdcef5ea1040d04f6cc5772b072b5475c74ae113547d4821",
           "popplerTextSHA256": "8285010d6cd456329c3b1813f60b5e99825b97f48afa4bfcea715b35851e6850"
         },
         {
           "pdfPage": 24,
           "printedPageLabel": null,
-          "parserAgreement": 0.9871,
-          "pdfplumberTextSHA256": "1928211c7b91c567d2cb4f21d7276886b093ea726481ccc3365015f648d644b3",
+          "parserAgreement": 0.9971,
+          "pdfplumberTextSHA256": "4a7166b93a74663aef27e49844a5d5caca2ed1105c95fda8fc4df5fcd5f1a315",
           "popplerTextSHA256": "8cb8d110741c3d6b945e6aa330ab196c05bff6782005f24d94e7377a76d0b639"
         },
         {
@@ -4404,8 +4404,8 @@
         {
           "pdfPage": 31,
           "printedPageLabel": null,
-          "parserAgreement": 0.9718,
-          "pdfplumberTextSHA256": "6d45027cb0172643844d56f492a38419582d249cc360dab0f194e55ab6f2ce93",
+          "parserAgreement": 0.9857,
+          "pdfplumberTextSHA256": "57b14d6be6a1be1745260681074184f3011d12b7fee2761fba1cff9ea18dd236",
           "popplerTextSHA256": "7715ada5e1115ec1ff352e1e76db3209c6d442397c6ebeaad0a7536c19e623ee"
         },
         {
@@ -4418,29 +4418,29 @@
         {
           "pdfPage": 33,
           "printedPageLabel": null,
-          "parserAgreement": 0.9718,
-          "pdfplumberTextSHA256": "80a9553bf12a7981e7cf11c8a22f31b86788b6def5513be5611b0fcebe64f602",
+          "parserAgreement": 0.8531,
+          "pdfplumberTextSHA256": "2f28a6479e841b61a36b7ecd3e945474650f5a12f4fda00c96c661afa38175b5",
           "popplerTextSHA256": "4b8b169aa032fdadcc697cb9721c34ec2da33837a6c8b8bf9c86724583a8ca80"
         },
         {
           "pdfPage": 34,
           "printedPageLabel": null,
-          "parserAgreement": 0.8182,
-          "pdfplumberTextSHA256": "ad8be30d9cb26d2276872c46b1bf6cffc2c7fefc20e3f10da2d642d5f2a94242",
+          "parserAgreement": 0.8532,
+          "pdfplumberTextSHA256": "fc4a2152b7f9e3cfafffdd40163bcf1d61685de4254a7f80cdfb879e03b0e2eb",
           "popplerTextSHA256": "4dc95cdd489a058fde7bb29d4421f3d8f1951fcbdae515c7b343d515ded0da73"
         },
         {
           "pdfPage": 35,
           "printedPageLabel": null,
-          "parserAgreement": 0.8222,
-          "pdfplumberTextSHA256": "c186392483324b6ae5585703f183a97a64a0c8b290a43a506f36e6e574aaffe1",
+          "parserAgreement": 0.8775,
+          "pdfplumberTextSHA256": "9e20ad18d15ecdb71be9f7c71fb07358a2f47290b39a9e8ac7fcb279eaae658c",
           "popplerTextSHA256": "440b2cf0ca3ce758c4cbc1ad97e06d0dbeda89e68a19526f4a42904f620a4270"
         },
         {
           "pdfPage": 36,
           "printedPageLabel": null,
-          "parserAgreement": 0.9522,
-          "pdfplumberTextSHA256": "e2bd3467cafcbbc5e749aefb85dfa66d8e9cedd79918e5288873e8f1f98f4f1a",
+          "parserAgreement": 0.9911,
+          "pdfplumberTextSHA256": "eb661db8e9772c9cdbfb577da3f44f26b489b33d9bce0e131962ddd08e7e1c92",
           "popplerTextSHA256": "5152f0ef6e90161722eb9e179536332649839670422b3b91fc25d9697567300c"
         },
         {
@@ -4453,36 +4453,36 @@
         {
           "pdfPage": 38,
           "printedPageLabel": null,
-          "parserAgreement": 0.9831,
-          "pdfplumberTextSHA256": "eadc4d4068e3602d7ae7b080c9196180364fca9351f4e09160c797bf95f82335",
+          "parserAgreement": 0.9966,
+          "pdfplumberTextSHA256": "3ef6eddc4d7c97ca3b71446dec3398245e36819634f470e878c866019f5fafe6",
           "popplerTextSHA256": "061463c4f8e9e7cccd5f2c7a94ff94090bb3c04a0535a9cd142345c787da3073"
         },
         {
           "pdfPage": 39,
           "printedPageLabel": null,
-          "parserAgreement": 0.9655,
-          "pdfplumberTextSHA256": "61a4515418840f54fb4d8409039c7858e7f8120ca1b127fb1b7be9920af53c50",
+          "parserAgreement": 0.9904,
+          "pdfplumberTextSHA256": "141055c6d5ad17876c7ce4119a3aab40166292794d9f2bd98504d459211a3da5",
           "popplerTextSHA256": "797cb47639a90a929720569563d21b1460e2dcf5007ea5a3b42fce2beb128c78"
         },
         {
           "pdfPage": 40,
           "printedPageLabel": null,
-          "parserAgreement": 0.9855,
-          "pdfplumberTextSHA256": "f6eefdd1da696dd9bace284625e0bd28a42abdf555e297a6ff052b638f4916cf",
+          "parserAgreement": 0.9876,
+          "pdfplumberTextSHA256": "02ccacb5cd731f8f5bd4b14a9ec9474f3aecff0a622d8ebf387144f8c65e8f93",
           "popplerTextSHA256": "042b8a4869f563fd5778e0be971e611f95fc06f729bbea56c6630ccd1caf2828"
         },
         {
           "pdfPage": 41,
           "printedPageLabel": null,
-          "parserAgreement": 0.9926,
-          "pdfplumberTextSHA256": "e949e3c5ad9bba6a91c17e304275ac445a926e76a8c4bc78231ad1d30b615823",
+          "parserAgreement": 0.9705,
+          "pdfplumberTextSHA256": "47ff0a92c009b978c76535db06b182c97c5a999a8494f08a17a6284a013b3c79",
           "popplerTextSHA256": "7cc42b1531e6bead0e2e798b18a98828d1689740428c84164b35c82b03116145"
         },
         {
           "pdfPage": 42,
           "printedPageLabel": null,
-          "parserAgreement": 0.9608,
-          "pdfplumberTextSHA256": "3a57214d5f6a659bac3705b63039fb4e29b34031e96965537901cc1884c3dcbc",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "2cbb97e6a3e5e56a3231c7ce51932ff69ca5294f1eaf4e137c83ebe6322196c2",
           "popplerTextSHA256": "91c1c0f42d3821fe1fb1f3a2c69fae0d4d471d52e3a99ce06e2ce81c098af787"
         },
         {
@@ -4495,78 +4495,78 @@
         {
           "pdfPage": 44,
           "printedPageLabel": null,
-          "parserAgreement": 0.861,
-          "pdfplumberTextSHA256": "e998012998516628db2ab7133152230aa001152117bedde539f232d4dc03fb9f",
+          "parserAgreement": 0.9942,
+          "pdfplumberTextSHA256": "0bc59885c843bdbe048b600878e8bf61f371f33c8eeedb81ea6ce410cb5838c1",
           "popplerTextSHA256": "c4dfb8e2dc83b95f6abe6035caf9ef18784bb17d6554043ffa80805d782cc21d"
         },
         {
           "pdfPage": 45,
           "printedPageLabel": null,
-          "parserAgreement": 0.9542,
-          "pdfplumberTextSHA256": "27f5d4ddd76ff964c4bf2219a3f585b2add3b11df81b431f7fe686ec81670eca",
+          "parserAgreement": 0.9928,
+          "pdfplumberTextSHA256": "432cb089142b87b9f9a36cedbfb9542320b81ffc1bd10b75eff552f6f43b55b1",
           "popplerTextSHA256": "b43d5c7a2b995ac511d27d0fca45ae4b1134fc6a1dbe42e7bfd6d623ec24a0f0"
         },
         {
           "pdfPage": 46,
           "printedPageLabel": null,
-          "parserAgreement": 0.9386,
-          "pdfplumberTextSHA256": "d7738626d78cc4f81a472315472c20d9036b13b295d885ab9b9ee2c8de591b11",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "836f4c9d29e8d4295448c6ef8cb81d4576dadeae85c6c92e5bd5c0f08ad6a6ae",
           "popplerTextSHA256": "ba46c5d2849ec0b3a4d3e8ff6a0b3f14873138e1e33a7ea8b05dc613706c29ad"
         },
         {
           "pdfPage": 47,
           "printedPageLabel": null,
-          "parserAgreement": 0.9547,
-          "pdfplumberTextSHA256": "c801764da572d15d355df90cdd51754db67894662b12020368643519bd66a13d",
+          "parserAgreement": 0.9147,
+          "pdfplumberTextSHA256": "f64e49b6bdbc6156603af928b7947a718acc476a7cb54adcd024b3aca20b14b0",
           "popplerTextSHA256": "e7d31cf3e325628072e4fcb68b8cba8c95f22e61cabaadb0da086246d9ccbfe5"
         },
         {
           "pdfPage": 48,
           "printedPageLabel": null,
-          "parserAgreement": 0.9878,
-          "pdfplumberTextSHA256": "a9229519a15fa167ae41cea4a5635011bac1573f9694ca4a14363042d7fd916c",
+          "parserAgreement": 0.9908,
+          "pdfplumberTextSHA256": "09ab072b67201104005119fa6b964b97b4b21d383cbbf43fbb1043f04a4dce62",
           "popplerTextSHA256": "3c584925b66d69c78672d48dc6a78f665279c376ebfa41ef8dc27c6cff49b97b"
         },
         {
           "pdfPage": 49,
           "printedPageLabel": null,
-          "parserAgreement": 0.9719,
-          "pdfplumberTextSHA256": "3d7f30454eb1779c2a0e62f644bbcb7f446c7c9561387d0fd144fd94c513114e",
+          "parserAgreement": 0.9673,
+          "pdfplumberTextSHA256": "5070bac2de47aa15c1ece4996d3aca8f3a26ddbb34631e002f72036fbc54dc7b",
           "popplerTextSHA256": "04bf3f5ab3cbd145073f19499a95552380c3c1c255218b722b60d93203307340"
         },
         {
           "pdfPage": 50,
           "printedPageLabel": null,
-          "parserAgreement": 0.9834,
-          "pdfplumberTextSHA256": "f9b709aa7588c5f2f8c2df9c60a979ef71d586a956bd417a7b2e2c54c98f45e4",
+          "parserAgreement": 0.9732,
+          "pdfplumberTextSHA256": "3f942d3d46e1a3bc2dab3807d0475c70391999ee2613dd9a9d038d680f2e40c4",
           "popplerTextSHA256": "4d44a3ed8d844dd85370628b76233ad3c18ba9f5bc1ae5fa7e2224e60cb198f3"
         },
         {
           "pdfPage": 51,
           "printedPageLabel": null,
-          "parserAgreement": 0.9847,
-          "pdfplumberTextSHA256": "0b7daf49ffbe43806b80c2302300858e8fe9db240d0f940dfcb5f3b0540f6867",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "776c89375c11067a71f8c74860c9c63673d70d11546a9f28d56f158e11ed4ca9",
           "popplerTextSHA256": "837d355750168f82c8387bbaa7c183ad5f94521acfb6ced70d259929293a968b"
         },
         {
           "pdfPage": 52,
           "printedPageLabel": null,
-          "parserAgreement": 0.9803,
-          "pdfplumberTextSHA256": "5f10ccfacc7ca1f9f6d6a7dcf988fa4f6b65960eddfc6ee0da81400df0478e16",
+          "parserAgreement": 0.992,
+          "pdfplumberTextSHA256": "6dbb8471399560919f5b48832bac135015a7c4d7d91c21265d261e2aff6c5308",
           "popplerTextSHA256": "63966ebcdda093ba029ebb5c9681e870bfc4ef8e4c6d86c3fa54e55d2ee5d654"
         },
         {
           "pdfPage": 53,
           "printedPageLabel": null,
-          "parserAgreement": 0.9471,
-          "pdfplumberTextSHA256": "de70971ddb2ada1e07133c7a90aa486e5fa3cd53e88c8179a47001ab44dfc0ed",
+          "parserAgreement": 0.9727,
+          "pdfplumberTextSHA256": "fefa510bdbfbd2fa4c5cc3126e1d66628114be294c607847210b0de07a94e984",
           "popplerTextSHA256": "3490df4c4c6de304f474ecf2f49128539e53ab277bbe377576dcb7f4e323d6f9"
         },
         {
           "pdfPage": 54,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "5b8d4938488f326815f23318b3ced88791515341ceb44c20c908d438e67ae81c",
+          "pdfplumberTextSHA256": "69d64aba48fe2cee5ac81502d2f596f5f45a64dc04c5bbb4a88d2fbffd74b4b2",
           "popplerTextSHA256": "254610d69a9134e6ca05047c7cd0213d2e119f307fe1280e254e67cca601ef8f"
         },
         {
@@ -4587,7 +4587,7 @@
           "pdfPage": 57,
           "printedPageLabel": null,
           "parserAgreement": 0.9875,
-          "pdfplumberTextSHA256": "f34e7b69c2bf8f1f451d1917306e0145284cfb1e8daa861de86a672587150312",
+          "pdfplumberTextSHA256": "e8a1b498634190594e53412894007381608ff65f8b28105d1724e8506abcd16a",
           "popplerTextSHA256": "1b2f74594c40177d1b856f5e1a222e8d31900867a0f79f818f1d4ea04c957b74"
         },
         {
@@ -4623,7 +4623,7 @@
       "bytes": 508200,
       "pageCount": 26,
       "sectionCount": 173,
-      "minimumParserAgreement": 0.9869,
+      "minimumParserAgreement": 0.897,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -4650,56 +4650,56 @@
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 0.9968,
-          "pdfplumberTextSHA256": "02dd3c5fb2ce916f52fc3792d10d7b28d451786632fea0ff6a0725108081d466",
+          "pdfplumberTextSHA256": "79757dd1426a6b5b7bd732e2fce0e12be615727654f12557dd5c1ebc72cfbd76",
           "popplerTextSHA256": "2596a4595d561b1fbbd6d54eb0eb99086c36f3a91c8b47a80a8a6599435e5dda"
         },
         {
           "pdfPage": 5,
           "printedPageLabel": null,
-          "parserAgreement": 0.9869,
-          "pdfplumberTextSHA256": "4895ecb2f95d05e30f681a283ce8a1085bb72ef9eba44a2aa04a15ccfd1072a6",
+          "parserAgreement": 0.9706,
+          "pdfplumberTextSHA256": "b8f85a6c48ee4473888aff30661d4f2b7389edc9e22e9ee49630489a757f99e1",
           "popplerTextSHA256": "33608873f65fa6c073813c999f7ec944f008be524554a4ac4036c410ce3cf515"
         },
         {
           "pdfPage": 6,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "ba382088125f06d24deea167024b246fec369b322296d2c08ba0c486f5990255",
+          "parserAgreement": 0.964,
+          "pdfplumberTextSHA256": "cbcbb763cfe5eafd80fbf572fb51aaaca30379dc3189ec6ba40b920c72b17eda",
           "popplerTextSHA256": "bfe27514cbc91ff618c0870423995dffa0724b89cf03af5eeed86a888cea7f28"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": null,
-          "parserAgreement": 0.9963,
-          "pdfplumberTextSHA256": "0b1eed5758e1bc3075bd181dbd6e5042c5add3f3af6f8b870276d9c7aaf623e0",
+          "parserAgreement": 0.897,
+          "pdfplumberTextSHA256": "cebe92301f485a73699bfd1c1763abe25139e9380fb5b15b41a1f490e2a7c2de",
           "popplerTextSHA256": "e5fa4af509e66b41097aa9e3bc613fff312bcb77df27a78044b3c200095f0eb7"
         },
         {
           "pdfPage": 8,
           "printedPageLabel": "6",
           "parserAgreement": 0.996,
-          "pdfplumberTextSHA256": "4733e50c57f41ec44e0fd9a80a0dc2cabff7dc0d60bf770a703a6efe4939d27e",
+          "pdfplumberTextSHA256": "48363e20d951c58099241b93571a9095ff430b9a2d56c5161a4c2261923b2770",
           "popplerTextSHA256": "87c9a74071435bd94de42feae79f49e79869a67c129b5c9d30915d87765d6407"
         },
         {
           "pdfPage": 9,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "d4fec7817e237c6ff5b2188e4d50fc66e0dc77edd1c8901a5beff42721559cc3",
+          "pdfplumberTextSHA256": "dc296912225282aff776be8dad5f8c124f204065eaab76a867a2d03b4dc4554f",
           "popplerTextSHA256": "d689b5870aa7c2e299cc7e80572601e8e05178b1828d2e28d26f376588dbc980"
         },
         {
           "pdfPage": 10,
           "printedPageLabel": null,
           "parserAgreement": 0.9953,
-          "pdfplumberTextSHA256": "0623551f567b2228d2ee81013e134c01016def616b4dceb8c1fb88822074f23e",
+          "pdfplumberTextSHA256": "d360f0a9803c60010cef9d0229e283defde72e8a7213fad44fde88c06d20c0f2",
           "popplerTextSHA256": "9624abd9325bad7d6b38da9fb5b5a473ec93796ebddc5e729f6e38961ddccb5a"
         },
         {
           "pdfPage": 11,
           "printedPageLabel": null,
           "parserAgreement": 0.9961,
-          "pdfplumberTextSHA256": "4ae9149fe45f5b8fe240d7c88a7b213d950da8489d53d24e4018d32bba29db0c",
+          "pdfplumberTextSHA256": "09c77680748208dbba3947af5adf885dc4a760708f396fed36dce6526cecd29c",
           "popplerTextSHA256": "6bdf59d4595ae44432d424a32338431774862519eef6994f5d89209d4b9603ce"
         },
         {
@@ -4775,8 +4775,8 @@
         {
           "pdfPage": 22,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "e465a162f9d187b8e8d9ab23d2409a3ee096ce9aa6567938b9c29047967f18f0",
+          "parserAgreement": 0.9746,
+          "pdfplumberTextSHA256": "8ef3d6d1bee19ca0b4bab7d298a973ea86c0a4999183848ce8f9e54a24f35622",
           "popplerTextSHA256": "7a7023b2d2ec1ace978077905bfd089412370fd16d0bce27eafd7f19319c6c89"
         },
         {
@@ -4819,7 +4819,7 @@
       "bytes": 942818,
       "pageCount": 41,
       "sectionCount": 311,
-      "minimumParserAgreement": 0.8685,
+      "minimumParserAgreement": 0.8314,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -4881,7 +4881,7 @@
           "pdfPage": 9,
           "printedPageLabel": "5",
           "parserAgreement": 0.9891,
-          "pdfplumberTextSHA256": "f00d6249ff79ba5da58c248a2c6fb0d4e5319e0a3bb633bcc68a26023311e874",
+          "pdfplumberTextSHA256": "d3fb336dcd996955b66b86f3c27ab08344f723c5de7ee6d006449b2153b38e6a",
           "popplerTextSHA256": "61193860d995fd2e45f06ef278d5cfd0e5a9781daf1d206478f79b25a1c663c0"
         },
         {
@@ -4902,7 +4902,7 @@
           "pdfPage": 12,
           "printedPageLabel": "6",
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "57f344209e72ddb91438b35e378eb90f956e7ab3dc3e2bbedfaa7b4baa519f97",
+          "pdfplumberTextSHA256": "40572e151d2ef2e9e6c80dc088e90351ed94eeca6f9e8f8a3c42456547502c14",
           "popplerTextSHA256": "9bf6b3605e068f97241ecef2bcaa014e6c28d57b50f6bae19b4838b00844166a"
         },
         {
@@ -4951,7 +4951,7 @@
           "pdfPage": 19,
           "printedPageLabel": null,
           "parserAgreement": 0.9979,
-          "pdfplumberTextSHA256": "02409da787a313615deb4cbf26070e50ebc068335c845b69c8c6ab29cd0b9303",
+          "pdfplumberTextSHA256": "27570ad9572ccfc263aaada609cfd7dc40a7154986abbab856dabdd50ee37be3",
           "popplerTextSHA256": "d514c158a1cd08cac6e4adc31f33b26001474a76efca2b8665bd6ee6e369fd1c"
         },
         {
@@ -4965,7 +4965,7 @@
           "pdfPage": 21,
           "printedPageLabel": null,
           "parserAgreement": 0.9969,
-          "pdfplumberTextSHA256": "94d85fd5f2d31a4df15f1c5f2592e4459dc97f092ba9a42abf9a2a4c6f0d0c0a",
+          "pdfplumberTextSHA256": "6b23b14b292117c3e02a7137202e1401f38dccbfd416266f7bd701a3e714b6f2",
           "popplerTextSHA256": "ebf7a9f18a5cfca2b79151b2a34a6178cd00d212579a8999ebd7c45ed1045b7b"
         },
         {
@@ -4985,8 +4985,8 @@
         {
           "pdfPage": 24,
           "printedPageLabel": null,
-          "parserAgreement": 0.9539,
-          "pdfplumberTextSHA256": "33e526a6153959edac23069bb900b9ee3b045e77dabfdab57e45af54fad072ec",
+          "parserAgreement": 0.9692,
+          "pdfplumberTextSHA256": "360b14e0482656019fb307a3446b742fbf7a2850488acfc40b1e1eea24f70924",
           "popplerTextSHA256": "7530838978a0b5ea96f76405153272bdc3d90d1b8c591dc7d9058d30fccf6988"
         },
         {
@@ -5007,42 +5007,42 @@
           "pdfPage": 27,
           "printedPageLabel": "25",
           "parserAgreement": 0.9899,
-          "pdfplumberTextSHA256": "fe41f653b736a75543f5c9fc11eb6442d15850ab56d7db37310e0b283c3a4ce2",
+          "pdfplumberTextSHA256": "e18c62e9b85da69def9e2b5d11f8eee64dfa264db99a3469ab90d831ba897637",
           "popplerTextSHA256": "b8ba52bb6a5643b10e61fd9e18b0b390b00053b7d9568cd25fcef72c8fe0a3d8"
         },
         {
           "pdfPage": 28,
           "printedPageLabel": "8",
           "parserAgreement": 0.9648,
-          "pdfplumberTextSHA256": "ded4e5aa415213fa44d4eaf54aa9eec7b55c84b20f9399a4b5f67559d07e6fd1",
+          "pdfplumberTextSHA256": "39738035ddbcc50d0c77a31f90327c10e1c3dcba3f813517aa7541db61e00b95",
           "popplerTextSHA256": "af9edeaa8afba1495dcf8dc38a038b34e9c5c3996454ab1c1e825bfa87b25784"
         },
         {
           "pdfPage": 29,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "ed3833f4da3b7409140fdd429e365cbff132326a4697e7fde5a1503b1f3145ac",
+          "parserAgreement": 0.9973,
+          "pdfplumberTextSHA256": "6378c58bf5b54764c186c03c5dd00f20d6f5e49695202623a935a8e05fca7a5b",
           "popplerTextSHA256": "dcab5346e704100cef390bbb4157462ca024b4b9918fa573564b4cab682ef7e9"
         },
         {
           "pdfPage": 30,
           "printedPageLabel": null,
-          "parserAgreement": 0.939,
-          "pdfplumberTextSHA256": "a44e4d603e0f2e8e862c2d390bd93cfdc8ebeb6bef9ca63d9f4dac42116d7422",
+          "parserAgreement": 0.8876,
+          "pdfplumberTextSHA256": "037cc4e616849ac4b4f26416eec81e91af94cbc511389efb0a6013b9cfb4ad11",
           "popplerTextSHA256": "fa638968b59aebe70a529541a6b2887afb9e69ab78437aab6076ff3fa92c625c"
         },
         {
           "pdfPage": 31,
           "printedPageLabel": null,
-          "parserAgreement": 0.9969,
-          "pdfplumberTextSHA256": "cdd871b1776b1b064abe2dff05fa9076f4ba9214c0ce7af902fe0aa1c812ad16",
+          "parserAgreement": 0.9938,
+          "pdfplumberTextSHA256": "fbf0e38356da71150846a9de69786c7590058ac48bea7f2275a45bcf15b7e01f",
           "popplerTextSHA256": "4275a170ed5efe7dc0a802c236c490f177456882d5f81704eb549409656d38d5"
         },
         {
           "pdfPage": 32,
           "printedPageLabel": null,
-          "parserAgreement": 0.9391,
-          "pdfplumberTextSHA256": "23cfc782286abba3722f67472ceebefec9e43557250e6b4208fc2368d0a0e7d9",
+          "parserAgreement": 0.9359,
+          "pdfplumberTextSHA256": "6ec87ea8869e3a30c10438c57b4dc052bf029db64ad3fdfb2de48bcd241480bb",
           "popplerTextSHA256": "62951c506c7754f1d7fd3ddc18116d3d5c57f81d190d15cf3e9a09530ecd2c47"
         },
         {
@@ -5054,23 +5054,23 @@
         },
         {
           "pdfPage": 34,
-          "printedPageLabel": "10",
-          "parserAgreement": 0.9963,
-          "pdfplumberTextSHA256": "98e70cbb94297294325aa4e952e93feee73af32976c1e790d6611ac7851f6083",
+          "printedPageLabel": "8",
+          "parserAgreement": 0.9975,
+          "pdfplumberTextSHA256": "515997b958065bf06c040c787331c15aa49e8ebd627ee6ffe7bcd9cf3ed8a0a7",
           "popplerTextSHA256": "d6ab7278f9a0d64872253137b46201cf98668d42ba6c1a2d529a56815aa88a7e"
         },
         {
           "pdfPage": 35,
           "printedPageLabel": "5",
           "parserAgreement": 0.9977,
-          "pdfplumberTextSHA256": "0ca0ef12a142ef1dbcf3566fc47230a7a67aac4db4eb27c90feecaba823280e0",
+          "pdfplumberTextSHA256": "6685039b78d3c90329242c4d0e03f6a48317f0d94658ee51624ea3ce26415e50",
           "popplerTextSHA256": "287e3b8e22092bcd34cc869dfba79c9cceddf4743c9faa3730c3b07afe9fba53"
         },
         {
           "pdfPage": 36,
           "printedPageLabel": "50",
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "b5a54cd519a1b1454a83752f3f8d16d88efd3fa89d604296228dfc8e85569c8c",
+          "pdfplumberTextSHA256": "0528f472503cd7ab5bc3cc1727e8cf8dea766f35239d2cef0e5127b2d9f6f683",
           "popplerTextSHA256": "b2ac088aadbe26b26a75fc5d8b514545e0ef28e36b5b4fa6310fc623cf7ec873"
         },
         {
@@ -5090,15 +5090,15 @@
         {
           "pdfPage": 39,
           "printedPageLabel": null,
-          "parserAgreement": 0.8685,
-          "pdfplumberTextSHA256": "d55336029169bda2a4f8ca22a5aa01604af7b951eab1f494028e4b8465ab83af",
+          "parserAgreement": 0.8314,
+          "pdfplumberTextSHA256": "02e36aefb598a060114face0d74e0c9ea4861fbae431a57baf0e8efe19cf0e85",
           "popplerTextSHA256": "da8992018c2208d515ad7979f7ae5a96837938a67690ab6c45c959d73259bff5"
         },
         {
           "pdfPage": 40,
           "printedPageLabel": null,
-          "parserAgreement": 0.9916,
-          "pdfplumberTextSHA256": "dd9770bc04f2e448a58e5f42dbff40b2fb71f4956521d814f2c65a8232856055",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "0bdd7cb57399f90840eb0e54fbcf41553e8debf108ad0880be69ef246fd52e5e",
           "popplerTextSHA256": "85fce9332a4a77bfe3c5c67a4bd1d4f1c34dbad72f08af76828d939efed889ac"
         },
         {
@@ -5120,7 +5120,7 @@
       "bytes": 575772,
       "pageCount": 23,
       "sectionCount": 225,
-      "minimumParserAgreement": 0.958,
+      "minimumParserAgreement": 0.8454,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -5140,42 +5140,42 @@
           "pdfPage": 3,
           "printedPageLabel": null,
           "parserAgreement": 0.9877,
-          "pdfplumberTextSHA256": "878bb27780a78e99cf719ecf023e4aafe8b7725444822f4375bed187fd82e20e",
+          "pdfplumberTextSHA256": "88ff4e7635a8eee17fe891ee3489aef50595eedbb3a6210d60706fc1100c8b6e",
           "popplerTextSHA256": "3ff6476797c37db97d2ad919824413d214812730690725641cde3a2bd2cfac3b"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "2198ff87d021c87fb66e6c3f5c54b5983155cc9436d70b9d32c3365b3f6ab241",
+          "pdfplumberTextSHA256": "580ccce6eed6edf67a9a6f4549f83693ed9db8b81f76ea5dbd91262c026f03c9",
           "popplerTextSHA256": "cc3f92fd3626a64973a3ed4eb7c5e8d2b6adae3580eaffe5664516e7be46ea26"
         },
         {
           "pdfPage": 5,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "e4a79c0df4afbd697355be0d165d9d73eee41cc12f6c18cf204844a669daebb2",
+          "pdfplumberTextSHA256": "8e3b029e75608f1b696b4f3f185c567d32b41a5655ad00bcbd1c67ca18b4ae9b",
           "popplerTextSHA256": "f3b81d9882e42a08b92d8c0a733954fd34cfb4c21edb43a103a1cad9b6ee2897"
         },
         {
           "pdfPage": 6,
           "printedPageLabel": null,
           "parserAgreement": 0.995,
-          "pdfplumberTextSHA256": "73da34828557cc6b2a94a9add465bffd385c1dc2f54d9c8701241fec87c5a355",
+          "pdfplumberTextSHA256": "3371b4b35c08021b4dd91adfee9f0f87ae8e48925b97b700b8c1d2ef82db24fd",
           "popplerTextSHA256": "2998376aef5221757e498421d610068d70f536c2092902be21bbfb2def8fb947"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": null,
           "parserAgreement": 0.9973,
-          "pdfplumberTextSHA256": "fa82208b0b8ca52441ad602379068841c51a603be716cb1ac3a1af332af6610c",
+          "pdfplumberTextSHA256": "fc7412abc2e4f0900b66bea5796c06405daa449f18bcd3758cfe80e88e917bdb",
           "popplerTextSHA256": "7b6b7d7b3b947169bd752a995c308522b3f7668833ce7a76d8644ac9aab604d9"
         },
         {
           "pdfPage": 8,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "407a3d8c5353de11d539f5a1691f2591a962b5295f104fbec62b5fef2ae64ed3",
+          "pdfplumberTextSHA256": "1c3f845e98f9d1f89c1f6ed3a3b7b81e37a02d883e6ecd37ce4d3f9d8a4fc699",
           "popplerTextSHA256": "8075c0a25ea9f5157689a226ea40509e4162cfe006a48daed0fb24ad4d8cfd62"
         },
         {
@@ -5196,14 +5196,14 @@
           "pdfPage": 11,
           "printedPageLabel": null,
           "parserAgreement": 0.9928,
-          "pdfplumberTextSHA256": "8267fbd393814429e7334b7a0edaebc2e49165f975d5b2cc5b970faf8bbc0adc",
+          "pdfplumberTextSHA256": "6b00367f96e40bbdaef39f18ff93ed3cf84ee0da5609c5ce17b397cb41a384a3",
           "popplerTextSHA256": "b64e00558654d228d5692abb717091d6a042a9fea7c6f72c7d2f67c71881ed25"
         },
         {
           "pdfPage": 12,
           "printedPageLabel": null,
           "parserAgreement": 0.9801,
-          "pdfplumberTextSHA256": "63c6b938d8353d595597d66b579badfc250c113d6e46aac99b4d594a590bddc4",
+          "pdfplumberTextSHA256": "19f1aadd80d96a0581ae6cf67d9e647fb40ad2d8017f742d512fd220d565f508",
           "popplerTextSHA256": "a9a60dff02ec8b6dea952e8130f3641e325524006a147649a0cfe97eef192835"
         },
         {
@@ -5224,42 +5224,42 @@
           "pdfPage": 15,
           "printedPageLabel": null,
           "parserAgreement": 0.9971,
-          "pdfplumberTextSHA256": "75f444a01268b0bedfd73fdeb09ee2545502097d115d097c7fd67af430e21492",
+          "pdfplumberTextSHA256": "455f2a5c84d93fbdaec3bdb7599e89e30f83dfa2911be2b7d508de5b9fcea882",
           "popplerTextSHA256": "aeacca1f1a4490087483c2508ddc4f0a77f357c77a107f68aaefaffdf4d7ec94"
         },
         {
           "pdfPage": 16,
           "printedPageLabel": null,
-          "parserAgreement": 0.9914,
-          "pdfplumberTextSHA256": "4b07ea670786ced22696ef11e7d6f7a66c97a9219b409a22b2a43fe1e1d21756",
+          "parserAgreement": 0.9931,
+          "pdfplumberTextSHA256": "fd004248082916201a44dc6031ed4ac26a14bce354073cc066a0458ab0e52187",
           "popplerTextSHA256": "586bfb00bb0d93d16e64b9b03435da21a4883f3c65d0d9c432ea6eb717a5b769"
         },
         {
           "pdfPage": 17,
           "printedPageLabel": null,
-          "parserAgreement": 0.9949,
-          "pdfplumberTextSHA256": "bf026d16959d3afe41711e37ef2db1a0ee36dc29ff354a81840ed886d2c8d883",
+          "parserAgreement": 0.9966,
+          "pdfplumberTextSHA256": "7977ac8c3d8a318ebbcb45a9a003b55157579ca79a64a4e9402ac5d0481a537a",
           "popplerTextSHA256": "465191d8822defbd95fea9b1c99f4df48ef764602d75caee2ab443b18acd52f8"
         },
         {
           "pdfPage": 18,
           "printedPageLabel": null,
-          "parserAgreement": 0.958,
-          "pdfplumberTextSHA256": "a38177620133db74603894bda4dde144adaa3aa0174b88276bff89ace95208a6",
+          "parserAgreement": 0.8454,
+          "pdfplumberTextSHA256": "5aeb6a62ee76cd5e59a569a48c077632b5cb83e5a557f24bf73d3b3888e17e4d",
           "popplerTextSHA256": "ddf22bb761e775938720e2520fe1032bb20691bec0e376b43013b01680a6d3bc"
         },
         {
           "pdfPage": 19,
           "printedPageLabel": null,
           "parserAgreement": 0.9921,
-          "pdfplumberTextSHA256": "4553158cea8753b74907552d21edd83a10caf941eea351de18be441633566d37",
+          "pdfplumberTextSHA256": "ccb2efdc1808ed835b6814c574b1355ae7f7e95b79fdd1409de3656b4fc2aa92",
           "popplerTextSHA256": "9feac34772a4ee9857e62f830a9247dc6c95eff05d74ef6c379a14ee4a98e521"
         },
         {
           "pdfPage": 20,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "b0025e19b457346f02eddf3aef654128164400e8e6c28946dd5f772aa7af40e9",
+          "pdfplumberTextSHA256": "93bde9a64988868c385ad829bf3343e259dc5e881556faf601baf976be954ca9",
           "popplerTextSHA256": "5bc7e6b0f7167a303abb9d0b398bf17a153103645e0bfdf269379e1b158efa69"
         },
         {
@@ -5349,22 +5349,22 @@
         {
           "pdfPage": 5,
           "printedPageLabel": null,
-          "parserAgreement": 0.993,
-          "pdfplumberTextSHA256": "8813834f487996d30ac5924ef2ac36ce20244d7d98ce3e3eab8f00d3bad09ad9",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "414f1eb7d6b67fe2b7d63429ef5626c54123e87ea86e826e6cb00e6d05235c19",
           "popplerTextSHA256": "17753ac5c825ecceed6f3dd13cf5c377fffa081639ae9917d3e69ff06d5f1ea1"
         },
         {
           "pdfPage": 6,
           "printedPageLabel": null,
-          "parserAgreement": 0.9914,
-          "pdfplumberTextSHA256": "3243c6a577950b5e5c0743262a886587295e2a0dfc195c874d0816db280ba1eb",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "58e3f215cdda02880f2c0784ab4858c5dd1ed43d96d4c32c2dac4e8c180e954d",
           "popplerTextSHA256": "94ced9e2c994fb27d8a18c817f920e68edadc91f109943937c9155a587fd6bb9"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "b1c8afce26de1c92ddee79db727578edf85666389d8d6965c29ffce62d8d70aa",
+          "parserAgreement": 0.9805,
+          "pdfplumberTextSHA256": "19c924b315e3dc5159488d575e8caf4eae13ba5d4547d7909cb388ece9bd3ac0",
           "popplerTextSHA256": "1093ed3aaade28c81603f4cb4308ea4d4d36711a882de2c28cb126dc4f71a0ef"
         },
         {
@@ -5378,28 +5378,28 @@
           "pdfPage": 9,
           "printedPageLabel": null,
           "parserAgreement": 0.9965,
-          "pdfplumberTextSHA256": "419f47f2685481eeb17664cdf689d63f3a41938b4f602214ce5c1ceba8aa6398",
+          "pdfplumberTextSHA256": "93382009e4ad00b9eeabda9f1ed850c2e8d8becdc202eb4f259cb668b790f1c7",
           "popplerTextSHA256": "f97d0e30c20bffe7f1409b6099ea5d059d388d6c977af209e6651c81f830f728"
         },
         {
           "pdfPage": 10,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "a954fc871dd07f4ccbfeb57acbb502d35860fa13707290d91e2040b17ca3873b",
+          "pdfplumberTextSHA256": "ab48e64123f947f3d8d7106597183700ec76d811a9850726b608296ec0b43149",
           "popplerTextSHA256": "099eab25ae4d6765ae4ccf6a6f5fbc35ea3e3c74f1f344ea85fd6e67d5f3c940"
         },
         {
           "pdfPage": 11,
           "printedPageLabel": null,
-          "parserAgreement": 0.9788,
-          "pdfplumberTextSHA256": "f0582e2a6a5672068ee7a27b7cddeb9397e6b441ca9be2b7750ac213f819a633",
+          "parserAgreement": 0.9967,
+          "pdfplumberTextSHA256": "5a09fde391beddf3c5bafb9c95cb206b162ab35c53d9c87243ef4a5bd02770d9",
           "popplerTextSHA256": "388a9535d05c326182ae05c0c8b31d66f603a86aa3893cb0c0f833af34d7b7a1"
         },
         {
           "pdfPage": 12,
           "printedPageLabel": null,
-          "parserAgreement": 0.9893,
-          "pdfplumberTextSHA256": "2b897de425634aa6646ac86d75fa11f84b70886333cb8c713bd72e9882557d0e",
+          "parserAgreement": 0.9969,
+          "pdfplumberTextSHA256": "8384b6c2c94b4adb2a4632202402ddda80a22b47f3a0af6283e59ddd6fc2927e",
           "popplerTextSHA256": "840faa8805e093745fde455e4cae144bc5e61396ebf1bc68e3299bf829c9768a"
         },
         {
@@ -5419,8 +5419,8 @@
         {
           "pdfPage": 15,
           "printedPageLabel": null,
-          "parserAgreement": 0.9881,
-          "pdfplumberTextSHA256": "f7d68ad1352f728597ccce0fe1c64a1d21dcb5ac34b83665b497a129f0638a34",
+          "parserAgreement": 0.9384,
+          "pdfplumberTextSHA256": "40c56045d092fbbff28fc0ac13bd6cff0c336b8f1cd842bae61f1c0cdf654bbe",
           "popplerTextSHA256": "e99c25215ad48d18f1ff6a71ff20ac4086abb30db044faa5c356ba656b9233b2"
         },
         {
@@ -5482,8 +5482,8 @@
         {
           "pdfPage": 24,
           "printedPageLabel": null,
-          "parserAgreement": 0.994,
-          "pdfplumberTextSHA256": "9821ceefc94f40f9eb56e4e533404398c8c51b142c024529c8d50277ad6c78e1",
+          "parserAgreement": 0.9976,
+          "pdfplumberTextSHA256": "01c5f132535bd6982c3a3d29ac9526ba67e802b4324bdbc1f8131c4885525ae7",
           "popplerTextSHA256": "e351ac318a9e987051ec187f9ec70b79e493d2039bf70dd815a631f53c143a61"
         },
         {
@@ -5540,7 +5540,7 @@
       "bytes": 268460,
       "pageCount": 6,
       "sectionCount": 53,
-      "minimumParserAgreement": 0.9926,
+      "minimumParserAgreement": 0.9896,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -5566,8 +5566,8 @@
         {
           "pdfPage": 4,
           "printedPageLabel": null,
-          "parserAgreement": 0.9965,
-          "pdfplumberTextSHA256": "8e4952471d485d4ce8dc69ac689ce65d85e6b8afe3c5af44463f54309f51773c",
+          "parserAgreement": 0.9896,
+          "pdfplumberTextSHA256": "aeaa6f29f82a2fae82ed6a5ffbf69f4e9e2ee6d18d7524c722c0169048ebee76",
           "popplerTextSHA256": "302d79209a509b9b87462f16a7958851624315127467d2a8a2382975116c2434"
         },
         {
@@ -5580,8 +5580,8 @@
         {
           "pdfPage": 6,
           "printedPageLabel": null,
-          "parserAgreement": 0.9959,
-          "pdfplumberTextSHA256": "4868c09e34c688936d398f96e2ed8cf8dd6b2861c6cd6ff65e5bf6c617b30449",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "dc81d2a908cf578fb9ce410228399f0cd02ba6d065f5ab1ad7055a6a145397d5",
           "popplerTextSHA256": "1c3634879943525736668072e41b4df1b7e9b4260b5331edffa910d32f71030c"
         }
       ]
@@ -5650,8 +5650,8 @@
         {
           "pdfPage": 8,
           "printedPageLabel": null,
-          "parserAgreement": 0.9961,
-          "pdfplumberTextSHA256": "201f5499a9c95cf4934825e327d4c7a171f85946dc6f167e544a9e3ac82bd9ce",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "adf587cfca54bf2fd0c88e30d21b0d9276def62e1dce81a8819ba857a8a46631",
           "popplerTextSHA256": "564be4f49fe1d8c8985f727ab586fe3ccb4f4148c6b88aff7b0fcd9fbaaed7cf"
         },
         {
@@ -5811,8 +5811,8 @@
         {
           "pdfPage": 31,
           "printedPageLabel": null,
-          "parserAgreement": 0.9046,
-          "pdfplumberTextSHA256": "74ec8450599f2e441bcb328027101448b08019f74ba189917aa4bf32913f1b1f",
+          "parserAgreement": 0.7829,
+          "pdfplumberTextSHA256": "c9477ac07360f303289d701f03965408caf2a7f1c46c9be3d8d95e93c9d41a93",
           "popplerTextSHA256": "f0151b05e6686ba7f5bb9153d152de67fbfb7d84b3f95fe06246be6b090b7719"
         },
         {
@@ -6170,7 +6170,7 @@
       "bytes": 324692,
       "pageCount": 10,
       "sectionCount": 59,
-      "minimumParserAgreement": 0.9203,
+      "minimumParserAgreement": 0.9589,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -6182,15 +6182,15 @@
         {
           "pdfPage": 2,
           "printedPageLabel": "15",
-          "parserAgreement": 0.9203,
-          "pdfplumberTextSHA256": "dea45fc30bea8c4e4b7f4c487b24cd219c394dd404a9be0a74ec0f67f927308e",
+          "parserAgreement": 0.9687,
+          "pdfplumberTextSHA256": "64d547c23bea5aa342147ef3e55d55e3581fcde35658cfd9295541e4b1b40c4d",
           "popplerTextSHA256": "20756782c297712bb6d8cc2e94414e0cc5ae4785a601866ad45d5469d531bb2a"
         },
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 0.9234,
-          "pdfplumberTextSHA256": "9a3019e856a831ddb1cfbe0f1553227224cc16b27060e286dcb95b270ccab450",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "2a6a5e28378a62a66c29de160c51e73ac86e07c1930e3075000fc4896ca22577",
           "popplerTextSHA256": "643015ab87c239ecb7d1cd4c999c1e290a5e02643bac3fcfa1bacc650f525d45"
         },
         {
@@ -6203,8 +6203,8 @@
         {
           "pdfPage": 5,
           "printedPageLabel": null,
-          "parserAgreement": 0.9567,
-          "pdfplumberTextSHA256": "67bc40e77e4d8fdba756eb2ba45ae9530e8ec5c00df11085215bc79e310ca85b",
+          "parserAgreement": 0.9589,
+          "pdfplumberTextSHA256": "8ea4ea1cdd5a9d6ca8bd05d6decc627f0091fbfaa035da670c647f44db4ac28d",
           "popplerTextSHA256": "64b6a58f3cbfd9d00f2da1ccb7ab6b7dac27190295f58b4ed1352cb09fdbae51"
         },
         {
@@ -6281,7 +6281,7 @@
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "272c83d7d36b63b0eff9fd0c9f23f2b4f3d7673440bfc354c4c3f5c59c6b8ee5",
+          "pdfplumberTextSHA256": "65b866446a063318d1d3bf95f40ed2b766c8b1f739cacecaec16c944ecbf9ba5",
           "popplerTextSHA256": "a050df6c5f94757f0c62fcb086dddd360a6db1745d7a4077eafd7e83008a1421"
         },
         {
@@ -6386,7 +6386,7 @@
           "pdfPage": 8,
           "printedPageLabel": "I-2",
           "parserAgreement": 0.9938,
-          "pdfplumberTextSHA256": "c56c61744c2ee78a95edd69ed41e8a46d16cd516c56cb0604d55430fee4c9ec3",
+          "pdfplumberTextSHA256": "b93e4a1b118244bb83ac22487eeb2bdf89dd6555b26383225c0641d9fcdfe76d",
           "popplerTextSHA256": "93bed2a4320db8611b7cccef9a25549b662879c44c0d1ef1707b424e218c51f6"
         },
         {
@@ -6624,7 +6624,7 @@
           "pdfPage": 4,
           "printedPageLabel": "11",
           "parserAgreement": 0.9948,
-          "pdfplumberTextSHA256": "e03e0bea8d836e6036287d132f18cff0a2b71e3ec48a515e20a00e8867850766",
+          "pdfplumberTextSHA256": "8c6267b4a017221296ea0d4b1212c08790175d7180a57d7d626e3f3199ec2bae",
           "popplerTextSHA256": "c77ff05de20d67a767d913ecc1bf1c0bd21772a743bbe587e2e1da1d6abd4cb0"
         },
         {
@@ -6758,7 +6758,7 @@
       "bytes": 1864508,
       "pageCount": 109,
       "sectionCount": 764,
-      "minimumParserAgreement": 0.9803,
+      "minimumParserAgreement": 0.9034,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -7163,7 +7163,7 @@
           "pdfPage": 58,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "8317c3bd74a3c55db241c2ee8867dabc03aff67d972738399d5eaa7e304cc547",
+          "pdfplumberTextSHA256": "8f912ebf69feafdcd5b0e84986bb4b27a45cf0bac785838c52ea5dadecc4c60f",
           "popplerTextSHA256": "4e8e1fa0d3e8e8bab9cfea9bf4a819a4573c58da1069c1e20013a0765005c192"
         },
         {
@@ -7317,7 +7317,7 @@
           "pdfPage": 80,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "2983baffc327dfe98a55eb303742772271fa4a82d8b40a2e65e67f74d04441c0",
+          "pdfplumberTextSHA256": "740394e3468375532d049299869cfb5b9d60259ea37a2649675ca526c20a07c0",
           "popplerTextSHA256": "68c40fc7856eaf16fb7b36c82e0c265200d09cca39fbba9a093f430b0e6d1f75"
         },
         {
@@ -7352,7 +7352,7 @@
           "pdfPage": 85,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "d97c9c4febe2befc4837eff91cbe8fbc87823e1ad50f46009f7a3e6e05243e14",
+          "pdfplumberTextSHA256": "7dfa32a824922c83b13e419c5e3f01d1d09749eaf0ba1830e9697dc5d6248b00",
           "popplerTextSHA256": "5abfe145b974e6c8859180b82b26ef8ce96417114f1bd44e4dce7fcf9e02c7df"
         },
         {
@@ -7365,29 +7365,29 @@
         {
           "pdfPage": 87,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "fdfa378d712c43d70c1306e81b6ecb2e425d492863c00446b0426367db0b8f8f",
+          "parserAgreement": 0.9366,
+          "pdfplumberTextSHA256": "270483f0bb1464413cf6679d61d17e071cc8210f9cc535aaaa1c89aed3a3b3d5",
           "popplerTextSHA256": "f74ff9eebba0ed68a004a6e2b1cac951b2460650598bff8204fb188e18368409"
         },
         {
           "pdfPage": 88,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "6c00e25a2099d0900219591999dc45a1e55f8b5c8c82834bc865a574948fb282",
+          "parserAgreement": 0.9455,
+          "pdfplumberTextSHA256": "ec24bc6b8e4ece4196c7ebe1431ad4e0290c43f94f7a420f3a2ffd47102988ab",
           "popplerTextSHA256": "6f3631f86bb00550fbf4d9ca3930c494e99ecbf327bf17d7442c56b993824d45"
         },
         {
           "pdfPage": 89,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "2656ae72155ff45f6c236ce4213e243b40748cce60e0c2e26b299725147d5765",
+          "parserAgreement": 0.9423,
+          "pdfplumberTextSHA256": "45b4adf4bdd560fa66f2bfb681e7ad11c6c2cef536ccfd3cab55d2ec7f8dc8bc",
           "popplerTextSHA256": "b08ef9e3458bffd039ed4dbd8054e9090c833dc6359dcba7c4f25e080d13fafe"
         },
         {
           "pdfPage": 90,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "078031cc946d87647ef3457258cb2250172f2c3bccc07d28d7a88019d96842bc",
+          "parserAgreement": 0.9746,
+          "pdfplumberTextSHA256": "caa57608422b0a5f32d4fe04781e7b93439171d70f8df3d6d314063d0431160a",
           "popplerTextSHA256": "e537d3717647aa3a2f7eb51fcbe27e78c53dd353d02417e51c898e32569b09e1"
         },
         {
@@ -7400,8 +7400,8 @@
         {
           "pdfPage": 92,
           "printedPageLabel": null,
-          "parserAgreement": 0.9973,
-          "pdfplumberTextSHA256": "02fcf071488b73724de5061dbf4276e044511dc2cb22d1661be5630c0160e9b3",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "ab329bd75b90b7108bf086938524c1441feed66b9f3ca7ae2597662cf45bf646",
           "popplerTextSHA256": "1a2b519ccc9e4ca5a2d2bac57d0ea299088229e74e719fa4354c6a0a6629de67"
         },
         {
@@ -7491,8 +7491,8 @@
         {
           "pdfPage": 105,
           "printedPageLabel": null,
-          "parserAgreement": 0.9803,
-          "pdfplumberTextSHA256": "c23734fe67ac3e266e6b1406f965439dba01731cd50c3cbf422e8535ffce8f76",
+          "parserAgreement": 0.9034,
+          "pdfplumberTextSHA256": "6721800a043156caeb3ea49b71cc1133ca0473862afac33e0cbebcd78f189acd",
           "popplerTextSHA256": "1304aab18a3270a621d920791454dfc196df34df6d8c25b1841d702452753c49"
         },
         {
@@ -7556,41 +7556,41 @@
       "bytes": 406953,
       "pageCount": 18,
       "sectionCount": 3,
-      "minimumParserAgreement": 1.0,
+      "minimumParserAgreement": 0.7855,
       "pageExtraction": [
         {
           "pdfPage": 1,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "1c150d02032102f7ac6dbbf19ff4787dcb2815d6f827d5592259cbbfbf9d71a7",
+          "parserAgreement": 0.9067,
+          "pdfplumberTextSHA256": "3070f71a1aff3e8816305fb46ec385d90666ac416def1be63131973f28794865",
           "popplerTextSHA256": "a86a946274accb3b0960b14370e847c392bd8cd97080fcbd660fc02de08a4ded"
         },
         {
           "pdfPage": 2,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "5a3c0755084f723bf5aa6a1564f7b2b5a95ed29d09af77dcb29d7d3ccc996707",
+          "parserAgreement": 0.9178,
+          "pdfplumberTextSHA256": "1434f71c2f4e6c19f5f70d6370f6377df4215b4c9d30e1918816ef4db58a1d16",
           "popplerTextSHA256": "f027be4dc14ebfab786fbe819c21db90b604c87e547820553516a207c823649d"
         },
         {
           "pdfPage": 3,
-          "printedPageLabel": "7011",
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "59179b13a44ee26cbb4859a1c888b15b00c89a353a1b8fcdeaabf8c8a0be60cf",
+          "printedPageLabel": null,
+          "parserAgreement": 0.9244,
+          "pdfplumberTextSHA256": "7fedd83b77ca76b622e3ce4329e88f9e63932ac0a29062c41a1a9d1fb6fd5dc2",
           "popplerTextSHA256": "07bde83bc5a77492278417fc4c33f2f125f4fecb5c57af6d4075a5ac5d4e9588"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": "G402",
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "7ca0bdc831abb3a0b25010da8df01085b79ca47029084fb01e2c97fa6525aaaa",
+          "parserAgreement": 0.9187,
+          "pdfplumberTextSHA256": "5894fbc1085b0aedde14b39f6f9fba29e51bb17cae388f58c70e8ef32d9fba5b",
           "popplerTextSHA256": "abc884a66d99ae8fb361256568be8e8f5fe22bc09250870596e850374ce51cf3"
         },
         {
           "pdfPage": 5,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "76df876f6dd67612d7f94223b0f4255f49158cc931dac67796d2ae410c5c49e0",
+          "parserAgreement": 0.9804,
+          "pdfplumberTextSHA256": "2576435fb26f039f04749255d97a9927b2fbb98c0cccb82ff975c9682525e5d5",
           "popplerTextSHA256": "5f113f8d3bf495ecee633a8efa90e92e0fc05df0920344e4bb933a3e90a40b92"
         },
         {
@@ -7624,36 +7624,36 @@
         {
           "pdfPage": 10,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "e241fafe59e3435053ee6b6227578bbd9b331af05a136da6667cd8e105229386",
+          "parserAgreement": 0.9891,
+          "pdfplumberTextSHA256": "dbeefdf61ed9628602b82ea939f2138bf51d8151ef67e357c4a465dc7f77b45e",
           "popplerTextSHA256": "67fb48d5c3c608a278d843f79a34b50a8d46c867cc7edba256b0aae42596a571"
         },
         {
           "pdfPage": 11,
-          "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "81b3511a7206944a003c5d04a7d1b7bf6de1bd92a58caa66c9e6c8f7f2ba467f",
+          "printedPageLabel": "306",
+          "parserAgreement": 0.7855,
+          "pdfplumberTextSHA256": "7d068760d9a9379c0a172b0eddc2cd470162a36b29142d54e3d5788de693f994",
           "popplerTextSHA256": "8950b9aaa59d305454b2e59a76c122fa45d4798766f850d58c3cc05bc6ee72bc"
         },
         {
           "pdfPage": 12,
           "printedPageLabel": "29",
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "c2de56e19fd7eec48ae2a27419127d208e7f542ad6f273e05b77ce3ee4b3ed8a",
+          "parserAgreement": 0.8342,
+          "pdfplumberTextSHA256": "1be1dbf8230c8dfc91995276fd0a01417f95a509ac99b0e369328ccd2cc80c2b",
           "popplerTextSHA256": "6c385f67044ebb563adb78a50d457c3ce0219ce0964c41f9464ec79336e9c1ca"
         },
         {
           "pdfPage": 13,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "872a2d806bf84334c134a84eb0a94cc9fc240a4f727ae7b2e562bfd57a61ac45",
+          "parserAgreement": 0.8359,
+          "pdfplumberTextSHA256": "97366bfe1e24138f91e2b083e2b6f7ff6fcf720adfd39412489110b318705f9d",
           "popplerTextSHA256": "99e01cf7ab78ab1991339aaf20e0c18a1101c198b3bf41e69e5ccc378a1ca997"
         },
         {
           "pdfPage": 14,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "1f570744823c20a23d5d6276d977b7905244e58460e2b5f8da70c6380b5a89cc",
+          "parserAgreement": 0.8637,
+          "pdfplumberTextSHA256": "6a77d3c3c39c88f699280517798bb12c734812a1334416306920245b4f7d0288",
           "popplerTextSHA256": "35d71c2bf29a3a1cac4cbcd8284b32efb4c5852d4372e242e6adb0fb974030ae"
         },
         {
@@ -7665,23 +7665,23 @@
         },
         {
           "pdfPage": 16,
-          "printedPageLabel": "3970",
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "95b805aff4a149e7a3a0cb6ecd964911443a7dc2eb1911d7debc7f55ae34c322",
+          "printedPageLabel": null,
+          "parserAgreement": 0.7913,
+          "pdfplumberTextSHA256": "d18fe0769cb6c1e90735fdf63b2faff739b85ac45c2f8ee1db7cc23da9fbc6a4",
           "popplerTextSHA256": "ac47b41436ef43870cae8a9cd21833f09b33b24b4add5cfb7d560fa5bb9cccc1"
         },
         {
           "pdfPage": 17,
           "printedPageLabel": "2007",
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "45ed1daf23cc0497570db98b534389696bef61e71f20965f5875b57e8b0e7878",
+          "parserAgreement": 0.971,
+          "pdfplumberTextSHA256": "31a938fd6ae5654f41cae01343c24902fcb8dda6931552f88cc6cbe955895b9d",
           "popplerTextSHA256": "3d5e0591719c965e35231f775ee1a8319ef222710e5d1f73026a635e73e6d5a7"
         },
         {
           "pdfPage": 18,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "86b737fc025c5ca82acbcb6a6f527a163f0d70050044d2de0b41f4083b798b36",
+          "parserAgreement": 0.9038,
+          "pdfplumberTextSHA256": "cb42d58a5dfc49776cb4c97f8a627e40d677f77c58b48093cc923f5c547b1951",
           "popplerTextSHA256": "4ae96dd74efa3f6783c68fcbf6aa90b7e353795ab7f71f3a5e8e9ff7c590197d"
         }
       ]
@@ -8115,7 +8115,7 @@
           "pdfPage": 5,
           "printedPageLabel": "1192",
           "parserAgreement": 0.9967,
-          "pdfplumberTextSHA256": "604f9db39727bdff2d8e4c44c5653cdc684b18c023bfabfe09c1cd9cb610cd2d",
+          "pdfplumberTextSHA256": "f3b970cf5ae79f864403e79bf4dc8f60a957ac17420bc6f563a3efbb284ec9e2",
           "popplerTextSHA256": "45a00c051b4db77d899e2cbbdef2c9a4ea815f96005e469428f8e43077d874c0"
         },
         {
@@ -8143,7 +8143,7 @@
           "pdfPage": 1,
           "printedPageLabel": null,
           "parserAgreement": 0.9966,
-          "pdfplumberTextSHA256": "c18d91c91be40e3a103cb4f6bbbb039aa3f04e40b77b18b7d5a7650940fb40e0",
+          "pdfplumberTextSHA256": "90b7a057cc081627907e1cf7888dd6ca7c12134874800fdbd619bbe3e477b04f",
           "popplerTextSHA256": "1d800c35d48bb453c0cf9a56f459a4b8d35243254ff35282016c3f76548cce1e"
         },
         {
@@ -8165,7 +8165,7 @@
       "bytes": 565221,
       "pageCount": 30,
       "sectionCount": 128,
-      "minimumParserAgreement": 0.9635,
+      "minimumParserAgreement": 0.9526,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -8339,28 +8339,28 @@
           "pdfPage": 25,
           "printedPageLabel": null,
           "parserAgreement": 0.9953,
-          "pdfplumberTextSHA256": "fe762da82f39aa3ffd0111e3062ebb555032ad32c082d29d6dc38eefa7564382",
+          "pdfplumberTextSHA256": "02b291bcaca032588f427a2810275e49631872b0ae17275477d85e1dee7425f0",
           "popplerTextSHA256": "fd7ecda0a1c448f03eef21d994beef1c5c1538336c56a4ad6766ae3c5393f997"
         },
         {
           "pdfPage": 26,
           "printedPageLabel": null,
           "parserAgreement": 0.9747,
-          "pdfplumberTextSHA256": "bbf967b1d6164984fc89841755342e452e04bce3f1a0b7056270ff7354ff51d8",
+          "pdfplumberTextSHA256": "a10433de3761d2c343ebdd5e9f5deac75311f980bfdaa29feb308a76c65a78f6",
           "popplerTextSHA256": "8ee2f508f01daaa14df94050c07b18af5c7b62e53a4d304a5de210d6e8cfdbdc"
         },
         {
           "pdfPage": 27,
           "printedPageLabel": null,
-          "parserAgreement": 0.9635,
-          "pdfplumberTextSHA256": "af90f93bd8f314938f8c6b3b825d4a885da70567ec1219b7b6770998f5eba3aa",
+          "parserAgreement": 0.9526,
+          "pdfplumberTextSHA256": "857adb3478a9876307d591643889ee54ac4cfea1442325b32ddd3d104adebc49",
           "popplerTextSHA256": "8c1d67a7724a797fd9511a9a123594870b301c7ed7cf0ceb5e836707b2a1e9fe"
         },
         {
           "pdfPage": 28,
           "printedPageLabel": null,
           "parserAgreement": 0.9911,
-          "pdfplumberTextSHA256": "3c13a59ba7e702ef5f423ef44b6b717ad0ed11f1ee440802a2b7db95de432a66",
+          "pdfplumberTextSHA256": "b0f29d9844699e19f3901530c6c2257b1fa4aba6dfdc1de02b7be2e4a86ba90b",
           "popplerTextSHA256": "c6d24ca4f3f017ff4c8ec3526dbb2b7018df479e7cb08294b50e2ef393e01b9d"
         },
         {
@@ -8416,7 +8416,7 @@
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 0.9905,
-          "pdfplumberTextSHA256": "0f17cfbd8cf82000fba03037dec8e7953b0081bf4a9731cb115f6aaa99bcd22f",
+          "pdfplumberTextSHA256": "4a2dd127f964e2498fd412f60f32dd44e5f94080c459956e9d8b91928a57fb98",
           "popplerTextSHA256": "b9c8892091e579830d1f953d9583bb67ffbc5903d121145d9bed4c5b9b6ef110"
         },
         {
@@ -8703,7 +8703,7 @@
           "pdfPage": 30,
           "printedPageLabel": "1",
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "f50f83e4f9d629ff99e1e91c142ecaca78e5888558f2f0ce45c6bcc5d013a2f6",
+          "pdfplumberTextSHA256": "1fb05946642e0a499b2e8b462ead73ee93fb94c9a01bb70fd539c066d6f7856f",
           "popplerTextSHA256": "e6ce61f1d4c83e5bf215e8e21f6da5c977c6232bcbed52115dca1fe0f5a750bd"
         },
         {
@@ -9088,7 +9088,7 @@
           "pdfPage": 7,
           "printedPageLabel": null,
           "parserAgreement": 0.9975,
-          "pdfplumberTextSHA256": "a59ff5766ac8c30a9752f439eb73efb6c70a301e5d66d0691cea99afa8cedce4",
+          "pdfplumberTextSHA256": "a64fb31935f51ec35777abd6b3b96a601580796ecd424544c36bc4fc722a4175",
           "popplerTextSHA256": "f3a268c036aac4a9877cb0cdfbbe6e9790b4f2a73840d4e6d2960f91f96562d2"
         },
         {
@@ -9305,7 +9305,7 @@
           "pdfPage": 2,
           "printedPageLabel": null,
           "parserAgreement": 0.9825,
-          "pdfplumberTextSHA256": "a51042e433aa7ae947c38797330681d6d0bdd89c2f3bd5db9c198a95642d32ff",
+          "pdfplumberTextSHA256": "68ac734c2fccfb8a26cc2c2cefb56042681426e22bbb941cd243b3a21ecfe0ee",
           "popplerTextSHA256": "3c050b26e900a13367fa9d590ea5ef4e88fcf4ec5aab1578058db3e0ee477236"
         },
         {
@@ -9333,7 +9333,7 @@
           "pdfPage": 6,
           "printedPageLabel": null,
           "parserAgreement": 0.9827,
-          "pdfplumberTextSHA256": "efd881a5aead3904f7a2aa1ddaeea9e8213bc86f8211229ff2e65b26021c9d6c",
+          "pdfplumberTextSHA256": "abf237351379352997a91e8f40168aa9d838792a1a5aa413fcdbae68b2c4865c",
           "popplerTextSHA256": "d2362e674ca6c9495e4404273146a99dfd6354cac707bfd1dfe6ce5d9598a35b"
         }
       ]
@@ -9606,7 +9606,7 @@
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 0.9895,
-          "pdfplumberTextSHA256": "9311fee1e7537e11fb165fe38108ef05d976b2f71afa90b5362d7210ce3a9c8b",
+          "pdfplumberTextSHA256": "3c7ed04bdd9fdd28d591f84e2a17958ddbc976bc621111def1fae9213646249e",
           "popplerTextSHA256": "92c85341cbcd33a4accfc3a3a8430239e3b28b53e4ba38772feeaafb5682cae8"
         },
         {
@@ -9656,7 +9656,7 @@
       "bytes": 518115,
       "pageCount": 13,
       "sectionCount": 146,
-      "minimumParserAgreement": 0.9846,
+      "minimumParserAgreement": 0.8732,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -9668,15 +9668,15 @@
         {
           "pdfPage": 2,
           "printedPageLabel": null,
-          "parserAgreement": 0.9873,
-          "pdfplumberTextSHA256": "c8c56ff4a43b951e800227b18ab8d1fd0b198165e272bf4dcdd44f38b522de01",
+          "parserAgreement": 0.8732,
+          "pdfplumberTextSHA256": "0a4972ee67dccad8817db1e7c77325d154bfefb04ae08a9818c45ff44bed962d",
           "popplerTextSHA256": "4fd438737fa5283bd71b0c14bde43f9c1d37f8add97db9267271bc4dddbac346"
         },
         {
           "pdfPage": 3,
           "printedPageLabel": null,
           "parserAgreement": 0.9959,
-          "pdfplumberTextSHA256": "f34b2933f114bed8319c35c8b8f995ea6bc103238767490a440163c17d6fbbcf",
+          "pdfplumberTextSHA256": "2ae3e42529963896c1b1e2e48fd1d7d6df204f896436364e42e89b44450842df",
           "popplerTextSHA256": "ee835a0289e999ab3d18b1dff7182768d15e0babbfbcab4f8caf3d12889f1ed8"
         },
         {
@@ -9796,7 +9796,7 @@
       "bytes": 556036,
       "pageCount": 21,
       "sectionCount": 200,
-      "minimumParserAgreement": 0.9848,
+      "minimumParserAgreement": 0.9738,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -9816,21 +9816,21 @@
           "pdfPage": 3,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "e40fde1c9ec93beab6a9909c875badabc4f8d11a6024fe2eeec0337064b2bfce",
+          "pdfplumberTextSHA256": "c40976cd74c0ff0fbd3d3fbcf2ee0d8ae4e9755a1aa3a97178a002dc850f1d83",
           "popplerTextSHA256": "b5267193b23b6a427da86bdda30d9264a7e7fc7b110c49c15ae914f43f619220"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 0.99,
-          "pdfplumberTextSHA256": "b28ce06d9b863f5b1327ca659e00483da9685dbc2b45afe55196ab673f1bc4e0",
+          "pdfplumberTextSHA256": "34107ca1799fa9781f8760f4a3b4ed76527802d4b9c10724f6513e5c13e53326",
           "popplerTextSHA256": "7f56af5ee0321167283cb91d259877d4134977cbe73791b39fee6a055f4771d2"
         },
         {
           "pdfPage": 5,
           "printedPageLabel": null,
           "parserAgreement": 0.9848,
-          "pdfplumberTextSHA256": "3445ba1f54ddb1815d7b43d366af4714f5af13568451f6615c075cffe3065a6c",
+          "pdfplumberTextSHA256": "81845454fb056b015f3a05ffa37a65931877f012b5cdaf351b6cfb525c337563",
           "popplerTextSHA256": "f4ed9be0584277fdb502a3677c8ea993090bca067f4803952ff0543be1b9df5a"
         },
         {
@@ -9858,14 +9858,14 @@
           "pdfPage": 9,
           "printedPageLabel": null,
           "parserAgreement": 0.9971,
-          "pdfplumberTextSHA256": "6623d2a0875c5005b5489e84ba84898e9261d932491b8253fc8a6a06c8679691",
+          "pdfplumberTextSHA256": "97a7a6f254c0eef585828d72ccc07e0364cfa3e646d56888b59c43dcd85a4cd0",
           "popplerTextSHA256": "5a8b4096c369992cf8a1d31472911aba0ce5eb8be2bdc7c29d57cd7a12d5196f"
         },
         {
           "pdfPage": 10,
           "printedPageLabel": null,
           "parserAgreement": 0.9878,
-          "pdfplumberTextSHA256": "9d813658de346123c2b1a4ed125361acd85fbff99bcebdc7462d63ca78f723aa",
+          "pdfplumberTextSHA256": "892cac06c57d516b7e3b97a4850339cb6e6c7b0cf985b3eb5549cc079ea2b921",
           "popplerTextSHA256": "ad59b9bc867ff70d7b1acdee1a3dd77097ecb5b0fc28ba08c665abbd129a3486"
         },
         {
@@ -9893,7 +9893,7 @@
           "pdfPage": 14,
           "printedPageLabel": null,
           "parserAgreement": 0.989,
-          "pdfplumberTextSHA256": "f1dcbf1598a62eb758b19b0b1bcc2b348c1764001e2d9839dc0cdb651b73271b",
+          "pdfplumberTextSHA256": "150989da9257b79dd7c2452537d6e12c030f3e7e2990e6c3c59d5ff86a25ace8",
           "popplerTextSHA256": "af9c674240f8a37e2a5372b771d1b64c4aa01291af54880cc18402beb1666c73"
         },
         {
@@ -9913,8 +9913,8 @@
         {
           "pdfPage": 17,
           "printedPageLabel": null,
-          "parserAgreement": 0.9938,
-          "pdfplumberTextSHA256": "a1a44a1b6ed9f4bcac4a44a49b435215ccc37651b518da78c86562357fa18124",
+          "parserAgreement": 0.9738,
+          "pdfplumberTextSHA256": "e7a7a277a05353a827bd97aafb8b2267fee3b923cc1b70a290c1b4c342564516",
           "popplerTextSHA256": "a8ddc2e13240461c08f4e9869977af67b60e73e13fdde0d47e2e4dfef9b17317"
         },
         {
@@ -9928,7 +9928,7 @@
           "pdfPage": 19,
           "printedPageLabel": null,
           "parserAgreement": 0.9913,
-          "pdfplumberTextSHA256": "8d18f6ec8334c0cee1df5c945c144bfdfac73f0f907718c6c4264c6616d9a7e9",
+          "pdfplumberTextSHA256": "454c21bc206810ea74ed10225e6357b35655ae16e4c68a5b04a9c6b68a0b4fad",
           "popplerTextSHA256": "89d632144493395f0e1cc1da9ac7ec99b906ceb030aaaca25f9e98d778db5f21"
         },
         {
@@ -9957,7 +9957,7 @@
       "bytes": 410925,
       "pageCount": 18,
       "sectionCount": 171,
-      "minimumParserAgreement": 0.9543,
+      "minimumParserAgreement": 0.9413,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -9970,21 +9970,21 @@
           "pdfPage": 2,
           "printedPageLabel": null,
           "parserAgreement": 0.9873,
-          "pdfplumberTextSHA256": "1e64d2d53fde345540ecd9546aa45e1f9184d299f5e9d3c51e3cb11d904de5f3",
+          "pdfplumberTextSHA256": "d7ff5a1e4665455ef3cf6368f67158e2d4dfc31cc253d6c5d4d53741c875fe88",
           "popplerTextSHA256": "f79c671b99bbc0f7fa36dbba5f1f5e88506eb30ca295519d9524f1a9a7ff3677"
         },
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 0.9927,
-          "pdfplumberTextSHA256": "bcaab200e92a91ac596ae9215d49ec56094c1a81ef5ac256fe72a52c899c291b",
+          "parserAgreement": 0.9709,
+          "pdfplumberTextSHA256": "f1119ad24928dbe4bc35e3e51835a724ea02baf551ab929ac928cac9df82416f",
           "popplerTextSHA256": "b2cd73c4a57b7102f0711be10738fcfdbb200db2685dcc055f1f6e55985f9913"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": "5",
-          "parserAgreement": 0.9941,
-          "pdfplumberTextSHA256": "4441841b792eb55c00016dc5a85cdf899a1e45f31967289f1fd478978fe88143",
+          "parserAgreement": 0.9883,
+          "pdfplumberTextSHA256": "3effb99cf02599d4fa29ce8091e358d935925c386acaacd05fc58f8cc9030b73",
           "popplerTextSHA256": "c98a40b011089f19d8c0d44723b80c74e5ead22a3bd22a3467438b41ea1663e6"
         },
         {
@@ -10012,7 +10012,7 @@
           "pdfPage": 8,
           "printedPageLabel": null,
           "parserAgreement": 0.9975,
-          "pdfplumberTextSHA256": "d750287f81bc0e1a0532166de030378741a1d16a9aa8adf2a4e20f213779a275",
+          "pdfplumberTextSHA256": "c0d81c92436779d5c362e8c9269d711611936ca439b897a849d30e38f0137d6d",
           "popplerTextSHA256": "d77333012613ac60ca985c6e31fe8fc01bc49ac70df6815940254afa8f923935"
         },
         {
@@ -10026,7 +10026,7 @@
           "pdfPage": 10,
           "printedPageLabel": null,
           "parserAgreement": 0.9954,
-          "pdfplumberTextSHA256": "c3964bb4398db25b10f4f29ab0ef00684faaf40c53640ec78ecdad28403b69ea",
+          "pdfplumberTextSHA256": "64b13e28dc1e20cdf144999bb3f629009dd524d6b962c42e464dfae1d80a1e61",
           "popplerTextSHA256": "a8e92f606968e314acd291d6afdcef7d508dd8dfdf7ae0d393106d96b3580f49"
         },
         {
@@ -10040,14 +10040,14 @@
           "pdfPage": 12,
           "printedPageLabel": null,
           "parserAgreement": 0.9543,
-          "pdfplumberTextSHA256": "0a132872d77a35fa08ea0e62b8ad2ec2cff0f64906410146e2f637ea9b56d564",
+          "pdfplumberTextSHA256": "5adce6f81980041a86a7ba7994974d696ce39a98bfed75a46356bafde0ada820",
           "popplerTextSHA256": "2db4e0ea6414a0fa91c87d755d43e7f4668b74ab4d7a57e7fbae276fd671d597"
         },
         {
           "pdfPage": 13,
           "printedPageLabel": "3",
           "parserAgreement": 0.9626,
-          "pdfplumberTextSHA256": "9376e5bfad328c077b44b09297204fac2b8ba1d82eaab2d546d4c6274fd92bf4",
+          "pdfplumberTextSHA256": "3be0f12e983863309a9b16821e974b5c00bf7a00e1a1f17f9f80fa30440fb939",
           "popplerTextSHA256": "06b12794521fac3f7fce9ef6119d9fc5190771de274caa18e774c6ea2c54895e"
         },
         {
@@ -10061,21 +10061,21 @@
           "pdfPage": 15,
           "printedPageLabel": null,
           "parserAgreement": 0.9918,
-          "pdfplumberTextSHA256": "f86473d32f36ebe8b108e204440375bff5d0aa4d356393b174937514f21004af",
+          "pdfplumberTextSHA256": "6cd27595589b81a9b2d9d57506f91d959ffc072cf9968cf60c6b799c56090133",
           "popplerTextSHA256": "2a1f9fde9eeaf14cb37faca53991a91b36f3a45b3131dd6dee9585c49c9088b0"
         },
         {
           "pdfPage": 16,
           "printedPageLabel": null,
           "parserAgreement": 0.9978,
-          "pdfplumberTextSHA256": "0dfc442289d3223eaf10b7c284cacc911468b9411cf9a76fa6507239f23b7450",
+          "pdfplumberTextSHA256": "1a1a7ae80203cd5be34c92420154201c64acf0a25a6e295dd4352f6c47a3665a",
           "popplerTextSHA256": "a72db3e3a6523b9184de32819769d10d30ebc024adf66665a5ee89bf4f1c5b93"
         },
         {
           "pdfPage": 17,
           "printedPageLabel": "1",
-          "parserAgreement": 0.9573,
-          "pdfplumberTextSHA256": "f31f70532b9b802f947be2a4d1d9e979538867547cd9bc91678f20e419d8d615",
+          "parserAgreement": 0.9413,
+          "pdfplumberTextSHA256": "953c3a9012e24f8a6f809afd6f1dbf4bc081219c4b20f197bb90818abc14ada1",
           "popplerTextSHA256": "2f53c6148d2d3685d87ceb878c6c4f0a49b8dfe6553af0ac1d4d703108fe1ce6"
         },
         {
@@ -10125,7 +10125,7 @@
       "bytes": 298216,
       "pageCount": 9,
       "sectionCount": 81,
-      "minimumParserAgreement": 0.9547,
+      "minimumParserAgreement": 0.9483,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -10165,29 +10165,29 @@
         {
           "pdfPage": 6,
           "printedPageLabel": null,
-          "parserAgreement": 0.9847,
-          "pdfplumberTextSHA256": "e2e5564335c29500c52f7031a7b2c8084303d2c2b4aea8811dba605c19aea747",
+          "parserAgreement": 0.9669,
+          "pdfplumberTextSHA256": "1d3dca64980f4aeb6d90ee757d046f1c782abd02ef9b0d5856f0d7adbd5c64af",
           "popplerTextSHA256": "e47a0eece4d822aa31414c69288ae02db48a6ce6126c040ee7d15d7d2551d022"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": null,
           "parserAgreement": 0.982,
-          "pdfplumberTextSHA256": "d81e6ec456ee0838809b2778c997f453a1665bd5720f9bd82b0f48883db2a713",
+          "pdfplumberTextSHA256": "e818df5298c559092203aaa72c16cc74a6ad8b55275c2dbe604b4a34ad49ee22",
           "popplerTextSHA256": "781ccf561ecc3cadc3ad68c04321581f0040fef9c30202dad83a17cfe6fa5011"
         },
         {
           "pdfPage": 8,
           "printedPageLabel": null,
-          "parserAgreement": 0.9547,
-          "pdfplumberTextSHA256": "f02bc8d5e4ed8c4a145b1e0a41f047c1a12ceb6171cf75841ede046bf65bb72d",
+          "parserAgreement": 0.9483,
+          "pdfplumberTextSHA256": "4fec25cc23755921f6176e5ac04e82e5183b16dd4c070620a58c4b7a70b8b0f2",
           "popplerTextSHA256": "8544530e720a7ad0609bf7c54c0f8ee6f23ffc42bc7dde2d76da68372804e37f"
         },
         {
           "pdfPage": 9,
           "printedPageLabel": null,
           "parserAgreement": 0.9765,
-          "pdfplumberTextSHA256": "31576903b25d97e9be34964fe43bbd10d45d90684b2084401802ba0912e7d030",
+          "pdfplumberTextSHA256": "9d1ec77f249258c22785fa6e676e0411d162a2617c96baeecc1777765075e5b5",
           "popplerTextSHA256": "b3dcfc43366ed992a581e5ff308919ae71e6d3a064936953e1e66e05f651e1a4"
         }
       ]
@@ -10284,22 +10284,22 @@
         {
           "pdfPage": 7,
           "printedPageLabel": null,
-          "parserAgreement": 0.9738,
-          "pdfplumberTextSHA256": "b0c958add81d4ad998c57e4e90e4f6dd13bb83f520ad9a10f412dfdcc1e397ff",
+          "parserAgreement": 0.9925,
+          "pdfplumberTextSHA256": "74df2c2d46e33b83d8fcf155fc35702a787d72d52f4d6d6da167b59f5bf525c2",
           "popplerTextSHA256": "3038786e9c0ac73a8430b3fa7660b94010c2500a7f6f70ff5d8c56b83cd79ff9"
         },
         {
           "pdfPage": 8,
           "printedPageLabel": null,
           "parserAgreement": 0.9938,
-          "pdfplumberTextSHA256": "bc80fa008627939d636786ccbac9ecc60e169cb21c4d92cb8f5615bb7408e0ae",
+          "pdfplumberTextSHA256": "4a966dfa5b46e42c40fd0218c7a52eac32790bbfbaaae200e2bd307dbad3d0ef",
           "popplerTextSHA256": "a40864679cb4343f0f8ab0367a4908e48e39c0ccb552d47762956f9f19609bbe"
         },
         {
           "pdfPage": 9,
           "printedPageLabel": "3",
           "parserAgreement": 0.9896,
-          "pdfplumberTextSHA256": "666b9fff5974edf5fde102ceedf7f59b55bee994b1061b19a64012bb5dc38ccf",
+          "pdfplumberTextSHA256": "78803c4b0d93f75dde976ae28b3ad8d821bc7d733b4c10f48aeb761d5f191f65",
           "popplerTextSHA256": "f0b6919e8509252afda4e7c4710b830bc1efa5395ad80bfdadd49cc34150b0ea"
         },
         {
@@ -10319,15 +10319,15 @@
         {
           "pdfPage": 12,
           "printedPageLabel": null,
-          "parserAgreement": 0.9831,
-          "pdfplumberTextSHA256": "256f84b0066986cb9fb601208fd3e312d222dd387762373d398a922ede99c4be",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "ec7c4df00a00df82079d24c782e6769841c745b7bf0007aeb03fc00d27131041",
           "popplerTextSHA256": "6e8c259fa2c39f4547bc1d41dbeea2a19a6cd99743979a80b8a19590f9ad7965"
         },
         {
           "pdfPage": 13,
           "printedPageLabel": null,
-          "parserAgreement": 0.9027,
-          "pdfplumberTextSHA256": "a975f045e1440de4883255fd5f8df559ff685277ff0d1164165a38aac3c62176",
+          "parserAgreement": 0.9898,
+          "pdfplumberTextSHA256": "0420155a5214142ad71ced2e82ca72c4383cb3e2c887b2ef7d1694168c769b26",
           "popplerTextSHA256": "f69aecf69cca2dfe974b175911ef23c0fae3d90fcaee1ec386efeea27fd2d60a"
         },
         {
@@ -10389,43 +10389,43 @@
         {
           "pdfPage": 1,
           "printedPageLabel": "2005",
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "fd0e31273cfc92d755aca14ab79f9f0e7a3dabc79cd40eb1215af7b2815d42df",
+          "parserAgreement": 0.9335,
+          "pdfplumberTextSHA256": "36b04518e95e8211e00147cdf094a441d0fa3be94f3d0f896593bdcda39ac66e",
           "popplerTextSHA256": "1a1e5c0d116a9eeff2136229017674d2383a12792fa0404ce7850cde64a9a1dc"
         },
         {
           "pdfPage": 2,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "b9171731068f4d759c9529b708d6144e10745856bc8010053f6288a20fc1b231",
+          "parserAgreement": 0.9871,
+          "pdfplumberTextSHA256": "8f09fa5601dbad2dbc542c3cb66fdb388cbb9586a91d890b4fcca49e281a22cb",
           "popplerTextSHA256": "a0ee912ca21a5eb86a67f31e76f55633675aca82278ba49b29b68125b56210fc"
         },
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 0.9922,
-          "pdfplumberTextSHA256": "b9619aa72e25940a0f75b7648c80eb5972db595419b4b4b9c7f3828f9947fb27",
+          "parserAgreement": 0.9375,
+          "pdfplumberTextSHA256": "b40766524bc5725f1c31fb1bd8359b301309084aeb421e1766285dfd68a717b7",
           "popplerTextSHA256": "14c24fd33f3a9082a83b9f1173d3435b060cbd2bfc9b5b2e68413f8ac50dd7df"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "2d947ef03d16a1761835f695a911c679134bc9802145644bd14018df7d601adc",
+          "parserAgreement": 0.9382,
+          "pdfplumberTextSHA256": "6d790fbf785d4bca63d2f5429afea747b3e939a827c9078e3f911be54bdfa4e9",
           "popplerTextSHA256": "277dbbbddd8824ef32e24058126095a0954d1c9021b87265d3efffed1cdd173c"
         },
         {
           "pdfPage": 5,
           "printedPageLabel": null,
-          "parserAgreement": 0.9969,
-          "pdfplumberTextSHA256": "83b6f5ab231ce312b50e2767fef37627c288a66206be7452a0911ae866cd6060",
+          "parserAgreement": 0.9271,
+          "pdfplumberTextSHA256": "2885576f4681e52850b6ed6090690d66303d68d0a698f51c9c6ddd57b55e630e",
           "popplerTextSHA256": "7d771ab2dd697b1a86a1155e3e0cb58d94f3c0fc12cf8fe4586d25524f1601e1"
         },
         {
           "pdfPage": 6,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "df1f06a8f8dd4210c9f7f43abdc7e4e3faa2c840361262e99fcbf14ad68e6165",
+          "parserAgreement": 0.9406,
+          "pdfplumberTextSHA256": "5c629ed5a1c70c9dc936873c8adeeea5792143b5275bf72ca62c883d5fc387c1",
           "popplerTextSHA256": "491efd90b557ad29b455778ede09c1c9ac21f98e25dab5eb128e33cae0c7ec42"
         },
         {
@@ -10572,7 +10572,7 @@
           "pdfPage": 4,
           "printedPageLabel": "100",
           "parserAgreement": 0.9912,
-          "pdfplumberTextSHA256": "0c285b1074ae5eb567cfeb9b575289067d29de133f2c55a738a2aa0ae7d9ef66",
+          "pdfplumberTextSHA256": "e103f07114ffbd82abc932b8c5f7c1c817a3a5b81fc12d99fcd7d8b26cd24e86",
           "popplerTextSHA256": "0ec9e94c68d3c71b50240b9c5db842775e15545968112b034bdd535752af9cf1"
         },
         {
@@ -10642,7 +10642,7 @@
           "pdfPage": 14,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "cbb9293ea5174a766ca4379449e32342ae3416c18bb541be2e4c3d5850bacb74",
+          "pdfplumberTextSHA256": "f5926fec512b01992587d00b0ebc95d5ca36e9452c058956810fa3572261941a",
           "popplerTextSHA256": "bd4d993c11cebc777aac4caff184fd0303a98627521fc0760f3e7ea35981e792"
         },
         {
@@ -10656,21 +10656,21 @@
           "pdfPage": 16,
           "printedPageLabel": "1",
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "669784aebdc28735c0f28d6ad6e35645516068f75f78d4cf95f406257b0a36f1",
+          "pdfplumberTextSHA256": "f97db879aeaacdba4821204aa80fcb340d69d7a1cb10a49164969c556eb82532",
           "popplerTextSHA256": "dc63e15bd4815c463b333e2abd846538c4c40c99cddc6f9079367abb7bef3a46"
         },
         {
           "pdfPage": 17,
           "printedPageLabel": null,
           "parserAgreement": 0.956,
-          "pdfplumberTextSHA256": "da5b342cadad53c35dddbea81f37e539fa0d071656d8861f0ed6974085e662b6",
+          "pdfplumberTextSHA256": "98708ab295e3b3025265a8f8df3092e0ed4171450beeaf48eecc491d929457d7",
           "popplerTextSHA256": "f4e4d9ccb0737c37d0827fc6a403362c0928b9740dd657d08422451228ab6d42"
         },
         {
           "pdfPage": 18,
           "printedPageLabel": null,
           "parserAgreement": 0.942,
-          "pdfplumberTextSHA256": "155fce63fc3072939f04bc15b17abb545ec6e90cc7adc8008184df9f2f7b9163",
+          "pdfplumberTextSHA256": "81fdbd2ffe532829484c90ca12cfc637afcc416eefe18065349f2cd22db00e06",
           "popplerTextSHA256": "7c69adca3505d1ba2166c799abf7d4e931abf992726b704418e166a86a6ca560"
         }
       ]
@@ -10902,7 +10902,7 @@
       "bytes": 333487,
       "pageCount": 10,
       "sectionCount": 89,
-      "minimumParserAgreement": 0.9431,
+      "minimumParserAgreement": 0.9282,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -10935,8 +10935,8 @@
         {
           "pdfPage": 5,
           "printedPageLabel": "30",
-          "parserAgreement": 0.9431,
-          "pdfplumberTextSHA256": "681d7d18456970ead36a69583d2bfca4804e079821bdf1c02628024f78f41377",
+          "parserAgreement": 0.9282,
+          "pdfplumberTextSHA256": "c941387a24567531efeb089dfc6065aff88dccc5b432ae9f3ca75b5af8848943",
           "popplerTextSHA256": "b7d50378bbf59835f5844670c4c601f59ab78487f414dae3000fde65189a08ee"
         },
         {
@@ -10950,21 +10950,21 @@
           "pdfPage": 7,
           "printedPageLabel": null,
           "parserAgreement": 0.9976,
-          "pdfplumberTextSHA256": "a7f2b73ff5773f60debb288f1afb05d70fa4be7d1852543f235b01ce32321dc0",
+          "pdfplumberTextSHA256": "298b7e72d98113a9056a98551ece88b89cd68ab4283701862439bea75bc61ee9",
           "popplerTextSHA256": "2edade4f6d75ee7df42b823be2163500b6a73109dd0ca90700e1b99cd6999fa5"
         },
         {
           "pdfPage": 8,
           "printedPageLabel": null,
           "parserAgreement": 0.9974,
-          "pdfplumberTextSHA256": "55e1f979619e495aa2758aed567081c64c0fcefa956c5a358389b823f5e54ab2",
+          "pdfplumberTextSHA256": "960f0a31c6363479e1c318bb5bdca255b1f238875e56d697458feeacfd4fb71d",
           "popplerTextSHA256": "e9347c3f00421f7411df48ec1a74b4afd6a6fe2329f741c947acb42a4cc93a9c"
         },
         {
           "pdfPage": 9,
           "printedPageLabel": "12",
           "parserAgreement": 0.9854,
-          "pdfplumberTextSHA256": "0061eb391dde30694826e02b11c99ea6a165483e5fc1c217190d6f6d142622e1",
+          "pdfplumberTextSHA256": "ee38c29c4e564f0f5ce1a537a955ce860842f4dce2236069b78577c47206aee0",
           "popplerTextSHA256": "fe7b6f95571e5c412907c53942bbeb527cc8bb1654187d356ba14a2b00e8274d"
         },
         {
@@ -10986,7 +10986,7 @@
       "bytes": 489093,
       "pageCount": 10,
       "sectionCount": 43,
-      "minimumParserAgreement": 0.9186,
+      "minimumParserAgreement": 0.9396,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -11005,15 +11005,15 @@
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 0.9879,
-          "pdfplumberTextSHA256": "6a2977a6b0f8c6abaf9ba21bd6d7b96092df26a9c1117cb5d78b76c874a23233",
+          "parserAgreement": 0.9896,
+          "pdfplumberTextSHA256": "f4acbffe6fef81ad73aac090b1c12c920bd835bffffec8fcf3874f808687849b",
           "popplerTextSHA256": "5172c29e8c73841a89c181695980845a4d1c3b86d01d242d448c27142773e8ad"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": "120",
           "parserAgreement": 0.9396,
-          "pdfplumberTextSHA256": "3370828968297db2f89cf3abeffa6250573e2b8863cc2bb14f0445a629eef310",
+          "pdfplumberTextSHA256": "bdfa5f951a457c884595b80c5414577ffe1121498e98b8971742adb6ce3b4639",
           "popplerTextSHA256": "7a570573e946535294bad0d6d6f9727d92e5aebbe4098e4a8885a98fc7bc59f9"
         },
         {
@@ -11026,29 +11026,29 @@
         {
           "pdfPage": 6,
           "printedPageLabel": null,
-          "parserAgreement": 0.9588,
-          "pdfplumberTextSHA256": "1b6fa2cf149c18b7f7ae3206ddfc0aa1fefa28544ebd2c8e2f4e6b3d91829903",
+          "parserAgreement": 0.9763,
+          "pdfplumberTextSHA256": "564a4a8002f2aeca1d5e5fe514411eb01694ec96e1d4b49e4c8252fcc744d0f0",
           "popplerTextSHA256": "1fa0075304911efad5f46e29ae964b9127b708ae7aba71a3b59e3af09bd0e769"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": null,
-          "parserAgreement": 0.9337,
-          "pdfplumberTextSHA256": "05520467550309f57a179df804410d2cc801604775a1b87ad461e33689ca9b64",
+          "parserAgreement": 0.9892,
+          "pdfplumberTextSHA256": "a37b6ac74e05db412a3f6354be287f542d8d35905c0a10ab047ff594f58adf71",
           "popplerTextSHA256": "bb3088ef5b5853ebf6cbf172e6f6c1b291beed59f576c9d6ce751b181d235d9b"
         },
         {
           "pdfPage": 8,
           "printedPageLabel": null,
-          "parserAgreement": 0.9186,
-          "pdfplumberTextSHA256": "12a8af40e51bf08444166e833ae6396e3da73314499b81b38fba4ddd5c2cfeff",
+          "parserAgreement": 0.9619,
+          "pdfplumberTextSHA256": "558b2ca9f385179a9e2377a5830446b7f500f9f8a3a4e5525a055af29ef1d74d",
           "popplerTextSHA256": "c4c82d1caa18907f5794f03bd227ed8a98f04e568bb69ee140d9830add41b70d"
         },
         {
           "pdfPage": 9,
           "printedPageLabel": null,
-          "parserAgreement": 0.9907,
-          "pdfplumberTextSHA256": "f126711945eed145b503294b47291e1ab7245e51ddeb8a61476370b28c85e445",
+          "parserAgreement": 0.992,
+          "pdfplumberTextSHA256": "964fd6025317e6535566e1fd1b743ea5c54cc1db5b6087e8797f24052a706b3e",
           "popplerTextSHA256": "f0364e922265bc88b39abc9e928d424a22d26579f952145e6adb8e07177f0160"
         },
         {
@@ -11070,7 +11070,7 @@
       "bytes": 616478,
       "pageCount": 30,
       "sectionCount": 295,
-      "minimumParserAgreement": 0.9787,
+      "minimumParserAgreement": 0.9547,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -11089,8 +11089,8 @@
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 0.9902,
-          "pdfplumberTextSHA256": "ffc933bb34aacfa86cec4744c2ffb96328e47e4caef3e3f6ad8f5f7a7e0b140e",
+          "parserAgreement": 0.9888,
+          "pdfplumberTextSHA256": "a934c8e9eb557ad833ce80990be75fdf55bfa30b252afca2efecccb57e011bf3",
           "popplerTextSHA256": "9a055ece5e507c19ed1b655e87b4f941f84c2d5a1d9669056233dd82b6204021"
         },
         {
@@ -11243,29 +11243,29 @@
         {
           "pdfPage": 25,
           "printedPageLabel": null,
-          "parserAgreement": 0.9863,
-          "pdfplumberTextSHA256": "bc9d37994b4bed0c991594e2b581eff4a23613f6a9055e71414788a971aec383",
+          "parserAgreement": 0.9547,
+          "pdfplumberTextSHA256": "269abaf93df0267be645a3025427b459c0a843de529d91252d92857724ea4574",
           "popplerTextSHA256": "30ea116b13112c7c7ceda4949bf29e660bfcd8895f53e0790ab27a6a0df45045"
         },
         {
           "pdfPage": 26,
           "printedPageLabel": null,
-          "parserAgreement": 0.9885,
-          "pdfplumberTextSHA256": "1f825b8d133d228e55f042dd76ee7c1acb78ba2c4161aeda274f5337e21216fc",
+          "parserAgreement": 0.9799,
+          "pdfplumberTextSHA256": "fa1f521656d2d33eb3c5baeeb4734d36f846501e6058b0aa9035faa5fe7b24a0",
           "popplerTextSHA256": "c0b441cb3234a655f4ae6097f3e19ff710aa9610012ea002a46ed95c7017dce5"
         },
         {
           "pdfPage": 27,
           "printedPageLabel": "6",
-          "parserAgreement": 0.9787,
-          "pdfplumberTextSHA256": "e23d8459c7a1557934f165a8b6cf699298444043e4a488b3bf502aecf4b4b71c",
+          "parserAgreement": 0.9819,
+          "pdfplumberTextSHA256": "33cbe50924f90c1527c549da445f6599a4cbabd254f9636d47914f56b514fe57",
           "popplerTextSHA256": "a3797685c6dff25aafd3e4019cb2187a840942b71632dce9b92043b76fa79a94"
         },
         {
           "pdfPage": 28,
           "printedPageLabel": "60",
           "parserAgreement": 0.9869,
-          "pdfplumberTextSHA256": "e5e1d8c5cc507f013527f48005e5dc84923e810ce8576d83032558dfb1a770dd",
+          "pdfplumberTextSHA256": "b5fd5a611fcff1d499a9850c710dbf1f029ffaf8810d687dc8dcabb966c31315",
           "popplerTextSHA256": "8560a8d9553fc565eefdb68c4d6909380936fbb6da89c98daaf3f8fca7f5ac20"
         },
         {
@@ -11328,7 +11328,7 @@
           "pdfPage": 5,
           "printedPageLabel": null,
           "parserAgreement": 0.9951,
-          "pdfplumberTextSHA256": "bd2d6fef12290bf19936c491485bf9ba99a07d832bdd29bf2a46815cf98a3c3d",
+          "pdfplumberTextSHA256": "366b8147b6d03668f02d5796f4ee424d40f7cdfdfc0044beb9ab2a89fe07249f",
           "popplerTextSHA256": "b85cb4634d3d9741c9d93f21a863db5a2e14c6fb1b654912e501d441daf36603"
         },
         {
@@ -11363,7 +11363,7 @@
           "pdfPage": 10,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "7462610cf2ce3511f40a149b1e481a0e9dd009ba433374bf2e4791fde2474a2e",
+          "pdfplumberTextSHA256": "6499f98d3ae117ac8b7401887e666c0279071fc669759218219d6ce82325f9c6",
           "popplerTextSHA256": "be1d7691bf2d7f72c3d3b09cba81c2518799ef5ccfd44dfcd90c4af643c7730f"
         },
         {
@@ -11376,8 +11376,8 @@
         {
           "pdfPage": 12,
           "printedPageLabel": null,
-          "parserAgreement": 0.9931,
-          "pdfplumberTextSHA256": "c9a61aab4f36599856cac547b4333f2b8edf6c5a1bd3d7a23748b32f9b2b96be",
+          "parserAgreement": 0.9945,
+          "pdfplumberTextSHA256": "4f2774d7e9797fffad16383ba34f9808735cdd151aaed4f65fe8478be0b4ecc8",
           "popplerTextSHA256": "006fbd634b35d390cedeb940bdf6af0d498d07658e4eb04b9bf06f2a979a0f88"
         },
         {
@@ -11396,9 +11396,9 @@
         },
         {
           "pdfPage": 15,
-          "printedPageLabel": "2",
+          "printedPageLabel": "3",
           "parserAgreement": 0.9884,
-          "pdfplumberTextSHA256": "58440166d4a037554e1190fa0fd577394a891f50c20880c8b4ffdd06f4e41b06",
+          "pdfplumberTextSHA256": "88b1c021c0314dc83495a61df00cc868b68bc29dd3aec45acbb3d0587e5be878",
           "popplerTextSHA256": "43a4a1bff58ad6b1a7e07411a0b0364f30406f451e8dd1ed04b1096e76f0389c"
         },
         {
@@ -11462,7 +11462,7 @@
       "bytes": 585360,
       "pageCount": 12,
       "sectionCount": 100,
-      "minimumParserAgreement": 0.985,
+      "minimumParserAgreement": 0.9775,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -11489,7 +11489,7 @@
           "pdfPage": 4,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "1df2b0c81950a2ea38ac3713f15997deb96a2d5d2a9ce4bf0641b1041124b595",
+          "pdfplumberTextSHA256": "bd373afa7d8ac28066edf5552214030e3a8afe103ff626f180a3d0fcbd2b64df",
           "popplerTextSHA256": "b1268e1ce628f0238250a53b6c9ad77bdafa43b21edb1b35243c73b691420f86"
         },
         {
@@ -11509,15 +11509,15 @@
         {
           "pdfPage": 7,
           "printedPageLabel": null,
-          "parserAgreement": 0.985,
-          "pdfplumberTextSHA256": "b4e0dc39876d633fdafc77cfcac10f57ba6f0f763de3e80707e5fa956bb279ae",
+          "parserAgreement": 0.9775,
+          "pdfplumberTextSHA256": "c9cfa16187c6550e1881ffbb6e328fc4b48c587729d00c174f6682005b25ccdf",
           "popplerTextSHA256": "eda118630c86d145c10f037cf928e82f5326974b6d72a6dded9bc7ff2f322f7b"
         },
         {
           "pdfPage": 8,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "2c1762a39ba892f95fb09d59f9ab6681c99db107e5933e569e9ba08232f89cf3",
+          "pdfplumberTextSHA256": "ad820c4451b119b52b81a8bd948fd82e2b76164418e195e6b7eb4d08d5284fad",
           "popplerTextSHA256": "03994d2ee80d533baed3aee92f973028862e13fd0ceb50ef0f3d811eae99687b"
         },
         {
@@ -11537,8 +11537,8 @@
         {
           "pdfPage": 11,
           "printedPageLabel": null,
-          "parserAgreement": 0.9935,
-          "pdfplumberTextSHA256": "1991518446cc5d9046df51579bc659a5ea34ec20aab0fc8680a35f603d717a83",
+          "parserAgreement": 0.9974,
+          "pdfplumberTextSHA256": "0304a5257cd0cc6b689d3224e40aeab6ead3aee745757744b403ca57199884d4",
           "popplerTextSHA256": "3d3b4a5ddcb59ba4141e81cf371b0d2c0e18aad7ab63f039389c5c7f6a74a346"
         },
         {
@@ -11615,7 +11615,7 @@
           "pdfPage": 8,
           "printedPageLabel": null,
           "parserAgreement": 0.995,
-          "pdfplumberTextSHA256": "98a50f28a630f199e90cea95bba080b0b5c8280bc7f7a335c58618db80c600f4",
+          "pdfplumberTextSHA256": "aa78a60ab5225b6675a140a8400569ecfab8b371f52cb1af2872393ba0ec066b",
           "popplerTextSHA256": "16fb5e9044555c5a207b5cbc51db2c4e0e1f7c25bf65a1c79d4cd461da067542"
         }
       ]
@@ -11630,7 +11630,7 @@
       "bytes": 369275,
       "pageCount": 5,
       "sectionCount": 45,
-      "minimumParserAgreement": 0.9637,
+      "minimumParserAgreement": 0.9908,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -11656,8 +11656,8 @@
         {
           "pdfPage": 4,
           "printedPageLabel": null,
-          "parserAgreement": 0.9637,
-          "pdfplumberTextSHA256": "c6e5c602b6a6f83e3d17be76fff570290a1eba969e4121074cf69034350018c8",
+          "parserAgreement": 0.9908,
+          "pdfplumberTextSHA256": "b0d4e01305387260e1aac9a025f1ccb0be6c006216b3376f64208d981df91b71",
           "popplerTextSHA256": "8dd58b71651cfee65951d276ee3284d5dbd9ff6fb8de2961a65d54bcafae7685"
         },
         {
@@ -11679,7 +11679,7 @@
       "bytes": 479556,
       "pageCount": 13,
       "sectionCount": 98,
-      "minimumParserAgreement": 0.9878,
+      "minimumParserAgreement": 0.9921,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -11698,8 +11698,8 @@
         {
           "pdfPage": 3,
           "printedPageLabel": "A2",
-          "parserAgreement": 0.9878,
-          "pdfplumberTextSHA256": "a638c85d581b006c73732471fd6a4388ff5d744543e679fdb727177350430c4b",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "88ca7adfeb9973076849346e5797e6fccf134cb7a4a3b85261144fc6fdf59e46",
           "popplerTextSHA256": "4ac6e1d1a008e1cb836d5d597f1d240ea7aab2f7447d4a3d95a1561c9a9d15ba"
         },
         {
@@ -11733,8 +11733,8 @@
         {
           "pdfPage": 8,
           "printedPageLabel": null,
-          "parserAgreement": 0.9927,
-          "pdfplumberTextSHA256": "5c2f839c61411d9527c627e6dd09d0203c1a9c39573fdbcaba99edbcf9cdf0c7",
+          "parserAgreement": 0.9942,
+          "pdfplumberTextSHA256": "075b55d872ad9d7ce64b8898bdf470f3a4e08343677160ea4cf1072015238614",
           "popplerTextSHA256": "7922e089c4eddd3dcffb2af5a0b11559da7a12bf7e09135224770c47f61fd333"
         },
         {
@@ -11754,15 +11754,15 @@
         {
           "pdfPage": 11,
           "printedPageLabel": "B2",
-          "parserAgreement": 0.9974,
-          "pdfplumberTextSHA256": "1aa9cae66ab05c5843e9e176b8a3930dcb4d729e4ac36e6e6fdc9337c960f9e6",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "718ce948a0f85188529cf733a0b6b1eec43b94b0dee5c69f036dfeb83ecb92e2",
           "popplerTextSHA256": "74914f3b170f3ffc15d6fecf93f3e481d5117445f6fe1effa31e12805a5a7622"
         },
         {
           "pdfPage": 12,
           "printedPageLabel": null,
-          "parserAgreement": 0.994,
-          "pdfplumberTextSHA256": "b42e3bf147f2744d33a41750772e5e703718eec0cccbc0b21bf0817a045885f1",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "4a1a837242d4d7fcc0f60b06a1cfa4a402d86c6f474d3d88f3fb6073a105c174",
           "popplerTextSHA256": "ae6f311f2e08e48370c01f4030cc33f083f162ed09e0e56f852dc4a1b82d0dca"
         },
         {
@@ -11797,7 +11797,7 @@
           "pdfPage": 2,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "d1420dc968a272674e2384b5a6700b0246d54b0cab67b0fe8567707ccdbe1d89",
+          "pdfplumberTextSHA256": "bef47272c09815c4698741b2d419220e3166499260e8732d51bfe8f13a3e5922",
           "popplerTextSHA256": "82ba1e3bddd639bcbb085fa5e49ab7aecd6123a444e31136b081934cd534208d"
         },
         {
@@ -11861,7 +11861,7 @@
       "bytes": 487130,
       "pageCount": 12,
       "sectionCount": 140,
-      "minimumParserAgreement": 0.9729,
+      "minimumParserAgreement": 0.9851,
       "pageExtraction": [
         {
           "pdfPage": 1,
@@ -11880,15 +11880,15 @@
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 0.9909,
-          "pdfplumberTextSHA256": "2737eb0afc3ddb0fcf93a5ba28af15c881851d2b126d03c16e3294418f9758dc",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "398ff48b0996410ccf1d75fa3ed538756613179658dc11f56ed5b57ac6880cb3",
           "popplerTextSHA256": "d8ff052accac11f026e43f2fbcbcb392582749fcd5afaee1d5fc52098824c230"
         },
         {
           "pdfPage": 4,
           "printedPageLabel": null,
-          "parserAgreement": 0.9975,
-          "pdfplumberTextSHA256": "890c786d291f6ab02d106370754570a3415f1b1f00993dcf54c8b9c8130f090c",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "0d587cbe66bb3ef731de8603cdf6899fb23bd3ecd5e40a8166dd6fe682dd59f3",
           "popplerTextSHA256": "44ea2b9b96538fe9f5507d16f1611424d8dbfc4032f0ecc19e9becf273e3c081"
         },
         {
@@ -11923,21 +11923,21 @@
           "pdfPage": 9,
           "printedPageLabel": null,
           "parserAgreement": 0.9851,
-          "pdfplumberTextSHA256": "2f17e970635ae387b90561c618fe0b6538b3727659ca484200650644854d717b",
+          "pdfplumberTextSHA256": "5b278a324f4091479c8262c7010128b80beeb83a5530d73ba56201039085a5d6",
           "popplerTextSHA256": "3440f2ee6440863a535240c5770105e0d239e3cfbd2e3b72d2ccb4e067a82a6a"
         },
         {
           "pdfPage": 10,
           "printedPageLabel": "275",
-          "parserAgreement": 0.9729,
-          "pdfplumberTextSHA256": "1d2f5c5d3826e2da8bf68d2b338170639ab398ffc41614da632cc26511f49ed3",
+          "parserAgreement": 0.9901,
+          "pdfplumberTextSHA256": "b8e0338880f3cf6afa601007814a91e815065c4d624e69e54234c0d2e7818b6a",
           "popplerTextSHA256": "20f98ea5856a64464b065f01ea9f20c02e2e200ed74f9f2537357fc7971636c0"
         },
         {
           "pdfPage": 11,
           "printedPageLabel": null,
           "parserAgreement": 0.9969,
-          "pdfplumberTextSHA256": "95b4f6d7e32b3b4594095d91e1a895d313ab09cd62f9d1f1dc9fdbfeecdee20b",
+          "pdfplumberTextSHA256": "051fea814d025c91f8436fcb4c14a7adf27e8c0f3adfcd0c785ed2aebf1675a1",
           "popplerTextSHA256": "f618c0d543440bc0b0ef2d25297da9b8a003ca94c9fb38387511c0a1439fe799"
         },
         {
@@ -11987,27 +11987,27 @@
       "bytes": 244623,
       "pageCount": 11,
       "sectionCount": 3,
-      "minimumParserAgreement": 0.9263,
+      "minimumParserAgreement": 0.7665,
       "pageExtraction": [
         {
           "pdfPage": 1,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "106c3488c31234fe7d68a674fa32d182c289a385ecc83c6908c43e45234a00b0",
+          "parserAgreement": 0.8566,
+          "pdfplumberTextSHA256": "ef26f316c2bf0b036e70904e243c8a55203160747d0d586c2db4a3159969a605",
           "popplerTextSHA256": "3abeac2bde07329a70c6a659e5101b2140342f51aa4e4e0ef7ff19c2ae06e9f1"
         },
         {
           "pdfPage": 2,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "f4f866ada24cd6bf8eb021a034ac610173b478d659b0d677e8439c3220e8dc8f",
+          "parserAgreement": 0.8694,
+          "pdfplumberTextSHA256": "1879edeaf45a949ddb83ccd8257c0fcde77108ce6a2e27838b5d35a05457a67d",
           "popplerTextSHA256": "72dfe31cd00726ab56fa1400553319c24a4bdd1a2fcfe0906eb3853b94af7544"
         },
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 0.9872,
-          "pdfplumberTextSHA256": "064bcb6680f5f77b0de06b838159f64a461d1daba4c8bf77cb9ebb12bc00d0e5",
+          "parserAgreement": 0.9297,
+          "pdfplumberTextSHA256": "860b6bf47b2e0eef567048ff397e3dae778aa552611ac59e7059b882425b4909",
           "popplerTextSHA256": "d337b8f29970928f322ed0370f7f201ce96af9011616abbeaf75b65808477120"
         },
         {
@@ -12027,29 +12027,29 @@
         {
           "pdfPage": 6,
           "printedPageLabel": null,
-          "parserAgreement": 0.9263,
-          "pdfplumberTextSHA256": "428387766dcc8fafb48eaa5bbde5bc68f991d5c763147b2404dac1f7928684da",
+          "parserAgreement": 0.8316,
+          "pdfplumberTextSHA256": "cc3f1995eb5e994dde3708b151771e0e75ed4110150d449b15fb615da973bdcc",
           "popplerTextSHA256": "06743f538ca959e2ac470b34974a95662dd80ec5f73ab2c82492f9bd8afac2e0"
         },
         {
           "pdfPage": 7,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "8dbda380ffede43f0054783514fc30c32f94e9875cc78a1cc44ad783cfcac446",
+          "parserAgreement": 0.7665,
+          "pdfplumberTextSHA256": "a487fbfc4e08e55438f40a491d0003c629aa339fbd3176a1b4844f379eb11935",
           "popplerTextSHA256": "176e4446fa6681f0e4802b6b0954ea83f6d6ca10f82d5cbe3be69681068f7ac9"
         },
         {
           "pdfPage": 8,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "9b91780ef35b98790f076c397bcb56bbe79ba5e119d414a85a84f2b160d33b2e",
+          "parserAgreement": 0.9644,
+          "pdfplumberTextSHA256": "fab9a7a35d8e535758c94176480728ec2a1e561a0e167a65593ff2c359e5d3e7",
           "popplerTextSHA256": "55757c4a1a81cab0d92921c72e6b4836f7ababf623738166a8001224d5cb5eb8"
         },
         {
           "pdfPage": 9,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "6303a68e44478f27a68d7307d262f0f0e763b2796d8f48b9a6d8c60a09d7d13c",
+          "parserAgreement": 0.9347,
+          "pdfplumberTextSHA256": "411a263ad4457cfc0e7bfe283b1b473246b8c2127a35b82eb279aabd6958aff2",
           "popplerTextSHA256": "4a78c3167a38c47d794da77109bcea758b766b53445896df88050cb68777f9fb"
         },
         {
@@ -12063,7 +12063,7 @@
           "pdfPage": 11,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "cff717e0af781bc7a135d6b6e4928e6a265a5873a9c2c80535c904bd7fc41eef",
+          "pdfplumberTextSHA256": "d276ae9955a88cb1a814f440b90fe10461fa2f72ef539d03c0a21d16ad61c785",
           "popplerTextSHA256": "a85a7db7c531372fbd37add868d6917396fae0e2477eb529ce3782b05bfd78e1"
         }
       ]
@@ -12265,8 +12265,8 @@
         {
           "pdfPage": 9,
           "printedPageLabel": null,
-          "parserAgreement": 0.9958,
-          "pdfplumberTextSHA256": "c05ee7cfd8220af03ace762d83d4cc4c55be26b59865ccdd687cc84ef83d53c5",
+          "parserAgreement": 1.0,
+          "pdfplumberTextSHA256": "7e4ab45743a01ea231ea5098deea6321e5de260154fb52c38b6e9e6a1837f1b4",
           "popplerTextSHA256": "419378e18827e32b04b42ea796c15fa9473b1d4332df96aa86219b2d74645ab7"
         },
         {
@@ -12301,7 +12301,7 @@
           "pdfPage": 2,
           "printedPageLabel": null,
           "parserAgreement": 0.9955,
-          "pdfplumberTextSHA256": "61404d5d6f6817946ee03f12604eeaee391da342e79ca8b62ee448d4b2299ced",
+          "pdfplumberTextSHA256": "fa78486d861d4c5babda2d81cd6dd8d0d000359df772caf428da8db7dab53dc4",
           "popplerTextSHA256": "0d56268c3294adfa6c34eac16e53f745097fb00f7135f3870cb6b6049a948522"
         },
         {
@@ -12314,8 +12314,8 @@
         {
           "pdfPage": 4,
           "printedPageLabel": null,
-          "parserAgreement": 0.986,
-          "pdfplumberTextSHA256": "3fd17037103eb2620902e33d20c0fd48d8ef4ed23dc6d442132b8c9b63cc3c77",
+          "parserAgreement": 0.9906,
+          "pdfplumberTextSHA256": "dfceb9cb50dfd611fe63247b2cf88261fde80e660b525216632df3c368db73d9",
           "popplerTextSHA256": "3374fa27890a7fb2ace303b09865aca6ed93478cc1e093146b07aeef4e73ad7e"
         },
         {
@@ -12371,7 +12371,7 @@
           "pdfPage": 12,
           "printedPageLabel": null,
           "parserAgreement": 0.9589,
-          "pdfplumberTextSHA256": "12b845550d178fe4f1203172ef701b2f61098f4321f109ad500ab78db65220fe",
+          "pdfplumberTextSHA256": "709b0ee1aebd4230f371b575dc342d3d3ea3c7f017eb8aee22e2564eaa9bd90d",
           "popplerTextSHA256": "7924bf82e00e460404a6587c0b2e5f4f77c5cc40ea7fcac43429434b346da986"
         },
         {
@@ -12419,15 +12419,15 @@
         {
           "pdfPage": 2,
           "printedPageLabel": "P2",
-          "parserAgreement": 0.9716,
-          "pdfplumberTextSHA256": "417fbd0a607e6125fc8d52696c9a2420d3f30bef901b7eade1e87acca89c4ac8",
+          "parserAgreement": 0.9715,
+          "pdfplumberTextSHA256": "75b843f95b362c386974fdd1b85844b276a5202c876208be652242af57880495",
           "popplerTextSHA256": "34d1c5ebcbb7d6e5643930207710401ffba71dd972387fdb77d67300e16c5b2d"
         },
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 0.9885,
-          "pdfplumberTextSHA256": "a1ed0e63a58e41e95fe301d10992f619d7ac732438ffd76c804e207f6cf5df35",
+          "parserAgreement": 0.9923,
+          "pdfplumberTextSHA256": "10c873b44ca041b5e6cab34a95cfbf5b151cc4d487ef2e3164fd1ae717cca73f",
           "popplerTextSHA256": "ed8aecc37523f30188dcad635d410d34a6294b46a3f2d487a601ebb8f320643b"
         },
         {
@@ -12504,7 +12504,7 @@
           "pdfPage": 14,
           "printedPageLabel": null,
           "parserAgreement": 0.9883,
-          "pdfplumberTextSHA256": "657cb8e6c91d0707687a2cd79a65e03bc9ab63a933c275550d7ea936c78d58f4",
+          "pdfplumberTextSHA256": "67a5ed0422fd20a1cce49f31e82e581a9157c0b1be7c58e684a8f48d54c61081",
           "popplerTextSHA256": "10def72c8ed2a7767a2c98aa12184e3288bc366c2ee686526ec22c35db140978"
         },
         {
@@ -12651,7 +12651,7 @@
           "pdfPage": 6,
           "printedPageLabel": null,
           "parserAgreement": 0.9957,
-          "pdfplumberTextSHA256": "066df7413beb6a1ed0cc24ab217b9c9b50a9e8546b85ec8f3f35c78339dddd12",
+          "pdfplumberTextSHA256": "32bcc9d13268cdb9127250db3a4f0f0266882718e2c9718bd9ea7f47b8461a8d",
           "popplerTextSHA256": "ba3dde4f55306fe5fcaf31acf61a64620d5bd3d9f5e2284d330a7af6170a3659"
         },
         {
@@ -12735,7 +12735,7 @@
           "pdfPage": 18,
           "printedPageLabel": null,
           "parserAgreement": 0.9964,
-          "pdfplumberTextSHA256": "a479e7644e4f0093cc7c81bdf3afd6b8fdb103992a0f3dd7ac1a58be342bffec",
+          "pdfplumberTextSHA256": "70693d81f45fd43fbfd4da3c71efbf37b3dbe4063a263369d203987d1e9bde5f",
           "popplerTextSHA256": "38e1ef1509cb9e0e7fb180006bd4bac8ae7c605081d7bdfdc1baf6567298f619"
         },
         {
@@ -12903,7 +12903,7 @@
           "pdfPage": 42,
           "printedPageLabel": null,
           "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "c25cb378ea49c6b9aa6ceee1f1c55606cf11e6d0e71508f33a986305f1b55cee",
+          "pdfplumberTextSHA256": "5ab5aba1fac7257cfa7f9c96625724d6deb95a25f5bc55675cc45aa24adeea75",
           "popplerTextSHA256": "11391fc801337e929e57209abcc704f00e84d97ea7c903f3e53b62e8df7c915e"
         },
         {
@@ -12923,8 +12923,8 @@
         {
           "pdfPage": 45,
           "printedPageLabel": null,
-          "parserAgreement": 0.9965,
-          "pdfplumberTextSHA256": "27f7124e581716c4d011dbacd67ffdc5bed076ee473a0bb8c1e4633cebe9ed51",
+          "parserAgreement": 0.9976,
+          "pdfplumberTextSHA256": "1974f39c3de1d7f93c054dff173d94d2c95390ff883d5fa75d212d673060a493",
           "popplerTextSHA256": "c695eb32d5b084561af70b1ede9dcc0d60289e4eacfd3d4efcb94b119775c8db"
         },
         {
@@ -13036,7 +13036,7 @@
           "pdfPage": 12,
           "printedPageLabel": null,
           "parserAgreement": 0.9931,
-          "pdfplumberTextSHA256": "5beb8ed772fd6f99578aa31e56a2da8f88551dbf67b280d5f44012c9a3d29441",
+          "pdfplumberTextSHA256": "4b5066b0a63ba429e478052397ec455835720886c7c576851fbd3d07ea7a6bd4",
           "popplerTextSHA256": "d72503766075fa6627e660ce2061a70ef30f6b26eb51710d9d232b5d70d72333"
         }
       ]
@@ -13072,27 +13072,27 @@
       "bytes": 209246,
       "pageCount": 3,
       "sectionCount": 3,
-      "minimumParserAgreement": 0.9961,
+      "minimumParserAgreement": 0.8417,
       "pageExtraction": [
         {
           "pdfPage": 1,
           "printedPageLabel": null,
-          "parserAgreement": 0.9961,
-          "pdfplumberTextSHA256": "0352c967bbd365d7a30363bb423fdef1fd0f5f722ef15ed430356dcf5f766809",
+          "parserAgreement": 0.9785,
+          "pdfplumberTextSHA256": "2ae2a3ab4d446b2b862a3203e65b6a6d2975b3aad8401a673c77a933af8d03ab",
           "popplerTextSHA256": "e9b9c80ab7159122c9b2b847c14ced766984923b1fcc26ec691673326102f5c7"
         },
         {
           "pdfPage": 2,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "4b7bd08a3e2cdb9d85970a5f1dc7e9a87c81f47c91a0b0251cab360239f8a90c",
+          "parserAgreement": 0.8417,
+          "pdfplumberTextSHA256": "d29eb3912728fbf04d574df611d43b8b25513066aafd9ed4ea3db834fc989d26",
           "popplerTextSHA256": "6b63ec690542d50c3713090f5c543a98860571f3347804aa536394800cc4b0b8"
         },
         {
           "pdfPage": 3,
           "printedPageLabel": null,
-          "parserAgreement": 1.0,
-          "pdfplumberTextSHA256": "36b597c57b29e4db6c944716c3f4f66cd697e894817c9bd7f39541756927c80c",
+          "parserAgreement": 0.9068,
+          "pdfplumberTextSHA256": "eb191a1fb3d8f2a20614416c76f9eb8c6a95b03fefc4cf000ac6698e95b01cb1",
           "popplerTextSHA256": "e3759030ce09b6280470afe81e3b7c8abef73ca1360360938f38f87d78a98081"
         }
       ]
@@ -13197,7 +13197,7 @@
           "pdfPage": 1,
           "printedPageLabel": "3",
           "parserAgreement": 0.9942,
-          "pdfplumberTextSHA256": "51c03c23ea6dba36e23d0cdab18144ca591e664a8ba307580e470efcfcfb648d",
+          "pdfplumberTextSHA256": "e1cab7c39cb1b54aa1d514a995977f238945b1bce71ae1269bf1e9f06945060f",
           "popplerTextSHA256": "d2c7aa2d29c21bb81464e6ac85cc0bd5497b94378390f021235118531531f0c2"
         },
         {
@@ -13283,6 +13283,6 @@
     ],
     "chapterPDFCount": 110,
     "structuredTableCount": 147,
-    "discrepancyCount": 410
+    "discrepancyCount": 413
   }
 }

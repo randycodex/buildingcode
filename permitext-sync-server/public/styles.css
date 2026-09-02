@@ -4200,6 +4200,87 @@ select option:checked {
   line-height: var(--reader-line-height);
 }
 
+.code-table caption {
+  padding: 0 0 var(--space-3);
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  white-space: normal;
+}
+
+.code-table th {
+  background: color-mix(in srgb, var(--text-primary) 7%, var(--surface));
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.code-table .code-table-footnote {
+  max-width: 76rem;
+  margin: var(--space-2) 0 0;
+  color: var(--text-secondary) !important;
+  font-size: calc(var(--reader-font-size) * 0.82) !important;
+  line-height: 1.42;
+  white-space: normal;
+}
+
+.section-html .code-equation {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-4);
+  margin: var(--space-4) 0 var(--space-3);
+  padding-left: var(--space-2);
+}
+
+.section-html .code-equation-formula {
+  justify-self: start;
+  font-family: var(--reader-font-family);
+  font-size: calc(var(--reader-font-size) * 1.05) !important;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.section-html .code-equation-label {
+  justify-self: end;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.section-html .code-equation-where {
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.section-html .code-definition {
+  display: grid;
+  grid-template-columns: minmax(2.5rem, auto) auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  padding-left: var(--space-2);
+}
+
+.section-html .code-definition-term {
+  min-width: 2.5rem;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.section-html .code-definition-equals {
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .section-html .code-equation {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .section-html .code-equation-label {
+    justify-self: start;
+  }
+}
+
 .code-table :where(table, thead, tbody, tfoot, tr, td, th, p, div, span, strong, em, b, i, li) {
   color: inherit !important;
   -webkit-text-fill-color: currentColor;

@@ -168,12 +168,91 @@ assert.equal(
   "Structured table cells must not be duplicated as paragraph text."
 );
 
+const unexposedSurface = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "705.7"
+);
+assert(unexposedSurface, "BC 705.7 is missing.");
+const unexposedSurfaceBody = await historicalConstructionSection(unexposedSurface.id);
+assert.match(unexposedSurfaceBody.officialText, /A_e = A \+ \(A_f × F_eo\) \(Equation 7-1\)/);
+assert.equal(/\(Equation 7-1\) e f where/.test(unexposedSurfaceBody.officialText), false);
+assert.match(unexposedSurfaceBody.blocks[0].html, /class="code-equation"/);
+assert.match(unexposedSurfaceBody.blocks[0].html, /A<sub>e<\/sub>/);
+assert.match(unexposedSurfaceBody.blocks[0].html, /F<sub>eo<\/sub>/);
+assert.equal(unexposedSurfaceBody.blocks[0].html.includes("<br>where:"), false);
+assert(
+  unexposedSurfaceBody.blocks.some((block) =>
+    block.kind === "image" && block.imageID === "2014-bc-7-p0008-figure-01.png"
+  ),
+  "BC 705.7 must retain the complete official-PDF Figure 705.7 asset."
+);
+
+const exteriorOpenings = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "705.8"
+);
+assert(exteriorOpenings, "BC 705.8 is missing.");
+const exteriorOpeningsBody = await historicalConstructionSection(exteriorOpenings.id);
+const exteriorOpeningsTableBlock = exteriorOpeningsBody.blocks.find((block) =>
+  block.kind === "table" && block.tableID === "nyc-2014-table-bc-7-705-8"
+);
+assert(exteriorOpeningsTableBlock, "Complete Table 705.8 is not bound to BC 705.8.");
+assert.match(exteriorOpeningsTableBlock.html, /rowspan="3"/);
+assert.equal((exteriorOpeningsTableBlock.html.match(/<tr>/g) || []).length, 25);
+assert.match(exteriorOpeningsTableBlock.html, /30 or greater/);
+assert.match(exteriorOpeningsTableBlock.html, /m\. Upon special application/);
+assert.equal(
+  exteriorOpeningsBody.blocks.some((block) => block.imageID === "2014-bc-7-p0009-table-review-01.png"),
+  false,
+  "The partial page-9 image must not remain beside the complete Table 705.8."
+);
+const exteriorOpeningsTable = bundle.tables.find((table) =>
+  table.id === "nyc-2014-table-bc-7-705-8"
+);
+assert(exteriorOpeningsTable, "Complete Table 705.8 is missing from the table registry.");
+assert.equal(exteriorOpeningsTable.rowCount, 25);
+assert.deepEqual(exteriorOpeningsTable.officialPDFProvenance.pdfPages, [9, 10]);
+assert.equal(exteriorOpeningsTable.footnotes.length, 17);
+
+const verticalSeparation = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "705.8.6"
+);
+assert(verticalSeparation, "BC 705.8.6 is missing.");
+const verticalSeparationBody = await historicalConstructionSection(verticalSeparation.id);
+assert.equal(/MAXIMUM AREA OF EXTERIOR WALL OPENINGS/.test(verticalSeparationBody.officialText), false);
+assert.equal(/Upon special application/.test(verticalSeparationBody.officialText), false);
+
+const exteriorWallJoints = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "705.9"
+);
+assert(exteriorWallJoints, "BC 705.9 is missing.");
+const exteriorWallJointsBody = await historicalConstructionSection(exteriorWallJoints.id);
+assert.equal(
+  exteriorWallJointsBody.blocks.some((block) => block.kind === "table"),
+  false,
+  "The continuation of Table 705.8 must not be attached to BC 705.9."
+);
+
+const reserved5032 = catalog.find((section) =>
+  section.codePrefix === "BC" && section.sectionNumber === "503.2"
+);
+assert(reserved5032, "BC 503.2 is missing.");
+const reserved5032Body = await historicalConstructionSection(reserved5032.id);
+assert.equal(
+  reserved5032Body.officialText,
+  "",
+  "Table 503 continuation notes must not leak into the reserved BC 503.2 section."
+);
+
 assert(searchIndex.get("vision")?.includes(visionPanel.id));
 assert(bundle.tables.length > 0, "No independently verified structured tables were emitted.");
 for (const table of bundle.tables) {
   assert.match(table.officialPDFProvenance.sourceSHA256, /^[a-f0-9]{64}$/);
-  assert(Number.isInteger(table.officialPDFProvenance.pdfPage));
-  assert.equal(table.officialPDFProvenance.extraction, "pdfplumber-grid verified against Poppler bbox text");
+  if (table.id === "nyc-2014-table-bc-7-705-8") {
+    assert.deepEqual(table.officialPDFProvenance.pdfPages, [9, 10]);
+    assert.match(table.officialPDFProvenance.extraction, /verified cell-by-cell/i);
+  } else {
+    assert(Number.isInteger(table.officialPDFProvenance.pdfPage));
+    assert.equal(table.officialPDFProvenance.extraction, "pdfplumber-grid verified against Poppler bbox text");
+  }
   assert(
     !table.caption || /^\*?\s*TABLE\s+[A-Z0-9]/i.test(table.caption),
     `Table ${table.id} has a prose reference instead of an actual table caption.`
