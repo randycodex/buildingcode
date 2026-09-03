@@ -44,6 +44,17 @@ The owner then opened Account on build 51 and confirmed all three requested cont
 
 This is persisted existing-account, saved-content, and Research Project-context continuity, not a fresh Apple sign-in exercise. The existing projects never contained saved items, so project-item continuity remains unexercised rather than failed. No Research question was submitted during the Project-selector check.
 
+## Authorized Production Research exercise
+
+Status: **AUTHORIZED — awaiting the owner's one TestFlight submission**
+
+The owner authorized exactly one Production Research turn from TestFlight build 51 against Git commit `195de4f31229d785760eef570a658208f1f4e47d`, asking: `What are the requirements for designing an accessible ramp under the 2022 NYC Building Code?`
+
+- Maximum cumulative API spend: `$1.00`.
+- Scope: one submitted question, with no repetition or follow-up turn authorized.
+- Turn accounting: the included Pro turn may be consumed only if Permitext completes and durably saves the answer.
+- Verification boundary: retain only aggregate completion, turn-accounting, model-request, estimated-cost, latency, and error status plus the owner's redacted answer/citation observations. Do not retain the account identifier, Project name, or unrelated content in this record.
+
 ## Evidence boundary
 
 This result proves the replacement resolver and bundled Chapter 7 work together on the tested physical iPhone. It does **not** by itself prove every section, table, image, chapter, or 2014 code family on a physical device. Automated corpus and native tests provide broader non-device coverage, but do not replace representative owner testing.

@@ -199,7 +199,7 @@ Release-bound: **yes**
 - Free and Pro entitlement presentation passed: Lifetime Pro passed on build 51; build 51 Free presentation remains open.
 - 2014 Construction Codes Reader passed: yes for the replacement scenario — on build 51 the owner opened 2014 Construction Codes → Building Code → Chapter 7 and reported that it looked good. This closes the build 50 `Chapter HTML Missing` defect; representative physical-device coverage of other chapters/code families remains open.
 - Restore/cancellation/refund state presentation passed as applicable:
-- One separately authorized complete Production Research turn preserved the shared web/iOS response contract:
+- One separately authorized complete Production Research turn preserved the shared web/iOS response contract: authorized for build 51 at a `$1.00` cumulative API-spend ceiling; owner submission, completion, response review, turn accounting, and aggregate telemetry remain pending.
 - Account-deletion presentation and recovery boundaries passed:
 - No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained: build 51 targets the canonical Production backend, exactly matches Production Git commit `195de4f31229d785760eef570a658208f1f4e47d`, and displayed Lifetime Pro rather than Sandbox.
 - Redacted evidence and timestamp: [build 51 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), September 3, 2026; [build 50 continuity and defect evidence](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
