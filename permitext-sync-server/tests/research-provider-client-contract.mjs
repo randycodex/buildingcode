@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
 import { requestResearchProvider } from "../research-provider-client.mjs";
+import {
+  beginResearchSpendReservation, endResearchSpendReservation,
+  reserveResearchProviderSpend, settleResearchProviderSpend
+} from "../research-config.mjs";
 
 function providerResponse(status, body, headers = {}) {
   return new Response(JSON.stringify(body), {
@@ -16,6 +20,44 @@ function requestOptions(overrides = {}) {
     failureMessage: "Research provider failed.",
     ...overrides
   };
+}
+
+{
+  const environment = {
+    VERCEL_ENV: "production",
+    PERMITEXT_RESEARCH_MAX_REQUEST_USD: "0.02",
+    PERMITEXT_RESEARCH_USER_DAILY_CAP_USD: "1",
+    PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD: "7",
+    PERMITEXT_RESEARCH_DAILY_CAP_USD: "10",
+    PERMITEXT_RESEARCH_MONTHLY_CAP_USD: "100",
+    PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "10",
+    PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: "1",
+    PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "10",
+    PERMITEXT_RESEARCH_PRICING_VERSION: "provider-cap-test"
+  };
+  let calls = 0;
+  const phases = [];
+  beginResearchSpendReservation({ id: "provider-retry-cap-test" }, environment);
+  await assert.rejects(requestResearchProvider(requestOptions({
+    requestBody: { model: "test-model", input: "PRIVATE_QUESTION", max_output_tokens: 100, service_tier: null },
+    reserveProviderSpend: (body) => reserveResearchProviderSpend(body, environment),
+    settleProviderSpend: (reservation, payload) => settleResearchProviderSpend(reservation, payload, environment),
+    observePhase: (event) => phases.push(event),
+    fetchImpl: async (url, options) => {
+      calls += 1;
+      assert.equal(JSON.parse(options.body).service_tier, "default");
+      return providerResponse(503, { error: { code: "service_unavailable" } });
+    }
+  })), { code: "RESEARCH_SPEND_CAP" });
+  const spend = endResearchSpendReservation();
+  assert.equal(calls, 1, "A retry was dispatched after it could exceed the cumulative limit.");
+  assert.equal(spend.providerRequestCount, 1);
+  assert.equal(spend.pendingProviderReservationCount, 1);
+  assert.equal(phases.length, 1);
+  assert.equal(phases[0].outcome, "failed");
+  assert.equal(phases[0].providerAttempts, 1);
+  assert(phases[0].durationMilliseconds >= 0);
+  assert.doesNotMatch(JSON.stringify(phases), /PRIVATE_QUESTION|test-key/);
 }
 
 {

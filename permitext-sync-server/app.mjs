@@ -20212,6 +20212,22 @@ async function handleResearchConversationMessage(request, response) {
       durationMilliseconds: Math.round(performance.now() - researchOperationStartedAt)
     });
     if (!mockMode) {
+      try {
+        console.info(JSON.stringify({
+          event: "research_operation_accounting",
+          operationID: researchOperation.id,
+          status: researchOperation.status,
+          charged: researchOperation.charged,
+          failureCode: researchOperation.failureCode || null,
+          providerRequestCount: researchOperation.providerRequestCount,
+          pendingProviderRequestCount: researchOperation.pendingProviderRequestCount,
+          estimatedTokenCostUSD: researchOperation.actualProviderCostUSD,
+          conservativeProviderCostUSD: researchOperation.conservativeProviderCostUSD,
+          durationMilliseconds: researchOperation.durationMilliseconds
+        }));
+      } catch {
+        // Logging must not replace the original Research response.
+      }
       await saveResearchOperationMetricBestEffort(context.userID, researchOperation);
     }
   }

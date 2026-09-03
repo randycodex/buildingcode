@@ -625,7 +625,32 @@ const wrongColumnResult = evaluateResearchWebAttribution({
 assert.equal(wrongColumnResult.pass, false);
 assert.deepEqual(wrongColumnResult.guidanceSupportedPointIndexes, [0]);
 assert.match(researchWebAttributionRevisionIssues(wrongColumnResult)[0].detail, /out of supportedPoints/);
+assert.match(researchWebAttributionRevisionIssues(wrongColumnResult)[0].detail, /supportedPoints\[0\]/);
+assert.match(researchWebAttributionRevisionIssues(wrongColumnResult)[0].detail, /WEB_SOURCE_ID=web-bb-2022-013, WEB_CLAIM_ID=bb-2022-013-claim-3/);
 assert.doesNotMatch(wrongColumn.supportedPoints[0].explanation, /bulletin|guidance|\bBB\b/i);
+
+// A presentation label alone must not reject an enacted answer twice. This is
+// a synthetic failure-class fixture, not the unavailable failed live draft.
+const designGuidance = structuredClone(answer);
+designGuidance.supportedPoints[0].heading = "Design guidance";
+designGuidance.supportedPoints[0].explanation = "Requires sufficient thickness to eliminate concealed gaps and form an effective barrier between stories.";
+designGuidance.supportingSourceUses = [];
+assert.equal(evaluateResearchWebAttribution({
+  answer: designGuidance, evidence, supportingSources: []
+}).pass, true);
+assert.equal(evaluateResearchWebAttribution({
+  answer: designGuidance, evidence, supportingSources
+}).pass, true);
+for (const attribution of ["DOB guidance requires an additional review.", "According to guidance, an additional review is required.", "Guidance requires an additional review.", "The guidance includes additional filing requirements.", "Buildings Bulletin 2022-013 requires an additional review."]) {
+  const externalClaim = structuredClone(designGuidance);
+  externalClaim.supportedPoints[0].explanation = attribution;
+  assert.equal(evaluateResearchWebAttribution({
+    answer: externalClaim, evidence, supportingSources: []
+  }).pass, false, attribution);
+}
+const repairedAttribution = evaluateResearchWebAttribution({ answer, evidence, supportingSources });
+assert.equal(repairedAttribution.pass, true);
+assert.deepEqual(researchWebAttributionRevisionIssues(repairedAttribution), []);
 
 const droppedSourceUse = structuredClone(answer);
 droppedSourceUse.supportingSourceUses = [];

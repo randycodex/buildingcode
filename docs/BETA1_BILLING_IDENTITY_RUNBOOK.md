@@ -173,11 +173,13 @@ PERMITEXT_RESEARCH_MONTHLY_CAP_USD=100
 PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT=100
 ```
 
-These are exposure ceilings, not spending targets. The $7 per-user monthly ceiling provides headroom above the $6.06 V6 p90 projection for 100 fully used turns. Review actual provider usage weekly and lower the request limit or disable Research before increasing the $100 system cap.
+These are exposure ceilings, not spending targets. The per-request value is a cumulative per-turn limit across analysis, web support, answer generation, verification, revisions, and provider retries. Before dispatch, the guard reserves the next call's conservative maximum against the remaining limit. Unknown usage keeps its reservation; a blocked call is not sent or counted as dispatched. Requests explicitly use the standard service tier. For GPT-5.6, the bound includes long-context/cache-write price allowances, the documented image-patch maximum, and bounded web-search context plus tool fees. Unsupported tools, remote history, and unreviewed image-model combinations fail before dispatch. The $7 per-user monthly ceiling provides headroom above the $6.06 V6 p90 projection for 100 fully used turns. Review actual provider usage weekly and lower the request limit or disable Research before increasing the $100 system cap.
+
+Before deploying the September 3 spending correction, verify the configured model-specific prices and run a no-provider request-envelope preflight under the intended cap. Conservative reservations can block large requests even when their eventual average cost might fit. Do not raise a cap or enable paid retries automatically to overcome that rejection. `estimatedTokenCostUSD` in runtime accounting is a versioned token-price estimate, not an invoice; `conservativeProviderCostUSD` retains pricing/tool/unknown-usage allowances. See [Research failure recovery](./PERMITEXT_RESEARCH_FAILURE_RECOVERY_2026-09-03.md).
 
 Beta readiness requires the per-user monthly value to equal exactly `$7.00`; it rejects both a lower value that cannot support the retained allowance and a higher value that exceeds the approved ceiling. See [PERMITEXT_BETA1_SEVEN_DOLLAR_GUARDRAIL_EVIDENCE_2026-08-28.md](./PERMITEXT_BETA1_SEVEN_DOLLAR_GUARDRAIL_EVIDENCE_2026-08-28.md).
 
-The cost safeguards remain operational controls and must not be presented as customer-facing error messages. Before enabling paid continuation, configure:
+The dollar amounts and internal pricing details remain operational controls. A stopped turn may explain that Research reached its spending safety limit while preserving the question; it must not claim that a paid answer was completed. Before enabling paid continuation, configure:
 
 ```text
 PERMITEXT_RESEARCH_PAID_TURNS_ENABLED=1

@@ -18,6 +18,15 @@ const messageStart = appSource.indexOf("async function handleResearchConversatio
 const messageEnd = appSource.indexOf("async function handleResearchConversationDelete", messageStart);
 assert.ok(messageStart >= 0 && messageEnd > messageStart, "Could not locate Research message handler.");
 const messageHandlerSlice = appSource.slice(messageStart, messageEnd);
+const accountingStart = messageHandlerSlice.indexOf('event: "research_operation_accounting"');
+const accountingFinally = messageHandlerSlice.lastIndexOf("} finally {");
+assert.ok(accountingFinally >= 0 && accountingStart > accountingFinally,
+  "Operation accounting must include every completed or failed generation, not just an early rejection.");
+const accountingLog = messageHandlerSlice.slice(accountingStart, messageHandlerSlice.indexOf("}));", accountingStart));
+assert.match(accountingLog, /estimatedTokenCostUSD: researchOperation.actualProviderCostUSD/);
+assert.match(accountingLog, /pendingProviderRequestCount: researchOperation.pendingProviderRequestCount/);
+assert.doesNotMatch(accountingLog, /userID|question|projectContext|draft|apiKey/,
+  "Public runtime accounting must not log private request content or identity.");
 assert.match(
   messageHandlerSlice,
   /await commitResearchConversationMessage\(/,

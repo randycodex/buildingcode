@@ -3149,10 +3149,12 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     #if DEBUG
     private let phase3ResearchFixtureEnabled: Bool
+    private let phase3ResearchFailureCode: String?
     private var phase3ResearchConversations: [String: ResearchConversation] = [:]
 
-    init(phase3ResearchFixtureEnabled: Bool = false) {
+    init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil) {
         self.phase3ResearchFixtureEnabled = phase3ResearchFixtureEnabled
+        self.phase3ResearchFailureCode = phase3ResearchFailureCode
     }
     #endif
 
@@ -3497,6 +3499,9 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse {
         #if DEBUG
         if phase3ResearchFixtureEnabled {
+            if let phase3ResearchFailureCode {
+                throw PermitextBackendHTTPError.serverStatus(502, "Fixture verification rejection", code: phase3ResearchFailureCode)
+            }
             var conversation = try phase3ResearchConversation(id: request.conversationID)
             let source = conversation.sources.first
             let sectionID = source?.sectionID ?? "1"

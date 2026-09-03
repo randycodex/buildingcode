@@ -127,7 +127,54 @@ export function researchSpendGuardrails(environment = process.env) {
   };
 }
 
+function spendCapError(message) {
+  const error = new Error(message);
+  error.code = "RESEARCH_SPEND_CAP";
+  return error;
+}
+
+function providerToolAllowance(requestBody) {
+  const tools = requestBody?.tools || [];
+  if (!tools.length) return { inputTokens: 0, costUSD: 0 };
+  const calls = requestBody.max_tool_calls;
+  if (!Number.isSafeInteger(calls) || calls <= 0 || tools.some((tool) =>
+    tool.type !== "web_search" || tool.return_token_budget === "unlimited"
+  )) throw spendCapError("Research cannot bound this provider tool request.");
+  // https://developers.openai.com/api/docs/guides/tools-web-search
+  // Search has a 128k context window. Reserve that entire window for every
+  // possible tool step and final synthesis, not an average search size.
+  // https://developers.openai.com/api/docs/pricing (2026-09-03): $10/1k calls.
+  return { inputTokens: 128_000 * (calls + 1), costUSD: calls * 0.01 };
+}
+
+function boundedProviderInputTokens(requestBody) {
+  // Remote history/files and multimodal tokenization cannot be bounded by
+  // serialized text bytes. Fail before dispatch until a reviewed bound exists.
+  if (requestBody?.previous_response_id || requestBody?.conversation || requestBody?.prompt ||
+      (requestBody?.service_tier && requestBody.service_tier !== "default")) {
+    throw spendCapError("Research cannot bound this provider input or pricing tier.");
+  }
+  let imageTokens = 0;
+  const textBody = JSON.stringify(requestBody, (key, value) => {
+    if (["input_file", "input_audio", "item_reference"].includes(value?.type)) {
+      throw spendCapError("Research cannot bound this provider input.");
+    }
+    if (value?.type === "input_image") {
+      if (!/^gpt-5\.6-(?:sol|terra|luna)(?:-\d{4}-\d{2}-\d{2})?$/.test(requestBody.model || "")) {
+        throw spendCapError("Research has no reviewed image-token bound for this model.");
+      }
+      // Official images-vision guide: at most 30,000 patches per image,
+      // multiplied by 1.2 for GPT-5.6. Larger images are rejected by the API.
+      imageTokens += 36_000;
+      return { type: "input_image", detail: value.detail };
+    }
+    return value;
+  });
+  return Buffer.byteLength(textBody, "utf8") + 1_024 + imageTokens;
+}
+
 function maximumProviderRequestCost(requestBody, environment = process.env) {
+  const inputTokens = boundedProviderInputTokens(requestBody);
   const pricing = researchPricing(environment, requestBody?.model);
   const maxOutputTokens = nonnegativeNumber(requestBody?.max_output_tokens);
   if (pricing.inputRate === null || pricing.outputRate === null || !pricing.pricingVersion || !maxOutputTokens) {
@@ -135,10 +182,24 @@ function maximumProviderRequestCost(requestBody, environment = process.env) {
     error.code = "RESEARCH_SPEND_CAP";
     throw error;
   }
-  const maximumInputTokens = Buffer.byteLength(JSON.stringify(requestBody), "utf8");
+  const toolAllowance = providerToolAllowance(requestBody);
+  // Include protocol framing overhead in addition to one token per JSON byte.
+  const maximumInputTokens = inputTokens + toolAllowance.inputTokens;
+  const ceiling = providerPricingCeiling(requestBody?.model, pricing);
   return Math.ceil(
-    ((maximumInputTokens * pricing.inputRate + maxOutputTokens * pricing.outputRate) / 1_000_000) * 1_000_000
+    ((maximumInputTokens * ceiling.inputRate + maxOutputTokens * ceiling.outputRate) / 1_000_000 + toolAllowance.costUSD) * 1_000_000
   ) / 1_000_000;
+}
+
+function providerPricingCeiling(model, pricing) {
+  // GPT-5.6 long-context cache writes can cost 2.5x standard short-context
+  // input; long-context output can cost 1.5x. Do not release these allowances
+  // based on a short-context-only usage estimate. Prices remain versioned env.
+  const tiered = /^gpt-5\.6-/.test(model || "");
+  return {
+    inputRate: Math.max(pricing.inputRate * (tiered ? 2.5 : 1), pricing.cachedInputRate || 0),
+    outputRate: pricing.outputRate * (tiered ? 1.5 : 1)
+  };
 }
 
 export function beginResearchSpendReservation(reservation, environment = process.env) {
@@ -162,10 +223,16 @@ export function beginResearchSpendReservation(reservation, environment = process
 export function reserveResearchProviderSpend(requestBody, environment = process.env) {
   const context = productionSpendContext.getStore();
   if (!context) {
+    if (environment.VERCEL === "1" || environment.VERCEL_ENV) {
+      throw spendCapError("A hosted Research request requires a cumulative spend reservation.");
+    }
     return { active: false, reservedUSD: 0, actualUSD: 0, providerRequestCount: 0 };
   }
   const maximumRequestUSD = maximumProviderRequestCost(requestBody, environment);
   const nextReservedUSD = Number((context.reservedUSD + maximumRequestUSD).toFixed(6));
+  if (nextReservedUSD > context.maximumRequestUSD) {
+    throw spendCapError("Research stopped before another provider call could exceed the cumulative per-turn spending limit.");
+  }
   context.reservedUSD = nextReservedUSD;
   context.providerRequestCount += 1;
   const reservationID = `${context.id}:${context.providerRequestCount}`;
@@ -174,6 +241,9 @@ export function reserveResearchProviderSpend(requestBody, environment = process.
     active: true,
     reservationID,
     maximumRequestUSD,
+    model: requestBody?.model || null,
+    pricingCeiling: providerPricingCeiling(requestBody?.model, researchPricing(environment, requestBody?.model)),
+    toolAllowanceUSD: providerToolAllowance(requestBody).costUSD,
     reservedUSD: context.reservedUSD,
     actualUSD: context.actualUSD,
     providerRequestCount: context.providerRequestCount
@@ -208,7 +278,7 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
     cachedInputTokens: usage.input_tokens_details?.cached_tokens,
     outputTokens,
     modelUsage: [{
-      model: providerPayload?.model || null,
+      model: reservation.model || providerPayload?.model || null,
       inputTokens,
       cachedInputTokens: usage.input_tokens_details?.cached_tokens,
       outputTokens
@@ -220,10 +290,16 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
     throw error;
   }
   context.pendingProviderReservations.delete(reservation.reservationID);
+  // Tool fees are not included in usage.input_tokens/output_tokens. Retain the
+  // full reserved fee as a conservative bound rather than reporting it as paid.
+  const toolAllowanceUSD = reservation.toolAllowanceUSD || 0;
+  const tokenCostBound = reservation.pricingCeiling
+    ? Math.ceil(inputTokens * reservation.pricingCeiling.inputRate + outputTokens * reservation.pricingCeiling.outputRate) / 1_000_000
+    : actualCost;
   context.actualUSD = Number((context.actualUSD + actualCost).toFixed(6));
   context.reservedUSD = Number(Math.max(
     0,
-    context.reservedUSD - maximumRequestUSD + actualCost
+    context.reservedUSD - maximumRequestUSD + Math.max(actualCost, tokenCostBound) + toolAllowanceUSD
   ).toFixed(6));
   return {
     active: true,

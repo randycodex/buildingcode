@@ -371,6 +371,38 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
     }
 
+    func testResearchVerificationFailureRemainsVisibleAfterReopeningConversation() {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--permitext-disable-clerk",
+            "--phase3-entitled-research-fixture", "--phase3-seeded-selection-fixture",
+            "--research-verification-failure-fixture"
+        ]
+        app.launch()
+        let composer = element(in: app, identifier: "research-composer")
+        XCTAssertTrue(composer.waitForExistence(timeout: 45), app.debugDescription)
+        composer.tap()
+        composer.typeText("Accessible ramp requirements?")
+        app.buttons["Send Research question"].tap()
+        let disclosure = app.buttons["Continue to Research"]
+        if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
+        let failure = app.staticTexts.matching(NSPredicate(
+            format: "label == %@",
+            "A Research model produced a response, but Permitext could not verify it against the enacted evidence. Your question is still here."
+        )).firstMatch
+        XCTAssertTrue(failure.waitForExistence(timeout: 10), app.debugDescription)
+        app.buttons["Research history"].tap()
+        let history = app.buttons.matching(identifier: "research-history-row").firstMatch
+        XCTAssertTrue(history.waitForExistence(timeout: 5), app.debugDescription)
+        history.tap()
+        XCTAssertTrue(failure.waitForExistence(timeout: 5), app.debugDescription)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Research was interrupted")).firstMatch.exists)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "research-verification-error-restored"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+    }
+
     func testPhase3EntitledReaderResearchJourney() {
         let app = XCUIApplication()
         // Xcode 26.6 cannot drive the system-owned edit menu on the iOS 27

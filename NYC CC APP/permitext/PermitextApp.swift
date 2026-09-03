@@ -457,7 +457,9 @@ private struct Phase3EntitledResearchConfiguration {
                 databaseURL: testDirectory.appendingPathComponent("user_data.sqlite")
             )
             let transport = LocalPermitextBackendTransport(
-                phase3ResearchFixtureEnabled: true
+                phase3ResearchFixtureEnabled: true,
+                phase3ResearchFailureCode: ProcessInfo.processInfo.arguments.contains("--research-verification-failure-fixture")
+                    ? "RESEARCH_VERIFICATION_FAILED" : nil
             )
             let account = SignedInAccount(
                 appUserID: "guest:phase3-entitled-research",

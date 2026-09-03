@@ -5059,6 +5059,42 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testResearchTerminalFailureSurvivesCacheReloadWithoutBecomingAnInterruption() throws {
+        let attempt = ResearchQuestionAttempt(id: "retained-request", question: "Accessible ramp requirements?")
+        let error = PermitextBackendHTTPError.serverStatus(
+            502, "Untrusted server details", code: "RESEARCH_VERIFICATION_FAILED"
+        )
+        let failed = attempt.recordingFailure(error)
+        let reloaded = try JSONDecoder().decode(ResearchQuestionAttempt.self, from: JSONEncoder().encode(failed))
+        XCTAssertEqual(reloaded.id, attempt.id)
+        XCTAssertEqual(reloaded.question, attempt.question)
+        XCTAssertEqual(reloaded.recoveryMessage, ResearchRequestFailurePresentation.resolve(error).message)
+        XCTAssertFalse(reloaded.recoveryMessage.contains("interrupted"))
+        XCTAssertFalse(reloaded.recoveryMessage.contains("Untrusted"))
+        XCTAssertEqual(reloaded.retryAttempt, attempt)
+
+        let legacy = try JSONDecoder().decode(ResearchQuestionAttempt.self, from: Data(
+            #"{"id":"legacy","question":"Pending question"}"#.utf8
+        ))
+        XCTAssertNil(legacy.failure)
+        XCTAssertTrue(legacy.recoveryMessage.contains("interrupted"))
+    }
+
+    func testResearchReconcilesLostResponsesButNotExplicitVerificationOrSpendRejections() {
+        for code in ["RESEARCH_VERIFICATION_FAILED", "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP"] {
+            let error = PermitextBackendHTTPError.serverStatus(502, "Rejected", code: code)
+            XCTAssertFalse(ResearchRequestFailurePresentation.shouldReconcileCompletion(after: error))
+        }
+        XCTAssertTrue(ResearchRequestFailurePresentation.shouldReconcileCompletion(after: URLError(.timedOut)))
+        XCTAssertTrue(ResearchRequestFailurePresentation.shouldReconcileCompletion(after: URLError(.networkConnectionLost)))
+        XCTAssertTrue(ResearchRequestFailurePresentation.shouldReconcileCompletion(after:
+            PermitextBackendHTTPError.serverStatus(502, "Unknown failure", code: nil)
+        ))
+        XCTAssertTrue(ResearchRequestFailurePresentation.resolve(
+            PermitextBackendHTTPError.serverStatus(503, "Do not show this", code: "RESEARCH_SPEND_CAP")
+        ).message.contains("spending limit"))
+    }
+
     func testResearchRequestCanCancelAndReconciledCompletionRefreshesAllowance() throws {
         let projectRoot = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

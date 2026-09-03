@@ -35,6 +35,21 @@ struct ResearchQuestionAttempt: Identifiable, Equatable, Codable, Sendable {
 
     let id: String
     let question: String
+    var failure: ResearchRequestFailurePresentation? = nil
+
+    var recoveryMessage: String {
+        failure?.message ?? "Research was interrupted before an answer was saved. Retry to recover the same request. Your question is still here."
+    }
+
+    func recordingFailure(_ error: Error) -> ResearchQuestionAttempt {
+        var saved = self
+        saved.failure = ResearchRequestFailurePresentation.resolve(error)
+        return saved
+    }
+
+    var retryAttempt: ResearchQuestionAttempt {
+        ResearchQuestionAttempt(id: id, question: question)
+    }
 }
 
 enum ResearchTrustCopy {
@@ -225,8 +240,22 @@ struct ResearchAuthoritativeConversationRecovery {
     }
 }
 
-struct ResearchRequestFailurePresentation: Equatable {
+struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
     let message: String
+
+    static func shouldReconcileCompletion(after error: Error) -> Bool {
+        // These are explicit pre-commit rejections, not lost responses. Polling
+        // four times cannot recover an answer and adds twelve seconds of delay.
+        let terminalCodes: Set<String> = [
+            "RESEARCH_VERIFICATION_FAILED", "RESEARCH_SPEND_CAP",
+            "RESEARCH_EVAL_SPEND_CAP", "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE",
+            "RESEARCH_EVIDENCE_NOT_FOUND", "RESEARCH_EVIDENCE_REQUIRED",
+            "RESEARCH_TURNS_REQUIRED", "RESEARCH_CAPACITY_REVIEW"
+        ]
+        let code = (error as? PermitextBackendHTTPError)?.serverCode?
+            .trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        return !terminalCodes.contains(code ?? "")
+    }
 
     static func resolve(_ error: Error) -> ResearchRequestFailurePresentation {
         if let backendError = error as? PermitextBackendHTTPError {
@@ -274,6 +303,8 @@ struct ResearchRequestFailurePresentation: Equatable {
         ]
 
         switch code {
+        case "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP":
+            return retainedQuestion("Research stopped before another model call could exceed its spending limit.")
         case "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE":
             return retainedQuestion(
                 "Permitext could not retrieve attributable official guidance from the approved sources."
@@ -627,6 +658,7 @@ struct ResearchView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(deletingConversationID == item.id)
+                .accessibilityIdentifier("research-history-row")
                 .listRowInsets(EdgeInsets(top: 8, leading: 18, bottom: 8, trailing: 18))
                 .listRowBackground(Color.clear)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
@@ -1380,6 +1412,7 @@ struct ResearchView: View {
             activeResearchRequestTask = nil
             return
         }
+        let attempt = attempt.retryAttempt
         let messageIDsBeforeRequest = Set(conversation?.messages.map(\.id) ?? [])
         cacheQuestionAttempt(attempt, conversationID: id)
         isSending = true
@@ -1409,8 +1442,7 @@ struct ResearchView: View {
             questionErrorMessage = nil
         } catch {
             if Task.isCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled {
-                failedQuestionAttempt = attempt
-                questionErrorMessage = ResearchRequestFailurePresentation.resolve(URLError(.cancelled)).message
+                retainQuestionFailure(attempt, error: URLError(.cancelled), conversationID: id)
                 return
             }
             if let authoritative = ResearchAuthoritativeConversationRecovery.conversation(
@@ -1430,9 +1462,13 @@ struct ResearchView: View {
                     failedQuestionAttempt = nil
                     questionErrorMessage = nil
                 } else {
-                    failedQuestionAttempt = attempt
-                    questionErrorMessage = ResearchRequestFailurePresentation.resolve(error).message
+                    retainQuestionFailure(attempt, error: error, conversationID: id)
                 }
+                return
+            }
+            guard ResearchRequestFailurePresentation.shouldReconcileCompletion(after: error) else {
+                retainQuestionFailure(attempt, error: error, conversationID: id)
+                await library.refreshResearchTurnAllowance(showsErrors: false)
                 return
             }
             // A network timeout can arrive after Research has completed on the
@@ -1451,8 +1487,7 @@ struct ResearchView: View {
                 errorMessage = nil
                 questionErrorMessage = nil
             } else {
-                failedQuestionAttempt = attempt
-                questionErrorMessage = ResearchRequestFailurePresentation.resolve(error).message
+                retainQuestionFailure(attempt, error: error, conversationID: id)
             }
         }
     }
@@ -1576,6 +1611,13 @@ struct ResearchView: View {
         )
     }
 
+    private func retainQuestionFailure(_ attempt: ResearchQuestionAttempt, error: Error, conversationID: String) {
+        let failed = attempt.recordingFailure(error)
+        cacheQuestionAttempt(failed, conversationID: conversationID)
+        failedQuestionAttempt = failed
+        questionErrorMessage = failed.recoveryMessage
+    }
+
     private func cacheQuestionAttempt(_ attempt: ResearchQuestionAttempt, conversationID: String) {
         guard let account = library.signedInAccount else { return }
         try? cache.store(
@@ -1621,7 +1663,7 @@ struct ResearchView: View {
             return
         }
         failedQuestionAttempt = attempt
-        questionErrorMessage = "Research was interrupted before an answer was saved. Retry to recover the same request. Your question is still here."
+        questionErrorMessage = attempt.recoveryMessage
     }
 }
 

@@ -36,10 +36,20 @@ function materialTokens(value) {
     .filter((token) => token.length >= 3 && !insignificantWords.has(token)));
 }
 
+// "Design guidance" is a presentation label, not evidence of web provenance.
+// Still reject named bulletins and statements attributing a rule to guidance;
+// source-specific paraphrases are independently checked below.
 const webGuidanceClaimPattern =
-  /\b(?:(?:NYC\s+)?(?:DOB|Department of Buildings|Buildings?)\s+)?(?:Buildings?\s+)?(?:Bulletin|guidance)\b|\bBB\s*(?:19|20)\d{2}\s*[-\u2013\u2014]\s*\d{3}\b/i;
+  /\b(?:Buildings?\s+)?Bulletin\b|\bBB\s*(?:19|20)\d{2}\s*[-\u2013\u2014]\s*\d{3}\b|\b(?:DOB|Department of Buildings|official|agency|web|supporting|noncontrolling)\s+guidance\b|\b(?:according to|per|under)\s+(?:the\s+)?guidance\b|\bguidance\s+(?:says|states|requires|permits|allows|establishes|provides|recommends)\b/i;
 const unavailableDocumentPattern =
   /\b(?:could not|unable to|not (?:retrieved|available|used|reviewed|opened)|unavailable|no source-specific|no attributable)\b/i;
+
+function explicitGuidanceAttribution(point) {
+  // Keep the original conservative body-text check. Only a generic heading
+  // label is exempt; moving the same wording into a substantive claim is not.
+  return /\bguidance\b/i.test(compactText(point?.explanation)) ||
+    [point?.heading, point?.explanation].some((text) => webGuidanceClaimPattern.test(compactText(text)));
+}
 
 function sourceReferences(source) {
   return namedDocumentReferences(
@@ -48,39 +58,45 @@ function sourceReferences(source) {
   );
 }
 
-function webDerivedSupportedPointIndexes(answer, sources, evidence) {
+function webDerivedSupportedPointMatches(answer, sources, evidence) {
   if (!sources.size) {
     return (Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : [])
       .map((point, index) => ({
         index,
-        text: compactText([point?.heading, point?.explanation].filter(Boolean).join(" "))
+        explicit: explicitGuidanceAttribution(point)
       }))
-      .filter(({ text }) => webGuidanceClaimPattern.test(text))
-      .map(({ index }) => index);
+      .filter(({ explicit }) => explicit)
+      .map(({ index }) => ({ index, reason: "explicit_guidance_attribution", bindings: [] }));
   }
   const enactedTokens = materialTokens((Array.isArray(evidence) ? evidence : [])
     .flatMap((item) => [item?.title, item?.text])
     .filter(Boolean)
     .join(" "));
   const distinctiveWebTokenSets = [...sources.values()].flatMap((source) =>
-    (Array.isArray(source?.attributedClaims) ? source.attributedClaims : []).map((claim) =>
-      new Set([...materialTokens(claimText(claim))].filter((token) => !enactedTokens.has(token)))
-    )
-  ).filter((tokens) => tokens.size > 0);
+    (Array.isArray(source?.attributedClaims) ? source.attributedClaims : []).map((claim) => ({
+      sourceID: compactText(source.id),
+      claimID: claimID(claim),
+      tokens: new Set([...materialTokens(claimText(claim))].filter((token) => !enactedTokens.has(token)))
+    }))
+  ).filter(({ tokens }) => tokens.size > 0);
 
   return (Array.isArray(answer?.supportedPoints) ? answer.supportedPoints : [])
     .map((point, index) => ({
       index,
+      explicit: explicitGuidanceAttribution(point),
       text: compactText([point?.heading, point?.explanation].filter(Boolean).join(" "))
     }))
-    .filter(({ text }) => {
-      if (webGuidanceClaimPattern.test(text)) return true;
+    .flatMap(({ index, text, explicit }) => {
       const pointTokens = materialTokens(text);
-      return distinctiveWebTokenSets.some((webTokens) =>
-        [...webTokens].filter((token) => pointTokens.has(token)).length >= 2
-      );
-    })
-    .map(({ index }) => index);
+      const bindings = distinctiveWebTokenSets.filter(({ tokens }) =>
+        [...tokens].filter((token) => pointTokens.has(token)).length >= 2
+      ).map(({ sourceID, claimID }) => ({ sourceID, claimID }));
+      return explicit || bindings.length ? [{
+        index,
+        reason: explicit ? "explicit_guidance_attribution" : "web_claim_overlap",
+        bindings
+      }] : [];
+    });
 }
 
 export function evaluateResearchWebAttribution({
@@ -166,7 +182,8 @@ export function evaluateResearchWebAttribution({
     )
   );
 
-  const guidanceSupportedPointIndexes = webDerivedSupportedPointIndexes(answer, sources, evidence);
+  const guidanceSupportedPointMatches = webDerivedSupportedPointMatches(answer, sources, evidence);
+  const guidanceSupportedPointIndexes = guidanceSupportedPointMatches.map(({ index }) => index);
   const guidanceOnly =
     sources.size > 0 &&
     validUsedBindings.length > 0 &&
@@ -215,6 +232,7 @@ export function evaluateResearchWebAttribution({
     undisclosedGuidanceOnlyEnactedBoundary,
     guidanceOnlyClaimsControllingAuthority,
     guidanceSupportedPointIndexes,
+    guidanceSupportedPointMatches,
     invalidSourceUseBindings
   };
 }
@@ -223,9 +241,14 @@ export function researchWebAttributionRevisionIssues(result) {
   if (!result || result.pass) return [];
   const issues = [];
   if (result.guidanceSupportedPointIndexes?.length) {
+    const targets = (result.guidanceSupportedPointMatches || []).map(({ index, reason, bindings }) =>
+      `supportedPoints[${index}] (${reason})${bindings.length
+        ? ` overlaps ${bindings.map(({ sourceID, claimID }) => `WEB_SOURCE_ID=${sourceID}, WEB_CLAIM_ID=${claimID}`).join("; ")}`
+        : ": no matching web claim binding was identified"}`
+    ).join(". ");
     issues.push({
       type: "wrong_attribution",
-      detail: "Move every web-derived statement out of supportedPoints, including paraphrases that omit the words bulletin, guidance, or BB. supportedPoints and enacted citations may state only rules established by assembled enacted text. Select each noncontrolling web statement in supportingSourceUses using its exact WEB_SOURCE_ID and WEB_CLAIM_ID pair, and label it as guidance in answerText."
+      detail: `${targets ? `Flagged zero-based locations: ${targets}. ` : ""}Move every web-derived statement out of supportedPoints, including paraphrases that omit the words bulletin, guidance, or BB. supportedPoints and enacted citations may state only rules established by assembled enacted text. Check each flagged point against its cited enacted passages; preserve independently established enacted rules, but separate web-only clauses. Select each noncontrolling web statement in supportingSourceUses using its exact WEB_SOURCE_ID and WEB_CLAIM_ID pair, and label it as guidance in answerText. If no supplied web binding supports the statement, remove it rather than inventing a binding.`
     });
   }
   if (result.missingRequiredSourceIDs?.length) {

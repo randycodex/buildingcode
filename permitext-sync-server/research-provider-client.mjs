@@ -154,7 +154,42 @@ export function researchProviderFailure({
   return error;
 }
 
-export async function requestResearchProvider({
+export async function requestResearchProvider(options) {
+  const startedAt = performance.now();
+  let result;
+  let failure;
+  try {
+    result = await performResearchProviderRequest({
+      ...options,
+      // Prevent a project-level automatic Fast tier from invalidating the
+      // standard-price reservation. An explicit tier is checked by the guard.
+      requestBody: { ...options.requestBody, service_tier: options.requestBody?.service_tier ?? "default" }
+    });
+    return result;
+  } catch (error) {
+    failure = error;
+    throw error;
+  } finally {
+    const event = {
+      event: "research_provider_phase",
+      stage: options.requestBody?.tools?.some((tool) => tool.type === "web_search")
+        ? "web_support"
+        : String(options.requestBody?.text?.format?.name || "research").replace(/[^a-z0-9_]/gi, "").slice(0, 80),
+      outcome: failure ? "failed" : "completed",
+      durationMilliseconds: Math.round(performance.now() - startedAt),
+      providerAttempts: result?.attempts ?? failure?.providerAttempts ?? 0
+    };
+    // No question, draft, Project facts, account ID, or provider token is logged.
+    try {
+      if (process.env.VERCEL === "1" || process.env.VERCEL_ENV) console.info(JSON.stringify(event));
+      options.observePhase?.(event);
+    } catch {
+      // Observability must never replace the answer or its original failure.
+    }
+  }
+}
+
+async function performResearchProviderRequest({
   apiKey,
   requestBody,
   signal = null,
