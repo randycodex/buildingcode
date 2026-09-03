@@ -60,7 +60,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260902-2014-code-v20";
+} from "./offline-storage.js?v=20260902-account-cleanup-v22";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -95,7 +95,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260902-2014-code-v20";
+} from "./research-intent-state.js?v=20260902-account-cleanup-v22";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -6182,7 +6182,13 @@ function resetEnhancedSelects(scope) {
 function activeAccount() {
   const userID = state.account?.userID?.trim();
   const sessionToken = state.account?.sessionToken?.trim();
-  return userID && sessionToken ? { userID, sessionToken } : null;
+  if (!userID || !sessionToken) return null;
+  const explicitProvider = String(state.account?.authProvider || "").trim().toLowerCase();
+  const inferredProvider = userID.split(":", 1)[0].toLowerCase();
+  const authProvider = ["apple", "clerk", "web"].includes(inferredProvider)
+    ? inferredProvider
+    : explicitProvider || "web";
+  return { userID, sessionToken, authProvider };
 }
 
 function updateConnectionStatus() {
@@ -8362,6 +8368,52 @@ async function deleteLocalWorkboard(projectID) {
   const mounted = workboardMounts.get(projectID);
   disposeProjectWorkboardMount(mounted);
   workboardMounts.delete(projectID);
+}
+
+function accountScopedWorkboardProjectIDs(account, sources = {}) {
+  const accountUserID = String(account?.userID || "").trim();
+  if (!accountUserID) return [];
+  const summary = sources.summary ?? currentContentSummary();
+  const localProjects = sources.localProjects ?? state.localProjects ?? [];
+  const queueEntries = [
+    ...(sources.syncOutbox ?? state.syncOutbox ?? []),
+    ...(sources.syncConflicts ?? state.syncConflicts ?? [])
+  ];
+  const projectIDs = new Set();
+  const addProjectID = (value) => {
+    const projectID = String(value || "").trim();
+    if (projectID && projectID.length <= 200) projectIDs.add(projectID);
+  };
+  const addProjectRecord = (project) => {
+    addProjectID(project?.clientID || project?.id || project?.localFolderID);
+  };
+  (summary?.projects || []).forEach(addProjectRecord);
+  (summary?.workboards || []).forEach((workboard) => addProjectID(workboard?.projectID));
+  localProjects
+    .filter((project) => String(project?.userID || "").trim() === accountUserID)
+    .forEach(addProjectRecord);
+  queueEntries
+    .filter((entry) => String(entry?.accountUserID || "").trim() === accountUserID)
+    .forEach((entry) => {
+      const [kind, record] = Object.entries(entry?.mutation || {})[0] || [];
+      if (!record || !["project", "workboard"].includes(kind)) return;
+      const recordUserID = String(record.userID || "").trim();
+      if (recordUserID && recordUserID !== accountUserID) return;
+      if (kind === "project") {
+        addProjectRecord(record);
+        return;
+      }
+      const directProjectID = String(record.projectID || "").trim();
+      if (directProjectID) {
+        addProjectID(directProjectID);
+        return;
+      }
+      const marker = ":workboard:";
+      const recordID = String(record.id || "");
+      const markerIndex = recordID.lastIndexOf(marker);
+      if (markerIndex !== -1) addProjectID(recordID.slice(markerIndex + marker.length));
+    });
+  return Array.from(projectIDs);
 }
 
 function responseErrorMessage(payload, fallback) {
@@ -10717,10 +10769,12 @@ async function createProjectFolder(details = {}) {
   const description = String(details.description || "").trim();
   const address = String(details.address || "").trim();
   const type = requestedType;
+  const account = activeAccount();
   const project = {
     id,
     clientID: id,
     localFolderID,
+    userID: account?.userID || "local-web",
     codeVersion: defaultSyncCodeVersion,
     name,
     title: name,
@@ -10737,7 +10791,6 @@ async function createProjectFolder(details = {}) {
   state.localProjects = [...(state.localProjects || []), project];
   saveWorkspaceState();
 
-  const account = activeAccount();
   if (!account) return project;
 
   try {
@@ -11376,10 +11429,12 @@ function setAnnotationNoteValue(target, value) {
     return false;
   }
   const existingTags = tagsForTarget(target);
+  const deleteEmptyAnnotation = !nextNote.trim() && existingTags.length === 0;
   const record = annotationRecordForTarget(target, {
     noteBody: nextNote,
     tags: existingTags,
-    syncFields: ["noteBody"]
+    syncFields: ["noteBody"],
+    deletedAt: deleteEmptyAnnotation ? new Date().toISOString() : null
   });
   upsertLocalAnnotation(record);
   scheduleAnnotationPush(record);
@@ -14450,6 +14505,7 @@ async function openSectionDetail(searchID, section, options = {}) {
   const anchors = sectionDetailAnchorsBySearch();
   details[searchID] = {
     codePrefix: section.codePrefix || "BC",
+    codeVersion: syncCodeVersion(section.codeVersion || syncCodeVersionForPrefix(section.codePrefix || "BC")),
     chapterID: section.navigationChapterID || section.chapterID || "",
     chapterNumber: section.chapterNumber || "",
     sectionID,
@@ -28950,11 +29006,43 @@ function closeSavedItemDetailsForPane(savedPaneID) {
 async function openSavedItemInReader(item, savedPaneID) {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
   if (!sectionID) return;
-  await openSourceInReader({
+  const navigationItem = {
     ...item,
     id: sectionID,
     sectionID
-  }, savedPaneID);
+  };
+  closeSavedItemDetailsForPane(savedPaneID);
+  const detailInstance = newUtilityInstance("sdc");
+  state.utilityInstances = [...(state.utilityInstances || []), detailInstance];
+  await openSectionDetail(detailInstance.id, navigationItem, {
+    anchorPaneID: savedPaneID,
+    updateURL: false,
+    evidenceAnchor: item?.evidenceAnchor || null
+  });
+
+  const detail = sectionDetailsBySearch()[detailInstance.id];
+  if (!detail) return;
+  const readerOverrides = {
+    sourceAnchorPaneID: paneIDForSectionDetail(detailInstance.id),
+    savedSourcePaneID: savedPaneID,
+    sourceBlockID: normalizeAnnotationBlockID(detail.blockID)
+  };
+  let reader = (state.readers || []).find((candidate) =>
+    readerMatchesSource(candidate, detail) &&
+    !searchIDForLinkedReaderPane(paneIDForReader(candidate))
+  ) || null;
+  if (reader) {
+    Object.assign(reader, readerFieldsForSectionDetail(detail, readerOverrides));
+    placeLinkedReaderAfterSectionDetail(detailInstance.id, reader.id);
+  } else {
+    reader = await openOrUpdateLinkedReaderForSearch(detailInstance.id, detail, readerOverrides);
+  }
+  if (reader) {
+    saveWorkspaceState();
+    await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
+    revealReaderSourceTarget(reader, navigationItem, item?.evidenceAnchor || null);
+  }
+  scrollPaneIntoView(paneIDForSectionDetail(detailInstance.id));
 }
 
 async function startFocusedResearchFromSavedItem(item, projectID = "") {
@@ -30498,10 +30586,7 @@ function renderSettings() {
     const progress = openAccountDeletionProgress();
     progress.setStage("billing", "active");
     progress.setStage("data", "active");
-    const localProjectIDs = new Set([
-      ...(currentContentSummary().projects || []).map((project) => workboardProjectID(projectIdentity(project))),
-      ...(state.localProjects || []).map((project) => workboardProjectID(projectIdentity(project)))
-    ].filter(Boolean));
+    const localProjectIDs = accountScopedWorkboardProjectIDs(account);
 
     const clearThisBrowser = async () => {
       const failures = [];

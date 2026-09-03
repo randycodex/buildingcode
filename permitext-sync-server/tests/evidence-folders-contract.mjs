@@ -170,8 +170,19 @@ assert.match(
 const openSavedItemSource = functionSource(appSource, "openSavedItemInReader");
 assert.match(
   openSavedItemSource,
-  /openSourceInReader\([\s\S]*?sectionID[\s\S]*?savedPaneID/,
-  "A saved passage must open its exact enacted source in Reader."
+  /newUtilityInstance\("sdc"\)[\s\S]*?openSectionDetail\([\s\S]*?anchorPaneID: savedPaneID[\s\S]*?readerMatchesSource[\s\S]*?openOrUpdateLinkedReaderForSearch\([\s\S]*?revealReaderSourceTarget/,
+  "A saved passage must open a note-capable Source Detail and its exact enacted source in Reader."
+);
+assert.match(
+  sectionDetailSource,
+  /textarea\.placeholder = "Add a note"/,
+  "The Source Detail opened from Saved must expose the note editor."
+);
+const setAnnotationNoteValueSource = functionSource(appSource, "setAnnotationNoteValue");
+assert.match(
+  setAnnotationNoteValueSource,
+  /deleteEmptyAnnotation = !nextNote\.trim\(\) && existingTags\.length === 0[\s\S]*?deletedAt: deleteEmptyAnnotation \? new Date\(\)\.toISOString\(\) : null/,
+  "Clearing the last annotation field must write a deletion tombstone instead of consuming note quota invisibly."
 );
 
 const normalizeAnnotationTags = new Function(
