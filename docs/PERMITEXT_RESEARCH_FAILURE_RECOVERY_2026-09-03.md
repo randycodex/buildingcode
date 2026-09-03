@@ -1,6 +1,6 @@
 # Research failure recovery — September 3, 2026
 
-Status: local implementation complete; server checks, 163 native unit tests, and the rendered Simulator failure/reopen regression pass. Production configuration verification and release approval remain open. Not deployed.
+Status: implementation and no-cost verification complete. The owner subsequently approved the configuration and release: Production serves `1873ba6453bf6f3d1f076e34fa2ddfb96b9cf40c`, and TestFlight build 52 has been uploaded. See the [release record](./PERMITEXT_RESEARCH_RECOVERY_RELEASE_2026-09-03.md) for Apple processing and acceptance boundaries.
 
 ## Observed attempt
 
@@ -8,7 +8,7 @@ The owner authorized one Production Research turn from TestFlight build 51 again
 
 The September 3 request began at 21:30:44 UTC and returned HTTP 502 after 105,018 ms. Both deterministic checks reported `wrong_attribution`; the second followed one bounded revision. The server returned `RESEARCH_VERIFICATION_FAILED`. The physical iPhone instead displayed the restored-pending-request interruption message. No answer was delivered. This is a failed acceptance attempt, not a completed Research turn. No failed draft was available to reproduce the exact wording. The actual prior API cost and usage-ledger entries remain unverified; the code's failure path releases the Pro-turn reservation but is not proof of that attempt's persisted ledger outcome.
 
-The one-submission authorization has been attempted and is not reused by this work. No paid model calls, deployment, TestFlight upload, price/allowance changes, or public-release acceptance are authorized here.
+The one-submission authorization has been attempted and is not reused by this work. The original implementation phase authorized no paid calls, deployment, TestFlight upload, or price/allowance changes. Later approval covers only the configuration/backend/TestFlight release recorded separately; it does not authorize a paid retry, customer price/allowance changes, or public-release acceptance.
 
 ## Changes
 
@@ -59,12 +59,12 @@ The official standard short-context rates checked September 3 are Luna $0.20 inp
 
 Repeat the no-cost envelope check with `node tests/research-ramp-design-retrieval-contract.mjs` in `permitext-sync-server`, without provider credentials or paid-evaluation flags.
 
-## Release prerequisites
+## Release and acceptance gates
 
-1. Review the final local commit and retained passing no-cost checks, including the rendered failure/reopen regression.
-2. Close the hidden Production pricing/model configuration boundary and verify the full request envelope under the existing cap. The base offline preflight above is complete but is not whole-turn acceptance. Do not automatically raise caps if an envelope does not fit.
-3. Obtain approval before push/deployment or a replacement TestFlight upload.
-4. Obtain a separate exact live-turn authorization only after the release is bound to its source SHA. Do not rerun the failed build-51 request automatically.
+1. Complete: final source review and retained passing no-cost checks, including the rendered failure/reopen regression.
+2. Complete for the configuration release: owner-authorized writes of the known model/pricing values, unchanged cap metadata, and a fresh protected Production build. The base offline envelope preflight is not whole-turn acceptance. Do not automatically raise caps if a future request does not fit.
+3. Approved and executed: push/deployment and replacement TestFlight upload. Apple processing and device installation are tracked in the release record.
+4. Still open: obtain a separate exact live-turn authorization after the replacement build is installed. Do not rerun the failed build-51 request automatically. Live answer correctness, actual latency, and invoiced cost remain unproven.
 
 ## Official billing references
 
