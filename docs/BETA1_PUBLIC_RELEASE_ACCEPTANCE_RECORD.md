@@ -73,7 +73,7 @@ Release-bound: **yes**
 - Fresh-account Google sign-in:
 - Fresh-account Microsoft sign-in:
 - Existing-account email-code sign-in retained the correct Permitext account/data:
-- Existing-account Apple sign-in retained the correct Permitext account/data: yes for the persisted account session on exact build 51 — the Account screen remained signed in, Lifetime Pro remained active, and sync reported `Synced`. This is not fresh-account Apple evidence. Saved-content continuity on build 51 remains to be checked separately.
+- Existing-account Apple sign-in retained the correct Permitext account/data: yes for the persisted account session on exact build 51 — the Account screen remained signed in, Lifetime Pro remained active, sync reported `Synced`, existing saved content remained present, and existing Project containers remained present. This is not fresh-account Apple evidence. The projects never contained saved items, so project-item continuity remains unexercised rather than failed.
 - Existing-account Google sign-in retained the correct Permitext account/data:
 - Existing-account Microsoft sign-in retained the correct Permitext account/data:
 - Dedicated disposable-account pre-deletion export and aggregate baseline captured safely:
@@ -195,7 +195,7 @@ Release-bound: **yes**
 - Final iOS archive was built from the selected release commit: yes for the current candidate — signed version `1.0`, build `51`, executable SHA-256 `650650e5529c4427b6b50b37a2447bc71408bb7dbcf767f0936e47d46c2ea450` was produced from the exact Production commit.
 - App Store Connect processed the intended build: yes — build 51 is Validated, Ready to Submit, assigned to Internal Testers, and installed by the owner.
 - Physical-iPhone authentication passed: existing Apple-authenticated account continuity passed on build 51. This was a persisted session, not a fresh Apple sign-in; fresh-account Apple and the remaining provider matrix remain open.
-- Account/sync and representative saved Project continuity passed: Account reported `Synced` on build 51. Saved-content and project-container continuity passed historically on build 50 but remain to be rechecked on build 51; project-item continuity remains unexercised because the existing projects never contained saved items.
+- Account/sync and representative saved Project continuity passed: yes for Account `Synced`, existing saved content, and existing Project containers on build 51. Project-item continuity remains unexercised because the existing projects never contained saved items.
 - Free and Pro entitlement presentation passed: Lifetime Pro passed on build 51; build 51 Free presentation remains open.
 - 2014 Construction Codes Reader passed: yes for the replacement scenario — on build 51 the owner opened 2014 Construction Codes → Building Code → Chapter 7 and reported that it looked good. This closes the build 50 `Chapter HTML Missing` defect; representative physical-device coverage of other chapters/code families remains open.
 - Restore/cancellation/refund state presentation passed as applicable:
