@@ -30,7 +30,7 @@ Interim no-input evidence: [PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRIT
 ## Production deployment
 
 Gate ID: `production-deployment`
-Status: **CURRENT BUILD 50 CANDIDATE PASSED — selected-release machine binding remains open**
+Status: **CURRENT PRODUCTION BACKEND PASSED — build 50 client is superseded and replacement release binding remains open**
 Release-bound: **yes**
 
 - Production build log passed commercial configuration, live Stripe, release identity, and external-monitoring checks: yes — exact deployment `dpl_GzjcRMmjuZD1pDxsmiYT4FjH2HvP` reported every protected check ready and completed successfully.
@@ -188,19 +188,20 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN — build 50 release identity, installation, existing Apple account, sync, Lifetime Pro, and saved continuity passed; remaining client workflows remain open**
+Status: **OPEN — build 50 account/sync continuity passed, but its 2014 Reader failed on the physical iPhone; replacement build and remaining client workflows are required**
 Release-bound: **yes**
 
 - Production web release ID and Git commit match the selected release: current candidate yes — release ID `c78a4b6c26d8`, Git commit `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`; final machine selection remains open.
-- Final iOS archive was built from the selected release commit: current candidate yes — signed version `1.0`, build `50`, executable SHA-256 `7cb3dcc312ac1eb19e72acee57429852fafd3324c50452d598fd7074ce6005b0` from the same exact commit.
-- App Store Connect processed the intended build: build 50 upload succeeded, the owner installed it, and paired-device readback confirmed version `1.0` / build `50`; final owner release selection remains open.
+- Final iOS archive was built from the selected release commit: no — signed version `1.0`, build `50`, executable SHA-256 `7cb3dcc312ac1eb19e72acee57429852fafd3324c50452d598fd7074ce6005b0` matched the then-current Production commit, but the physical-iPhone Reader defect supersedes it.
+- App Store Connect processed the intended build: historical build 50 upload, installation, and paired-device identity readback passed; a corrected replacement build has not yet completed this gate.
 - Physical-iPhone authentication passed: existing Apple-authenticated account continuity passed after relaunch; fresh-account Apple and the remaining provider matrix remain open.
 - Account/sync and representative saved Project continuity passed: Account reported `Synced`, existing saved sections or notes remained present, and existing project containers remained present. The projects had never contained saved items, so their empty state was expected; project-item continuity remains unexercised rather than failed.
 - Free and Pro entitlement presentation passed: Lifetime Pro passed on build 50; final-build Free presentation remains open.
+- 2014 Construction Codes Reader passed: no on build 50 — opening Building Code Chapter 7 displayed `Chapter HTML Missing`. The archive contained `bc-7.html`; the corrected resolver and its 161/161 Simulator suite pass, but a replacement physical-iPhone result remains required.
 - Restore/cancellation/refund state presentation passed as applicable:
 - One separately authorized complete Production Research turn preserved the shared web/iOS response contract:
 - Account-deletion presentation and recovery boundaries passed:
-- No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained: yes for the tested build — its backend is Production, its entitlement was Lifetime Pro rather than Sandbox, and installed build/Production Git identity align to `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`.
+- No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained: yes for superseded build 50 — its backend was Production, its entitlement was Lifetime Pro rather than Sandbox, and installed build/Production Git identity aligned to `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`. This identity evidence does not waive replacement-build binding.
 - Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), through `2026-09-03T10:33:44.038Z`.
 
 Source, Simulator, archive-upload, and TestFlight-processing evidence do not substitute for the final physical-device workflow.

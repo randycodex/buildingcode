@@ -308,6 +308,104 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
 }
 
 final class EntitlementAndSyncContractTests: XCTestCase {
+    func testPublishedHTMLStoreResolvesFlat2014ChapterFilesByCodeFamily() throws {
+        let resourceURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-flat-2014-html-\(UUID().uuidString)", isDirectory: true)
+        let relativeRootPath = "CodeContent/authored/new-york-city/2014-construction-codes"
+        let chaptersURL = resourceURL
+            .appendingPathComponent(relativeRootPath, isDirectory: true)
+            .appendingPathComponent("chapters", isDirectory: true)
+        try FileManager.default.createDirectory(at: chaptersURL, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: resourceURL) }
+
+        let expectedFiles = [
+            "administrative-provisions": "ac-1.html",
+            "building-code": "bc-7.html",
+            "plumbing-code": "pc-7.html",
+            "mechanical-code": "mc-7.html",
+            "fuel-gas-code": "fgc-7.html"
+        ]
+        for fileName in expectedFiles.values {
+            try "<html><body>\(fileName)</body></html>".write(
+                to: chaptersURL.appendingPathComponent(fileName),
+                atomically: true,
+                encoding: .utf8
+            )
+        }
+
+        for (slug, expectedFileName) in expectedFiles {
+            let chapterNumber = slug == "administrative-provisions" ? "1" : "7"
+            let store = PublishedHTMLContentStore(
+                resourceURL: resourceURL,
+                relativeRootPath: relativeRootPath,
+                codeSectionSlug: slug
+            )
+            XCTAssertEqual(
+                store.chapterURL(chapterNumber: chapterNumber)?.lastPathComponent,
+                expectedFileName,
+                slug
+            )
+        }
+    }
+
+    func testPublishedHTMLStoreKeepsNestedChapterResolutionAndDoesNotGuessUnknownFlatPrefix() throws {
+        let resourceURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-html-layout-\(UUID().uuidString)", isDirectory: true)
+        let relativeRootPath = "CodeContent/authored/new-york-city/2022-construction-codes"
+        let baseURL = resourceURL.appendingPathComponent(relativeRootPath, isDirectory: true)
+        let nestedChaptersURL = baseURL
+            .appendingPathComponent("code-sections/building-code/chapters", isDirectory: true)
+        let flatChaptersURL = baseURL.appendingPathComponent("chapters", isDirectory: true)
+        try FileManager.default.createDirectory(at: nestedChaptersURL, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: flatChaptersURL, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: resourceURL) }
+
+        try "<html><body>nested</body></html>".write(
+            to: nestedChaptersURL.appendingPathComponent("7.html"),
+            atomically: true,
+            encoding: .utf8
+        )
+        try "<html><body>unrelated</body></html>".write(
+            to: flatChaptersURL.appendingPathComponent("mystery-7.html"),
+            atomically: true,
+            encoding: .utf8
+        )
+
+        let nestedStore = PublishedHTMLContentStore(
+            resourceURL: resourceURL,
+            relativeRootPath: relativeRootPath,
+            codeSectionSlug: "building-code"
+        )
+        XCTAssertEqual(nestedStore.chapterURL(chapterNumber: "7")?.lastPathComponent, "7.html")
+
+        let unknownStore = PublishedHTMLContentStore(
+            resourceURL: resourceURL,
+            relativeRootPath: relativeRootPath,
+            codeSectionSlug: "mystery-code"
+        )
+        XCTAssertNil(unknownStore.chapterURL(chapterNumber: "7"))
+    }
+
+    func testPublishedHTMLStoreResolvesBundled2014BuildingChapterSeven() throws {
+        let version = try XCTUnwrap(
+            BundleDatabaseLocator(defaults: isolatedEntitlementDefaults())
+                .availableCodeVersions().first {
+                UserContentSyncCodeVersion.server($0.codeVersion) ==
+                    UserContentSyncCodeVersion.canonicalNYC2014
+            }
+        )
+        let relativeRootPath = try XCTUnwrap(version.authoredHTMLBundlePath)
+        let store = PublishedHTMLContentStore(
+            relativeRootPath: relativeRootPath,
+            codeSectionSlug: "building-code"
+        )
+        let chapterURL = try XCTUnwrap(store.chapterURL(chapterNumber: "7"))
+
+        XCTAssertEqual(chapterURL.lastPathComponent, "bc-7.html")
+        XCTAssertTrue(PublishedHTMLContentStore.containsInlineTables(in: chapterURL))
+        XCTAssertTrue(PublishedHTMLContentStore.containsInlineImages(in: chapterURL))
+    }
+
     @MainActor
     func testIndependentReaderSessionSeparatesTransientStateAndDoesNotOwnAccountSync() {
         let mainDefaults = isolatedEntitlementDefaults()

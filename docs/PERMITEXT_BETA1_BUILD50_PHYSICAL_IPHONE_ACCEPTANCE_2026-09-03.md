@@ -1,6 +1,6 @@
 # Permitext Beta 1 build 50 physical-iPhone acceptance — September 3, 2026
 
-Status: **PARTIAL PASS — existing Apple-account continuity, Lifetime Pro, sync, and saved-content continuity passed; the complete Production-client and account-lifecycle gates remain open**
+Status: **SUPERSEDED — existing Apple-account continuity, Lifetime Pro, sync, and saved-content continuity passed, but the physical iPhone exposed a release-blocking 2014 Construction Codes chapter-resolution defect**
 
 This record contains no email address, customer content, provider token, payment data, raw account export, or other personal identifier. The owner performed the physical-iPhone observations. Codex retained only release identity, aggregate request status, build metadata, hashes, and pass/open outcomes.
 
@@ -43,7 +43,15 @@ Exercise window: September 3, 2026, approximately `10:20Z`–`10:28Z`.
 - Production continued receiving app sync/checkpoint/usage traffic. All 26 recent requests represented in the status-code audit returned HTTP 200; no 4xx or 5xx result was present.
 - No client crash or transport error appeared during the successful observation.
 
-This proves existing-session continuity on the exact Production-targeted build. It does **not** count as fresh-account Apple sign-in evidence and does not substitute for the remaining provider matrix or the dedicated disposable-account deletion exercise.
+## Release-blocking Reader observation
+
+At approximately 6:47 AM EDT on September 3, the owner opened 2014 Building Code Chapter 7 on the physical iPhone. Build 50 displayed `Chapter HTML Missing` instead of the chapter. The signed archive does contain the complete `bc-7.html` file. The defect was in client resolution: the 2014 corpus stores flat, code-family-prefixed chapter names such as `bc-7.html`, while the shared resolver searched only unprefixed names such as `7.html` when no nested `code-sections/building-code` directory existed.
+
+The source-level correction now maps the five known 2014 code-section slugs to their exact flat filename prefixes (`ac`, `bc`, `pc`, `mc`, and `fgc`) and fails closed for unknown slugs. A dedicated Simulator fixture visibly opened 2014 Building Code Chapter 7 after the correction, and the complete iOS suite passed 161/161 tests, including the real bundled Chapter 7, every code-family mapping, the unchanged nested 2022 layout, all 111 native 2014 documents, 192 structured tables, and 285 local media items.
+
+This correction is not present in build 50. Build 50 must not be selected for Beta 1; a replacement build and physical-iPhone confirmation are required.
+
+This proves existing-session continuity on the exact Production-targeted build, but it does **not** make build 50 an acceptable release candidate. It does not count as fresh-account Apple sign-in evidence and does not substitute for the replacement-build Reader check, the remaining provider matrix, or the dedicated disposable-account deletion exercise.
 
 ## Gates that remain open
 

@@ -672,10 +672,11 @@ private struct Phase3EntitledResearchHarness: View {
 }
 
 private struct NativeReaderPhysicalStressConfiguration {
-    enum Target {
+    enum Target: Equatable {
         case bookmarkStress
         case crossCodeLink
         case plumbingChapter
+        case legacy2014BuildingChapter7
     }
 
     struct PreparedHarness {
@@ -686,6 +687,7 @@ private struct NativeReaderPhysicalStressConfiguration {
     static let launchArgument = "--native-reader-physical-stress"
     static let crossCodeLinkLaunchArgument = "--native-reader-cross-code-link-test"
     static let plumbingChapterLaunchArgument = "--native-reader-universal-plumbing-test"
+    static let legacy2014BuildingChapter7LaunchArgument = "--native-reader-2014-building-chapter-7"
     private static let defaultsSuiteName = "com.randycodex.permitext.native-reader-physical-stress"
     private static let temporaryDirectoryName = "permitext-native-reader-physical-stress"
 
@@ -698,12 +700,15 @@ private struct NativeReaderPhysicalStressConfiguration {
         guard arguments.contains(launchArgument)
                 || arguments.contains(crossCodeLinkLaunchArgument)
                 || arguments.contains(plumbingChapterLaunchArgument)
+                || arguments.contains(legacy2014BuildingChapter7LaunchArgument)
         else {
             return nil
         }
 
         let target: Target
-        if arguments.contains(plumbingChapterLaunchArgument) {
+        if arguments.contains(legacy2014BuildingChapter7LaunchArgument) {
+            target = .legacy2014BuildingChapter7
+        } else if arguments.contains(plumbingChapterLaunchArgument) {
             target = .plumbingChapter
         } else if arguments.contains(crossCodeLinkLaunchArgument) {
             target = .crossCodeLink
@@ -814,10 +819,13 @@ private struct NativeReaderPhysicalStressHarness: View {
             return
         }
 
+        let constructionCodeBundleSuffix = configuration.target == .legacy2014BuildingChapter7
+            ? "2014-construction-codes"
+            : "2022-construction-codes"
         guard let constructionVersion = library.availableVersions.first(where: {
-            $0.authoredHTMLBundlePath?.hasSuffix("2022-construction-codes") == true
+            $0.authoredHTMLBundlePath?.hasSuffix(constructionCodeBundleSuffix) == true
         }) else {
-            failureMessage = "The 2022 Construction Codes bundle is unavailable."
+            failureMessage = "The \(constructionCodeBundleSuffix) bundle is unavailable."
             return
         }
 
@@ -826,22 +834,30 @@ private struct NativeReaderPhysicalStressHarness: View {
             guard await waitForInitialContent(
                 selectedVersionFileName: constructionVersion.fileName
             ) else {
-                failureMessage = "The 2022 Construction Codes bundle did not finish loading."
+                failureMessage = "The \(constructionCodeBundleSuffix) bundle did not finish loading."
                 return
             }
         }
 
         let codeSectionName: String
+        let chapterNumber: String
         let initialSectionNumber: String?
         switch configuration.target {
         case .bookmarkStress:
             codeSectionName = "BUILDING CODE"
+            chapterNumber = "1"
             initialSectionNumber = nil
         case .crossCodeLink:
             codeSectionName = "FUEL GAS CODE"
+            chapterNumber = "1"
             initialSectionNumber = "102.2.1"
         case .plumbingChapter:
             codeSectionName = "PLUMBING CODE"
+            chapterNumber = "1"
+            initialSectionNumber = nil
+        case .legacy2014BuildingChapter7:
+            codeSectionName = "BUILDING CODE"
+            chapterNumber = "7"
             initialSectionNumber = nil
         }
 
@@ -853,26 +869,26 @@ private struct NativeReaderPhysicalStressHarness: View {
         }
         library.updateSelectedCodeSection(id: codeSection.id)
 
-        guard let chapterOne = library.chapters(for: codeSection.id).first(where: {
-            $0.chapterNumber == "1"
+        guard let selectedChapter = library.chapters(for: codeSection.id).first(where: {
+            $0.chapterNumber == chapterNumber
         }) else {
-            failureMessage = "\(codeSectionName.localizedCapitalized) Chapter 1 is unavailable."
+            failureMessage = "\(codeSectionName.localizedCapitalized) Chapter \(chapterNumber) is unavailable."
             return
         }
         let selectedInitialSection: CodeSectionSummary?
         if let initialSectionNumber {
-            selectedInitialSection = library.sections(for: chapterOne).first(where: {
+            selectedInitialSection = library.sections(for: selectedChapter).first(where: {
                 $0.sectionNumber == initialSectionNumber
             })
         } else {
-            selectedInitialSection = await library.firstSectionAsync(for: chapterOne)
+            selectedInitialSection = await library.firstSectionAsync(for: selectedChapter)
         }
         guard let selectedInitialSection else {
-            failureMessage = "\(codeSectionName.localizedCapitalized) Chapter 1 has no readable section."
+            failureMessage = "\(codeSectionName.localizedCapitalized) Chapter \(chapterNumber) has no readable section."
             return
         }
 
-        chapter = chapterOne
+        chapter = selectedChapter
         initialSection = selectedInitialSection
     }
 

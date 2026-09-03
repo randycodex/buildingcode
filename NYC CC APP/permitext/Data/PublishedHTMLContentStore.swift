@@ -43,6 +43,7 @@ final class PublishedHTMLContentStore {
 
     private let rootURL: URL?
     private let readAccessRootURL: URL?
+    private let chapterFileNamePrefix: String?
     private var chapterCache: [String: ChapterCache] = [:]
 
     init(resourceURL: URL? = Bundle.main.resourceURL, relativeRootPath: String?, codeSectionSlug: String? = nil) {
@@ -59,13 +60,18 @@ final class PublishedHTMLContentStore {
                 if FileManager.default.fileExists(atPath: codeSectionURL.path) {
                     self.rootURL = codeSectionURL
                     self.readAccessRootURL = baseURL
+                    self.chapterFileNamePrefix = nil
                 } else {
                     self.rootURL = baseURL
                     self.readAccessRootURL = baseURL
+                    self.chapterFileNamePrefix = Self.flatChapterFileNamePrefix(
+                        forCodeSectionSlug: codeSectionSlug
+                    )
                 }
             } else {
                 self.rootURL = baseURL
                 self.readAccessRootURL = baseURL
+                self.chapterFileNamePrefix = nil
             }
         } else {
             let defaultRootURL = resourceURL?
@@ -73,13 +79,17 @@ final class PublishedHTMLContentStore {
                 .appendingPathComponent("2022-construction-codes", isDirectory: true)
             self.rootURL = defaultRootURL
             self.readAccessRootURL = defaultRootURL
+            self.chapterFileNamePrefix = nil
         }
     }
 
     func chapterURL(chapterNumber: String) -> URL? {
         guard let rootURL else { return nil }
         let chaptersURL = rootURL.appendingPathComponent("chapters", isDirectory: true)
-        for fileName in Self.chapterFileNameCandidates(for: chapterNumber) {
+        for fileName in Self.chapterFileNameCandidates(
+            for: chapterNumber,
+            prefix: chapterFileNamePrefix
+        ) {
             let url = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
             if FileManager.default.fileExists(atPath: url.path) {
                 return url
@@ -92,7 +102,27 @@ final class PublishedHTMLContentStore {
         readAccessRootURL ?? rootURL
     }
 
-    private static func chapterFileNameCandidates(for chapterNumber: String) -> [String] {
+    private static func flatChapterFileNamePrefix(forCodeSectionSlug slug: String) -> String? {
+        switch slug {
+        case "administrative-provisions":
+            return "ac"
+        case "building-code":
+            return "bc"
+        case "plumbing-code":
+            return "pc"
+        case "mechanical-code":
+            return "mc"
+        case "fuel-gas-code":
+            return "fgc"
+        default:
+            return nil
+        }
+    }
+
+    private static func chapterFileNameCandidates(
+        for chapterNumber: String,
+        prefix: String? = nil
+    ) -> [String] {
         let trimmed = chapterNumber.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
 
@@ -103,6 +133,10 @@ final class PublishedHTMLContentStore {
             }
         }
 
+        if let prefix {
+            append("\(prefix)-\(trimmed.uppercased()).html")
+            append("\(prefix)-\(trimmed).html")
+        }
         append("\(trimmed.uppercased()).html")
         append("\(trimmed).html")
         append("Chapter \(trimmed).html")
