@@ -65,7 +65,7 @@ The controlled monetary and entitlement lifecycle does not need another paid Bet
 ## Production authentication and account lifecycle
 
 Gate ID: `production-auth-account-lifecycle`
-Status: **OPEN — existing Apple-account build 50 continuity passed; fresh providers, remaining existing providers, and deletion remain open**
+Status: **OPEN — existing Apple-account build 51 continuity passed; fresh providers, remaining existing providers, and deletion remain open**
 Release-bound: **yes**
 
 - Fresh-account email-code sign-in:
@@ -73,14 +73,14 @@ Release-bound: **yes**
 - Fresh-account Google sign-in:
 - Fresh-account Microsoft sign-in:
 - Existing-account email-code sign-in retained the correct Permitext account/data:
-- Existing-account Apple sign-in retained the correct Permitext account/data: yes for the persisted account session on exact build 50 — the Account screen was signed in after relaunch, Lifetime Pro remained active, sync reported `Synced`, and existing saved sections or notes remained present. No fresh `/account/sign-in` request occurred in this window because the completed account session persisted; this is not fresh-account Apple evidence.
+- Existing-account Apple sign-in retained the correct Permitext account/data: yes for the persisted account session on exact build 51 — the Account screen remained signed in, Lifetime Pro remained active, and sync reported `Synced`. This is not fresh-account Apple evidence. Saved-content continuity on build 51 remains to be checked separately.
 - Existing-account Google sign-in retained the correct Permitext account/data:
 - Existing-account Microsoft sign-in retained the correct Permitext account/data:
 - Dedicated disposable-account pre-deletion export and aggregate baseline captured safely:
 - Customer-interface deletion reported every applicable billing, data, private-asset, device, and Clerk stage accurately:
 - Deleted session failed, private asset disappeared, and recreated identity returned an empty Free account:
 - Disposable account and test content cleanup completed under separate authorization:
-- Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), physical observation window approximately `2026-09-03T10:20:00Z`–`2026-09-03T10:28:18Z`.
+- Redacted evidence and timestamp: [build 51 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), September 3, 2026; [build 50 saved-content continuity evidence](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
 Follow [the detailed account export/deletion checklist](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance). Never use the owner's primary, administrator, Lifetime Pro, or real customer account.
 
@@ -194,14 +194,14 @@ Release-bound: **yes**
 - Production web release ID and Git commit match the selected release: current candidate yes — release ID `195de4f31229`, Git commit `195de4f31229d785760eef570a658208f1f4e47d`; final machine selection remains open.
 - Final iOS archive was built from the selected release commit: yes for the current candidate — signed version `1.0`, build `51`, executable SHA-256 `650650e5529c4427b6b50b37a2447bc71408bb7dbcf767f0936e47d46c2ea450` was produced from the exact Production commit.
 - App Store Connect processed the intended build: yes — build 51 is Validated, Ready to Submit, assigned to Internal Testers, and installed by the owner.
-- Physical-iPhone authentication passed: existing Apple-authenticated account continuity passed after relaunch on build 50; it has not been re-exercised on build 51. Fresh-account Apple and the remaining provider matrix remain open.
-- Account/sync and representative saved Project continuity passed: on build 50, Account reported `Synced`, existing saved sections or notes remained present, and existing project containers remained present. The projects had never contained saved items, so their empty state was expected; build 51 continuity and project-item continuity remain unexercised rather than failed.
-- Free and Pro entitlement presentation passed: Lifetime Pro passed on build 50; build 51 Free presentation remains open.
+- Physical-iPhone authentication passed: existing Apple-authenticated account continuity passed on build 51. This was a persisted session, not a fresh Apple sign-in; fresh-account Apple and the remaining provider matrix remain open.
+- Account/sync and representative saved Project continuity passed: Account reported `Synced` on build 51. Saved-content and project-container continuity passed historically on build 50 but remain to be rechecked on build 51; project-item continuity remains unexercised because the existing projects never contained saved items.
+- Free and Pro entitlement presentation passed: Lifetime Pro passed on build 51; build 51 Free presentation remains open.
 - 2014 Construction Codes Reader passed: yes for the replacement scenario — on build 51 the owner opened 2014 Construction Codes → Building Code → Chapter 7 and reported that it looked good. This closes the build 50 `Chapter HTML Missing` defect; representative physical-device coverage of other chapters/code families remains open.
 - Restore/cancellation/refund state presentation passed as applicable:
 - One separately authorized complete Production Research turn preserved the shared web/iOS response contract:
 - Account-deletion presentation and recovery boundaries passed:
-- No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained: build 51 targets the canonical Production backend and exactly matches Production Git commit `195de4f31229d785760eef570a658208f1f4e47d`. Its entitlement presentation has not yet been re-exercised and remains open rather than inferred from build 50.
+- No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained: build 51 targets the canonical Production backend, exactly matches Production Git commit `195de4f31229d785760eef570a658208f1f4e47d`, and displayed Lifetime Pro rather than Sandbox.
 - Redacted evidence and timestamp: [build 51 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), September 3, 2026; [build 50 continuity and defect evidence](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
 Source, Simulator, archive-upload, and TestFlight-processing evidence do not substitute for the final physical-device workflow.

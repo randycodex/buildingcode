@@ -33,8 +33,16 @@ On September 3, 2026, the owner installed TestFlight build 51, opened 2014 Const
 
 This closes the specific release-blocking failure observed in build 50: the physical iPhone no longer presents `Chapter HTML Missing` for 2014 Building Code Chapter 7, and the owner accepted the opened chapter's rendered result.
 
+The owner then opened Account on build 51 and confirmed all three requested continuity indicators:
+
+- The existing Permitext account remained signed in.
+- The plan displayed `Lifetime Pro`.
+- Sync displayed `Synced`.
+
+This is persisted existing-account continuity, not a fresh Apple sign-in exercise.
+
 ## Evidence boundary
 
 This result proves the replacement resolver and bundled Chapter 7 work together on the tested physical iPhone. It does **not** by itself prove every section, table, image, chapter, or 2014 code family on a physical device. Automated corpus and native tests provide broader non-device coverage, but do not replace representative owner testing.
 
-This observation also does not re-prove build 51 authentication, existing saved-content continuity, Project-item continuity, Free entitlement presentation, restore/cancellation presentation, a complete Production Research turn, the remaining sign-in provider matrix, or the disposable-account export/deletion lifecycle. The corresponding build 50 continuity evidence remains historical evidence only where the changed resolver did not materially affect those paths. Final public-Beta owner go/no-go remains open.
+This observation does not prove fresh Apple authentication, existing saved-content continuity, Project-item continuity, Free entitlement presentation, restore/cancellation presentation, a complete Production Research turn, the remaining sign-in provider matrix, or the disposable-account export/deletion lifecycle. Final public-Beta owner go/no-go remains open.
