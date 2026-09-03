@@ -30,15 +30,15 @@ Interim no-input evidence: [PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRIT
 ## Production deployment
 
 Gate ID: `production-deployment`
-Status: **CURRENT PRODUCTION BACKEND PASSED — build 50 client is superseded and replacement release binding remains open**
+Status: **CURRENT PRODUCTION BACKEND PASSED — exact build 51 release binding passes; remaining client workflows remain open**
 Release-bound: **yes**
 
-- Production build log passed commercial configuration, live Stripe, release identity, and external-monitoring checks: yes — exact deployment `dpl_GzjcRMmjuZD1pDxsmiYT4FjH2HvP` reported every protected check ready and completed successfully.
+- Production build log passed commercial configuration, live Stripe, release identity, and external-monitoring checks: yes — exact deployment `dpl_EVfpG8R9q1Di3F7kguri9ekbjYvs` reported every protected check ready and completed successfully.
 - Production `/health` passed: yes — PostgreSQL storage/rate limiting, schema `normalized-v4`, commercial readiness, and the accepted monitoring marker passed on September 3, 2026.
-- Production `/release` returned the selected full Git commit: current candidate yes — `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`; the final machine-selected release field remains intentionally null pending owner go/no-go sequencing.
+- Production `/release` returned the selected full Git commit: current candidate yes — `195de4f31229d785760eef570a658208f1f4e47d`; the final machine-selected release field remains intentionally null pending owner go/no-go sequencing.
 - Canonical Production domain serves that deployment: yes — `permitext-sync.vercel.app`, `permitext.com`, and `www.permitext.com` are aliases on the READY deployment.
 - No unexpected migration, runtime, billing-webhook, or client error appeared after deployment: yes for the retained September 3 window — all 26 recent request results in the status-code audit were HTTP 200.
-- Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), through `2026-09-03T10:33:44.038Z`.
+- Redacted evidence and timestamp: [build 51 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), September 3, 2026.
 
 This is deployment evidence only. It does not prove the later manual activation gates.
 
@@ -188,21 +188,21 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN — build 50 account/sync continuity passed, but its 2014 Reader failed on the physical iPhone; replacement build and remaining client workflows are required**
+Status: **OPEN — exact build 51 replacement Reader check passed on the physical iPhone; remaining client workflows are required**
 Release-bound: **yes**
 
-- Production web release ID and Git commit match the selected release: current candidate yes — release ID `c78a4b6c26d8`, Git commit `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`; final machine selection remains open.
-- Final iOS archive was built from the selected release commit: no — signed version `1.0`, build `50`, executable SHA-256 `7cb3dcc312ac1eb19e72acee57429852fafd3324c50452d598fd7074ce6005b0` matched the then-current Production commit, but the physical-iPhone Reader defect supersedes it.
-- App Store Connect processed the intended build: historical build 50 upload, installation, and paired-device identity readback passed; a corrected replacement build has not yet completed this gate.
-- Physical-iPhone authentication passed: existing Apple-authenticated account continuity passed after relaunch; fresh-account Apple and the remaining provider matrix remain open.
-- Account/sync and representative saved Project continuity passed: Account reported `Synced`, existing saved sections or notes remained present, and existing project containers remained present. The projects had never contained saved items, so their empty state was expected; project-item continuity remains unexercised rather than failed.
-- Free and Pro entitlement presentation passed: Lifetime Pro passed on build 50; final-build Free presentation remains open.
-- 2014 Construction Codes Reader passed: no on build 50 — opening Building Code Chapter 7 displayed `Chapter HTML Missing`. The archive contained `bc-7.html`; the corrected resolver and its 161/161 Simulator suite pass, but a replacement physical-iPhone result remains required.
+- Production web release ID and Git commit match the selected release: current candidate yes — release ID `195de4f31229`, Git commit `195de4f31229d785760eef570a658208f1f4e47d`; final machine selection remains open.
+- Final iOS archive was built from the selected release commit: yes for the current candidate — signed version `1.0`, build `51`, executable SHA-256 `650650e5529c4427b6b50b37a2447bc71408bb7dbcf767f0936e47d46c2ea450` was produced from the exact Production commit.
+- App Store Connect processed the intended build: yes — build 51 is Validated, Ready to Submit, assigned to Internal Testers, and installed by the owner.
+- Physical-iPhone authentication passed: existing Apple-authenticated account continuity passed after relaunch on build 50; it has not been re-exercised on build 51. Fresh-account Apple and the remaining provider matrix remain open.
+- Account/sync and representative saved Project continuity passed: on build 50, Account reported `Synced`, existing saved sections or notes remained present, and existing project containers remained present. The projects had never contained saved items, so their empty state was expected; build 51 continuity and project-item continuity remain unexercised rather than failed.
+- Free and Pro entitlement presentation passed: Lifetime Pro passed on build 50; build 51 Free presentation remains open.
+- 2014 Construction Codes Reader passed: yes for the replacement scenario — on build 51 the owner opened 2014 Construction Codes → Building Code → Chapter 7 and reported that it looked good. This closes the build 50 `Chapter HTML Missing` defect; representative physical-device coverage of other chapters/code families remains open.
 - Restore/cancellation/refund state presentation passed as applicable:
 - One separately authorized complete Production Research turn preserved the shared web/iOS response contract:
 - Account-deletion presentation and recovery boundaries passed:
-- No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained: yes for superseded build 50 — its backend was Production, its entitlement was Lifetime Pro rather than Sandbox, and installed build/Production Git identity aligned to `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`. This identity evidence does not waive replacement-build binding.
-- Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), through `2026-09-03T10:33:44.038Z`.
+- No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained: build 51 targets the canonical Production backend and exactly matches Production Git commit `195de4f31229d785760eef570a658208f1f4e47d`. Its entitlement presentation has not yet been re-exercised and remains open rather than inferred from build 50.
+- Redacted evidence and timestamp: [build 51 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), September 3, 2026; [build 50 continuity and defect evidence](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
 Source, Simulator, archive-upload, and TestFlight-processing evidence do not substitute for the final physical-device workflow.
 
