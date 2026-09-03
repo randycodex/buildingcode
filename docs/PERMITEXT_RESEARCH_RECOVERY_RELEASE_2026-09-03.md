@@ -1,6 +1,6 @@
 # Research recovery release — September 3, 2026
 
-Status: **released to Production and Internal TestFlight; build 52 installed and basic physical-device continuity verified**. The owner reported installation, then authorized direct iPhone use. The checks below were observed through iPhone Mirroring. Live-answer acceptance and the remaining table-gesture check remain separate.
+Status: **released to Production and Internal TestFlight; build 52 installed, basic physical-device continuity verified, and one separately authorized live Research answer completed**. The checks below were observed through iPhone Mirroring. The [controlled ramp test](./PERMITEXT_BUILD52_RAMP_LIVE_TEST_2026-09-03.md) passed delivery, reopening, and one-turn allowance checks in 34.9 seconds at $0.057825 estimated API cost; answer completeness and the remaining table-gesture check are still open.
 
 ## Authorization and source identity
 
@@ -75,7 +75,7 @@ The owner reported build 52 installed and explicitly authorized using the physic
 
 Account identifiers and Project content are intentionally omitted from this durable record. The displayed remaining-turn count is not evidence of the original failed attempt's ledger outcome.
 
-This record does not establish successful completion/latency/cost of the ramp answer, the original failed attempt's invoiced cost and persisted turn ledger, or physical touch access to every table column. Existing failed conversations cannot acquire an answer merely from this update. A new live attempt requires a separate exact authorization naming this release and its cumulative API-spend ceiling. No App Review or public App Store submission is included.
+The subsequent [separately authorized ramp test](./PERMITEXT_BUILD52_RAMP_LIVE_TEST_2026-09-03.md) establishes one completed/reopened answer, correlated server timing and estimated cost, and one visible allowance decrement. It does not establish complete answer coverage, performance with the original Project facts, independently reconciled invoiced spend, the original failed attempt's persisted turn ledger, or physical touch access to every table column. Both single-turn authorizations are consumed. Existing failed conversations cannot acquire an answer merely from this update. Another live attempt requires a separate exact authorization; no App Review or public App Store submission is included.
 
 ## Separate dependency finding
 

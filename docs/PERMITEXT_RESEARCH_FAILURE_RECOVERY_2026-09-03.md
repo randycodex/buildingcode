@@ -64,7 +64,7 @@ Repeat the no-cost envelope check with `node tests/research-ramp-design-retrieva
 1. Complete: final source review and retained passing no-cost checks, including the rendered failure/reopen regression.
 2. Complete for the configuration release: owner-authorized writes of the known model/pricing values, unchanged cap metadata, and a fresh protected Production build. The base offline envelope preflight is not whole-turn acceptance. Do not automatically raise caps if a future request does not fit.
 3. Approved and executed: push/deployment and replacement TestFlight upload. Apple processing and device installation are tracked in the release record.
-4. Still open: obtain a separate exact live-turn authorization after the replacement build is installed. Do not rerun the failed build-51 request automatically. Live answer correctness, actual latency, and invoiced cost remain unproven.
+4. One controlled live-turn check complete: the owner separately authorized build 52 at the released SHA, the exact ramp question, and a $1 cumulative API-spend ceiling. The [saved Production result](./PERMITEXT_BUILD52_RAMP_LIVE_TEST_2026-09-03.md) returned HTTP 200 in 34.9 seconds, at $0.057825 estimated token/API cost and $0.114176 conservative accounting, with two provider requests and no pending reservations. The answer reopened and the allowance decremented once. This fresh Unassigned test does not prove the original Project-context path or independently reconciled invoiced spend. Answer completeness remains open: a zero-provider exact-wording reproduction omits available landing/handrail dependencies. Both single-turn authorizations are consumed; no automatic retry is permitted.
 
 ## Official billing references
 
