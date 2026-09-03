@@ -1,6 +1,6 @@
 # Permitext Beta 1 — Master Plan and Current Status
 
-Last updated: September 2, 2026
+Last updated: September 3, 2026
 
 This is the top-level Beta 1 plan. Detailed workstreams remain in their linked documents, but this file is the single place to see what is done, what is happening now, and what still blocks release.
 
@@ -16,6 +16,8 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 - Zoning Research is now planned for Beta 1, but public access remains disabled until the official corpus is current and its citation, table, map, amendment, applicability, evaluation, cost, and cross-platform gates pass.
 
 ## Current position
+
+September 3 exact-release and physical-iPhone update: iOS sign-in now gives the cold Production reconciliation path up to 60 seconds while retaining the ordinary 20-second backend timeout. Exact commit `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c` is on `main`, equals `origin/main`, and is served by READY Production deployment `dpl_GzjcRMmjuZD1pDxsmiYT4FjH2HvP`. The protected deployment build, live `/release`, `/health`, AASA, strict policy publication audit, complete no-cost server check, signed archive, upload, and build 50 installation all pass. On the physical iPhone, the existing Apple-authenticated account remained signed in after relaunch, `Lifetime Pro` remained active, Account reported `Synced`, and existing saved sections or notes remained present. All 26 recent requests represented in the Production status-code audit returned HTTP 200. This closes the observed existing-Apple-session timeout regression and final local build/check steps, but not fresh-provider sign-in, the other provider matrix, disposable-account export/deletion, Project/Research/restore presentation, Zoning client acceptance, spend-control execution, or owner go/no-go. Evidence: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
 September 2 Production release update: the owner accepted the documented Vercel-alert plus daily privacy-bounded monitoring alternative for Beta 1. The accepted operating marker and the exact `$7` per-user Research monthly cost cap were configured in Vercel Production. Exact commit `cb7918b453988a07d57a7834f5982d523d0e3901` was then fast-forwarded to `main` and deployed as `dpl_2i2iRQjwqkuQaQChbzR5MGh6j8EW`. The protected build passed commercial configuration, live Stripe `$20` monthly Price and webhook coverage, automatic/exclusive Stripe tax, Research caps, monitoring, and release identity. Live `/release`, `/health`, AASA, code routes, all three exact approved policy hashes, and the first post-deployment privacy-bounded log audit pass. The separately authorized [controlled Production Stripe lifecycle](./PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md) then passed on this exact release: `$20.00` base price, `$1.78` New York tax, `$21.78` total charge, Pro with 100 turns, cancellation, full refund, immediate subscription termination, return to Free, and all related webhooks HTTP 200. Final account-lifecycle acceptance, spend-control execution, final Production-targeted TestFlight/physical-iPhone acceptance, and public-Beta owner go/no-go remain open. Deployment evidence: [Production deployment record](./PERMITEXT_BETA1_PRODUCTION_DEPLOYMENT_2026-09-02.md).
 
@@ -55,11 +57,11 @@ The v12 repair recognizes only the reproduced bounded generic Appendix J source-
 
 The required [v12 post-run no-cost diagnosis](./PERMITEXT_ZONING_REMEDIATION_3_V12_POST_RUN_DIAGNOSIS_2026-08-31.md), clause-local v13 repair and run, and [privacy-bounded v13 diagnosis](./PERMITEXT_ZONING_REMEDIATION_3_V13_POST_RUN_DIAGNOSIS_2026-08-31.md) are complete. Prompt-only v14 repair and its exact package ran once, followed by the [v14 no-cost diagnosis](./PERMITEXT_ZONING_REMEDIATION_3_V14_POST_RUN_DIAGNOSIS_2026-08-31.md), v15 explicit-input-boundary repair, and the privacy-bounded v15 diagnosis. [Package `9751e50d1f830db527a822b1a515552465749907`](./PERMITEXT_ZONING_REMEDIATION_3_V16_CONFIRMATION_PACKAGE_2026-08-31.md) ran once. Terminal partial [run `784648df-2d7b-4957-972a-1ef14a054c43`](./PERMITEXT_ZONING_REMEDIATION_3_V16_CONFIRMATION_RESULT_2026-08-31.md) spent `$0.218828`, passed case 1, retained a case-2 quality failure, and failed closed uncharged at case 3; its authorization is consumed.
 
-Current development branch: `codex/zoning-research-beta1`
+Current release-candidate branch: `main` at `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`
 
 ## Status dashboard
 
-Checklist snapshot: **162 completed, 15 open** across the full file: 10 main open items plus five remaining steps in the separately tracked merge, deployment, TestFlight, and release sequence. Merge, Production deployment, and the controlled Stripe subscription lifecycle are complete; public Beta activation remains separately gated.
+Checklist snapshot: **166 completed, 11 open** across the full file: eight main open items plus three remaining steps in the separately tracked merge, deployment, TestFlight, and release sequence. Merge, exact-commit Production deployment, build 50 upload/installation, existing-Apple-account physical-iPhone continuity, and the controlled Stripe subscription lifecycle are complete; public Beta activation remains separately gated.
 
 | Workstream | Status | What is done and what remains |
 | --- | --- | --- |
@@ -67,18 +69,18 @@ Checklist snapshot: **162 completed, 15 open** across the full file: 10 main ope
 | Research quality and subscriber economics | General Beta gate passed; owner-example source correction complete | Immutable V6 passed 20/20 and the no-cost 100-turn/full-service economics model is complete. The repaired-v2 owner-example confirmation completed 9/9 turns for `$1.289404` with zero pending requests and no paid judge; its historical manual result remains seven acceptable and two incomplete. The Appendix P cross-edition path, official OMH starting-point boundary, generated-quote cleanup, and vision-lite review correction now pass the no-network runtime and complete server check. No third paid package is planned. Actual tax, refund, and infrastructure results remain separately gated. |
 | Zoning Research Beta 1 expansion | Known limitations accepted for Beta sequencing; release acceptance open | [Architecture V2.1 confirmation](./PERMITEXT_ZONING_ARCHITECTURE_V21_CONFIRMATION_RESULT_2026-09-01.md) attempted all 30 ordered cases once: 13 delivered answers, 12 required-rubric passes, one delivered quality failure, five verifier blocks, and 12 correct fail-closed prerequisite/evidence boundaries. The owner moved the six unresolved cases to the post-launch Beta feedback backlog without relabeling them as passed. The one-use authorization is consumed; no retry or automatic V2.2 package is authorized. Public Zoning Research remains disabled until exact-release web/iOS and physical-iPhone acceptance and final owner approval. |
 | Billing and paid continuation | Core subscription lifecycle complete; final-release binding open | Server billing contracts, local Stripe/Apple exercises, the provider-backed Stripe sandbox lifecycle, isolated Apple staging, and Apple-created purchase/account-restore/cancellation/expiration/refund/renewal/billing-recovery/delayed-delivery evidence pass. The exact backend/web release and automatic/exclusive Stripe tax configuration are live. A dedicated Free Production account completed the real `$21.78` taxed purchase, Pro/100-turn grant, cancellation, full refund, terminal subscription, and return-to-Free lifecycle with successful webhooks. The activation JSON remains open until the final web/TestFlight commit is selected; additional-turn sales stay disabled. |
-| Authentication and account lifecycle | Configuration ready; acceptance open | Product contracts, exact Production Clerk provider/domain/portal/native configuration, public AASA, and a permanent aggregate-only audit pass. Final fresh/existing Production sign-in plus account export/deletion verification remain. |
+| Authentication and account lifecycle | Existing Apple account passed; broader acceptance open | Product contracts, exact Production Clerk provider/domain/portal/native configuration, public AASA, and a permanent aggregate-only audit pass. Build 50 retained the existing Apple-authenticated account, Lifetime Pro, synced state, and saved data on the physical iPhone. Fresh-provider coverage, existing Google/Microsoft/email coverage, and the disposable-account export/deletion lifecycle remain. |
 | Legal, privacy, and customer promises | Exact policies and tax configuration live; taxed Checkout passed | Official-source owner review, exact customer-document approval, stable version identifiers, age/data rules, versioned acceptance, purchase consent, server enforcement, and a retainable web post-purchase acknowledgment are implemented. The live Terms, Privacy, and subscription/refund bytes match their approved hashes. The Product uses `txcd_10701400`, New York Stripe Tax is active, and automatic/exclusive configuration is live. A controlled New York Checkout calculated `8.875%` (`$1.78`) tax on the `$20.00` base price and the full `$21.78` refund passed. The owner confirmed private certificate storage and printing/display, while actual-certificate corroboration of the DTF-17 `09/18/2026` date remains open. Quarterly filing and the December 21 reminder are established. No attorney approval is claimed. |
 | Hosting, monitoring, recovery, and support | Recovery and accepted Beta monitoring complete; spend drill open | Vercel Pro, spend controls, two included live alert rules, owner web/email subscriptions, verified generic web delivery, an owner-accepted daily privacy-bounded Production-log audit, support tabletop, Neon point-in-time recovery, durable-data comparison, private Blob restore, and the provider-capacity guard pass. The exact live release reports the accepted monitoring marker, and its first post-deployment audit was clean. Anomaly-specific delivery remains a post-Beta improvement; the separate spend-notification/hard-stop drill remains open. |
-| Merge, deploy, TestFlight, and release | Production deployed; client acceptance open | `main` and Production now serve exact commit `cb7918b453988a07d57a7834f5982d523d0e3901`; protected build, release identity, policy hashes, health, AASA, public routes, initial logs, and the controlled Stripe subscription lifecycle pass. Production authentication/account deletion and the Production-targeted TestFlight/physical-iPhone sequence remain open. This is not public-Beta activation. |
+| Merge, deploy, TestFlight, and release | Build 50 deployed and partially accepted; full client acceptance open | `main`, `origin/main`, Production, the signed archive, and installed build 50 align to exact commit `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`. Protected build, release identity, policy hashes, health, AASA, complete local checks, upload/installation, existing Apple account, Lifetime Pro, sync, saved continuity, and the controlled Stripe lifecycle pass. The remaining provider matrix, account deletion, Project/Research/restore presentation, Zoning client acceptance, and owner go/no-go remain open. This is not public-Beta activation. |
 
 ### What still blocks a public paid Beta
 
-1. Reverify Production authentication and the account export/deletion lifecycle.
+1. Complete the remaining Production authentication matrix and the account export/deletion lifecycle; existing Apple-account continuity on build 50 now passes.
 2. Confirm the issued New York Certificate of Authority's effective date against the DTF-17 `09/18/2026` date. Exact approved policies, quarterly filing/reminder, automatic/exclusive tax configuration, and the real taxed-Checkout/refund exercise now pass.
 3. Complete the separate spend-notification/hard-stop exercise; the bounded Beta 1 monitoring path is owner-accepted and live.
 4. Preserve the six known Zoning limitations as an explicit Beta feedback backlog, retain fail-closed behavior, and complete exact-release web/iOS and physical-iPhone acceptance before the owner's final Zoning go/no-go decision.
-5. Complete the final local Release build, Production verification, TestFlight upload/processing, physical-iPhone acceptance, and owner go/no-go sequence.
+5. Complete the remaining exact-release physical-iPhone workflows—Project context, Research, applicable restore/state presentation, and deletion—then record owner go/no-go. The final local checks, signed build 50 upload/installation, existing Apple account, sync, and saved-content continuity now pass.
 
 ## 1. Core product and cross-platform foundation
 
@@ -250,8 +252,8 @@ Read-only configuration evidence: [PERMITEXT_PRODUCTION_AUTH_CONFIGURATION_EVIDE
 - [x] Complete final owner approval of the exact customer documents and record dormant identifiers `terms-2026-08-28`, `privacy-2026-08-28`, and `subscriptions-2026-08-28` with their approved-file hashes.
 - [x] Retain machine-readable approved-artifact and [live-publication guards](./PERMITEXT_POLICY_PUBLICATION_AUDIT_2026-08-30.md) so an edited file cannot silently reuse an approved identifier and stale Production pages cannot pass; all local hashes pass, while the August 30 live audit correctly remains red.
 - [x] Record explicit owner acceptance of all documented residual Beta risks without treating that acceptance as legal approval or release authorization.
-- [ ] Publish the exact owner-approved document bytes at the existing stable URLs and ensure web/iOS purchase screens match them.
-- [ ] After the strict live audit reports `publicationReady: true`, configure and activate the already owner-approved current policy versions.
+- [x] Publish the exact owner-approved document bytes at the existing stable URLs and ensure web/iOS purchase screens match them.
+- [x] After the strict live audit reports `publicationReady: true`, configure and activate the already owner-approved current policy versions.
 
 Release checklist: [BETA1_LEGAL_READINESS_CHECKLIST.md](./BETA1_LEGAL_READINESS_CHECKLIST.md)
 
@@ -291,12 +293,12 @@ This sequence begins only after the remaining pre-release gates are acceptable a
 1. [x] Review the full branch diff and preserve unrelated local iOS/Xcode changes.
 2. [x] Commit and push the completed remediation and new evaluation evidence.
 3. [x] Merge the verified branch into `main` and confirm local/remote ancestry and SHA equality.
-4. [ ] Run the final local server checks and iOS Release build.
+4. [x] Run the final local server checks and iOS Release build.
 5. [x] Run the Beta 1 production-configuration readiness verifier.
 6. [x] Deploy the compatible backend/web release first.
-7. [ ] Verify `/health`, `/release`, sign-in, sync, billing/entitlement reads, and one complete Research turn in Production. Health, release identity, and billing/entitlement lifecycle pass; sign-in, sync, and Research acceptance remain open.
+7. [ ] Verify `/health`, `/release`, sign-in, sync, billing/entitlement reads, and one complete Research turn in Production. Health, release identity, billing/entitlement lifecycle, and existing Apple-account sign-in/sync pass on build 50; the remaining provider matrix and Research acceptance remain open.
 8. [x] Confirm the serving production SHA exactly matches the intended GitHub commit.
-9. [ ] Build/archive/upload the next iOS build and verify TestFlight processing.
+9. [x] Build/archive/upload build 50, verify upload processing through installation, and confirm version `1.0` / build `50` on the physical iPhone.
 10. [ ] Test the TestFlight build on a physical iPhone against the deployed backend, including authentication, Project context, Research, subscription state, restore, and account deletion.
 11. [ ] Record go/no-go evidence; do not call source/test/build success a public release.
 
@@ -306,8 +308,8 @@ The current Research quality and no-cost subscriber-economics gate has passed. B
 
 - the six known Architecture V2.1 limitations remain disclosed and fail closed where required, and exact-release web/TestFlight physical-iPhone acceptance passes before the owner's final Zoning go/no-go decision; no additional pre-Beta paid cohort is planned;
 - retain the passed Apple Sandbox/TestFlight and controlled Production Stripe lifecycle evidence, and rebind/recheck only if the final release materially changes those paths;
-- Production authentication plus account export/deletion are reverified;
-- approved customer documents are published at stable URLs, the issued New York Certificate of Authority is actually received/saved/printed, the Stripe tax classification and provider registration are approved and recorded, and the implemented policy-acceptance flow is activated with the exact current versions;
+- the remaining Production authentication matrix plus account export/deletion are reverified; existing Apple-account continuity on build 50 passes;
+- the issued New York Certificate of Authority's effective date is corroborated against the retained DTF-17 date; approved customer documents, Stripe tax classification/provider registration, and exact current policy activation already pass;
 - remaining Production alert coverage and delivery/hard-stop behavior are tested;
 - Production web and the final TestFlight build are verified against the exact intended release SHA.
 

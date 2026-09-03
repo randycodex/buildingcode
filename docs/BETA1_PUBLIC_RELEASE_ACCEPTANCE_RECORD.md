@@ -30,15 +30,15 @@ Interim no-input evidence: [PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRIT
 ## Production deployment
 
 Gate ID: `production-deployment`
-Status: **OPEN**
+Status: **CURRENT BUILD 50 CANDIDATE PASSED — selected-release machine binding remains open**
 Release-bound: **yes**
 
-- Production build log passed commercial configuration, live Stripe, release identity, and external-monitoring checks:
-- Production `/health` passed:
-- Production `/release` returned the selected full Git commit:
-- Canonical Production domain serves that deployment:
-- No unexpected migration, runtime, billing-webhook, or client error appeared after deployment:
-- Redacted evidence and timestamp:
+- Production build log passed commercial configuration, live Stripe, release identity, and external-monitoring checks: yes — exact deployment `dpl_GzjcRMmjuZD1pDxsmiYT4FjH2HvP` reported every protected check ready and completed successfully.
+- Production `/health` passed: yes — PostgreSQL storage/rate limiting, schema `normalized-v4`, commercial readiness, and the accepted monitoring marker passed on September 3, 2026.
+- Production `/release` returned the selected full Git commit: current candidate yes — `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`; the final machine-selected release field remains intentionally null pending owner go/no-go sequencing.
+- Canonical Production domain serves that deployment: yes — `permitext-sync.vercel.app`, `permitext.com`, and `www.permitext.com` are aliases on the READY deployment.
+- No unexpected migration, runtime, billing-webhook, or client error appeared after deployment: yes for the retained September 3 window — all 26 recent request results in the status-code audit were HTTP 200.
+- Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), through `2026-09-03T10:33:44.038Z`.
 
 This is deployment evidence only. It does not prove the later manual activation gates.
 
@@ -65,7 +65,7 @@ The controlled monetary and entitlement lifecycle does not need another paid Bet
 ## Production authentication and account lifecycle
 
 Gate ID: `production-auth-account-lifecycle`
-Status: **OPEN**
+Status: **OPEN — existing Apple-account build 50 continuity passed; fresh providers, remaining existing providers, and deletion remain open**
 Release-bound: **yes**
 
 - Fresh-account email-code sign-in:
@@ -73,31 +73,31 @@ Release-bound: **yes**
 - Fresh-account Google sign-in:
 - Fresh-account Microsoft sign-in:
 - Existing-account email-code sign-in retained the correct Permitext account/data:
-- Existing-account Apple sign-in retained the correct Permitext account/data:
+- Existing-account Apple sign-in retained the correct Permitext account/data: yes for the persisted account session on exact build 50 — the Account screen was signed in after relaunch, Lifetime Pro remained active, sync reported `Synced`, and existing saved sections or notes remained present. No fresh `/account/sign-in` request occurred in this window because the completed account session persisted; this is not fresh-account Apple evidence.
 - Existing-account Google sign-in retained the correct Permitext account/data:
 - Existing-account Microsoft sign-in retained the correct Permitext account/data:
 - Dedicated disposable-account pre-deletion export and aggregate baseline captured safely:
 - Customer-interface deletion reported every applicable billing, data, private-asset, device, and Clerk stage accurately:
 - Deleted session failed, private asset disappeared, and recreated identity returned an empty Free account:
 - Disposable account and test content cleanup completed under separate authorization:
-- Redacted evidence and timestamp:
+- Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), physical observation window approximately `2026-09-03T10:20:00Z`–`2026-09-03T10:28:18Z`.
 
 Follow [the detailed account export/deletion checklist](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance). Never use the owner's primary, administrator, Lifetime Pro, or real customer account.
 
 ## Exact policy publication
 
 Gate ID: `exact-policy-publication`
-Status: **OPEN**
+Status: **OPEN — exact current-candidate publication passes; final-client consent confirmation remains open**
 Release-bound: **yes**
 
-- Strict live publication audit returned `publicationReady: true` for Terms, Privacy, and Subscription/Refund policy:
-- Live document SHA-256 hashes equal the approved manifest:
-- Production version identifiers equal the approved current versions:
+- Strict live publication audit returned `publicationReady: true` for Terms, Privacy, and Subscription/Refund policy: yes at `2026-09-03T10:33:44.038Z`.
+- Live document SHA-256 hashes equal the approved manifest: yes for all three canonical routes; the audit emitted hashes only, not policy bodies or customer data.
+- Production version identifiers equal the approved current versions: yes — the protected exact-candidate build reported approved policy versions ready.
 - Web purchase consent displays and records those exact versions:
 - iOS purchase consent displays and records those exact versions:
 - Retainable post-purchase acknowledgment matches the selected release:
-- Canonical URLs are direct HTTPS 200 responses without redirect or fallback bytes:
-- Redacted evidence and timestamp:
+- Canonical URLs are direct HTTPS 200 responses without redirect or fallback bytes: yes for `/terms`, `/privacy`, and `/refunds`.
+- Redacted evidence and timestamp: strict live audit at `2026-09-03T10:33:44.038Z`; exact release identity is retained in [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
 The August 30 read-only baseline is [PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md](./PERMITEXT_BETA1_PRODUCTION_CONFIGURATION_PREFLIGHT_2026-08-30.md). On September 2, the three exact policy-version identifiers and both approved Stripe-tax activation keys were staged in Vercel Production without a deployment. Evidence: [policy staging](./PERMITEXT_BETA1_PRODUCTION_POLICY_CONFIGURATION_STAGING_2026-09-02.md) and [Stripe tax provider activation](./PERMITEXT_BETA1_STRIPE_TAX_PROVIDER_ACTIVATION_2026-09-02.md).
 
@@ -132,7 +132,7 @@ Do not include the taxpayer identification number, residential address, or certi
 ## Monitoring delivery
 
 Gate ID: `monitoring-delivery`
-Status: **OWNER-ACCEPTED BOUNDED ALTERNATIVE; EXACT-RELEASE VERIFICATION OPEN**
+Status: **OWNER-ACCEPTED BOUNDED ALTERNATIVE VERIFIED ON CURRENT BUILD 50 CANDIDATE; selected-release machine binding remains open**
 Release-bound: **yes**
 
 - Production health-failure detection: accepted daily privacy-bounded log audit with direct `/health` fallback when no health request appears in the sampled window.
@@ -143,8 +143,8 @@ Release-bound: **yes**
 - Research p95 latency delivery or accepted bounded daily alternative: accepted bounded daily alternative.
 - Named owner received the actual configured notification: generic Vercel web delivery was observed and owner web/email subscriptions are checked; anomaly-specific and email delivery remain unproven.
 - `PERMITEXT_MONITORING_PROVIDER` matches retained delivery evidence: `vercel-observability-daily-review` was staged in Vercel Production after explicit owner acceptance.
-- Privacy-bounded Production log audit passed after the exercise: exact-release post-deployment audit remains open.
-- Redacted evidence and timestamp: [Production monitoring audit evidence](./PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md), owner acceptance September 2, 2026 at approximately 6:52 PM EDT.
+- Privacy-bounded Production log audit passed after the exercise: yes for the accepted bounded path — the September 3 audit emitted no raw messages or customer identifiers, the required direct `/health` fallback passed when the supplied sample contained no health request, and the recent Production status audit contained 26 HTTP 200 results with no 4xx/5xx result.
+- Redacted evidence and timestamp: [Production monitoring audit evidence](./PERMITEXT_PRODUCTION_MONITORING_AUDIT_EVIDENCE_2026-08-29.md), owner acceptance September 2, 2026 at approximately 6:52 PM EDT, and [build 50 exact-release evidence](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md) through `2026-09-03T10:33:44.038Z`.
 
 This accepted Beta 1 alternative does not claim immediate delivery for every category. Keep this release-bound gate open in the machine record until the exact deployed release reports the marker and its post-deployment privacy-bounded audit or direct-health fallback is retained.
 
@@ -188,20 +188,20 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN**
+Status: **OPEN — build 50 release identity, installation, existing Apple account, sync, Lifetime Pro, and saved continuity passed; remaining client workflows remain open**
 Release-bound: **yes**
 
-- Production web release ID and Git commit match the selected release:
-- Final iOS archive was built from the selected release commit:
-- App Store Connect processed the intended build:
-- Physical-iPhone authentication passed:
-- Account/sync and representative saved Project continuity passed:
-- Free and Pro entitlement presentation passed:
+- Production web release ID and Git commit match the selected release: current candidate yes — release ID `c78a4b6c26d8`, Git commit `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`; final machine selection remains open.
+- Final iOS archive was built from the selected release commit: current candidate yes — signed version `1.0`, build `50`, executable SHA-256 `7cb3dcc312ac1eb19e72acee57429852fafd3324c50452d598fd7074ce6005b0` from the same exact commit.
+- App Store Connect processed the intended build: build 50 upload succeeded, the owner installed it, and paired-device readback confirmed version `1.0` / build `50`; final owner release selection remains open.
+- Physical-iPhone authentication passed: existing Apple-authenticated account continuity passed after relaunch; fresh-account Apple and the remaining provider matrix remain open.
+- Account/sync and representative saved Project continuity passed: Account reported `Synced` and existing saved sections or notes remained present; representative Project continuity remains open.
+- Free and Pro entitlement presentation passed: Lifetime Pro passed on build 50; final-build Free presentation remains open.
 - Restore/cancellation/refund state presentation passed as applicable:
 - One separately authorized complete Production Research turn preserved the shared web/iOS response contract:
 - Account-deletion presentation and recovery boundaries passed:
-- No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained:
-- Redacted evidence and timestamp:
+- No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained: yes for the tested build — its backend is Production, its entitlement was Lifetime Pro rather than Sandbox, and installed build/Production Git identity align to `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`.
+- Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), through `2026-09-03T10:33:44.038Z`.
 
 Source, Simulator, archive-upload, and TestFlight-processing evidence do not substitute for the final physical-device workflow.
 
