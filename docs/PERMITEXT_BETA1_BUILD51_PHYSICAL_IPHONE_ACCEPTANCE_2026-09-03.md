@@ -40,11 +40,12 @@ The owner then opened Account on build 51 and confirmed all three requested cont
 - Sync displayed `Synced`.
 - Existing saved sections or notes remained present in Saved.
 - Existing project containers remained present in Projects.
+- In Research, the owner selected an existing Project and confirmed that its name remained displayed in the Project selector.
 
-This is persisted existing-account and saved-content continuity, not a fresh Apple sign-in exercise. The existing projects never contained saved items, so project-item continuity remains unexercised rather than failed.
+This is persisted existing-account, saved-content, and Research Project-context continuity, not a fresh Apple sign-in exercise. The existing projects never contained saved items, so project-item continuity remains unexercised rather than failed. No Research question was submitted during the Project-selector check.
 
 ## Evidence boundary
 
 This result proves the replacement resolver and bundled Chapter 7 work together on the tested physical iPhone. It does **not** by itself prove every section, table, image, chapter, or 2014 code family on a physical device. Automated corpus and native tests provide broader non-device coverage, but do not replace representative owner testing.
 
-This observation does not prove fresh Apple authentication, Project-item continuity, Free entitlement presentation, restore/cancellation presentation, a complete Production Research turn, the remaining sign-in provider matrix, or the disposable-account export/deletion lifecycle. Final public-Beta owner go/no-go remains open.
+This observation does not prove fresh Apple authentication, Project-item continuity, Free entitlement presentation, restore/cancellation presentation, a complete Production Research turn and response contract, the remaining sign-in provider matrix, or the disposable-account export/deletion lifecycle. Final public-Beta owner go/no-go remains open.
