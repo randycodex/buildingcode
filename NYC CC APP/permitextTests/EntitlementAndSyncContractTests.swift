@@ -100,6 +100,23 @@ private final class ResearchRequestPathRecorder: @unchecked Sendable {
     }
 }
 
+private final class RequestTimeoutRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var valuesByPath: [String: TimeInterval] = [:]
+
+    func record(_ request: URLRequest) {
+        lock.lock()
+        valuesByPath[request.url?.path ?? ""] = request.timeoutInterval
+        lock.unlock()
+    }
+
+    func timeout(for path: String) -> TimeInterval? {
+        lock.lock()
+        defer { lock.unlock() }
+        return valuesByPath[path]
+    }
+}
+
 private func permitextRequestBody(_ request: URLRequest) throws -> Data {
     if let body = request.httpBody { return body }
     guard let stream = request.httpBodyStream else { throw URLError(.cannotDecodeContentData) }
@@ -1508,6 +1525,54 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 allowsInsecureLocalhost: true
             )
         )
+    }
+
+    func testColdSignInAllowsLongerReconciliationWithoutRelaxingOrdinaryRequests() async throws {
+        let host = "backend-timeout-\(UUID().uuidString.lowercased()).test"
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer {
+            ScopedPermitextURLProtocol.removeHandler(for: host)
+            session.invalidateAndCancel()
+        }
+
+        let recorder = RequestTimeoutRecorder()
+        ScopedPermitextURLProtocol.install({ request in
+            recorder.record(request)
+            if request.url?.path == "/health" {
+                return (200, Data(#"{"ok":true,"storage":"test"}"#.utf8))
+            }
+            return (503, Data(#"{"error":"Synthetic response."}"#.utf8))
+        }, for: host)
+
+        let transport = PermitextBackendHTTPTransport(
+            baseURL: try XCTUnwrap(URL(string: "https://\(host)/")),
+            session: session,
+            requestTimeout: 20
+        )
+        _ = try await transport.health()
+
+        do {
+            _ = try await transport.signIn(
+                BackendSignInRequest(
+                    credential: AccountSignInCredential(
+                        provider: .clerk,
+                        providerUserID: "user_timeout_test",
+                        displayName: nil,
+                        signedInAt: Date(timeIntervalSince1970: 100),
+                        sessionToken: "test-session-token"
+                    ),
+                    linkFrom: nil
+                )
+            )
+            XCTFail("Expected the synthetic sign-in response to fail.")
+        } catch let error as PermitextBackendHTTPError {
+            XCTAssertEqual(error.statusCode, 503)
+        }
+
+        XCTAssertEqual(recorder.timeout(for: "/health"), 20)
+        XCTAssertEqual(recorder.timeout(for: "/account/sign-in"), 60)
     }
 
     func testFreePlanIncludesContinuityAndCrossDeviceSync() {

@@ -2809,7 +2809,15 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
     }
 
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord {
-        try await post("account/sign-in", body: request)
+        // A cold Production sign-in performs Clerk verification, verified-email
+        // lookup, database initialization, and pending Lifetime Pro activation.
+        // Keep ordinary backend requests tightly bounded, but do not abandon a
+        // valid authentication while that one-time reconciliation is finishing.
+        try await post(
+            "account/sign-in",
+            body: request,
+            timeoutInterval: max(requestTimeout, 60)
+        )
     }
 
     func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse {
