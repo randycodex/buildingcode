@@ -1,6 +1,6 @@
 # Research failure recovery — September 3, 2026
 
-Status: local implementation complete; server and native unit checks pass. Rendered failure/reopen acceptance remains open because Simulator UI-test startup is unreliable. Not deployed.
+Status: local implementation complete; server checks, 163 native unit tests, and the rendered Simulator failure/reopen regression pass. Production configuration verification and release approval remain open. Not deployed.
 
 ## Observed attempt
 
@@ -22,16 +22,47 @@ The one-submission authorization has been attempted and is not reused by this wo
 
 - Full server `npm run check`: passed with provider credentials/paid-evaluation switches removed.
 - Server `node tests/smoke.mjs`: passed.
+- After retaining the envelope regression, the complete `npm run test:research-chat` group, provider-client and web-attribution contracts, and new helper syntax check passed again with provider credentials/paid-evaluation switches removed. Runtime implementation is unchanged from local repair commit `baceb4a62a475c45d1a54dad011e75e944d79941`.
 - Focused final contracts: attribution/revision, hard cost caps (including concurrent isolation), provider retry dispatch, durable messages, turn idempotency, trust boundary, spend-control acceptance, economics persistence, and ramp retrieval passed with no paid calls.
 - iOS unit suite: 163/163 passed, including failure serialization, backward-compatible cache decode, same-ID retry state, and terminal-vs-lost-response reconciliation.
-- Rendered Simulator failure/reopen regression: not passed. The iOS 26.5 run reached the composer and submitted the local failure fixture, then exposed an XCTest 128-character identifier limit; the test now uses a label predicate. Other iOS 26.5 launches crashed in Clerk startup despite the test-only disable flag. Manual launch with the explicit fixture/disable flags rendered the isolated Research screen successfully, but does not prove the failure/reopen journey. The matching iOS 27 run could not initialize UI automation: `Timed out waiting for AX loaded notification`. No Simulator reset, production-authentication change, or physical-device acceptance is inferred from these attempts.
+- Rendered Simulator failure/reopen regression: passed on iOS 26.5 in 35.407 seconds. The test submitted the isolated local failure fixture, reopened the conversation through Research history, and found the exact verification failure rather than the generic interruption message. The question and same-request retry remained visible. [Retained screen](./evidence/research-recovery-2026-09-03/reopened-verification-failure.png) was visually inspected: no clipped error text; all Project/usage content is synthetic. This does not prove physical-device or live-provider behavior.
+- No-provider ramp request-envelope contract: passed using the shipped corpus and the actual answer-request prompt/schema builders. With the versioned standard-price fixture and a $0.50 cap, the base Terra answer bound is $0.288220 and the Luna web-support bound is $0.289275. An unreconciled duplicate web request and a Terra web request are blocked. Synthetic settled web usage (18,000 input / 700 output tokens) allows the base answer with a combined conservative bound of $0.328480. This is a reconciliation regression, not a prediction of real usage. The un-settled combined bound is $0.577495, so a full-turn fit must not be inferred from the individual checks. Project facts, prior chat, returned web claims, evidence analysis, verifier, and revision are outside this fixture.
 
 Tests use mocks/local fixtures and do not call a paid provider. Physical-iPhone acceptance and a new live Research result remain separate release gates. The full native suite ran with the installed Xcode-beta selected per command, not a machine-wide developer-directory change. The storage guard refused cleanup in the isolated worktree; no cleanup was performed or bypassed.
 
+### Simulator reproduction
+
+Earlier attempts hit the XCTest 128-character identifier limit (fixed by a label predicate), a Clerk startup assertion, and an iOS 27 accessibility startup timeout. The successful run uses an empty **build-time, local-test-only** Clerk key so an early test launch cannot initialize the placeholder authentication configuration. Production authentication is unchanged. No Simulator reset or erase was needed.
+
+From the isolated worktree, with the existing Xcode lock acquired and no other owned test running:
+
+```sh
+DEVELOPER_DIR=/Applications/Xcode-beta.app/Contents/Developer \
+PATH=/Applications/Xcode-beta.app/Contents/Developer/usr/bin:$PATH \
+xcodebuild test \
+  -project 'NYC CC APP/NYC CC APP.xcodeproj' \
+  -scheme permitextPhysicalStress \
+  -destination 'platform=iOS Simulator,id=C9635051-D686-4415-99AA-9DA90CC9DC59' \
+  -derivedDataPath /Users/randy/Library/Developer/Xcode/DerivedData/PermitextShared \
+  -parallel-testing-enabled NO -parallel-testing-worker-count 1 -maximum-parallel-testing-workers 1 \
+  CODE_SIGNING_ALLOWED=NO CLERK_PUBLISHABLE_KEY='' \
+  -only-testing:permitextPhysicalStressUITests/NativeReaderPhysicalStressUITests/testResearchVerificationFailureRemainsVisibleAfterReopeningConversation
+```
+
+Result: `Test-permitextPhysicalStress-2026.09.03_18-27-58--0400.xcresult` in the shared DerivedData test logs. Full command log: `/private/tmp/permitext-research-recovery-empty-clerk-ui.log`. These local diagnostic paths may expire; the synthetic screenshot is retained in this repository.
+
+### Production pricing boundary
+
+The September 3 read-only Vercel audit found the Research models, pricing, and caps stored as **sensitive** environment variables. The list/decryption request and the individual-variable read returned metadata without usable values. Missing values are not zero, and the public health/configuration-ready flag does not prove correct prices or request fit. No environment values were changed. Do not repeat a paid request to discover the configuration.
+
+The official standard short-context rates checked September 3 are Luna $0.20 input / $0.02 cached input / $1.20 output and Terra $2.00 / $0.20 / $12.00 per million tokens. The guard separately preserves the long-context/cache-write and web-tool allowances. The offline fixture uses these rates; it is not evidence that Production already has them. Model/routing settings must match the configured rate families. A fresh authorization to write the intended non-secret configuration, or owner verification of the live values, is required to close this boundary. Keep current spending limits unchanged; do not infer authority to change model routing or limits from a pricing inspection.
+
+Repeat the no-cost envelope check with `node tests/research-ramp-design-retrieval-contract.mjs` in `permitext-sync-server`, without provider credentials or paid-evaluation flags.
+
 ## Release prerequisites
 
-1. Review the final local commit and no-cost checks; complete the rendered failure/reopen regression in a working UI-test environment.
-2. Verify Production model-specific pricing and the conservative request envelope under the existing cap; do not automatically raise caps if the envelope does not fit.
+1. Review the final local commit and retained passing no-cost checks, including the rendered failure/reopen regression.
+2. Close the hidden Production pricing/model configuration boundary and verify the full request envelope under the existing cap. The base offline preflight above is complete but is not whole-turn acceptance. Do not automatically raise caps if an envelope does not fit.
 3. Obtain approval before push/deployment or a replacement TestFlight upload.
 4. Obtain a separate exact live-turn authorization only after the release is bound to its source SHA. Do not rerun the failed build-51 request automatically.
 

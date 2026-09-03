@@ -7,6 +7,7 @@ import {
   evidenceDiscoveryVersion
 } from "../evidence-discovery.mjs";
 import { assembleResearchEvidence } from "../research-evidence-assembly.mjs";
+import { preflightRampRequestEnvelopes } from "./research-request-envelope-preflight.mjs";
 
 const testRoot = dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = join(testRoot, "../..");
@@ -146,4 +147,5 @@ assert(assembled.sources.some((source) => source.sectionNumber === "1012.6.3"));
 assert(assembled.sources.some((source) => source.sectionNumber === "1012.6.4"));
 assert(assembled.sources.some((source) => source.sectionNumber === "1012.10.1"));
 
+await preflightRampRequestEnvelopes(assembled.sources);
 console.log("Permitext ramp-design full-corpus retrieval regression passed; paid model calls: no.");
