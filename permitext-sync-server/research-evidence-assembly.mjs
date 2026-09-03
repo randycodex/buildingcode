@@ -8,14 +8,16 @@ import {
   researchQuestionReturnsToOriginalTopic
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
+import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260830-pinned-passage-budget-v21";
+export const researchEvidenceAssemblyVersion = "20260903-topic-dependency-coverage-v22";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
   maximumDiscovered: 10,
   maximumTargetedDefinitions: 2,
   maximumCrossReferences: 6,
+  maximumTopicDependencies: 14,
   maximumCharacters: 48_000,
   maximumSupplementalCharacters: 48_000,
   maximumCharactersPerSource: 12_000
@@ -106,6 +108,11 @@ function positiveInteger(value, fallback, maximum) {
 
 function appliedLimits(value = {}) {
   return {
+    maximumTopicDependencies: positiveInteger(
+      value.maximumTopicDependencies,
+      researchEvidenceAssemblyLimits.maximumTopicDependencies,
+      researchEvidenceAssemblyLimits.maximumTopicDependencies
+    ),
     maximumCandidates: positiveInteger(
       value.maximumCandidates,
       researchEvidenceAssemblyLimits.maximumCandidates,
@@ -1041,6 +1048,73 @@ export async function assembleResearchEvidence({
   await onStage?.("reviewing_provisions", "completed");
   await onStage?.("following_cross_references", "active");
 
+  // A routed design question needs its dimensional dependencies, not whichever
+  // six references happen to appear first after lexical ranking. This separate,
+  // reviewed set shares the existing character and provider-spend ceilings.
+  const dependencyPlan = !pinnedEvidence.length && appliedStrategy.mode === researchEvidenceStrategies.broad
+    ? researchTopicDependencyPlan({ question: query.retrievalQuery, sources })
+    : null;
+  let topicDependencyCount = 0;
+  const missingTopicDependencies = [];
+  for (const [index, reference] of (dependencyPlan?.references || []).entries()) {
+    const existing = sources.find((source) => source.codePrefix === reference.codePrefix &&
+      source.sectionNumber === reference.sectionNumber && sameTopicDependencyCorpus(source, dependencyPlan.anchor));
+    if (existing) {
+      if (!existing.canonicalContextComplete) missingTopicDependencies.push(reference.sectionNumber);
+      else existing.evidencePriority = {
+        ...existing.evidencePriority,
+        claimCoverageRequired: true,
+        claimCoverageReason: "Dimensional dependency; retain scope and exceptions."
+      };
+      continue;
+    }
+    const remainingCharacters = supplementalCharacterCeiling - characterCount;
+    if (topicDependencyCount >= limits.maximumTopicDependencies || remainingCharacters < 1) {
+      missingTopicDependencies.push(reference.sectionNumber);
+      continue;
+    }
+    let resolved;
+    try {
+      resolved = await canonicalSection(async (request) => {
+        const value = await resolveSection(request);
+        // Validate the resolver's own identity before canonicalSection can fill
+        // omitted descriptor fields from the requested reference.
+        if (value?.codePrefix !== reference.codePrefix || value?.sectionNumber !== reference.sectionNumber ||
+          !sameTopicDependencyCorpus(value, dependencyPlan.anchor)) throw new Error("Dependency corpus mismatch");
+        return value;
+      }, reference, sourceOrigins.crossReference);
+    } catch {
+      resolverFailureCount += 1;
+      missingTopicDependencies.push(reference.sectionNumber);
+      continue;
+    }
+    // Do not truncate a dimensional rule away from its exceptions. If it cannot
+    // fit, preserve an explicit gap instead of declaring the topic complete.
+    if (resolved.text.length > Math.min(limits.maximumCharactersPerSource, remainingCharacters)) {
+      missingTopicDependencies.push(reference.sectionNumber);
+      continue;
+    }
+    const record = sourceRecord(resolved, {
+      origin: sourceOrigins.crossReference,
+      sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, index),
+      relationship: `Ramp design: ${reference.purpose}`,
+      characterAllowance: remainingCharacters,
+      canonicalResolved: true,
+      retrievalReason: "Reviewed edition-matched dimensional dependency",
+      retrievalVersion: dependencyPlan.version,
+      retrievalDepth: 1,
+      evidencePriority: {
+        ...researchEvidencePriorityMetadata({ ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: 1 }),
+        claimCoverageRequired: true,
+        claimCoverageReason: "Dimensional dependency; retain scope and exceptions."
+      },
+      retrievedAt
+    });
+    sources.push(record);
+    includedSectionIdentities.add(sectionIdentity(resolved));
+    characterCount += record.text.length;
+    topicDependencyCount += 1;
+  }
   const crossReferenceQueue = [];
   const queuedCrossReferenceIdentities = new Set();
   if (!strictPinnedEvidenceBoundary) {
@@ -1096,8 +1170,13 @@ export async function assembleResearchEvidence({
   );
 
   let crossReferenceCount = 0;
+  // The reviewed design dependencies replace most opportunistic expansion;
+  // do not append a second broad reference package and crowd out the cost budget.
+  const maximumCrossReferencesForTurn = dependencyPlan
+    ? Math.min(limits.maximumCrossReferences, 2)
+    : limits.maximumCrossReferences;
   for (const [index, reference] of crossReferenceQueue.entries()) {
-    if (crossReferenceCount >= limits.maximumCrossReferences) break;
+    if (crossReferenceCount >= maximumCrossReferencesForTurn) break;
     const remainingCharacters = supplementalCharacterCeiling - characterCount;
     if (remainingCharacters < 1) break;
     let resolved;
@@ -1148,6 +1227,22 @@ export async function assembleResearchEvidence({
     crossReferenceCount += 1;
   }
   await onStage?.("following_cross_references", "completed");
+
+  // Generic expansion may recover a dependency that the topic-specific count
+  // limit omitted. Report final coverage, not an intermediate false absence.
+  const unresolvedTopicDependencies = missingTopicDependencies.filter((sectionNumber) => {
+    const recovered = sources.find((source) => source.codePrefix === "BC" && source.sectionNumber === sectionNumber &&
+      source.canonicalContextComplete && sameTopicDependencyCorpus(source, dependencyPlan.anchor));
+    if (!recovered) return true;
+    recovered.evidencePriority = { ...recovered.evidencePriority, claimCoverageRequired: true,
+      claimCoverageReason: "Dimensional dependency; retain scope and exceptions." };
+    return false;
+  });
+  if (unresolvedTopicDependencies.length) limitations.push({
+    kind: "topic-dependency-coverage-gap",
+    text: `The routed ramp-design package could not include complete edition-matched BC sections: ${unresolvedTopicDependencies.join(", ")}. Do not infer those requirements from memory.`,
+    planID: dependencyPlan.id
+  });
 
   if (resolverFailureCount) {
     limitations.push({
@@ -1239,6 +1334,7 @@ export async function assembleResearchEvidence({
       discoveredCount,
       targetedDefinitionCount,
       crossReferenceCount,
+      topicDependencyCount,
       characterCount,
       resolverFailureCount,
       nonMaterialCandidateCount

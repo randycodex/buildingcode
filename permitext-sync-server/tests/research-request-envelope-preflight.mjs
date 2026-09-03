@@ -3,15 +3,19 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import {
   researchInputForEvidence, researchInterpretationSchemaForEvidence,
-  researchWebSupportRequestBody
+  researchWebSupportRequestBody, deterministicResearchEvidenceAnalysisForTurn
 } from "../app.mjs";
+import { requiredResearchClaimsFromEvidence } from "../research-required-claim-coverage.mjs";
 import {
   beginResearchSpendReservation, endResearchSpendReservation,
   researchModelConfiguration, reserveResearchProviderSpend, settleResearchProviderSpend
 } from "../research-config.mjs";
 import { researchEvidenceAssemblyVersion } from "../research-evidence-assembly.mjs";
 import { researchAnswerPresentationContract } from "../research-answer-presentation.mjs";
-import { zoningResearchSafetyInstruction } from "../research-zoning-safety.mjs";
+import { zoningResearchSafetyInstruction, zoningResearchSafetyPromptContext } from "../research-zoning-safety.mjs";
+import { zoningResearchPromptContext } from "../research-zoning-planner.mjs";
+import { resolveResearchCodeBasis } from "../research-code-basis.mjs";
+import { createResearchCorpusRegistry, routeResearchCorpora } from "../research-corpus-registry.mjs";
 
 // Versioned offline fixture, NOT a read of Production. Standard prices checked
 // against https://developers.openai.com/api/docs/pricing on 2026-09-03.
@@ -69,6 +73,38 @@ export async function preflightRampRequestEnvelopes(evidence) {
   };
   const answerBoundUSD = bound(answer);
   const webBoundUSD = bound(web);
+  const registry = createResearchCorpusRegistry();
+  const answerOptions = {
+    responseStyle: "conversational",
+    requiredClaims: requiredResearchClaimsFromEvidence(evidence),
+    structuredEvidenceAnalysis: deterministicResearchEvidenceAnalysisForTurn(evidence, []),
+    codeBasis: resolveResearchCodeBasis({ availableCorpora: registry,
+      corpusPlan: routeResearchCorpora({ question, registry }), resolvedAt: "2026-09-03T23:00:00.000Z" })
+  };
+  const completeAnswer = buildAnswerRequest(question, evidence, userID, answerOptions);
+  const completeAnswerBoundUSD = bound(completeAnswer);
+  assert(completeAnswerBoundUSD > 0 && completeAnswerBoundUSD <= 0.50);
+  // Request-size fixture only: no private Project facts or previous live answer.
+  const projectAnswerBoundUSD = bound(buildAnswerRequest(question, evidence, userID, {
+    ...answerOptions,
+    projectContextFacts: Array.from({ length: 29 }, (_, index) =>
+      `Synthetic property fact ${index + 1}: value not independently verified.`)
+  }));
+  assert(projectAnswerBoundUSD <= 0.50);
+
+  const verificationStart = source.indexOf("async function openAIResearchVerification(");
+  const verificationEnd = source.indexOf("  const { payload } = await requestResearchProvider({", verificationStart);
+  const schemaStart = source.indexOf("const researchVerificationIssueTypes =");
+  const schemaEnd = source.indexOf("function validateResearchVerification(", schemaStart);
+  assert(verificationStart >= 0 && verificationEnd > verificationStart && schemaStart >= 0 && schemaEnd > schemaStart);
+  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext };
+  const buildVerifierRequest = new Function(...Object.keys(verificationDependencies),
+    `${source.slice(schemaStart, schemaEnd)} return ${source.slice(verificationStart, verificationEnd).replace(/^async function/, "function")} return requestBody; };`
+  )(...Object.values(verificationDependencies));
+  const verifier = buildVerifierRequest(question, evidence, {
+    answerText: "Synthetic answer-size placeholder. ".repeat(240)
+  }, userID, { ...answerOptions, model: "gpt-5.6-luna" });
+  const verifierBoundUSD = bound(verifier);
   assert(answerBoundUSD > 0 && answerBoundUSD <= 0.50);
   assert(webBoundUSD > 0 && webBoundUSD <= 0.50);
   beginResearchSpendReservation({ id: "offline-cumulative" }, environment);
@@ -85,15 +121,24 @@ export async function preflightRampRequestEnvelopes(evidence) {
     settleResearchProviderSpend(reservation, {
       usage: { input_tokens: 18_000, output_tokens: 700 }
     }, environment);
-    syntheticReconciledCombinedBoundUSD = reserveResearchProviderSpend(answer, environment).reservedUSD;
+    syntheticReconciledCombinedBoundUSD = reserveResearchProviderSpend(completeAnswer, environment).reservedUSD;
     assert(syntheticReconciledCombinedBoundUSD <= 0.50);
+  } finally { endResearchSpendReservation(); }
+  beginResearchSpendReservation({ id: "offline-answer-verifier" }, environment);
+  let syntheticAnswerVerifierBoundUSD;
+  try {
+    const reservation = reserveResearchProviderSpend(completeAnswer, environment);
+    // Synthetic usage is a bounded test case, not measured cost or latency.
+    settleResearchProviderSpend(reservation, { usage: { input_tokens: 24_000, output_tokens: 3_000 } }, environment);
+    syntheticAnswerVerifierBoundUSD = reserveResearchProviderSpend(verifier, environment).reservedUSD;
+    assert(syntheticAnswerVerifierBoundUSD <= 0.50);
   } finally { endResearchSpendReservation(); }
   assert.throws(() => bound({ ...web, model: "gpt-5.6-terra" }), { code: "RESEARCH_SPEND_CAP" });
   console.log(JSON.stringify({
-    preflight: "ramp-base-request-envelopes", answerBoundUSD, webBoundUSD,
+    preflight: "ramp-request-envelopes", answerBoundUSD, completeAnswerBoundUSD, projectAnswerBoundUSD, verifierBoundUSD, webBoundUSD,
     unsettledCombinedBoundUSD: Number((answerBoundUSD + webBoundUSD).toFixed(6)),
-    syntheticReconciledCombinedBoundUSD,
+    syntheticReconciledCombinedBoundUSD, syntheticAnswerVerifierBoundUSD,
     capUSD: 0.50, providerCalls: 0, liveConfigVerified: false,
-    scope: "Base requests only; no Project facts, prior chat, returned web claims, analysis, verifier, or revision. Not full-turn acceptance."
+    scope: "Actual request builders with deterministic analysis, required claims and routed code basis; separate synthetic 29-fact, settled-web and answer/verifier cases. No prior chat, returned web claims or revision. Not live or full-turn acceptance."
   }));
 }
