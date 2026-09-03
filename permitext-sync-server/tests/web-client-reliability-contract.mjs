@@ -84,6 +84,55 @@ assert(
   "Foreground sync must reconcile safe surfaces without replacing mounted Project editors."
 );
 
+const foregroundSignalHandlerSource = functionSource(
+  "async function handleForegroundSyncSignal(message)",
+  "function ensureForegroundSyncChannel()"
+);
+let refreshedAfterMissingSnapshot = false;
+const foregroundSignalHarness = new Function(
+  "activeAccount",
+  "isForegroundSyncLeader",
+  "loadOfflineSyncSnapshot",
+  "refreshSyncedWorkspaceInPlace",
+  `
+    const foregroundSyncTabID = "local-tab";
+    let syncedContent = {
+      latestEventID: 0,
+      contentMapVersion: 2,
+      entitlementFingerprint: "before"
+    };
+    let foregroundSyncLastFullPullAt = 0;
+    ${foregroundSignalHandlerSource}
+    return {
+      handle: handleForegroundSyncSignal,
+      content: () => syncedContent,
+      lastFullPullAt: () => foregroundSyncLastFullPullAt
+    };
+  `
+)(
+  () => ({ userID: "deleted-user" }),
+  () => false,
+  async () => null,
+  async () => {
+    refreshedAfterMissingSnapshot = true;
+  }
+);
+await assert.doesNotReject(() => foregroundSignalHarness.handle({
+  type: "sync-complete",
+  accountUserID: "deleted-user",
+  sourceTabID: "remote-tab",
+  latestEventID: 0,
+  contentMapVersion: 3,
+  entitlementFingerprint: "after"
+}));
+assert.equal(
+  refreshedAfterMissingSnapshot,
+  false,
+  "A cross-tab sync signal must not refresh from an offline snapshot removed by account deletion."
+);
+assert.equal(foregroundSignalHarness.content()?.contentMapVersion, 2);
+assert.equal(foregroundSignalHarness.lastFullPullAt(), 0);
+
 const utilityReconciliation = functionSource(
   "async function renderUtilityWorkspace(options = {})",
   "async function transitionWorkspace("

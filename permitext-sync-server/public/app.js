@@ -60,7 +60,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260902-account-cleanup-v22";
+} from "./offline-storage.js?v=20260902-post-delete-sync-v23";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -95,7 +95,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260902-account-cleanup-v22";
+} from "./research-intent-state.js?v=20260902-post-delete-sync-v23";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -10107,6 +10107,7 @@ async function handleForegroundSyncSignal(message) {
   if (!checkpointChanged) return;
   const snapshot = await loadOfflineSyncSnapshot(accountUserID).catch(() => null);
   if (
+    !snapshot ||
     activeAccount()?.userID !== accountUserID ||
     Number(snapshot?.latestEventID || 0) < Number(message.latestEventID || 0)
   ) return;
