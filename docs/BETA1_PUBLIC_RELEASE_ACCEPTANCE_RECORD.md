@@ -195,7 +195,7 @@ Release-bound: **yes**
 - Final iOS archive was built from the selected release commit: current candidate yes — signed version `1.0`, build `50`, executable SHA-256 `7cb3dcc312ac1eb19e72acee57429852fafd3324c50452d598fd7074ce6005b0` from the same exact commit.
 - App Store Connect processed the intended build: build 50 upload succeeded, the owner installed it, and paired-device readback confirmed version `1.0` / build `50`; final owner release selection remains open.
 - Physical-iPhone authentication passed: existing Apple-authenticated account continuity passed after relaunch; fresh-account Apple and the remaining provider matrix remain open.
-- Account/sync and representative saved Project continuity passed: Account reported `Synced` and existing saved sections or notes remained present; representative Project continuity remains open.
+- Account/sync and representative saved Project continuity passed: Account reported `Synced`, existing saved sections or notes remained present, and existing project containers remained present. The projects had never contained saved items, so their empty state was expected; project-item continuity remains unexercised rather than failed.
 - Free and Pro entitlement presentation passed: Lifetime Pro passed on build 50; final-build Free presentation remains open.
 - Restore/cancellation/refund state presentation passed as applicable:
 - One separately authorized complete Production Research turn preserved the shared web/iOS response contract:

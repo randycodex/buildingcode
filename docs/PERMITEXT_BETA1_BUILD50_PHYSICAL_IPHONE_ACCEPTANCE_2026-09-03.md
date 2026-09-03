@@ -39,6 +39,7 @@ Exercise window: September 3, 2026, approximately `10:20Z`–`10:28Z`.
 - The Account screen displayed `Lifetime Pro`.
 - The Account sync status displayed `Synced`.
 - The owner opened Saved and confirmed that existing saved sections or notes remained present.
+- The owner opened Projects and confirmed that the existing project containers remained present. Those projects had never contained saved items, so their empty item lists were expected and no project data loss was observed; project-item continuity was not exercised.
 - Production continued receiving app sync/checkpoint/usage traffic. All 26 recent requests represented in the status-code audit returned HTTP 200; no 4xx or 5xx result was present.
 - No client crash or transport error appeared during the successful observation.
 
@@ -49,7 +50,7 @@ This proves existing-session continuity on the exact Production-targeted build. 
 - Fresh-account Apple, Google, Microsoft, and email sign-in.
 - Existing-account Google, Microsoft, and email sign-in.
 - Production account export/deletion using only a dedicated disposable account, including cleanup and recreated-empty-account verification.
-- Representative Project continuity on the exact release.
+- Representative Project-item continuity on the exact release using a project that actually contains test content; project-list continuity already passes.
 - A separately authorized complete Production Research turn and matching web/iOS response-contract review.
 - Final-build Free-state and applicable restore/cancellation/refund presentation.
 - Account-deletion presentation and recovery boundaries on the final client.
