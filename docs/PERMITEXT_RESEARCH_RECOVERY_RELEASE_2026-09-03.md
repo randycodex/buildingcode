@@ -1,6 +1,6 @@
 # Research recovery release — September 3, 2026
 
-Status: **released to Production and Internal TestFlight**. Build 52 is processed and assigned to Internal Testers. Physical-device and live-answer acceptance remain separate.
+Status: **released to Production and Internal TestFlight; build 52 installed and basic physical-device continuity verified**. The owner reported installation, then authorized direct iPhone use. The checks below were observed through iPhone Mirroring. Live-answer acceptance and the remaining table-gesture check remain separate.
 
 ## Authorization and source identity
 
@@ -60,7 +60,22 @@ The guarded archive workflow used command-local Xcode selection and its build lo
 
 ## Acceptance boundary
 
-This record does not establish installation or physical-iPhone behavior for build 52, successful completion/latency/cost of the ramp answer, or the original failed attempt's invoiced cost and persisted turn ledger. Existing failed conversations cannot acquire an answer merely from this update. A new live attempt requires a separate exact authorization naming this release and its cumulative API-spend ceiling. No App Review or public App Store submission is included.
+### September 3 physical-iPhone continuity check
+
+The owner reported build 52 installed and explicitly authorized using the physical phone. Direct iPhone Mirroring inspection at approximately 19:11–19:14 EDT established:
+
+- TestFlight displays version `1.0 (52)` and opens Permitext after its build-specific test notes.
+- The app opens successfully. The existing account remains signed in, with `Lifetime Pro` active and `Synced` displayed.
+- Existing Projects and a saved section remain visible. An existing Project opens and finishes loading its synced records.
+- The 2014 Building Code selector and Chapter 7 open in the native Reader without `Chapter HTML Missing`. Chapter search returns results and navigates to selected content.
+- Figure 705.7 displays its complete graph, axes, and caption in the Reader and in the enlarged image viewer; no cropping was visible in this example.
+- Table 705.8 renders as a structured table and vertically scrolls to additional rows. The rightmost column extends beyond the narrow viewport, and automated horizontal scroll attempts through Mirroring did not move it. This is an **unresolved gesture check**, not a complete table pass or proof that physical touch scrolling is broken. Source inspection confirms a horizontal scroll container, but does not substitute for device acceptance.
+- Research history and an existing conversation open. No question was entered or submitted, no retry was tapped, and no purchase, restore, sign-out, deletion, or account mutation was performed. The old failed ramp request's restored state was not established by these checks.
+- A fresh read-only Production `/release` check still returned `1873ba6453bf6f3d1f076e34fa2ddfb96b9cf40c`. No backend configuration or binary was changed for these checks.
+
+Account identifiers and Project content are intentionally omitted from this durable record. The displayed remaining-turn count is not evidence of the original failed attempt's ledger outcome.
+
+This record does not establish successful completion/latency/cost of the ramp answer, the original failed attempt's invoiced cost and persisted turn ledger, or physical touch access to every table column. Existing failed conversations cannot acquire an answer merely from this update. A new live attempt requires a separate exact authorization naming this release and its cumulative API-spend ceiling. No App Review or public App Store submission is included.
 
 ## Separate dependency finding
 
