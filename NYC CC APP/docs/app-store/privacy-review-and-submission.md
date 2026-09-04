@@ -30,11 +30,11 @@ Build/upload and app availability were rechecked September 3. Agreement, bank, t
 
 These answers are derived from the app privacy manifest and the published privacy policy. They must be checked against App Store Connect's current wording before being submitted.
 
-September 3 source audit corrected three omissions: Search History, Performance Data, and Other Diagnostic Data. See the [source-to-declaration evidence](../../../docs/PERMITEXT_PRIVACY_DATA_FLOW_AUDIT_2026-09-03.md). These local corrections are not published App Store answers or a replacement TestFlight binary. Third-party SDK/provider collection and the final candidate privacy report still require reconciliation before owner approval.
+September 3 source audit corrected Search History, Performance Data, and Other Diagnostic Data. The owner subsequently approved applying the provider disclosure proposal to the local release package: Device ID, Coarse Location, and Analytics purposes for User ID and Product Interaction are now also reflected in the local manifest. See the [source-to-declaration evidence](../../../docs/PERMITEXT_PRIVACY_DATA_FLOW_AUDIT_2026-09-03.md) and [approved local scope](../../../docs/PERMITEXT_PRIVACY_PROVIDER_DISCLOSURE_PROPOSAL_2026-09-03.md). These corrections are not published App Store answers or a replacement TestFlight binary. Exact policy wording/publication, remaining provider review and final candidate privacy aggregation remain separate gates.
 
 ### Tracking
 
-Provider follow-up: the [owner-review proposal](../../../docs/PERMITEXT_PRIVACY_PROVIDER_DISCLOSURE_PROPOSAL_2026-09-03.md) now recommends Device ID and Coarse Location disclosures plus Analytics purposes for User ID and Product Interaction. The provider rows below remain unresolved for publication pending that review and synchronized manifest/policy preparation. Do not submit the current checklist as a completed questionnaire.
+Provider disclosure classifications below are approved for local preparation and synchronized with the app-owned manifest. Do not submit this checklist as a completed questionnaire until the remaining publication and final-candidate checks pass.
 
 - Data used to track the user: `No`
 - Tracking domains: none
@@ -50,8 +50,10 @@ Provider follow-up: the [owner-review proposal](../../../docs/PERMITEXT_PRIVACY_
 
 ### Identifiers
 
-- User ID: collected, linked to identity, App Functionality
-- Device ID: unresolved provider declaration; do not submit a `No` answer yet. The pinned Clerk iOS SDK sends `identifierForVendor` as `x-native-device-id`; confirm retention, linkage, and purpose before completing the questionnaire.
+- User ID: collected, linked to identity, App Functionality and Analytics
+  - account continuity/authentication plus Clerk's distinct-user activity and retention reporting
+- Device ID: collected, linked to identity, App Functionality
+  - Clerk's native device identifier and device-linked security/session logs; not an advertising-tracking declaration
 
 ### Purchases
 
@@ -70,8 +72,8 @@ Provider follow-up: the [owner-review proposal](../../../docs/PERMITEXT_PRIVACY_
 
 ### Usage data
 
-- Product Interaction: collected, linked to identity, App Functionality
-  - recently viewed sections, reading continuity, and sync state
+- Product Interaction: collected, linked to identity, App Functionality and Analytics
+  - recently viewed sections, reading continuity and sync state; Clerk sign-in, sign-up and active-use reporting
 - Advertising Data: not collected
 - Other Usage Data: not declared as collected
 
@@ -91,10 +93,11 @@ Provider follow-up: the [owner-review proposal](../../../docs/PERMITEXT_PRIVACY_
   - the operation record excludes question/answer text but remains linked through its database `user_id`; content-free is not anonymous
   - provider-managed IP addresses, request logs, and SDK behavior still require review; the linked declarations above are already required by Permitext's own stored records
 
-### Location — provider review required
+### Location
 
 - Precise Location: no device-location collection established by this audit; this is not a complete provider assessment.
-- Coarse Location: unresolved provider declaration; do not submit a blanket `No` for Location. Clerk's session activity model and current provider documentation include IP-derived city/country data. Confirm the production service's collection and purposes; a Project's entered street address is separately covered under Physical Address.
+- Coarse Location: collected, linked to identity, App Functionality
+  - Clerk's account/session-associated IP-derived city/country data, not GPS collection; a Project's entered street address is separately covered under Physical Address
 
 ### Remaining draft categories not collected — subject to provider review
 

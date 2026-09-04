@@ -1,12 +1,12 @@
 # Provider privacy disclosures — owner-review proposal
 
-Status: researched local proposal, not approved or published. No app behavior, privacy manifest, public policy, provider configuration, Apple field, or UI/UX is changed by this proposal. Base: `85cf031563c65368c46ea70dc29bb28216c961e7`.
+Status: **Owner approved applying these disclosures to the local release package** with the reply “i do,” acknowledged at approximately `2026-09-04T01:02Z` (September 3 EDT). The local privacy manifest and checklist now include the approved categories/purposes. No app behavior, approved public policy, provider configuration, Apple field, or UI/UX changes are authorized by that approval. Reviewed proposal base: `85cf031563c65368c46ea70dc29bb28216c961e7`; proposal commit: `e3025da17a60a3175a0ce96c0b18dd92faa03a05`.
 
-## Proposed answers
+## Approved local answers
 
 The [pinned SDK/source audit](./PERMITEXT_PRIVACY_DATA_FLOW_AUDIT_2026-09-03.md) established the app's actual Clerk integration. The provider sources below now support the following classifications. These are engineering interpretations of documented behavior, not a live inspection of a user's private session or a legal opinion.
 
-| Item | Proposed classification | Basis |
+| Item | Approved local classification | Basis |
 | --- | --- | --- |
 | Device ID | Collected, linked, App Functionality; not tracking | Pinned Clerk iOS sends identifierForVendor; Clerk documents retained event logs searchable by device ID and actor. |
 | Coarse Location | Collected, linked, App Functionality; not tracking | Clerk's stored session-activity model contains account/session-associated IP-derived city and country. This is not permission to collect GPS data. |
@@ -33,10 +33,22 @@ The existing no-tracking proposal is consistent with the reviewed authentication
 - Keep the current public policy's provider-log/backup caveat. Do not replace it with an invented zero-retention claim or treat `store: false` in a different provider as controlling Clerk data.
 - Actual disposable-account export/deletion verification remains a separate, explicitly authorized exercise. No account, session, subscription or stored record was changed during this review.
 
-## One approval boundary, then implementation
+## Implementation and publication boundaries
 
-Before publishing these answers, review this proposal with the owner and reconcile any provider-specific exceptions or uses not reflected in the documented standard behavior. An approved implementation should update the app privacy manifest and the matching checklist together, add category/purpose regression checks, and clarify the public policy through its existing version/hash approval process. Do not silently replace currently approved public-policy bytes.
+The approved local implementation adds Device ID and Coarse Location as linked, functionality-only, non-tracking categories and adds Analytics only to User ID and Product Interaction. Existing categories/reasons remain intact. The regression contract checks all thirteen categories, exact purposes, linkage/non-tracking flags and matching checklist answers, including negative controls for omitted categories or Analytics purposes. No SDK option or collection code changes.
+
+Before publication, reconcile any provider-specific exceptions or uses not reflected in the documented standard behavior and clarify the public policy through its existing version/hash approval process. Do not silently replace currently approved public-policy bytes. Approval of the classifications is not approval to publish new policy wording or enter Apple fields.
+
+### Policy clarification draft — not published or hash-approved
+
+For the next owner-reviewed policy revision, prepare wording along these lines:
+
+> When you sign in, Clerk processes account- and device-linked session information, including device identifiers and technical metadata. Its session records can include approximate city and country derived from your IP address for account management and security. This is distinct from device GPS location and from Project addresses you enter.
+>
+> Clerk also uses account and session activity to provide sign-up, sign-in, active-user and retention reports. Those reports measure use of the service; they do not add cross-app advertising tracking. Provider-managed logs and backups follow the applicable provider retention practices.
+
+This draft must be reconciled with the complete policy and assigned the next approved version/hash before a later authorized publication. The existing published policy and acceptance configuration are unchanged.
 
 Final candidate privacy aggregation remains required after the owner's UI/UX work and the selected release build. This proposal does not authorize creating a build, uploading to TestFlight, configuring Apple, submitting for review or releasing the app.
 
-No additional paid Research cohort is needed for this privacy work. The earlier no-cost runtime checks remain evidence for their exact tested source, not for a future manifest change or owner approval.
+No additional paid Research cohort is needed for this privacy work. The prior full no-cost runtime check remains evidence for its exact tested source; the declaration-only follow-up is checked separately and is not new physical-device acceptance.

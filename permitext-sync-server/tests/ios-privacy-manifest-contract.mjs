@@ -12,7 +12,12 @@ const [manifest, nativeContinuity, server, syncRepository, checklist] = await Pr
   read("../../NYC CC APP/docs/app-store/privacy-review-and-submission.md")
 ]);
 
-const correctedCategories = ["SearchHistory", "PerformanceData", "OtherDiagnosticData"];
+const declaredCategories = [
+  "Name", "EmailAddress", "PhysicalAddress", "UserID", "PurchaseHistory",
+  "PhotosorVideos", "OtherUserContent", "ProductInteraction", "SearchHistory",
+  "PerformanceData", "OtherDiagnosticData", "DeviceID", "CoarseLocation"
+];
+const analyticsCategories = new Set(["UserID", "ProductInteraction"]);
 
 // Inspect leaf declaration dictionaries, not unrelated flags elsewhere in the plist.
 // XML syntax is also checked with plutil on macOS; this is a bounded contract,
@@ -22,7 +27,11 @@ function validateDeclarations(source) {
     source.matchAll(/<dict>((?:(?!<\/?dict>)[\s\S])*)<\/dict>/g),
     (match) => match[1]
   );
-  for (const category of correctedCategories) {
+  const collectionEntries = dictionaries.filter((entry) =>
+    entry.includes("<key>NSPrivacyCollectedDataType</key>")
+  );
+  assert.equal(collectionEntries.length, declaredCategories.length, "Unexpected collected-data category.");
+  for (const category of declaredCategories) {
     const type = `NSPrivacyCollectedDataType${category}`;
     const entries = dictionaries.filter((entry) =>
       entry.includes(`<string>${type}</string>`)
@@ -37,12 +46,21 @@ function validateDeclarations(source) {
       assert.equal(entry.split(`<key>${key}</key>`).length - 1, 1, `${type}: duplicate ${key}.`);
       assert.match(entry, new RegExp(`<key>${key}</key>\\s*<${value}\\s*/>`), `${type}: incorrect ${key}.`);
     }
-    assert.match(entry, /<key>NSPrivacyCollectedDataTypePurposes<\/key>\s*<array>\s*<string>NSPrivacyCollectedDataTypePurposeAppFunctionality<\/string>\s*<\/array>/);
+    const purposeEntries = Array.from(entry.matchAll(
+      /<key>NSPrivacyCollectedDataTypePurposes<\/key>\s*<array>([\s\S]*?)<\/array>/g
+    ));
+    assert.equal(purposeEntries.length, 1, `${type}: missing or duplicate purpose array.`);
+    const purposes = Array.from(purposeEntries[0][1].matchAll(/<string>([^<]+)<\/string>/g), (match) => match[1]);
+    const expectedPurposes = ["NSPrivacyCollectedDataTypePurposeAppFunctionality"];
+    if (analyticsCategories.has(category)) expectedPurposes.push("NSPrivacyCollectedDataTypePurposeAnalytics");
+    assert.deepEqual(purposes.sort(), expectedPurposes.sort(), `${type}: incorrect purposes.`);
   }
+  assert.match(source, /<key>NSPrivacyTracking<\/key>\s*<false\s*\/>/);
+  assert.match(source, /<key>NSPrivacyTrackingDomains<\/key>\s*<array\s*\/>/);
 }
 
 validateDeclarations(manifest);
-for (const category of correctedCategories) {
+for (const category of declaredCategories) {
   assert.throws(() => validateDeclarations(manifest.replace(
     `NSPrivacyCollectedDataType${category}`, `MISSING_${category}`
   )), /must have one declaration/);
@@ -56,7 +74,10 @@ assert.throws(() => validateDeclarations(manifest.replaceAll(
 assert.throws(() => validateDeclarations(manifest.replaceAll(
   "NSPrivacyCollectedDataTypePurposeAppFunctionality",
   "NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising"
-)));
+)), /incorrect purposes/);
+assert.throws(() => validateDeclarations(manifest.replaceAll(
+  "<string>NSPrivacyCollectedDataTypePurposeAnalytics</string>", ""
+)), /incorrect purposes/);
 
 // The native continuity payload contains real query strings, not just counts.
 assert.match(nativeContinuity, /JSONEncoder\(\)\.encode\(recentSearches\)[\s\S]*?values\["recentSearchesJSON"\] = json/);
@@ -95,12 +116,14 @@ assert.match(server, /INSERT INTO permitext_research_operations \(id, user_id, o
 assert.match(server, /saveResearchOperationMetricBestEffort\(context\.userID, researchOperation\)/);
 assert.match(server, /DELETE FROM permitext_research_operations WHERE user_id = \$\{userID\}/);
 
-for (const label of ["Search History", "Performance Data", "Other Diagnostic Data"]) {
+for (const label of ["Search History", "Performance Data", "Other Diagnostic Data", "Device ID", "Coarse Location"]) {
   assert.ok(checklist.includes(`${label}: collected, linked to identity, App Functionality`));
+}
+for (const label of ["User ID", "Product Interaction"]) {
+  assert.ok(checklist.includes(`${label}: collected, linked to identity, App Functionality and Analytics`));
 }
 assert.doesNotMatch(checklist, /Search History outside Permitext/);
 assert.doesNotMatch(checklist, /Performance Data: not currently declared/);
-assert.match(checklist, /Device ID: unresolved provider declaration/);
-assert.match(checklist, /Coarse Location: unresolved provider declaration/);
+assert.doesNotMatch(checklist, /(?:Device ID|Coarse Location): unresolved provider declaration/);
 
 console.log("Permitext iOS privacy manifest/data-flow contract passed (synthetic data, no network).");
