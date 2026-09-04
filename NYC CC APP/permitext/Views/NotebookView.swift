@@ -15,8 +15,8 @@ private struct NativeNotebookEditorRoute: Identifiable, Hashable {
     let id: String
     let cardID: String?
 
-    init(cardID: String? = nil) {
-        self.id = cardID ?? "new:\(UUID().uuidString.lowercased())"
+    init(cardID: String? = nil, draftID: String? = nil) {
+        self.id = draftID ?? cardID ?? "new:\(UUID().uuidString.lowercased())"
         self.cardID = cardID
     }
 }
@@ -30,16 +30,8 @@ struct ProjectNotebookView: View {
     let accentColor: Color
     let referenceCandidates: [NativeNotebookReferenceCandidate]
     let initialCardID: String?
+    var cacheDirectoryURL: URL? = nil
     var onChanged: (() -> Void)? = nil
-
-    @State private var cards: [ProjectNotebookCardSummary] = []
-    @State private var access = NotebookAccess(role: "viewer", readOnly: true)
-    @State private var isLoading = false
-    @State private var errorMessage: String?
-    @State private var editorRoute: NativeNotebookEditorRoute?
-    @State private var isVisible = false
-    @State private var hasPresentedInitialCard = false
-    private let cache = ProjectHubOfflineCache()
 
     init(
         projectID: String,
@@ -47,8 +39,65 @@ struct ProjectNotebookView: View {
         accentColor: Color,
         referenceCandidates: [NativeNotebookReferenceCandidate],
         initialCardID: String? = nil,
+        cacheDirectoryURL: URL? = nil,
         onChanged: (() -> Void)? = nil
     ) {
+        self.projectID = projectID
+        self.projectName = projectName
+        self.accentColor = accentColor
+        self.referenceCandidates = referenceCandidates
+        self.initialCardID = initialCardID
+        self.cacheDirectoryURL = cacheDirectoryURL
+        self.onChanged = onChanged
+    }
+
+    var body: some View {
+        ProjectNotebookSessionView(
+            projectID: projectID, projectName: projectName, accentColor: accentColor,
+            referenceCandidates: referenceCandidates, initialCardID: initialCardID,
+            onChanged: onChanged, owner: library.privateRequestIdentity, cacheDirectoryURL: cacheDirectoryURL
+        ).id(library.privateSessionID)
+    }
+}
+
+private struct ProjectNotebookSessionView: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.scenePhase) private var scenePhase
+
+    let projectID: String
+    let projectName: String
+    let accentColor: Color
+    let referenceCandidates: [NativeNotebookReferenceCandidate]
+    let initialCardID: String?
+    var onChanged: (() -> Void)? = nil
+
+    @State private var cards: [ProjectNotebookCardSummary] = []
+    @State private var localDrafts: [(scope: String, value: NativeNotebookDraft)] = []
+    @State private var access = NotebookAccess(role: "viewer", readOnly: true)
+    @State private var isLoading = true
+    @State private var loadID: UUID?
+    @State private var cachedAt: String?
+    @State private var errorMessage: String?
+    @State private var editorRoute: NativeNotebookEditorRoute?
+    @State private var isVisible = false
+    @State private var shouldRefreshAfterBackground = false
+    @State private var hasPresentedInitialCard = false
+    private let cache: ProjectHubOfflineCache
+    private let owner: NativePrivateRequestIdentity?
+    private var isCurrentOwner: Bool { owner != nil && owner == library.privateRequestIdentity }
+
+    init(
+        projectID: String,
+        projectName: String,
+        accentColor: Color,
+        referenceCandidates: [NativeNotebookReferenceCandidate],
+        initialCardID: String? = nil,
+        onChanged: (() -> Void)? = nil,
+        owner: NativePrivateRequestIdentity?,
+        cacheDirectoryURL: URL? = nil
+    ) {
+        self.owner = owner
+        self.cache = ProjectHubOfflineCache(directoryURL: cacheDirectoryURL)
         self.projectID = projectID
         self.projectName = projectName
         self.accentColor = accentColor
@@ -67,9 +116,13 @@ struct ProjectNotebookView: View {
                 .padding(.vertical, 10)
 
             Group {
-                if isLoading && cards.isEmpty {
+                if isLoading && cards.isEmpty && localDrafts.isEmpty {
                     ProgressView("Loading Notebook…")
-                } else if cards.isEmpty {
+                } else if cards.isEmpty && localDrafts.isEmpty, let errorMessage {
+                    NativeNotebookLoadFailureView(message: errorMessage) {
+                        Task { await loadCards(forceNetwork: true) }
+                    }
+                } else if cards.isEmpty && localDrafts.isEmpty {
                     ContentUnavailableView(
                         "No Notes yet",
                         systemImage: "note.text",
@@ -78,9 +131,29 @@ struct ProjectNotebookView: View {
                 } else {
                     List {
                         if let errorMessage {
-                            Text(errorMessage)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(errorMessage).font(.footnote).foregroundStyle(.secondary)
+                                Button("Retry") { Task { await loadCards(forceNetwork: true) } }
+                            }
+                        }
+                        if let cachedAt {
+                            Text("Saved on this iPhone: \(notebookDate(cachedAt)). Connect to refresh access and content.")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        if !localDrafts.isEmpty {
+                            Section("Drafts on this iPhone") {
+                                ForEach(localDrafts, id: \.scope) { entry in
+                                    Button {
+                                        editorRoute = NativeNotebookEditorRoute(cardID: entry.value.cardID, draftID: String(entry.scope.dropFirst("native-notebook-draft:".count)))
+                                    } label: {
+                                        VStack(alignment: .leading, spacing: 5) {
+                                            Text(entry.value.title.isEmpty ? "Untitled Note" : entry.value.title)
+                                            Text(entry.value.pendingSave == nil ? "Unsynchronized draft" : "Save confirmation pending")
+                                                .font(.caption).foregroundStyle(.secondary)
+                                        }
+                                    }
+                                }
+                            }
                         }
                         ForEach(cards) { card in
                             Button {
@@ -136,7 +209,10 @@ struct ProjectNotebookView: View {
             await loadCards()
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active, isVisible, editorRoute == nil else { return }
+            if phase == .background { shouldRefreshAfterBackground = true }
+            guard phase == .active, shouldRefreshAfterBackground else { return }
+            shouldRefreshAfterBackground = false
+            guard isVisible, editorRoute == nil else { return }
             Task { await loadCards(forceNetwork: true) }
         }
         .onAppear { isVisible = true }
@@ -151,10 +227,13 @@ struct ProjectNotebookView: View {
                     readOnly: access.readOnly,
                     accentColor: accentColor,
                     referenceCandidates: referenceCandidates,
+                    owner: owner,
                     onSaved: {
+                        guard isCurrentOwner else { return }
                         Task { await loadCards(forceNetwork: true) }
                         onChanged?()
-                    }
+                    },
+                    cache: cache
                 )
                 .environmentObject(library)
             }
@@ -162,33 +241,50 @@ struct ProjectNotebookView: View {
     }
 
     private func loadCards(forceNetwork: Bool = false) async {
-        guard let accountID = library.signedInAccount?.appUserID else { return }
-        if !forceNetwork,
-           cards.isEmpty,
-           let cached = try? cache.load(
-                NotebookCardListResponse.self,
-                accountID: accountID,
-                projectID: projectID,
-                scope: "native-notebook-list"
-           ) {
+        guard isCurrentOwner, let owner else {
+            cards = []
+            access = NotebookAccess(role: "viewer", readOnly: true)
+            errorMessage = "Sign in to load this Notebook."
+            isLoading = false
+            return
+        }
+        localDrafts = (try? cache.entries(NativeNotebookDraft.self, accountID: owner.accountID, projectID: projectID, scopePrefix: "native-notebook-draft:"))?.filter {
+            $0.value.hasUnsynchronizedChanges
+        }.sorted { ($0.value.editedAt ?? .distantPast) > ($1.value.editedAt ?? .distantPast) } ?? []
+        let requestID = UUID()
+        loadID = requestID
+        if !forceNetwork, cards.isEmpty, let cached = try? cache.load(
+            NotebookCardListResponse.self, accountID: owner.accountID,
+            projectID: projectID, scope: "native-notebook-list"
+        ) {
             cards = cached.value.cards
-            access = cached.value.access ?? access
+            // Cached access is descriptive; an online response authorizes edits.
+            access = NotebookAccess(role: "viewer", readOnly: true)
+            cachedAt = cached.cachedAt
         }
         isLoading = true
-        defer { isLoading = false }
+        defer { if isCurrentOwner && loadID == requestID { isLoading = false } }
         do {
             let response = try await library.notebookCards(projectID: projectID)
+            guard isCurrentOwner, loadID == requestID, !Task.isCancelled else { return }
             cards = response.cards.sorted { $0.updatedAt > $1.updatedAt }
             access = response.access ?? NotebookAccess(role: "editor", readOnly: false)
             errorMessage = nil
-            try? cache.store(
-                response,
-                accountID: accountID,
-                projectID: projectID,
-                scope: "native-notebook-list"
-            )
+            cachedAt = nil
+            try? cache.store(response, accountID: owner.accountID, projectID: projectID, scope: "native-notebook-list")
         } catch {
-            if cards.isEmpty { errorMessage = error.localizedDescription }
+            guard isCurrentOwner, loadID == requestID, !Task.isCancelled else { return }
+            if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) {
+                cards = []
+                cachedAt = nil
+                access = NotebookAccess(role: "viewer", readOnly: true)
+            }
+            if NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                try? cache.removeProject(accountID: owner.accountID, projectID: projectID)
+                localDrafts = []
+                editorRoute = nil
+            }
+            errorMessage = nativeNotebookRequestErrorMessage(error)
         }
     }
 
@@ -198,16 +294,108 @@ struct ProjectNotebookView: View {
     }
 }
 
-private struct NativeNotebookDraft: Codable, Hashable, Sendable {
+private func nativeNotebookRequestErrorMessage(_ error: Error) -> String {
+    if let error = error as? URLError {
+        switch error.code {
+        case .notConnectedToInternet, .networkConnectionLost, .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed:
+            return "Unable to connect. Check your internet connection, then try again."
+        case .timedOut:
+            return "The Notebook request timed out. Try again."
+        default:
+            return "The Notebook request could not be completed. Try again."
+        }
+    }
+    if error is CancellationError { return "The request was interrupted. Your draft is still available to retry." }
+    return error.localizedDescription
+}
+
+struct NativeNotebookLoadFailureView: View {
+    let message: String
+    let retry: () -> Void
+
+    var body: some View {
+        ContentUnavailableView {
+            Label("Notebook unavailable", systemImage: "exclamationmark.arrow.triangle.2.circlepath")
+        } description: {
+            Text(message)
+        } actions: {
+            Button("Retry", action: retry)
+                .accessibilityIdentifier("native-notebook-retry")
+        }
+    }
+}
+
+/// The explicit overwrite review includes nested text, images and evidence.
+private struct NativeNotebookConflictPreview: View {
+    let projectID: String
+    let document: NotebookDocument
+    let evidenceLinks: [NotebookEvidenceLink]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(flattened(document.document), id: \.block.id) { entry in
+                VStack(alignment: .leading, spacing: 6) {
+                    if entry.block.type == "image" {
+                        NotebookAssetImage(projectID: projectID, url: entry.block.props.url ?? "")
+                        Text(entry.block.props.name ?? "Image").font(.caption)
+                        if let caption = entry.block.props.caption, !caption.isEmpty { Text(caption) }
+                    } else {
+                        Text(inlineText(entry.block.content ?? []))
+                            .font(entry.block.type == "heading" ? .headline : .body)
+                    }
+                }
+                .padding(.leading, CGFloat(entry.depth) * 12)
+            }
+            ForEach(evidenceLinks) { link in
+                Label(link.label, systemImage: "text.quote").font(.footnote)
+                Text("\(link.source.codePrefix) \(link.source.sectionNumber) · \(link.source.codeEdition)")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+        }.frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func flattened(_ blocks: [NotebookBlock], depth: Int = 0) -> [(block: NotebookBlock, depth: Int)] {
+        blocks.flatMap { [($0, depth)] + flattened($0.children, depth: depth + 1) }
+    }
+
+    private func inlineText(_ values: [NotebookInlineContent]) -> AttributedString {
+        values.reduce(into: AttributedString()) { result, value in
+            var text = AttributedString(value.text ?? value.props?.label ?? "")
+            if value.styles?.bold == true { text.inlinePresentationIntent = .stronglyEmphasized }
+            if value.styles?.italic == true { text.inlinePresentationIntent = (text.inlinePresentationIntent ?? []).union(.emphasized) }
+            result.append(text)
+            if let children = value.content { result.append(inlineText(children)) }
+            if let href = value.href { result.append(AttributedString(" (\(href))")) }
+        }
+    }
+}
+
+struct NativeNotebookDraft: Codable, Hashable, Sendable {
     var cardID: String?
     var version: Int
     var title: String
     var document: NotebookDocument
     var evidenceLinks: [NotebookEvidenceLink]
     var editedAt: Date? = nil
+    var clientMutationID: String? = nil
+    var pendingSave: NativeNotebookSaveAttempt? = nil
+    var baseContent: NativeNotebookEditableContent? = nil
+
+    var hasUnsynchronizedChanges: Bool {
+        pendingSave != nil || baseContent != NativeNotebookEditableContent(title: title, document: document, evidenceLinks: evidenceLinks)
+    }
 }
 
-private struct NativeNotebookEditableContent: Hashable, Sendable {
+/// Persist the exact request until its acknowledgement arrives. A later edit must
+/// not turn an uncertain create into a second create with a different key/body.
+struct NativeNotebookSaveAttempt: Codable, Hashable, Sendable {
+    let clientMutationID: String
+    let cardID: String?
+    let expectedVersion: Int
+    let content: NativeNotebookEditableContent
+}
+
+struct NativeNotebookEditableContent: Codable, Hashable, Sendable {
     var title: String
     var document: NotebookDocument
     var evidenceLinks: [NotebookEvidenceLink]
@@ -232,6 +420,8 @@ private struct NotebookCardEditorView: View {
     let readOnly: Bool
     let accentColor: Color
     let referenceCandidates: [NativeNotebookReferenceCandidate]
+    let owner: NativePrivateRequestIdentity?
+    private var isCurrentOwner: Bool { owner != nil && owner == library.privateRequestIdentity }
     let onSaved: () -> Void
 
     @State private var currentCardID: String?
@@ -241,6 +431,7 @@ private struct NotebookCardEditorView: View {
     @State private var evidenceLinks: [NotebookEvidenceLink] = []
     @State private var isLoading = false
     @State private var isSaving = false
+    @State private var isDeleting = false
     @State private var needsSave = false
     @State private var hasLoaded = false
     @State private var statusMessage = ""
@@ -255,12 +446,23 @@ private struct NotebookCardEditorView: View {
     @State private var showingDeleteConfirmation = false
     @State private var lastSyncedContent: NativeNotebookEditableContent?
     @State private var lastLocalEditAt: Date?
-    private let cache = ProjectHubOfflineCache()
+    @State private var draftMutationID = UUID().uuidString.lowercased()
+    @State private var mutationContent: NativeNotebookEditableContent?
+    @State private var pendingSave: NativeNotebookSaveAttempt?
+    @State private var hasLocalDraft = false
+    @State private var requiresConflictReview = false
+    @State private var conflictingCard: NotebookCard?
+    @State private var showingConflictReview = false
+    let cache: ProjectHubOfflineCache
 
     var body: some View {
         Group {
             if isLoading && !hasLoaded {
                 ProgressView("Loading Note…")
+            } else if !hasLoaded, let errorMessage {
+                NativeNotebookLoadFailureView(message: errorMessage) {
+                    Task { await loadCard(forceNetwork: true) }
+                }
             } else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
@@ -272,6 +474,10 @@ private struct NotebookCardEditorView: View {
                             Text(errorMessage)
                                 .font(.footnote)
                                 .foregroundStyle(.red)
+                        }
+                        if requiresConflictReview {
+                            Button("Review latest version") { Task { await reviewLatestVersion() } }
+                                .accessibilityIdentifier("native-notebook-review-conflict")
                         }
 
                         ForEach(Array(document.document.enumerated()), id: \.element.id) { index, block in
@@ -299,19 +505,46 @@ private struct NotebookCardEditorView: View {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Done") { dismiss() }
             }
-            if !readOnly {
+            if !readOnly && hasLoaded {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button("Save") { Task { await saveNow() } }
-                        .disabled(isSaving || !hasLoaded)
+                        .disabled(isSaving || isDeleting || !hasLoaded || requiresConflictReview)
                     if currentCardID != nil {
                         Button("Delete", systemImage: "trash", role: .destructive) {
                             showingDeleteConfirmation = true
                         }
+                        .disabled(isSaving || isDeleting)
                     }
                 }
             }
         }
         .tint(accentColor)
+        .sheet(isPresented: $showingConflictReview) {
+            NavigationStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Your draft").font(.headline)
+                        Text(title).font(.title3)
+                        NativeNotebookConflictPreview(projectID: projectID, document: document, evidenceLinks: evidenceLinks)
+                        if let latest = conflictingCard {
+                            Divider()
+                            Text("Latest saved Note · version \(latest.version)").font(.headline)
+                            Text(latest.title).font(.title3)
+                            NativeNotebookConflictPreview(projectID: projectID, document: latest.document, evidenceLinks: latest.evidenceLinks)
+                            Text("Saving your draft replaces this reviewed version. If it changes again, Permitext will ask you to review the conflict again.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                            Button("Save my draft over version \(latest.version)") { resolveConflict(using: latest) }
+                                .buttonStyle(.bordered)
+                                .tint(accentColor)
+                                .foregroundStyle(.primary)
+                                .accessibilityIdentifier("native-notebook-confirm-conflict")
+                        }
+                    }.padding(20)
+                }
+                .navigationTitle("Review Note conflict")
+                .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Keep draft") { showingConflictReview = false } } }
+            }
+        }
         .task { await loadCard() }
         .onChange(of: title) { _, _ in scheduleAutosave() }
         .onChange(of: document) { _, _ in scheduleAutosave() }
@@ -494,11 +727,12 @@ private struct NotebookCardEditorView: View {
     }
 
     private func loadCard(forceNetwork: Bool = false) async {
-        guard let accountID = library.signedInAccount?.appUserID else { return }
+        guard isCurrentOwner else { return }
+        guard let accountID = owner?.accountID else { return }
         isLoading = true
         defer { isLoading = false }
 
-        var restoredDraft: NativeNotebookDraft?
+        var restoredDraft: NativeNotebookDraft? = hasLocalDraft ? currentDraft : nil
 
         if !forceNetwork, !hasLoaded {
             if let cachedDraft = try? cache.load(
@@ -506,7 +740,7 @@ private struct NotebookCardEditorView: View {
                 accountID: accountID,
                 projectID: projectID,
                 scope: "native-notebook-draft:\(routeID)"
-            )?.value {
+            )?.value, cachedDraft.hasUnsynchronizedChanges {
                 restoredDraft = cachedDraft
                 apply(cachedDraft)
             } else if let cardID,
@@ -519,7 +753,7 @@ private struct NotebookCardEditorView: View {
                 apply(cachedCard)
             } else {
                 currentCardID = cardID
-                hasLoaded = true
+                hasLoaded = cardID == nil
             }
         }
 
@@ -529,20 +763,26 @@ private struct NotebookCardEditorView: View {
         }
         do {
             let card = try await library.notebookCard(projectID: projectID, cardID: cardID)
-            if let restoredDraft,
-               editableContent(for: restoredDraft) != editableContent(for: card),
-               let localEditAt = restoredDraft.editedAt,
-               localEditAt > notebookDateValue(card.updatedAt) {
-                currentCardID = card.id
-                version = card.version
-                lastSyncedContent = editableContent(for: card)
-                lastLocalEditAt = localEditAt
-                statusMessage = "Saving latest changes…"
-                needsSave = true
+            guard isCurrentOwner, !Task.isCancelled else { return }
+            if let restoredDraft {
+                if restoredDraft.pendingSave != nil {
+                    // Reconcile the exact original save, even if the user edited
+                    // a newer local revision before the response was lost.
+                    statusMessage = "Draft kept on this iPhone. Retry Save to confirm the pending change."
+                } else if restoredDraft.version != card.version {
+                    conflictingCard = card
+                    requiresConflictReview = true
+                    errorMessage = "This Note changed elsewhere. Your draft and its original version are preserved. Review the latest Note before saving."
+                } else if editableContent(for: restoredDraft) == editableContent(for: card) {
+                    apply(card)
+                    errorMessage = nil
+                } else {
+                    statusMessage = "Draft kept on this iPhone"
+                }
             } else {
                 apply(card)
+                errorMessage = nil
             }
-            errorMessage = nil
             try? cache.store(
                 card,
                 accountID: accountID,
@@ -553,7 +793,14 @@ private struct NotebookCardEditorView: View {
                 await saveNow()
             }
         } catch {
-            if !hasLoaded { errorMessage = error.localizedDescription }
+            guard isCurrentOwner else { return }
+            if NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                // Preserve the draft, but do not display or edit revoked server content.
+                try? cache.removeProject(accountID: accountID, projectID: projectID)
+                hasLoaded = false
+            }
+            errorMessage = nativeNotebookRequestErrorMessage(error)
+            statusMessage = hasLoaded ? "Saved on this iPhone; could not refresh" : ""
         }
     }
 
@@ -566,6 +813,12 @@ private struct NotebookCardEditorView: View {
         lastSyncedContent = editableContent(for: card)
         lastLocalEditAt = nil
         hasLoaded = true
+        hasLocalDraft = false
+        pendingSave = nil
+        draftMutationID = UUID().uuidString.lowercased()
+        requiresConflictReview = false
+        conflictingCard = nil
+        mutationContent = editableContent
         statusMessage = "Synced"
     }
 
@@ -575,17 +828,26 @@ private struct NotebookCardEditorView: View {
         title = draft.title
         document = draft.document
         evidenceLinks = draft.evidenceLinks
-        lastSyncedContent = nil
+        lastSyncedContent = draft.baseContent
         lastLocalEditAt = draft.editedAt
+        draftMutationID = draft.clientMutationID ?? UUID().uuidString.lowercased()
+        pendingSave = draft.pendingSave
+        mutationContent = editableContent(for: draft)
+        hasLocalDraft = true
         hasLoaded = true
         statusMessage = "Draft on this iPhone"
     }
 
     private func scheduleAutosave() {
-        guard hasLoaded, !readOnly else { return }
+        guard isCurrentOwner else { return }
+        guard hasLoaded, !readOnly, !isLoading, !isDeleting else { return }
         guard editableContent != lastSyncedContent else { return }
         lastLocalEditAt = Date()
-        cacheDraft()
+        guard cacheDraft() else { return }
+        if requiresConflictReview {
+            statusMessage = "Draft kept on this iPhone; review the conflict before saving"
+            return
+        }
         statusMessage = "Saving…"
         saveTask?.cancel()
         saveTask = Task {
@@ -597,131 +859,141 @@ private struct NotebookCardEditorView: View {
 
     @MainActor
     private func saveNow() async {
-        guard hasLoaded, !readOnly else { return }
-        if isSaving {
-            needsSave = true
-            return
-        }
+        guard isCurrentOwner, hasLoaded, !readOnly, !isLoading, !isDeleting, !requiresConflictReview else { return }
+        if isSaving { needsSave = true; return }
+        guard pendingSave != nil || editableContent != lastSyncedContent else { return }
         isSaving = true
         needsSave = false
         defer {
             isSaving = false
-            if needsSave { Task { await saveNow() } }
+            if isCurrentOwner, needsSave, !requiresConflictReview { Task { await saveNow() } }
         }
-        cacheDraft()
-        let contentAtStart = editableContent
+        guard cacheDraft() else { return }
+        let attempt = pendingSave ?? NativeNotebookSaveAttempt(
+            clientMutationID: draftMutationID, cardID: currentCardID, expectedVersion: version, content: editableContent
+        )
+        pendingSave = attempt
+        guard cacheDraft() else { return }
         do {
             let saved = try await library.saveNotebookCard(
-                projectID: projectID,
-                cardID: currentCardID,
-                expectedVersion: version,
-                title: normalizedTitle(contentAtStart.title),
-                document: contentAtStart.document,
-                evidenceLinks: contentAtStart.evidenceLinks
+                projectID: projectID, cardID: attempt.cardID, expectedVersion: attempt.expectedVersion,
+                title: normalizedTitle(attempt.content.title), document: attempt.content.document,
+                evidenceLinks: attempt.content.evidenceLinks, clientMutationID: attempt.clientMutationID
             )
-            completeSave(saved, contentAtStart: contentAtStart)
+            guard isCurrentOwner, !Task.isCancelled else { return }
+            pendingSave = nil
+            completeSave(saved, contentAtStart: attempt.content)
         } catch let error as PermitextBackendHTTPError where error.statusCode == 409 {
-            await reconcileVersionConflict()
+            guard isCurrentOwner else { return }
+            await reconcileVersionConflict(error)
         } catch {
+            guard isCurrentOwner else { return }
+            guard cacheDraft() else { return }
             statusMessage = "Draft kept on this iPhone"
-            errorMessage = error.localizedDescription
+            errorMessage = nativeNotebookRequestErrorMessage(error)
         }
     }
 
     private func deleteCard() async {
+        guard isCurrentOwner, !isSaving, !isDeleting else { return }
         guard let currentCardID else { return }
+        isDeleting = true
+        saveTask?.cancel()
+        defer { isDeleting = false }
         do {
             try await library.deleteNotebookCard(
                 projectID: projectID,
                 cardID: currentCardID,
                 expectedVersion: version
             )
+            guard isCurrentOwner, !Task.isCancelled else { return }
+            // Dismissing a deleted editor must not schedule another save or
+            // recreate the removed local draft in onDisappear.
+            hasLoaded = false
+            needsSave = false
+            pendingSave = nil
+            saveTask?.cancel()
+            if let owner {
+                try? cache.remove(accountID: owner.accountID, projectID: projectID, scope: "native-notebook-card:\(currentCardID)")
+                try? cache.remove(accountID: owner.accountID, projectID: projectID, scope: "native-notebook-draft:\(routeID)")
+            }
             onSaved()
             dismiss()
         } catch {
-            errorMessage = error.localizedDescription
+            guard isCurrentOwner else { return }
+            errorMessage = nativeNotebookRequestErrorMessage(error)
         }
     }
 
-    private func cacheDraft() {
-        guard let accountID = library.signedInAccount?.appUserID else { return }
-        try? cache.store(
-            NativeNotebookDraft(
-                cardID: currentCardID,
-                version: version,
-                title: title,
-                document: document,
-                evidenceLinks: evidenceLinks,
-                editedAt: lastLocalEditAt
-            ),
-            accountID: accountID,
-            projectID: projectID,
-            scope: "native-notebook-draft:\(routeID)"
-        )
+    private var currentDraft: NativeNotebookDraft {
+        NativeNotebookDraft(cardID: currentCardID, version: version, title: title, document: document,
+            evidenceLinks: evidenceLinks, editedAt: lastLocalEditAt, clientMutationID: draftMutationID, pendingSave: pendingSave, baseContent: lastSyncedContent)
+    }
+
+    @discardableResult
+    private func cacheDraft() -> Bool {
+        guard isCurrentOwner, let accountID = owner?.accountID else { return false }
+        if mutationContent != editableContent {
+            draftMutationID = UUID().uuidString.lowercased()
+            mutationContent = editableContent
+        }
+        hasLocalDraft = editableContent != lastSyncedContent || pendingSave != nil
+        do {
+            try cache.store(currentDraft, accountID: accountID, projectID: projectID, scope: "native-notebook-draft:\(routeID)")
+            return true
+        } catch {
+            errorMessage = "Could not save the local draft. Keep this Note open and try again after freeing space. \(error.localizedDescription)"
+            statusMessage = "Draft is not saved on this iPhone"
+            return false
+        }
     }
 
     @MainActor
-    private func reconcileVersionConflict() async {
-        guard let currentCardID else {
-            statusMessage = "Draft kept on this iPhone"
-            errorMessage = "Permitext could not reconcile this Note yet. Try Save again."
+    private func reconcileVersionConflict(_ error: PermitextBackendHTTPError) async {
+        guard isCurrentOwner else { return }
+        requiresConflictReview = true
+        needsSave = false
+        conflictingCard = error.authoritativeNotebookCard
+        guard cacheDraft() else { return }
+        statusMessage = "Draft kept on this iPhone"
+        errorMessage = "This Note changed elsewhere. Your draft and its original version are preserved. Review the latest Note before saving."
+    }
+
+    private func reviewLatestVersion() async {
+        guard isCurrentOwner else { return }
+        let id = currentCardID ?? pendingSave?.cardID ?? conflictingCard?.id
+        guard let id else {
+            errorMessage = "The original save could not be confirmed. Your draft is preserved; retry after reconnecting before creating another Note."
             return
         }
-
-        cacheDraft()
         do {
-            let serverCard = try await library.notebookCard(
-                projectID: projectID,
-                cardID: currentCardID
-            )
-            let localContent = editableContent
-            let serverContent = editableContent(for: serverCard)
-
-            if localContent == serverContent {
-                apply(serverCard)
-                storeServerCard(serverCard)
-                errorMessage = nil
-                onSaved()
-                return
-            }
-
-            let serverEditAt = notebookDateValue(serverCard.updatedAt)
-            if lastLocalEditAt == nil || serverEditAt >= (lastLocalEditAt ?? .distantPast) {
-                // The local draft was cached before replacing it, so a failed or
-                // interrupted reconciliation never destroys the user's work.
-                apply(serverCard)
-                storeServerCard(serverCard)
-                errorMessage = nil
-                statusMessage = "Synced latest change"
-                onSaved()
-                return
-            }
-
-            // This iPhone has the newest edit. Rebase it on the authoritative
-            // version and retry exactly once; a second conflict remains a draft.
-            version = serverCard.version
-            lastSyncedContent = serverContent
-            let rebasedContent = editableContent
-            do {
-                let saved = try await library.saveNotebookCard(
-                    projectID: projectID,
-                    cardID: currentCardID,
-                    expectedVersion: serverCard.version,
-                    title: normalizedTitle(rebasedContent.title),
-                    document: rebasedContent.document,
-                    evidenceLinks: rebasedContent.evidenceLinks
-                )
-                completeSave(saved, contentAtStart: rebasedContent)
-            } catch {
-                cacheDraft()
-                statusMessage = "Draft kept on this iPhone"
-                errorMessage = "Permitext found another newer edit. Your draft is safe; try Save again after syncing."
-            }
+            let latest = try await library.notebookCard(projectID: projectID, cardID: id)
+            guard isCurrentOwner, !Task.isCancelled else { return }
+            conflictingCard = latest
+            showingConflictReview = true
         } catch {
-            cacheDraft()
-            statusMessage = "Draft kept on this iPhone"
-            errorMessage = "Could not check the latest Note. Your draft is safe on this iPhone."
+            guard isCurrentOwner else { return }
+            errorMessage = "Could not load the latest Note. Your draft is still on this iPhone."
         }
+    }
+
+    private func resolveConflict(using reviewed: NotebookCard) {
+        guard isCurrentOwner, conflictingCard == reviewed else { return }
+        // Only this explicit action adopts a newer base version. The next save
+        // remains conditional, so a change after review returns another conflict.
+        currentCardID = reviewed.id
+        version = reviewed.version
+        lastSyncedContent = editableContent(for: reviewed)
+        pendingSave = nil
+        draftMutationID = UUID().uuidString.lowercased()
+        mutationContent = editableContent
+        requiresConflictReview = false
+        showingConflictReview = false
+        conflictingCard = nil
+        errorMessage = nil
+        statusMessage = editableContent == lastSyncedContent ? "Synced" : "Saving reviewed draft…"
+        guard cacheDraft() else { return }
+        Task { await saveNow() }
     }
 
     @MainActor
@@ -741,6 +1013,7 @@ private struct NotebookCardEditorView: View {
         }
         errorMessage = nil
         storeServerCard(saved)
+        cacheDraft()
         onSaved()
     }
 
@@ -779,7 +1052,8 @@ private struct NotebookCardEditorView: View {
     }
 
     private func storeServerCard(_ card: NotebookCard) {
-        guard let accountID = library.signedInAccount?.appUserID else { return }
+        guard isCurrentOwner else { return }
+        guard let accountID = owner?.accountID else { return }
         try? cache.store(
             card,
             accountID: accountID,
@@ -789,6 +1063,7 @@ private struct NotebookCardEditorView: View {
     }
 
     private func uploadImage(_ item: PhotosPickerItem) async {
+        guard isCurrentOwner else { return }
         isUploadingImage = true
         defer {
             isUploadingImage = false
@@ -800,6 +1075,7 @@ private struct NotebookCardEditorView: View {
                   let data = image.jpegData(compressionQuality: 0.86) else {
                 throw PermitextBackendHTTPError.invalidResponse
             }
+            guard isCurrentOwner, !Task.isCancelled else { return }
             let asset = try await library.uploadNotebookAsset(
                 projectID: projectID,
                 data: data,
@@ -807,6 +1083,7 @@ private struct NotebookCardEditorView: View {
                 width: Int(image.size.width * image.scale),
                 height: Int(image.size.height * image.scale)
             )
+            guard isCurrentOwner, !Task.isCancelled else { return }
             document.document.append(
                 .image(
                     url: asset.url,
@@ -815,7 +1092,8 @@ private struct NotebookCardEditorView: View {
                 )
             )
         } catch {
-            errorMessage = error.localizedDescription
+            guard isCurrentOwner else { return }
+            errorMessage = nativeNotebookRequestErrorMessage(error)
         }
     }
 
@@ -932,10 +1210,14 @@ private struct NotebookAssetImage: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .task(id: url) { await load() }
+        .task(id: "\(library.privateSessionID):\(url)") { await load() }
     }
 
     private func load() async {
+        let identity = library.privateRequestIdentity
+        image = nil
+        failed = false
+        guard identity != nil else { failed = true; return }
         guard !url.isEmpty else { failed = true; return }
         do {
             let data: Data
@@ -948,9 +1230,11 @@ private struct NotebookAssetImage: View {
             } else {
                 throw PermitextBackendHTTPError.invalidResponse
             }
+            guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
             image = UIImage(data: data)
             failed = image == nil
         } catch {
+            guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
             failed = true
         }
     }

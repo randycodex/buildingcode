@@ -170,7 +170,26 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var currentEntitlementSource: EntitlementSource
     @Published private(set) var currentCapabilityContract: PermitextCapabilityContract? = nil
     @Published private(set) var entitlementPrompt: EntitlementRequirement?
-    @Published private(set) var signedInAccount: SignedInAccount?
+    @Published private(set) var signedInAccount: SignedInAccount? {
+        didSet {
+            guard oldValue?.appUserID != signedInAccount?.appUserID else { return }
+            privateSessionID = UUID()
+            activeResearchConversationID = nil
+            if oldValue != nil { pendingResearchSelections = [] }
+        }
+    }
+    @Published private(set) var privateSessionID = UUID()
+    private var researchSelectionID = UUID()
+
+    var privateRequestIdentity: NativePrivateRequestIdentity? {
+        signedInAccount.map { NativePrivateRequestIdentity(accountID: $0.appUserID, sessionID: privateSessionID) }
+    }
+
+    var researchRequestIdentity: NativeResearchRequestIdentity? {
+        privateRequestIdentity.map {
+            NativeResearchRequestIdentity(account: $0, conversationID: activeResearchConversationID, selectionID: researchSelectionID)
+        }
+    }
     @Published private(set) var isAccountBusy = false
     @Published private(set) var accountAuthenticationMessage: String?
     @Published var isClerkAuthenticationPresented = false
@@ -236,7 +255,11 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var startupFirstUsableDurationMilliseconds: Int?
     @Published var selectedTab: AppTab = .browse
     @Published var browserTabSwitchRequest: BrowserContextID?
-    @Published var activeResearchConversationID: String?
+    @Published var activeResearchConversationID: String? {
+        didSet {
+            if oldValue != activeResearchConversationID { researchSelectionID = UUID() }
+        }
+    }
     @Published private(set) var pendingResearchSelections: [ResearchSelectionRequest] = []
     @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
 
@@ -254,7 +277,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let lifetimeGrantLookupClient: LifetimeGrantLookupClient
     private let accountBackendClient: AccountBackendClient
     private let ownsAccountSync: Bool
-    private let projectHubOfflineCache = ProjectHubOfflineCache()
+    private let projectHubOfflineCache: ProjectHubOfflineCache
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let storeKitResearchTurnService = StoreKitResearchTurnService()
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
@@ -348,8 +371,10 @@ final class CodeLibraryViewModel: ObservableObject {
         loadsInitialContent: Bool = true,
         loadsPersistedAccount: Bool = true,
         initialSignedInAccount: SignedInAccount? = nil,
-        ownsAccountSync: Bool = true
+        ownsAccountSync: Bool = true,
+        privateCacheDirectoryURL: URL? = nil
     ) {
+        self.projectHubOfflineCache = ProjectHubOfflineCache(directoryURL: privateCacheDirectoryURL)
         let loadedSignedInAccount = initialSignedInAccount
             ?? (loadsPersistedAccount ? Self.loadSignedInAccount() : nil)
         if let storedLifetimeUserID = preferencesDefaults.string(
@@ -2388,25 +2413,44 @@ final class CodeLibraryViewModel: ObservableObject {
         pendingResearchSelections.removeFirst(selections.count)
     }
 
+    private func performPrivateAccountRequest<Value: Sendable>(
+        _ operation: (SignedInAccount) async throws -> Value
+    ) async throws -> Value {
+        guard let account = signedInAccount, let identity = privateRequestIdentity else {
+            throw ProjectHubLoadError.signInRequired
+        }
+        do {
+            let value = try await operation(account)
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
+            return value
+        } catch {
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
+            throw error
+        }
+    }
+
     func researchConversations() async throws -> [ResearchConversationSummary] {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.researchConversations(account: signedInAccount)
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.researchConversations(account: account)
+        }
     }
 
     func researchConversation(id: String) async throws -> ResearchConversation {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.researchConversation(
-            account: signedInAccount,
-            conversationID: id
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.researchConversation(
+                account: account,
+                conversationID: id
+            )
+        }
     }
 
     func refreshResearchConversation(id: String) async throws -> ResearchConversation {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.refreshResearchConversation(
-            account: signedInAccount,
-            conversationID: id
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.refreshResearchConversation(
+                account: account,
+                conversationID: id
+            )
+        }
     }
 
     func reviewResearchProjectContext(
@@ -2414,23 +2458,25 @@ final class CodeLibraryViewModel: ObservableObject {
         projectID: String,
         facts: [String]
     ) async throws -> ResearchConversation {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.reviewResearchProjectContext(
-            account: signedInAccount,
-            conversationID: conversationID,
-            projectID: projectID,
-            facts: facts
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.reviewResearchProjectContext(
+                account: account,
+                conversationID: conversationID,
+                projectID: projectID,
+                facts: facts
+            )
+        }
     }
 
     func reviewResearchSelection(
         _ selection: ResearchSelectionRequest
     ) async throws -> ResearchSelectionReviewResponse {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.reviewResearchSelection(
-            account: signedInAccount,
-            selection: selection
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.reviewResearchSelection(
+                account: account,
+                selection: selection
+            )
+        }
     }
 
     func createResearchConversation(
@@ -2438,7 +2484,9 @@ final class CodeLibraryViewModel: ObservableObject {
         projectID: String?
     ) async throws -> ResearchConversation {
         guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        let identity = privateRequestIdentity
         try await ensureAssignedProjectIsSyncedForResearch(projectID)
+        guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
         return try await accountBackendClient.createResearchConversation(
             account: signedInAccount,
             projectID: projectID,
@@ -2474,12 +2522,13 @@ final class CodeLibraryViewModel: ObservableObject {
         conversationID: String,
         selections: [ResearchSelectionRequest]
     ) async throws -> ResearchConversation {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.addResearchEvidence(
-            account: signedInAccount,
-            conversationID: conversationID,
-            selections: selections
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.addResearchEvidence(
+                account: account,
+                conversationID: conversationID,
+                selections: selections
+            )
+        }
     }
 
     func sendResearchMessage(
@@ -2488,6 +2537,7 @@ final class CodeLibraryViewModel: ObservableObject {
         requestID: String = UUID().uuidString
     ) async throws -> ResearchConversation {
         guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
+        let identity = privateRequestIdentity
         do {
             let conversation = try await accountBackendClient.sendResearchMessage(
                 account: signedInAccount,
@@ -2495,9 +2545,12 @@ final class CodeLibraryViewModel: ObservableObject {
                 question: question,
                 requestID: requestID
             )
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             await refreshResearchTurnAllowance(showsErrors: false)
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             return conversation
         } catch {
+            guard identity == privateRequestIdentity else { throw CancellationError() }
             if let backendError = error as? PermitextBackendHTTPError,
                backendError.serverCode == "RESEARCH_TURNS_REQUIRED" {
                 await refreshResearchTurnAllowance(showsErrors: false)
@@ -2512,23 +2565,25 @@ final class CodeLibraryViewModel: ObservableObject {
         category: String,
         comment: String?
     ) async throws -> ResearchFeedback {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.saveResearchFeedback(
-            account: signedInAccount,
-            conversationID: conversationID,
-            answerID: answerID,
-            category: category,
-            comment: comment
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.saveResearchFeedback(
+                account: account,
+                conversationID: conversationID,
+                answerID: answerID,
+                category: category,
+                comment: comment
+            )
+        }
     }
 
     func renameResearchConversation(id: String, title: String) async throws -> ResearchConversation {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.renameResearchConversation(
-            account: signedInAccount,
-            conversationID: id,
-            title: title
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.renameResearchConversation(
+                account: account,
+                conversationID: id,
+                title: title
+            )
+        }
     }
 
     func assignResearchConversation(
@@ -2536,38 +2591,42 @@ final class CodeLibraryViewModel: ObservableObject {
         projectID: String?,
         confirmMove: Bool
     ) async throws -> ResearchConversation {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.assignResearchConversation(
-            account: signedInAccount,
-            conversationID: id,
-            projectID: projectID,
-            confirmMove: confirmMove
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.assignResearchConversation(
+                account: account,
+                conversationID: id,
+                projectID: projectID,
+                confirmMove: confirmMove
+            )
+        }
     }
 
     func deleteResearchConversation(id: String) async throws {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        try await accountBackendClient.deleteResearchConversation(
-            account: signedInAccount,
-            conversationID: id
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.deleteResearchConversation(
+                account: account,
+                conversationID: id
+            )
+        }
     }
 
     func notebookCards(projectID: String) async throws -> NotebookCardListResponse {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.notebookCards(
-            account: signedInAccount,
-            projectID: projectID
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.notebookCards(
+                account: account,
+                projectID: projectID
+            )
+        }
     }
 
     func notebookCard(projectID: String, cardID: String) async throws -> NotebookCard {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.notebookCard(
-            account: signedInAccount,
-            projectID: projectID,
-            cardID: cardID
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.notebookCard(
+                account: account,
+                projectID: projectID,
+                cardID: cardID
+            )
+        }
     }
 
     func saveNotebookCard(
@@ -2576,28 +2635,32 @@ final class CodeLibraryViewModel: ObservableObject {
         expectedVersion: Int,
         title: String,
         document: NotebookDocument,
-        evidenceLinks: [NotebookEvidenceLink]
+        evidenceLinks: [NotebookEvidenceLink],
+        clientMutationID: String? = nil
     ) async throws -> NotebookCard {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.saveNotebookCard(
-            account: signedInAccount,
-            projectID: projectID,
-            cardID: cardID,
-            expectedVersion: expectedVersion,
-            title: title,
-            document: document,
-            evidenceLinks: evidenceLinks
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.saveNotebookCard(
+                account: account,
+                projectID: projectID,
+                cardID: cardID,
+                expectedVersion: expectedVersion,
+                title: title,
+                document: document,
+                evidenceLinks: evidenceLinks,
+                clientMutationID: clientMutationID
+            )
+        }
     }
 
     func deleteNotebookCard(projectID: String, cardID: String, expectedVersion: Int) async throws {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        try await accountBackendClient.deleteNotebookCard(
-            account: signedInAccount,
-            projectID: projectID,
-            cardID: cardID,
-            expectedVersion: expectedVersion
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.deleteNotebookCard(
+                account: account,
+                projectID: projectID,
+                cardID: cardID,
+                expectedVersion: expectedVersion
+            )
+        }
     }
 
     func uploadNotebookAsset(
@@ -2607,26 +2670,27 @@ final class CodeLibraryViewModel: ObservableObject {
         width: Int?,
         height: Int?
     ) async throws -> NotebookImageAsset {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.uploadNotebookAsset(
-            account: signedInAccount,
-            projectID: projectID,
-            data: data,
-            contentType: contentType,
-            width: width,
-            height: height
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.uploadNotebookAsset(
+                account: account,
+                projectID: projectID,
+                data: data,
+                contentType: contentType,
+                width: width,
+                height: height
+            )
+        }
     }
 
     func notebookAsset(projectID: String, assetID: String) async throws -> Data {
-        guard let signedInAccount else { throw ProjectHubLoadError.signInRequired }
-        return try await accountBackendClient.notebookAsset(
-            account: signedInAccount,
-            projectID: projectID,
-            assetID: assetID
-        )
+        try await performPrivateAccountRequest { account in
+            try await accountBackendClient.notebookAsset(
+                account: account,
+                projectID: projectID,
+                assetID: assetID
+            )
+        }
     }
-
     func bookmarks(inFolder folderID: Int64) -> [BookmarkedSection] {
         projectBookmarksByFolderID[folderID] ?? []
     }
@@ -2646,11 +2710,13 @@ final class CodeLibraryViewModel: ObservableObject {
             folder.clientID,
             userID: signedInAccount.appUserID
         ) ?? folder.clientID
+        let identity = privateRequestIdentity
         do {
             let snapshot = try await accountBackendClient.projectHub(
                 account: signedInAccount,
                 projectID: projectID
             )
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             try? projectHubOfflineCache.store(
                 snapshot,
                 accountID: signedInAccount.appUserID,
@@ -2659,6 +2725,11 @@ final class CodeLibraryViewModel: ObservableObject {
             )
             return snapshot
         } catch {
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
+            if NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                try? projectHubOfflineCache.removeProject(accountID: signedInAccount.appUserID, projectID: projectID)
+            }
+            guard NativePrivateCachePolicy.permitsOfflineFallback(after: error) else { throw error }
             if let cached = try? projectHubOfflineCache.load(
                 ProjectHubSnapshot.self,
                 accountID: signedInAccount.appUserID,
@@ -2679,9 +2750,13 @@ final class CodeLibraryViewModel: ObservableObject {
         guard !isOrganizationWorkspaceLoading else { return }
         isOrganizationWorkspaceLoading = true
         defer { isOrganizationWorkspaceLoading = false }
+        let identity = privateRequestIdentity
         do {
-            organizations = try await accountBackendClient.organizations(account: signedInAccount)
+            let loaded = try await accountBackendClient.organizations(account: signedInAccount)
+            guard identity == privateRequestIdentity, !Task.isCancelled else { return }
+            organizations = loaded
         } catch {
+            guard identity == privateRequestIdentity, !Task.isCancelled else { return }
             if handleBackendSessionFailureIfNeeded(error) { return }
             statusMessage = error.localizedDescription
         }
@@ -2719,11 +2794,13 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let signedInAccount else {
             throw ProjectHubLoadError.signInRequired
         }
+        let identity = privateRequestIdentity
         do {
             let snapshot = try await accountBackendClient.organizationProjectSnapshot(
                 account: signedInAccount,
                 projectID: projectID
             )
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
             try? projectHubOfflineCache.store(
                 snapshot,
                 accountID: signedInAccount.appUserID,
@@ -2732,13 +2809,20 @@ final class CodeLibraryViewModel: ObservableObject {
             )
             return snapshot
         } catch {
+            guard identity == privateRequestIdentity, !Task.isCancelled else { throw CancellationError() }
+            if NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                try? projectHubOfflineCache.removeProject(accountID: signedInAccount.appUserID, projectID: projectID)
+            }
+            guard NativePrivateCachePolicy.permitsOfflineFallback(after: error) else { throw error }
             if let cached = try? projectHubOfflineCache.load(
                 BackendOrganizationProjectSnapshotResponse.self,
                 accountID: signedInAccount.appUserID,
                 projectID: projectID,
                 scope: "organization"
             ) {
-                return cached.value
+                var snapshot = cached.value
+                snapshot.cachedAt = cached.cachedAt
+                return snapshot
             }
             throw error
         }
@@ -3270,12 +3354,14 @@ final class CodeLibraryViewModel: ObservableObject {
             clearResearchTurnState()
             return
         }
+        let identity = privateRequestIdentity
         do {
             let allowance = try await accountBackendClient.researchTurnAllowance(account: account)
-            guard signedInAccount?.appUserID == account.appUserID else { return }
+            guard identity == privateRequestIdentity, !Task.isCancelled else { return }
             researchTurnAllowance = allowance
             let productIDs = allowance.packs.compactMap(\.appleProductID)
             let products = await storeKitResearchTurnService.products(for: productIDs)
+            guard identity == privateRequestIdentity, !Task.isCancelled else { return }
             researchTurnProductDisplayPrices = Dictionary(
                 uniqueKeysWithValues: products.map { ($0.id, $0.displayPrice) }
             )
@@ -3283,6 +3369,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 await recoverUnfinishedResearchTurnPurchases()
             }
         } catch {
+            guard identity == privateRequestIdentity, !Task.isCancelled else { return }
             if showsErrors {
                 researchTurnPurchaseMessage = "Permitext could not load Research turns: \(error.localizedDescription)"
             }
@@ -4283,6 +4370,10 @@ final class CodeLibraryViewModel: ObservableObject {
     func deleteAccount() async -> AccountDeletionExecutionResult? {
         guard let account = signedInAccount else { return nil }
         guard !isAccountBusy else { return nil }
+        let identity = privateRequestIdentity
+        let knownProjectIDs = folders.filter { $0.folderType == .project }.map {
+            UserContentProjectIdentity.stable($0.clientID, userID: account.appUserID) ?? $0.clientID
+        }
         isAccountBusy = true
         defer { isAccountBusy = false }
         accountDeletionServerCode = nil
@@ -4291,13 +4382,19 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             response = try await accountBackendClient.deleteAccount(account: account)
         } catch {
+            guard identity == privateRequestIdentity else { return nil }
             accountDeletionServerCode = (error as? PermitextBackendHTTPError)?.serverCode
             statusMessage = error.localizedDescription
             return nil
         }
 
+        let deviceCleanupError = retryDeletedAccountDeviceCleanup(accountID: account.appUserID, knownProjectIDs: knownProjectIDs)
+        // Deletion still purges its original owner after an account switch, but
+        // its completion cannot sign out or reset another active account.
+        guard signedInAccount?.appUserID == account.appUserID else {
+            return AccountDeletionExecutionResult(response: response, deviceCleanupError: deviceCleanupError)
+        }
         stopForegroundAutomaticSync()
-        let deviceCleanupError = retryDeletedAccountDeviceCleanup(accountID: account.appUserID)
         if preferencesDefaults.string(forKey: AccountDefaults.storeKitTestOwnerUserIDKey) == account.appUserID {
             preferencesDefaults.removeObject(forKey: AccountDefaults.storeKitTestOwnerUserIDKey)
         }
@@ -4330,21 +4427,29 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     @discardableResult
-    func retryDeletedAccountDeviceCleanup(accountID: String) -> String? {
+    func retryDeletedAccountDeviceCleanup(accountID: String, knownProjectIDs preservedProjectIDs: [String] = []) -> String? {
+        let knownProjectIDs = preservedProjectIDs + (signedInAccount?.appUserID == accountID ? folders.filter { $0.folderType == .project }.map {
+            UserContentProjectIdentity.stable($0.clientID, userID: accountID) ?? $0.clientID
+        } : [])
         do {
+            try projectHubOfflineCache.removeAccount(accountID: accountID, knownProjectIDs: knownProjectIDs)
             if let accountUserDataProfiles {
                 let databaseURL = try accountUserDataProfiles.databaseURL(accountID: accountID)
                 try UserDataStore(databaseURL: databaseURL).deleteAllUserData()
                 accountUserDataProfiles.removeAccountProfile(accountID: accountID)
-            } else {
+            } else if signedInAccount?.appUserID == accountID {
                 try userContentRepository?.deleteAllUserData()
             }
             return nil
         } catch {
             let message = "Some Permitext data stored on this device could not be cleared: \(error.localizedDescription)"
-            statusMessage = message
+            if signedInAccount?.appUserID == accountID { statusMessage = message }
             return message
         }
+    }
+
+    var deletedAccountDeviceCleanupNotice: String? {
+        projectHubOfflineCache.retainedLegacyDataNotice
     }
 
     @discardableResult

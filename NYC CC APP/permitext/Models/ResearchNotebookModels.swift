@@ -613,6 +613,7 @@ struct NotebookCardSaveRequest: Codable, Hashable, Sendable {
     let title: String
     let document: NotebookDocument
     var evidenceLinks: [NotebookEvidenceLink] = []
+    var clientMutationID: String? = nil
 }
 
 struct NotebookCardDeleteRequest: Codable, Hashable, Sendable {

@@ -88,6 +88,10 @@ struct OrganizationProjectHubView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                 projectHeader
+                if let cachedAt = snapshot?.cachedAt {
+                    Text("Saved copy from \(cachedAt). Connect to refresh this shared Project.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
 
                 if isLoading && snapshot == nil {
                     CodeSurface(accent: projectAccent, showsBorder: false) {
@@ -136,7 +140,10 @@ struct OrganizationProjectHubView: View {
         .navigationTitle("Project Hub")
         .navigationBarTitleDisplayMode(.inline)
         .tint(Color.appChrome)
-        .task {
+        .task(id: library.privateSessionID) {
+            snapshot = nil
+            errorMessage = nil
+            reportShareURL = nil
             await loadSnapshot()
         }
         .onAppear {
@@ -669,6 +676,8 @@ struct OrganizationProjectHubView: View {
     }
 
     private func loadSnapshot() async {
+        let identity = library.privateRequestIdentity
+        guard identity != nil else { snapshot = nil; return }
         guard !isLoading else { return }
         lastSnapshotLoadAt = Date()
         isLoading = true
@@ -676,8 +685,11 @@ struct OrganizationProjectHubView: View {
         defer { isLoading = false }
         do {
             let response = try await library.organizationProjectSnapshot(projectID: project.id)
+            guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
             snapshot = response
         } catch {
+            guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
+            if NativePrivateCachePolicy.requiresInvalidation(after: error) { snapshot = nil }
             errorMessage = error.localizedDescription
         }
     }

@@ -2491,6 +2491,7 @@ struct BackendOrganizationProjectSnapshotRequest: Codable, Hashable, Sendable {
 struct BackendOrganizationProjectSnapshotResponse: Codable, Hashable, Sendable {
     let access: PermitextOrganizationProjectAccess
     let project: BackendProjectFoundationResponse
+    var cachedAt: String? = nil
 }
 
 struct BackendProjectReportFileReadRequest: Codable, Hashable, Sendable {
@@ -2503,6 +2504,7 @@ private struct BackendErrorResponse: Codable, Hashable, Sendable {
     let error: String?
     let code: String?
     let conversation: ResearchConversation?
+    let card: NotebookCard?
 }
 
 struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
@@ -2742,27 +2744,33 @@ enum PermitextBackendHTTPError: LocalizedError {
         Int,
         String?,
         code: String? = nil,
-        conversation: ResearchConversation? = nil
+        conversation: ResearchConversation? = nil,
+        notebookCard: NotebookCard? = nil
     )
 
     var statusCode: Int? {
-        guard case .serverStatus(let statusCode, _, _, _) = self else { return nil }
+        guard case .serverStatus(let statusCode, _, _, _, _) = self else { return nil }
         return statusCode
     }
 
     var serverCode: String? {
-        guard case .serverStatus(_, _, let code, _) = self else { return nil }
+        guard case .serverStatus(_, _, let code, _, _) = self else { return nil }
         return code
     }
 
     var serverMessage: String? {
-        guard case .serverStatus(_, let message, _, _) = self else { return nil }
+        guard case .serverStatus(_, let message, _, _, _) = self else { return nil }
         return message
     }
 
     var authoritativeResearchConversation: ResearchConversation? {
-        guard case .serverStatus(_, _, _, let conversation) = self else { return nil }
+        guard case .serverStatus(_, _, _, let conversation, _) = self else { return nil }
         return conversation
+    }
+
+    var authoritativeNotebookCard: NotebookCard? {
+        guard case .serverStatus(_, _, _, _, let card) = self else { return nil }
+        return card
     }
 
     var isAuthenticationFailure: Bool {
@@ -2773,7 +2781,7 @@ enum PermitextBackendHTTPError: LocalizedError {
         switch self {
         case .invalidResponse:
             return "The backend returned an invalid response."
-        case .serverStatus(let statusCode, let message, _, _):
+        case .serverStatus(let statusCode, let message, _, _, _):
             if let message, !message.isEmpty {
                 return message
             }
@@ -3012,7 +3020,8 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
                 httpResponse.statusCode,
                 backendError?.error,
                 code: backendError?.code,
-                conversation: backendError?.conversation
+                conversation: backendError?.conversation,
+                notebookCard: backendError?.card
             )
         }
         return data
@@ -3133,7 +3142,8 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
                 httpResponse.statusCode,
                 backendError?.error,
                 code: backendError?.code,
-                conversation: backendError?.conversation
+                conversation: backendError?.conversation,
+                notebookCard: backendError?.card
             )
         }
         return try decoder.decode(ResponseBody.self, from: data)
@@ -3151,8 +3161,18 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     private let phase3ResearchFixtureEnabled: Bool
     private let phase3ResearchFailureCode: String?
     private var phase3ResearchConversations: [String: ResearchConversation] = [:]
+    private var notebookListFailureRemaining: Bool
+    private let researchResponseDelay: Bool
+    private var notebookFixtureCard: NotebookCard?
 
-    init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil) {
+    init(phase3ResearchFixtureEnabled: Bool = false, phase3ResearchFailureCode: String? = nil, notebookListFailureOnce: Bool = false, researchResponseDelay: Bool = false, notebookConflictFixture: Bool = false) {
+        self.notebookListFailureRemaining = notebookListFailureOnce
+        self.researchResponseDelay = researchResponseDelay
+        self.notebookFixtureCard = notebookConflictFixture ? NotebookCard(
+            id: "native-conflict-card", version: 2, createdAt: "2026-09-04T12:00:00Z", updatedAt: "2026-09-04T13:00:00Z",
+            projectIDs: ["native-notebook-fixture"], title: "Latest saved analysis",
+            document: NotebookDocument(document: [.paragraph("Another device saved this analysis.")])
+        ) : nil
         self.phase3ResearchFixtureEnabled = phase3ResearchFixtureEnabled
         self.phase3ResearchFailureCode = phase3ResearchFailureCode
     }
@@ -3449,7 +3469,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .prefix(80)
             let conversation = ResearchConversation(
-                id: "phase3-research-conversation",
+                id: phase3ResearchConversations.isEmpty ? "phase3-research-conversation" : "phase3-research-conversation-\(phase3ResearchConversations.count + 1)",
                 title: title.map(String.init) ?? "Phase 3 Research",
                 createdAt: phase3ResearchTimestamp(),
                 updatedAt: phase3ResearchTimestamp(),
@@ -3499,6 +3519,11 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     func researchConversationMessage(_ request: ResearchConversationMessageRequest) async throws -> ResearchConversationMessageResponse {
         #if DEBUG
         if phase3ResearchFixtureEnabled {
+            if researchResponseDelay {
+                // A server may finish after client cancellation. Deliberately
+                // complete this synthetic response so the UI boundary is tested.
+                await Task.detached { try? await Task.sleep(for: .seconds(5)) }.value
+            }
             if let phase3ResearchFailureCode {
                 throw PermitextBackendHTTPError.serverStatus(502, "Fixture verification rejection", code: phase3ResearchFailureCode)
             }
@@ -3655,7 +3680,19 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     }
 
     func notebookCardList(_ request: NotebookCardListRequest) async throws -> NotebookCardListResponse {
-        NotebookCardListResponse(
+        #if DEBUG
+        if notebookListFailureRemaining {
+            notebookListFailureRemaining = false
+            throw URLError(.notConnectedToInternet)
+        }
+        if let card = notebookFixtureCard {
+            return NotebookCardListResponse(schemaVersion: 1, projectID: request.projectID,
+                cards: [ProjectNotebookCardSummary(id: card.id, version: card.version, cardType: card.cardType, title: card.title,
+                    plainText: card.plainText, referenceCount: 0, createdAt: card.createdAt, updatedAt: card.updatedAt)],
+                access: NotebookAccess(role: "owner", readOnly: false))
+        }
+        #endif
+        return NotebookCardListResponse(
             schemaVersion: 1,
             projectID: request.projectID,
             cards: [],
@@ -3664,14 +3701,36 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     }
 
     func notebookCardGet(_ request: NotebookCardGetRequest) async throws -> NotebookCardResponse {
+        #if DEBUG
+        if let card = notebookFixtureCard, card.id == request.cardID { return NotebookCardResponse(card: card) }
+        #endif
         throw URLError(.fileDoesNotExist)
     }
 
     func notebookCardSave(_ request: NotebookCardSaveRequest) async throws -> NotebookCardResponse {
+        #if DEBUG
+        if var card = notebookFixtureCard, request.cardID == card.id {
+            guard request.expectedVersion == card.version else {
+                throw PermitextBackendHTTPError.serverStatus(409, "The Note changed elsewhere.", code: "NOTEBOOK_VERSION_CONFLICT", notebookCard: card)
+            }
+            card.version += 1
+            card.title = request.title
+            card.document = request.document
+            card.evidenceLinks = request.evidenceLinks
+            notebookFixtureCard = card
+            return NotebookCardResponse(card: card)
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
     func notebookCardDelete(_ request: NotebookCardDeleteRequest) async throws -> NotebookCardDeleteResponse {
+        #if DEBUG
+        if let card = notebookFixtureCard, request.cardID == card.id, request.expectedVersion == card.version {
+            notebookFixtureCard = nil
+            return NotebookCardDeleteResponse(cardID: card.id, deletedAt: "2026-09-04T14:00:00Z")
+        }
+        #endif
         throw URLError(.unsupportedURL)
     }
 
@@ -5109,7 +5168,8 @@ protocol AccountBackendClient {
         expectedVersion: Int,
         title: String,
         document: NotebookDocument,
-        evidenceLinks: [NotebookEvidenceLink]
+        evidenceLinks: [NotebookEvidenceLink],
+        clientMutationID: String?
     ) async throws -> NotebookCard
     func deleteNotebookCard(
         account: SignedInAccount,

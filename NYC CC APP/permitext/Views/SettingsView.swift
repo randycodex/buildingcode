@@ -1233,7 +1233,7 @@ struct SettingsView: View {
         updateAccountDeletionStage(
             "device",
             status: result.deviceCleanupError == nil ? .complete : .failed,
-            detail: result.deviceCleanupError ?? "Permitext data stored on this device was cleared."
+            detail: result.deviceCleanupError ?? library.deletedAccountDeviceCleanupNotice ?? "Account-scoped Permitext data stored on this device was cleared."
         )
 
         await removeAccountDeletionIdentity(account: account)
@@ -1256,6 +1256,10 @@ struct SettingsView: View {
                     userInfo: [NSLocalizedDescriptionKey: "The signed-in Clerk identity is unavailable."]
                 )
             }
+            guard user.id == account.authProviderUserID else {
+                throw NSError(domain: "PermitextAccountDeletion", code: 2,
+                    userInfo: [NSLocalizedDescriptionKey: "The active sign-in identity changed. Only the original account’s identity may be removed."])
+            }
             try await user.delete()
             accountDeletionIdentityError = nil
             updateAccountDeletionStage("identity", status: .complete, detail: "The Permitext Clerk sign-in identity was removed.")
@@ -1274,7 +1278,7 @@ struct SettingsView: View {
             updateAccountDeletionStage(
                 "device",
                 status: accountDeletionDeviceError == nil ? .complete : .failed,
-                detail: accountDeletionDeviceError ?? "Permitext data stored on this device was cleared."
+                detail: accountDeletionDeviceError ?? library.deletedAccountDeviceCleanupNotice ?? "Account-scoped Permitext data stored on this device was cleared."
             )
         }
         if accountDeletionIdentityError != nil {

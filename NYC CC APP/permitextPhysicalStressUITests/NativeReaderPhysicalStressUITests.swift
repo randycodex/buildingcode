@@ -9,6 +9,85 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         executionTimeAllowance = 7_200
     }
 
+    func testNativeNotebookFirstLoadFailureShowsRetryAndRecovers() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--native-notebook-retry-fixture"]
+        app.launch()
+        let retry = app.buttons["native-notebook-retry"]
+        XCTAssertTrue(retry.waitForExistence(timeout: 30), "First-load failure must be visible and recoverable.")
+        XCTAssertFalse(app.staticTexts["No Notes yet"].exists, "A load failure is not an empty Notebook.")
+        keepScreenshot(named: "Native Notebook first-load retry", from: app)
+        retry.tap()
+        XCTAssertTrue(app.staticTexts["No Notes yet"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["New Note"].exists, "Successful retry must restore server-authorized editing.")
+    }
+
+    func testNativeNotebookConflictRequiresReviewAndDeletionDoesNotRestoreDraft() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--native-notebook-conflict-fixture"]
+        app.launch()
+        let review = app.buttons["native-notebook-review-conflict"]
+        XCTAssertTrue(review.waitForExistence(timeout: 30))
+        XCTAssertFalse(app.buttons["Save"].isEnabled, "A reopened stale draft must not silently adopt the latest version.")
+        review.tap()
+        XCTAssertTrue(app.staticTexts["Your draft"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["My local draft is still preserved."].exists)
+        XCTAssertTrue(app.staticTexts["Another device saved this analysis."].exists)
+        let screenshot = XCTAttachment(screenshot: app.screenshot())
+        screenshot.name = "Native Notebook explicit conflict review"
+        screenshot.lifetime = .keepAlways
+        add(screenshot)
+        app.buttons["native-notebook-confirm-conflict"].tap()
+        XCTAssertTrue(app.staticTexts["Synced"].waitForExistence(timeout: 10))
+        app.buttons["Delete"].tap()
+        app.buttons["Delete Note"].tap()
+        XCTAssertTrue(app.staticTexts["No Notes yet"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.staticTexts["Drafts on this iPhone"].exists)
+    }
+
+    func testResearchLateCompletionCannotReplaceNewConversation() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--phase3-seeded-selection-fixture", "--research-delayed-response-fixture"]
+        app.launch()
+        let composer = element(in: app, identifier: "research-composer")
+        XCTAssertTrue(composer.waitForExistence(timeout: 45), phase3LaunchFailureDescription(in: app))
+        composer.tap()
+        composer.typeText("Synthetic delayed private question")
+        app.buttons["Send Research question"].tap()
+        let disclosure = app.buttons["Continue to Research"]
+        if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
+        XCTAssertTrue(app.buttons["research-cancel-request"].waitForExistence(timeout: 3))
+        app.buttons["Research history"].tap()
+        app.buttons["New Research"].tap()
+        XCTAssertTrue(composer.waitForExistence(timeout: 5))
+        let oldAnswer = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "The selected enacted provision controls")).firstMatch
+        let noStaleAnswer = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == true"), object: oldAnswer)
+        noStaleAnswer.isInverted = true
+        XCTAssertEqual(XCTWaiter.wait(for: [noStaleAnswer], timeout: 7), .completed)
+        XCTAssertFalse(app.staticTexts["Synthetic delayed private question"].exists)
+        XCTAssertFalse(app.buttons["research-cancel-request"].exists)
+    }
+
+    func testResearchAnswerGuidesReviewBeforeNotebookAndWebReport() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--phase3-seeded-selection-fixture"]
+        app.launch()
+        let composer = element(in: app, identifier: "research-composer")
+        XCTAssertTrue(composer.waitForExistence(timeout: 45))
+        composer.tap()
+        composer.typeText("Synthetic next-step guidance question")
+        app.buttons["Send Research question"].tap()
+        let disclosure = app.buttons["Continue to Research"]
+        if disclosure.waitForExistence(timeout: 2) { disclosure.tap() }
+        XCTAssertTrue(element(in: app, identifier: "research-answer").waitForExistence(timeout: 15))
+        let guidance = element(in: app, identifier: "research-next-step-guidance")
+        reveal(guidance, in: app)
+        XCTAssertTrue(guidance.isHittable)
+        XCTAssertTrue(guidance.label.contains("your own conclusion in a Project Note"))
+        XCTAssertTrue(guidance.label.contains("Build Reports on Permitext Web"))
+        keepScreenshot(named: "Research review to Notebook and Web Report guidance", from: app)
+    }
+
     func testOneHundredReaderBookmarkProjectsCycles() {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -66,10 +145,10 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             element(in: app, identifier: "native-reader-ready").waitForExistence(timeout: 45),
             launchFailureDescription(in: app)
         )
-        XCTAssertTrue(
-            app.staticTexts["Plumbing Code"].waitForExistence(timeout: 10),
-            "The former HTML-only Plumbing Code chapter did not open in its native Reader."
-        )
+        let edition = element(in: app, identifier: "reader-source-edition")
+        XCTAssertTrue(edition.waitForExistence(timeout: 10))
+        XCTAssertTrue(edition.label.contains("Plumbing Code") && edition.label.contains("2022"),
+            "The native Reader must identify the code family and edition.")
 
         let attachment = XCTAttachment(screenshot: app.screenshot(), quality: .medium)
         attachment.name = "Plumbing Code Chapter 1 native Reader"

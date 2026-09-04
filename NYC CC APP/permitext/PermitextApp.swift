@@ -220,7 +220,15 @@ struct PermitextApp: App {
             Group {
 #if DEBUG
                 if let phase3ResearchConfiguration {
-                    Phase3EntitledResearchHarness(configuration: phase3ResearchConfiguration)
+                    if ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture") || ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") {
+                        NavigationStack {
+                            ProjectNotebookView(projectID: "native-notebook-fixture", projectName: "Notebook fixture", accentColor: .blue, referenceCandidates: [],
+                                initialCardID: ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") ? "native-conflict-card" : nil,
+                                cacheDirectoryURL: phase3ResearchConfiguration.cacheDirectoryURL)
+                        }
+                    } else {
+                        Phase3EntitledResearchHarness(configuration: phase3ResearchConfiguration)
+                    }
                 } else if let physicalStressConfiguration {
                     NativeReaderPhysicalStressHarness(configuration: physicalStressConfiguration)
                 } else if let snapshotConfiguration = NativeReaderPhase9SnapshotConfiguration.active {
@@ -459,7 +467,10 @@ private struct Phase3EntitledResearchConfiguration {
             let transport = LocalPermitextBackendTransport(
                 phase3ResearchFixtureEnabled: true,
                 phase3ResearchFailureCode: ProcessInfo.processInfo.arguments.contains("--research-verification-failure-fixture")
-                    ? "RESEARCH_VERIFICATION_FAILED" : nil
+                    ? "RESEARCH_VERIFICATION_FAILED" : nil,
+                notebookListFailureOnce: ProcessInfo.processInfo.arguments.contains("--native-notebook-retry-fixture"),
+                researchResponseDelay: ProcessInfo.processInfo.arguments.contains("--research-delayed-response-fixture"),
+                notebookConflictFixture: ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture")
             )
             let account = SignedInAccount(
                 appUserID: "guest:phase3-entitled-research",
@@ -484,6 +495,13 @@ private struct Phase3EntitledResearchConfiguration {
                 loadsPersistedAccount: false,
                 initialSignedInAccount: account
             )
+            if ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") {
+                let draft = NativeNotebookDraft(cardID: "native-conflict-card", version: 1, title: "Local unsynchronized analysis",
+                    document: NotebookDocument(document: [.paragraph("My local draft is still preserved.")]), evidenceLinks: [],
+                    clientMutationID: "native-conflict-draft-revision")
+                try ProjectHubOfflineCache(directoryURL: testDirectory.appendingPathComponent("research-cache", isDirectory: true))
+                    .store(draft, accountID: account.appUserID, projectID: "native-notebook-fixture", scope: "native-notebook-draft:native-conflict-card")
+            }
             return PreparedHarness(
                 configuration: Self(
                     defaults: defaults,

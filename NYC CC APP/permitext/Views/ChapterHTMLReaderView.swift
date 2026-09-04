@@ -358,10 +358,13 @@ struct ChapterHTMLReaderView: View {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 2) {
                     if !library.codeSections.isEmpty {
-                        Text(library.codeSectionName(id: chapter.codeSectionID))
+                        Text(library.codeSectionName(id: chapter.codeSectionID) + " · " + NativeReaderEditionLabel.label(for: library.selectedVersion?.codeVersion))
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(accentColor)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                            .accessibilityIdentifier("reader-source-edition")
+                            .accessibilityLabel(library.codeSectionName(id: chapter.codeSectionID) + ", " + (library.selectedVersion?.codeVersion ?? "Edition unavailable"))
                     }
                     Text(chapter.displayLabel + ":")
                         .font(.subheadline.weight(.semibold))
@@ -1137,5 +1140,20 @@ private struct ChapterHTMLJumpTarget: Identifiable, Hashable {
             anchorID: scrollTarget,
             level: level
         )
+    }
+}
+
+enum NativeReaderEditionLabel {
+    static func label(for version: String?) -> String {
+        guard let version else { return "Edition unavailable" }
+        switch UserContentSyncCodeVersion.server(version) {
+        case UserContentSyncCodeVersion.canonicalNYC2014: return "2014"
+        case UserContentSyncCodeVersion.canonicalNYC2022: return "2022"
+        case UserContentSyncCodeVersion.canonicalNYC2025Specialty: return "2025"
+        case UserContentSyncCodeVersion.canonicalNYCZoning: return "through 2026-08-13"
+        case UserContentSyncCodeVersion.canonicalNYCExistingBuilding: return "effective 2027-07-17"
+        case UserContentSyncCodeVersion.canonicalNYCEnactedAdministrative: return "through 2026-07-25"
+        default: return version
+        }
     }
 }

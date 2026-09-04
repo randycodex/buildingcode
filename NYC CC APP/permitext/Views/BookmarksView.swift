@@ -602,6 +602,7 @@ private var filteredSavedEmptyState: some View {
             if library.hasProjectAccess {
                 NavigationLink {
                     ProjectView(folderID: folder.id)
+                        .id(library.privateSessionID)
                 } label: {
                     projectTile(folder)
                         .frame(width: tileWidth)
@@ -1253,7 +1254,9 @@ struct ProjectView: View {
         .onDisappear {
             isProjectHubVisible = false
         }
-        .task(id: folder?.clientID) {
+        .task(id: "\(library.privateSessionID):\(folder?.clientID ?? "missing")") {
+            projectHubSnapshot = nil
+            projectHubError = nil
             await loadProjectHub()
         }
         .onChange(of: scenePhase) { _, phase in
@@ -1684,6 +1687,8 @@ struct ProjectView: View {
 
     @MainActor
     private func loadProjectHub() async {
+        let identity = library.privateRequestIdentity
+        guard identity != nil else { projectHubSnapshot = nil; return }
         guard isProjectFolder else {
             projectHubSnapshot = nil
             projectHubError = nil
@@ -1695,9 +1700,12 @@ struct ProjectView: View {
         defer { isProjectHubLoading = false }
         do {
             let snapshot = try await library.projectHubSnapshot(folderID: folderID)
+            guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
             projectHubSnapshot = snapshot
             projectHubError = nil
         } catch {
+            guard identity == library.privateRequestIdentity, !Task.isCancelled else { return }
+            if NativePrivateCachePolicy.requiresInvalidation(after: error) { projectHubSnapshot = nil }
             projectHubError = error.localizedDescription
         }
     }

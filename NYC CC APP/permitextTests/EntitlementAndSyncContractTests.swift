@@ -592,7 +592,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(filters.contains("minimumHitHeight: CGFloat = 44"))
         XCTAssertTrue(filters.contains("Image(systemName: \"checkmark\")"))
         XCTAssertTrue(filters.contains(".accessibilityAddTraits(isSelected ? .isSelected : [])"))
-        XCTAssertTrue(research.contains("Tap the sparkle icon to start Research."))
+        XCTAssertTrue(research.contains("Tap the plus button to start Research."))
         XCTAssertFalse(research.localizedCaseInsensitiveContains("tap the Astroid"))
         XCTAssertTrue(webView.contains("maximumZoomScale = 5"))
         XCTAssertFalse(webView.contains("user-scalable=no"))
@@ -2704,6 +2704,8 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(settingsSource.contains(".presentationCompactAdaptation(.sheet)"))
         XCTAssertTrue(settingsSource.contains(".presentationDetents([.large])"))
         XCTAssertFalse(settingsSource.contains("try? await clerk.user?.delete()"))
+        XCTAssertTrue(settingsSource.contains("guard user.id == account.authProviderUserID"))
+        XCTAssertTrue(settingsSource.contains("library.deletedAccountDeviceCleanupNotice"))
     }
 
     func testSettingsDoesNotExposeWebWorkspaceCard() throws {
@@ -7134,6 +7136,8 @@ final class NativeReaderPhase3ContractTests: XCTestCase {
         )
         XCTAssertEqual(ResearchTrustCopy.copyAnswerAction, "Copy answer")
         XCTAssertEqual(ResearchTrustCopy.reportProblemAction, "Report a problem")
+        XCTAssertTrue(ResearchTrustCopy.nextStepGuidance.contains("your own conclusion in a Project Note"))
+        XCTAssertTrue(ResearchTrustCopy.nextStepGuidance.contains("Build Reports on Permitext Web"))
 
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent("ResearchConversationCacheLifecycle.\(UUID().uuidString)", isDirectory: true)
@@ -7223,5 +7227,309 @@ private extension String {
               lower < upper
         else { return nil }
         return lower..<upper
+    }
+}
+
+extension EntitlementAndSyncContractTests {
+    @MainActor
+    func testNativePrivateIdentityRejectsAccountReentryAndConversationReentry() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        func model(_ accountID: String, file: String) throws -> CodeLibraryViewModel {
+            let defaults = isolatedEntitlementDefaults()
+            let account = SignedInAccount(appUserID: accountID, authProvider: .guest,
+                authProviderUserID: accountID, appleUserID: "", displayName: "Synthetic account", signedInAt: Date())
+            return CodeLibraryViewModel(
+                userContentRepository: try UserDataStore(databaseURL: directory.appendingPathComponent(file)),
+                continuityStore: ContinuityStore(defaults: defaults), readerThemeStore: ReaderThemeStore(defaults: defaults),
+                preferencesDefaults: defaults, entitlementService: LocalEntitlementService(defaults: defaults),
+                accountBackendClient: PermitextBackendClient(transport: LocalPermitextBackendTransport()),
+                loadsInitialContent: false, loadsPersistedAccount: false, initialSignedInAccount: account, ownsAccountSync: false)
+        }
+        let current = try model("synthetic-a", file: "current.sqlite")
+        let accountA = try model("synthetic-a", file: "a.sqlite")
+        let accountB = try model("synthetic-b", file: "b.sqlite")
+        current.activeResearchConversationID = "conversation-a"
+        let pendingRead = try XCTUnwrap(current.researchRequestIdentity)
+        current.activeResearchConversationID = "conversation-b"
+        XCTAssertNotEqual(current.researchRequestIdentity, pendingRead)
+        current.activeResearchConversationID = "conversation-a"
+        XCTAssertNotEqual(current.researchRequestIdentity, pendingRead, "Returning to the same conversation must not revive a stale result.")
+        let pendingSession = current.privateRequestIdentity
+        current.synchronizeIndependentReaderSession(from: accountB)
+        XCTAssertNil(current.activeResearchConversationID)
+        XCTAssertNotEqual(current.privateRequestIdentity, pendingSession)
+        current.synchronizeIndependentReaderSession(from: accountA)
+        XCTAssertNotEqual(current.privateRequestIdentity, pendingSession, "The same account in a new session must reject old callbacks.")
+        XCTAssertEqual(current.privateRequestIdentity?.accountID, "synthetic-a")
+    }
+
+    func testNativePrivateCacheFallbackRejectsPermissionDeletionAndCancellation() {
+        for status in [401, 403, 404, 410] {
+            let error = PermitextBackendHTTPError.serverStatus(status, "Unavailable")
+            XCTAssertFalse(NativePrivateCachePolicy.permitsOfflineFallback(after: error))
+            XCTAssertTrue(NativePrivateCachePolicy.requiresInvalidation(after: error))
+        }
+        for status in [400, 409, 422, 429] {
+            XCTAssertFalse(NativePrivateCachePolicy.permitsOfflineFallback(after: PermitextBackendHTTPError.serverStatus(status, "Rejected")))
+        }
+        XCTAssertFalse(NativePrivateCachePolicy.permitsOfflineFallback(after: CancellationError()))
+        XCTAssertFalse(NativePrivateCachePolicy.permitsOfflineFallback(after: URLError(.cancelled)))
+        XCTAssertFalse(NativePrivateCachePolicy.permitsOfflineFallback(after: URLError(.serverCertificateUntrusted)))
+        XCTAssertTrue(NativePrivateCachePolicy.permitsOfflineFallback(after: URLError(.notConnectedToInternet)))
+        XCTAssertTrue(NativePrivateCachePolicy.permitsOfflineFallback(after: URLError(.timedOut)))
+        XCTAssertTrue(NativePrivateCachePolicy.permitsOfflineFallback(after: PermitextBackendHTTPError.serverStatus(503, "Unavailable")))
+    }
+
+    func testNativeCacheRevocationPreservesDraftAndAccountDeletionPreservesOtherAccounts() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        for account in ["synthetic-a", "synthetic-b"] {
+            for scope in ["native-notebook-draft:new-route", "native-notebook-card:card", "personal", "organization", "research-conversation", ResearchQuestionAttempt.cacheScope] {
+                try cache.store(["owner": account], accountID: account, projectID: "project", scope: scope)
+            }
+        }
+        try cache.removeProject(accountID: "synthetic-a", projectID: "project")
+        XCTAssertNotNil(try cache.load([String: String].self, accountID: "synthetic-a", projectID: "project", scope: "native-notebook-draft:new-route"))
+        XCTAssertNil(try cache.load([String: String].self, accountID: "synthetic-a", projectID: "project", scope: "personal"))
+        try cache.removeAccount(accountID: "synthetic-a")
+        XCTAssertNil(try cache.load([String: String].self, accountID: "synthetic-a", projectID: "project", scope: "native-notebook-draft:new-route"))
+        XCTAssertNotNil(try cache.load([String: String].self, accountID: "synthetic-b", projectID: "project", scope: "native-notebook-draft:new-route"))
+        XCTAssertNotNil(try cache.load([String: String].self, accountID: "synthetic-b", projectID: "project", scope: "personal"))
+    }
+
+    func testNativeLegacyCacheMigrationVerifiesFullOwnerKeyAndPreservesAnonymousDrafts() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        func legacy(_ account: String, _ project: String, _ scope: String, value: [String: String]) throws -> URL {
+            let digest = SHA256.hash(data: Data([account, project, scope].joined(separator: "\u{1f}").utf8)).map { String(format: "%02x", $0) }.joined()
+            let file = directory.appendingPathComponent("\(digest).json")
+            let envelope: [String: Any] = ["schemaVersion": 1, "cachedAt": "2026-09-04T00:00:00Z", "value": value]
+            try JSONSerialization.data(withJSONObject: envelope).write(to: file)
+            return file
+        }
+        let oldA = try legacy("synthetic-a", "project", "native-notebook-draft:card", value: ["cardID": "card", "title": "A draft"])
+        let oldB = try legacy("synthetic-b", "project", "native-notebook-draft:card", value: ["cardID": "card", "title": "B draft"])
+        let unidentified = try legacy("synthetic-a", "project", "native-notebook-draft:new:unknown-route", value: ["title": "Unattributable legacy draft"])
+        try cache.removeAccount(accountID: "synthetic-a", knownProjectIDs: ["project"])
+        XCTAssertFalse(FileManager.default.fileExists(atPath: oldA.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: oldB.path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: unidentified.path), "No owner metadata exists for this legacy route; never guess and remove another account's work.")
+        XCTAssertNotNil(cache.retainedLegacyDataNotice, "Deletion must disclose retained unattributed legacy bytes rather than claim all local data was cleared.")
+        let restored = try cache.load([String: String].self, accountID: "synthetic-b", projectID: "project", scope: "native-notebook-draft:card")
+        XCTAssertEqual(restored?.value["title"], "B draft")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: oldB.path), "An exact-key read should migrate legacy data.")
+        let migratedDrafts = try cache.entries([String: String].self, accountID: "synthetic-b", projectID: "project", scopePrefix: "native-notebook-draft:")
+        XCTAssertEqual(migratedDrafts.first?.scope, "native-notebook-draft:card", "Ownership-proven legacy drafts remain discoverable without opening the old card first.")
+    }
+
+    func testNativeReaderEditionLabelDistinguishesHistoricalCanonicalAndLocalVersions() {
+        XCTAssertEqual(NativeReaderEditionLabel.label(for: UserContentSyncCodeVersion.localNYC2014), "2014")
+        XCTAssertEqual(NativeReaderEditionLabel.label(for: UserContentSyncCodeVersion.canonicalNYC2014), "2014")
+        XCTAssertEqual(NativeReaderEditionLabel.label(for: UserContentSyncCodeVersion.localNYC2022), "2022")
+        XCTAssertEqual(NativeReaderEditionLabel.label(for: UserContentSyncCodeVersion.canonicalNYC2022), "2022")
+        XCTAssertEqual(NativeReaderEditionLabel.label(for: nil), "Edition unavailable")
+        XCTAssertEqual(NativeReaderEditionLabel.label(for: "Future edition"), "Future edition")
+    }
+}
+
+extension EntitlementAndSyncContractTests {
+    @MainActor
+    func testLatePrivateResponseAndErrorAreRejectedAfterSameAccountReentry() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        for status in [200, 403] {
+            let host = "native-private-\(UUID().uuidString.lowercased()).invalid"
+            let barrier = DispatchSemaphore(value: 0)
+            let recorder = ResearchRequestPathRecorder()
+            defer { barrier.signal(); ScopedPermitextURLProtocol.removeHandler(for: host) }
+            let response = ResearchConversationResponse(conversation: ResearchConversation(
+                id: "old-conversation", title: "Synthetic private result", createdAt: "2026-09-04T00:00:00Z", updatedAt: "2026-09-04T00:00:00Z"))
+            let responseData = status == 200 ? try JSONEncoder().encode(response) : Data(#"{"error":"Synthetic revoked response"}"#.utf8)
+            ScopedPermitextURLProtocol.install({ request in
+                recorder.record(request.url?.path ?? "")
+                _ = barrier.wait(timeout: .now() + 10)
+                return (status, responseData)
+            }, for: host)
+            let configuration = URLSessionConfiguration.ephemeral
+            configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+            let session = URLSession(configuration: configuration)
+            defer { session.invalidateAndCancel() }
+            let client = PermitextBackendClient(transport: PermitextBackendHTTPTransport(baseURL: URL(string: "https://\(host)/")!, session: session))
+            func model(_ accountID: String, file: String) throws -> CodeLibraryViewModel {
+                let defaults = isolatedEntitlementDefaults()
+                let account = SignedInAccount(appUserID: accountID, authProvider: .guest,
+                    authProviderUserID: accountID, appleUserID: "", displayName: "Synthetic", signedInAt: Date(), backendSessionToken: "synthetic-token")
+                return CodeLibraryViewModel(
+                    userContentRepository: try UserDataStore(databaseURL: directory.appendingPathComponent("\(status)-\(file)")),
+                    continuityStore: ContinuityStore(defaults: defaults), readerThemeStore: ReaderThemeStore(defaults: defaults),
+                    preferencesDefaults: defaults, entitlementService: LocalEntitlementService(defaults: defaults),
+                    accountBackendClient: client, loadsInitialContent: false, loadsPersistedAccount: false,
+                    initialSignedInAccount: account, ownsAccountSync: false)
+            }
+            let current = try model("synthetic-a", file: "current.sqlite")
+            let accountB = try model("synthetic-b", file: "b.sqlite")
+            let accountA = try model("synthetic-a", file: "a.sqlite")
+            let pending = Task { try await current.researchConversation(id: "old-conversation") }
+            for _ in 0..<200 where !recorder.contains("/research/conversations/get") {
+                try await Task.sleep(for: .milliseconds(10))
+            }
+            XCTAssertTrue(recorder.contains("/research/conversations/get"))
+            current.synchronizeIndependentReaderSession(from: accountB)
+            current.synchronizeIndependentReaderSession(from: accountA)
+            current.activeResearchConversationID = "new-conversation"
+            barrier.signal()
+            do {
+                _ = try await pending.value
+                XCTFail("A response captured by the previous session must not be delivered to its caller.")
+            } catch {
+                XCTAssertTrue(error is CancellationError, "A stale failure must not become an error for the new session: \(error)")
+            }
+            XCTAssertEqual(current.activeResearchConversationID, "new-conversation")
+        }
+    }
+}
+
+extension EntitlementAndSyncContractTests {
+    @MainActor
+    func testAccountDeletionCompletionDoesNotClearAnotherAccount() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let host = "native-delete-\(UUID().uuidString.lowercased()).invalid"
+        let barrier = DispatchSemaphore(value: 0)
+        let recorder = ResearchRequestPathRecorder()
+        defer { barrier.signal(); ScopedPermitextURLProtocol.removeHandler(for: host) }
+        ScopedPermitextURLProtocol.install({ request in
+            recorder.record(request.url?.path ?? "")
+            _ = barrier.wait(timeout: .now() + 10)
+            return (200, Data(#"{"deleted":true,"deletedPrivateAssetCount":0,"deletedAt":"2026-09-04T00:00:00Z"}"#.utf8))
+        }, for: host)
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [ScopedPermitextURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        defer { session.invalidateAndCancel() }
+        let client = PermitextBackendClient(transport: PermitextBackendHTTPTransport(baseURL: URL(string: "https://\(host)/")!, session: session))
+        func model(_ id: String) throws -> CodeLibraryViewModel {
+            let defaults = isolatedEntitlementDefaults()
+            let account = SignedInAccount(appUserID: id, authProvider: .guest, authProviderUserID: id,
+                appleUserID: "", displayName: "Synthetic", signedInAt: Date(), backendSessionToken: "synthetic-token")
+            return CodeLibraryViewModel(userContentRepository: try UserDataStore(databaseURL: directory.appendingPathComponent("\(id).sqlite")),
+                continuityStore: ContinuityStore(defaults: defaults), readerThemeStore: ReaderThemeStore(defaults: defaults),
+                preferencesDefaults: defaults, entitlementService: LocalEntitlementService(defaults: defaults), accountBackendClient: client,
+                loadsInitialContent: false, loadsPersistedAccount: false, initialSignedInAccount: account, ownsAccountSync: false,
+                privateCacheDirectoryURL: directory.appendingPathComponent("cache"))
+        }
+        let current = try model("synthetic-a")
+        let other = try model("synthetic-b")
+        let cache = ProjectHubOfflineCache(directoryURL: directory.appendingPathComponent("cache"))
+        try cache.store("keep B", accountID: "synthetic-b", projectID: "project", scope: "personal")
+        let pending = Task { await current.deleteAccount() }
+        for _ in 0..<200 where !recorder.contains("/account/delete") { try await Task.sleep(for: .milliseconds(10)) }
+        XCTAssertTrue(recorder.contains("/account/delete"))
+        current.synchronizeIndependentReaderSession(from: other)
+        current.activeResearchConversationID = "account-b-conversation"
+        barrier.signal()
+        let result = await pending.value
+        XCTAssertEqual(result?.response.deleted, true)
+        XCTAssertEqual(current.signedInAccount?.appUserID, "synthetic-b")
+        XCTAssertEqual(current.activeResearchConversationID, "account-b-conversation")
+        XCTAssertEqual(try cache.load(String.self, accountID: "synthetic-b", projectID: "project", scope: "personal")?.value, "keep B")
+        XCTAssertThrowsError(try cache.store("late A", accountID: "synthetic-a", projectID: "project", scope: "personal"))
+    }
+
+    func testNativeResearchPermissionLossPreservesUnsentQuestionUntilDeletion() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        let attempt = ResearchQuestionAttempt(id: "synthetic-request", question: "Unsent synthetic question")
+        try cache.store(attempt, accountID: "synthetic-a", projectID: "conversation", scope: ResearchQuestionAttempt.cacheScope)
+        try ResearchConversationCacheLifecycle.store(["id": "conversation"], cache: cache, accountID: "synthetic-a", conversationID: "conversation")
+        try ResearchConversationCacheLifecycle.invalidateServerCopy(cache: cache, accountID: "synthetic-a", conversationID: "conversation", error: PermitextBackendHTTPError.serverStatus(403, "Revoked"))
+        XCTAssertNil(try ResearchConversationCacheLifecycle.load([String: String].self, cache: cache, accountID: "synthetic-a", conversationID: "conversation"))
+        XCTAssertEqual(try cache.load(ResearchQuestionAttempt.self, accountID: "synthetic-a", projectID: "conversation", scope: ResearchQuestionAttempt.cacheScope)?.value.id, attempt.id)
+        try ResearchConversationCacheLifecycle.invalidateServerCopy(cache: cache, accountID: "synthetic-a", conversationID: "conversation", error: PermitextBackendHTTPError.serverStatus(404, "Deleted"))
+        XCTAssertNil(try cache.load(ResearchQuestionAttempt.self, accountID: "synthetic-a", projectID: "conversation", scope: ResearchQuestionAttempt.cacheScope))
+    }
+}
+
+extension EntitlementAndSyncContractTests {
+    func testNativeNotebookPendingCreateRetainsExactReceiptAcrossNewerDraftAndRelaunch() throws {
+        let original = NativeNotebookEditableContent(title: "Original draft", document: .empty, evidenceLinks: [])
+        let attempt = NativeNotebookSaveAttempt(clientMutationID: "11111111-1111-4111-8111-111111111111", cardID: nil, expectedVersion: 0, content: original)
+        let draft = NativeNotebookDraft(cardID: nil, version: 0, title: "Newer unsynchronized edit", document: .empty,
+            evidenceLinks: [], editedAt: Date(), clientMutationID: "22222222-2222-4222-8222-222222222222", pendingSave: attempt)
+        let restored = try JSONDecoder().decode(NativeNotebookDraft.self, from: JSONEncoder().encode(draft))
+        XCTAssertEqual(restored.pendingSave, attempt)
+        XCTAssertNil(restored.pendingSave?.cardID)
+        XCTAssertEqual(restored.pendingSave?.expectedVersion, 0)
+        XCTAssertNotEqual(restored.clientMutationID, restored.pendingSave?.clientMutationID)
+        XCTAssertNotEqual(restored.title, restored.pendingSave?.content.title)
+        XCTAssertEqual(restored.version, 0, "Reopening must not silently adopt a later server base version.")
+    }
+
+    func testNativeNotebookAcknowledgedDraftIsNotMistakenForAnUnsavedConflict() {
+        let content = NativeNotebookEditableContent(title: "Saved Note", document: .empty, evidenceLinks: [])
+        var draft = NativeNotebookDraft(cardID: "card", version: 1, title: content.title, document: content.document,
+            evidenceLinks: [], baseContent: content)
+        XCTAssertFalse(draft.hasUnsynchronizedChanges, "An unchanged acknowledged cache must load the current server version without a false conflict.")
+        draft.title = "Unsaved edit"
+        XCTAssertTrue(draft.hasUnsynchronizedChanges)
+        draft.title = content.title
+        draft.pendingSave = NativeNotebookSaveAttempt(clientMutationID: "pending", cardID: "card", expectedVersion: 1, content: content)
+        XCTAssertTrue(draft.hasUnsynchronizedChanges, "An unacknowledged receipt always needs reconciliation.")
+    }
+
+    func testNativeNotebookNewDraftRemainsDiscoverableWithinItsAccountAndProject() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        let draft = NativeNotebookDraft(cardID: nil, version: 0, title: "Unsent new Note", document: .empty, evidenceLinks: [], clientMutationID: "synthetic-revision")
+        try cache.store(draft, accountID: "synthetic-a", projectID: "project-a", scope: "native-notebook-draft:new:synthetic-route")
+        let entries = try cache.entries(NativeNotebookDraft.self, accountID: "synthetic-a", projectID: "project-a", scopePrefix: "native-notebook-draft:")
+        XCTAssertEqual(entries.count, 1)
+        XCTAssertEqual(entries.first?.scope, "native-notebook-draft:new:synthetic-route")
+        XCTAssertEqual(entries.first?.value, draft)
+        XCTAssertTrue(try cache.entries(NativeNotebookDraft.self, accountID: "synthetic-b", projectID: "project-a", scopePrefix: "native-notebook-draft:").isEmpty)
+        XCTAssertTrue(try cache.entries(NativeNotebookDraft.self, accountID: "synthetic-a", projectID: "project-b", scopePrefix: "native-notebook-draft:").isEmpty)
+    }
+
+    func testNotebookSaveEncodesStableClientMutationAndOriginalVersion() throws {
+        let request = NotebookCardSaveRequest(auth: BackendAuthContext(accountUserID: "synthetic-a", bearerToken: nil), projectID: "project",
+            cardID: nil, expectedVersion: 0, cardType: "finding", title: "Draft", document: .empty,
+            clientMutationID: "11111111-1111-4111-8111-111111111111")
+        let first = try JSONEncoder().encode(request)
+        let replay = try JSONEncoder().encode(JSONDecoder().decode(NotebookCardSaveRequest.self, from: first))
+        let firstBody = try XCTUnwrap(JSONSerialization.jsonObject(with: first) as? NSDictionary)
+        let replayBody = try XCTUnwrap(JSONSerialization.jsonObject(with: replay) as? NSDictionary)
+        XCTAssertEqual(firstBody, replayBody)
+        XCTAssertNil(firstBody["cardID"])
+        XCTAssertEqual(firstBody["expectedVersion"] as? Int, 0)
+        XCTAssertEqual(firstBody["clientMutationID"] as? String, request.clientMutationID)
+    }
+}
+
+extension EntitlementAndSyncContractTests {
+    func testNativeDeletedAccountTombstoneRejectsLateCacheWriters() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        await withTaskGroup(of: Void.self) { group in
+            for index in 0..<20 {
+                group.addTask { try? cache.store(["revision": index], accountID: "deleted-synthetic-a", projectID: "project", scope: "native-notebook-draft:route") }
+            }
+            group.addTask { try? cache.removeAccount(accountID: "deleted-synthetic-a") }
+        }
+        XCTAssertNil(try cache.load([String: Int].self, accountID: "deleted-synthetic-a", projectID: "project", scope: "native-notebook-draft:route"))
+        XCTAssertThrowsError(try cache.store(["revision": 21], accountID: "deleted-synthetic-a", projectID: "project", scope: "native-notebook-draft:route"))
+        let reopenedCache = ProjectHubOfflineCache(directoryURL: directory)
+        XCTAssertThrowsError(try reopenedCache.store(["revision": 22], accountID: "deleted-synthetic-a", projectID: "project", scope: "personal"))
+        try reopenedCache.store(["revision": 1], accountID: "synthetic-b", projectID: "project", scope: "personal")
+        XCTAssertNotNil(try reopenedCache.load([String: Int].self, accountID: "synthetic-b", projectID: "project", scope: "personal"))
     }
 }

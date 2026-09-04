@@ -378,7 +378,7 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             )
         } catch let error as PermitextBackendHTTPError {
             switch error {
-            case .serverStatus(404, _, _, _), .serverStatus(405, _, _, _):
+            case .serverStatus(404, _, _, _, _), .serverStatus(405, _, _, _, _):
                 break
             default:
                 throw error
@@ -607,7 +607,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         expectedVersion: Int,
         title: String,
         document: NotebookDocument,
-        evidenceLinks: [NotebookEvidenceLink]
+        evidenceLinks: [NotebookEvidenceLink],
+        clientMutationID: String? = nil
     ) async throws -> NotebookCard {
         try await transport.notebookCardSave(
             NotebookCardSaveRequest(
@@ -618,7 +619,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
                 cardType: "finding",
                 title: title,
                 document: document,
-                evidenceLinks: evidenceLinks
+                evidenceLinks: evidenceLinks,
+                clientMutationID: clientMutationID
             )
         ).card
     }

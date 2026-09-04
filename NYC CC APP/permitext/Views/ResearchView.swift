@@ -58,6 +58,7 @@ enum ResearchTrustCopy {
     static let visualEvidenceDisclosure = "Selected official images are sent to OpenAI for analysis. Private notes are not included."
     static let copyAnswerAction = "Copy answer"
     static let reportProblemAction = "Report a problem"
+    static let nextStepGuidance = "Review the cited provision and Project facts, then record your own conclusion in a Project Note. Build Reports on Permitext Web."
 }
 
 enum ResearchConversationCacheLifecycle {
@@ -89,6 +90,19 @@ enum ResearchConversationCacheLifecycle {
             projectID: conversationID,
             scope: conversationScope
         )
+    }
+
+    static func invalidateServerCopy(
+        cache: ProjectHubOfflineCache, accountID: String, conversationID: String, error: Error
+    ) throws {
+        guard NativePrivateCachePolicy.requiresInvalidation(after: error) else { return }
+        if let status = (error as? PermitextBackendHTTPError)?.statusCode, [404, 410].contains(status) {
+            try removeDeletedConversation(cache: cache, accountID: accountID, conversationID: conversationID)
+        } else {
+            // Expired/revoked access hides server data, but is not a request to
+            // erase the account's unsent question. Restore it only after access returns.
+            try cache.remove(accountID: accountID, projectID: conversationID, scope: conversationScope)
+        }
     }
 
     static func removeDeletedConversation(
@@ -366,12 +380,25 @@ struct ResearchRequestFailurePresentation: Equatable, Codable, Sendable {
 
 struct ResearchView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    private let cacheDirectoryURL: URL?
+
+    init(cacheDirectoryURL: URL? = nil) { self.cacheDirectoryURL = cacheDirectoryURL }
+
+    var body: some View {
+        ResearchSessionView(owner: library.privateRequestIdentity, cacheDirectoryURL: cacheDirectoryURL)
+            .id(library.privateSessionID)
+    }
+}
+
+private struct ResearchSessionView: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.purchase) private var purchase
     @Environment(\.scenePhase) private var scenePhase
     @State private var summaries: [ResearchConversationSummary] = []
     @State private var conversation: ResearchConversation?
     @State private var question = ""
-    @State private var isLoading = false
+    @State private var isLoading = true
+    @State private var historyLoadID: UUID?
     @State private var isCreatingConversation = false
     @State private var isConsumingPendingSelection = false
     @State private var isSending = false
@@ -396,8 +423,10 @@ struct ResearchView: View {
     @State private var feedbackMessageID: String?
     @State private var isVisible = false
     private let cache: ProjectHubOfflineCache
+    private let owner: NativePrivateRequestIdentity?
 
-    init(cacheDirectoryURL: URL? = nil) {
+    init(owner: NativePrivateRequestIdentity?, cacheDirectoryURL: URL? = nil) {
+        self.owner = owner
         cache = ProjectHubOfflineCache(directoryURL: cacheDirectoryURL)
     }
 
@@ -425,7 +454,7 @@ struct ResearchView: View {
                             buttonTitle: "View Plans",
                             section: .plan
                         )
-                    } else if let conversation {
+                    } else if let conversation, conversation.id == library.activeResearchConversationID {
                         conversationView(conversation)
                     } else if isLoading && summaries.isEmpty {
                         ProgressView("Loading Research…")
@@ -454,6 +483,7 @@ struct ResearchView: View {
                 ResearchDisclosureAcknowledgementSheet(
                     onCancel: { pendingDisclosureAttempt = nil },
                     onContinue: {
+                        guard isCurrentOwner else { return }
                         ResearchDisclosureGate.acknowledge(
                             accountID: library.signedInAccount?.appUserID
                         )
@@ -511,16 +541,41 @@ struct ResearchView: View {
             } message: { pending in
                 Text("\u{201c}\(pending.title)\u{201d} will be permanently deleted from Permitext. This cannot be undone.")
             }
-            .task(id: "\(library.signedInAccount?.appUserID ?? "signed-out"):\(library.hasResearchAccess)") {
+            .task(id: "\(library.privateSessionID):\(library.hasResearchAccess)") {
+                guard isCurrentOwner else { return }
                 await library.refreshResearchTurnAllowance(
                     recoverUnfinishedPurchases: true,
                     showsErrors: false
                 )
+                guard isCurrentOwner, !Task.isCancelled else { return }
                 await loadHistory()
+                guard isCurrentOwner, !Task.isCancelled else { return }
                 await openActiveConversationIfNeeded()
+                guard isCurrentOwner, !Task.isCancelled else { return }
                 await consumePendingSelectionIfNeeded()
             }
-            .onChange(of: library.activeResearchConversationID) { _, _ in
+            .onChange(of: library.activeResearchConversationID) { _, id in
+                guard isCurrentOwner else { return }
+                if conversation?.id != id { conversation = nil }
+                activeResearchRequestTask?.cancel()
+                activeResearchRequestTask = nil
+                pendingQuestionAttempt = nil
+                pendingDisclosureAttempt = nil
+                failedQuestionAttempt = nil
+                pendingFeedbackReport = nil
+                pendingVisualReview = nil
+                pendingDeletion = nil
+                showingRename = false
+                showingAssignmentConfirmation = false
+                question = ""
+                draftTitle = ""
+                errorMessage = nil
+                questionErrorMessage = nil
+                isSending = false
+                isRefreshingSources = false
+                isConfirmingProjectContext = false
+                feedbackMessageID = nil
+                deletingConversationID = nil
                 Task { await openActiveConversationIfNeeded() }
             }
             .onChange(of: library.pendingResearchSelections) { _, selections in
@@ -621,11 +676,11 @@ struct ResearchView: View {
                     .listRowBackground(Color.clear)
             }
 
-            if summaries.isEmpty && !isLoading {
+            if summaries.isEmpty && !isLoading && errorMessage == nil {
                 ContentUnavailableView(
                     "No Research yet",
                     image: "Astroid",
-                    description: Text("Tap the sparkle icon to start Research.")
+                    description: Text("Tap the plus button to start Research.")
                 )
                 .padding(.top, 70)
                 .listRowBackground(Color.clear)
@@ -926,39 +981,59 @@ struct ResearchView: View {
     }
 
     private func confirmCurrentProjectContext(_ current: ResearchConversation) async {
+        guard let identity = requestIdentity(), identity.conversationID == current.id else { return }
         guard !isConfirmingProjectContext,
               let projectID = current.primaryProjectID
         else { return }
         isConfirmingProjectContext = true
-        defer { isConfirmingProjectContext = false }
+        defer { if isCurrent(identity) { isConfirmingProjectContext = false } }
         do {
             let updated = try await library.reviewResearchProjectContext(
                 conversationID: current.id,
                 projectID: projectID,
                 facts: current.projectContext?.facts ?? []
             )
+            guard isCurrent(identity) else { return }
             guard conversation?.id == current.id else { return }
+            guard isCurrent(identity) else { return }
             conversation = updated
             cacheConversation(updated)
             await loadHistory(forceNetwork: true)
+            guard isCurrent(identity) else { return }
             errorMessage = nil
         } catch {
+            guard isCurrent(identity) else { return }
+            if let id = identity.conversationID, NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                invalidateConversationIfRequired(error, id: id)
+                errorMessage = error.localizedDescription
+                return
+            }
             errorMessage = error.localizedDescription
         }
     }
 
     private func refreshChangedSources(_ current: ResearchConversation) async {
+        guard let identity = requestIdentity(), identity.conversationID == current.id else { return }
         guard !isRefreshingSources else { return }
         isRefreshingSources = true
-        defer { isRefreshingSources = false }
+        defer { if isCurrent(identity) { isRefreshingSources = false } }
         do {
             let updated = try await library.refreshResearchConversation(id: current.id)
+            guard isCurrent(identity) else { return }
             guard conversation?.id == current.id else { return }
+            guard isCurrent(identity) else { return }
             conversation = updated
             cacheConversation(updated)
             await loadHistory(forceNetwork: true)
+            guard isCurrent(identity) else { return }
             errorMessage = nil
         } catch {
+            guard isCurrent(identity) else { return }
+            if let id = identity.conversationID, NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                invalidateConversationIfRequired(error, id: id)
+                errorMessage = error.localizedDescription
+                return
+            }
             errorMessage = error.localizedDescription
         }
     }
@@ -1175,80 +1250,100 @@ struct ResearchView: View {
         )
     }
 
+    private var isCurrentOwner: Bool {
+        owner != nil && owner == library.privateRequestIdentity
+    }
+
+    private func requestIdentity() -> NativeResearchRequestIdentity? {
+        guard isCurrentOwner else { return nil }
+        return library.researchRequestIdentity
+    }
+
+    private func isCurrent(_ identity: NativeResearchRequestIdentity) -> Bool {
+        isCurrentOwner && identity == library.researchRequestIdentity
+    }
+
+    private func invalidateConversationIfRequired(_ error: Error, id: String) {
+        guard NativePrivateCachePolicy.requiresInvalidation(after: error), let owner, isCurrentOwner else { return }
+        try? ResearchConversationCacheLifecycle.invalidateServerCopy(cache: cache, accountID: owner.accountID, conversationID: id, error: error)
+        summaries.removeAll { $0.id == id }
+        cacheHistory(summaries, accountID: owner.accountID)
+        if conversation?.id == id { conversation = nil }
+        failedQuestionAttempt = nil
+        pendingQuestionAttempt = nil
+        question = ""
+        questionErrorMessage = nil
+    }
+
     private func loadHistory(forceNetwork: Bool = false) async {
-        guard let account = library.signedInAccount else {
-            summaries = []
-            return
-        }
+        guard isCurrentOwner, let owner else { return }
+        let loadID = UUID()
+        historyLoadID = loadID
         isLoading = true
-        defer { isLoading = false }
-        if !forceNetwork,
-           let cached = try? cache.load(
-                [ResearchConversationSummary].self,
-                accountID: account.appUserID,
-                projectID: "all-research",
-                scope: "research-history"
-           ) {
-            summaries = cached.value
-        }
+        defer { if isCurrentOwner && historyLoadID == loadID { isLoading = false } }
+        if !forceNetwork, let cached = try? cache.load(
+            [ResearchConversationSummary].self, accountID: owner.accountID,
+            projectID: "all-research", scope: "research-history"
+        ) { summaries = cached.value }
         do {
             let loaded = try await library.researchConversations()
+            guard isCurrentOwner, historyLoadID == loadID, !Task.isCancelled else { return }
             summaries = loaded
-            cacheHistory(loaded, accountID: account.appUserID)
+            cacheHistory(loaded, accountID: owner.accountID)
             errorMessage = nil
         } catch {
-            if summaries.isEmpty { errorMessage = error.localizedDescription }
+            guard isCurrentOwner, historyLoadID == loadID, !Task.isCancelled else { return }
+            if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) { summaries = [] }
+            if NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                try? cache.remove(accountID: owner.accountID, projectID: "all-research", scope: "research-history")
+            }
+            errorMessage = summaries.isEmpty ? error.localizedDescription : "Showing saved Research history. Could not refresh: \(error.localizedDescription)"
         }
     }
 
     private func refreshFromWeb() async {
+        guard let identity = requestIdentity() else { return }
         await library.refreshResearchTurnAllowance(showsErrors: false)
+        guard isCurrent(identity) else { return }
         await loadHistory(forceNetwork: true)
-        guard let id = library.activeResearchConversationID,
-              let account = library.signedInAccount else { return }
-        do {
-            let loaded = try await library.researchConversation(id: id)
-            guard library.signedInAccount?.appUserID == account.appUserID,
-                  library.activeResearchConversationID == id else { return }
-            conversation = loaded
-            cacheConversation(loaded)
-            restoreCachedQuestionAttempt(for: loaded, accountID: account.appUserID)
-            errorMessage = nil
-        } catch {
-            if conversation?.id == id { errorMessage = error.localizedDescription }
-        }
+        guard isCurrent(identity), let id = identity.conversationID else { return }
+        await loadConversation(id: id, identity: identity, useCache: false)
     }
 
     private func openActiveConversationIfNeeded() async {
-        guard let id = library.activeResearchConversationID,
-              conversation?.id != id,
-              let account = library.signedInAccount else { return }
+        guard let identity = requestIdentity(), let id = identity.conversationID,
+              conversation?.id != id else { return }
         failedQuestionAttempt = nil
         questionErrorMessage = nil
+        conversation = nil
+        await loadConversation(id: id, identity: identity, useCache: true)
+    }
+
+    private func loadConversation(id: String, identity: NativeResearchRequestIdentity, useCache: Bool) async {
+        guard isCurrent(identity) else { return }
         isLoading = true
-        if let cached = try? ResearchConversationCacheLifecycle.load(
-            ResearchConversation.self,
-            cache: cache,
-            accountID: account.appUserID,
-            conversationID: id
-        ) {
-            conversation = cached.value
-        }
+        defer { if isCurrent(identity) { isLoading = false } }
+        if useCache, let cached = try? ResearchConversationCacheLifecycle.load(
+            ResearchConversation.self, cache: cache, accountID: identity.account.accountID, conversationID: id
+        ) { conversation = cached.value }
         do {
             let loaded = try await library.researchConversation(id: id)
+            guard isCurrent(identity) else { return }
             conversation = loaded
             cacheConversation(loaded)
             errorMessage = nil
         } catch {
-            if conversation?.id != id { errorMessage = error.localizedDescription }
+            guard isCurrent(identity) else { return }
+            invalidateConversationIfRequired(error, id: id)
+            if !NativePrivateCachePolicy.permitsOfflineFallback(after: error) { conversation = nil }
+            errorMessage = conversation == nil ? error.localizedDescription : "Showing a saved conversation. Could not refresh: \(error.localizedDescription)"
         }
-        if let current = conversation, current.id == id {
-            restoreCachedQuestionAttempt(for: current, accountID: account.appUserID)
-        }
-        isLoading = false
+        guard isCurrent(identity) else { return }
+        if let current = conversation { restoreCachedQuestionAttempt(for: current, accountID: identity.account.accountID) }
     }
 
     private func consumePendingSelectionIfNeeded() async {
+        guard var identity = requestIdentity() else { return }
         guard library.signedInAccount != nil,
               library.hasResearchAccess,
               !isConsumingPendingSelection,
@@ -1258,6 +1353,7 @@ struct ResearchView: View {
         defer { isConsumingPendingSelection = false }
 
         while !library.pendingResearchSelections.isEmpty {
+            guard isCurrentOwner, !Task.isCancelled else { return }
             if isCreatingConversation {
                 try? await Task.sleep(for: .milliseconds(150))
                 continue
@@ -1265,6 +1361,7 @@ struct ResearchView: View {
             let originalSelection = library.pendingResearchSelections[0]
             do {
                 let review = try await library.reviewResearchSelection(originalSelection)
+                guard isCurrent(identity) else { return }
                 var reviewedSelection = review.selection
                 reviewedSelection.savedItemID = originalSelection.savedItemID
                 if review.requiresVisualReview {
@@ -1275,8 +1372,11 @@ struct ResearchView: View {
                     return
                 }
                 guard await persistResearchSelections([reviewedSelection]) else { return }
+                guard isCurrentOwner, !Task.isCancelled else { return }
+                identity = library.researchRequestIdentity ?? identity
                 library.acknowledgePendingResearchSelections([originalSelection])
             } catch {
+                guard isCurrent(identity) else { return }
                 errorMessage = error.localizedDescription
                 return
             }
@@ -1284,18 +1384,22 @@ struct ResearchView: View {
     }
 
     private func persistResearchSelections(_ selections: [ResearchSelectionRequest]) async -> Bool {
+        guard let identity = requestIdentity() else { return false }
         if let id = library.activeResearchConversationID {
             do {
                 let updated = try await library.addResearchEvidence(
                     conversationID: id,
                     selections: selections
                 )
+                guard isCurrent(identity) else { return false }
                 conversation = updated
                 cacheConversation(updated)
                 await loadHistory(forceNetwork: true)
+                guard isCurrent(identity) else { return false }
                 errorMessage = nil
                 return true
             } catch {
+                guard isCurrent(identity) else { return false }
                 errorMessage = error.localizedDescription
                 return false
             }
@@ -1304,6 +1408,7 @@ struct ResearchView: View {
     }
 
     private func cancelVisualReview(_ pending: PendingResearchVisualReview) {
+        guard isCurrentOwner else { return }
         guard pendingVisualReview?.id == pending.id else { return }
         pendingVisualReview = nil
         library.acknowledgePendingResearchSelections([pending.originalSelection])
@@ -1315,6 +1420,7 @@ struct ResearchView: View {
         _ pending: PendingResearchVisualReview,
         sourceIDs: [String]
     ) async {
+        guard isCurrentOwner else { return }
         guard pendingVisualReview?.id == pending.id, !sourceIDs.isEmpty else { return }
         var selection = pending.review.selection
         selection.savedItemID = pending.originalSelection.savedItemID
@@ -1324,6 +1430,7 @@ struct ResearchView: View {
             pendingVisualReview = nil
             return
         }
+        guard isCurrentOwner, !Task.isCancelled else { return }
         library.acknowledgePendingResearchSelections([pending.originalSelection])
         pendingVisualReview = nil
         await consumePendingSelectionIfNeeded()
@@ -1331,6 +1438,7 @@ struct ResearchView: View {
 
     @discardableResult
     private func createConversation(selections: [ResearchSelectionRequest]) async -> Bool {
+        guard var identity = requestIdentity() else { return false }
         guard !isCreatingConversation else { return false }
         isCreatingConversation = true
         defer { isCreatingConversation = false }
@@ -1339,12 +1447,15 @@ struct ResearchView: View {
                 selections: selections,
                 projectID: library.activeBackendProjectID
             )
+            guard isCurrent(identity) else { return false }
             conversation = created
             library.activeResearchConversationID = created.id
+            identity = library.researchRequestIdentity ?? identity
             failedQuestionAttempt = nil
             questionErrorMessage = nil
             cacheConversation(created)
             await loadHistory(forceNetwork: true)
+            guard isCurrent(identity) else { return false }
             errorMessage = nil
             if selections.isEmpty, !library.pendingResearchSelections.isEmpty {
                 Task {
@@ -1354,12 +1465,14 @@ struct ResearchView: View {
             }
             return true
         } catch {
+            guard isCurrent(identity) else { return false }
             errorMessage = error.localizedDescription
             return false
         }
     }
 
     private func startQuestionRequest() {
+        guard isCurrentOwner else { return }
         let normalized = question.trimmingCharacters(in: .whitespacesAndNewlines)
         guard normalized.count >= 3 else { return }
         let attempt = ResearchQuestionAttempt(id: UUID().uuidString, question: normalized)
@@ -1375,9 +1488,10 @@ struct ResearchView: View {
     }
 
     private func saveFeedback(messageID: String, category: String, comment: String?) async {
+        guard let identity = requestIdentity(), identity.conversationID == conversation?.id else { return }
         guard let conversationID = conversation?.id, feedbackMessageID == nil else { return }
         feedbackMessageID = messageID
-        defer { feedbackMessageID = nil }
+        defer { if isCurrent(identity) { feedbackMessageID = nil } }
         do {
             let saved = try await library.saveResearchFeedback(
                 conversationID: conversationID,
@@ -1385,6 +1499,7 @@ struct ResearchView: View {
                 category: category,
                 comment: comment?.trimmingCharacters(in: .whitespacesAndNewlines)
             )
+            guard isCurrent(identity) else { return }
             guard conversation?.id == conversationID,
                   let index = conversation?.messages.firstIndex(where: { $0.id == messageID })
             else { return }
@@ -1392,11 +1507,18 @@ struct ResearchView: View {
             if let updated = conversation { cacheConversation(updated) }
             errorMessage = nil
         } catch {
+            guard isCurrent(identity) else { return }
+            if let id = identity.conversationID, NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                invalidateConversationIfRequired(error, id: id)
+                errorMessage = error.localizedDescription
+                return
+            }
             errorMessage = error.localizedDescription
         }
     }
 
     private func startQuestionRequest(_ attempt: ResearchQuestionAttempt) {
+        guard isCurrentOwner else { return }
         guard activeResearchRequestTask == nil else { return }
         activeResearchRequestTask = Task {
             await sendQuestion(attempt)
@@ -1408,6 +1530,7 @@ struct ResearchView: View {
     }
 
     private func sendQuestion(_ attempt: ResearchQuestionAttempt) async {
+        guard let identity = requestIdentity(), identity.conversationID == conversation?.id else { return }
         guard let id = conversation?.id, !isSending, !researchSendIsBlocked else {
             activeResearchRequestTask = nil
             return
@@ -1421,7 +1544,7 @@ struct ResearchView: View {
         errorMessage = nil
         questionErrorMessage = nil
         defer {
-            if pendingQuestionAttempt?.id == attempt.id {
+            if isCurrent(identity), pendingQuestionAttempt?.id == attempt.id {
                 pendingQuestionAttempt = nil
                 isSending = false
                 activeResearchRequestTask = nil
@@ -1434,13 +1557,21 @@ struct ResearchView: View {
                 requestID: attempt.id
             )
             try Task.checkCancellation()
+            guard isCurrent(identity) else { return }
             conversation = updated
             cacheConversation(updated)
             clearCachedQuestionAttempt(conversationID: id)
             await loadHistory(forceNetwork: true)
+            guard isCurrent(identity) else { return }
             errorMessage = nil
             questionErrorMessage = nil
         } catch {
+            guard isCurrent(identity) else { return }
+            if let id = identity.conversationID, NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                invalidateConversationIfRequired(error, id: id)
+                errorMessage = error.localizedDescription
+                return
+            }
             if Task.isCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled {
                 retainQuestionFailure(attempt, error: URLError(.cancelled), conversationID: id)
                 return
@@ -1449,9 +1580,11 @@ struct ResearchView: View {
                 from: error,
                 matching: id
             ) {
+                guard isCurrent(identity) else { return }
                 conversation = authoritative
                 cacheConversation(authoritative)
                 await loadHistory(forceNetwork: true)
+                guard isCurrent(identity) else { return }
                 if ResearchRequestReconciliation.containsCompletedRequest(
                     messages: authoritative.messages,
                     requestID: attempt.id,
@@ -1459,6 +1592,7 @@ struct ResearchView: View {
                 ) {
                     clearCachedQuestionAttempt(conversationID: id)
                     await library.refreshResearchTurnAllowance(showsErrors: false)
+                    guard isCurrent(identity) else { return }
                     failedQuestionAttempt = nil
                     questionErrorMessage = nil
                 } else {
@@ -1469,6 +1603,7 @@ struct ResearchView: View {
             guard ResearchRequestFailurePresentation.shouldReconcileCompletion(after: error) else {
                 retainQuestionFailure(attempt, error: error, conversationID: id)
                 await library.refreshResearchTurnAllowance(showsErrors: false)
+                guard isCurrent(identity) else { return }
                 return
             }
             // A network timeout can arrive after Research has completed on the
@@ -1479,14 +1614,18 @@ struct ResearchView: View {
                 attempt: attempt,
                 priorMessageIDs: messageIDsBeforeRequest
             ) {
+                guard isCurrent(identity) else { return }
                 conversation = authoritative
                 cacheConversation(authoritative)
                 clearCachedQuestionAttempt(conversationID: id)
                 await loadHistory(forceNetwork: true)
+                guard isCurrent(identity) else { return }
                 await library.refreshResearchTurnAllowance(showsErrors: false)
+                guard isCurrent(identity) else { return }
                 errorMessage = nil
                 questionErrorMessage = nil
             } else {
+                guard isCurrent(identity) else { return }
                 retainQuestionFailure(attempt, error: error, conversationID: id)
             }
         }
@@ -1497,20 +1636,24 @@ struct ResearchView: View {
         attempt: ResearchQuestionAttempt,
         priorMessageIDs: Set<String>
     ) async -> ResearchConversation? {
+        guard let identity = requestIdentity() else { return nil }
         for delay in [0, 2, 4, 6] {
-            guard !Task.isCancelled else { return nil }
+            guard isCurrent(identity) else { return nil }
             if delay > 0 {
                 do {
                     try await Task.sleep(for: .seconds(delay))
                 } catch is CancellationError {
                     return nil
                 } catch {
+                    guard isCurrent(identity) else { return nil }
                     return nil
                 }
             }
+            guard isCurrent(identity) else { return nil }
             guard let authoritative = try? await library.researchConversation(id: conversationID) else {
                 continue
             }
+            guard isCurrent(identity) else { return nil }
             if ResearchRequestReconciliation.matchesCompletedAttempt(
                 messages: authoritative.messages,
                 requestID: attempt.id,
@@ -1524,13 +1667,22 @@ struct ResearchView: View {
     }
 
     private func renameConversation() async {
+        guard let identity = requestIdentity(), identity.conversationID == conversation?.id else { return }
         guard let id = conversation?.id else { return }
         do {
             let updated = try await library.renameResearchConversation(id: id, title: draftTitle)
+            guard isCurrent(identity) else { return }
             conversation = updated
             cacheConversation(updated)
             await loadHistory(forceNetwork: true)
+            guard isCurrent(identity) else { return }
         } catch {
+            guard isCurrent(identity) else { return }
+            if let id = identity.conversationID, NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                invalidateConversationIfRequired(error, id: id)
+                errorMessage = error.localizedDescription
+                return
+            }
             errorMessage = error.localizedDescription
         }
     }
@@ -1546,6 +1698,7 @@ struct ResearchView: View {
     }
 
     private func assignConversation(projectID: String?, confirmed: Bool) async {
+        guard let identity = requestIdentity(), identity.conversationID == conversation?.id else { return }
         guard let id = conversation?.id else { return }
         do {
             let updated = try await library.assignResearchConversation(
@@ -1553,46 +1706,49 @@ struct ResearchView: View {
                 projectID: projectID,
                 confirmMove: confirmed
             )
+            guard isCurrent(identity) else { return }
             conversation = updated
             cacheConversation(updated)
             await loadHistory(forceNetwork: true)
+            guard isCurrent(identity) else { return }
         } catch {
+            guard isCurrent(identity) else { return }
+            if let id = identity.conversationID, NativePrivateCachePolicy.requiresInvalidation(after: error) {
+                invalidateConversationIfRequired(error, id: id)
+                errorMessage = error.localizedDescription
+                return
+            }
             errorMessage = error.localizedDescription
         }
     }
 
     private func deleteConversation(id: String) async {
-        guard deletingConversationID == nil else { return }
+        guard let identity = requestIdentity(), deletingConversationID == nil else { return }
         deletingConversationID = id
-        defer { deletingConversationID = nil }
+        defer { if isCurrentOwner && deletingConversationID == id { deletingConversationID = nil } }
         do {
             try await library.deleteResearchConversation(id: id)
+            guard isCurrentOwner else { return }
+            try? ResearchConversationCacheLifecycle.removeDeletedConversation(
+                cache: cache, accountID: identity.account.accountID, conversationID: id
+            )
             summaries.removeAll { $0.id == id }
-            if let account = library.signedInAccount {
-                cacheHistory(summaries, accountID: account.appUserID)
-            }
-            if library.activeResearchConversationID == id {
-                library.activeResearchConversationID = nil
-            }
+            cacheHistory(summaries, accountID: identity.account.accountID)
             if conversation?.id == id {
                 conversation = nil
                 failedQuestionAttempt = nil
                 questionErrorMessage = nil
             }
-            if let account = library.signedInAccount {
-                try? ResearchConversationCacheLifecycle.removeDeletedConversation(
-                    cache: cache,
-                    accountID: account.appUserID,
-                    conversationID: id
-                )
-            }
+            if library.activeResearchConversationID == id { library.activeResearchConversationID = nil }
             await loadHistory(forceNetwork: true)
         } catch {
+            guard isCurrent(identity) else { return }
             errorMessage = error.localizedDescription
         }
     }
 
     private func cacheHistory(_ history: [ResearchConversationSummary], accountID: String) {
+        guard isCurrentOwner, owner?.accountID == accountID else { return }
         try? cache.store(
             history,
             accountID: accountID,
@@ -1602,11 +1758,11 @@ struct ResearchView: View {
     }
 
     private func cacheConversation(_ conversation: ResearchConversation) {
-        guard let account = library.signedInAccount else { return }
+        guard isCurrentOwner, let owner else { return }
         try? ResearchConversationCacheLifecycle.store(
             conversation,
             cache: cache,
-            accountID: account.appUserID,
+            accountID: owner.accountID,
             conversationID: conversation.id
         )
     }
@@ -1619,19 +1775,19 @@ struct ResearchView: View {
     }
 
     private func cacheQuestionAttempt(_ attempt: ResearchQuestionAttempt, conversationID: String) {
-        guard let account = library.signedInAccount else { return }
+        guard isCurrentOwner, let owner else { return }
         try? cache.store(
             attempt,
-            accountID: account.appUserID,
+            accountID: owner.accountID,
             projectID: conversationID,
             scope: ResearchQuestionAttempt.cacheScope
         )
     }
 
     private func clearCachedQuestionAttempt(conversationID: String) {
-        guard let account = library.signedInAccount else { return }
+        guard isCurrentOwner, let owner else { return }
         try? cache.remove(
-            accountID: account.appUserID,
+            accountID: owner.accountID,
             projectID: conversationID,
             scope: ResearchQuestionAttempt.cacheScope
         )
@@ -2135,6 +2291,10 @@ private struct ResearchAnswerView: View {
             Text(answer.disclaimer ?? "AI-generated research assistance, not an official code determination.")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+            Text(ResearchTrustCopy.nextStepGuidance)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .accessibilityIdentifier("research-next-step-guidance")
             HStack(spacing: 14) {
                 Button(didCopy ? "Copied" : ResearchTrustCopy.copyAnswerAction, systemImage: didCopy ? "checkmark" : "doc.on.doc") {
                     UIPasteboard.general.string = answer.structuredCopyText(sourceStatus: sourceStatus)
