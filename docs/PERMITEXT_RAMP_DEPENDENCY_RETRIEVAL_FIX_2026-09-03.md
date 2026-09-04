@@ -29,6 +29,18 @@ Focused ramp, complete Research-chat regressions, and `npm run check` pass. The 
 
 ## Release boundary and next action
 
-No new paid provider call, push, merge, deployment, TestFlight upload, pricing/cap change, or public-Beta activation is part of this correction. The build-51 and build-52 live-test authorizations remain consumed. Production and installed build 52 are not changed by local tests.
+The initial local correction did not authorize publication or a new paid call. The owner subsequently answered yes to merging, pushing, and deploying this backend-only fix, expressly excluding another paid Research test or TestFlight upload. The build-51 and build-52 live-test authorizations remain consumed.
 
-After the full local gate and scoped commit, the next step is owner-approved backend publication and exact-release verification. This backend-only change does not itself require a new iOS binary. Any later paid confirmation requires its own exact authorization; do not automatically prepare or run another batch.
+## Separately authorized Production publication
+
+- Released source: `573d4bc1aba839ad050125d12350769956c823c7`. Local `main`, `origin/main`, and a fresh GitHub `ls-remote` check match exactly. Integration was a fast-forward; unrelated dirty Xcode files and untracked owner files remain untouched.
+- Vercel Git integration created Production deployment `dpl_GvXhVjAL7MqnkW4BtchPf2Xk2Uh7`, now **READY**, at `https://permitext-sync-khpn7qrjz-randycodexs-projects-b72fc111.vercel.app`.
+- Created `2026-09-04T00:03:39.716Z`; building began `00:03:40.933Z`; READY `00:05:46.170Z` (September 3 local time). Build output reports 32 seconds; creation-to-READY was approximately 126 seconds. Node.js backend, Node 24 project setting, no framework preset.
+- Protected build passed commercial configuration, live Stripe settings, exact release identity, and the existing external-monitoring configuration. No environment variable, spending cap, model, price, allowance, kill switch, or Zoning gate was changed.
+- Both `https://permitext-sync.vercel.app/release` and `https://permitext.com/release` return HTTP 200, the exact released SHA, and environment `production`.
+- `npm run verify:production` passes on both origins: PostgreSQL `normalized-v4`, commercial readiness, and live Clerk configuration. AASA passes with the exact native app ID and section-link route. All three approved policy hashes pass strict live publication checks on both origins.
+- The deployment-scoped error/fatal scan from READY through `2026-09-04T00:06:47.651Z` returned no matching logs. This is a short early observation, not full live Research acceptance or a claim about future errors.
+- Vercel reports no configured drains. The previously owner-accepted Vercel-alert/daily-review alternative remains the monitoring basis; the protected build confirms its configured marker. This turn did not independently test alert delivery or the next scheduled daily review.
+- No Research question, retry, purchase, subscription change, TestFlight upload, or public-Beta activation was performed. The existing installed build 52 uses the updated backend without a new binary. Generated answer quality and the original private Project-context scenario were not live-retested.
+
+Next: any live answer confirmation still requires a separate exact authorization. Do not automatically prepare or run another paid batch. The existing medium-severity Tiptap advisory remains a separate scoped follow-up, not fixed by this release.
