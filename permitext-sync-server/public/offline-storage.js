@@ -1,3 +1,9 @@
+import {
+  historicalConstructionSyncCodeVersion,
+  syncCodeVersion,
+  syncCodeVersionForPrefix
+} from "./sync-identity.js?v=20260901-2014-code-v7";
+
 const databaseName = "permitext-offline";
 const databaseVersion = 4;
 const offlineLibrarySchemaVersion = 2;
@@ -9,8 +15,8 @@ const notebookImagesStoreName = "notebook-images";
 const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v764";
-const shellAssetVersion = "20260904-citation-integrity-v25";
+const shellCacheName = "permitext-pro-shell-v765";
+const shellAssetVersion = "20260904-citation-integrity-v26";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -19,16 +25,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260901-2014-code-assets-v15",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260904-citation-integrity-v25",
+  "/web/styles.css?v=20260904-citation-integrity-v26",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260904-citation-integrity-v25",
+  "/web/app.js?v=20260904-citation-integrity-v26",
   "/web/settings-copy.js?v=20260830-stripe-tax-copy-v4",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260826-research-request-recovery-v121",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260904-citation-integrity-v25",
-  "/web/research-intent-state.js?v=20260904-citation-integrity-v25",
+  "/web/offline-storage.js?v=20260904-citation-integrity-v26",
+  "/web/research-intent-state.js?v=20260904-citation-integrity-v26",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260811-research-columns-v3",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",
@@ -318,6 +324,36 @@ function sectionIdentityValues(installID, section) {
     .map((value) => `${installID}:${value}`);
 }
 
+function offlineSectionCodeVersion(record, chapter, metadata) {
+  const prefix = String(record.codePrefix || chapter?.codePrefix || "").trim().toUpperCase();
+  if (!prefix || (chapter?.codePrefix && prefix !== chapter.codePrefix)) return "";
+  const construction = ["BC", "AC", "PC", "MC", "FGC"].includes(prefix);
+  const sectionID = Number(record.id || record.sectionID);
+  const historical = sectionID >= 41_000_000 && sectionID < 42_000_000;
+  const expectedVersion = construction
+    ? historical ? historicalConstructionSyncCodeVersion : defaultCodeVersion
+    : syncCodeVersionForPrefix(prefix);
+  if (!construction && expectedVersion === defaultCodeVersion) return "";
+  const versions = [...new Set([record.codeVersion, chapter?.codeVersion]
+    .filter((value) => String(value || "").trim()).map(syncCodeVersion))];
+  if (versions.length > 1) return "";
+  let version = versions[0] || "";
+  if (!version && construction && !historical && sectionID > 0 && sectionID < 15_000_000) {
+    // Legacy downloads used an unversioned chapter index. Only its current
+    // Construction records can inherit the install's Construction identity.
+    // The top-level label never identifies ZR, EBC, or administrative content.
+    const installedConstruction = (metadata.libraries || []).find((library) =>
+      library.id === "nyc-2022-construction-codes" &&
+      library.syncCodeVersion && syncCodeVersion(library.syncCodeVersion) === expectedVersion
+    );
+    version = installedConstruction?.syncCodeVersion || (
+      metadata.codeVersion && syncCodeVersion(metadata.codeVersion) === expectedVersion
+        ? metadata.codeVersion : ""
+    );
+  }
+  return version && syncCodeVersion(version) === expectedVersion ? expectedVersion : "";
+}
+
 function chapterSectionRecord(installID, chapter, section) {
   const blocks = Array.isArray(section.blocks) ? section.blocks : [];
   const plainText = blocks.map((block) => block.plainText || "").join("\n\n").trim();
@@ -330,6 +366,7 @@ function chapterSectionRecord(installID, chapter, section) {
     webSectionID: section.webSectionID || null,
     chapterID: chapter.id,
     codePrefix: chapter.codePrefix || "BC",
+    codeVersion: section.codeVersion || chapter.codeVersion || "",
     codeSectionID: chapter.codeSectionID || null,
     chapterNumber: chapter.chapterNumber || "",
     sectionNumber: section.sectionNumber || "",
@@ -539,6 +576,15 @@ export async function downloadOfflineLibrary(options = {}) {
       );
       const chapter = { ...summary, ...payload.chapter };
       if (!chapter?.id) throw new Error(`Chapter ${summary.id} did not return offline content.`);
+      const versions = new Set((chapter.sections || []).map((section) =>
+        offlineSectionCodeVersion({ ...section, codePrefix: chapter.codePrefix }, chapter, librariesPayload)
+      ));
+      if (versions.size > 1 || versions.has("") ||
+          (summary.codeVersion && chapter.codeVersion &&
+            syncCodeVersion(summary.codeVersion) !== syncCodeVersion(chapter.codeVersion))) {
+        throw new Error(`Chapter ${summary.id} did not identify one exact offline code edition.`);
+      }
+      chapter.codeVersion = [...versions][0] || chapter.codeVersion || "";
       offlineAssetNamesForChapter(chapter).forEach((name) => referencedAssetNames.add(name));
       downloadedBytes += JSON.stringify(payload).length;
       await writeDownloadedChapter(installID, chapter);
@@ -720,6 +766,13 @@ async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQ
               : title.includes(normalizedQuery) ? 2 : 3;
           matches.push({
             rank,
+            record: {
+              installID: section.installID,
+              id: section.id,
+              chapterID: section.chapterID,
+              codePrefix: section.codePrefix,
+              codeVersion: section.codeVersion
+            },
             result: {
               id: section.id,
               chapterID: section.chapterID,
@@ -762,6 +815,7 @@ function sectionSummary(record, requestedID = null) {
     webSectionID: record.webSectionID,
     chapterID: record.chapterID,
     codePrefix: record.codePrefix,
+    codeVersion: record.codeVersion,
     codeSectionID: record.codeSectionID,
     chapterNumber: record.chapterNumber,
     sectionNumber: record.sectionNumber,
@@ -778,12 +832,43 @@ function sectionPayload(record) {
     chapterID: record.chapterID,
     chapterNumber: record.chapterNumber,
     codePrefix: record.codePrefix,
+    codeVersion: record.codeVersion,
     schemaVersion: 1,
     sectionID: Number(record.id),
     sectionNumber: record.sectionNumber,
     title: record.title,
     webSectionID: record.webSectionID
   };
+}
+
+async function offlineSectionWithEdition(record, metadata, chapters = new Map()) {
+  if (!record || record.installID !== metadata.installID) return null;
+  const key = `${metadata.installID}:${record.chapterID}`;
+  if (!chapters.has(key)) {
+    chapters.set(key, (async () => {
+      const database = await openDatabase();
+      try {
+        const transaction = database.transaction(chaptersStoreName, "readonly");
+        const stored = await requestResult(transaction.objectStore(chaptersStoreName).get(key),
+          "Could not read the installed source edition.");
+        return stored?.chapter ? {
+          installID: stored.installID,
+          chapter: {
+            id: stored.chapter.id,
+            codePrefix: stored.chapter.codePrefix,
+            codeVersion: stored.chapter.codeVersion
+          }
+        } : null;
+      } finally {
+        database.close();
+      }
+    })());
+  }
+  const chapterRecord = await chapters.get(key);
+  if (chapterRecord?.installID !== metadata.installID ||
+      String(chapterRecord.chapter?.id || "") !== String(record.chapterID)) return null;
+  const codeVersion = offlineSectionCodeVersion(record, chapterRecord.chapter, metadata);
+  return codeVersion ? { ...record, codeVersion } : null;
 }
 
 function tokenizeSearchText(text) {
@@ -828,7 +913,7 @@ export function compareOfflineChapters(left, right) {
     String(left?.id || "").localeCompare(String(right?.id || ""), undefined, { numeric: true });
 }
 
-async function offlineSearch(installID, url) {
+async function offlineSearch(metadata, url) {
   const query = url.searchParams.get("q")?.trim() || "";
   if (query.length < 2) return { query, results: [] };
   const tokens = tokenizeSearchText(query);
@@ -842,12 +927,18 @@ async function offlineSearch(installID, url) {
   const requestedLimit = Number.parseInt(url.searchParams.get("limit") || "", 10);
   const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 500) : 0;
   const normalizedQuery = query.toLowerCase();
-  const matches = (await matchingOfflineSearchResults(installID, {
+  const requestedVersion = url.searchParams.get("version");
+  const chapters = new Map();
+  const matches = (await Promise.all((await matchingOfflineSearchResults(metadata.installID, {
     codeFilter,
     normalizedQuery,
     query,
     tokens
-  }))
+  })).map(async (match) => {
+    const record = await offlineSectionWithEdition(match.record, metadata, chapters);
+    if (!record || (requestedVersion && record.codeVersion !== syncCodeVersion(requestedVersion))) return null;
+    return { rank: match.rank, result: { ...match.result, codeVersion: record.codeVersion } };
+  }))).filter(Boolean)
     .sort((left, right) =>
       left.rank - right.rank ||
       compareChapterNumbers(left.result.chapterNumber, right.result.chapterNumber) ||
@@ -919,18 +1010,23 @@ export async function offlineAPI(path) {
   }
   if (url.pathname === "/code/sections") {
     const ids = (url.searchParams.get("ids") || "").split(",").map((value) => value.trim()).filter(Boolean);
-    const records = await Promise.all(ids.map((id) => sectionByIdentity(metadata.installID, id)));
+    const chapters = new Map();
+    const records = await Promise.all(ids.map(async (id) => offlineSectionWithEdition(
+      await sectionByIdentity(metadata.installID, id), metadata, chapters
+    )));
     return {
       sections: records.map((record, index) => sectionSummary(record, ids[index])).filter(Boolean)
     };
   }
   const sectionMatch = url.pathname.match(/^\/code\/sections\/(\d+)$/);
   if (sectionMatch) {
-    const record = await sectionByIdentity(metadata.installID, sectionMatch[1]);
+    const record = await offlineSectionWithEdition(
+      await sectionByIdentity(metadata.installID, sectionMatch[1]), metadata
+    );
     return record ? { section: sectionPayload(record) } : null;
   }
   if (url.pathname === "/code/search") {
-    return offlineSearch(metadata.installID, url);
+    return offlineSearch(metadata, url);
   }
   return null;
 }

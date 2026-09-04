@@ -25,11 +25,12 @@ import {
 import { applyVisibleSectionNumber } from "../code-navigation-hierarchy.mjs";
 import { immutableEvidenceSnapshot } from "../project-foundation-contract.mjs";
 
-const [clientSource, serverSource, historicalCatalog, currentCatalogText] = await Promise.all([
+const [clientSource, serverSource, historicalCatalog, currentCatalogText, offlineSource] = await Promise.all([
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
   readFile(new URL("../app.mjs", import.meta.url), "utf8"),
   historicalConstructionSectionCatalog(),
-  readFile(new URL("../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapterCatalog.json", import.meta.url), "utf8")
+  readFile(new URL("../../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/chapterCatalog.json", import.meta.url), "utf8"),
+  readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8")
 ]);
 
 function between(source, startText, endText) {
@@ -171,6 +172,7 @@ const familySections = [historical, zoningCatalog[0], existingCatalog[0],
   ...[...new Set(enactedCatalog.map((section) => section.codePrefix))]
     .map((prefix) => enactedCatalog.find((section) => section.codePrefix === prefix))
 ];
+const canonicalFamilyResponses = [current];
 for (const summary of familySections) {
   let response;
   const sectionContext = vm.createContext({
@@ -187,6 +189,7 @@ for (const summary of familySections) {
   vm.runInContext(sectionHandler, sectionContext);
   await sectionContext.handleCodeSection(`/code/sections/${summary.id}`, {});
   assert.equal(response.status, 200);
+  canonicalFamilyResponses.push(response.section);
   assert.equal(response.section.codeVersion, summary.codeVersion, `${summary.codePrefix}: canonical handler returns edition.`);
   for (const input of [
     { sectionID: summary.id, codePrefix: summary.codePrefix, codeVersion: summary.codeVersion },
@@ -217,6 +220,167 @@ const alias = clientHarness({ api: async () => ({
 const aliasedReader = await alias.context.openSourceInReader({ id: 999999, codeVersion: defaultSyncCodeVersion });
 assert.equal(aliasedReader.sectionID, String(current.id));
 assert.deepEqual(alias.requests, ["/code/sections/999999"]);
+
+// Exercise the offline response boundary against the same Reader resolver.
+// Only the IndexedDB reads are replaced with in-memory fixtures; no installed
+// user library, network, or provider is touched.
+const offlineFunctions = [
+  between(offlineSource, "function sectionIdentityValues(", "async function writeDownloadedChapter("),
+  between(offlineSource, "async function matchingOfflineSearchResults(", "async function sectionByIdentity("),
+  between(offlineSource, "function sectionSummary(", "function tokenizeSearchText("),
+  between(offlineSource, "function tokenizeSearchText(", "export async function offlineAPI(")
+    .replace(/^export /gm, ""),
+  between(offlineSource, "export async function offlineAPI(", "export const offlineFeatureMetadata")
+    .replace("export async function", "async function")
+].join("\n");
+const installMetadata = {
+  installID: "offline-edition-fixture", librarySchemaVersion: 2, codeVersion: defaultSyncCodeVersion,
+  libraries: [{ id: "nyc-2022-construction-codes", syncCodeVersion: defaultSyncCodeVersion }]
+};
+function offlineHarness(records, chapters, metadata = installMetadata) {
+  const context = vm.createContext({
+    URL, defaultCodeVersion: defaultSyncCodeVersion, historicalConstructionSyncCodeVersion,
+    syncCodeVersion, syncCodeVersionForPrefix, chaptersStoreName: "chapters", sectionsStoreName: "sections",
+    IDBKeyRange: { only: (value) => value },
+    window: { location: { origin: "https://example.test" } },
+    metadataRecord: async () => metadata,
+    sectionByIdentity: async (_installID, id) => records.find((record) =>
+      [record.id, record.sectionID, record.webSectionID].map(String).includes(String(id))) || null,
+    requestResult: async (value) => value,
+    openDatabase: async () => ({
+      transaction: (store, mode) => {
+        assert(["chapters", "sections"].includes(store));
+        assert.equal(mode, "readonly", "Legacy edition recovery does not rewrite installed content.");
+        return { objectStore: () => ({
+          get: (key) => chapters.find((chapter) => chapter.key === key),
+          index: () => ({ openCursor: (installID) => {
+            const request = {};
+            const installed = records.filter((record) => record.installID === installID);
+            let index = 0;
+            const next = () => queueMicrotask(() => {
+              request.result = index < installed.length
+                ? { value: installed[index++], continue: next } : null;
+              request.onsuccess();
+            });
+            next();
+            return request;
+          } })
+        }) };
+      },
+      close() {}
+    })
+  });
+  vm.runInContext(offlineFunctions, context);
+  return context;
+}
+for (const canonical of canonicalFamilyResponses) {
+  const sectionID = canonical.sectionID || canonical.id;
+  const chapter = {
+    id: canonical.navigationChapterID || canonical.chapterID,
+    codePrefix: canonical.codePrefix, codeVersion: canonical.codeVersion,
+    chapterNumber: canonical.chapterNumber
+  };
+  const offline = offlineHarness([], []);
+  const record = offline.chapterSectionRecord(installMetadata.installID, chapter, {
+    ...canonical, id: sectionID, blocks: [{ plainText: "Retained offline enacted text." }]
+  });
+  assert.equal(record.codeVersion, canonical.codeVersion, `${canonical.codePrefix}: download retains section edition.`);
+  for (const legacy of [false, true]) {
+    const storedRecord = { ...record };
+    const storedChapter = { ...chapter };
+    if (legacy) {
+      delete storedRecord.codeVersion;
+      // Current Construction chapter responses historically omitted edition.
+      if (canonical.codeVersion === defaultSyncCodeVersion) delete storedChapter.codeVersion;
+    }
+    const chapters = [{ key: `${installMetadata.installID}:${chapter.id}`, installID: installMetadata.installID, chapter: storedChapter }];
+    const fallback = offlineHarness([storedRecord], chapters);
+    const before = JSON.stringify([storedRecord, chapters]);
+    const payload = await fallback.offlineAPI(`/code/sections/${sectionID}`);
+    assert.equal(payload?.section?.codeVersion, canonical.codeVersion, `${canonical.codePrefix}: ${legacy ? "legacy" : "new"} offline section response.`);
+    const summaries = await fallback.offlineAPI(`/code/sections?ids=${sectionID}`);
+    assert.equal(summaries.sections[0]?.codeVersion, canonical.codeVersion, "Batch hydration preserves the same edition.");
+    const reader = clientHarness({ api: (path) => fallback.offlineAPI(path) });
+    const opened = await reader.context.openSourceInReader({ sectionID, codePrefix: canonical.codePrefix, codeVersion: canonical.codeVersion });
+    assert.equal(opened?.sectionID, String(sectionID));
+    assert.equal(opened.codeVersion, canonical.codeVersion);
+    const numberOnlyReader = clientHarness({ api: (path) => fallback.offlineAPI(path) });
+    const numberOnlyOpened = await numberOnlyReader.context.openSourceInReader({
+      sectionNumber: canonical.sectionNumber, codePrefix: canonical.codePrefix, codeVersion: canonical.codeVersion
+    });
+    assert.equal(numberOnlyOpened?.sectionID, String(sectionID), `${canonical.codePrefix}: offline number-only resolution retains edition.`);
+    const wrongVersionSearch = await fallback.offlineAPI(`/code/search?${new URLSearchParams({
+      q: canonical.sectionNumber, code: canonical.codePrefix,
+      version: canonical.codeVersion === defaultSyncCodeVersion ? historicalConstructionSyncCodeVersion : defaultSyncCodeVersion
+    })}`);
+    assert.equal(wrongVersionSearch.results.length, 0, "Offline search cannot substitute a different requested edition.");
+    assert.equal(JSON.stringify([storedRecord, chapters]), before);
+  }
+}
+const legacyRecord = { ...current, installID: installMetadata.installID, codeVersion: undefined };
+const legacyChapter = { key: `${installMetadata.installID}:${current.chapterID}`, installID: installMetadata.installID,
+  chapter: { id: current.chapterID, codePrefix: "BC" } };
+const schemaOne = offlineHarness([legacyRecord], [legacyChapter], { installID: installMetadata.installID, codeVersion: defaultSyncCodeVersion });
+assert.equal((await schemaOne.offlineAPI(`/code/sections/${current.id}`)).section.codeVersion, defaultSyncCodeVersion,
+  "An old Construction install can use its stored edition without library metadata.");
+for (const [label, record, chapter, metadata] of [
+  ["contradictory section edition", { ...legacyRecord, codeVersion: historicalConstructionSyncCodeVersion }, legacyChapter, installMetadata],
+  ["contradictory chapter edition", legacyRecord, { ...legacyChapter, chapter: { ...legacyChapter.chapter, codeVersion: historicalConstructionSyncCodeVersion } }, installMetadata],
+  ["different installed library", { ...legacyRecord, installID: "another-install" }, legacyChapter, installMetadata],
+  ["missing installed chapter", legacyRecord, null, installMetadata],
+  ["unidentified legacy edition", legacyRecord, legacyChapter, { installID: installMetadata.installID }],
+  ["incorrect legacy install label", legacyRecord, legacyChapter, { installID: installMetadata.installID, codeVersion: historicalConstructionSyncCodeVersion }],
+  ["non-default family cannot inherit 2022", { ...legacyRecord, id: 20000000, sectionID: 20000000, codePrefix: "ZR" },
+    { ...legacyChapter, chapter: { ...legacyChapter.chapter, codePrefix: "ZR" } }, installMetadata]
+]) {
+  const fallback = offlineHarness([record], chapter ? [chapter] : [], metadata);
+  assert.equal(await fallback.offlineAPI(`/code/sections/${record.id}`), null, label);
+  const reader = clientHarness({ api: (path) => fallback.offlineAPI(path) });
+  assert.equal(await reader.context.openSourceInReader({ sectionID: record.id }), null, label);
+  assert.equal(reader.opened.length, 0, label);
+  assert.equal(reader.notices.length, 1, label);
+}
+
+const downloadedChapters = [];
+let activatedDownload = null;
+const currentDownloadChapter = { id: 10, codePrefix: "BC", sections: [{
+  id: current.id, sectionNumber: current.sectionNumber, title: current.title, blocks: []
+}] };
+const downloadFixtures = [currentDownloadChapter, { id: 999, codePrefix: "BC", sections: [] }];
+const downloadContext = vm.createContext({
+  indexedDB: {}, crypto: { randomUUID: () => "new-offline-install" },
+  navigator: { storage: { persist: async () => {} } },
+  defaultCodeVersion: defaultSyncCodeVersion, historicalConstructionSyncCodeVersion,
+  syncCodeVersion, syncCodeVersionForPrefix, offlineLibrarySchemaVersion: 2, offlineAssetVersion: "fixture",
+  prepareOfflineShell: async () => {},
+  fetchJSON: async (path) => {
+    if (path === "/code/chapters") return { chapters: downloadFixtures.map(({ sections, ...chapter }) => chapter) };
+    if (path === "/code/libraries") return { libraries: installMetadata.libraries };
+    const id = path.match(/\/code\/chapters\/(\d+)/)?.[1];
+    assert(id, "Download uses only fixture paths.");
+    return { chapter: downloadFixtures.find((chapter) => String(chapter.id) === id) };
+  },
+  mapWithConcurrency: async (items, _limit, operation) => Promise.all(items.map(operation)),
+  offlineAssetNamesForChapter: () => [], cacheOfflineAssets: async () => 0,
+  writeDownloadedChapter: async (_installID, chapter) => downloadedChapters.push(chapter),
+  activateInstall: async (metadata) => { activatedDownload = metadata; },
+  offlineLibraryStatus: async () => activatedDownload, deleteInstall: async () => {}
+});
+vm.runInContext([
+  between(offlineSource, "function offlineSectionCodeVersion(", "function chapterSectionRecord("),
+  between(offlineSource, "export async function downloadOfflineLibrary(", "export async function offlineLibraryStatus(")
+    .replace("export async function", "async function")
+].join("\n"), downloadContext);
+await downloadContext.downloadOfflineLibrary();
+assert.equal(activatedDownload.installID, "new-offline-install");
+assert.equal(downloadedChapters.find((chapter) => chapter.id === 10).codeVersion, defaultSyncCodeVersion,
+  "Download persists Construction edition from the fetched library metadata.");
+assert.equal(downloadedChapters.find((chapter) => chapter.id === 999).sections.length, 0,
+  "A reserved empty chapter does not prevent a complete offline install.");
+activatedDownload = null;
+currentDownloadChapter.sections[0].codeVersion = historicalConstructionSyncCodeVersion;
+await assert.rejects(downloadContext.downloadOfflineLibrary(), /exact offline code edition/);
+assert.equal(activatedDownload, null, "A contradictory download is never activated.");
 
 const evidenceFunctions = between(serverSource, "async function currentResearchEvidence(", "function researchAssemblyCrossReferences(");
 const refreshHandler = between(serverSource, "async function handleResearchConversationRefresh(", "function currentMonthStart(");

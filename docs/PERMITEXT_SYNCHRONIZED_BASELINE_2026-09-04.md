@@ -33,8 +33,15 @@ acceptance and does not change the Research or Zoning release gates.
   `87800fdf4d4d52a302aa0ae68d175e36b3da6536f3f50c44a18369da0fc58f38`.
 - `Upload succeeded` at September 4, 20:50:07 UTC, followed by
   `EXPORT SUCCEEDED` with exit 0.
-- Apple state: Processing; internal group is configured for automatic Xcode builds.
-- Device installation: build 53 has not yet been verified installed.
+- App Store Connect upload status: Complete. Build record
+  `61edac68-e76e-4465-8a5c-910002f85159` is Ready to Submit and assigned to Internal
+  Testers through the existing automatic Xcode-build distribution.
+- Device installation: build 53 installed through TestFlight on the iPhone 17 Pro
+  using Mirroring. TestFlight showed Open and version 1.0 (53); Permitext launched
+  to the Building Code library, and Account displayed Permitext 1.0 (Build 53).
+- App Store Connect availability and actual installed version were verified
+  separately. No account, Project, or settings changes or Research calls were
+  needed for this verification.
 - No App Store review submission or public release was performed.
 
 ## Retained local evidence
@@ -47,7 +54,8 @@ acceptance and does not change the Research or Zoning release gates.
   `PermitextShared/Logs/Test/Test-permitext-2026.09.04_16-34-48--0400.xcresult`.
 - Repair checks: `/private/tmp/permitext-readiness-check-20260904.log`,
   `/private/tmp/permitext-readiness-postcheck-20260904.log`, and
-  `/private/tmp/permitext-readiness-smoke-20260904.log`.
+  `/private/tmp/permitext-readiness-smoke-20260904.log`, and
+  `/private/tmp/permitext-readiness-final-checks-20260904.log`.
 
 Archives and logs are retained locally, not committed build artifacts. The repair
 branch `codex/production-readiness-fixes` starts at this baseline; its new fixes

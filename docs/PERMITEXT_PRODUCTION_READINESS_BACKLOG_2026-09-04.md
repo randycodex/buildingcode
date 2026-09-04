@@ -12,20 +12,22 @@ are repaired. No paid Research evaluation is authorized by this work.
 - Both `https://permitext.com/release` and
   `https://permitext-sync.vercel.app/release` returned that exact baseline SHA.
 - Native candidate: version 1.0, build 53, built from a separate detached checkout
-  at the same baseline. Upload succeeded; Apple processing and device installation
-  are tracked in `PERMITEXT_SYNCHRONIZED_BASELINE_2026-09-04.md`.
+  at the same baseline. Upload and internal availability succeeded; build 53 was
+  installed and launched on the iPhone 17 Pro through TestFlight/Mirroring. See
+  `PERMITEXT_SYNCHRONIZED_BASELINE_2026-09-04.md` for the separate evidence layers.
 - Repair branch: `codex/production-readiness-fixes`, created from that baseline.
 - Branch repairs are not part of the baseline deployment or native candidate.
 
 The baseline commit preserves semantically unchanged Xcode project/plist ordering
 and the shared Xcode Cloud manifest. It does not contain new audit repairs.
-The installed build 52 was inspected during the audit; it must not be described as
-the newer candidate or as a build of this repair branch.
+Build 52 was inspected during the original audit. This publication then installed
+build 53 from the shared baseline; it is not a build of this repair branch.
 
 ## First repair batch
 
-Status: implementation and local verification complete; isolated on the repair
-branch. Remaining findings below are open.
+Status: implementation and local verification complete, including the offline
+compatibility follow-up; isolated on the repair branch. Remaining findings below
+are open.
 
 1. **P0-1, canonical citation edition identity.** Resolve citations using canonical
    section identity; verify the expected edition; fail visibly when the exact
@@ -33,7 +35,12 @@ branch. Remaining findings below are open.
    preserve selected text and historical answer snapshots. Include regression
    coverage for the 2014/2022 section-number collision, saved snapshot identity,
    missing/mismatched sources, and source refresh. Synchronize web shell asset
-   versions so a future deployment can deliver the corrected client.
+   versions so a future deployment can deliver the corrected client. Preserve
+   per-section editions in new offline downloads and recover them from installed
+   chapter metadata for older downloads. Offline detail, hydration, search, and
+   number-only citation opening enforce the same identity. Missing or conflicting
+   metadata fails closed; empty reserved chapters remain supported. This does not
+   add historical 2014 downloading to the existing unversioned downloader.
 2. **P0-5, retired Workboard mutation paths.** Enforce the existing documented
    retirement at all four asset/preview write routes with authenticated HTTP 410.
    Reject Workboard sync mutations individually while allowing supported records
@@ -89,6 +96,8 @@ production customer incidents.
   is not automatically a reviewed professional decision.
 - Correct the stale native sparkle-icon instruction, transient empty history,
   duplicate search progress wording, and pane positioning after viewport changes.
+- Check the historical Reader find field overlapping its section heading while
+  find-in-reader is open; observed during this batch's local browser verification.
 
 ## Development order and preserved strengths
 
@@ -116,7 +125,7 @@ bounded failures.
 - Server precheck and main check suites passed. The initial final `postcheck`
   stopped on stale local Tiptap 3.29.0 versus locked 3.30.4. `npm ci` restored the
   existing lockfile; rerun `npm run postcheck` passed, including Notebook dependency
-  security and all seven UX alignment phases. No dependency version was changed.
+  security and the UX alignment checks. No dependency version was changed.
 - `npm run build:clients` passed with the locked Notebook dependency.
 - Citation integrity and Workboard retirement HTTP regressions passed again after
   the final edits; `node tests/smoke.mjs` passed using isolated local data and no
@@ -125,6 +134,11 @@ bounded failures.
   Slope through the historical Reader; correct labels and enacted passages rendered;
   no browser console errors observed. Saved-citation/source-refresh branches are
   covered by the behavior contracts, not a fresh paid Research UI run.
+- Final offline follow-up: expanded citation behavior contract passes for new
+  and legacy cached detail/batch/search responses, all supported code families,
+  number-only citation resolution, mismatched metadata, and empty/contradictory
+  downloads. Offline contract and syntax checks passed. Tests use in-memory
+  storage boundaries; no real offline library was replaced or deleted.
 - Workboard retirement received an independent read-only implementation/test
   review with no actionable findings. No live PostgreSQL mutation test was run;
   filtering is shared before the two storage adapters.

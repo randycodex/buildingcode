@@ -60,7 +60,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260904-citation-integrity-v25";
+} from "./offline-storage.js?v=20260904-citation-integrity-v26";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -95,7 +95,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260904-citation-integrity-v25";
+} from "./research-intent-state.js?v=20260904-citation-integrity-v26";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
