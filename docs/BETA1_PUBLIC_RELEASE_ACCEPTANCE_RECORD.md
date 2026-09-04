@@ -30,17 +30,18 @@ Interim no-input evidence: [PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRIT
 ## Production deployment
 
 Gate ID: `production-deployment`
-Status: **CURRENT PRODUCTION BACKEND PASSED — build 50 client is superseded and replacement release binding remains open**
+Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-- Production build log passed commercial configuration, live Stripe, release identity, and external-monitoring checks: yes — exact deployment `dpl_GzjcRMmjuZD1pDxsmiYT4FjH2HvP` reported every protected check ready and completed successfully.
-- Production `/health` passed: yes — PostgreSQL storage/rate limiting, schema `normalized-v4`, commercial readiness, and the accepted monitoring marker passed on September 3, 2026.
-- Production `/release` returned the selected full Git commit: current candidate yes — `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`; the final machine-selected release field remains intentionally null pending owner go/no-go sequencing.
-- Canonical Production domain serves that deployment: yes — `permitext-sync.vercel.app`, `permitext.com`, and `www.permitext.com` are aliases on the READY deployment.
-- No unexpected migration, runtime, billing-webhook, or client error appeared after deployment: yes for the retained September 3 window — all 26 recent request results in the status-code audit were HTTP 200.
-- Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), through `2026-09-03T10:33:44.038Z`.
+- Last verified application source: `0688e6b0564d44a92c803af3e1cfbbe6f87a2911`, deployment `dpl_5ETSni7gSRwdDDVuzryEb8HJF7Js`, READY.
+- Protected build passed commercial configuration, live Stripe, exact release identity, external-monitoring configuration and the Notebook security build gate.
+- Both canonical origins returned the exact application SHA and environment `production`; health passed PostgreSQL `normalized-v4` and live Clerk configuration.
+- App shell, offline-storage, service worker and Notebook asset bytes matched the tested local source. AASA and approved-policy publication checks passed on both origins.
+- Early deployment-scoped error/fatal scan through approximately `2026-09-04T01:24:12.419Z` returned no entries. This is not comprehensive customer-workflow or long-duration error coverage.
+- Evidence: [Notebook security publication](./PERMITEXT_NOTEBOOK_SECURITY_FIX_2026-09-03.md#authorized-production-publication). Documentation-only descendants can advance Git without changing application bytes; reverify serving identity after any automatic deployment.
+- Historical build-51 binding to `195de4f31229d785760eef570a658208f1f4e47d` is preserved in its [physical-iPhone record](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), not represented as today's release.
 
-This is deployment evidence only. It does not prove the later manual activation gates.
+This is website/backend publication evidence. The final machine-selected release remains unselected; a shared final web/TestFlight acceptance and owner go/no-go are separate.
 
 ## Controlled Production billing
 
@@ -65,7 +66,7 @@ The controlled monetary and entitlement lifecycle does not need another paid Bet
 ## Production authentication and account lifecycle
 
 Gate ID: `production-auth-account-lifecycle`
-Status: **OPEN — existing Apple-account build 50 continuity passed; fresh providers, remaining existing providers, and deletion remain open**
+Status: **OPEN — persisted-account continuity retained through build 52; fresh/remaining providers and complete deletion remain open**
 Release-bound: **yes**
 
 - Fresh-account email-code sign-in:
@@ -73,16 +74,16 @@ Release-bound: **yes**
 - Fresh-account Google sign-in:
 - Fresh-account Microsoft sign-in:
 - Existing-account email-code sign-in retained the correct Permitext account/data:
-- Existing-account Apple sign-in retained the correct Permitext account/data: yes for the persisted account session on exact build 50 — the Account screen was signed in after relaunch, Lifetime Pro remained active, sync reported `Synced`, and existing saved sections or notes remained present. No fresh `/account/sign-in` request occurred in this window because the completed account session persisted; this is not fresh-account Apple evidence.
+- Existing-account Apple sign-in retained the correct Permitext account/data: historical build-51 owner observations and build-52 Mirroring observations retain the signed-in account, Lifetime Pro, Synced, saved content and Project containers. These are persisted-session checks, not fresh Apple sign-in. Build 51 additionally retained an explicitly selected Project in Research. Representative saved Project-item coverage was not established.
 - Existing-account Google sign-in retained the correct Permitext account/data:
 - Existing-account Microsoft sign-in retained the correct Permitext account/data:
-- Dedicated disposable-account pre-deletion export and aggregate baseline captured safely:
-- Customer-interface deletion reported every applicable billing, data, private-asset, device, and Clerk stage accurately:
-- Deleted session failed, private asset disappeared, and recreated identity returned an empty Free account:
-- Disposable account and test content cleanup completed under separate authorization:
-- Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), physical observation window approximately `2026-09-03T10:20:00Z`–`2026-09-03T10:28:18Z`.
+- Dedicated disposable-account pre-deletion export and aggregate baseline captured safely: partial prior exercise retained; not a complete representative export.
+- Customer-interface deletion reported every applicable billing, data, private-asset, device, and Clerk stage accurately: not fully passed in the prior exercise.
+- Deleted session failed, private asset disappeared, and recreated identity returned an empty Free account: empty-account recreation and tested server categories passed; private assets and complete Clerk/device cleanup were not fully exercised.
+- Disposable account and test content cleanup completed under separate authorization: prior Permitext test-account cleanup is retained; external Clerk deletion was not proven.
+- Evidence: [build 51](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), [build 52](./PERMITEXT_RESEARCH_RECOVERY_RELEASE_2026-09-03.md#september-3-physical-iphone-continuity-check), and [partial Production deletion](./PERMITEXT_BETA1_PRODUCTION_ACCOUNT_DELETION_2026-09-02.md).
 
-Follow [the detailed account export/deletion checklist](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance). Never use the owner's primary, administrator, Lifetime Pro, or real customer account.
+Follow [the detailed account export/deletion checklist](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance). Never use the owner's primary, administrator, Lifetime Pro, or real customer account. Consolidating historical evidence does not authorize another destructive exercise.
 
 ## Exact policy publication
 
@@ -132,7 +133,7 @@ Do not include the taxpayer identification number, residential address, or certi
 ## Monitoring delivery
 
 Gate ID: `monitoring-delivery`
-Status: **OWNER-ACCEPTED BOUNDED ALTERNATIVE VERIFIED ON CURRENT BUILD 50 CANDIDATE; selected-release machine binding remains open**
+Status: **OWNER-ACCEPTED BOUNDED ALTERNATIVE — historical delivery/configuration evidence retained; selected-release machine binding remains open**
 Release-bound: **yes**
 
 - Production health-failure detection: accepted daily privacy-bounded log audit with direct `/health` fallback when no health request appears in the sampled window.
@@ -188,23 +189,21 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN — build 50 account/sync continuity passed, but its 2014 Reader failed on the physical iPhone; replacement build and remaining client workflows are required**
+Status: **OPEN — build 52 bounded device and live-answer evidence retained; final-candidate acceptance remains incomplete**
 Release-bound: **yes**
 
-- Production web release ID and Git commit match the selected release: current candidate yes — release ID `c78a4b6c26d8`, Git commit `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`; final machine selection remains open.
-- Final iOS archive was built from the selected release commit: no — signed version `1.0`, build `50`, executable SHA-256 `7cb3dcc312ac1eb19e72acee57429852fafd3324c50452d598fd7074ce6005b0` matched the then-current Production commit, but the physical-iPhone Reader defect supersedes it.
-- App Store Connect processed the intended build: historical build 50 upload, installation, and paired-device identity readback passed; a corrected replacement build has not yet completed this gate.
-- Physical-iPhone authentication passed: existing Apple-authenticated account continuity passed after relaunch; fresh-account Apple and the remaining provider matrix remain open.
-- Account/sync and representative saved Project continuity passed: Account reported `Synced`, existing saved sections or notes remained present, and existing project containers remained present. The projects had never contained saved items, so their empty state was expected; project-item continuity remains unexercised rather than failed.
-- Free and Pro entitlement presentation passed: Lifetime Pro passed on build 50; final-build Free presentation remains open.
-- 2014 Construction Codes Reader passed: no on build 50 — opening Building Code Chapter 7 displayed `Chapter HTML Missing`. The archive contained `bc-7.html`; the corrected resolver and its 161/161 Simulator suite pass, but a replacement physical-iPhone result remains required.
-- Restore/cancellation/refund state presentation passed as applicable:
-- One separately authorized complete Production Research turn preserved the shared web/iOS response contract:
-- Account-deletion presentation and recovery boundaries passed:
-- No TestFlight staging URL, Sandbox entitlement, or mismatched commit remained: yes for superseded build 50 — its backend was Production, its entitlement was Lifetime Pro rather than Sandbox, and installed build/Production Git identity aligned to `c78a4b6c26d8d47e096d3b1aba7baa8b161a4b2c`. This identity evidence does not waive replacement-build binding.
-- Redacted evidence and timestamp: [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), through `2026-09-03T10:33:44.038Z`.
+- Website/backend application source last verified: `0688e6b0564d44a92c803af3e1cfbbe6f87a2911`; see the publication section above.
+- Installed native archive: version `1.0 (52)`, source `1873ba6453bf6f3d1f076e34fa2ddfb96b9cf40c`, executable SHA-256 `abff19908971e29ef9c2cc99ea60ea8c474b08f300c69b75320ddde31fdc21c6`. No replacement binary was created by the later Notebook/privacy publication.
+- App Store Connect processing, Internal Testers assignment, owner installation and exact build identity: retained for build 52. This is not public App Store approval.
+- Physical-iPhone account/sync/representative continuity: existing signed-in account, Lifetime Pro, Synced, saved section and existing Projects observed on build 52. Fresh-provider and broader saved Project-item coverage remain open.
+- Free/Pro and restore/cancellation/refund presentation: Lifetime Pro observed; retain separately bound earlier billing evidence without inventing final-client coverage.
+- 2014 Reader: build 51 closed the specific Chapter 7 missing-HTML defect. Build 52 retained Chapter 7, chapter search and complete Figure 705.7. Table 705.8's horizontal gesture remains unresolved; the owner handles UI/UX and screenshots.
+- Research: build-51 authorization was consumed by a 105-second HTTP 502 verification failure with no delivered answer; that attempt's actual spend and persisted ledger outcome remain unverified. A separately authorized Unassigned build-52 question completed/reopened with HTTP 200 in 34.9 seconds, estimated API cost `$0.057825`, conservative accounting `$0.114176`, and one visible allowance decrement. Answer completeness and the original Project-context scenario remain unaccepted. Neither authorization permits another attempt.
+- Account-deletion presentation and complete cross-client recovery: open; retain the partial prior deletion record.
+- Backend/entitlement environment: build 52 uses canonical Production and displayed Lifetime Pro, not Sandbox. The newer compatible backend and older installed binary have different source SHAs; final common-candidate binding is not claimed.
+- Evidence: [historical build 51](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), [failure outcome](./PERMITEXT_RESEARCH_FAILURE_RECOVERY_2026-09-03.md#observed-attempt), [build 52 release/device record](./PERMITEXT_RESEARCH_RECOVERY_RELEASE_2026-09-03.md), and [separate live answer](./PERMITEXT_BUILD52_RAMP_LIVE_TEST_2026-09-03.md).
 
-Source, Simulator, archive-upload, and TestFlight-processing evidence do not substitute for the final physical-device workflow.
+Source, tests, upload/processing and this documentation merge do not replace final physical-device acceptance or authorize an Apple submission.
 
 ## Owner go/no-go
 

@@ -2,6 +2,8 @@
 
 Status: **SUPERSEDED — existing Apple-account continuity, Lifetime Pro, sync, and saved-content continuity passed, but the physical iPhone exposed a release-blocking 2014 Construction Codes chapter-resolution defect**
 
+Superseding result: the corrected replacement [build 51 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md) records that the owner installed build 51, opened 2014 Building Code Chapter 7, and accepted the rendered result. This build 50 record remains historical evidence for the continuity checks performed on build 50.
+
 This record contains no email address, customer content, provider token, payment data, raw account export, or other personal identifier. The owner performed the physical-iPhone observations. Codex retained only release identity, aggregate request status, build metadata, hashes, and pass/open outcomes.
 
 ## Exact release identity
