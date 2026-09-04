@@ -42,6 +42,8 @@ The local Clerk source checkout was verified at the exact lockfile revision `3b6
 
 ## Still open before owner-approved publication
 
+Provider-document review now supports a concrete [Device ID / Coarse Location / Analytics proposal](./PERMITEXT_PRIVACY_PROVIDER_DISCLOSURE_PROPOSAL_2026-09-03.md). It replaces an open-ended classification question with specific proposed answers and source references. The additional declarations are not yet applied to the manifest or approved public policy; owner review and exact provider-retention questions remain separate.
+
 1. Finish reconciling third-party collection/retention and purposes, including Clerk session/device/IP processing, production analytics and infrastructure/image-host logs. The pinned-source and archived-manifest checks above narrow this work but do not complete it. A dependency name alone does not prove a data category is collected or absent.
 2. Review final archived-candidate privacy aggregation. The existing build 52 predates this local manifest correction; no archive/upload is performed here.
 3. Verify the remaining account export/deletion lifecycle on an explicitly authorized disposable identity. Source deletion of operation telemetry is not proof of live provider log/backup erasure.

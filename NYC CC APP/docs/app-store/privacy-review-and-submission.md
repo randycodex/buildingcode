@@ -34,6 +34,8 @@ September 3 source audit corrected three omissions: Search History, Performance 
 
 ### Tracking
 
+Provider follow-up: the [owner-review proposal](../../../docs/PERMITEXT_PRIVACY_PROVIDER_DISCLOSURE_PROPOSAL_2026-09-03.md) now recommends Device ID and Coarse Location disclosures plus Analytics purposes for User ID and Product Interaction. The provider rows below remain unresolved for publication pending that review and synchronized manifest/policy preparation. Do not submit the current checklist as a completed questionnaire.
+
 - Data used to track the user: `No`
 - Tracking domains: none
 - Data sold or shared for third-party advertising: `No`
