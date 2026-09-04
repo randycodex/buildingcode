@@ -52,8 +52,8 @@ verification does not close production or release acceptance.
 ## Second repair batch: current status
 
 The second batch is implemented on `codex/production-readiness-fixes`. Native
-changes are committed as `d13a24c4e`; the web/server/test batch has passed combined
-verification and is ready to commit. The readiness contracts, client builds,
+changes are committed as `d13a24c4e`; the web/server/test batch is committed as
+`dcc6cb6cb` and pushed. The readiness contracts, client builds,
 smoke, main check, and postcheck passed. Precheck passed across its original run
 and the resumed tail after obsolete assertions were updated for the repaired
 contracts. This is aggregate suite evidence, not a single uninterrupted
@@ -64,11 +64,11 @@ contracts. This is aggregate suite evidence, not a single uninterrupted
 | ID | Finding | Implementation and local evidence | Remaining acceptance |
 | --- | --- | --- | --- |
 | P0-1 | Historical citations can open a different provision or edition. | First-batch canonical identity and offline compatibility repairs are complete. Citation contracts pass; the browser rendered the distinct 2014 and 2022 same-number provisions with the correct edition. | Verify saved-citation, refresh, offline, and native paths in the final release candidate; no fresh paid Research acceptance is claimed. |
-| P0-2 | Research moved between Projects retains prior active facts/history. | Implemented Project/context revision boundaries, fresh active history/facts after move or unassign, and rejection of generation started under the old context. Historical answers remain immutable. Context and concurrent HTTP contracts pass. | Run live PostgreSQL concurrency acceptance and the final cross-platform Project → Research → Report workflow. |
+| P0-2 | Research moved between Projects retains prior active facts/history. | Implemented Project/context revision boundaries, fresh active history/facts after move or unassign, and rejection of generation started under the old context. Historical answers remain immutable. Context, concurrent HTTP, and real local PostgreSQL move/completion races pass. | Complete final cross-platform Project → Research → Report acceptance and deployed-environment verification. |
 | P0-3 | Account transitions fail to isolate private state and async results. | Implemented owner/session/generation guards, per-account and guest workspace storage, conservative legacy quarantine, native account-scoped state, and guarded mutation/timer/error/finally paths. Deferred actual-function tests include A → B → A, stale 401, SDK callbacks, and captured-owner deletion cleanup. Linking checkpoints local work and fences same-tab editing; confirmed source work has an export-only recovery path. | Complete final candidate account-switch/deletion tests and review the explicit legacy and account-link recovery limits below. Cross-tab merging is not a transaction and source work is not automatically replayed. |
 | P0-4 | Offline cleanup deletes unsynchronized Notebook drafts/images. | Public code cleanup preserves private stores. Draft metadata, immutable pending-save journals, conditional acknowledgement, conflict review, owner deletion tombstones, and exact-owner recovery exports are implemented. Transactional storage tests pass. A synthetic browser 503 → 403 → reopen/export → restored-access flow preserved the Note title and returned to Synced. | Exercise device storage pressure, background termination, image upload/reconnect, and deletion failure recovery on the final native/browser candidates. Retained unattributed legacy bytes are not claimed deleted. |
 | P0-5 | Retired Workboard writers do not enforce read-only compatibility. | First-batch authenticated 410 responses and per-record mixed-sync rejection are complete. Historical reads, previews, and immutable Report sources pass imported-fixture HTTP regressions. | Verify final deployment/candidate compatibility; no live PostgreSQL write test or production exploit was performed. |
-| P0-6 | Concurrent Notebook/Research writes lose changes despite success. | Implemented atomic expected-version/context checks and exact retry receipts for Notebook, Research completion, and Project information. Newer drafts survive acknowledgement and reopen. File-adapter Research metrics, credit and usage updates now hold the lock across the entire mutation. Deterministic overlap tests preserve unrelated answers, debit balances, and metrics; the old metric mechanism reproduced the 25-versus-24 overwrite. | Live PostgreSQL and final cross-device concurrency acceptance remain required. PostgreSQL evidence currently checks transaction protocol, not a live database. |
+| P0-6 | Concurrent Notebook/Research writes lose changes despite success. | Implemented atomic expected-version/context checks and exact retry receipts for Notebook, Research completion, and Project information. Newer drafts survive acknowledgement and reopen. File-adapter Research metrics, credit and usage updates now hold the lock across the entire mutation. Real local PostgreSQL acceptance passed 34 Serializable batches, rollback and charge-once replay. | Final cross-device and deployed-environment acceptance remain required. The local PostgreSQL transport does not verify Neon cloud configuration or transport. |
 
 The original audit classified security, lost work, incorrect citation relationships,
 and credible cross-project contamination as P0. Isolated reproductions and source
@@ -79,10 +79,74 @@ production customer incidents.
 
 | ID | Finding | Implementation and local evidence | Remaining acceptance |
 | --- | --- | --- | --- |
-| P1-1 | Fact normalization loses negation, partial scope, and assumptions. | Shared qualification/projection helpers preserve original wording and qualifiers; only unambiguous assertions become established facts. Partial sprinklers, negated status, embedded hypotheticals, legacy inflated facts, and follow-ups pass focused tests. | Professional evaluation must verify meaning survives actual generation and verification. Extraction tests do not establish Research answer quality. |
+| P1-1 | Fact normalization loses negation, partial scope, and assumptions. | Shared qualification/projection helpers preserve original wording and qualifiers; only unambiguous assertions become established facts. Partial sprinklers, negated status, embedded hypotheticals, legacy inflated facts, and follow-ups pass focused tests. | Review meaning preservation in the final candidate's Project → Research → Report workflow. Extraction tests do not establish generated-answer quality. Retain the accepted Beta evaluation scope below; this finding does not require a new paid cohort. Any selected new provider-backed confirmation needs its own exact scope and authorization. |
 | P1-2 | Streaming errors discard recovery information. | JSON/stream responses share a safe error envelope. Web recovery preserves conflict/source/prerequisite details, offers current-state review, and rejects obsolete account responses. Recovery contracts pass. | Verify current-source review and retry with representative final-candidate workflows and provider failures; no new paid run is included. |
 | P1-3 | Private cache deletion/revocation lifecycle is incomplete. | Implemented owner-scoped native/web cleanup, persistent deletion tombstones, and authorization/deletion-sensitive cache fallback. Authored device work has a separate recovery route when access is unavailable. Native and web contracts pass. | Complete candidate account-deletion/privacy verification, stale independent-writer tests on actual devices, and explicit treatment of unattributed legacy bytes. |
-| P1-4 | Release acceptance does not substantiate the paid-product scope. | Remains open. Source fixes and local tests improve readiness but do not clear professional Research/Zoning, payment/support, privacy, or platform release gates. | Retain current fail-closed gates until owner-reviewed, release-shaped evaluation passes. Verify final archive/privacy aggregation, account reconciliation/deletion, payment lifecycle, and supported platform workflows. |
+| P1-4 | Final release acceptance remains incomplete for the repaired candidate. | Retain the accepted Research/no-cost economics scope, the owner's six-case Zoning Beta sequencing decision, passed controlled Stripe and Apple Sandbox/TestFlight lifecycles, passed support/restore exercises, and accepted bounded daily monitoring. These are historical evidence with their original limits; source fixes do not establish final candidate acceptance. | Bind the exact candidate to Production and TestFlight, verify supported client/authentication/account-deletion and privacy workflows, reconcile remaining non-charge billing evidence, complete the distinct spend-notification/hard-stop acceptance, and obtain final owner go/no-go. No new paid cohort or automatic repetition of passed payment/monitoring decisions is required. |
+
+## Release acceptance reconciliation
+
+The controlling [Beta 1 acceptance record](./BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md)
+and [master plan](./PERMITEXT_BETA1_MASTER_PLAN.md#release-blockers-at-a-glance)
+separate accepted historical evidence from final candidate verification. P1-4
+does not reopen these decisions:
+
+- **Research and Zoning:** the owner moved the six unresolved Architecture V2.1
+  cases into post-launch Beta observation on September 2. Retain the original
+  12 passing delivered answers, one delivered qualification failure, five
+  uncharged verifier blocks, and 12 prerequisite boundaries without rescoring.
+  No additional pre-Beta paid cohort is planned. Exact-candidate citation,
+  context, accounting, recovery, limitation disclosure, and physical-client
+  acceptance remain open; this is not blanket professional approval of answers.
+- **Payments:** retain the passed controlled Production Stripe charge,
+  entitlement, cancellation and refund, plus the Apple-created Sandbox/TestFlight
+  lifecycle. Recheck changed paths and bind compatibility to the selected release.
+  The acceptance record expressly avoids another paid Stripe repetition unless
+  billing logic or Production configuration materially changes. Remaining
+  non-charge replay/customer-cleanup evidence is separate from a new purchase.
+- **Monitoring, support and restore:** retain the owner-accepted Vercel anomaly
+  rules plus daily privacy-bounded review, with direct health fallback. Immediate
+  delivery for every warning was not required by that accepted Beta alternative.
+  Reverify its marker and bounded audit on the selected deployment. The synthetic
+  support tabletop and isolated provider restore passed; refresh affected support
+  recovery instructions locally without relabeling those exercises incomplete.
+
+The remaining acceptance sequence is:
+
+1. **Bind the candidate and finish technical verification.** Record the common
+   full source SHA, Production release/deployment, and final native archive/build.
+   Finish database concurrency, archive/privacy aggregation, and supported-device
+   checks, including wide tables, VoiceOver, offline/reopen/conflict recovery, exact
+   citations and the qualified Project → Research → Note → Report handoff. Earlier
+   publication/build evidence does not stand in for this candidate. Existing
+   authorization in the active work session continues to govern publication work.
+2. **Complete account and client consent evidence.** Exercise fresh/existing
+   email, Apple, Google and Microsoft sign-in with the intended identities, then
+   the complete export/deletion lifecycle on a dedicated disposable account.
+   Provider sign-in may need owner participation; destructive deletion/provider
+   cleanup needs an explicitly authorized target and scope. Preserve the actual
+   legacy/quarantine and merge-recovery limits. Verify final-client policy consent
+   and retainable acknowledgment against the already approved policy bytes.
+3. **Finish the narrowly open owner/operations items.** Obtain only nonsensitive
+   owner corroboration of the issued certificate's effective date and the filing
+   process; do not request or retain a certificate image. The tax configuration,
+   certificate possession/display, approved policies, and no-attorney self-review
+   decisions are already recorded. Spend Management notification and isolated
+   pause/resume evidence remain distinct from accepted daily monitoring: any
+   provider pause needs exact authorization, and the owner must disposition the
+   automatic-threshold evidence. Do not spend or lower the budget to force it.
+4. **Finish the Apple/privacy package, then obtain final go/no-go.** Prepare final
+   metadata, reviewer access, content/age/privacy answers, subscription material,
+   and the intended Production notification configuration before asking for
+   missing owner attestations or provider changes. Preserve approved local
+   privacy classifications; new public wording still needs exact owner approval.
+   Update the acceptance/machine records only when their evidence is sufficient.
+   App Store submission and public release remain the final separately authorized
+   actions; no historical cohort or paid-turn authorization permits a new run.
+
+This reconciliation changes no runtime rollout control, machine gate, historical
+outcome, price, allowance, or owner decision. The machine record remains open
+until the exact candidate and remaining evidence satisfy its requirements.
 
 ## Medium-priority findings
 
@@ -102,9 +166,14 @@ production customer incidents.
   workspace-restore failures and repaired without replacing unreadable saved
   layouts. The original audit's unexplained apparent guest transition is not
   proven to have the same cause; retain a final candidate session/reload check.
-- Complete physical wide-table access. Mirroring did not establish direct finger
-  scrolling failure or success for all table columns.
-- Complete native VoiceOver and web keyboard/contrast/touch-target checks.
+- Physical wide-table access passed on build 54: the owner swiped through
+  2022 Fuel Gas Code Table 504.2(2) to its far-right 12-inch columns. Mirroring's
+  horizontal scroll did not move this table and is not a direct-touch result.
+- The owner confirmed VoiceOver reads the table's headings and numbers clearly
+  and scrolls through it with the three-finger gesture. This is a bounded physical
+  traversal result, not full accessibility certification or verification of
+  programmatic header associations for every table. Broader keyboard/contrast
+  and supported-device coverage remain separate.
 - Verify the professional path: Project → Research → exact cited provision →
   qualified notes/Notebook → Report → reopening on iOS.
 - Web and native answers now give a concrete next step: open cited provisions,
@@ -197,13 +266,26 @@ bounded failures.
 
 ## Verification ledger: second batch
 
-- **Source status:** native commit `d13a24c4e` is on the repair branch. Web/server
-  changes passed combined verification and are ready to commit at this checkpoint.
-  Neither this commit nor the remaining repairs are claimed deployed
-  to Production, TestFlight, or the App Store.
-- **Native:** 176 unit tests and seven UI tests passed. These are local test
-  results; physical wide-table interaction, VoiceOver, and the final candidate's
-  archive/privacy aggregation remain pending.
+- **Source status:** native commit `d13a24c4e` and web/server commit `dcc6cb6cb`
+  are on the repair branch. Local and remote matched the full application SHA
+  `dcc6cb6cbe6ea6341ac77771ed96417e368d61fd`. Vercel Preview
+  `dpl_4iGxbhHJcYVswGFW3c7EaiFmYmDT` is READY; protected fetches returned SSO
+  redirects, so direct Preview endpoint identity is not claimed. Both Production
+  release endpoints still returned baseline `176cca6f2e2d01db6495f29192f805ef7daddfbe`.
+  The repair candidate has not been published to Production, TestFlight, or the
+  App Store.
+- **Native:** 176 unit tests and seven UI tests passed. Build 54 was archived
+  from a clean detached checkout at `dcc6cb6cb`; strict development signature and
+  matching entitlements passed. Aggregate privacy matched source (13 categories,
+  three API groups, no tracking). In-place installation and device metadata
+  verified version 1.0 (54). Mirroring retained the existing signed-in account,
+  Lifetime Pro, Synced, Project containers, saved section and prior code selection.
+  The owner confirmed direct finger scrolling reaches the far-right 12-inch
+  columns of 2022 Fuel Gas Code Table 504.2(2), a 29-column table. The visible
+  Reader header retained Fuel Gas Code · 2022 while scrolling. The owner then
+  confirmed clear VoiceOver heading/number reading and scrolling after using the
+  standard three-finger gesture. No replacement of enacted table values or new
+  gesture implementation was needed.
 - **Combined local checks:** `npm run test:readiness-recovery` and
   `npm run build:clients` passed. The readiness script includes qualified facts,
   Project fact projection, account isolation/mutation guards, durable Notebook
@@ -226,9 +308,13 @@ bounded failures.
   former stale metric snapshot overwrite. Reservation/credit duplicate and stale
   reconciliation behavior remains covered. The isolated Research billing
   lifecycle, turn, credit-ledger, and idempotency checks passed without providers.
-- **PostgreSQL boundary:** local contracts verify expected transaction/locking
-  protocol and conflict outcomes. A live PostgreSQL database was not exercised;
-  adapter protocol checks are not a live database acceptance result.
+- **PostgreSQL:** a disposable local PostgreSQL 18.6 cluster passed 834 actual SQL
+  requests, 34 Serializable batches and four simultaneous move/completion races.
+  Production HTTP handlers and Neon query encoding were exercised through a
+  test-only local transport. Rollback, exact replay and charge-once behavior passed.
+  See `PERMITEXT_LOCAL_POSTGRES_READINESS_2026-09-04.md` for provenance, reproduction
+  and the remaining Neon cloud/deployment boundary. The temporary cluster and
+  runtime were stopped and removed; no Production database or provider was used.
 - **Actual browser:** root verified the eight listed widths, tablet targets,
   collapsed facts' accessibility state, exact-search term recovery, historical and
   current edition rendering, qualified Report text in revision 2, v33 Reader
