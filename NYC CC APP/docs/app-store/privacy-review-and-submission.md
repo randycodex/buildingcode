@@ -30,6 +30,8 @@ Build/upload and app availability were rechecked September 3. Agreement, bank, t
 
 These answers are derived from the app privacy manifest and the published privacy policy. They must be checked against App Store Connect's current wording before being submitted.
 
+September 3 source audit corrected three omissions: Search History, Performance Data, and Other Diagnostic Data. See the [source-to-declaration evidence](../../../docs/PERMITEXT_PRIVACY_DATA_FLOW_AUDIT_2026-09-03.md). These local corrections are not published App Store answers or a replacement TestFlight binary. Third-party SDK/provider collection and the final candidate privacy report still require reconciliation before owner approval.
+
 ### Tracking
 
 - Data used to track the user: `No`
@@ -47,7 +49,7 @@ These answers are derived from the app privacy manifest and the published privac
 ### Identifiers
 
 - User ID: collected, linked to identity, App Functionality
-- Device ID: not declared as collected
+- Device ID: unresolved provider declaration; do not submit a `No` answer yet. The pinned Clerk iOS SDK sends `identifierForVendor` as `x-native-device-id`; confirm retention, linkage, and purpose before completing the questionnaire.
 
 ### Purchases
 
@@ -67,24 +69,37 @@ These answers are derived from the app privacy manifest and the published privac
 ### Usage data
 
 - Product Interaction: collected, linked to identity, App Functionality
-  - searches, recents, reading continuity, and sync state
+  - recently viewed sections, reading continuity, and sync state
 - Advertising Data: not collected
 - Other Usage Data: not declared as collected
+
+### Search history
+
+- Search History: collected, linked to identity, App Functionality
+  - in-app search queries are included in account continuity sync (`recentSearchesJSON`)
+  - Apple's category includes searches performed inside the app, not only external searches
 
 ### Diagnostics
 
 - Crash Data: not currently declared as collected by the app
-- Performance Data: not currently declared as collected by the app
-- Other Diagnostic Data: limited operational logs may be processed by the service; verify App Store Connect's definition before answering
+- Performance Data: collected, linked to identity, App Functionality
+  - Research duration is retained with the account's operation record for reliability and performance assessment
+- Other Diagnostic Data: collected, linked to identity, App Functionality
+  - Research failure codes, verification attempts, and provider request/retry counts are retained with the account's operation record for troubleshooting and safe operation
+  - the operation record excludes question/answer text but remains linked through its database `user_id`; content-free is not anonymous
+  - provider-managed IP addresses, request logs, and SDK behavior still require review; the linked declarations above are already required by Permitext's own stored records
 
-### Sensitive categories not collected
+### Location — provider review required
+
+- Precise Location: no device-location collection established by this audit; this is not a complete provider assessment.
+- Coarse Location: unresolved provider declaration; do not submit a blanket `No` for Location. Clerk's session activity model and current provider documentation include IP-derived city/country data. Confirm the production service's collection and purposes; a Project's entered street address is separately covered under Physical Address.
+
+### Remaining draft categories not collected — subject to provider review
 
 - Health and Fitness
 - Financial Information other than subscription status/history
-- Location
 - Contacts
 - Browsing History outside Permitext
-- Search History outside Permitext
 - Sensitive Info
 
 ## App information declarations requiring final owner confirmation
