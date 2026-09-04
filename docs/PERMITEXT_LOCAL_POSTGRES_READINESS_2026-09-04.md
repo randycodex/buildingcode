@@ -14,6 +14,22 @@ Final run: **passed**, 834 SQL transport requests, 34 Serializable batches, maxi
 
 ## Provenance
 
+The original frozen-runtime result above remains historical. A follow-up on the
+repair branch extended this same opt-in harness with `account-link-recovery-http.mjs`.
+It reproduced the lost transitive ancestry and a PostgreSQL `42P18` failure in
+account linking: JSON constructors received untyped parameters. Source ancestry
+is now carried into the destination, and account/entitlement constructor inputs
+have explicit text casts.
+
+The final follow-up passed **907 SQL requests, 37 Serializable batches, maximum
+14 connections**, with the four earlier move/completion races. The added HTTP
+flow preserves a linked Project and Pro entitlement across A → B → C, returns
+both source identities on fresh sign-in after discarded merge responses, rejects
+old source sessions, and ignores client-supplied ancestry. No provider or external
+database requests occurred. The disposable cluster was stopped, image detached,
+and its temporary runtime/data removed. Evidence:
+`/private/tmp/permitext-readiness-links-postgres-final-20260904.log`.
+
 - Primary distribution: [Postgres.app downloads](https://postgresapp.com/downloads.html), [2.9.6 release](https://github.com/PostgresApp/PostgresApp/releases/tag/v2.9.6).
 - Asset: `Postgres-2.9.6-18.dmg`, 122,517,005 bytes. Its actual SHA-256 matched the release digest: `9fc7d0dc08cf46dfd94bb32cbaaad81b41b37847a42d6dcb2f9fbd292813defb`.
 - `codesign --verify --deep --strict` passed. Signer: `Developer ID Application: Jakob Egger (ZF84SJ5A3G)`, through Apple Root CA; signature timestamp August 12, 2026.

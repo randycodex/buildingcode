@@ -405,4 +405,36 @@ for (const indexWriteFails of [false, true]) {
   assert.equal(recoveries[0].sourceUserID, A.userID);
   assert.equal(Boolean(recoveries[0].storageWarning), indexWriteFails, "An index quota failure must leave an immediate export route from the in-memory confirmed receipt.");
 }
+
+// The link may have succeeded on the server while its response was lost.
+// Fresh authenticated sign-in must reconstruct export access from server-owned
+// ancestry, never from the account that happened to be open in this browser.
+for (const indexWriteFails of [false, true]) {
+  const storage = new RecoveryStorage();
+  const sourceKey = privateWorkspacePrefix(A.userID) + "permitext:webWorkspace:v1";
+  storage.setItem(sourceKey, JSON.stringify({ localProjects: [project] }));
+  const h = harness({ localStorage: storage, confirmedAccountLinkRecovery, recordConfirmedAccountLinkRecovery,
+    refreshNotebookPendingStatus: async () => {}, reconcileOfflineFeatureAccess: async () => {},
+    loadSyncedContent: async () => {}, flushCodeQuestionOutbox: async () => {}, renderWorkspace: async () => {} });
+  vm.runInContext(extract("storeSignedInAccount"), h.c);
+  const unrelated = { userID: "web:unrelated", sessionToken: "synthetic-unrelated" };
+  h.switchTo(unrelated);
+  h.c.replaceActiveAccount = (next) => h.switchTo(next);
+  if (indexWriteFails) storage.setItem = () => { throw new Error("Synthetic recovery-index quota"); };
+  h.c.storeSignedInAccount({ account: { appUserID: B.userID, backendSessionToken: B.sessionToken,
+    mergedAccountIDs: [A.userID, A.userID, "", null, {}, B.userID] } });
+  let recoveries = h.c.linkedAccountRecoverySources();
+  assert.deepEqual([...recoveries].map((entry) => entry.sourceUserID), [A.userID]);
+  assert.equal(Boolean(recoveries[0].storageWarning), indexWriteFails);
+  assert.equal(storage.getItem(sourceKey), JSON.stringify({ localProjects: [project] }));
+  assert.equal(h.c.state.syncOutbox.length, 0);
+  const C = { userID: "apple:synthetic-c", sessionToken: "synthetic-c" };
+  h.c.storeSignedInAccount({ account: { appUserID: C.userID, backendSessionToken: C.sessionToken,
+    mergedAccountIDs: [A.userID, B.userID] }, mergedAccount: { sourceUserID: B.userID, targetUserID: C.userID } });
+  recoveries = h.c.linkedAccountRecoverySources();
+  assert.deepEqual([...recoveries.map((entry) => entry.sourceUserID)].sort(), [A.userID, B.userID].sort());
+  assert.equal(recoveries.some((entry) => entry.sourceUserID === unrelated.userID), false);
+  h.switchTo(unrelated);
+  assert.equal(h.c.linkedAccountRecoverySources().length, 0);
+}
 console.log("Web account mutation isolation contract passed (real entry points; deferred synthetic adapters).");

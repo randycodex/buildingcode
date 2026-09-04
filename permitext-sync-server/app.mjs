@@ -23974,8 +23974,9 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
   targetAccount.migrationState = "localDataAttached";
   targetAccount.mergedAccountIDs = Array.from(new Set([
     ...(Array.isArray(targetAccount.mergedAccountIDs) ? targetAccount.mergedAccountIDs : []),
+    ...(Array.isArray(sourceAccount.mergedAccountIDs) ? sourceAccount.mergedAccountIDs : []),
     sourceUserID
-  ]));
+  ].filter((userID) => typeof userID === "string" && userID.trim() && userID !== targetUserID)));
   store.users[targetUserID] = targetAccount;
 
   const passkeyCredentials = store.passkeyCredentials || {};

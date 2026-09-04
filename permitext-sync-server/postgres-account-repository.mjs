@@ -273,11 +273,12 @@ export function createPostgresAccountRepository(sql, options = {}) {
             display_name = COALESCE(target.display_name, source.display_name),
             migration_state = 'localDataAttached',
             account = source.account || target.account || jsonb_build_object(
-              'appUserID', ${targetUserID},
+              'appUserID', ${targetUserID}::text,
               'migrationState', 'localDataAttached',
               'mergedAccountIDs',
                 COALESCE(target.account->'mergedAccountIDs', '[]'::jsonb) ||
-                jsonb_build_array(${sourceUserID}),
+                COALESCE(source.account->'mergedAccountIDs', '[]'::jsonb) ||
+                jsonb_build_array(${sourceUserID}::text),
               'linkedAppleUserIDs', (
                 SELECT COALESCE(jsonb_agg(DISTINCT identities.subject), '[]'::jsonb)
                 FROM (
@@ -297,7 +298,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
                 ) AS identities
                 WHERE identities.subject IS NOT NULL
               ),
-              'appleBillingAccountToken', ${mergedAppleBillingTokens.appleBillingAccountToken},
+              'appleBillingAccountToken', ${mergedAppleBillingTokens.appleBillingAccountToken}::text,
               'appleBillingAccountTokenAliases',
                 ${JSON.stringify(mergedAppleBillingTokens.appleBillingAccountTokenAliases)}::jsonb,
               'policyAcceptances',
@@ -314,8 +315,8 @@ export function createPostgresAccountRepository(sql, options = {}) {
         SELECT
           ${targetUserID}, plan, source, ${targetUserID},
           entitlement || jsonb_build_object(
-            'grantedUserID', ${targetUserID},
-            'transferredFromUserID', ${sourceUserID},
+            'grantedUserID', ${targetUserID}::text,
+            'transferredFromUserID', ${sourceUserID}::text,
             'updatedAt', now()
           ),
           expires_at, now()

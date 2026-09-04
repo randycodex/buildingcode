@@ -301,7 +301,7 @@ assert.ok(appSource.includes('renderWorkspace({ persist: false })'));
 assert.ok(appSource.includes("if (clientValuesMatch(incomingDomain, currentDomain)) return;"));
 assert.ok(appSource.includes("preservePresentation: true"));
 assert.ok(appSource.includes('conflictCode: "CODE_QUESTION_DEPENDENCY_CONFLICT"'));
-assert.ok(appSource.includes("recordConfirmedAccountLinkRecovery(localStorage, payload.mergedAccount, previousUserID, account.appUserID)"));
+assert.ok(appSource.includes("recordConfirmedAccountLinkRecovery(localStorage, recovery, recovery.sourceUserID, account.appUserID)"));
 const signInSource = appSource.slice(appSource.indexOf("function storeSignedInAccount("), appSource.indexOf("function linkedAccountRecoverySources("));
 assert.doesNotMatch(signInSource, /migrateCodeQuestionAccountState\(/,
   "Sign-in must preserve the original local Code Question namespace instead of replaying it into the linked account.");

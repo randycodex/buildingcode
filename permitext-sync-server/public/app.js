@@ -79,7 +79,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260904-readiness-recovery-v35";
+} from "./offline-storage.js?v=20260904-readiness-recovery-v36";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -114,7 +114,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260904-readiness-recovery-v35";
+} from "./research-intent-state.js?v=20260904-readiness-recovery-v36";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -8147,13 +8147,26 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   codeQuestionUnauthorizedAccountUserID = "";
   const previousUserID = state.account?.userID;
   if (previousUserID) persistCodeQuestionAccountState(previousUserID);
+  const confirmedRecoveries = [];
   if (payload.mergedAccount) {
-    const recovery = confirmedAccountLinkRecovery(payload.mergedAccount, previousUserID, account.appUserID);
-    sessionAccountLinkRecoveries.set(`${account.appUserID}:${previousUserID}`, recovery);
+    confirmedRecoveries.push(confirmedAccountLinkRecovery(payload.mergedAccount, previousUserID, account.appUserID));
+  }
+  // This entry point receives a fresh authenticated server response. Its
+  // server-owned ancestry also survives a lost merge response or a later link.
+  // Never derive access from the previously open account, stored workspace
+  // metadata, or an unconfirmed source-side recovery index.
+  for (const sourceUserID of new Set(Array.isArray(account.mergedAccountIDs) ? account.mergedAccountIDs : [])) {
+    if (typeof sourceUserID !== "string" || !sourceUserID.trim() || sourceUserID === account.appUserID) continue;
+    confirmedRecoveries.push(confirmedAccountLinkRecovery(
+      { sourceUserID, targetUserID: account.appUserID }, sourceUserID, account.appUserID
+    ));
+  }
+  for (const recovery of new Map(confirmedRecoveries.map((entry) => [entry.sourceUserID, entry])).values()) {
+    sessionAccountLinkRecoveries.set(`${account.appUserID}:${recovery.sourceUserID}`, recovery);
     try {
-      recordConfirmedAccountLinkRecovery(localStorage, payload.mergedAccount, previousUserID, account.appUserID);
+      recordConfirmedAccountLinkRecovery(localStorage, recovery, recovery.sourceUserID, account.appUserID);
     } catch (error) {
-      // The server has already merged these identities. Keep its exact receipt
+      // The server has already merged these identities. Keep its confirmation
       // available for immediate export even if this browser cannot write it.
       recovery.storageWarning = error.message || "The recovery index could not be saved. Export retained work before closing this page.";
     }

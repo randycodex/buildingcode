@@ -33,6 +33,7 @@ neonConfig.fetchFunction = async (url, options) => {
   const queries = body.queries || [body];
   const client = new pg.Client({ connectionString, application_name: "permitext-readiness-local",
     types: { getTypeParser: () => (value) => value } });
+  let activeStatement = "";
   requests += 1; activeConnections += 1; maximumConnections = Math.max(maximumConnections, activeConnections);
   try {
     await client.connect();
@@ -45,6 +46,7 @@ neonConfig.fetchFunction = async (url, options) => {
     }
     const results = [];
     for (const query of queries) {
+      activeStatement = query.query;
       const result = await client.query({ text: query.query, values: query.params, rowMode: "array" });
       results.push({ fields: result.fields.map((field) => ({ name: field.name, dataTypeID: field.dataTypeID })),
         rows: result.rows, command: result.command, rowCount: result.rowCount });
@@ -53,6 +55,7 @@ neonConfig.fetchFunction = async (url, options) => {
     return new Response(JSON.stringify(body.queries ? { results } : results[0]), { status: 200 });
   } catch (error) {
     await client.query("ROLLBACK").catch(() => {});
+    if (error.code === "42P18") console.error(JSON.stringify({ code: error.code, statement: activeStatement }));
     return new Response(JSON.stringify({ message: error.message, code: error.code, detail: error.detail, constraint: error.constraint }), { status: 400 });
   } finally { await client.end(); activeConnections -= 1; }
 };
@@ -99,6 +102,13 @@ try {
     .replaceAll('"../app.mjs"', JSON.stringify(new URL("../app.mjs", import.meta.url).href))
     .replaceAll('"../research-context-state.mjs"', JSON.stringify(new URL("../research-context-state.mjs", import.meta.url).href));
   await import(`data:text/javascript;base64,${Buffer.from(cases).toString("base64")}`);
+
+  // Exercise the same lost-receipt and successive-link HTTP flow against the
+  // production account repository, including its source-deletion transaction.
+  let linkCases = await readFile(new URL("./account-link-recovery-http.mjs", import.meta.url), "utf8");
+  linkCases = linkCases.replace('"PERMITEXT_SYNC_DATABASE_URL", ', "")
+    .replaceAll('"../app.mjs"', JSON.stringify(new URL("../app.mjs", import.meta.url).href));
+  await import(`data:text/javascript;base64,${Buffer.from(linkCases).toString("base64")}`);
 
   // Additional real SQL acceptance for pre-move completions and atomic rollback.
   const owner = "apple:synthetic-cas-owner";
@@ -175,6 +185,7 @@ try {
   assert.ok(serializableBatches > 5 && maximumConnections > 1);
   console.log(JSON.stringify({ result: "passed", postgresVersion: initial[0].version, requests, serializableBatches, maximumConnections,
     simultaneousMoveCompletionRaces: 4, chargedOnceAfterReplay: true, failedMutationRollback: true,
+    accountLinkLostReceipt: true, successiveAccountLinkRecovery: true,
     productionHTTPHandlers: true, productionNeonQueryEncoder: true, transport: "test-only local node-postgres bridge", externalDatabaseRequests: 0, providerRequests: 0 }));
 } finally {
   delete globalThis.__permitextLocalPostgresAdapter;
