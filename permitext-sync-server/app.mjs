@@ -407,9 +407,7 @@ const maxSyncFutureClockSkewMilliseconds = 24 * 60 * 60 * 1_000;
 const maxWorkboardElements = 5_000;
 const maxWorkboardAssets = 250;
 const maxWorkboardRecordBytes = 768 * 1024;
-const maxWorkboardAssetBytes = 8 * 1024 * 1024;
 const maxNotebookAssetBytes = 8 * 1024 * 1024;
-const maxWorkboardPreviewBytes = 6 * 1024 * 1024;
 const maxReportFileBytes = 25 * 1024 * 1024;
 const defaultRequestBodyLimit = 1024 * 1024;
 const immutableStaticCacheControl = "public, max-age=31536000, s-maxage=31536000, immutable";
@@ -7027,26 +7025,8 @@ function notebookAssetPathBelongsToProject(pathname, projectID) {
   return pathname.startsWith(notebookAssetPrefix(projectID)) && /\.(?:gif|jpg|png|webp)$/.test(pathname);
 }
 
-function workboardAssetExtension(contentType) {
-  return {
-    "image/gif": "gif",
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp"
-  }[contentType] || "";
-}
-
-function workboardAssetPathname(userID, projectID, fileID, contentType) {
-  const extension = workboardAssetExtension(contentType);
-  return `${workboardAssetPrefix(userID, projectID)}${safeWorkboardPathHash(fileID)}.${extension}`;
-}
-
 function workboardPreviewPrefix(projectID) {
   return `project-assets/${safeWorkboardPathHash(projectID)}/workboard-previews/`;
-}
-
-function workboardPreviewPathname(projectID, previewID) {
-  return `${workboardPreviewPrefix(projectID)}${safeWorkboardPathHash(previewID)}.png`;
 }
 
 function workboardPreviewPathBelongsToProject(pathname, projectID) {
@@ -11195,7 +11175,9 @@ async function currentResearchEvidence(conversation) {
       sectionID: source.sectionID,
       kind: source.kind,
       blocking: source.kind === "selection",
-      current: Boolean(current && current.sectionTextHash === source.sectionTextHash && selectionPresent),
+      current: Boolean(current && current.sectionTextHash === source.sectionTextHash && selectionPresent &&
+        (!source.codeVersion || canonicalCodeVersion(source.codeVersion) === current.codeVersion) &&
+        (!source.corpusID || source.corpusID === current.corpusID)),
       selectionPresent,
       visualSelectionPresent
     };
@@ -11220,8 +11202,10 @@ function selectedResearchEvidence(conversation, currentEvidence) {
         ...evidence,
         sourceID: source.id,
         text: source.selectedText,
-        codeVersion: source.codeVersion || conversation.codeVersion || defaultSyncCodeVersion,
-        codeEdition: source.codeEdition || defaultResearchCodeEdition,
+        // Canonical evidence owns edition identity; older stored metadata may
+        // have been stamped with the default library during a source refresh.
+        codeVersion: evidence.codeVersion,
+        codeEdition: evidence.codeEdition,
         richSourceID: richSource?.id || null,
         richSourceKind: richSource?.kind || null,
         richSourceReference: richSource?.reference || null,
@@ -11979,41 +11963,6 @@ async function organizationCapabilityAccess(userID) {
       organization.capabilities?.organizationAdministration !== false
     )
   };
-}
-
-async function ownsProjectAssetScope(userID, projectID) {
-  if (await ownedProjectRecord(userID, projectID)) return true;
-  return (await userContentMutations(userID)).some((mutation) => {
-    const { kind, record } = mutationKindAndRecord(mutation);
-    return kind === "workboard" &&
-      !Number.isFinite(Date.parse(record?.deletedAt || "")) &&
-      String(syncProjectIdentity(record?.projectID, userID) || record?.projectID || "") === String(projectID);
-  });
-}
-
-async function workboardEditAccess(response, userID, projectID) {
-  const access = await projectAccessForUser(userID, projectID);
-  if (access) {
-    if (!access.permissions.includes(organizationPermissions.projectEdit)) {
-      sendJSON(response, 403, {
-        error: "Your Project role does not allow this action.",
-        code: "PROJECT_PERMISSION_REQUIRED",
-        requiredPermission: organizationPermissions.projectEdit
-      });
-      return null;
-    }
-    return access;
-  }
-  if (await ownsProjectAssetScope(userID, projectID)) {
-    return {
-      projectID,
-      organization: null,
-      storageOwnerUserID: userID,
-      owner: ownerScope(userID)
-    };
-  }
-  sendError(response, 404, "Project not found.");
-  return null;
 }
 
 async function ownedProjectTargetExists(userID, targetKind, targetID) {
@@ -17552,7 +17501,12 @@ async function handleResearchConversationRefresh(request, response) {
       sectionGroupLabel: evidence.sectionGroupLabel,
       sectionGroupTitle: evidence.sectionGroupTitle,
       sectionTextHash: evidence.sectionTextHash,
-      codeVersion: defaultSyncCodeVersion
+      jurisdiction: evidence.jurisdiction,
+      codeVersion: evidence.codeVersion,
+      codeEdition: evidence.codeEdition,
+      corpusID: evidence.corpusID,
+      corpusLabel: evidence.corpusLabel,
+      applicabilityStatus: evidence.applicabilityStatus
     } : source;
   });
   conversation.sourceStatus = "current";
@@ -21120,6 +21074,7 @@ async function handleCodeSection(path, response) {
         navigationChapterNumber: summary.navigationChapterNumber || summary.chapterNumber,
         codePrefix: summary.codePrefix,
         schemaVersion: 1,
+        codeVersion: defaultSyncCodeVersion,
         sectionID: Number(summary.id || sectionID),
         sectionNumber: summary.sectionNumber,
         title: summary.title,
@@ -21138,6 +21093,7 @@ async function handleCodeSection(path, response) {
       navigationChapterID: summary?.navigationChapterID || summary?.chapterID || body.navigationChapterID || body.chapterID || null,
       navigationChapterNumber: summary?.navigationChapterNumber || summary?.chapterNumber || body.navigationChapterNumber || body.chapterNumber || "",
       codePrefix: summary?.codePrefix || body.codePrefix || "",
+      codeVersion: defaultSyncCodeVersion,
       sectionID: Number(summary?.id || body.sectionID || sectionID),
       sectionNumber: summary?.sectionNumber || body.sectionNumber || "",
       title: summary?.title || body.title || "",
@@ -24753,130 +24709,33 @@ async function projectWorkboardPreviews(userID, projectID) {
     );
 }
 
-async function clearActiveWorkboardPreviewLinks(
-  storageOwnerUserID,
-  owner,
-  projectID,
-  now = new Date().toISOString()
-) {
-  const links = (await listStoredProjectLinks(storageOwnerUserID))
-    .filter((link) =>
-      !link.deletedAt &&
-      link.projectID === projectID &&
-      link.targetKind === "workboardPreview"
-    );
-  for (const link of links) {
-    await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
-      ...link,
-      owner,
-      updatedAt: now,
-      deletedAt: now,
-      version: link.version + 1
-    }));
+// Workboard is retired. Historical reads remain authenticated, but no endpoint
+// may create, replace, or delete a drawing asset or immutable preview.
+async function handleRetiredWorkboardUpload(request, response) {
+  const userID = String(request.headers["x-permitext-user-id"] || "").trim();
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
   }
-  return links.length;
+  if (!await authenticatedUserContext(request, response, userID)) return;
+  sendJSON(response, 410, {
+    error: "Workboard editing is no longer available. Existing saved content remains readable.",
+    code: "WORKBOARD_RETIRED"
+  });
 }
 
-async function handleWorkboardPreviewUpload(request, response) {
-  const userID = String(request.headers["x-permitext-user-id"] || "").trim();
-  const url = requestURL(request);
-  const projectID = String(url.searchParams.get("projectID") || "").trim();
-  const workboardUpdatedAt = String(url.searchParams.get("workboardUpdatedAt") || "").trim();
-  const elementCount = Number(url.searchParams.get("elementCount") || 0);
-  if (
-    !userID ||
-    !projectID ||
-    !Number.isSafeInteger(elementCount) ||
-    elementCount < 1 ||
-    !Number.isFinite(Date.parse(workboardUpdatedAt))
-  ) {
-    sendError(response, 400, "Missing or invalid Workboard preview identity.");
+async function handleRetiredWorkboardMutation(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
     return;
   }
-  const context = await authenticatedUserContext(request, response, userID);
-  if (!context) return;
-  const access = await workboardEditAccess(response, userID, projectID);
-  if (!access) return;
-  if (!access.organization && !hasActiveProEntitlement(context.entitlement)) {
-    sendJSON(response, 403, {
-      error: "Workboard previews require Pro.",
-      code: "PRO_REQUIRED_WORKBOARDS"
-    });
-    return;
-  }
-  const storageOwnerUserID = access.storageOwnerUserID;
-  if (!privateProjectAssetStorageConfigured()) {
-    sendError(response, 503, "Private Workboard preview storage is not configured.");
-    return;
-  }
-  const contentType = String(request.headers["content-type"] || "").split(";")[0].trim().toLowerCase();
-  if (contentType !== "image/png") {
-    sendError(response, 415, "Workboard previews must be PNG images.");
-    return;
-  }
-  const body = await readBody(request, maxWorkboardPreviewBytes);
-  if (
-    body.length < 64 ||
-    body.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a"
-  ) {
-    sendError(response, 400, "The Workboard preview is not a valid PNG image.");
-    return;
-  }
-  const now = new Date().toISOString();
-  const previewID = randomUUID();
-  const requestedPathname = workboardPreviewPathname(projectID, previewID);
-  const pathname = await storePrivateProjectAsset(requestedPathname, body, contentType);
-  const artifact = {
-    envelope: artifactEnvelope({
-      id: previewID,
-      type: "workboardPreview",
-      owner: access.owner,
-      createdAt: now,
-      updatedAt: now,
-      version: 1
-    }),
-    payload: {
-      projectID,
-      title: "Workboard preview",
-      description: `${elementCount} Workboard ${elementCount === 1 ? "element" : "elements"}`,
-      contentType,
-      contentHash: createHash("sha256").update(body).digest("hex"),
-      pathname,
-      size: body.length,
-      elementCount,
-      workboardUpdatedAt: new Date(workboardUpdatedAt).toISOString(),
-      readPath: "/workboards/previews/read",
-      createdAt: now
-    }
-  };
-  await saveStoredFoundationArtifact(storageOwnerUserID, artifact);
-  await clearActiveWorkboardPreviewLinks(
-    storageOwnerUserID,
-    access.owner,
-    access.projectID,
-    now
-  );
-  await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
-    id: deterministicFoundationLinkID(
-      storageOwnerUserID,
-      access.projectID,
-      "workboardPreview",
-      previewID
-    ),
-    owner: access.owner,
-    projectID: access.projectID,
-    targetKind: "workboardPreview",
-    targetID: previewID,
-    relationship: "owner",
-    createdAt: now,
-    updatedAt: now,
-    version: 1,
-    metadata: {
-      source: "web-workboard",
-      workboardUpdatedAt: artifact.payload.workboardUpdatedAt
-    }
-  }));
-  sendJSON(response, 201, { preview: workboardPreviewSummary(artifact) });
+  if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
+  sendJSON(response, 410, {
+    error: "Workboard editing is no longer available. Existing saved content remains readable.",
+    code: "WORKBOARD_RETIRED"
+  });
 }
 
 async function handleWorkboardPreviewRead(request, response) {
@@ -24931,33 +24790,6 @@ async function handleWorkboardPreviewRead(request, response) {
     "content-length": String(image.length)
   });
   response.end(image);
-}
-
-async function handleWorkboardPreviewClear(request, response) {
-  const body = await readJSON(request);
-  const userID = String(body.auth?.accountUserID || "").trim();
-  const projectID = String(body.projectID || "").trim();
-  if (!userID || !projectID) {
-    sendError(response, 400, "Missing Workboard preview identity.");
-    return;
-  }
-  const context = await authenticatedUserContext(request, response, userID, body.auth);
-  if (!context) return;
-  const access = await workboardEditAccess(response, userID, projectID);
-  if (!access) return;
-  if (!access.organization && !hasActiveProEntitlement(context.entitlement)) {
-    sendJSON(response, 403, {
-      error: "Workboard previews require Pro.",
-      code: "PRO_REQUIRED_WORKBOARDS"
-    });
-    return;
-  }
-  const clearedCount = await clearActiveWorkboardPreviewLinks(
-    access.storageOwnerUserID,
-    access.owner,
-    access.projectID
-  );
-  sendJSON(response, 200, { projectID: access.projectID, clearedCount });
 }
 
 async function handleNotebookAssetUpload(request, response) {
@@ -25227,65 +25059,6 @@ async function handleNotebookAssetDelete(request, response) {
   sendJSON(response, 200, { assetID, deletionQueued: true });
 }
 
-async function handleWorkboardAssetUpload(request, response) {
-  const userID = String(request.headers["x-permitext-user-id"] || "").trim();
-  const url = requestURL(request);
-  const projectID = String(url.searchParams.get("projectID") || "").trim();
-  const fileID = String(url.searchParams.get("fileID") || "").trim();
-  if (!userID || !projectID || !fileID || projectID.length > 200 || fileID.length > 200) {
-    sendError(response, 400, "Missing or invalid Workboard asset identity.");
-    return;
-  }
-  const context = await authenticatedUserContext(request, response, userID);
-  if (!context) return;
-  const access = await workboardEditAccess(response, userID, projectID);
-  if (!access) return;
-  if (!access.organization && !hasActiveProEntitlement(context.entitlement)) {
-    sendJSON(response, 403, {
-      error: "Workboard image uploads require Pro.",
-      code: "PRO_REQUIRED_WORKBOARDS"
-    });
-    return;
-  }
-  if (!blobStorageConfigured()) {
-    sendError(response, 503, "Private Workboard image storage is not configured.");
-    return;
-  }
-  const contentType = String(request.headers["content-type"] || "").split(";")[0].trim().toLowerCase();
-  if (!workboardAssetExtension(contentType)) {
-    sendError(response, 415, "Workboard images must be PNG, JPEG, WebP, or GIF files.");
-    return;
-  }
-  const body = await readBody(request, maxWorkboardAssetBytes);
-  if (!body.length) {
-    sendError(response, 400, "Workboard image is empty.");
-    return;
-  }
-  const pathname = workboardAssetPathname(
-    access.storageOwnerUserID,
-    access.projectID,
-    fileID,
-    contentType
-  );
-  const { put } = await vercelBlob();
-  const blob = await put(pathname, body, {
-    access: "private",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType
-  });
-  sendJSON(response, 200, {
-    asset: {
-      projectID,
-      fileID,
-      pathname: blob.pathname || pathname,
-      contentType,
-      size: body.length,
-      uploadedAt: new Date().toISOString()
-    }
-  });
-}
-
 async function handleWorkboardAssetRead(request, response) {
   const body = await readJSON(request);
   const userID = String(body.auth?.accountUserID || "").trim();
@@ -25330,37 +25103,6 @@ async function handleWorkboardAssetRead(request, response) {
     response.write(Buffer.from(value));
   }
   response.end();
-}
-
-async function handleWorkboardAssetDelete(request, response) {
-  const body = await readJSON(request);
-  const userID = String(body.auth?.accountUserID || "").trim();
-  const projectID = String(body.projectID || "").trim();
-  const pathnames = Array.isArray(body.pathnames) ? body.pathnames.map((value) => String(value || "").trim()) : [];
-  if (!userID || !projectID || !pathnames.length || pathnames.length > maxWorkboardAssets) {
-    sendError(response, 400, "Missing or invalid Workboard asset deletion request.");
-    return;
-  }
-  if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
-  const access = await workboardEditAccess(response, userID, projectID);
-  if (!access) return;
-  if (pathnames.some((pathname) =>
-    !workboardAssetPathBelongsToProject(
-      pathname,
-      access.storageOwnerUserID,
-      access.projectID
-    )
-  )) {
-    sendError(response, 403, "One or more Workboard images do not belong to the authenticated project.");
-    return;
-  }
-  if (!blobStorageConfigured()) {
-    sendError(response, 503, "Private Workboard image storage is not configured.");
-    return;
-  }
-  const { del } = await vercelBlob();
-  await del(pathnames);
-  sendJSON(response, 200, { deletedCount: pathnames.length });
 }
 
 async function syncResponseContract(userID, entitlement, body, contentMapVersion) {
@@ -25446,7 +25188,20 @@ async function handlePush(request, response) {
   }
 
   const canonicalizedBatch = await canonicalizeMutationBatch(submittedMutations);
-  const incoming = canonicalizedBatch.mutations;
+  // Reject retired records individually so older clients can still synchronize
+  // bookmarks, notes, and Projects in the same batch. Both storage adapters see
+  // only supported incoming mutations; existing Workboards remain readable.
+  const retiredMutations = canonicalizedBatch.mutations.filter((mutation) =>
+    mutationKindAndRecord(mutation).kind === "workboard"
+  );
+  const retiredMutationIDs = retiredMutations.map(normalizedMutationRecordID);
+  const retirementReasons = Object.fromEntries(retiredMutationIDs.map((id) => [id, {
+    code: "WORKBOARD_RETIRED",
+    message: "Workboard editing is no longer available. Existing saved content remains readable."
+  }]));
+  const incoming = canonicalizedBatch.mutations.filter((mutation) =>
+    mutationKindAndRecord(mutation).kind !== "workboard"
+  );
   const validation = validateMutations(incoming, userID);
   if (!validation.ok) {
     sendError(response, 400, validation.message);
@@ -25479,11 +25234,11 @@ async function handlePush(request, response) {
         canonicalizedBatch.aliasesByCanonicalID
       ),
       rejectedMutationIDs: includeSubmittedMutationIDAliases(
-        result.rejectedMutationIDs,
+        [...result.rejectedMutationIDs, ...retiredMutationIDs],
         canonicalizedBatch.aliasesByCanonicalID
       ),
       rejectionReasons: includeSubmittedMutationReasonAliases(
-        result.rejectionReasons,
+        { ...result.rejectionReasons, ...retirementReasons },
         canonicalizedBatch.aliasesByCanonicalID
       ),
       latestEventID: result.latestEventID,
@@ -25527,11 +25282,11 @@ async function handlePush(request, response) {
       canonicalizedBatch.aliasesByCanonicalID
     ),
     rejectedMutationIDs: includeSubmittedMutationIDAliases(
-      [...merge.rejectedMutationIDs, ...planEnforcement.rejectedMutationIDs],
+      [...merge.rejectedMutationIDs, ...planEnforcement.rejectedMutationIDs, ...retiredMutationIDs],
       canonicalizedBatch.aliasesByCanonicalID
     ),
     rejectionReasons: includeSubmittedMutationReasonAliases(
-      planEnforcement.rejectionReasons,
+      { ...planEnforcement.rejectionReasons, ...retirementReasons },
       canonicalizedBatch.aliasesByCanonicalID
     ),
     latestEventID,
@@ -31304,13 +31059,13 @@ const handlers = {
   "internal/lifetime-grants/lookup": handleInternalLifetimeGrantLookup,
   "internal/lifetime-grants/invite": handleInternalLifetimeGrantInvite,
   "internal/lifetime-grants/revoke": handleInternalLifetimeGrantRevoke,
-  // Legacy authenticated compatibility only. No current client exposes these writers.
-  "workboards/assets/upload": handleWorkboardAssetUpload,
+  // Authenticated read compatibility only; retired mutation routes fail closed.
+  "workboards/assets/upload": handleRetiredWorkboardUpload,
   "workboards/assets/read": handleWorkboardAssetRead,
-  "workboards/assets/delete": handleWorkboardAssetDelete,
-  "workboards/previews/upload": handleWorkboardPreviewUpload,
+  "workboards/assets/delete": handleRetiredWorkboardMutation,
+  "workboards/previews/upload": handleRetiredWorkboardUpload,
   "workboards/previews/read": handleWorkboardPreviewRead,
-  "workboards/previews/clear": handleWorkboardPreviewClear,
+  "workboards/previews/clear": handleRetiredWorkboardMutation,
   "sync/push": handlePush,
   "sync/checkpoint": handleSyncCheckpoint,
   "sync/pull": handlePull,

@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { seedLegacyWorkboardPreview, seedLegacyWorkboardRecord } from "./legacy-workboard-fixture.mjs";
 import { createHash, createHmac } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -1142,7 +1143,7 @@ async function main() {
         workspaceScript.text.includes("Projects require Pro") &&
         workspaceScript.text.includes("PDF export requires Pro") &&
         workspaceScript.text.includes("Workboards require Pro") &&
-        serverSource.includes("Workboard image uploads require Pro.") &&
+        serverSource.includes('code: "WORKBOARD_RETIRED"') &&
         syncRepositorySource.includes("lower(plan) = 'pro'") &&
         syncRepositorySource.includes("EXCLUDED.entity_kind = 'project'") &&
         syncRepositorySource.includes("permitext_user_content_records.mutation->'project'->>'folderType' = 'reference'"),
@@ -4354,26 +4355,17 @@ async function main() {
         ),
       "The historical Research endpoint did not restore the exact stored question, evidence, answer, and citation mapping."
     );
-    const workboardPreviewUpload = await request("/workboards/previews/upload?" + new URLSearchParams({
-      projectID: researchProjectIDs[0],
-      workboardUpdatedAt: "2026-07-24T11:59:00.000Z",
-      elementCount: "3"
-    }), {
-      method: "POST",
-      token: signIn.json.account.backendSessionToken,
-      headers: {
-        "content-type": "image/png",
-        "x-permitext-user-id": userID
-      },
+    const retiredPreviewUpload = await request("/workboards/previews/upload", {
+      method: "POST", token: signIn.json.account.backendSessionToken,
+      headers: { "content-type": "image/png", "x-permitext-user-id": userID },
       rawBody: smokePNG
     });
-    assert(
-      workboardPreviewUpload.response.status === 201 &&
-        workboardPreviewUpload.json.preview.elementCount === 3 &&
-        workboardPreviewUpload.json.preview.contentHash.length === 64,
-      "Saving an immutable flattened Workboard preview failed."
-    );
-    const workboardPreviewID = workboardPreviewUpload.json.preview.id;
+    assert(retiredPreviewUpload.response.status === 410 && retiredPreviewUpload.json.code === "WORKBOARD_RETIRED",
+      "A retired Workboard preview writer remained available.");
+    const legacyPreview = await seedLegacyWorkboardPreview({
+      dataPath, privateAssetPath, userID, projectID: researchProjectIDs[0], image: smokePNG
+    });
+    const workboardPreviewID = legacyPreview.id;
     const projectFoundationWithPreview = await request("/projects/foundation/state", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -4386,7 +4378,7 @@ async function main() {
       projectFoundationWithPreview.response.ok &&
         projectFoundationWithPreview.json.workboardPreview.id === workboardPreviewID &&
         projectFoundationWithPreview.json.workboardPreview.contentHash ===
-          workboardPreviewUpload.json.preview.contentHash &&
+          legacyPreview.contentHash &&
         projectFoundationWithPreview.json.researchAnswers.some((answer) =>
           answer.id === answerID && answer.sectionIDs.includes("8881")
         ) &&
@@ -5963,11 +5955,12 @@ async function main() {
       }
     });
     assert(
-      editorWorkboardPreviewUpload.response.status === 201 &&
+      editorWorkboardPreviewUpload.response.status === 410 &&
+        editorWorkboardPreviewUpload.json.code === "WORKBOARD_RETIRED" &&
         ownerFoundationAfterEditorPreview.response.ok &&
         ownerFoundationAfterEditorPreview.json.workboardPreview.id ===
-          editorWorkboardPreviewUpload.json.preview.id,
-      "An authorized Project editor did not write the Workboard preview into organization-owned Project storage."
+          workboardPreviewID,
+      "A retired editor upload changed the historical Workboard preview."
     );
     const reviewerWorkboardPreviewClear = await request("/workboards/previews/clear", {
       method: "POST",
@@ -5978,8 +5971,8 @@ async function main() {
       }
     });
     assert(
-      reviewerWorkboardPreviewClear.response.status === 403 &&
-        reviewerWorkboardPreviewClear.json.code === "PROJECT_PERMISSION_REQUIRED",
+      reviewerWorkboardPreviewClear.response.status === 410 &&
+        reviewerWorkboardPreviewClear.json.code === "WORKBOARD_RETIRED",
       "A Project reviewer was allowed to clear an organization-owned Workboard preview."
     );
     const clearWorkboardPreview = await request("/workboards/previews/clear", {
@@ -5991,9 +5984,9 @@ async function main() {
       }
     });
     assert(
-      clearWorkboardPreview.response.ok &&
-        clearWorkboardPreview.json.clearedCount === 1,
-      "Clearing the Project's active Workboard preview failed."
+      clearWorkboardPreview.response.status === 410 &&
+        clearWorkboardPreview.json.code === "WORKBOARD_RETIRED",
+      "A retired clear endpoint remained writable."
     );
     const reportSourcesAfterPreviewClear = await request("/reports/sources/list", {
       method: "POST",
@@ -6005,10 +5998,10 @@ async function main() {
     });
     assert(
       reportSourcesAfterPreviewClear.response.ok &&
-        !reportSourcesAfterPreviewClear.json.sources.some((source) =>
+        reportSourcesAfterPreviewClear.json.sources.some((source) =>
           source.kind === "workboardPreview"
         ),
-      "A cleared Workboard preview remained available to new Report Drafts."
+      "Rejecting a retired clear removed a historical Report source."
     );
     const historicalWorkboardPreview = await requestBinary("/workboards/previews/read", {
       method: "POST",
@@ -6022,7 +6015,7 @@ async function main() {
     assert(
       historicalWorkboardPreview.response.ok &&
         historicalWorkboardPreview.body.equals(smokePNG),
-      "Clearing the active Workboard preview broke an immutable historical Report source."
+      "A rejected clear broke an immutable historical Report source."
     );
     const moveResearchWithoutReview = await request("/research/conversations/assign-project", {
       method: "POST",
@@ -7625,9 +7618,16 @@ async function main() {
     });
     assert(workboardPush.response.ok, "Workboard sync push failed.");
     assert(
-      workboardPush.json.acceptedMutationIDs.includes(canonicalWorkboardRecordID),
-      "Workboard sync did not use its canonical project-scoped ID."
+      workboardPush.json.acceptedMutationIDs.length === 0 &&
+        workboardPush.json.rejectedMutationIDs.includes(canonicalWorkboardRecordID) &&
+        workboardPush.json.rejectedMutationIDs.includes("local-workboard-id") &&
+        workboardPush.json.rejectionReasons[canonicalWorkboardRecordID]?.code === "WORKBOARD_RETIRED",
+      "Retired Workboard sync did not reject the canonical and submitted record IDs."
     );
+
+    await seedLegacyWorkboardRecord(dataPath, {
+      workboard: { ...workboardMutation.workboard, id: canonicalWorkboardRecordID, codeVersion: defaultSyncCodeVersion }
+    });
 
     const workboardPull = await request("/sync/pull", {
       method: "POST",
@@ -7677,7 +7677,7 @@ async function main() {
       },
       rawBody: Buffer.from([0x89, 0x50, 0x4e, 0x47])
     });
-    assert(unconfiguredAssetUpload.response.status === 503, "Workboard asset upload did not report missing private Blob storage.");
+    assert(unconfiguredAssetUpload.response.status === 410 && unconfiguredAssetUpload.json.code === "WORKBOARD_RETIRED", "Retired Workboard upload reached storage.");
 
     const forgedAssetDelete = await request("/workboards/assets/delete", {
       method: "POST",
@@ -7688,7 +7688,7 @@ async function main() {
         pathnames: ["workboards/another-user/another-project/image.png"]
       }
     });
-    assert(forgedAssetDelete.response.status === 403, "Workboard asset deletion accepted another project's pathname.");
+    assert(forgedAssetDelete.response.status === 410 && forgedAssetDelete.json.code === "WORKBOARD_RETIRED", "Retired Workboard deletion remained available.");
 
     const webSavedMutation = {
       savedItem: {

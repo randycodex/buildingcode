@@ -60,7 +60,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260903-notebook-security-v24";
+} from "./offline-storage.js?v=20260904-citation-integrity-v25";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -95,7 +95,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260903-notebook-security-v24";
+} from "./research-intent-state.js?v=20260904-citation-integrity-v25";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -20840,7 +20840,8 @@ async function openNotebookReference(project, foundation, reference, selectCard,
       .find((item) => String(item.sectionID) === String(reference.referenceID));
     await openSourceInReader({
       sectionID: reference.referenceID,
-      codePrefix: savedItem?.codePrefix || "BC",
+      codePrefix: savedItem?.codePrefix || "",
+      codeVersion: savedItem?.codeVersion || "",
       chapterID: savedItem?.chapterID || "",
       chapterNumber: savedItem?.chapterNumber || "",
       sectionNumber: savedItem?.sectionNumber || "",
@@ -28932,20 +28933,53 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null) {
   });
 }
 
-async function openSourceInReader(item, anchorPaneID = "", options = {}) {
-  const codePrefix = String(item.codePrefix || "BC").toUpperCase();
+async function resolveReaderSource(item) {
+  const sourcePrefix = String(item.codePrefix || item.codeBook || "").trim().toUpperCase();
+  const codePrefix = sourcePrefix || "BC";
   const sectionNumber = String(item.sectionNumber || "").trim();
-  const needsResolution = !item.sectionID || !item.chapterID;
-  const resolvedSection = sectionNumber && needsResolution
-    ? await resolveInlineCodeSection(codePrefix, sectionNumber)
-    : null;
-  const navigationItem = resolvedSection
-    ? {
-        ...item,
-        ...resolvedSection,
-        sectionID: resolvedSection.sectionID || resolvedSection.id
-      }
-    : item;
+  const sourceVersion = String(item.codeVersion || item.sourceLibraryVersion || "").trim();
+  const codeVersion = syncCodeVersion(sourceVersion || syncCodeVersionForPrefix(codePrefix));
+  // A saved source's id identifies the evidence record, not necessarily the
+  // enacted section. Never replace a canonical section with a number lookup.
+  const sectionID = String(item.sectionID || (/^\d+$/.test(String(item.id || "")) ? item.id : "")).trim();
+  const resolved = sectionID
+    ? (await api(`/code/sections/${encodeURIComponent(sectionID)}`)).section
+    : sectionNumber
+      ? await resolveInlineCodeSection(codePrefix, sectionNumber, codeVersion)
+      : null;
+  const resolvedID = String(resolved?.sectionID || resolved?.id || "").trim();
+  const resolvedPrefix = String(resolved?.codePrefix || "").trim().toUpperCase();
+  const resolvedVersion = resolved?.codeVersion ? syncCodeVersion(resolved.codeVersion) : "";
+  if (
+    !resolvedID ||
+    !resolvedPrefix ||
+    !resolvedVersion ||
+    !(resolved?.navigationChapterID || resolved?.chapterID) ||
+    ((sourcePrefix || !sectionID) && resolvedPrefix !== codePrefix) ||
+    ((sourceVersion || !sectionID) && resolvedVersion !== codeVersion) ||
+    (sectionID && resolvedID !== sectionID && String(resolved.webSectionID || "") !== sectionID) ||
+    (!sectionID && normalizedInlineSectionNumber(resolved.sectionNumber) !== normalizedInlineSectionNumber(sectionNumber))
+  ) {
+    throw new Error("This source could not be matched to its exact code section and edition. Reopen the saved evidence or refresh its sources before continuing.");
+  }
+  return {
+    ...item,
+    ...resolved,
+    id: resolvedID,
+    sectionID: resolvedID,
+    codePrefix: resolvedPrefix,
+    codeVersion: resolvedVersion
+  };
+}
+
+async function openSourceInReader(item, anchorPaneID = "", options = {}) {
+  let navigationItem;
+  try {
+    navigationItem = await resolveReaderSource(item);
+  } catch (error) {
+    await showWebNotice("Source could not be opened", error.message || "The exact source is unavailable.");
+    return null;
+  }
   const detail = searchResultDetail(navigationItem);
   const sourceFields = readerFieldsForSectionDetail(detail, {
     shouldSmoothScrollToSection: false,
