@@ -16,6 +16,16 @@ const appServer = await readFile(new URL("../app.mjs", import.meta.url), "utf8")
 const webClient = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const packageManifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
+// Build-time gates must ship even though private test fixtures do not.
+const vercelIgnore = await readFile(new URL("../.vercelignore", import.meta.url), "utf8");
+assert.match(vercelIgnore, /^tests\/$/m, "Keep test fixtures excluded from deployment.");
+assert.equal(packageManifest.scripts["prebuild:notebook"], "npm run test:notebook-security");
+assert.equal(packageManifest.scripts["test:notebook-security"], "node scripts/verify-notebook-dependencies.mjs");
+assert.doesNotMatch(vercelIgnore, /^\/?scripts(?:\/|$)/m, "The build security gate must be deployed.");
+const notebookSecurityGate = await readFile(new URL("../scripts/verify-notebook-dependencies.mjs", import.meta.url), "utf8");
+assert.match(notebookSecurityGate, /DOMSerializer\.renderSpec/);
+assert.match(notebookSecurityGate, /assertPatched\(locked\.version/);
+
 assert(
   notebookEditor.includes('from "@blocknote/core"') &&
     notebookEditor.includes('from "@blocknote/mantine"') &&

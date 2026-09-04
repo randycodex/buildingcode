@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+// Shipped build gate: tests/ is intentionally excluded from Vercel deployments.
 // GHSA-cp6q-959q-f8rh: an own JSON __proto__ key must never become
 // inherited DOM attributes. Test the dependency, not a copied implementation.
 const root = fileURLToPath(new URL("../", import.meta.url));
