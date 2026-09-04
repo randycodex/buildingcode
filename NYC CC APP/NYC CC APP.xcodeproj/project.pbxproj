@@ -290,6 +290,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		A4000000000000000000000A /* Diagnostics */ = {
+			isa = PBXGroup;
+			children = (
+				A2000000000000000000001F /* Signposts.swift */,
+			);
+			path = Diagnostics;
+			sourceTree = "<group>";
+		};
 		A4000000000000000000000B /* Fonts */ = {
 			isa = PBXGroup;
 			children = (
@@ -298,14 +306,6 @@
 				A20000000000000000000036 /* Source-Serif-4-OFL.txt */,
 			);
 			path = Fonts;
-			sourceTree = "<group>";
-		};
-		A4000000000000000000000A /* Diagnostics */ = {
-			isa = PBXGroup;
-			children = (
-				A2000000000000000000001F /* Signposts.swift */,
-			);
-			path = Diagnostics;
 			sourceTree = "<group>";
 		};
 		B40000000000000000000001 /* permitextTests */ = {
@@ -414,10 +414,10 @@
 				Base,
 			);
 			mainGroup = A40000000000000000000001;
-			productRefGroup = A40000000000000000000003 /* Products */;
 			packageReferences = (
 				D20000000000000000000001 /* XCRemoteSwiftPackageReference "clerk-ios" */,
 			);
+			productRefGroup = A40000000000000000000003 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -624,9 +624,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
 				CURRENT_PROJECT_VERSION = 41;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;
@@ -656,9 +656,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
 				CODE_SIGN_ENTITLEMENTS = permitext/permitext.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CLERK_PUBLISHABLE_KEY = pk_live_Y2xlcmsucGVybWl0ZXh0LmNvbSQ;
 				CURRENT_PROJECT_VERSION = 41;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = permitext/Info.plist;
