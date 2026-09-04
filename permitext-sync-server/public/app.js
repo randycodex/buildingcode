@@ -60,7 +60,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260902-post-delete-sync-v23";
+} from "./offline-storage.js?v=20260903-notebook-security-v24";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -95,7 +95,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260902-post-delete-sync-v23";
+} from "./research-intent-state.js?v=20260903-notebook-security-v24";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -263,7 +263,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20260817-simple-native-parity-v13";
+const notebookClientVersion = "20260903-tiptap-security-v14";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;

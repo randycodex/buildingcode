@@ -2,11 +2,15 @@
 
 This is the working checklist for App Store version 1.0. It separates preparation from public declarations and submission actions.
 
-## Confirmed current configuration
+September 3 live audit: see [current observed Apple state](../../../docs/PERMITEXT_APP_STORE_READONLY_AUDIT_2026-09-03.md). App Store submission and release are the owner's final steps and are not authorized. Older configuration notes below are not proof that Apple fields have been saved.
+
+## Configuration and previously recorded setup
+
+Build/upload and app availability were rechecked September 3. Agreement, bank, tax, and subscription-price entries below retain earlier evidence and need a final live confirmation; do not treat this entire list as a new audit.
 
 - Bundle ID: `com.randycodex.permitext`
 - Version: `1.0`
-- Current local build: `40`
+- Latest uploaded TestFlight build verified September 3: `52`; no App Store build is selected
 - App Store Connect/TestFlight build: confirm the exact live build before selecting the submission candidate
 - Minimum iOS: `17.0`
 - Device family: iPhone only
@@ -86,7 +90,7 @@ These answers are derived from the app privacy manifest and the published privac
 ## App information declarations requiring final owner confirmation
 
 - Content Rights: confirm Permitext has the necessary rights to display every included code source and related content. The repository still identifies at least one source as requiring republication-rights review, so this must not be represented as cleared until that review is complete.
-- Age Rating: expected `4+` if all objectionable-content frequency questions are None and the app has no unrestricted web access, gambling, contests, advertising, or public user-generated content. Recheck each live questionnaire item before saving.
+- Age Rating: not yet configured. Answer the current questionnaire based on actual features and content; do not preselect a rating from older assumptions. Keep the platform rating distinct from the product's terms-of-use minimum age.
 - Primary category: Reference
 - Secondary category: Productivity
 - App price: Free
@@ -94,20 +98,20 @@ These answers are derived from the app privacy manifest and the published privac
 
 ## App Review access
 
-Recommended configuration:
+Review-access plan (requires approval and verification before submission):
 
-- Do not mark the app as requiring sign-in for review.
 - Explain that reading and search work without an account.
-- Explain that reviewers may create their own account using Apple, Google, Microsoft, or passwordless email to inspect sync and the subscription.
-- Do not invent or publish a reusable password because Permitext's email login is passwordless.
+- Provide a dedicated synthetic reviewer-access plan for account-based features. Do not assume that asking Apple to create an account replaces verified reviewer access. See Apple's [review guidelines](https://developer.apple.com/app-store/review/guidelines/), Before You Submit and 2.1.
+- Verify the actual passwordless or identity-provider route without sharing the owner's credentials or introducing an authentication bypass. A demo mode is a separate product/security decision, not an automatic addition.
+- The live sign-in-required checkbox is currently checked; it was not changed during the audit. Review notes and credentials are currently blank.
 - Review contact name: Higinio Jimenez Manzano
 - Review contact email: `permitext@gmail.com`
 - Review contact phone: required from the owner before submission
 
 ## Version 1.0 items still required in App Store Connect
 
-- Select the exact final version 1.0 build only after its upload and physical-device smoke test; the current local build is 40
-- Upload the prepared iPhone 6.9-inch screenshots from `screenshots/iphone-6.9/submission/`
+- Select the exact final version 1.0 build only after its upload and physical-device acceptance; build 52 is uploaded but not selected for App Store review
+- Recapture and inspect final release-build iPhone screenshots before upload; the old build-33 Reader image contains a debug control
 - Enter description, keywords, URLs, and copyright
 - Add the app's free price schedule
 - Set primary and secondary categories
@@ -124,11 +128,11 @@ Recommended configuration:
 
 ## Prepared screenshot package
 
-- Four portrait screenshots are ready at Apple's accepted iPhone 6.9-inch size: `1320 × 2868`.
+- Four historical portrait screenshots have the accepted iPhone 6.9-inch size: `1320 × 2868`; they are not the final approved upload set.
 - The upload copies are JPEGs without alpha channels.
 - The screenshots show the code library, native reader, search results, and a saved section.
 - They were recaptured from the locally built version 1.0, Build 33 app at commit `45ec8be57e9734f9bf66dad8ab46abadf7cf5b31`.
-- No screenshot contains an email address, account identifier, test diagnostic, or sandbox purchase state.
+- September 3 inspection found the ladybug debug control in `02-code-reader.jpg`; recapture rather than retouching the image. No personal account information was visible in the four inspected JPEGs.
 - See `screenshots/README.md` for ordering and provenance.
 
 ## Server notification boundary

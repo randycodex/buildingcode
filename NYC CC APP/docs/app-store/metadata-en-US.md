@@ -2,6 +2,8 @@
 
 Prepared for App Store version 1.0. The values in this file are drafts until they are entered and saved in App Store Connect.
 
+September 3 preparation update: **do not submit or release**. The owner wants App Store submission and public release last. The reviewer-access section remains incomplete until a dedicated, independently verified access method is approved; do not paste an incomplete draft into Apple review fields.
+
 ## Listing
 
 - Name: `permitext`
@@ -37,7 +39,7 @@ Save sections, add notes, and organize references around your Projects. Sign in 
 
 UPGRADE TO PERMITEXT PRO
 
-Permitext Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and up to 100 selected-evidence Research turns each month.
+Permitext Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 Research turns per UTC calendar month. Research answers use identified evidence and citations. A turn is counted only when an answer is completed and saved; failed or interrupted requests do not use an included turn.
 
 Pro is $20.00 per month. There is no trial. Payment is charged to your Apple Account when the purchase is confirmed. The subscription renews monthly unless canceled at least 24 hours before the end of the current billing period. You can manage or cancel the subscription in your Apple Account settings. Code reading and search remain free after cancellation.
 
@@ -53,22 +55,24 @@ Subscription and Refund Policy: https://permitext.com/refunds
 
 ## App Review notes
 
-Permitext can be reviewed without an account:
+Reading and search can be reviewed without an account:
 
 1. Launch the app.
 2. Use the library or search tabs to read and search code text.
-3. Open Settings to see the current Free plan.
+3. Open the account control from Saved (accessibility label: Open Account) and inspect the Plan section.
 
-An account is required only for account-owned sync and Pro access. Reviewers may create an account using Sign in with Apple, Google, Microsoft, or passwordless email. Permitext does not use passwords for its email option.
+Account-based workspace, sync, and Pro features also require review. A dedicated synthetic reviewer identity and independently tested access instructions must be supplied before submission. The app supports Apple, Google, Microsoft, and passwordless email through its sign-in UI. Do not substitute an instruction to create an account for the verified access plan, disclose the owner's credentials, or add a hidden authentication/entitlement bypass.
+
+Internal preparation only: reviewer identity/access method and Pro access are **not yet provisioned or verified**. Resolve these with owner approval, then replace this preparation note with complete review instructions. Reviewers must be able to inspect the enabled features without needing a live response from the owner to obtain each verification code.
 
 To review the in-app subscription:
 
-1. Open Settings.
-2. Sign in or create an account.
-3. Tap Upgrade to Pro.
+1. Open the account control and the Plan section.
+2. Sign in through the approved reviewer-access route.
+3. Open the Pro upgrade flow.
 4. Select Permitext Pro Monthly and confirm with the App Store test account supplied by Apple.
 
-The iOS app uses StoreKit for the purchase. A successful purchase is verified by the Permitext backend and attached to the signed-in Permitext account. Restore Subscription is available on the upgrade screen. Account deletion is available in Settings and requires confirmation.
+The iOS app uses StoreKit for the purchase. A successful purchase is verified by the Permitext backend and attached to the signed-in Permitext account. Restore Subscription is available on the upgrade screen. Delete Account is available in the Account section and requires confirmation. Confirm these instructions on the final candidate before copying them to App Store Connect.
 
 Permitext Pro Monthly:
 
@@ -92,3 +96,5 @@ Support: `permitext@gmail.com`
 ## Release control
 
 Use manual release for version 1.0 so approval does not publish the app before the final production and device checks are complete.
+
+The September 3 read-only audit found automatic release currently selected. This recommendation has not been applied. Do not use Add for Review, Submit for Review, or release controls without later explicit owner approval.

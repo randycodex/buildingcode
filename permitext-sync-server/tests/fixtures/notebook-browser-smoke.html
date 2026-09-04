@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Permitext Notebook dependency smoke test</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/web/notebook-assets/notebook.css?v=20260903-tiptap-security-v14">
+<style>
+  body { font: 16px system-ui; margin: 32px auto; max-width: 860px; padding: 0 20px; color: #17202a; background: #fff; }
+  #editor { border: 1px solid #ddd; padding: 20px 0; margin: 20px 0; }
+  button { padding: 8px; margin-right: 8px; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 280px; overflow: auto; }
+</style>
+<h1>Notebook editor verification</h1>
+<p>Local synthetic content only. Nothing is saved to an account.</p>
+<p id="status" role="status">Loading editor…</p>
+<div id="editor"></div>
+<button id="snapshot">Inspect document</button>
+<button id="restore">Reload snapshot</button>
+<button id="legacy">Load legacy note</button>
+<button id="reference">Insert reference</button>
+<pre id="result" aria-label="Serialized notebook document"></pre>
+<script type="module">
+  import { mountPermitextNotebookEditor } from '/web/notebook-assets/notebook.js?v=20260903-tiptap-security-v14';
+  const status = document.querySelector('#status');
+  const result = document.querySelector('#result');
+  const seed = {
+    schema: 'permitext-notebook-card', schemaVersion: 2, format: 'blocknote-json',
+    document: [
+      { type: 'heading', props: { level: 2 }, content: [{ type: 'text', text: 'Safety verification', styles: {} }] },
+      { type: 'paragraph', content: [
+        { type: 'text', text: 'Check ', styles: { bold: true } },
+        { type: 'permitextReference', props: { referenceKind: 'canonicalSection', referenceID: '8881', label: 'BC 705.8 Openings' } },
+        { type: 'text', text: ' before filing.', styles: { italic: true } }
+      ] },
+      { type: 'bulletListItem', content: [{ type: 'text', text: 'Preserve the reference and formatting.', styles: {} }] },
+      { type: 'numberedListItem', content: [{ type: 'text', text: 'Edit this synthetic note.', styles: {} }] }
+    ]
+  };
+  let edits = 0;
+  let saved;
+  const editor = mountPermitextNotebookEditor(document.querySelector('#editor'), {
+    document: seed, ariaLabel: 'Notebook smoke editor',
+    onReady() { status.textContent = 'Editor ready'; },
+    onChange(value) { edits += 1; status.textContent = `Editor ready — ${edits} changes`; result.textContent = JSON.stringify(value, null, 2); }
+  });
+  document.querySelector('#snapshot').onclick = () => {
+    saved = editor.getDocument();
+    result.textContent = JSON.stringify(saved, null, 2);
+  };
+  document.querySelector('#restore').onclick = () => {
+    if (saved) editor.setDocument(saved);
+  };
+  document.querySelector('#legacy').onclick = () => editor.setDocument({
+    schema: 'permitext-notebook-card', schemaVersion: 1, format: 'tiptap-json',
+    document: { type: 'doc', content: [{ type: 'paragraph', content: [
+      { type: 'text', text: 'Legacy note retained', marks: [{ type: 'bold' }] }
+    ] }] }
+  });
+  document.querySelector('#reference').onclick = () => editor.insertReference({
+    referenceKind: 'canonicalSection', referenceID: '8882', label: 'BC 1012.6 Landings'
+  });
+</script>
+</html>

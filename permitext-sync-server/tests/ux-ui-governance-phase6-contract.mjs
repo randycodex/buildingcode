@@ -138,7 +138,8 @@ const allowedAudit = auditAddedLines([
 assert.equal(allowedAudit.failures.length, 0);
 
 const packageJSON = JSON.parse(packageSource);
-assert.equal(packageJSON.scripts.postcheck, "npm run test:ux-alignment");
+assert.equal(packageJSON.scripts.postcheck, "npm run test:notebook-security && npm run test:ux-alignment");
+assert.equal(packageJSON.scripts["prebuild:notebook"], "npm run test:notebook-security");
 assert.match(packageJSON.scripts["test:ux-alignment"], /ux-ui-governance-phase6-contract\.mjs/);
 assert.equal(packageJSON.scripts["audit:ux-ui"], "node scripts/audit-ux-ui.mjs");
 assert.match(governance, /Save passage/);
