@@ -50,6 +50,18 @@ import {
   sanitizedServerErrorReport
 } from "./operational-readiness.mjs";
 import { mergeContinuityMutations } from "./continuity-merge.mjs";
+import { applyNotebookCardMutation, commitPostgresNotebookCardMutation, notebookCreationID, notebookMutationReplay } from "./notebook-persistence.mjs";
+import { normalizedResearchProjectStructuredFacts, researchProjectFactLine, projectFactProjection } from "./project-fact-projection.mjs";
+import {
+  activeResearchMessages,
+  activeResearchTopicContext,
+  assertResearchConversationRevision,
+  researchContextRevision,
+  researchConversationConflict,
+  researchConversationRevision,
+  researchPublicErrorEnvelope,
+  resetResearchActiveContext
+} from "./research-context-state.mjs";
 import {
   withFileStoreLock,
   writeJSONFileAtomically
@@ -938,7 +950,7 @@ function fileStoreOrganizationSeatState(store, organizationID) {
   );
 }
 
-function createFileStoreAdapter() {
+export function createFileStoreAdapter() {
   const rateLimitRepository = createLocalRateLimitRepository();
   async function readUnlocked() {
     try {
@@ -1182,11 +1194,17 @@ function createFileStoreAdapter() {
       }
       return conversations;
     },
-    async saveResearchConversation(userID, conversation) {
+    async saveResearchConversation(userID, conversation, expectedRevision = null) {
       return this.withMutation((store) => {
         store.researchConversationsByUserID ||= {};
         const conversations = store.researchConversationsByUserID[userID] || [];
         const index = conversations.findIndex((item) => item.id === conversation.id);
+        const existing = index === -1 ? null : conversations[index];
+        if ((expectedRevision === null && existing) ||
+            (expectedRevision !== null && (!existing || researchConversationRevision(existing) !== expectedRevision))) {
+          throw researchConversationConflict(existing, conversation);
+        }
+        conversation = { ...conversation, revision: Number(expectedRevision || 0) + 1 };
         if (index === -1) conversations.push(conversation);
         else conversations[index] = conversation;
         store.researchConversationsByUserID[userID] = conversations;
@@ -1209,6 +1227,7 @@ function createFileStoreAdapter() {
           : withoutCandidate;
         const updated = {
           ...conversation,
+          revision: researchConversationRevision(conversation) + 1,
           candidateDispositions,
           updatedAt: change.updatedAt
         };
@@ -1259,6 +1278,9 @@ function createFileStoreAdapter() {
         store.foundationArtifactsByUserID[userID] = entries;
         return next;
       });
+    },
+    async commitNotebookCardMutation(userID, mutation) {
+      return this.withMutation((store) => applyNotebookCardMutation(store, userID, mutation));
     },
     async allocateCodeQuestionCounter(userID, scope, scopeKey) {
       return this.withMutation((store) => {
@@ -1366,15 +1388,27 @@ function createFileStoreAdapter() {
       link,
       clearedLinks = [],
       expectedLink = null,
-      expectedClearedLinks = []
+      expectedClearedLinks = [],
+      conversation = null,
+      expectedConversationRevision = null
     }) {
       return this.withMutation((store) => {
+        let nextConversation = null;
+        if (conversation) {
+          const entries = store.researchConversationsByUserID?.[userID] || [];
+          const index = entries.findIndex((item) => item.id === conversation.id);
+          if (index < 0 || researchConversationRevision(entries[index]) !== expectedConversationRevision) {
+            throw researchConversationConflict(entries[index], conversation);
+          }
+          nextConversation = { ...conversation, revision: expectedConversationRevision + 1 };
+          entries[index] = nextConversation;
+        }
         store.projectLinksByUserID ||= {};
         const entries = store.projectLinksByUserID[userID] || [];
         const expectedByID = new Map(expectedClearedLinks.map((item) => [item.id, item]));
         const guardedLinks = [
           ...clearedLinks.map((nextLink) => ({ nextLink, expected: expectedByID.get(nextLink.id) })),
-          { nextLink: link, expected: expectedLink }
+          ...(link ? [{ nextLink: link, expected: expectedLink }] : [])
         ];
         if (
           expectedClearedLinks.length !== clearedLinks.length ||
@@ -1385,15 +1419,16 @@ function createFileStoreAdapter() {
             )
           )
         ) {
+          if (conversation) throw researchConversationConflict(null, conversation);
           throw researchCodeDecisionLinkConflict();
         }
-        for (const nextLink of [...clearedLinks, link]) {
+        for (const nextLink of [...clearedLinks, ...(link ? [link] : [])]) {
           const index = entries.findIndex((item) => item.id === nextLink.id);
           if (index === -1) entries.push(nextLink);
           else entries[index] = nextLink;
         }
         store.projectLinksByUserID[userID] = entries;
-        return { link, clearedLinks };
+        return { link, clearedLinks, ...(nextConversation ? { conversation: nextConversation } : {}) };
       });
     },
     async listResearchAnswers(userID, options = {}) {
@@ -1829,8 +1864,7 @@ function createFileStoreAdapter() {
       return (store.researchCreditsByUserID?.[userID] || []).slice();
     },
     async saveResearchCreditEntry(userID, entry) {
-      return withResearchUsageLock("__global_research_credits__", async () => {
-        const store = await this.read();
+      return withResearchUsageLock("__global_research_credits__", async () => this.withMutation((store) => {
         const existing = Object.entries(store.researchCreditsByUserID || {})
           .flatMap(([ownerUserID, entries]) => (entries || []).map((item) => ({ ownerUserID, item })))
           .find(({ item }) => item.id === entry.id);
@@ -1844,13 +1878,11 @@ function createFileStoreAdapter() {
         store.researchCreditsByUserID ||= {};
         store.researchCreditsByUserID[userID] ||= [];
         store.researchCreditsByUserID[userID].push(entry);
-        await this.write(store);
         return { created: true, ownerUserID: userID, entry };
-      });
+      }));
     },
     async claimResearchCreditPurchase(userID, claim, creditEntry) {
-      return withResearchUsageLock("__global_research_credits__", async () => {
-        const store = await this.read();
+      return withResearchUsageLock("__global_research_credits__", async () => this.withMutation((store) => {
         store.researchPurchaseClaimsByID ||= {};
         const existing = store.researchPurchaseClaimsByID[claim.id];
         if (existing) {
@@ -1864,9 +1896,8 @@ function createFileStoreAdapter() {
         store.researchCreditsByUserID[userID] ||= [];
         store.researchPurchaseClaimsByID[claim.id] = claim;
         store.researchCreditsByUserID[userID].push(creditEntry);
-        await this.write(store);
         return { created: true, ownerUserID: userID, claim };
-      });
+      }));
     },
     async researchCreditPurchaseClaim(claimID) {
       const store = await this.read();
@@ -1879,8 +1910,7 @@ function createFileStoreAdapter() {
       ) || null;
     },
     async reconcileResearchCreditPurchase(claimID, reconciliation) {
-      return withResearchUsageLock("__global_research_credits__", async () => {
-        const store = await this.read();
+      return withResearchUsageLock("__global_research_credits__", async () => this.withMutation((store) => {
         const claim = store.researchPurchaseClaimsByID?.[claimID] || null;
         if (!claim) return { applied: false, reason: "claim_not_found", claim: null };
         const decision = researchCreditClaimReconciliation({ claim, ...reconciliation });
@@ -1916,14 +1946,13 @@ function createFileStoreAdapter() {
             store.researchCreditsByUserID[decision.nextClaim.creditedUserID].push(creditEntry);
           }
         }
-        await this.write(store);
         return {
           ...decision,
           ownerUserID: decision.nextClaim.creditedUserID || null,
           claim: decision.nextClaim,
           creditEntry
         };
-      });
+      }));
     },
     async researchSpendSince(since) {
       const store = await this.read();
@@ -1948,17 +1977,15 @@ function createFileStoreAdapter() {
         .sort((left, right) => right.estimatedCostUSD - left.estimatedCostUSD);
     },
     async saveResearchOperationMetric(userID, metric) {
-      return withResearchUsageLock(userID, async () => {
-        const store = await this.read();
+      return withResearchUsageLock(userID, async () => this.withMutation((store) => {
         store.researchOperationsByUserID ||= {};
         const operations = store.researchOperationsByUserID[userID] || [];
         const index = operations.findIndex((operation) => operation.id === metric.id);
         if (index === -1) operations.push(metric);
         else operations[index] = metric;
         store.researchOperationsByUserID[userID] = operations;
-        await this.write(store);
         return metric;
-      });
+      }));
     },
     async researchOperationsSince(since) {
       const store = await this.read();
@@ -1976,8 +2003,7 @@ function createFileStoreAdapter() {
       ));
     },
     async completeResearchUsageReservation(userID, reservationID, entry) {
-      return withResearchUsageLock(userID, async () => {
-        const store = await this.read();
+      return withResearchUsageLock(userID, async () => this.withMutation((store) => {
         const entries = store.researchUsageByUserID?.[userID] || [];
         const index = entries.findIndex((item) =>
           item.id === reservationID && item.mode === "reservation"
@@ -2005,8 +2031,7 @@ function createFileStoreAdapter() {
             });
           }
         }
-        await this.write(store);
-      });
+      }));
     },
     async commitResearchConversationMessage(userID, payload) {
       return withResearchUsageLock(userID, async () => this.withMutation((store) =>
@@ -2019,17 +2044,15 @@ function createFileStoreAdapter() {
       ));
     },
     async releaseResearchUsageReservation(userID, reservationID) {
-      return withResearchUsageLock(userID, async () => {
-        const store = await this.read();
+      return withResearchUsageLock(userID, async () => this.withMutation((store) => {
         const entries = store.researchUsageByUserID?.[userID] || [];
         const remaining = entries.filter((item) =>
           item.id !== reservationID || item.mode !== "reservation"
         );
         if (remaining.length === entries.length) return false;
         store.researchUsageByUserID[userID] = remaining;
-        await this.write(store);
         return true;
-      });
+      }));
     },
     async listResearchFeedback(userID) {
       const store = await this.read();
@@ -3859,9 +3882,10 @@ async function createPostgresStoreAdapter() {
           `;
       return rows.map((row) => safeJSON(row.conversation, {}));
     },
-    async saveResearchConversation(userID, conversation) {
+    async saveResearchConversation(userID, conversation, expectedRevision = null) {
       await ensureSchema();
-      await sql`
+      const next = { ...conversation, revision: Number(expectedRevision || 0) + 1 };
+      const rows = expectedRevision === null ? await sql`
         INSERT INTO permitext_research_conversations (
           id, user_id, title, conversation, created_at, updated_at
         )
@@ -3869,18 +3893,22 @@ async function createPostgresStoreAdapter() {
           ${conversation.id},
           ${userID},
           ${conversation.title},
-          ${JSON.stringify(conversation)}::jsonb,
+          ${JSON.stringify(next)}::jsonb,
           ${conversation.createdAt}::timestamptz,
           ${conversation.updatedAt}::timestamptz
         )
-        ON CONFLICT (id) DO UPDATE SET
-          user_id = EXCLUDED.user_id,
-          title = EXCLUDED.title,
-          conversation = EXCLUDED.conversation,
-          updated_at = EXCLUDED.updated_at
-        WHERE permitext_research_conversations.user_id = ${userID}
+        ON CONFLICT (id) DO NOTHING
+        RETURNING conversation
+      ` : await sql`
+        UPDATE permitext_research_conversations
+        SET title = ${next.title}, conversation = ${JSON.stringify(next)}::jsonb,
+            updated_at = ${next.updatedAt}::timestamptz
+        WHERE id = ${next.id} AND user_id = ${userID}
+          AND COALESCE((conversation->>'revision')::bigint, 0) = ${expectedRevision}
+        RETURNING conversation
       `;
-      return conversation;
+      if (!rows.length) throw researchConversationConflict(null, conversation);
+      return safeJSON(rows[0].conversation, next);
     },
     async updateResearchCandidateDisposition(userID, conversationID, change) {
       await ensureSchema();
@@ -3919,7 +3947,8 @@ async function createPostgresStoreAdapter() {
                   ), '[]'::jsonb)
                 END,
                 true
-              ) || jsonb_build_object('updatedAt', ${change.updatedAt})
+              ) || jsonb_build_object('updatedAt', ${change.updatedAt},
+                'revision', COALESCE((stored.conversation->>'revision')::bigint, 0) + 1)
             ),
             updated_at = ${change.updatedAt}::timestamptz
         WHERE stored.id = ${conversationID} AND stored.user_id = ${userID}
@@ -4154,6 +4183,10 @@ async function createPostgresStoreAdapter() {
         );
       }
       return next;
+    },
+    async commitNotebookCardMutation(userID, mutation) {
+      await ensureSchema();
+      return commitPostgresNotebookCardMutation(sql, userID, mutation);
     },
     async allocateCodeQuestionCounter(userID, scope, scopeKey) {
       await ensureSchema();
@@ -4402,7 +4435,9 @@ async function createPostgresStoreAdapter() {
       link,
       clearedLinks = [],
       expectedLink = null,
-      expectedClearedLinks = []
+      expectedClearedLinks = [],
+      conversation = null,
+      expectedConversationRevision = null
     }) {
       await ensureSchema();
       const expectedByID = new Map(expectedClearedLinks.map((item) => [item.id, item]));
@@ -4448,23 +4483,37 @@ async function createPostgresStoreAdapter() {
         )
         SELECT 1 / COUNT(*)::int AS mutation_guard FROM changed
       `;
+      const nextConversation = conversation
+        ? { ...conversation, revision: expectedConversationRevision + 1 } : null;
       try {
         await sql.transaction(
           [
+            ...(nextConversation ? [sql`
+              WITH changed AS (
+                UPDATE permitext_research_conversations
+                SET title = ${nextConversation.title}, conversation = ${JSON.stringify(nextConversation)}::jsonb,
+                    updated_at = ${nextConversation.updatedAt}::timestamptz
+                WHERE id = ${nextConversation.id} AND user_id = ${userID}
+                  AND COALESCE((conversation->>'revision')::bigint, 0) = ${expectedConversationRevision}
+                RETURNING id
+              )
+              SELECT 1 / COUNT(*)::int AS context_mutation_guard FROM changed
+            `] : []),
             ...clearedLinks.map((nextLink) =>
               guardedReplace(nextLink, expectedByID.get(nextLink.id) || null)
             ),
-            guardedReplace(link, expectedLink)
+            ...(link ? [guardedReplace(link, expectedLink)] : [])
           ],
           { isolationLevel: "Serializable" }
         );
       } catch (error) {
         if (["22012", "23505", "40001"].includes(String(error?.code || ""))) {
+          if (conversation) throw researchConversationConflict(null, conversation);
           throw researchCodeDecisionLinkConflict();
         }
         throw error;
       }
-      return { link, clearedLinks };
+      return { link, clearedLinks, ...(nextConversation ? { conversation: nextConversation } : {}) };
     },
     async listResearchAnswers(userID, options = {}) {
       await ensureSchema();
@@ -5186,15 +5235,16 @@ async function createPostgresStoreAdapter() {
       events = []
     }) {
       await ensureSchema();
+      const expectedRevision = researchConversationRevision(conversation);
+      const expectedContextRevision = researchContextRevision(conversation);
+      const expectedProjectID = String(conversation.primaryProjectID || "");
+      const nextConversation = { ...conversation, revision: expectedRevision + 1 };
       const existingAnswerRows = await sql`
-        SELECT answer
-        FROM permitext_research_answers
-        WHERE id = ${answer.id} AND user_id = ${userID}
-          AND EXISTS (
-            SELECT 1
-            FROM permitext_research_conversations
-            WHERE id = ${conversation.id} AND user_id = ${userID}
-          )
+        SELECT answers.answer, stored.conversation
+        FROM permitext_research_answers AS answers
+        JOIN permitext_research_conversations AS stored
+          ON stored.id = ${conversation.id} AND stored.user_id = ${userID}
+        WHERE answers.id = ${answer.id} AND answers.user_id = ${userID}
         LIMIT 1
       `;
       if (existingAnswerRows.length) {
@@ -5202,23 +5252,30 @@ async function createPostgresStoreAdapter() {
         if (!existing || canonicalJSONString(existing) !== canonicalJSONString(answer)) {
           throw new Error("Immutable Research answer cannot be changed.");
         }
-        return { replayed: true, answer: existing, conversation };
+        return { replayed: true, answer: existing,
+          conversation: safeJSON(existingAnswerRows[0].conversation, conversation) };
       }
 
       const queries = [sql`
         WITH target_conversation AS MATERIALIZED (
-          SELECT id
+          SELECT id, conversation
           FROM permitext_research_conversations
           WHERE id = ${conversation.id} AND user_id = ${userID}
           FOR UPDATE
         ), target_state AS (
-          SELECT (SELECT id FROM target_conversation LIMIT 1) AS id
+          SELECT (SELECT id FROM target_conversation LIMIT 1) AS id,
+            (SELECT conversation FROM target_conversation LIMIT 1) AS conversation
         )
         SELECT
           id,
           CASE
             WHEN id IS NULL
               THEN ('RESEARCH_CONVERSATION_DELETED:' || COALESCE(id, ''))::integer
+            WHEN COALESCE((conversation->>'contextRevision')::bigint, 0) <> ${expectedContextRevision}
+              OR COALESCE(conversation->>'primaryProjectID', '') <> ${expectedProjectID}
+              THEN ('RESEARCH_CONTEXT_CHANGED:' || id)::integer
+            WHEN COALESCE((conversation->>'revision')::bigint, 0) <> ${expectedRevision}
+              THEN ('RESEARCH_CONVERSATION_CHANGED:' || id)::integer
             ELSE 1
           END AS conversation_assertion
         FROM target_state
@@ -5292,7 +5349,7 @@ async function createPostgresStoreAdapter() {
       queries.push(sql`
         UPDATE permitext_research_conversations
         SET title = ${conversation.title},
-            conversation = ${JSON.stringify(conversation)}::jsonb,
+            conversation = ${JSON.stringify(nextConversation)}::jsonb,
             updated_at = ${conversation.updatedAt}::timestamptz
         WHERE id = ${conversation.id} AND user_id = ${userID}
         RETURNING id
@@ -5318,6 +5375,10 @@ async function createPostgresStoreAdapter() {
         if (String(error?.message || "").includes("RESEARCH_CONVERSATION_DELETED")) {
           throw researchConversationDeletedError();
         }
+        if (/RESEARCH_CONTEXT_CHANGED|RESEARCH_CONVERSATION_CHANGED/.test(String(error?.message || "")) || error?.code === "40001") {
+          const conflict = researchConversationConflict(null, conversation, String(error?.message || "").includes("RESEARCH_CONTEXT_CHANGED"));
+          throw conflict;
+        }
         throw error;
       }
       if (reservationID && usageEntry) {
@@ -5326,7 +5387,7 @@ async function createPostgresStoreAdapter() {
           throw new Error("Research usage reservation was not found.");
         }
       }
-      return { replayed: false, answer, conversation };
+      return { replayed: false, answer, conversation: nextConversation };
     },
     async commitCodeQuestionAnalysisCompletion(actorUserID, storageUserID, {
       reservationID = null,
@@ -5784,7 +5845,9 @@ async function storageSummary() {
 async function listStoredResearchConversations(userID, options = {}) {
   const adapter = await storeAdapter();
   return typeof adapter.listResearchConversations === "function"
-    ? adapter.listResearchConversations(userID, options)
+    ? (await adapter.listResearchConversations(userID, options)).map((conversation) => ({
+        ...conversation, revision: researchConversationRevision(conversation)
+      }))
     : [];
 }
 
@@ -5794,7 +5857,11 @@ async function storedResearchConversation(userID, conversationID) {
 
 async function saveStoredResearchConversation(userID, conversation) {
   const adapter = await storeAdapter();
-  return adapter.saveResearchConversation(userID, conversation);
+  const expectedRevision = Object.hasOwn(conversation, "revision")
+    ? researchConversationRevision(conversation) : null;
+  const saved = await adapter.saveResearchConversation(userID, conversation, expectedRevision);
+  Object.assign(conversation, saved);
+  return saved;
 }
 
 async function updateStoredResearchCandidateDisposition(userID, conversationID, change) {
@@ -5820,6 +5887,14 @@ async function listStoredFoundationArtifacts(userID, options = {}) {
 async function saveStoredFoundationArtifact(userID, artifact) {
   const adapter = await storeAdapter();
   return adapter.saveFoundationArtifact(userID, artifact);
+}
+
+async function commitStoredNotebookCardMutation(userID, mutation) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.commitNotebookCardMutation !== "function") {
+    throw new Error("Atomic Notebook storage is unavailable.");
+  }
+  return adapter.commitNotebookCardMutation(userID, mutation);
 }
 
 async function saveStoredFoundationArtifactCompareAndSwap(userID, artifact, expectedVersion) {
@@ -6354,8 +6429,11 @@ export function applyResearchConversationMessageCommit(store, userID, {
     if (canonicalJSONString(existingAnswer) !== canonicalJSONString(answer)) {
       throw new Error("Immutable Research answer cannot be changed.");
     }
-    return { replayed: true, answer: existingAnswer, conversation };
+    return { replayed: true, answer: existingAnswer, conversation: conversations[conversationIndex] };
   }
+
+  assertResearchConversationRevision(conversations[conversationIndex], conversation, researchConversationRevision(conversation));
+  conversation = { ...conversation, revision: researchConversationRevision(conversation) + 1 };
 
   if (reservationID && usageEntry) {
     const usageEntries = store.researchUsageByUserID[userID] || [];
@@ -6507,7 +6585,9 @@ async function commitResearchConversationMessage(userID, payload) {
   if (typeof adapter.commitResearchConversationMessage !== "function") {
     throw new Error("Atomic Research conversation completion is unavailable.");
   }
-  return adapter.commitResearchConversationMessage(userID, payload);
+  const result = await adapter.commitResearchConversationMessage(userID, payload);
+  Object.assign(payload.conversation, result.conversation);
+  return result;
 }
 
 async function commitCodeQuestionAnalysisCompletion(actorUserID, storageUserID, payload) {
@@ -6623,7 +6703,7 @@ function sendError(response, status, message, extraHeaders = {}) {
   sendJSON(response, status, { error: message }, extraHeaders);
 }
 
-function researchProgressResponder(request, response, enabled) {
+export function researchProgressResponder(request, response, enabled) {
   let started = false;
   let ended = false;
   let sequence = 0;
@@ -6677,8 +6757,9 @@ function researchProgressResponder(request, response, enabled) {
     throw error;
   };
   const json = (status, body, extraHeaders = {}) => {
+    const publicError = status >= 400 ? researchPublicErrorEnvelope(status, body) : null;
     if (!enabled) {
-      sendJSON(response, status, body, extraHeaders);
+      sendJSON(response, status, publicError || body, extraHeaders);
       return;
     }
     if (ended || response.writableEnded) return;
@@ -6686,7 +6767,7 @@ function researchProgressResponder(request, response, enabled) {
       progress(activeStageID, "failed");
     }
     write(status >= 400
-      ? { type: "error", error: { status, message: body?.error || "Research request failed.", code: body?.code || null } }
+      ? { type: "error", error: publicError }
       : { type: "result", payload: body });
     ended = true;
     response.end();
@@ -11543,114 +11624,12 @@ async function ownedProjectRecord(userID, projectID) {
 }
 
 const researchProjectFactStatuses = new Set(["stated", "confirmed", "sourced", "unknown", "rejected"]);
-const researchProjectFactAliases = new Map([
-  ["stories", ["stories-above-grade", "Stories Above Grade"]],
-  ["sprinkler-status", ["sprinkler-protection", "Sprinkler Protection"]],
-  ["work-type", ["work-filing-type", "Work / Filing Type"]]
-]);
-const researchBuildingCodeFactKeys = new Set([
-  "occupancy", "construction-type", "stories-above-grade", "levels-below-grade",
-  "building-height", "sprinkler-protection", "project-status", "work-filing-type",
-  "code-basis", "building-area", "building-count", "residential-units", "total-units",
-  "year-built", "years-altered", "building-class"
-]);
-const researchZoningFactKeys = new Set([
-  "address", "bbl", "borough", "block", "tax-lots", "zip-code", "tax-lot-area",
-  "land-use-code", "zoning-lot-composition", "zoning-districts",
-  "commercial-overlays", "special-purpose-district", "zoning-map", "community-district",
-  "zoning-lot-area", "lot-width", "lot-depth", "lot-type", "street-frontages",
-  "mih-area-options", "affordable-housing-zoning-status", "transit-zone",
-  "limited-height-district", "waterfront-status", "lower-density-growth-management-area",
-  "fresh-program-area", "appendix-j-designated-m-district"
-]);
-
-function researchProjectFactGroup(key) {
-  if (researchBuildingCodeFactKeys.has(key)) return "buildingCode";
-  if (researchZoningFactKeys.has(key)) return "zoning";
-  return "custom";
-}
-
-function normalizedResearchProjectStructuredFacts(project) {
-  return (Array.isArray(project?.structuredFacts) ? project.structuredFacts : []).flatMap((fact) => {
-    if (!fact || typeof fact !== "object") return [];
-    const key = normalizedResearchText(fact.key || fact.id || "", 120)
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-    const [canonicalKey, canonicalLabel] = researchProjectFactAliases.get(key) || [key, fact.label];
-    const label = normalizedResearchText(canonicalLabel, 160);
-    const value = normalizedResearchText(fact.value, 1_000);
-    if (!key || !label || !value) return [];
-    const status = researchProjectFactStatuses.has(String(fact.status || "").toLowerCase())
-      ? String(fact.status).toLowerCase()
-      : "stated";
-    return [{
-      id: normalizedResearchText(fact.id || `project-fact:${canonicalKey}`, 200),
-      key: canonicalKey,
-      label,
-      value,
-      group: researchProjectFactGroup(canonicalKey),
-      status,
-      source: normalizedResearchText(fact.source || "description", 100),
-      sourceText: normalizedResearchText(fact.sourceText || "", 500),
-      updatedAt: fact.updatedAt || null,
-      usedInResearch: status === "stated" || status === "confirmed" || status === "sourced"
-    }];
-  });
-}
-
-function researchProjectFactLine(fact) {
-  const groupLabel = fact.group === "buildingCode"
-    ? "Building / Code Fact"
-    : fact.group === "zoning"
-      ? "Zoning Fact"
-      : "Custom Fact";
-  const qualification = fact.status === "sourced"
-    ? "NYC Planning sourced data; verify current official records"
-    : fact.status === "confirmed"
-      ? "user-confirmed; not independently verified"
-      : "user-stated; not independently verified";
-  return `${groupLabel} — ${fact.label}: ${fact.value} (${qualification})`;
-}
-
 export function researchProjectInformation(projectID, project) {
   if (!projectID || !project) return null;
-  const address = String(project.address || "").trim();
-  const description = String(project.description || "").trim();
+  const projection = projectFactProjection(project);
+  const { address, description, structuredFacts, buildingCodeFacts, zoningFacts, customFacts } = projection;
   const codeVersion = String(project.codeVersion || "").trim() || null;
-  const structuredFacts = normalizedResearchProjectStructuredFacts(project);
-  const usableStructuredFacts = structuredFacts.filter((fact) => fact.usedInResearch && fact.key !== "floor-affected");
-  const sourcedAddressFact = usableStructuredFacts.find((fact) => fact.key === "address") || null;
-  const sourcedAddressMatchesProject = sourcedAddressFact && address &&
-    sourcedAddressFact.value.localeCompare(address, undefined, { sensitivity: "base" }) === 0;
-  const addressFact = sourcedAddressMatchesProject
-    ? sourcedAddressFact
-    : (address ? {
-    id: "project-address",
-    key: "address",
-    label: "Address",
-    value: normalizedResearchText(address, 1_000),
-    group: "zoning",
-    status: "confirmed",
-    source: "project-record",
-    sourceText: "",
-    updatedAt: project.updatedAt || null,
-    usedInResearch: true
-  } : sourcedAddressFact);
-  const buildingCodeFacts = usableStructuredFacts.filter((fact) => fact.group === "buildingCode");
-  const zoningFacts = [
-    ...(addressFact ? [addressFact] : []),
-    ...usableStructuredFacts.filter((fact) => fact.group === "zoning" && (!addressFact || fact.key !== "address"))
-  ];
-  const customFacts = usableStructuredFacts.filter((fact) => fact.group === "custom");
-  const facts = [
-    ...buildingCodeFacts.map(researchProjectFactLine),
-    ...zoningFacts.map(researchProjectFactLine),
-    ...customFacts.map(researchProjectFactLine)
-  ];
-  if (description) {
-    facts.push(`Additional Project facts: ${normalizedResearchText(description, 4_000)}`);
-  }
+  const facts = projection.researchFacts;
   return {
     projectID,
     address,
@@ -13641,13 +13620,14 @@ async function handleOrganizationEvidenceReviewSave(request, response) {
 }
 
 function collaborationArtifactForClient(artifact) {
+  const { _saveReceipt, ...payload } = artifact.payload;
   return {
     id: artifact.envelope.id,
     version: artifact.envelope.version,
     createdAt: artifact.envelope.createdAt,
     updatedAt: artifact.envelope.updatedAt,
     deletedAt: artifact.envelope.deletedAt,
-    ...artifact.payload
+    ...payload
   };
 }
 
@@ -13779,6 +13759,24 @@ async function handleProjectCollaborationNoteSave(request, response) {
   );
   if (!access) return;
   const requestedNoteID = String(context.body.noteID || "").trim();
+  const clientMutationID = context.body.clientMutationID;
+  if (clientMutationID !== undefined && (typeof clientMutationID !== "string" ||
+      !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,159}$/.test(clientMutationID))) {
+    sendJSON(response, 400, { error: "Invalid Project note save identifier.", code: "INVALID_PROJECT_NOTE_MUTATION_ID" });
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion ?? 0);
+  const receipt = clientMutationID ? { clientMutationID, projectID, expectedVersion,
+    fingerprint: createHash("sha256").update(canonicalJSONString({ actorUserID: context.userID,
+      projectID, requestedNoteID, expectedVersion, title: context.body.title,
+      body: context.body.body, document: context.body.document })).digest("hex") } : null;
+  const creationID = clientMutationID ? notebookCreationID(access.storageOwnerUserID, `project-note:${projectID}`, clientMutationID) : null;
+  const replaySavedMutation = async (artifact) => {
+    const replay = notebookMutationReplay(artifact, await listStoredProjectLinks(access.storageOwnerUserID), receipt, "projectNote");
+    if (!replay) return false;
+    sendJSON(response, 200, { note: collaborationArtifactForClient(artifact), link: replay.link, replayed: true });
+    return true;
+  };
   const linkedNoteIDs = new Set(
     (await listStoredProjectLinks(access.storageOwnerUserID))
       .filter((link) =>
@@ -13802,25 +13800,27 @@ async function handleProjectCollaborationNoteSave(request, response) {
   const existing = requestedNoteID
     ? projectNotes.find((artifact) => artifact.envelope.id === requestedNoteID) || null
     : projectNotes[0] || null;
+  const replayCandidate = projectNotes.find((artifact) => artifact.envelope.id === (requestedNoteID || creationID)) || existing;
+  if (receipt && await replaySavedMutation(replayCandidate)) return;
   if (requestedNoteID && !existing) {
     sendError(response, 404, "Project note not found.");
     return;
   }
-  const expectedVersion = Number(context.body.expectedVersion ?? 0);
   if (
-    existing &&
-    (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existing.envelope.version)
+    !Number.isSafeInteger(expectedVersion) || expectedVersion < 0 ||
+    (existing ? expectedVersion !== existing.envelope.version ||
+      (clientMutationID && existing.payload?._saveReceipt?.clientMutationID === clientMutationID) : expectedVersion !== 0)
   ) {
     sendJSON(response, 409, {
       error: "This Project note changed after you opened it. Review the current version before saving.",
       code: "PROJECT_NOTE_VERSION_CONFLICT",
-      note: collaborationArtifactForClient(existing)
+      ...(existing ? { note: collaborationArtifactForClient(existing) } : {})
     });
     return;
   }
   try {
     const now = new Date().toISOString();
-    const noteID = existing?.envelope.id || randomUUID();
+    const noteID = existing?.envelope.id || creationID || randomUUID();
     const payload = normalizeProjectNotePayload({
       projectID,
       title: context.body.title || "Project information",
@@ -13832,6 +13832,7 @@ async function handleProjectCollaborationNoteSave(request, response) {
         collaborationActorDisplayName(context),
       updatedByDisplayName: collaborationActorDisplayName(context)
     });
+    if (receipt) payload._saveReceipt = receipt;
     await validateNotebookImageAssets(
       access.storageOwnerUserID,
       projectID,
@@ -13848,7 +13849,6 @@ async function handleProjectCollaborationNoteSave(request, response) {
       }),
       payload
     };
-    await saveStoredFoundationArtifact(access.storageOwnerUserID, artifact);
     let link = null;
     if (!existing) {
       link = projectLinkRecord({
@@ -13868,7 +13868,6 @@ async function handleProjectCollaborationNoteSave(request, response) {
         version: 1,
         metadata: { createdWith: "permitext-project-studio" }
       });
-      await saveStoredProjectLink(access.storageOwnerUserID, link);
     }
     const event = activityEvent({
       owner: access.owner,
@@ -13881,20 +13880,40 @@ async function handleProjectCollaborationNoteSave(request, response) {
       newStatus: `version-${artifact.envelope.version}`,
       createdAt: now
     });
-    await saveStoredActivityEvent(access.storageOwnerUserID, event);
+    const activeProjectLink = existing ? (await listStoredProjectLinks(access.storageOwnerUserID)).find((item) =>
+      !item.deletedAt && item.projectID === projectID && item.targetKind === "projectNote" && item.targetID === noteID) : null;
+    if (existing && !activeProjectLink) throw Object.assign(new Error("The Project note link changed. Reload before saving."), { code: "PROJECT_NOTE_VERSION_CONFLICT" });
+    await commitStoredNotebookCardMutation(access.storageOwnerUserID, {
+      artifact, expectedVersion, links: link ? [link] : [], expectedLinks: activeProjectLink ? [activeProjectLink] : [], events: [event],
+      requireEmptyProjectNoteProjectID: existing ? null : projectID
+    });
     const removedImageAssets = (existing?.payload?.imageAssets || [])
       .filter((assetID) => !(payload.imageAssets || []).includes(assetID));
-    await deleteOrphanedNotebookImageAssets(
+    await cleanupCommittedNotebookImageAssets(
       access.storageOwnerUserID,
       projectID,
       removedImageAssets
     );
+    const artifactRevisions = await bumpCommittedNotebookArtifactRevisions(access.storageOwnerUserID,
+      projectArtifactRevisionChange(projectID, ["foundation", "activity"]));
     sendJSON(response, existing ? 200 : 201, {
       note: collaborationArtifactForClient(artifact),
       link,
-      activity: event
+      activity: event,
+      artifactRevisions
     });
   } catch (error) {
+    if (error?.code === "PROJECT_NOTE_VERSION_CONFLICT") {
+      const activeIDs = new Set((await listStoredProjectLinks(access.storageOwnerUserID)).filter((item) =>
+        !item.deletedAt && item.projectID === projectID && item.targetKind === "projectNote").map((item) => item.targetID));
+      const notes = (await listStoredFoundationArtifacts(access.storageOwnerUserID)).filter((item) =>
+        item.envelope.type === "projectNote" && !item.envelope.deletedAt && activeIDs.has(item.envelope.id));
+      const current = notes.find((item) => item.envelope.id === (requestedNoteID || creationID)) || notes[0];
+      if (receipt && await replaySavedMutation(current)) return;
+      sendJSON(response, 409, { error: "This Project note changed after you opened it. Review the current version before saving.",
+        code: "PROJECT_NOTE_VERSION_CONFLICT", ...(current ? { note: collaborationArtifactForClient(current) } : {}) });
+      return;
+    }
     sendJSON(response, 400, {
       error: error instanceof Error ? error.message : "Invalid Project note.",
       code: "INVALID_PROJECT_NOTE"
@@ -14494,6 +14513,7 @@ async function handleProjectFoundationUnlink(request, response) {
 }
 
 function notebookCardForClient(artifact, projectIDs = []) {
+  const { _saveReceipt, ...payload } = artifact.payload;
   return {
     id: artifact.envelope.id,
     version: artifact.envelope.version,
@@ -14502,7 +14522,7 @@ function notebookCardForClient(artifact, projectIDs = []) {
     archivedAt: artifact.envelope.archivedAt || null,
     deletedAt: artifact.envelope.deletedAt,
     projectIDs,
-    ...artifact.payload
+    ...payload
   };
 }
 
@@ -14727,6 +14747,23 @@ async function handleNotebookCardGet(request, response) {
   sendJSON(response, 200, { card: notebookCardForClient(artifact, projectIDs) });
 }
 
+async function cleanupCommittedNotebookImageAssets(userID, projectID, assetIDs) {
+  try {
+    await deleteOrphanedNotebookImageAssets(userID, projectID, assetIDs);
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "notebook_image_cleanup_deferred", code: error?.code || "CLEANUP_FAILED" }));
+  }
+}
+
+async function bumpCommittedNotebookArtifactRevisions(userID, changes) {
+  try {
+    return await bumpStoredArtifactRevisions(userID, changes);
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "notebook_artifact_revision_deferred", code: error?.code || "REVISION_FAILED" }));
+    return { account: null, projects: [], deferred: true };
+  }
+}
+
 async function handleNotebookCardSave(request, response) {
   const context = await authenticatedNotebookBody(request, response);
   if (!context) return;
@@ -14740,26 +14777,36 @@ async function handleNotebookCardSave(request, response) {
   const storageOwnerUserID = access.storageOwnerUserID;
 
   const requestedCardID = String(context.body.cardID || "").trim();
-  const existing = requestedCardID
-    ? await ownedNotebookArtifact(storageOwnerUserID, requestedCardID)
-    : null;
+  const clientMutationID = context.body.clientMutationID;
+  if (clientMutationID !== undefined && (typeof clientMutationID !== "string" ||
+      !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,159}$/.test(clientMutationID))) {
+    sendJSON(response, 400, { error: "Invalid Notebook save identifier.", code: "INVALID_NOTEBOOK_MUTATION_ID" });
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion ?? 0);
+  const cardID = requestedCardID || (clientMutationID
+    ? notebookCreationID(storageOwnerUserID, projectID, clientMutationID) : randomUUID());
+  const receipt = clientMutationID ? {
+    clientMutationID, projectID, expectedVersion,
+    fingerprint: createHash("sha256").update(canonicalJSONString({
+      actorUserID: context.userID, projectID, requestedCardID, expectedVersion,
+      cardType: context.body.cardType, title: context.body.title,
+      document: context.body.document, evidenceLinks: context.body.evidenceLinks || []
+    })).digest("hex")
+  } : null;
+  const existing = await ownedNotebookArtifact(storageOwnerUserID, cardID, { includeDeleted: true });
+  const replaySavedMutation = async (current) => {
+    if (!receipt) return false;
+    const replay = notebookMutationReplay(current, await listStoredProjectLinks(storageOwnerUserID), receipt);
+    if (!replay) return false;
+    sendJSON(response, 200, { card: notebookCardForClient(replay.artifact, [projectID]), link: replay.link, replayed: true });
+    return true;
+  };
+  if (await replaySavedMutation(existing)) return;
   if (requestedCardID && !existing) {
     sendError(response, 404, "Notebook card not found.");
     return;
   }
-  const expectedVersion = Number(context.body.expectedVersion ?? 0);
-  if (
-    existing &&
-    (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existing.envelope.version)
-  ) {
-    sendJSON(response, 409, {
-      error: "This Notebook card changed after you opened it. Review the current version before saving.",
-      code: "NOTEBOOK_VERSION_CONFLICT",
-      card: notebookCardForClient(existing)
-    });
-    return;
-  }
-
   const links = await listStoredProjectLinks(storageOwnerUserID);
   const activeProjectLink = existing
     ? links.find((link) =>
@@ -14777,9 +14824,20 @@ async function handleNotebookCardSave(request, response) {
     return;
   }
 
+  if ((clientMutationID && existing?.payload?._saveReceipt?.clientMutationID === clientMutationID) ||
+      !Number.isSafeInteger(expectedVersion) || expectedVersion < 0 ||
+      (existing ? existing.envelope.deletedAt || expectedVersion !== existing.envelope.version : expectedVersion !== 0)) {
+    sendJSON(response, 409, {
+      error: "This Notebook card changed after you opened it. Review the current version before saving.",
+      code: "NOTEBOOK_VERSION_CONFLICT",
+      ...(existing ? { card: notebookCardForClient(existing) } : {})
+    });
+    return;
+  }
+
+
   try {
     const now = new Date().toISOString();
-    const cardID = existing?.envelope.id || randomUUID();
     const payload = normalizeNotebookCardPayload({
       cardType: context.body.cardType,
       title: context.body.title,
@@ -14788,6 +14846,7 @@ async function handleNotebookCardSave(request, response) {
       createdBy: existing?.payload?.createdBy || context.userID,
       updatedBy: context.userID
     });
+    if (receipt) payload._saveReceipt = receipt;
     await validateNotebookReferences(storageOwnerUserID, payload.references, payload.evidenceLinks);
     await validateNotebookImageAssets(storageOwnerUserID, projectID, payload.imageAssets);
     const artifact = {
@@ -14801,8 +14860,6 @@ async function handleNotebookCardSave(request, response) {
       }),
       payload
     };
-    await saveStoredFoundationArtifact(storageOwnerUserID, artifact);
-
     let link = activeProjectLink;
     if (!link) {
       link = projectLinkRecord({
@@ -14822,7 +14879,6 @@ async function handleNotebookCardSave(request, response) {
         version: 1,
         metadata: { createdWith: "permitext-notebook" }
       });
-      await saveStoredProjectLink(storageOwnerUserID, link);
     }
     const event = activityEvent({
       owner: access.owner,
@@ -14839,11 +14895,16 @@ async function handleNotebookCardSave(request, response) {
         referenceCount: payload.references.length
       }
     });
-    await saveStoredActivityEvent(storageOwnerUserID, event);
+    await commitStoredNotebookCardMutation(storageOwnerUserID, {
+      artifact, expectedVersion,
+      links: activeProjectLink ? [] : [link],
+      expectedLinks: activeProjectLink ? [activeProjectLink] : [],
+      events: [event]
+    });
     const removedImageAssets = (existing?.payload?.imageAssets || [])
       .filter((assetID) => !payload.imageAssets.includes(assetID));
-    await deleteOrphanedNotebookImageAssets(storageOwnerUserID, projectID, removedImageAssets);
-    const artifactRevisions = await bumpStoredArtifactRevisions(
+    await cleanupCommittedNotebookImageAssets(storageOwnerUserID, projectID, removedImageAssets);
+    const artifactRevisions = await bumpCommittedNotebookArtifactRevisions(
       storageOwnerUserID,
       projectArtifactRevisionChange(projectID, ["notebook", "foundation", "activity"])
     );
@@ -14854,6 +14915,15 @@ async function handleNotebookCardSave(request, response) {
       artifactRevisions
     });
   } catch (error) {
+    if (error?.code === "NOTEBOOK_VERSION_CONFLICT") {
+      const current = await ownedNotebookArtifact(storageOwnerUserID, cardID, { includeDeleted: true });
+      if (await replaySavedMutation(current)) return;
+      const currentIsLinked = current && (await listStoredProjectLinks(storageOwnerUserID)).some((link) =>
+        !link.deletedAt && link.projectID === projectID && link.targetKind === "notebookCard" && link.targetID === cardID);
+      sendJSON(response, 409, { error: error.message, code: error.code,
+        ...(currentIsLinked ? { card: notebookCardForClient(current, [projectID]) } : {}) });
+      return;
+    }
     sendJSON(response, 400, {
       error: error instanceof Error ? error.message : "Invalid Notebook card.",
       code: "INVALID_NOTEBOOK_CARD"
@@ -14918,12 +14988,8 @@ async function handleNotebookCardDelete(request, response) {
       return;
     }
   }
-  await saveStoredFoundationArtifact(access.storageOwnerUserID, deletedArtifact);
-  await deleteOrphanedNotebookImageAssets(
-    access.storageOwnerUserID,
-    access.projectID,
-    artifact.payload?.imageAssets || []
-  );
+  const deletedLinks = [];
+  const deleteEvents = [];
   for (const existingLink of activeLinks) {
     const link = projectLinkRecord({
       ...existingLink,
@@ -14932,8 +14998,8 @@ async function handleNotebookCardDelete(request, response) {
       deletedAt: now,
       version: existingLink.version + 1
     });
-    await saveStoredProjectLink(access.storageOwnerUserID, link);
-    await saveStoredActivityEvent(access.storageOwnerUserID, activityEvent({
+    deletedLinks.push(link);
+    deleteEvents.push(activityEvent({
       owner: access.owner,
       projectID: existingLink.projectID,
       actorUserID: context.userID,
@@ -14945,7 +15011,14 @@ async function handleNotebookCardDelete(request, response) {
       createdAt: now
     }));
   }
-  const artifactRevisions = await bumpStoredArtifactRevisions(access.storageOwnerUserID, {
+  await commitStoredNotebookCardMutation(access.storageOwnerUserID, {
+    artifact: deletedArtifact, expectedVersion, links: deletedLinks,
+    expectedLinks: activeLinks, events: deleteEvents
+  });
+  await cleanupCommittedNotebookImageAssets(
+    access.storageOwnerUserID, access.projectID, artifact.payload?.imageAssets || []
+  );
+  const artifactRevisions = await bumpCommittedNotebookArtifactRevisions(access.storageOwnerUserID, {
     projects: activeLinks.map((link) => ({
       projectID: link.projectID,
       domains: ["notebook", "foundation", "activity"]
@@ -15008,7 +15081,6 @@ async function handleNotebookCardArchive(request, response) {
       version: artifact.envelope.version + 1
     })
   };
-  await saveStoredFoundationArtifact(access.storageOwnerUserID, updatedArtifact);
   const activity = activityEvent({
     owner: access.owner,
     projectID: access.projectID,
@@ -15020,8 +15092,10 @@ async function handleNotebookCardArchive(request, response) {
     newStatus: archived ? "archived" : "active",
     createdAt: now
   });
-  await saveStoredActivityEvent(access.storageOwnerUserID, activity);
-  const artifactRevisions = await bumpStoredArtifactRevisions(
+  await commitStoredNotebookCardMutation(access.storageOwnerUserID, {
+    artifact: updatedArtifact, expectedVersion, expectedLinks: links, events: [activity]
+  });
+  const artifactRevisions = await bumpCommittedNotebookArtifactRevisions(
     access.storageOwnerUserID,
     projectArtifactRevisionChange(access.projectID, ["notebook", "foundation", "activity"])
   );
@@ -15307,8 +15381,9 @@ async function reportSourcesForProject(userID, projectID) {
   const warnings = [];
 
   const project = (await projectAccessForUser(userID, projectID))?.project || null;
-  if (project?.description) {
-    const facts = String(project.description).trim();
+  const factProjection = projectFactProjection(project);
+  if (factProjection.reportFacts) {
+    const facts = factProjection.reportFacts;
     sources.push({
       id: projectID,
       kind: "projectFacts",
@@ -15320,8 +15395,10 @@ async function reportSourcesForProject(userID, projectID) {
         kind: "projectFacts",
         sourceID: projectID,
         title: project.name || project.title || "Project facts",
-        address: project.address || "",
-        facts
+        address: factProjection.address,
+        facts,
+        structuredFacts: factProjection.structuredFacts,
+        projectionVersion: factProjection.projectionVersion
       }
     });
   }
@@ -16915,43 +16992,16 @@ async function handleResearchConversationAssignProject(request, response) {
     : null;
   if (targetProjectID && !targetProject) return;
   const now = new Date().toISOString();
-  if (currentProjectID) {
-    let removedLink;
-    try {
-      removedLink = await removeResearchConversationProjectLink(
-        context.userID,
-        conversation.id,
-        currentProjectID,
-        now
-      );
-    } catch (error) {
-      if (sendCodeQuestionError(response, error)) return;
-      throw error;
-    }
-    if (removedLink) {
-      await recordResearchConversationRemovalActivity(
-        context.userID,
-        currentProjectID,
-        removedLink,
-        now
-      );
-    }
-  }
-  if (targetProjectID) {
-    await setResearchConversationProjectLink(
-      context.userID,
-      conversation.id,
-      targetProjectID,
-      now
-    );
-    await recordResearchProjectLinkActivity(
-      context.userID,
-      targetProjectID,
-      conversation.id,
-      "item.linked",
-      now
-    );
-  }
+  const links = (await listStoredProjectLinks(context.userID)).filter((link) =>
+    link.targetKind === "researchConversation" && link.targetID === conversation.id);
+  const previousLink = links.find((link) => !link.deletedAt && link.projectID === currentProjectID);
+  const removedLink = previousLink ? projectLinkRecord({
+    ...clearedResearchCodeDecisionLinkRecord(previousLink, now, context.userID), deletedAt: now
+  }) : null;
+  const existingTargetLink = links.find((link) => link.projectID === targetProjectID) || null;
+  const targetLink = targetProjectID ? researchConversationProjectLinkRecord(
+    context.userID, conversation.id, targetProjectID, now, existingTargetLink
+  ) : null;
   conversation.primaryProjectID = targetProjectID;
   conversation.codeVersion = defaultSyncCodeVersion;
   conversation.codeBasis = researchCodeBasis(
@@ -16968,9 +17018,26 @@ async function handleResearchConversationAssignProject(request, response) {
   conversation.projectContextReviewRequired = false;
   conversation.movedFromProjectID = currentProjectID;
   conversation.movedAt = now;
+  Object.assign(conversation, resetResearchActiveContext(conversation, now));
   conversation.updatedAt = now;
-  await saveStoredResearchConversation(context.userID, conversation);
-  const artifactRevisions = await bumpResearchArtifactRevisions(context.userID, [
+  const committed = await replaceStoredResearchCodeDecisionLinks(context.userID, {
+    link: targetLink || removedLink,
+    expectedLink: targetLink ? existingTargetLink : previousLink || null,
+    clearedLinks: targetLink && removedLink ? [removedLink] : [],
+    expectedClearedLinks: targetLink && previousLink ? [previousLink] : [],
+    conversation,
+    expectedConversationRevision: researchConversationRevision(conversation)
+  });
+  Object.assign(conversation, committed.conversation);
+  // The context and its links are already durable. Activity bookkeeping must
+  // not turn a completed move into a failed request that invites a second move.
+  try {
+    if (removedLink) await recordResearchConversationRemovalActivity(context.userID, currentProjectID, removedLink, now);
+    if (targetLink) await recordResearchProjectLinkActivity(context.userID, targetProjectID, conversation.id, "item.linked", now);
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "research_move_activity_deferred", code: error?.code || "ACTIVITY_WRITE_FAILED" }));
+  }
+  const artifactRevisions = await bumpCommittedResearchArtifactRevisions(context.userID, [
     ...(currentProjectID ? [{
       projectID: currentProjectID,
       domains: ["activity", "foundation", "research"]
@@ -18218,6 +18285,7 @@ async function commitProjectContextOnlyResearchMessage({
   const userMessage = {
     id: requestIdentity ? `${requestIdentity}:question` : randomUUID(),
     role: "user",
+    contextRevision: researchContextRevision(conversation),
     question,
     createdAt: now,
     ...(researchRequestID ? { researchRequestID } : {})
@@ -18225,6 +18293,7 @@ async function commitProjectContextOnlyResearchMessage({
   const assistantMessage = {
     id: requestIdentity ? `${requestIdentity}:answer` : randomUUID(),
     role: "assistant",
+    contextRevision: researchContextRevision(conversation),
     createdAt: now,
     ...(researchRequestID ? { researchRequestID } : {}),
     answer: {
@@ -18371,6 +18440,8 @@ async function handleResearchConversationMessage(request, response) {
   if (!context) return;
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
+  const activeMessages = activeResearchMessages(conversation);
+  const topicContext = activeResearchTopicContext(conversation);
   const question = normalizedResearchText(context.body.question, 2_000);
   if (question.length < 3) {
     sendError(response, 400, "Enter a research question.");
@@ -18384,7 +18455,7 @@ async function handleResearchConversationMessage(request, response) {
     sendJSON(response, 409, {
       error: "Review the user-provided Project context before generating another answer.",
       code: "RESEARCH_PROJECT_REVIEW_REQUIRED",
-      conversation
+      conversation: await researchConversationForClient(conversation, { userID: context.userID })
     });
     return;
   }
@@ -18485,7 +18556,8 @@ async function handleResearchConversationMessage(request, response) {
       progressResponse.json(409, {
         error: "The enacted passage, structured source, or visual attachment changed after it was added. Refresh the sources before asking another question.",
         code: "RESEARCH_SOURCE_CHANGED",
-        conversation: { ...conversation, sourceStatuses: current.sourceStatuses }
+        conversation: { ...await researchConversationForClient(conversation, { userID: context.userID }),
+          sourceStatuses: current.sourceStatuses }
       });
       return;
     }
@@ -18534,7 +18606,7 @@ async function handleResearchConversationMessage(request, response) {
     }
     const corpusPlan = await researchCorpusPlanForTurn({
       question,
-      messages: conversation.messages || [],
+      messages: activeMessages,
       projectCodeVersion: projectInformation?.codeVersion || projectInformation?.canonicalCodeVersion || null,
       projectFacts: combinedProjectFacts,
       pinnedEvidence
@@ -18555,11 +18627,11 @@ async function handleResearchConversationMessage(request, response) {
     progressResponse.progress("preparing_question", "completed");
     const evidencePackage = await assembledResearchEvidenceForTurn({
       question,
-      messages: conversation.messages || [],
+      messages: activeMessages,
       pinnedEvidence,
       originSurface: conversation.origin?.surface || "",
       projectFacts: combinedProjectFacts,
-      topicContext: conversation.topicContext || null,
+      topicContext,
       corpusPlan,
       zoningPlan: initialZoningPlan,
       onStage: progressResponse.progress
@@ -18567,7 +18639,7 @@ async function handleResearchConversationMessage(request, response) {
     const conversationFactState = resolveResearchConversationFacts({
       question,
       topicDecision: evidencePackage.topicDecision,
-      topicContext: conversation.topicContext || null
+      topicContext
     });
     const conversationFactContext = researchConversationFactPromptContext(conversationFactState);
     const zoningPlan = zoningTurn
@@ -18844,7 +18916,7 @@ async function handleResearchConversationMessage(request, response) {
       assembledEvidence,
       context.userID,
       {
-        messages: conversation.messages,
+        messages: activeMessages,
         projectContextFacts: combinedProjectFacts,
         conversationFactContext,
         validUserFacts,
@@ -18957,7 +19029,7 @@ async function handleResearchConversationMessage(request, response) {
     let answerEscalated = false;
     const interpretationOptions = {
       selections,
-      messages: conversation.messages,
+      messages: activeMessages,
       projectContextFacts: combinedProjectFacts,
       conversationFactContext,
       responseStyle: "conversational",
@@ -19659,6 +19731,7 @@ async function handleResearchConversationMessage(request, response) {
         ? `${researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID)}:question`
         : randomUUID(),
       role: "user",
+      contextRevision: researchContextRevision(conversation),
       question,
       createdAt: now,
       ...(researchRequestID ? { researchRequestID } : {})
@@ -19668,6 +19741,7 @@ async function handleResearchConversationMessage(request, response) {
         ? `${researchRequestMessageIdentity(context.userID, conversation.id, researchRequestID)}:answer`
         : randomUUID(),
       role: "assistant",
+      contextRevision: researchContextRevision(conversation),
       createdAt: now,
       ...(researchRequestID ? { researchRequestID } : {}),
       researchProgress: progressResponse.summary(now),
@@ -19839,9 +19913,10 @@ async function handleResearchConversationMessage(request, response) {
     conversation.codeVersion = answerCodeBasis.codeVersion;
     conversation.codeBasis = answerCodeBasis;
     conversation.topicContext = {
+      contextRevision: researchContextRevision(conversation),
       version: evidencePackage.topicDecision?.version || null,
       originalTopic: normalizedResearchText(
-        conversation.topicContext?.originalTopic ||
+        topicContext?.originalTopic ||
         evidencePackage.topicDecision?.rootTopic?.text ||
         question,
         2_000
@@ -20043,6 +20118,16 @@ async function handleResearchConversationMessage(request, response) {
         operationID: conversation.id,
         reason: error.message
       })));
+    }
+    if (["RESEARCH_CONTEXT_CHANGED", "RESEARCH_CONVERSATION_CHANGED"].includes(error.code)) {
+      progressResponse.failActive("failed");
+      const currentConversation = await storedResearchConversation(context.userID, conversation.id);
+      progressResponse.error(409, error.message, {
+        code: error.code,
+        charged: false,
+        ...(currentConversation ? { conversation: await researchConversationForClient(currentConversation, { userID: context.userID }) } : {})
+      });
+      return;
     }
     if (error.code === "RESEARCH_CONVERSATION_DELETED") {
       progressResponse.failActive("failed");
@@ -31239,6 +31324,10 @@ async function handleRequestUnlocked(request, response) {
   } catch (error) {
     if (error instanceof RequestBodyTooLargeError) {
       sendError(response, 413, "Request body is too large.");
+      return;
+    }
+    if (["RESEARCH_CONTEXT_CHANGED", "RESEARCH_CONVERSATION_CHANGED", "NOTEBOOK_VERSION_CONFLICT"].includes(error?.code)) {
+      sendJSON(response, 409, researchPublicErrorEnvelope(409, { error: error.message, code: error.code }));
       return;
     }
     if (error instanceof SyntaxError) {

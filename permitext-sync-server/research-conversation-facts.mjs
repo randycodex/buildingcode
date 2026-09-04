@@ -1,5 +1,7 @@
+import { researchFactQualification } from "./research-fact-qualification.mjs";
+
 export const researchConversationFactsVersion =
-  "20260824-topic-scoped-user-facts-v4";
+  "20260904-qualified-user-facts-v5";
 
 export const researchConversationFactKinds = Object.freeze({
   established: "established",
@@ -59,13 +61,14 @@ function fact({ key, value, statement, kind, sourceText }) {
     statement: compactText(statement, 1_000),
     kind,
     sourceText: compactText(sourceText, 1_000),
-    source: "user"
+    source: "user",
+    qualificationVersion: researchConversationFactsVersion
   };
 }
 
 function turnKind(question, topicDecision) {
   const text = compactText(question);
-  if (/^(?:what if|suppose|assuming|assume|hypothetically)\b/i.test(text)) {
+  if (researchFactQualification(text).hypothetical) {
     return researchConversationFactKinds.hypothetical;
   }
   if (/\b(?:unknown|not known|not yet known|not determined|undetermined|to be determined|tbd)\b/i.test(text)) {
@@ -243,8 +246,8 @@ function structuredFacts(question, kind, topicDecision) {
   if (codeBasisYear) add("code_basis_year", codeBasisYear, `The user-stated code basis year for the active topic is ${codeBasisYear}.`);
 
   if (
-    /\b(?:is|are|will be|has been)\s+(?:fully\s+)?sprinklered\b/i.test(text) ||
-    (!startsWithLegalAuthority && /\b(?:building|structure|project|it|this)\b/i.test(text) && /\band\s+(?:fully\s+)?sprinklered\b/i.test(text))
+    /\b(?:is|are|will be|has been)\s+fully\s+sprinklered\b/i.test(text) ||
+    (!startsWithLegalAuthority && /\b(?:building|structure|project|it|this)\b/i.test(text) && /\band\s+fully\s+sprinklered\b/i.test(text))
   ) {
     add("sprinkler_status", "fully_sprinklered", "The active-topic building is fully sprinklered.");
   } else if (/\b(?:is|are)\s+(?:not|un)\s*-?sprinklered\b|\bwithout\s+(?:an\s+)?automatic sprinkler/i.test(text)) {
@@ -291,6 +294,71 @@ function structuredFacts(question, kind, topicDecision) {
   return facts;
 }
 
+const qualifiedFactMentions = [
+  ["sprinkler_status", /\bsprinkler(?:ed|s|ing| status| system| protection)?\b/i],
+  ["building_status", /\b(?:existing|new)\b[^.;?]{0,80}\b(?:building|structure|project)\b|\b(?:building|structure|project)\b[^.;?]{0,40}\b(?:existing|new)\b/i],
+  ["story_count", /\b(?:story|stories)\b/i],
+  ["occupancy_group", /\b(?:occupancy|Group\s+[A-Z](?:-\d+)?)\b/i],
+  ["construction_type", /\b(?:construction type|Type\s+[IV]+[AB]?\s+construction)\b/i],
+  ["building_height_feet", /\bheight\b|\b(?:feet|ft)\s+high\b/i],
+  ["occupant_load", /\boccupant load\b/i],
+  ["occupant_count", /\boccupants?\b/i],
+  ["travel_distance_feet", /\btravel distance\b/i],
+  ["employee_count", /\bemployees?\b/i],
+  ["dwelling_unit_count", /\bdwelling units?\b/i],
+  ["area_square_feet", /\b(?:sf|sq\.?\s*ft\.?|square feet)\b/i],
+  ["work_scope", /\b(?:work|scope|alteration|new construction|change of (?:use|occupancy))\b/i],
+  ["floor_location", /\b(?:work|alteration|space|room)\b[^.;?]{0,60}\bfloor\b/i],
+  ["use", /\b(?:space|room|building)\b[^.;?]{0,40}\b(?:used|designed|arranged|intended)\b/i],
+  ["filing_date", /\bfiled\b/i],
+  ["code_basis_year", /\bunder\b[^.;?]{0,40}\b20\d{2}\b/i]
+];
+
+function qualifiedFacts(question, topicDecision) {
+  // Split independent sentences, but keep an embedded assumption with the
+  // assertion it might qualify. Do not split decimal or thousands separators.
+  const clauses = compactText(question)
+    .split(/(?<=[.!?;])\s+(?=[A-Z])|;\s*/i)
+    .filter(Boolean);
+  const result = [];
+  let hypotheticalScope = false;
+  for (const clause of clauses) {
+    if (/^(?:(?:AC|BC|EBC|FC|FGC|MC|PC)\b|Table\b|Section\b)/i.test(clause)) continue;
+    const qualification = researchFactQualification(clause);
+    hypotheticalScope ||= qualification.hypothetical;
+    const kind = hypotheticalScope ? researchConversationFactKinds.hypothetical : turnKind(clause, topicDecision);
+    // A question about a fact does not correct that fact, even when negated.
+    if (!assertionLike(clause, kind, topicDecision)) continue;
+    const extracted = structuredFacts(clause, kind, topicDecision);
+    const sprinklerMention = /\bsprinkler(?:ed|s|ing| status| system| protection)?\b/i.test(clause);
+    const limitedSprinklerScope = sprinklerMention && (
+      /\b(?:floor|room|space|level|cellar|basement|portion|area|tenant|unit|wing)\b[^.;?]{0,40}\bsprinkler|\bsprinkler[^.;?]{0,40}\b(?:on|in|at|for)\b[^.;?]{0,30}\b(?:floor|room|space|level|cellar|basement|portion|area|tenant|unit|wing)\b|\b(?:above|below)\s+grade\b/i.test(clause) ||
+      !extracted.some((item) => item.key === "sprinkler_status")
+    );
+    const requiresQualification = qualification.qualified || limitedSprinklerScope || kind === researchConversationFactKinds.unknown;
+    if (requiresQualification || hypotheticalScope) {
+      const keys = new Set(extracted.map((item) => item.key));
+      for (const [key, pattern] of qualifiedFactMentions) {
+        if (pattern.test(clause)) keys.add(key);
+      }
+      // Canonical categories cannot encode scope, negation or conditionality.
+      // Keep the exact assertion and replace prior certainty for the same key.
+      for (const key of keys) {
+        result.push(fact({
+          key,
+          value: requiresQualification ? "unknown" : extracted.find((item) => item.key === key)?.value || "unknown",
+          statement: `${hypotheticalScope ? "Turn-only hypothetical" : "Qualified user statement; do not infer an unqualified fact"}: ${clause}`,
+          kind: hypotheticalScope ? researchConversationFactKinds.hypothetical : researchConversationFactKinds.unknown,
+          sourceText: clause
+        }));
+      }
+    } else {
+      result.push(...extracted);
+    }
+  }
+  return result;
+}
+
 function normalizedFactList(value, kind) {
   const seen = new Set();
   const result = [];
@@ -306,7 +374,8 @@ function normalizedFactList(value, kind) {
       statement,
       kind,
       sourceText: compactText(item?.sourceText, 1_000),
-      source: "user"
+      source: "user",
+      qualificationVersion: item?.qualificationVersion || null
     });
   }
   return result.slice(0, maximumFactsPerTopic);
@@ -317,10 +386,31 @@ function normalizedTopics(topicContext) {
   for (const topic of Array.isArray(topicContext?.factTopics) ? topicContext.factTopics : []) {
     const rootTopic = compactText(topic?.rootTopic);
     if (!rootTopic || result.some((item) => normalizedTopic(item.rootTopic) === normalizedTopic(rootTopic))) continue;
+    const established = normalizedFactList(topic?.establishedFacts, researchConversationFactKinds.established);
+    const unknown = normalizedFactList(topic?.unknownFacts, researchConversationFactKinds.unknown);
+    const revalidated = [];
+    const needsConfirmation = [];
+    for (const item of established) {
+      if (item.qualificationVersion === researchConversationFactsVersion) {
+        revalidated.push(item);
+        continue;
+      }
+      const candidate = item.sourceText
+        ? qualifiedFacts(item.sourceText, { decision: "continuation" }).filter((entry) => entry.key === item.key).at(-1)
+        : null;
+      if (candidate?.kind === researchConversationFactKinds.established) revalidated.push(candidate);
+      else needsConfirmation.push(fact({
+        key: item.key,
+        value: "unknown",
+        statement: `A prior saved fact requires reconfirmation. Original user wording: ${item.sourceText || item.statement}`,
+        kind: researchConversationFactKinds.unknown,
+        sourceText: item.sourceText || item.statement
+      }));
+    }
     result.push({
       rootTopic,
-      establishedFacts: normalizedFactList(topic?.establishedFacts, researchConversationFactKinds.established),
-      unknownFacts: normalizedFactList(topic?.unknownFacts, researchConversationFactKinds.unknown)
+      establishedFacts: revalidated,
+      unknownFacts: replaceByKey(needsConfirmation, unknown)
     });
   }
   return result.slice(0, maximumStoredTopics);
@@ -352,10 +442,13 @@ export function resolveResearchConversationFacts({
   }
 
   const kind = turnKind(normalizedQuestion, topicDecision);
-  const extracted = structuredFacts(normalizedQuestion, kind, topicDecision);
-  const hypotheticalFacts = kind === researchConversationFactKinds.hypothetical ? extracted : [];
-  const unknownFacts = kind === researchConversationFactKinds.unknown ? extracted : [];
-  const establishedTurnFacts = kind === researchConversationFactKinds.established ? extracted : [];
+  const extracted = qualifiedFacts(normalizedQuestion, topicDecision);
+  const hypotheticalFacts = extracted.filter((item) => item.kind === researchConversationFactKinds.hypothetical);
+  const latestActiveFacts = [...new Map(extracted
+    .filter((item) => item.kind !== researchConversationFactKinds.hypothetical)
+    .map((item) => [item.key, item])).values()];
+  const unknownFacts = latestActiveFacts.filter((item) => item.kind === researchConversationFactKinds.unknown);
+  const establishedTurnFacts = latestActiveFacts.filter((item) => item.kind === researchConversationFactKinds.established);
 
   if (establishedTurnFacts.length) {
     active.establishedFacts = replaceByKey(active.establishedFacts, establishedTurnFacts);
@@ -396,9 +489,12 @@ export function resolveResearchConversationFacts({
 }
 
 export function researchConversationFactPromptContext(result) {
+  const wording = (item) => item.sourceText && !item.statement.includes(item.sourceText)
+    ? `${item.statement} Original user wording: ${item.sourceText}`
+    : item.statement;
   return {
-    established: (result?.establishedFacts || []).map((item) => item.statement),
-    hypothetical: (result?.hypotheticalFacts || []).map((item) => item.statement),
-    unknown: (result?.unknownFacts || []).map((item) => item.statement)
+    established: (result?.establishedFacts || []).map(wording),
+    hypothetical: (result?.hypotheticalFacts || []).map(wording),
+    unknown: (result?.unknownFacts || []).map(wording)
   };
 }

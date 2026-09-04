@@ -536,8 +536,10 @@ async function main() {
       workspaceScript.text.indexOf("async function start()"),
       workspaceScript.text.indexOf("start().catch")
     );
-    const startupChapterCatalogIndex = workspaceStartupSource.search(
-      /api\("\/code\/chapters(?:\?view=startup)?"\)/
+    const startupChapterCatalogIndex = workspaceStartupSource.indexOf("void loadStartupCatalogs();");
+    const startupCatalogSource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("function loadStartupCatalogs()"),
+      workspaceScript.text.indexOf("async function start()")
     );
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(
@@ -569,7 +571,9 @@ async function main() {
         !webRoot.text.includes('id="add-workspace"') &&
         webRoot.text.includes('id="collapse-readers" type="button" aria-label="Close all columns" title="Close all columns">Close all</button>') &&
         !webRoot.text.includes(">One Reader</button>") &&
-        workspaceScript.text.includes('const workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
+        workspaceScript.text.includes('let workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
+        workspaceScript.text.includes('privateWorkspaceKeys') &&
+        workspaceScript.text.includes('function configurePrivateWorkspace(account)') &&
         !workspaceScript.text.includes("toolbarOrderKey") &&
         !workspaceScript.text.includes("bindToolbarReordering") &&
         !workspaceScript.text.includes("application/x-permitext-toolbar") &&
@@ -605,7 +609,7 @@ async function main() {
         workspaceStyles.text.includes(".workspace-switch-placeholder {") &&
         workspaceStateScript.text.includes("export function emptyWorkspaceLayout()") &&
         workspaceStateScript.text.includes("export function duplicateWorkspace"),
-      "Blank-start named workspaces, single-row pills, Close All, or direct-link Reader wiring is missing."
+      "Account-scoped named workspaces, responsive toolbar, Close All, or direct-link Reader wiring is missing."
     );
     assert(
       workspaceScript.text.includes('panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"))'),
@@ -657,7 +661,12 @@ async function main() {
         !workspaceScript.text.includes('appendMutedRow(content, "Loading saved content"') &&
         workspaceStartupSource.indexOf("bindImmediateUtilityControls();") >= 0 &&
         startupChapterCatalogIndex >= 0 &&
-        workspaceStartupSource.indexOf("bindImmediateUtilityControls();") < startupChapterCatalogIndex,
+        workspaceStartupSource.indexOf("bindImmediateUtilityControls();") < startupChapterCatalogIndex &&
+        !workspaceStartupSource.includes("await loadStartupCatalogs()") &&
+        startupCatalogSource.includes('api("/code/chapters?view=startup")') &&
+        startupCatalogSource.includes('api("/code/libraries")') &&
+        workspaceStartupSource.indexOf("await resumeClerkSignInReturn();") > startupChapterCatalogIndex &&
+        workspaceStartupSource.indexOf("await resumeClerkSignInReturn();") < workspaceStartupSource.indexOf("await renderWorkspace();"),
       "Search and Saved must bind before cold-start catalogs load, and Saved must hydrate after its shell is mounted."
     );
     assert(
@@ -895,7 +904,8 @@ async function main() {
         workspaceScript.text.includes("function printReportManifestAsPDF(manifest)") &&
         workspaceScript.text.includes("function renderFirmStandardsEditor") &&
         workspaceScript.text.includes('postResearch("/organizations/controls/save"') &&
-        workspaceScript.text.includes('postResearch("/reports/options"') &&
+        workspaceScript.text.includes('reportRequest("/reports/options"') &&
+        workspaceScript.text.includes('const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };') &&
         workspaceScript.text.includes('currentOption.textContent = activeDraft.id') &&
         workspaceScript.text.includes(': "Current Report"') &&
         workspaceScript.text.includes('newOption.textContent = "Create new Report…"') &&
@@ -1005,7 +1015,9 @@ async function main() {
         !workspaceScript.text.includes('title.textContent = "Notebook"') &&
         !workspaceStyles.text.includes(".notebook-eyebrow") &&
         workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);\n  align-items: flex-start;\n  justify-content: flex-end;") &&
-        workspaceScript.text.includes("cardType: cardAtStart.cardType"),
+        workspaceScript.text.includes('cardType: submittedDraft.cardType || "finding"') &&
+        workspaceScript.text.includes("clientMutationID: submittedDraft.revision") &&
+        workspaceScript.text.includes("expectedVersion: submittedDraft.baseVersion"),
       "Web Project Studio no longer switches its Project overview, Notebook, Research history, and Report as one guarded workspace."
     );
     assert(
@@ -1172,10 +1184,12 @@ async function main() {
         workspaceScript.text.includes("syncProjectIdentity(detail.clientID, detail.userID)") &&
         workspaceScript.text.includes("saved.browserCredentialID") &&
         workspaceScript.text.includes('const accountSessionKey = "permitext:webAccount:v1"') &&
-        workspaceScript.text.includes('const tabWorkspaceKey = "permitext:webWorkspaceTab:v1"') &&
+        workspaceScript.text.includes('let tabWorkspaceKey = "permitext:webWorkspaceTab:v1"') &&
+        workspaceScript.text.includes("function configurePrivateWorkspace(account)") &&
         workspaceScript.text.includes("sessionStorage.getItem(tabWorkspaceKey)") &&
         workspaceScript.text.includes("sessionStorage.setItem(activeWorkspaceSessionKey") &&
-        workspaceScript.text.includes("persistAccountSession(null)") &&
+        workspaceScript.text.includes("replaceActiveAccount(null") &&
+        workspaceScript.text.includes("persistAccountSession(nextAccount)") &&
         workspaceScript.text.includes("recentSearchesJSON"),
       "Web foreground sync no longer applies iOS bulk clears or recent-search continuity."
     );
@@ -1254,7 +1268,8 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function renderReaderTrust") &&
-        workspaceScript.text.includes("codeTrustProfiles = libraryPayload.codeTrustProfiles || []") &&
+        startupCatalogSource.includes("codeTrustProfiles = payload.codeTrustProfiles || []") &&
+        startupCatalogSource.includes('codeTrustProfilesStatus = codeTrustProfiles.length ? "ready" : "unavailable"') &&
         !workspaceScript.text.includes("function renderReaderSectionToolbar") &&
         workspaceScript.text.includes("function renderInlineCommentBox") &&
         workspaceScript.text.includes('bookmarkButton.className = "inline-bookmark-toggle"') &&
@@ -1506,10 +1521,11 @@ async function main() {
     );
     assert(
       webRoot.text.includes('class="mobile-web-message"') &&
-        webRoot.text.includes("Permitext mobile is still in process.") &&
+        webRoot.text.includes("Use a wider screen") &&
+        webRoot.text.includes("This web workspace is designed for desktop and tablet screens.") &&
         workspaceStyles.text.includes("@media (max-width: 767px) and (pointer: coarse)") &&
         workspaceStyles.text.includes("body > .workspace-shell"),
-      "Phone-sized touch browsers should receive the temporary mobile-in-process screen."
+      "Phone-sized touch browsers should receive accurate desktop/tablet guidance."
     );
     assert(
       workspaceScript.text.includes("function syncSavedArchiveButtonStates()") &&

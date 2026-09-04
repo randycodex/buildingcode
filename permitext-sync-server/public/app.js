@@ -1,4 +1,17 @@
 import {
+  accountContextChangedError,
+  accountRequestIdentity,
+  accountRequestIsCurrent,
+  accountLinkRecoverySources,
+  confirmedAccountLinkRecovery,
+  migrateLegacyPrivateWorkspace,
+  privateWorkspaceMigrationStatus,
+  privateWorkspaceKeys,
+  privateWorkspaceRecoverySnapshot,
+  recordConfirmedAccountLinkRecovery,
+  removePrivateWorkspace
+} from "./private-workspace-state.js?v=20260904-account-isolation-v5";
+import {
   inlineCodeReferencePhrases,
   parseCodeJumpAnchor,
   rewriteStructuredCodeLinks
@@ -37,7 +50,10 @@ import {
   syncLeaderLeaseIsAvailable
 } from "./sync-state.js?v=20260811-research-code-basis-v2";
 import {
+  acknowledgeNotebookDraft,
+  beginNotebookDraftSave,
   disableOfflineFeature,
+  deleteOfflineAccountData,
   deleteNotebookCardSnapshot,
   deleteLocalNotebookImage,
   deleteNotebookDraft,
@@ -53,14 +69,17 @@ import {
   offlineAPI,
   offlineFeatureMetadata,
   offlineLibraryStatus,
+  offlineAccountRecoverySnapshot,
   reconcileOfflineFeatureAccess,
+  rebaseNotebookDraftAfterReview,
   pendingNotebookImages,
+  pendingNotebookDrafts,
   saveNotebookDraft,
   saveNotebookCardSnapshot,
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260904-citation-integrity-v26";
+} from "./offline-storage.js?v=20260904-readiness-recovery-v35";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -95,7 +114,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260904-citation-integrity-v26";
+} from "./research-intent-state.js?v=20260904-readiness-recovery-v35";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -242,12 +261,12 @@ const permitextClientCapabilities = Object.freeze([
   "evidence-discovery",
   "code-question-workspace"
 ]);
-const baseWorkspaceKey = "permitext:webWorkspace:v1";
+let baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
-const tabWorkspaceKey = "permitext:webWorkspaceTab:v1";
-const workspaceRegistryKey = "permitext:webWorkspaces:v2";
-const workspaceStateKeyPrefix = "permitext:webWorkspace:v2:";
-const activeWorkspaceSessionKey = "permitext:webWorkspaceActive:v2";
+let tabWorkspaceKey = "permitext:webWorkspaceTab:v1";
+let workspaceRegistryKey = "permitext:webWorkspaces:v2";
+let workspaceStateKeyPrefix = "permitext:webWorkspace:v2:";
+let activeWorkspaceSessionKey = "permitext:webWorkspaceActive:v2";
 const firstUseWelcomeSeenKey = "permitext:webFirstUseWelcome:v1";
 const researchDisclosureAcknowledgmentVersion = "2026-08-27-v1";
 const researchDisclosureAcknowledgmentKeyPrefix = "permitext:researchDisclosureAcknowledged:";
@@ -269,7 +288,7 @@ const legacyDetachedProjectParameter = new URLSearchParams(window.location.searc
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
 const detachedProjectSessionID = String(detachedProjectSession?.id || "");
 const detachedProjectWindow = Boolean(detachedProjectSession?.project);
-const workspaceKey = detachedProjectWindow
+let workspaceKey = detachedProjectWindow
   ? `${baseWorkspaceKey}:detached:${detachedProjectSessionID}`
   : baseWorkspaceKey;
 const track = document.querySelector("#panel-track");
@@ -389,6 +408,12 @@ const recentSearchPopoverLimit = 15;
 const researchChatPlaceholder = "Ask a Research question…";
 const repeatableUtilityKeys = new Set(["search", "saved"]);
 const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title"]);
+// Workspace restoration normalizes Project identities before the rest of the module runs.
+const projectColorOptions = [
+  "#6674c8", "#5aaea4", "#f27a4f", "#a14fc0", "#879a6d", "#9b7d6f", "#d75f7a",
+  "#2f8f4e", "#0891b2", "#c96410", "#3f6f9f", "#b58b2a", "#6f58c9", "#c84b7a", "#4f8f8b"
+];
+const projectStructuredFactStatuses = new Set(["stated", "confirmed", "sourced", "unknown", "rejected"]);
 const collapsedSettingsCardIDs = new Set();
 const sharedWorkspaceStateKeys = [
   "localProjects",
@@ -426,6 +451,8 @@ const defaultReaderSettings = {
 
 let chapters = [];
 let codeTrustProfiles = [];
+let codeTrustProfilesStatus = "loading";
+let startupCatalogPromise = null;
 let workspaceRegistry = null;
 let activeWorkspaceID = "";
 let suppressReaderScrollRestore = false;
@@ -438,7 +465,21 @@ const codeQuestionDeniedProjectIDs = new Set();
 const codeQuestionIndexArchiveModeProjectIDs = new Set();
 let codeQuestionAccountGeneration = 0;
 let codeQuestionUnauthorizedAccountUserID = "";
-let state = loadWorkspaceState();
+let accountRuntimeGeneration = 0;
+let accountLinkWriteFence = null;
+const sessionAccountLinkRecoveries = new Map();
+let notebookPendingDraftCount = 0;
+let notebookDraftSyncPromise = null;
+let workspaceMigrationError = null;
+let workspaceRestoreError = null;
+const initialPersistedAccount = loadPersistedAccount();
+try {
+  migrateLegacyPrivateWorkspace(localStorage, initialPersistedAccount?.userID || "");
+} catch (error) {
+  workspaceMigrationError = error;
+}
+configurePrivateWorkspace(initialPersistedAccount);
+let state = loadWorkspaceState(initialPersistedAccount);
 loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
 purgeLegacyCodeQuestionWorkspaceSnapshots();
 retireProjectWorkboardSyncState();
@@ -527,7 +568,15 @@ let firstUseWelcomeActive = false;
 
 applyReaderSettings();
 
-function loadWorkspaceState() {
+function configurePrivateWorkspace(account) {
+  ({ baseWorkspaceKey, workspaceRegistryKey, workspaceStateKeyPrefix, tabWorkspaceKey,
+    activeWorkspaceSessionKey, workspaceKey } = privateWorkspaceKeys(
+    account?.userID || "", detachedProjectWindow ? detachedProjectSessionID : ""
+  ));
+}
+
+function loadWorkspaceState(accountOverride) {
+  workspaceRestoreError = null;
   try {
     const sharedState = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
     const tabState = !detachedProjectWindow
@@ -556,12 +605,7 @@ function loadWorkspaceState() {
       const requestedWorkspaceID = sessionStorage.getItem(activeWorkspaceSessionKey) || storedRegistry?.activeWorkspaceID || "";
       workspaceRegistry = normalizeWorkspaceRegistry(storedRegistry, { activeWorkspaceID: requestedWorkspaceID });
       activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
-      let storedLayout = null;
-      try {
-        storedLayout = JSON.parse(localStorage.getItem(`${workspaceStateKeyPrefix}${activeWorkspaceID}`) || "null");
-      } catch {
-        storedLayout = null;
-      }
+      let storedLayout = JSON.parse(localStorage.getItem(`${workspaceStateKeyPrefix}${activeWorkspaceID}`) || "null");
       if (!storedRegistry) {
         storedLayout = workspaceLayoutHasVisiblePanes(legacySaved)
           ? captureWorkspaceLayout(legacySaved)
@@ -638,7 +682,7 @@ function loadWorkspaceState() {
         analysis: Boolean(saved.utilities?.analysis || (saved.utilityInstances || []).some((item) => item?.key === "analysis")),
         settings: Boolean(saved.utilities?.settings)
       },
-      account: loadPersistedAccount(saved.account),
+      account: accountOverride === undefined ? loadPersistedAccount(saved.account) : accountOverride,
       browserCredentialID: typeof saved.browserCredentialID === "string" ? saved.browserCredentialID : "",
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
       paneOrder: Array.isArray(saved.paneOrder) ? saved.paneOrder.filter((id) => typeof id === "string") : [],
@@ -698,17 +742,16 @@ function loadWorkspaceState() {
       codeQuestionOutbox: [],
       codeQuestionConflicts: []
     };
-  } catch {
+  } catch (error) {
+    workspaceRestoreError = error;
+    console.error("Saved workspace restoration failed; stored data has been preserved.", {
+      name: error?.name || "Error",
+      // Omit the error message: a JSON parser can include private stored text in it.
+      stack: String(error?.stack || "").split("\n").slice(1, 6).join("\n")
+    });
     if (!detachedProjectWindow) {
       workspaceRegistry = normalizeWorkspaceRegistry(null);
       activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
-      try {
-        localStorage.setItem(workspaceRegistryKey, JSON.stringify(workspaceRegistry));
-        localStorage.setItem(`${workspaceStateKeyPrefix}${activeWorkspaceID}`, JSON.stringify(emptyWorkspaceLayout()));
-        sessionStorage.setItem(activeWorkspaceSessionKey, activeWorkspaceID);
-      } catch {
-        // The in-memory blank workspace remains usable if storage is unavailable.
-      }
     }
     return {
       readers: [],
@@ -739,7 +782,7 @@ function loadWorkspaceState() {
       localSavedSectionIDs: [],
       utilityInstances: [],
       utilities: { projects: false, archive: false, search: false, saved: false, analysis: false, settings: false },
-      account: null,
+      account: accountOverride === undefined ? loadPersistedAccount() : accountOverride,
       browserCredentialID: "",
       paneWeights: {},
       paneOrder: [],
@@ -988,7 +1031,7 @@ function activeWorkspaceRecord() {
 }
 
 function persistWorkspaceRegistry() {
-  if (detachedProjectWindow || !workspaceRegistry) return;
+  if (workspaceRestoreError || detachedProjectWindow || !workspaceRegistry) return;
   workspaceRegistry = normalizeWorkspaceRegistry(workspaceRegistry, { activeWorkspaceID });
   activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
   localStorage.setItem(workspaceRegistryKey, JSON.stringify(workspaceRegistry));
@@ -997,17 +1040,24 @@ function persistWorkspaceRegistry() {
 
 function loadWorkspaceSnapshot(workspaceID) {
   try {
+    const stored = JSON.parse(localStorage.getItem(workspaceSnapshotKey(workspaceID)) || "null");
+    if (stored !== null && (typeof stored !== "object" || Array.isArray(stored))) throw new TypeError("Invalid workspace layout");
     return normalizeWorkspaceLayout(
       workspaceLayoutWithoutCodeQuestionData(
-        JSON.parse(localStorage.getItem(workspaceSnapshotKey(workspaceID)) || "null") || emptyWorkspaceLayout()
+        stored || emptyWorkspaceLayout()
       )
     );
-  } catch {
-    return emptyWorkspaceLayout();
+  } catch (error) {
+    console.error("Saved workspace snapshot could not be opened; stored data has been preserved.", {
+      name: error?.name || "Error", stack: String(error?.stack || "").split("\n").slice(1, 6).join("\n")
+    });
+    return null;
   }
 }
 
 function saveWorkspaceState() {
+  // A temporary empty fallback must never replace a workspace that failed to load.
+  if (workspaceRestoreError) return;
   if (!detachedProjectWindow) {
     persistCodeQuestionAccountState();
     const layout = captureWorkspaceLayout(state, {
@@ -1180,6 +1230,7 @@ function applyStoredWorkspaceLayout(layout) {
 }
 
 async function switchWorkspace(workspaceID, options = {}) {
+  const requestIdentity = captureAccountRequest();
   const target = workspaceRegistry?.workspaces?.find((workspace) => workspace.id === workspaceID);
   if (!target) return false;
   if (workspaceID === activeWorkspaceID) {
@@ -1191,10 +1242,16 @@ async function switchWorkspace(workspaceID, options = {}) {
     renderWorkspaceTabs();
     return false;
   }
+  if (!isCurrentAccountRequest(requestIdentity)) return false;
+  const nextLayout = loadWorkspaceSnapshot(workspaceID);
+  if (!nextLayout) {
+    presentWorkspaceIssue("This saved workspace could not be opened. Its original data is preserved, and your current workspace is still open. Reload to retry; avoid clearing site data.");
+    return false;
+  }
   saveWorkspaceState();
   activeWorkspaceID = workspaceID;
   workspaceRegistry = { ...workspaceRegistry, activeWorkspaceID };
-  applyStoredWorkspaceLayout(loadWorkspaceSnapshot(workspaceID));
+  applyStoredWorkspaceLayout(nextLayout);
   persistWorkspaceRegistry();
   renderWorkspaceTransitionState(target.name);
   if (options.focus !== false) focusActiveWorkspaceTab();
@@ -1256,12 +1313,19 @@ function beginWorkspaceRename(workspaceID) {
 }
 
 async function duplicateNamedWorkspace(workspaceID) {
+  const requestIdentity = captureAccountRequest();
   if (!(await confirmWorkspaceTransition())) return;
+  if (!isCurrentAccountRequest(requestIdentity)) return;
   if (workspaceID === activeWorkspaceID) saveWorkspaceState();
+  const sourceLayout = loadWorkspaceSnapshot(workspaceID);
+  if (!sourceLayout) {
+    presentWorkspaceIssue("This saved workspace could not be duplicated. Its original data is preserved. Reload to retry; avoid clearing site data.");
+    return;
+  }
   const duplication = duplicateWorkspace(
     workspaceRegistry,
     workspaceID,
-    loadWorkspaceSnapshot(workspaceID)
+    sourceLayout
   );
   if (!duplication) return;
   workspaceRegistry = duplication.registry;
@@ -1282,6 +1346,7 @@ async function duplicateNamedWorkspace(workspaceID) {
 }
 
 async function removeNamedWorkspace(workspaceID) {
+  const requestIdentity = captureAccountRequest();
   const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
   if (!workspace) return;
   const confirmed = await confirmWebWarning(
@@ -1290,10 +1355,19 @@ async function removeNamedWorkspace(workspaceID) {
     { confirmLabel: "Delete Workspace" }
   );
   if (!confirmed) return;
+  if (!isCurrentAccountRequest(requestIdentity)) return;
   const deletingActiveWorkspace = workspaceID === activeWorkspaceID;
   if (deletingActiveWorkspace && !(await confirmWorkspaceTransition())) return;
-  if (deletingActiveWorkspace) saveWorkspaceState();
+  if (!isCurrentAccountRequest(requestIdentity)) return;
   const removal = deleteWorkspace(workspaceRegistry, workspaceID);
+  const nextLayout = deletingActiveWorkspace
+    ? removal.replacementLayout || loadWorkspaceSnapshot(removal.registry.activeWorkspaceID)
+    : null;
+  if (deletingActiveWorkspace && !nextLayout) {
+    presentWorkspaceIssue("The replacement workspace could not be opened, so this workspace was kept. Both saved layouts are preserved. Reload to retry; avoid clearing site data.");
+    return;
+  }
+  if (deletingActiveWorkspace) saveWorkspaceState();
   workspaceRegistry = removal.registry;
   if (removal.deletedWorkspaceID) {
     localStorage.removeItem(workspaceSnapshotKey(removal.deletedWorkspaceID));
@@ -1304,7 +1378,6 @@ async function removeNamedWorkspace(workspaceID) {
     return;
   }
   activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
-  const nextLayout = removal.replacementLayout || loadWorkspaceSnapshot(activeWorkspaceID);
   if (removal.replacementLayout) {
     localStorage.setItem(
       workspaceSnapshotKey(activeWorkspaceID),
@@ -4035,10 +4108,33 @@ function codeTrustCurrencyLabel(profile) {
 function renderReaderTrust(panel, reader) {
   const trust = panel.querySelector(".reader-trust");
   const profile = codeTrustProfile(reader.codePrefix, reader.codeVersion);
-  if (!trust || !profile) {
-    if (trust) trust.hidden = true;
+  if (!trust) return;
+  if (!profile) {
+    const metadataUnavailable = codeTrustProfilesStatus !== "loading";
+    trust.hidden = false;
+    trust.dataset.statusKind = metadataUnavailable ? "unavailable" : "loading";
+    trust.querySelector(".reader-trust-status").textContent = metadataUnavailable
+      ? "Source metadata unavailable" : "Source metadata loading";
+    trust.querySelector(".reader-trust-currency").textContent = "";
+    trust.querySelector(".reader-trust-edition").textContent = codeDisplayLabel(reader.codePrefix, reader.codeVersion);
+    trust.querySelector(".reader-trust-authority").textContent = "Source details have not loaded.";
+    trust.querySelector(".reader-trust-basis-row").hidden = true;
+    trust.querySelector(".reader-trust-verified").textContent = "";
+    trust.querySelector(".reader-trust-boundary").textContent = "Verify this edition against its official source before relying on it.";
+    trust.querySelector(".reader-trust-source").hidden = true;
+    let retry = trust.querySelector(".reader-trust-retry");
+    if (!retry) {
+      retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "reader-trust-retry";
+      retry.addEventListener("click", () => { void loadStartupCatalogs(); });
+      trust.append(retry);
+    }
+    retry.textContent = metadataUnavailable ? "Retry source details" : "Loading source details…";
+    retry.disabled = !metadataUnavailable;
     return;
   }
+  trust.querySelector(".reader-trust-retry")?.remove();
   trust.hidden = false;
   trust.dataset.statusKind = profile.statusKind;
   trust.querySelector(".reader-trust-status").textContent = profile.statusLabel;
@@ -4055,6 +4151,7 @@ function renderReaderTrust(panel, reader) {
   ].filter(Boolean).join(" · ");
   trust.querySelector(".reader-trust-boundary").textContent = profile.boundary;
   const source = trust.querySelector(".reader-trust-source");
+  source.hidden = false;
   source.href = profile.sourceURL;
   source.textContent = `Open ${profile.sourceLabel}`;
   if (trust.dataset.interactionBound !== "true") {
@@ -4315,6 +4412,9 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
     expanded = Boolean(nextExpanded);
     window.clearTimeout(hideTimer);
     updateControls(expanded);
+    if (!expanded && body.contains(document.activeElement)) toggles[0]?.focus({ preventScroll: true });
+    body.inert = !expanded;
+    body.setAttribute("aria-hidden", String(!expanded));
     if (expanded) {
       body.hidden = false;
       if (options.instant) {
@@ -4588,6 +4688,10 @@ async function fetchChapterBodyWindow(chapterID, start, limit) {
 }
 
 async function postJSON(path, body, options = {}) {
+  if (!["/account/sign-in", "/account/apple/start"].includes(path)) requirePrivateWorkspaceWritable();
+  const identity = captureAccountRequest();
+  if (body?.auth?.accountUserID && (body.auth.accountUserID !== identity.userID ||
+      options.token !== identity.sessionToken)) throw accountContextChangedError();
   const headers = { "Content-Type": "application/json" };
   if (options.token) {
     headers.Authorization = `Bearer ${options.token}`;
@@ -4599,13 +4703,39 @@ async function postJSON(path, body, options = {}) {
       headers,
       body: JSON.stringify(body)
     });
+    requireCurrentAccountRequest(identity);
     serverReachable = response.status < 500;
   } catch (error) {
+    requireCurrentAccountRequest(identity);
     serverReachable = false;
     updateConnectionStatus();
     throw error;
   }
   updateConnectionStatus();
+  const payload = await response.json().catch(() => ({}));
+  requireCurrentAccountRequest(identity);
+  if (!response.ok) {
+    const error = new Error(payload.error || `Request failed: ${response.status}`);
+    error.status = response.status;
+    error.payload = payload;
+    throw error;
+  }
+  return payload;
+}
+
+async function deleteCapturedAccount(account, identity) {
+  requireCurrentAccountRequest(identity);
+  if (!account?.userID || account.userID !== identity.userID || account.sessionToken !== identity.sessionToken) {
+    throw accountContextChangedError();
+  }
+  // Deletion can finish after this browser changes accounts. Retain its receipt
+  // so cleanup can purge only the captured owner; never update current-session
+  // reachability, authentication, or workspace state from this response.
+  const response = await fetch("/account/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${account.sessionToken}` },
+    body: JSON.stringify({ auth: { accountUserID: account.userID }, confirmation: "DELETE" })
+  });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(payload.error || `Request failed: ${response.status}`);
@@ -4614,6 +4744,32 @@ async function postJSON(path, body, options = {}) {
     throw error;
   }
   return payload;
+}
+
+async function clearDeletedAccountBrowserData(account, identity) {
+  const failures = [];
+  try { await deleteOfflineAccountData(account.userID); }
+  catch (error) { failures.push(`Private offline data: ${error.message || "could not be removed"}`); }
+  try {
+    clearResearchRequestRecoveries(localStorage, { accountUserID: account.userID });
+    removeCodeQuestionAccountState(localStorage, account.userID);
+    localStorage.removeItem(foregroundSyncLeaseKey(account.userID));
+    for (const key of Object.keys(localStorage)) {
+      const disclosureKey = key.startsWith(researchDisclosureAcknowledgmentKeyPrefix)
+        ? key.slice(researchDisclosureAcknowledgmentKeyPrefix.length) : "";
+      const owner = disclosureKey.includes(":") ? disclosureKey.slice(disclosureKey.indexOf(":") + 1) : "";
+      if (owner === account.userID) {
+        localStorage.removeItem(key);
+        researchDisclosureAcknowledgedAccounts.delete(key);
+      }
+    }
+    if (activeAccount()?.userID === account.userID) replaceActiveAccount(null, { persistPrevious: false });
+    removePrivateWorkspace(localStorage, account.userID);
+    removePrivateWorkspace(sessionStorage, account.userID);
+  } catch (error) {
+    failures.push(`Browser storage: ${error.message || "could not be cleared"}`);
+  }
+  return failures;
 }
 
 async function loadCurrentPolicyConfiguration() {
@@ -4819,6 +4975,7 @@ function confirmWebWarning(title, message, options = {}) {
 }
 
 function showWebNotice(title, message, options = {}) {
+  if (message === accountContextChangedError().message) return Promise.resolve(false);
   return openWebWarning({ title, message, ...options, confirmLabel: options.confirmLabel || "OK", cancellable: false });
 }
 
@@ -5587,7 +5744,7 @@ function populateCodeSelect(panel, reader) {
     codes.forEach((code) => {
       const option = document.createElement("option");
       option.value = codeOptionValue(code);
-      option.textContent = code.label;
+      option.textContent = readerCodeOptionLabel(code);
       group.append(option);
     });
     codeSelect.append(group);
@@ -5595,8 +5752,16 @@ function populateCodeSelect(panel, reader) {
   const selectedCode = codeOptionFor(reader.codePrefix, reader.codeVersion);
   codeSelect.value = codeOptionValue(selectedCode);
   codeSelect.setAttribute("aria-label", "Code section");
-  codeSelect.title = selectedCode.label;
+  codeSelect.title = readerCodeOptionLabel(selectedCode);
   resizeCodeSelect(codeSelect);
+}
+
+function readerCodeOptionLabel(code) {
+  if (["BC", "AC", "PC", "MC", "FGC"].includes(code.prefix) && codeOptionVersion(code) === defaultSyncCodeVersion && !/\b2022\b/.test(code.label)) {
+    return `${code.label} (2022)`;
+  }
+  if (code.prefix === "FC" && code.label === "Fire Code") return "Fire Code (2022)";
+  return code.label;
 }
 
 function readerCodeSelectionKey(reader) {
@@ -6191,11 +6356,144 @@ function activeAccount() {
   return { userID, sessionToken, authProvider };
 }
 
+function captureAccountRequest() {
+  return accountRequestIdentity(activeAccount(), accountRuntimeGeneration);
+}
+
+function isCurrentAccountRequest(identity) {
+  return accountRequestIsCurrent(identity, activeAccount(), accountRuntimeGeneration);
+}
+
+function requireCurrentAccountRequest(identity) {
+  if (!isCurrentAccountRequest(identity)) throw accountContextChangedError();
+}
+
+function requirePrivateWorkspaceWritable() {
+  if (!accountLinkWriteFence || !isCurrentAccountRequest(accountLinkWriteFence.identity)) return;
+  const error = new Error("Account connection is in progress. Wait for it to finish before editing private work.");
+  error.code = "ACCOUNT_LINK_IN_PROGRESS";
+  throw error;
+}
+
+function releaseAccountLinkWriteFence(fence = accountLinkWriteFence) {
+  if (!fence || accountLinkWriteFence !== fence) return;
+  accountLinkWriteFence = null;
+  track.inert = fence.previousInert;
+}
+
+async function withAccountLinkWriteFence(identity, operation) {
+  requireCurrentAccountRequest(identity);
+  requirePrivateWorkspaceWritable();
+  const fence = { identity, previousInert: Boolean(track.inert) };
+  accountLinkWriteFence = fence;
+  track.inert = true;
+  try { return await operation(); }
+  finally { releaseAccountLinkWriteFence(fence); }
+}
+
+async function requireAccountLinkWorkSaved(account, identity) {
+  requireCurrentAccountRequest(identity);
+  try {
+    if (workspaceRestoreError) throw new Error("The saved workspace needs recovery before accounts can be connected.");
+    await Promise.all(Array.from(notebookMounts.values()).map((mount) => mount.persistDraft?.()));
+    requireCurrentAccountRequest(identity);
+    // A quota failure here must stop before the server can retire the source ID.
+    saveWorkspaceState();
+    persistCodeQuestionAccountState(account.userID);
+    const [drafts, images] = await Promise.all([
+      pendingNotebookDrafts(account.userID), pendingNotebookImages(account.userID)
+    ]);
+    requireCurrentAccountRequest(identity);
+    const ownedCount = (entries) => (entries || []).filter((entry) => entry.accountUserID === account.userID).length;
+    const counts = {
+      notebookDrafts: drafts.length, notebookImages: images.length,
+      queuedChanges: ownedCount(state.syncOutbox) + ownedCount(state.codeQuestionOutbox),
+      conflicts: ownedCount(state.syncConflicts) + ownedCount(state.codeQuestionConflicts),
+      localChanges: [state.localProjects, state.localSavedItems, state.localProjectSections, state.localAnnotations]
+        .reduce((count, entries) => count + (entries || []).length, 0),
+      activeResearch: activeResearchProgress.size,
+      unsavedReports: Array.from(reportDraftMounts.values()).filter((mount) => mount.hasUnsavedChanges?.()).length
+    };
+    if (Object.values(counts).some((count) => count > 0)) {
+      const details = [
+        counts.notebookDrafts ? `${counts.notebookDrafts} Notebook drafts` : "",
+        counts.notebookImages ? `${counts.notebookImages} unsynced images` : "",
+        counts.queuedChanges ? `${counts.queuedChanges} queued changes` : "",
+        counts.conflicts ? `${counts.conflicts} conflicts` : "",
+        counts.localChanges ? `${counts.localChanges} local edits` : "",
+        counts.activeResearch ? `${counts.activeResearch} active Research requests` : "",
+        counts.unsavedReports ? `${counts.unsavedReports} unsaved Reports` : ""
+      ].filter(Boolean).join(", ");
+      const error = new Error(`Finish syncing or recover your current account's work before connecting another sign-in: ${details}. Open Sync status and Notebook to save or review pending work. Your source work remains on this device.`);
+      error.code = "ACCOUNT_LINK_PENDING_WORK";
+      error.counts = counts;
+      throw error;
+    }
+  } catch (error) {
+    requireCurrentAccountRequest(identity);
+    if (error.code === "ACCOUNT_LINK_PENDING_WORK") throw error;
+    const failure = new Error(`Account connection paused because local work could not be checkpointed or checked. Resolve device storage or draft recovery and retry. ${error.message || "Local storage is unavailable."}`);
+    failure.code = "ACCOUNT_LINK_STORAGE_UNAVAILABLE";
+    failure.cause = error;
+    throw failure;
+  }
+}
+
+function replaceActiveAccount(nextAccount, options = {}) {
+  releaseAccountLinkWriteFence();
+  const previous = activeAccount();
+  if (options.persistPrevious !== false) saveWorkspaceState();
+  accountRuntimeGeneration += 1;
+  workspaceRenderGeneration += 1;
+  projectStudioTransitionGeneration += 1;
+  stopForegroundSyncLoop();
+  clearResearchAccountRuntime();
+  unloadCodeQuestionAccountState();
+  activeWebWarningClose?.(false);
+  closeActiveCustomSelect();
+  closeWorkspaceContextMenu();
+  closeMobileMoreSheet({ restoreFocus: false });
+  document.querySelectorAll(".command-palette-backdrop, .project-sheet-overlay").forEach((node) => node.remove());
+  notebookMounts.forEach((mount) => mount.dispose());
+  notebookMounts.clear();
+  reportDraftMounts.forEach((mount) => mount.dispose());
+  reportDraftMounts.clear();
+  workboardMounts.forEach((mount) => mount.dispose?.());
+  workboardMounts.clear();
+  [legacyHydrationByProject, coordinationComposerDraftByProject, pendingNotebookCardByProject,
+    pendingReportDraftByProject, reportDraftFocusResultByProject, notebookCardMenuOpenByProject,
+    projectArtifactRevisions, accountArtifactRevisions, projectSelectionControllers].forEach((map) => map.clear());
+  annotationPushTimers.forEach((timer) => clearTimeout(timer));
+  annotationPushTimers.clear();
+  clearTimeout(continuityPushTimer);
+  continuityPushTimer = null;
+  syncLoadPromise = null;
+  syncFlushPromise = null;
+  foregroundSyncPromise = null;
+  notebookDraftSyncPromise = null;
+  notebookPendingDraftCount = 0;
+  organizationWorkspace = null;
+  organizationLoadPromise = null;
+  projectStudioFolderReconcilePromise = null;
+  projectTransitionHubEntry = null;
+  projectArtifactCheckpointPromise = null;
+  projectArtifactConsumerRefreshQueue = Promise.resolve();
+  pendingResearchIntentResumePromise = null;
+  syncedContent = null;
+  persistAccountSession(nextAccount);
+  configurePrivateWorkspace(nextAccount);
+  state = loadWorkspaceState(nextAccount);
+  loadCodeQuestionAccountStateIntoWorkspace(nextAccount?.userID || "");
+  clear(track);
+  saveWorkspaceState();
+  return previous;
+}
+
 function updateConnectionStatus() {
   if (!connectionStatus) return;
   const account = activeAccount();
   const pending = account
-    ? (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID).length
+    ? (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID).length + notebookPendingDraftCount
     : 0;
   const conflicts = account
     ? (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID).length
@@ -6264,10 +6562,7 @@ function isSessionAuthenticationError(error) {
 
 function clearExpiredAccountSession() {
   if (!activeAccount()) return;
-  stopForegroundSyncLoop();
-  clearResearchAccountRuntime();
-  state.account = null;
-  persistAccountSession(null);
+  replaceActiveAccount(null);
   syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
   clearTimeout(syncRetryTimer);
   syncRetryTimer = null;
@@ -6277,7 +6572,7 @@ function clearExpiredAccountSession() {
 }
 
 function currentEntitlement() {
-  return state.account?.entitlement || syncedContent?.entitlement || null;
+  return state.account?.entitlement || (syncedContent?.userID === activeAccount()?.userID ? syncedContent?.entitlement : null) || null;
 }
 
 function currentPlan() {
@@ -6413,6 +6708,8 @@ function clearResearchAccountRuntime() {
     progress.controller?.abort();
   });
   activeResearchProgress.clear();
+  supplementalResearchConversationIDs.length = 0;
+  supplementalResearchConversations.clear();
   clearActiveResearchConversation();
   researchConversationList = [];
   researchUsage = null;
@@ -6996,6 +7293,7 @@ function postCodeQuestion(path, values = {}) {
 }
 
 function enqueueCodeQuestionOfflineCommand(path, values = {}, options = {}) {
+  requirePrivateWorkspaceWritable();
   const account = activeAccount();
   if (!account) {
     const error = new Error("Sign in before saving this question offline.");
@@ -7715,27 +8013,39 @@ function loadClerkScript(config) {
 }
 
 async function completeClerkPermitextSignIn(config) {
-  const clerk = await loadClerkScript(config);
-  if (!clerk.isSignedIn || !clerk.session || !clerk.user?.id) return null;
-  const sessionToken = await clerk.session.getToken();
-  if (!sessionToken) throw new Error("Secure sign-in did not return a session token.");
+  const requestIdentity = captureAccountRequest();
   const existingAccount = activeAccount();
-  const targetUserID = `clerk:${clerk.user.id}`;
+  const clerk = await loadClerkScript(config);
+  requireCurrentAccountRequest(requestIdentity);
+  if (!clerk.isSignedIn || !clerk.session || !clerk.user?.id) return null;
+  const clerkSession = clerk.session;
+  const clerkUser = clerk.user;
+  const sessionToken = await clerkSession.getToken();
+  requireCurrentAccountRequest(requestIdentity);
+  if (clerk.session !== clerkSession || clerk.user?.id !== clerkUser.id) throw accountContextChangedError();
+  if (!sessionToken) throw new Error("Secure sign-in did not return a session token.");
+  const targetUserID = `clerk:${clerkUser.id}`;
   const linkFrom = existingAccount && existingAccount.userID !== targetUserID
     ? { accountUserID: existingAccount.userID, sessionToken: existingAccount.sessionToken }
     : undefined;
-  const displayName = clerk.user.fullName || clerk.user.firstName || "Permitext account";
-  const payload = await postJSON("/account/sign-in", {
-    credential: {
-      provider: "clerk",
-      providerUserID: clerk.user.id,
-      sessionToken,
-      displayName,
-      signedInAt: new Date().toISOString()
-    },
-    linkFrom
-  }, { token: existingAccount?.sessionToken });
-  return storeSignedInAccount(payload, displayName);
+  const displayName = clerkUser.fullName || clerkUser.firstName || "Permitext account";
+  const completeSignIn = async () => {
+    if (linkFrom) await requireAccountLinkWorkSaved(existingAccount, requestIdentity);
+    requireCurrentAccountRequest(requestIdentity);
+    const payload = await postJSON("/account/sign-in", {
+      credential: {
+        provider: "clerk",
+        providerUserID: clerkUser.id,
+        sessionToken,
+        displayName,
+        signedInAt: new Date().toISOString()
+      },
+      linkFrom
+    }, { token: existingAccount?.sessionToken });
+    requireCurrentAccountRequest(requestIdentity);
+    return storeSignedInAccount(payload, displayName);
+  };
+  return linkFrom ? withAccountLinkWriteFence(requestIdentity, completeSignIn) : completeSignIn();
 }
 
 async function signInWithClerkWeb(config) {
@@ -7836,14 +8146,19 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   }
   codeQuestionUnauthorizedAccountUserID = "";
   const previousUserID = state.account?.userID;
-  if (previousUserID && previousUserID !== account.appUserID) stopForegroundSyncLoop();
   if (previousUserID) persistCodeQuestionAccountState(previousUserID);
-  if (previousUserID !== account.appUserID) clearResearchAccountRuntime();
-  if (previousUserID && payload.mergedAccount?.sourceUserID === previousUserID) {
-    retargetSyncOutbox(previousUserID, account.appUserID);
-    migrateCodeQuestionAccountState(localStorage, previousUserID, account.appUserID);
+  if (payload.mergedAccount) {
+    const recovery = confirmedAccountLinkRecovery(payload.mergedAccount, previousUserID, account.appUserID);
+    sessionAccountLinkRecoveries.set(`${account.appUserID}:${previousUserID}`, recovery);
+    try {
+      recordConfirmedAccountLinkRecovery(localStorage, payload.mergedAccount, previousUserID, account.appUserID);
+    } catch (error) {
+      // The server has already merged these identities. Keep its exact receipt
+      // available for immediate export even if this browser cannot write it.
+      recovery.storageWarning = error.message || "The recovery index could not be saved. Export retained work before closing this page.";
+    }
   }
-  state.account = {
+  const nextAccount = {
     userID: account.appUserID,
     sessionToken: account.backendSessionToken,
     authProvider: account.authProvider || "web",
@@ -7851,28 +8166,110 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
     publicUsername: account.publicUsername || null,
     entitlement: payload.entitlement || null
   };
-  loadCodeQuestionAccountStateIntoWorkspace(account.appUserID);
-  persistAccountSession();
-  syncedContent = null;
+  replaceActiveAccount(nextAccount);
+  // Source namespaces and journals stay intact. Only synchronized server work
+  // is loaded into the destination; retained local work is export-only.
   saveWorkspaceState();
+  const identity = captureAccountRequest();
+  void refreshNotebookPendingStatus(identity).catch(() => {});
   void reconcileOfflineFeatureAccess(hasCapability("offline-access")).catch(() => {});
   loadSyncedContent({ force: true })
-    .then(() => flushSyncOutbox({ refresh: true }))
-    .then(() => flushCodeQuestionOutbox())
-    .then(() => renderWorkspace())
-    .catch(() => renderWorkspace());
+    .then(() => { requireCurrentAccountRequest(identity); return flushSyncOutbox({ refresh: true }); })
+    .then(() => { requireCurrentAccountRequest(identity); return flushCodeQuestionOutbox(); })
+    .then(() => isCurrentAccountRequest(identity) && renderWorkspace())
+    .catch(() => isCurrentAccountRequest(identity) && renderWorkspace());
   return state.account;
 }
 
+function linkedAccountRecoverySources(targetUserID = activeAccount()?.userID || "") {
+  if (!targetUserID || targetUserID !== activeAccount()?.userID) return [];
+  let saved = [];
+  try { saved = accountLinkRecoverySources(localStorage, targetUserID); } catch { /* Session receipts still permit export. */ }
+  const entries = [...saved, ...sessionAccountLinkRecoveries.values()]
+    .filter((entry) => entry.targetUserID === targetUserID && entry.access === "export-only");
+  return [...new Map(entries.map((entry) => [entry.sourceUserID, entry])).values()];
+}
+
+async function linkedAccountRecoveryBundle(sourceUserID, identity = captureAccountRequest()) {
+  return accountLocalRecoveryBundle(sourceUserID, identity);
+}
+
+async function accountLocalRecoveryBundle(sourceUserID, identity = captureAccountRequest()) {
+  requireCurrentAccountRequest(identity);
+  if (!identity.userID || !sourceUserID) throw new Error("Sign in to the account that owns this retained work.");
+  const receipt = linkedAccountRecoverySources(identity.userID).find((entry) => entry.sourceUserID === sourceUserID);
+  if (sourceUserID !== identity.userID && !receipt) throw new Error("This account has no confirmed link to that retained source.");
+  const offline = await offlineAccountRecoverySnapshot(sourceUserID);
+  requireCurrentAccountRequest(identity);
+  const images = await Promise.all(offline.images.map(async ({ blob, ...record }) => ({
+    ...record, ...(blob ? { dataURL: await blobDataURL(blob) } : {})
+  })));
+  requireCurrentAccountRequest(identity);
+  return {
+    format: "permitext-account-local-recovery", version: 1, access: "export-only",
+    sourceUserID, confirmedDestinationUserID: identity.userID, exportedAt: new Date().toISOString(),
+    instructions: "Review this retained source work before copying any content into the destination. This file does not import or replay changes.",
+    workspaces: { local: privateWorkspaceRecoverySnapshot(localStorage, sourceUserID),
+      session: privateWorkspaceRecoverySnapshot(sessionStorage, sourceUserID) },
+    codeQuestions: readCodeQuestionAccountState(localStorage, sourceUserID),
+    offline: { ...offline, images }
+  };
+}
+
+function appendLinkedAccountRecoveryControls(container, identity = captureAccountRequest()) {
+  const sources = linkedAccountRecoverySources(identity.userID);
+  if (!sources.length) return;
+  const region = document.createElement("div");
+  const heading = document.createElement("p");
+  heading.className = "section-label";
+  heading.textContent = "Retained work from connected accounts";
+  const copy = document.createElement("p");
+  copy.className = "settings-help-copy";
+  copy.textContent = "Source-account drafts, images and workspace changes remain on this device. Export them for review; they are not automatically copied or synchronized into this account. Unattributed legacy work remains isolated.";
+  region.append(heading, copy);
+  sources.forEach((source, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "settings-secondary-button";
+    button.textContent = sources.length === 1 ? "Export retained source work" : `Export retained source ${index + 1}`;
+    const status = document.createElement("p");
+    status.setAttribute("role", "status");
+    if (source.storageWarning) status.textContent = "The recovery index could not be saved. Export this source work before closing this page.";
+    button.addEventListener("click", async () => {
+      if (!isCurrentAccountRequest(identity)) return;
+      button.disabled = true;
+      try {
+        const bundle = await linkedAccountRecoveryBundle(source.sourceUserID, identity);
+        requireCurrentAccountRequest(identity);
+        downloadCodeMemoBlob(new Blob([JSON.stringify(bundle, null, 2)], { type: "application/json" }), "permitext-linked-account-recovery.json");
+        status.textContent = "Recovery file downloaded. Source work remains on this device.";
+      } catch (error) {
+        if (isCurrentAccountRequest(identity)) status.textContent = `Export could not finish: ${error.message}`;
+      } finally {
+        if (isCurrentAccountRequest(identity)) button.disabled = false;
+      }
+    });
+    region.append(button, status);
+  });
+  container?.append(region);
+}
+
 async function signInWithAppleWeb(config) {
+  const requestIdentity = captureAccountRequest();
   const existingAccount = activeAccount();
   const linkFrom = existingAccount && state.account?.authProvider === "web"
     ? { accountUserID: existingAccount.userID, sessionToken: existingAccount.sessionToken }
     : undefined;
-  const payload = await postJSON("/account/apple/start", {
-    linkFrom,
-    successURL: `${window.location.pathname}${window.location.search}`
-  }, { token: existingAccount?.sessionToken });
+  const startSignIn = async () => {
+    if (linkFrom) await requireAccountLinkWorkSaved(existingAccount, requestIdentity);
+    requireCurrentAccountRequest(requestIdentity);
+    return postJSON("/account/apple/start", {
+      linkFrom,
+      successURL: `${window.location.pathname}${window.location.search}`
+    }, { token: existingAccount?.sessionToken });
+  };
+  const payload = linkFrom ? await withAccountLinkWriteFence(requestIdentity, startSignIn) : await startSignIn();
+  requireCurrentAccountRequest(requestIdentity);
   if (!payload.authorizationURL) {
     throw new Error("Apple sign-in did not return an authorization URL.");
   }
@@ -7893,11 +8290,14 @@ async function signInWithBrowserFallback() {
 }
 
 async function signInCurrentBrowser() {
+  const requestIdentity = captureAccountRequest();
   const clerkConfig = await clerkWebSignInConfig().catch(() => null);
+  requireCurrentAccountRequest(requestIdentity);
   if (clerkConfig?.available) {
     return signInWithClerkWeb(clerkConfig);
   }
   const config = await appleWebSignInConfig();
+  requireCurrentAccountRequest(requestIdentity);
   if (config.available) {
     return signInWithAppleWeb(config);
   }
@@ -7948,6 +8348,7 @@ function syncedMutationSupersedesConflict(entry) {
 }
 
 async function convergeServerNewerSyncConflicts(account) {
+  const requestIdentity = captureAccountRequest();
   const convergent = (state.syncConflicts || []).filter((entry) =>
     entry.accountUserID === account.userID && syncedMutationSupersedesConflict(entry)
   );
@@ -7955,6 +8356,7 @@ async function convergeServerNewerSyncConflicts(account) {
 
   const resolvedIDs = new Set();
   for (const entry of convergent) {
+    requireCurrentAccountRequest(requestIdentity);
     const { kind, record } = mutationKindAndRecord(entry.mutation);
     try {
       if (kind === "workboard") {
@@ -7968,6 +8370,7 @@ async function convergeServerNewerSyncConflicts(account) {
       // Keep the conflict visible if applying the authoritative server copy fails.
     }
   }
+  requireCurrentAccountRequest(requestIdentity);
   if (!resolvedIDs.size) return false;
   state.syncConflicts = (state.syncConflicts || []).filter((entry) => !resolvedIDs.has(entry.id));
   saveWorkspaceState();
@@ -8106,7 +8509,8 @@ function summarizeMutations(mutations = []) {
 }
 
 function currentContentSummary() {
-  const summary = syncedContent?.summary || summarizeMutations([]);
+  const summary = syncedContent?.userID === activeAccount()?.userID
+    ? syncedContent?.summary || summarizeMutations([]) : summarizeMutations([]);
   const clearRecords = currentBulkClearRecords();
   // Always apply every durable clear to the cached remote summary. Incremental
   // pulls can refresh one clear scope without rebuilding the other scopes, so
@@ -8176,18 +8580,19 @@ function currentContentSummary() {
 
 async function loadSyncedContent(options = {}) {
   const account = activeAccount();
+  const identity = captureAccountRequest();
   if (!account) {
     syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
     return syncedContent;
   }
-  if (syncLoadPromise && !options.force) {
+  if (syncLoadPromise && isCurrentAccountRequest(syncLoadPromise.accountIdentity) && !options.force) {
     return syncLoadPromise;
   }
   const baseline = ["connected", "offline"].includes(syncedContent?.status) && syncedContent?.userID === account.userID
     ? syncedContent
     : null;
   const requestedEventID = Number.isSafeInteger(baseline?.latestEventID) ? baseline.latestEventID : null;
-  syncLoadPromise = postJSON("/sync/pull", {
+  const request = postJSON("/sync/pull", {
     auth: { accountUserID: account.userID },
     sinceEventID: requestedEventID,
     contentMapVersion: Number(baseline?.contentMapVersion || 2),
@@ -8195,8 +8600,10 @@ async function loadSyncedContent(options = {}) {
     clientCapabilities: permitextClientCapabilities
   }, { token: account.sessionToken })
     .then(async (payload) => {
+      if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       let entitlement = payload.entitlement || null;
       const repaired = await repairAppleBrowserAccountLink(account, entitlement);
+      if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       if (repaired?.entitlement) {
         entitlement = repaired.entitlement;
       }
@@ -8220,8 +8627,11 @@ async function loadSyncedContent(options = {}) {
         summary: summarizeMutations(mutations)
       };
       await convergeServerNewerSyncConflicts(account);
+      if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       await applyRemoteContinuityIfNewer();
+      if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       await saveOfflineSyncSnapshot(account.userID, syncedContent).catch(() => {});
+      if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       foregroundSyncLastFullPullAt = Date.now();
       broadcastForegroundSyncSignal("sync-complete", {
         latestEventID: syncedContent.latestEventID,
@@ -8233,11 +8643,13 @@ async function loadSyncedContent(options = {}) {
       return syncedContent;
     })
     .catch(async (error) => {
+      if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       if (isSessionAuthenticationError(error)) {
         clearExpiredAccountSession();
         return syncedContent;
       }
       const snapshot = baseline || await loadOfflineSyncSnapshot(account.userID).catch(() => null);
+      if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       const mutations = snapshot?.mutations || [];
       syncedContent = {
         ...(snapshot || {}),
@@ -8250,9 +8662,11 @@ async function loadSyncedContent(options = {}) {
       return syncedContent;
     })
     .finally(() => {
-      syncLoadPromise = null;
+      if (syncLoadPromise === request) syncLoadPromise = null;
     });
-  return syncLoadPromise;
+  request.accountIdentity = identity;
+  syncLoadPromise = request;
+  return request;
 }
 
 function mergeSyncedMutations(existing, incoming) {
@@ -8271,8 +8685,8 @@ async function ensureSyncedContentForRender() {
     }
     return syncedContent;
   }
-  if (syncedContent?.status === "connected") return syncedContent;
-  if (syncedContent?.status === "offline" && (navigator.onLine === false || !serverReachable)) {
+  if (syncedContent?.userID === activeAccount()?.userID && syncedContent?.status === "connected") return syncedContent;
+  if (syncedContent?.userID === activeAccount()?.userID && syncedContent?.status === "offline" && (navigator.onLine === false || !serverReachable)) {
     return syncedContent;
   }
   return loadSyncedContent();
@@ -8490,9 +8904,12 @@ async function notebookImageDimensions(blob) {
 }
 
 async function uploadPendingNotebookImage(record) {
+  requirePrivateWorkspaceWritable();
   const account = activeAccount();
+  const requestIdentity = captureAccountRequest();
   if (!account || account.userID !== record.accountUserID) return null;
   const dimensions = await notebookImageDimensions(record.blob);
+  requireCurrentAccountRequest(requestIdentity);
   const url = new URL("/notebook/assets/upload", window.location.origin);
   url.searchParams.set("projectID", record.projectID);
   url.searchParams.set("assetID", record.assetID);
@@ -8510,39 +8927,120 @@ async function uploadPendingNotebookImage(record) {
       body: record.blob
     });
   } catch (error) {
+    requireCurrentAccountRequest(requestIdentity);
     throw new Error(navigator.onLine === false
       ? "Upload is waiting for network connectivity."
       : `Notebook image upload failed: ${error.message}`);
   }
+  requireCurrentAccountRequest(requestIdentity);
   const payload = await response.json().catch(() => ({}));
+  requireCurrentAccountRequest(requestIdentity);
   if (!response.ok) throw new Error(responseErrorMessage(payload, "Could not upload this Notebook image."));
   await markNotebookImageUploaded(record.localURL, payload.asset);
+  requireCurrentAccountRequest(requestIdentity);
   window.dispatchEvent(new CustomEvent("permitext:notebook-image-uploaded", {
-    detail: { projectID: record.projectID, localURL: record.localURL, permanentURL: payload.asset.url }
+    detail: { accountUserID: account.userID, generation: requestIdentity.generation, projectID: record.projectID, localURL: record.localURL, permanentURL: payload.asset.url }
   }));
   return payload.asset;
 }
 
 async function flushPendingNotebookImages() {
   const account = activeAccount();
+  const requestIdentity = captureAccountRequest();
   if (!account || navigator.onLine === false) return [];
   const pending = await pendingNotebookImages(account.userID).catch(() => []);
+  requireCurrentAccountRequest(requestIdentity);
   const uploaded = [];
   let firstError = null;
   for (const record of pending) {
+    requireCurrentAccountRequest(requestIdentity);
     try {
       const asset = await uploadPendingNotebookImage(record);
       if (asset) uploaded.push(asset);
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       await markNotebookImageUploadError(record.localURL, error.message).catch(() => {});
       firstError ||= error;
       if (navigator.onLine === false) break;
     }
   }
+  requireCurrentAccountRequest(requestIdentity);
   if (firstError && navigator.onLine !== false) {
     void showWebNotice("Notebook image not synchronized", firstError.message);
   }
   return uploaded;
+}
+
+async function refreshNotebookPendingStatus(requestIdentity = captureAccountRequest()) {
+  if (!requestIdentity.userID) return;
+  const drafts = await pendingNotebookDrafts(requestIdentity.userID);
+  if (!isCurrentAccountRequest(requestIdentity)) return;
+  notebookPendingDraftCount = drafts.length;
+  updateConnectionStatus();
+}
+
+async function synchronizeNotebookDraft(draft, requestIdentity = captureAccountRequest(), options = {}) {
+  requireCurrentAccountRequest(requestIdentity);
+  if (draft.accountUserID !== requestIdentity.userID) throw accountContextChangedError();
+  if (draft.recoveryConflict || (draft.scope && draft.scope !== "notebook-card")) return null;
+  const pending = draft.pendingSave || draft;
+  if (!Number.isSafeInteger(pending.baseVersion) || pending.baseVersion < 0 || !String(pending.title || "").trim()) return null;
+  const document = await reconcileNotebookDocumentAssets(pending.document, pending.projectID, requestIdentity);
+  requireCurrentAccountRequest(requestIdentity);
+  if (notebookDocumentAssetURLs(document, "permitext-notebook-local:").length) return null;
+  const submittedDraft = await beginNotebookDraftSave(requestIdentity.userID, draft.projectID, draft.cardID, draft.revision, { document });
+  requireCurrentAccountRequest(requestIdentity);
+  const submittedDocument = submittedDraft.document;
+  if (notebookDocumentAssetURLs(submittedDocument, "permitext-notebook-local:").length) return null;
+  const payload = await postResearch("/notebook/cards/save", {
+    projectID: draft.projectID,
+    cardID: submittedDraft.cardID || undefined,
+    clientMutationID: submittedDraft.revision,
+    expectedVersion: submittedDraft.baseVersion,
+    cardType: submittedDraft.cardType || "finding",
+    title: submittedDraft.title,
+    document: submittedDocument,
+    evidenceLinks: submittedDraft.evidenceLinks || []
+  });
+  requireCurrentAccountRequest(requestIdentity);
+  if (!options.deferAcknowledgement) {
+    await acknowledgeNotebookDraft(requestIdentity.userID, draft.projectID, submittedDraft.cardID, submittedDraft.revision, payload.card);
+    await saveNotebookCardSnapshot(requestIdentity.userID, draft.projectID, payload.card);
+    requireCurrentAccountRequest(requestIdentity);
+    await refreshNotebookPendingStatus(requestIdentity);
+  }
+  return { ...payload, submittedDraft };
+}
+
+async function flushPendingNotebookDrafts() {
+  const requestIdentity = captureAccountRequest();
+  if (!requestIdentity.userID || navigator.onLine === false || !isProAccount()) return;
+  if (notebookDraftSyncPromise) return notebookDraftSyncPromise;
+  const request = (async () => {
+    const drafts = await pendingNotebookDrafts(requestIdentity.userID);
+    requireCurrentAccountRequest(requestIdentity);
+    for (const draft of drafts) {
+      requireCurrentAccountRequest(requestIdentity);
+      if (draft.recoveryConflict || (draft.scope && draft.scope !== "notebook-card")) continue;
+      const mount = notebookMounts.get(draft.projectID);
+      if (mount?.activeCardID?.() === (draft.cardID || "")) {
+        await mount.syncDraft?.();
+        continue;
+      }
+      try { await synchronizeNotebookDraft(draft, requestIdentity); }
+      catch (error) {
+        requireCurrentAccountRequest(requestIdentity);
+        // Keep the original version and bytes until the user resolves a conflict or connectivity returns.
+        if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT") continue;
+        if (!error.status || error.status >= 500) break;
+      }
+    }
+    await refreshNotebookPendingStatus(requestIdentity);
+  })().finally(() => {
+    if (notebookDraftSyncPromise === request) notebookDraftSyncPromise = null;
+  });
+  notebookDraftSyncPromise = request;
+  return request;
 }
 
 function notebookDocumentAssetURLs(document, prefix) {
@@ -8601,18 +9099,22 @@ async function pruneUnusedPendingNotebookImages(accountUserID, projectID, cardID
   });
 }
 
-async function reconcileNotebookDocumentAssets(document) {
+async function reconcileNotebookDocumentAssets(document, projectID, requestIdentity = captureAccountRequest()) {
+  requireCurrentAccountRequest(requestIdentity);
   let reconciled = document;
   for (const localURL of notebookDocumentAssetURLs(document, "permitext-notebook-local:")) {
     const record = await notebookImageRecord(localURL).catch(() => null);
-    if (record?.permanentURL) {
+    requireCurrentAccountRequest(requestIdentity);
+    if (record?.accountUserID === requestIdentity.userID && record?.projectID === projectID && record?.permanentURL) {
       reconciled = replaceNotebookDocumentAssetURL(reconciled, localURL, record.permanentURL);
     }
   }
   return reconciled;
 }
 
-async function uploadNotebookAsset(projectID, file, cardID = "") {
+async function uploadNotebookAsset(projectID, file, cardID = "", requestIdentity = captureAccountRequest()) {
+  requirePrivateWorkspaceWritable();
+  requireCurrentAccountRequest(requestIdentity);
   const account = activeAccount();
   if (!account) throw new Error("Sign in to upload Notebook images.");
   if (!(file instanceof File) || !notebookImageTypes.has(file.type)) {
@@ -8622,6 +9124,8 @@ async function uploadNotebookAsset(projectID, file, cardID = "") {
     throw new Error("Notebook images must be 8 MB or smaller.");
   }
   const blob = await optimizedWorkboardImageBlob(file);
+  requireCurrentAccountRequest(requestIdentity);
+  requirePrivateWorkspaceWritable();
   const record = await stageNotebookImage({
     accountUserID: account.userID,
     projectID,
@@ -8630,10 +9134,12 @@ async function uploadNotebookAsset(projectID, file, cardID = "") {
     blob,
     name: file.name
   });
+  requireCurrentAccountRequest(requestIdentity);
   if (navigator.onLine !== false) {
     try {
       return (await uploadPendingNotebookImage(record)).url;
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       await markNotebookImageUploadError(record.localURL, error.message).catch(() => {});
       if (!/network|connectivity|failed to fetch/i.test(error.message)) throw error;
     }
@@ -8641,11 +9147,13 @@ async function uploadNotebookAsset(projectID, file, cardID = "") {
   return record.localURL;
 }
 
-async function resolveNotebookAsset(projectID, assetURL) {
+async function resolveNotebookAsset(projectID, assetURL, requestIdentity = captureAccountRequest()) {
+  requireCurrentAccountRequest(requestIdentity);
   const value = String(assetURL || "");
   if (value.startsWith("permitext-notebook-local:")) {
     const local = await notebookImageRecord(value);
-    if (!local?.blob) throw new Error("This offline Notebook image is no longer available on this device.");
+    requireCurrentAccountRequest(requestIdentity);
+    if (local?.accountUserID !== requestIdentity.userID || local?.projectID !== projectID || !local?.blob) throw new Error("This offline Notebook image is no longer available on this device.");
     return URL.createObjectURL(local.blob);
   }
   if (!value.startsWith("permitext-notebook-asset:")) return value;
@@ -8667,11 +9175,14 @@ async function resolveNotebookAsset(projectID, assetURL) {
       ...(legacyPathname ? { pathname: legacyPathname } : { assetID: identity })
     })
   });
+  requireCurrentAccountRequest(requestIdentity);
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
     throw new Error(responseErrorMessage(payload, "Could not load this Notebook image."));
   }
-  return URL.createObjectURL(await response.blob());
+  const blob = await response.blob();
+  requireCurrentAccountRequest(requestIdentity);
+  return URL.createObjectURL(blob);
 }
 
 async function saveWorkboardPreview(projectID, blob, metadata = {}) {
@@ -9020,6 +9531,14 @@ async function applyRemoteContinuityIfNewer() {
 }
 
 function enqueueSyncMutation(mutation, account, options = {}) {
+  requirePrivateWorkspaceWritable();
+  const currentAccount = activeAccount();
+  const { record } = mutationKindAndRecord(mutation);
+  if (!account || currentAccount?.userID !== account.userID ||
+      currentAccount?.sessionToken !== account.sessionToken ||
+      (record?.userID && record.userID !== account.userID)) {
+    throw accountContextChangedError();
+  }
   const recordID = syncMutationRecordID(mutation);
   if (!recordID) throw new Error("Could not queue a sync record without an ID.");
   const entry = {
@@ -9043,11 +9562,13 @@ function enqueueSyncMutation(mutation, account, options = {}) {
 }
 
 async function pushMutationBatch(mutations, options = {}) {
+  const requestIdentity = captureAccountRequest();
   const account = activeAccount();
   if (!account || !mutations.length) return null;
   const operationGroupID = options.operationGroupID || crypto.randomUUID();
   const entries = mutations.map((mutation) => enqueueSyncMutation(mutation, account, { operationGroupID }));
   const result = await flushSyncOutbox({ refresh: true });
+  requireCurrentAccountRequest(requestIdentity);
   const rejected = entries.find((entry) => result.rejectedMutationIDs.includes(entry.recordID));
   if (rejected) {
     const reason = result.payload?.rejectionReasons?.[rejected.recordID];
@@ -9198,6 +9719,7 @@ function discardLocalMutationOverlay(mutation) {
 }
 
 async function resolveSyncConflict(entry, keepLocal) {
+  const requestIdentity = captureAccountRequest();
   const account = activeAccount();
   if (!account || entry.accountUserID !== account.userID) return;
   if (keepLocal) {
@@ -9207,15 +9729,18 @@ async function resolveSyncConflict(entry, keepLocal) {
       [kind]: { ...record, userID: account.userID, updatedAt: new Date().toISOString() }
     }, account);
     await flushSyncOutbox({ refresh: true });
+    requireCurrentAccountRequest(requestIdentity);
   } else {
     const { kind, record } = mutationKindAndRecord(entry.mutation);
     if (kind !== "workboard") discardLocalMutationOverlay(entry.mutation);
     state.syncConflicts = (state.syncConflicts || []).filter((item) => item.id !== entry.id);
     saveWorkspaceState();
     await loadSyncedContent({ force: true });
+    requireCurrentAccountRequest(requestIdentity);
     if (kind === "workboard") {
       const projectID = String(record?.projectID || "");
       await replaceLocalWorkboard(projectID, syncedWorkboardForProject(projectID));
+      requireCurrentAccountRequest(requestIdentity);
     }
   }
   await renderWorkspace();
@@ -9232,9 +9757,11 @@ function scheduleSyncOutboxRetry(attemptCount = 1) {
 
 async function flushSyncOutbox(options = {}) {
   const account = activeAccount();
+  const identity = captureAccountRequest();
   if (!account) return { acceptedMutationIDs: [], rejectedMutationIDs: [] };
   if (syncFlushPromise) {
     const inFlightResult = await syncFlushPromise;
+    requireCurrentAccountRequest(identity);
     const stillActiveAccount = activeAccount();
     const hasPending = stillActiveAccount && (state.syncOutbox || [])
       .some((item) => item.accountUserID === stillActiveAccount.userID);
@@ -9253,13 +9780,14 @@ async function flushSyncOutbox(options = {}) {
     };
   }
 
-  syncFlushPromise = (async () => {
+  const request = (async () => {
     retryRejectedDeletionConflictsOnce(account);
     prepareSyncOutboxForFlush(account);
     const acceptedMutationIDs = [];
     const rejectedMutationIDs = [];
     let latestPayload = null;
     while (true) {
+      requireCurrentAccountRequest(identity);
       const queuedEntries = (state.syncOutbox || [])
         .filter((item) => item.accountUserID === account.userID);
       let entries = queuedEntries.slice(0, 100);
@@ -9326,6 +9854,7 @@ async function flushSyncOutbox(options = {}) {
         saveWorkspaceState();
         storeAccountEntitlement(payload.entitlement || null);
       } catch (error) {
+        requireCurrentAccountRequest(identity);
         const entryVersions = new Map(entries.map((item) => [item.id, item.queuedAt]));
         let highestAttemptCount = 1;
         state.syncOutbox = (state.syncOutbox || []).map((item) => {
@@ -9345,6 +9874,7 @@ async function flushSyncOutbox(options = {}) {
     if (options.refresh !== false && latestPayload) {
       await loadSyncedContent({ force: true, skipOutbox: true });
     }
+    requireCurrentAccountRequest(identity);
     if (acceptedMutationIDs.length > 0 && latestPayload) {
       markForegroundSyncActivity();
       broadcastForegroundSyncSignal("sync-invalidated", {
@@ -9353,9 +9883,10 @@ async function flushSyncOutbox(options = {}) {
     }
     return { acceptedMutationIDs, rejectedMutationIDs, payload: latestPayload };
   })().finally(() => {
-    syncFlushPromise = null;
-    updateConnectionStatus();
+    if (syncFlushPromise === request) syncFlushPromise = null;
+    if (isCurrentAccountRequest(identity)) updateConnectionStatus();
   });
+  syncFlushPromise = request;
   updateConnectionStatus();
   return syncFlushPromise;
 }
@@ -9772,6 +10303,7 @@ function currentProjectArtifactScope() {
   return {
     accountUserID: account?.userID || "",
     sessionToken: account?.sessionToken || "",
+    accountGeneration: accountRuntimeGeneration,
     workspaceID: activeWorkspaceID,
     researchVisible: researchArtifactConsumersVisible(),
     visibleProjectIDs: new Set(visibleProjectArtifactIDs())
@@ -9881,12 +10413,15 @@ function projectArtifactRequestScopeIsCurrent(scope) {
     scope.accountUserID &&
     current.accountUserID === scope.accountUserID &&
     current.sessionToken === scope.sessionToken &&
+    current.accountGeneration === scope.accountGeneration &&
     current.workspaceID === scope.workspaceID
   );
 }
 
 function enqueueProjectArtifactConsumerRefresh(refresh) {
-  const task = projectArtifactConsumerRefreshQueue.then(refresh, refresh);
+  const requestIdentity = captureAccountRequest();
+  const scopedRefresh = () => isCurrentAccountRequest(requestIdentity) ? refresh() : false;
+  const task = projectArtifactConsumerRefreshQueue.then(scopedRefresh, scopedRefresh);
   projectArtifactConsumerRefreshQueue = task.catch(() => false);
   return task;
 }
@@ -9988,15 +10523,16 @@ async function checkVisibleProjectArtifactRevisions() {
     projectArtifactCheckpointPending = true;
     return projectArtifactCheckpointPromise;
   }
+  const requestIdentity = captureAccountRequest();
   const scope = currentProjectArtifactScope();
   const projectIDs = Array.from(scope.visibleProjectIDs);
   if (!scope.accountUserID || !scope.workspaceID || (!projectIDs.length && !scope.researchVisible)) return null;
-  projectArtifactCheckpointPromise = (async () => {
+  const request = (async () => {
     const payload = await postResearch("/projects/artifacts/checkpoint", {
       projectIDs,
       includeAccountResearch: scope.researchVisible
     });
-    if (!projectArtifactRequestScopeIsCurrent(scope)) return null;
+    if (!isCurrentAccountRequest(requestIdentity) || !projectArtifactRequestScopeIsCurrent(scope)) return null;
     const currentVisible = new Set(visibleProjectArtifactIDs());
     const envelopes = (payload.projects || [])
       .filter((project) => currentVisible.has(String(project?.projectID || "")))
@@ -10004,7 +10540,9 @@ async function checkVisibleProjectArtifactRevisions() {
     const accountResult = payload.account && researchArtifactConsumersVisible()
       ? await applyAccountArtifactRevisionEnvelope(payload.account)
       : { accepted: null, refreshResearch: false };
+    requireCurrentAccountRequest(requestIdentity);
     const projectResult = await applyProjectArtifactRevisionEnvelopes(envelopes);
+    requireCurrentAccountRequest(requestIdentity);
     if (accountResult.accepted || projectResult.accepted.length) {
       broadcastForegroundSyncSignal("project-artifact-revisions", {
         workspaceID: scope.workspaceID,
@@ -10014,7 +10552,9 @@ async function checkVisibleProjectArtifactRevisions() {
     }
     return { account: accountResult, projects: projectResult };
   })().finally(() => {
+    if (projectArtifactCheckpointPromise !== request) return;
     projectArtifactCheckpointPromise = null;
+    if (!isCurrentAccountRequest(requestIdentity)) return;
     if (projectArtifactCheckpointPending) {
       projectArtifactCheckpointPending = false;
       startProjectArtifactCheckpointLoop({ immediate: true });
@@ -10022,7 +10562,8 @@ async function checkVisibleProjectArtifactRevisions() {
       startProjectArtifactCheckpointLoop();
     }
   });
-  return projectArtifactCheckpointPromise;
+  projectArtifactCheckpointPromise = request;
+  return request;
 }
 
 function stopProjectArtifactCheckpointLoop() {
@@ -10077,6 +10618,7 @@ function broadcastForegroundSyncSignal(type, details = {}) {
 }
 
 async function handleForegroundSyncSignal(message) {
+  const requestIdentity = captureAccountRequest();
   const accountUserID = activeAccount()?.userID || "";
   if (
     !message ||
@@ -10088,6 +10630,7 @@ async function handleForegroundSyncSignal(message) {
     if (message.accountEnvelope) {
       await applyAccountArtifactRevisionEnvelope(message.accountEnvelope);
     }
+    requireCurrentAccountRequest(requestIdentity);
     await applyProjectArtifactRevisionEnvelopes(message.envelopes || []);
     return;
   }
@@ -10108,7 +10651,7 @@ async function handleForegroundSyncSignal(message) {
   const snapshot = await loadOfflineSyncSnapshot(accountUserID).catch(() => null);
   if (
     !snapshot ||
-    activeAccount()?.userID !== accountUserID ||
+    !isCurrentAccountRequest(requestIdentity) ||
     Number(snapshot?.latestEventID || 0) < Number(message.latestEventID || 0)
   ) return;
   syncedContent = snapshot;
@@ -10148,19 +10691,21 @@ async function performForegroundSync(options = {}) {
   if (!canRunForegroundSync()) return null;
   if (foregroundSyncPromise) return foregroundSyncPromise;
 
-  foregroundSyncPromise = (async () => {
+  const requestIdentity = captureAccountRequest();
+  const request = (async () => {
     const accountUserID = activeAccount()?.userID || "";
     const previousStatus = syncedContent?.status || "";
     const previousEventID = Number(syncedContent?.latestEventID || 0);
     await flushPendingNotebookImages();
+    requireCurrentAccountRequest(requestIdentity);
+    await flushPendingNotebookDrafts();
+    requireCurrentAccountRequest(requestIdentity);
     const pushResult = await flushSyncOutbox({ refresh: false });
-    if (activeAccount()?.userID !== accountUserID) {
-      await renderWorkspace();
-      return null;
-    }
+    requireCurrentAccountRequest(requestIdentity);
     if (!canRunForegroundSync()) return null;
 
     if (syncLoadPromise) await syncLoadPromise;
+    requireCurrentAccountRequest(requestIdentity);
     let content = syncedContent;
     const forceFull = Boolean(
       options.forceFull ||
@@ -10187,15 +10732,13 @@ async function performForegroundSync(options = {}) {
     })) {
       content = await loadSyncedContent({ force: true, skipOutbox: true });
     }
-    if (activeAccount()?.userID !== accountUserID) {
-      await renderWorkspace();
-      return content;
-    }
+    requireCurrentAccountRequest(requestIdentity);
     if (!canRunForegroundSync() || content?.status === "error") return content;
     if (await migrateLegacyArchivedProjects()) {
       content = await loadSyncedContent({ force: true, skipOutbox: true });
     }
 
+    requireCurrentAccountRequest(requestIdentity);
     const nextEventID = Number(content?.latestEventID || 0);
     if (
       syncResultChangesWorkspace(pushResult) ||
@@ -10206,11 +10749,12 @@ async function performForegroundSync(options = {}) {
     }
     return content;
   })().finally(() => {
-    foregroundSyncPromise = null;
-    updateConnectionStatus();
+    if (foregroundSyncPromise === request) foregroundSyncPromise = null;
+    if (isCurrentAccountRequest(requestIdentity)) updateConnectionStatus();
   });
+  foregroundSyncPromise = request;
   updateConnectionStatus();
-  return foregroundSyncPromise;
+  return request;
 }
 
 function startForegroundSyncLoop(options = {}) {
@@ -10229,26 +10773,31 @@ function startForegroundSyncLoop(options = {}) {
     return;
   }
   scheduleForegroundSyncLeaderHeartbeat();
+  const requestIdentity = captureAccountRequest();
   foregroundSyncTimer = window.setTimeout(async () => {
+    if (!isCurrentAccountRequest(requestIdentity)) return;
     try {
       await performForegroundSync({ forceFull: options.forceFull });
     } catch {
       // The durable outbox and its exponential retry retain pending local changes.
     } finally {
-      startForegroundSyncLoop();
+      if (isCurrentAccountRequest(requestIdentity)) startForegroundSyncLoop();
     }
   }, options.immediate ? 0 : foregroundSyncDelay({ lastActivityAt: foregroundSyncLastActivityAt }));
 }
 
 async function pushMutation(mutation) {
+  const requestIdentity = captureAccountRequest();
   const account = activeAccount();
   if (!account) {
     throw new Error("Sign in from Account before saving from the web.");
   }
   const entry = enqueueSyncMutation(mutation, account);
   let result = await flushSyncOutbox({ refresh: true });
+  requireCurrentAccountRequest(requestIdentity);
   if ((state.syncOutbox || []).some((item) => item.id === entry.id && item.queuedAt === entry.queuedAt)) {
     const followUp = await flushSyncOutbox({ refresh: true });
+    requireCurrentAccountRequest(requestIdentity);
     result = {
       ...followUp,
       acceptedMutationIDs: [...result.acceptedMutationIDs, ...followUp.acceptedMutationIDs],
@@ -10414,24 +10963,6 @@ function deletedSavedMutationForSection(section, existingRecord = null) {
   };
 }
 
-const projectColorOptions = [
-  "#6674c8",
-  "#5aaea4",
-  "#f27a4f",
-  "#a14fc0",
-  "#879a6d",
-  "#9b7d6f",
-  "#d75f7a",
-  "#2f8f4e",
-  "#0891b2",
-  "#c96410",
-  "#3f6f9f",
-  "#b58b2a",
-  "#6f58c9",
-  "#c84b7a",
-  "#4f8f8b"
-];
-
 function projectColor(project) {
   // `colorHex` is the native iOS storage field and the canonical sync value.
   // Legacy web aliases remain as fallbacks for records created before sync.
@@ -10482,8 +11013,6 @@ function numericLocalFolderID(project) {
   const value = Number(project?.localFolderID);
   return Number.isInteger(value) && value > 0 ? value : 0;
 }
-
-const projectStructuredFactStatuses = new Set(["stated", "confirmed", "sourced", "unknown", "rejected"]);
 
 function normalizeProjectStructuredFact(fact) {
   if (!fact || typeof fact !== "object") return null;
@@ -10674,6 +11203,7 @@ function projectIsArchived(project) {
 }
 
 async function migrateLegacyArchivedProjects() {
+  const requestIdentity = captureAccountRequest();
   const account = activeAccount();
   if (!account || syncedContent?.status !== "connected") return false;
   const legacyArchivedIDs = archivedProjectIDSet();
@@ -10692,9 +11222,11 @@ async function migrateLegacyArchivedProjects() {
     saveWorkspaceState();
     try {
       await pushMutation(projectMutationForRecord(archivedProject, account));
+      requireCurrentAccountRequest(requestIdentity);
       state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
       saveWorkspaceState();
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
       return false;
     }
@@ -10755,6 +11287,8 @@ function nextProjectSortOrder() {
 }
 
 async function createProjectFolder(details = {}) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
   const requestedType = String(details.folderType || "project").toLowerCase() === "reference"
     ? "reference"
     : "project";
@@ -10796,16 +11330,22 @@ async function createProjectFolder(details = {}) {
 
   try {
     await pushMutation(projectMutationForRecord(project, account));
+    requireCurrentAccountRequest(requestIdentity);
     state.localProjects = (state.localProjects || []).filter((item) => item.id !== project.id);
     saveWorkspaceState();
   } catch (error) {
+    requireCurrentAccountRequest(requestIdentity);
     if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
     // The local project and queued mutation remain available while sync recovers.
   }
+  requireCurrentAccountRequest(requestIdentity);
   return project;
 }
 
 async function persistProjectOrder(projects, paneID) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
+  const account = activeAccount();
   const now = Date.now();
   const updates = projects.map((project, index) => ({
     ...project,
@@ -10819,16 +11359,17 @@ async function persistProjectOrder(projects, paneID) {
   ];
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-
-  const account = activeAccount();
+  requireCurrentAccountRequest(requestIdentity);
   if (!account) return;
   const syncedIDs = new Set();
   for (const project of updates) {
     if (project.sharedOnly) continue;
     try {
       await pushMutation(projectMutationForRecord(project, account));
+      requireCurrentAccountRequest(requestIdentity);
       syncedIDs.add(projectRecordID(project));
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
     }
   }
@@ -10840,6 +11381,8 @@ async function persistProjectOrder(projects, paneID) {
 }
 
 async function updateProjectFolder(project, details = {}) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
   const id = projectRecordID(project);
   if (!id) return;
   const nextFolderType = details.folderType ? folderType(details) : folderType(project);
@@ -10892,14 +11435,17 @@ async function updateProjectFolder(project, details = {}) {
   if (account) {
     try {
       await pushMutation(projectMutationForRecord(updated, account));
+      requireCurrentAccountRequest(requestIdentity);
       state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
       saveWorkspaceState();
       projectUpdatePersisted = true;
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
       // Keep the local edit visible while the durable sync queue recovers.
     }
   }
+  requireCurrentAccountRequest(requestIdentity);
   const updatedProjectID = projectDetailKey(projectIdentity(updated));
   if (visibleProjectArtifactIDs().includes(updatedProjectID)) {
     refreshMountedResearchProjectContext(updatedProjectID);
@@ -10909,6 +11455,7 @@ async function updateProjectFolder(project, details = {}) {
         refreshNotebookReferences: true,
         refreshReportSources: true
       });
+      requireCurrentAccountRequest(requestIdentity);
     }
   }
   return true;
@@ -10941,6 +11488,7 @@ function savedSectionRecord(section, codeVersion = "") {
 }
 
 function setLocalSectionSaved(section, saved, codeVersion = defaultSyncCodeVersion) {
+  requirePrivateWorkspaceWritable();
   const record = section && typeof section === "object" ? section : { sectionID: section, codeVersion };
   const sectionKey = String(record.sectionID || "");
   if (!sectionKey) return;
@@ -10956,6 +11504,9 @@ function setLocalSectionSaved(section, saved, codeVersion = defaultSyncCodeVersi
 }
 
 async function persistSectionBookmark(sectionPayload, saved, options = {}) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
+  const account = activeAccount();
   const existingRecord = savedItemForSection(sectionPayload);
   if (
     saved &&
@@ -10981,6 +11532,9 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
         updatedAt: new Date().toISOString()
       };
   const localRecord = saved ? record : { ...record, deletedAt: record.updatedAt };
+  const mutation = saved
+    ? savedMutationForSection(sectionPayload)
+    : deletedSavedMutationForSection(sectionPayload, existingRecord);
   state.localSavedItems = [
     ...(state.localSavedItems || []).filter((item) => savedEvidenceKey(item) !== sectionKey),
     localRecord
@@ -10993,46 +11547,61 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     await removeSectionFromAllProjects(sectionPayload, {
       refreshPanes: options.refreshProjectPanes !== false
     });
+    requireCurrentAccountRequest(requestIdentity);
   }
   if (options.refreshSavedPanes !== false) await refreshOpenSavedPanes();
-  if (!activeAccount()) return true;
+  requireCurrentAccountRequest(requestIdentity);
+  if (!account) return true;
   try {
-    await pushMutation(saved
-      ? savedMutationForSection(sectionPayload)
-      : deletedSavedMutationForSection(sectionPayload, existingRecord));
+    await pushMutation(mutation);
+    requireCurrentAccountRequest(requestIdentity);
     state.localSavedItems = (state.localSavedItems || []).filter((item) => savedEvidenceKey(item) !== sectionKey);
     saveWorkspaceState();
   } catch (error) {
+    requireCurrentAccountRequest(requestIdentity);
     if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
     // Keep the local record and queued mutation available while sync recovers.
   }
+  requireCurrentAccountRequest(requestIdentity);
   return true;
 }
 
 async function persistSectionInProject(project, sectionPayload) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
+  const account = activeAccount();
   if (folderIsProject(project) && !hasCapability("projects")) {
     void presentPlanLimitNotice("Project organization requires Pro", "Upgrade to Pro to add saved code to Projects.");
     return false;
   }
   const record = projectSectionRecordForSection(project, sectionPayload);
+  const mutation = projectSectionMutationForSection(project, sectionPayload);
   const current = (state.localProjectSections || []).filter((item) => item.id !== record.id);
   state.localProjectSections = [...current, record];
   saveWorkspaceState();
   await refreshProjectMembershipPanes(project);
-  if (!activeAccount()) return true;
+  requireCurrentAccountRequest(requestIdentity);
+  if (!account) return true;
   try {
-    await pushMutation(projectSectionMutationForSection(project, sectionPayload));
+    await pushMutation(mutation);
+    requireCurrentAccountRequest(requestIdentity);
     state.localProjectSections = (state.localProjectSections || []).filter((item) => item.id !== record.id);
     saveWorkspaceState();
   } catch (error) {
+    requireCurrentAccountRequest(requestIdentity);
     if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
     // Keep the local project link and queued mutation available while sync recovers.
   }
+  requireCurrentAccountRequest(requestIdentity);
   await refreshProjectSourceConsumers([project]);
+  requireCurrentAccountRequest(requestIdentity);
   return true;
 }
 
 async function persistSectionFolderSelection(sectionPayload, selectedFolders, visibleFolders) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
+  const account = activeAccount();
   const selectedByID = new Map(selectedFolders.map((folder) => [projectRecordID(folder), folder]));
   if (!selectedByID.size) return { saved: false, changed: false, queued: false };
   if (
@@ -11114,18 +11683,24 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
   // before waiting for the network round-trip. The authoritative hydration
   // below will reconcile the same rows after sync completes.
   await refreshProjectMembershipPanes(selectedFolders[0] || null);
+  requireCurrentAccountRequest(requestIdentity);
 
   let queued = false;
-  if (activeAccount() && mutations.length) {
+  if (account && mutations.length) {
     try {
       await pushMutationBatch(mutations);
+      requireCurrentAccountRequest(requestIdentity);
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       queued = true;
       if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
     }
   }
+  requireCurrentAccountRequest(requestIdentity);
   await refreshOpenSavedPanes();
+  requireCurrentAccountRequest(requestIdentity);
   await refreshProjectSourceConsumers(touchedProjects);
+  requireCurrentAccountRequest(requestIdentity);
   return {
     saved: true,
     changed: !wasSaved || additions.length > 0 || removals.length > 0,
@@ -11134,6 +11709,7 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
 }
 
 async function removeSectionFromAllProjects(sectionPayload, options = {}) {
+  const requestIdentity = captureAccountRequest();
   const sectionID = String(sectionPayload.sectionID || sectionPayload.savedSectionID || sectionPayload.itemID || "");
   if (!sectionID) return;
   const summary = currentContentSummary();
@@ -11151,10 +11727,14 @@ async function removeSectionFromAllProjects(sectionPayload, options = {}) {
       removeBookmark: false,
       refreshPanes: options.refreshPanes !== false
     });
+    requireCurrentAccountRequest(requestIdentity);
   }
 }
 
 async function removeSectionFromProject(project, item, options = {}) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
+  const account = activeAccount();
   const sectionID = String(item.sectionID || item.savedSectionID || item.itemID || "");
   const blockID = normalizeAnnotationBlockID(item.blockID);
   const projectID = projectRecordID(project);
@@ -11176,26 +11756,33 @@ async function removeSectionFromProject(project, item, options = {}) {
   ];
   saveWorkspaceState();
   if (options.refreshPanes !== false) await refreshProjectMembershipPanes(project);
+  requireCurrentAccountRequest(requestIdentity);
 
-  if (activeAccount()) {
+  if (account) {
     try {
       await pushMutation(deletion);
+      requireCurrentAccountRequest(requestIdentity);
       state.localProjectSections = (state.localProjectSections || []).filter((candidate) => !matches(candidate));
       saveWorkspaceState();
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
       // Keep the local project-membership tombstone while sync recovers.
     }
   }
+  requireCurrentAccountRequest(requestIdentity);
 
   if (options.removeBookmark === true) {
     await persistSectionBookmark(item, false, { refreshSavedPanes: false });
+    requireCurrentAccountRequest(requestIdentity);
     syncReaderNoteBookmarkButtons(sectionID, false, item.codeVersion);
   }
   if (options.refreshPanes !== false) await refreshProjectSourceConsumers([project]);
+  requireCurrentAccountRequest(requestIdentity);
 }
 
 async function unlinkEvidenceFromFolder(folder, item, container = null, options = {}) {
+  const requestIdentity = captureAccountRequest();
   const remainingLinks = (currentContentSummary().projectSections || []).filter((candidate) =>
     savedEvidenceKey(candidate) === savedEvidenceKey(item) &&
     !projectSectionBelongsToProject(candidate, folder)
@@ -11207,17 +11794,20 @@ async function unlinkEvidenceFromFolder(folder, item, container = null, options 
       confirmLabel: "Remove and delete",
       container
     });
+    requireCurrentAccountRequest(requestIdentity);
     if (!confirmed) return false;
     await removeSectionFromProject(folder, item, {
       removeBookmark: true,
       refreshPanes: options.refreshPanes !== false
     });
+    requireCurrentAccountRequest(requestIdentity);
     return true;
   }
   await removeSectionFromProject(folder, item, {
     removeBookmark: false,
     refreshPanes: options.refreshPanes !== false
   });
+  requireCurrentAccountRequest(requestIdentity);
   return true;
 }
 
@@ -11359,6 +11949,7 @@ function annotationRecordForTarget(target, values = {}) {
 }
 
 function upsertLocalAnnotation(record) {
+  requirePrivateWorkspaceWritable();
   const annotations = (state.localAnnotations || []).filter((item) => String(item.id || "") !== String(record.id || ""));
   state.localAnnotations = [...annotations, record];
   if (!record.blockID) {
@@ -11388,6 +11979,7 @@ function annotationMutationForRecord(record) {
 }
 
 function scheduleAnnotationPush(record) {
+  const requestIdentity = captureAccountRequest();
   const account = activeAccount();
   if (!account) return;
   const mutation = annotationMutationForRecord(record);
@@ -11396,7 +11988,9 @@ function scheduleAnnotationPush(record) {
   clearTimeout(annotationPushTimers.get(timerKey));
   annotationPushTimers.set(timerKey, window.setTimeout(async () => {
     try {
+      requireCurrentAccountRequest(requestIdentity);
       await pushMutation(mutation);
+      requireCurrentAccountRequest(requestIdentity);
       state.localAnnotations = (state.localAnnotations || []).filter((item) =>
         String(item.id || "") !== timerKey || String(item.updatedAt || "") !== String(record.updatedAt || "")
       );
@@ -11404,9 +11998,11 @@ function scheduleAnnotationPush(record) {
     } catch {
       // The local annotation and durable outbox entry remain available for retry.
     } finally {
+      if (!isCurrentAccountRequest(requestIdentity)) return;
       annotationPushTimers.delete(timerKey);
       if ((record.syncFields || []).includes("noteBody")) {
         await refreshOpenSavedPanes().catch(() => {});
+        if (!isCurrentAccountRequest(requestIdentity)) return;
         refreshVisibleSyncedDerivedState();
       }
     }
@@ -12327,6 +12923,7 @@ async function progressivelyRenderReaderChapter(
 }
 
 async function renderSectionContent(panel, reader) {
+  panel.dataset.readerSearchToken = `reader:${crypto.randomUUID()}`;
   const content = panel.querySelector(".reader-content");
   stopReaderProgressiveHydration(content);
   content?.classList.remove("is-searching-reader");
@@ -13352,18 +13949,36 @@ function snippetForMatch(value, query) {
 async function renderReaderInternalSearchResults(panel, reader, query) {
   const content = panel.querySelector(".reader-content");
   if (!content) return;
+  const needle = query.trim().toLowerCase();
+  const searchToken = `search:${crypto.randomUUID()}`;
+  panel.dataset.readerSearchToken = searchToken;
+  if (needle.length < 2 || !reader.chapterID) {
+    if (content.classList.contains("is-searching-reader")) await renderSectionContent(panel, reader);
+    return;
+  }
+  panel.dataset.readerRenderToken = searchToken;
   stopReaderProgressiveHydration(content);
   clear(content);
   content.classList.add("is-searching-reader");
   content.scrollTop = 0;
-
-  const needle = query.trim().toLowerCase();
-  const searchToken = `${Date.now()}:${query}`;
-  panel.dataset.readerSearchToken = searchToken;
-  if (needle.length < 2 || !reader.chapterID) return;
-
-  const chapter = await fetchChapter(reader.chapterID, { includeBody: true });
+  emptyReader(content, "Searching this chapter", "Finding matching sections in the code text.");
+  let chapter;
+  try {
+    chapter = await fetchChapter(reader.chapterID, { includeBody: true });
+  } catch {
+    if (panel.isConnected && panel.dataset.readerSearchToken === searchToken) {
+      emptyReader(content, "Search could not load", "Try again, or close find to return to the code text.");
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "ghost-button search-empty-action";
+      retry.textContent = "Try again";
+      retry.addEventListener("click", () => void renderReaderInternalSearchResults(panel, reader, query));
+      content.querySelector(".reader-empty")?.append(retry);
+    }
+    return;
+  }
   if (!panel.isConnected || panel.dataset.readerSearchToken !== searchToken) return;
+  clear(content);
 
   const results = document.createElement("section");
   results.className = "reader-internal-results";
@@ -13375,6 +13990,11 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       matches.push({ section, title, body });
     }
   });
+
+  if (!matches.length) {
+    emptyReader(content, "No exact match in this chapter", "Try a shorter phrase, or use Search to look across codes.");
+    return;
+  }
 
   matches.forEach(({ section, title, body }) => {
     const row = document.createElement("button");
@@ -14311,7 +14931,29 @@ async function renderSearchResults(panel, instance) {
   if (filteredResults.length === 0) {
     updateSearchDock(panel, searchInstance, 0);
     const scope = selectedPrefixes.length ? selectedPrefixes.join(", ") : "all codes";
-    renderSearchPlaceholder(results, { title: "No results", body: `Nothing matched in ${scope}. Try a shorter phrase or an exact section number.` });
+    const terms = [...new Set(query.match(/[\p{L}\p{N}][\p{L}\p{N}.-]*/gu) || [])]
+      .filter((term) => term.length >= 2 && !/^(a|an|and|are|as|at|be|by|for|from|in|is|it|of|on|or|the|to|with)$/i.test(term))
+      .filter((term) => term.toLowerCase() !== query.toLowerCase())
+      .slice(0, 4);
+    renderSearchPlaceholder(results, {
+      title: "No exact match",
+      body: `Search looks for this phrase together in section titles or code text. It was not found in ${scope}. Try a shorter phrase or a section number${terms.length ? ", or search one term below." : "."}`
+    });
+    for (const term of terms) {
+      const termButton = document.createElement("button");
+      termButton.type = "button";
+      termButton.className = "ghost-button search-empty-action";
+      termButton.textContent = `Search “${term}”`;
+      termButton.addEventListener("click", () => {
+        searchInstance.query = term;
+        panel.querySelector(".search-input").value = term;
+        clearTimeout(searchTimers.get(paneIDForUtilityInstance(searchInstance)));
+        saveWorkspaceState();
+        setSearchRecentPopoverOpen(panel, false);
+        void renderSearchResults(panel, searchInstance);
+      });
+      results.querySelector(".reader-empty")?.append(termButton);
+    }
     if (selectedPrefixes.length) {
       const showAllButton = document.createElement("button");
       showAllButton.type = "button";
@@ -16005,6 +16647,10 @@ function renderResearchInterpretation(container, result, options = {}) {
     result.disclaimer || "AI-generated research assistance, not an official code determination."
   ).trim();
   card.append(disclaimer);
+  const nextStep = document.createElement("p");
+  nextStep.className = "research-answer-disclaimer research-answer-next-step";
+  nextStep.textContent = "Review cited provisions and Project facts. Record your own conclusion in a Project Note before adding it to a Report.";
+  card.append(nextStep);
   container.append(card);
   wireResearchDetailsMotion(evidenceReviewed, evidenceReviewedBody);
   if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
@@ -16034,16 +16680,20 @@ function researchRequestBody(values = {}) {
 
 async function postResearch(path, values = {}) {
   const account = activeAccount();
+  const identity = captureAccountRequest();
   if (!account) throw new Error("Sign in from Account to use private research conversations.");
   if (path === "/research/conversations/create" && String(values.projectID || "").trim()) {
     await ensureResearchProjectSynced(values.projectID, account);
   }
-  const payload = await postJSON(path, researchRequestBody(values), { token: account.sessionToken });
+  requireCurrentAccountRequest(identity);
+  const payload = await postJSON(path, { ...values, auth: { accountUserID: account.userID } }, { token: account.sessionToken });
+  requireCurrentAccountRequest(identity);
   if (payload?.artifactRevisions) observeLocalProjectArtifactRevisions(payload.artifactRevisions);
   return payload;
 }
 
 async function ensureResearchProjectSynced(projectID, account = activeAccount()) {
+  const requestIdentity = captureAccountRequest();
   const normalizedProjectID = String(projectID || "").trim();
   if (!normalizedProjectID) return;
   const pendingProject = (state.localProjects || []).find((project) =>
@@ -16056,6 +16706,7 @@ async function ensureResearchProjectSynced(projectID, account = activeAccount())
 
   const pendingUpdatedAt = pendingProject.updatedAt || null;
   await pushMutation(projectMutationForRecord(pendingProject, account));
+  requireCurrentAccountRequest(requestIdentity);
   state.localProjects = (state.localProjects || []).filter((project) =>
     researchProjectID(project) !== normalizedProjectID ||
     (project.updatedAt || null) !== pendingUpdatedAt
@@ -16065,6 +16716,7 @@ async function ensureResearchProjectSynced(projectID, account = activeAccount())
 
 async function postResearchWithProgress(values, { signal, onProgress } = {}) {
   const account = activeAccount();
+  const identity = captureAccountRequest();
   if (!account) throw new Error("Sign in from Account to use private research conversations.");
   let response;
   try {
@@ -16077,8 +16729,10 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
       body: JSON.stringify(researchRequestBody({ ...values, progressStream: "ndjson" })),
       signal
     });
+    requireCurrentAccountRequest(identity);
     serverReachable = response.status < 500;
   } catch (error) {
+    requireCurrentAccountRequest(identity);
     serverReachable = false;
     updateConnectionStatus();
     throw error;
@@ -16087,6 +16741,7 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
   const contentType = String(response.headers.get("content-type") || "");
   if (!contentType.includes("application/x-ndjson") || !response.body) {
     const payload = await response.json().catch(() => ({}));
+    requireCurrentAccountRequest(identity);
     if (!response.ok) {
       const error = new Error(payload.error || `Request failed: ${response.status}`);
       error.status = response.status;
@@ -16102,6 +16757,7 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
   let buffer = "";
   let result = null;
   const consumeLine = (line) => {
+    requireCurrentAccountRequest(identity);
     if (!line.trim()) return;
     const event = JSON.parse(line);
     if (event.type === "progress") {
@@ -16116,12 +16772,13 @@ async function postResearchWithProgress(values, { signal, onProgress } = {}) {
       const error = new Error(event.error?.message || "Research request failed.");
       error.status = Number(event.error?.status || 500);
       error.code = event.error?.code || null;
-      error.payload = event.error?.code ? { code: event.error.code } : {};
+      error.payload = event.error || {};
       throw error;
     }
   };
   while (true) {
     const { value, done } = await reader.read();
+    requireCurrentAccountRequest(identity);
     buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
     const lines = buffer.split("\n");
     buffer = lines.pop() || "";
@@ -16164,6 +16821,7 @@ async function loadOrganizationWorkspace(options = {}) {
     return organizationWorkspace;
   }
   const account = activeAccount();
+  const identity = captureAccountRequest();
   if (!account) {
     organizationWorkspace = { organizations: [] };
     return organizationWorkspace;
@@ -16174,20 +16832,23 @@ async function loadOrganizationWorkspace(options = {}) {
   }
   if (organizationWorkspace) return organizationWorkspace;
   if (!organizationLoadPromise) {
-    organizationLoadPromise = postResearch("/organizations/list")
+    const request = postResearch("/organizations/list")
       .then((payload) => {
+        if (!isCurrentAccountRequest(identity) || organizationLoadPromise !== request) return null;
         organizationWorkspace = {
           organizations: Array.isArray(payload.organizations) ? payload.organizations : []
         };
         return organizationWorkspace;
       })
       .catch((error) => {
+        if (!isCurrentAccountRequest(identity) || organizationLoadPromise !== request) return null;
         organizationWorkspace = { organizations: [], error: error.message };
         return organizationWorkspace;
       })
       .finally(() => {
-        organizationLoadPromise = null;
+        if (organizationLoadPromise === request) organizationLoadPromise = null;
       });
+    organizationLoadPromise = request;
   }
   return organizationLoadPromise;
 }
@@ -16357,6 +17018,7 @@ async function closeResearchConversation(conversationIDOverride = "") {
 }
 
 async function openSupplementalResearchConversation(conversationID) {
+  const requestIdentity = captureAccountRequest();
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
   if (normalizedConversationID === state.researchConversationID) {
@@ -16367,9 +17029,11 @@ async function openSupplementalResearchConversation(conversationID) {
   try {
     conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
   } catch (error) {
+    if (!isCurrentAccountRequest(requestIdentity)) return null;
     await showWebNotice("Could not open Research", error.message || "The conversation could not be loaded.");
     return null;
   }
+  if (!isCurrentAccountRequest(requestIdentity)) return null;
   supplementalResearchConversations.set(normalizedConversationID, conversation);
   if (!supplementalResearchConversationIDs.includes(normalizedConversationID)) {
     supplementalResearchConversationIDs.push(normalizedConversationID);
@@ -16384,6 +17048,7 @@ async function openSupplementalResearchConversation(conversationID) {
   state.paneOrder.splice(lastConversationIndex === -1 ? state.paneOrder.length : lastConversationIndex + 1, 0, paneID);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  if (!isCurrentAccountRequest(requestIdentity)) return null;
   scrollPaneIntoView(paneID);
   return conversation;
 }
@@ -17810,6 +18475,33 @@ function renderResearchProgressCard(progress, { completed = false } = {}) {
       purchase.textContent = "Buy more turns";
       purchase.addEventListener("click", () => toggleUtilityPane("settings"));
       actions.append(purchase);
+    } else if (!progress.recoveryReviewed && ["RESEARCH_CONTEXT_CHANGED", "RESEARCH_CONVERSATION_CHANGED", "RESEARCH_SOURCE_CHANGED"].includes(progress.errorCode)) {
+      const review = document.createElement("button");
+      review.className = "ghost-button research-progress-review";
+      review.type = "button";
+      review.textContent = progress.errorCode === "RESEARCH_SOURCE_CHANGED" ? "Review sources" : "Review current Research";
+      review.addEventListener("click", async () => {
+        const requestIdentity = progress.requestIdentity || captureAccountRequest();
+        if (!isCurrentAccountRequest(requestIdentity)) return;
+        review.disabled = true;
+        try {
+          let conversation;
+          if (supplementalResearchConversations.has(progress.conversationID)) {
+            conversation = await openSupplementalResearchConversation(progress.conversationID);
+          } else {
+            conversation = await openResearchConversation(progress.conversationID, { refreshList: true });
+          }
+          requireCurrentAccountRequest(requestIdentity);
+          if (!conversation) throw new Error("The current conversation is not available");
+          progress.recoveryReviewed = true;
+          refreshResearchProgressCard(progress);
+        } catch (error) {
+          if (!isCurrentAccountRequest(requestIdentity)) return;
+          progress.error = `Could not reload current Research: ${error.message}. Your question is preserved.`;
+          refreshResearchProgressCard(progress);
+        }
+      });
+      actions.append(review);
     } else if (typeof progress.retry === "function") {
       const retry = document.createElement("button");
       retry.className = "ghost-button research-progress-retry";
@@ -17866,7 +18558,10 @@ async function runResearchProgressSession(
   { onSuccess, onFailure, onRetry } = {},
   { retrying = false } = {}
 ) {
+  const requestIdentity = progress.requestIdentity || captureAccountRequest();
+  progress.requestIdentity = requestIdentity;
   const execute = async (retrying = false) => {
+    if (!isCurrentAccountRequest(requestIdentity)) return;
     if (retrying) {
       onRetry?.();
       progress.stages = new Map(researchProgressStages.map((stage) => [stage.id, "pending"]));
@@ -17874,6 +18569,7 @@ async function runResearchProgressSession(
       progress.status = "retrying";
       progress.error = "";
       progress.errorCode = "";
+      progress.recoveryReviewed = false;
       progress.startedAt = Date.now();
       progress.endedAt = null;
       progress.controller = new AbortController();
@@ -17889,8 +18585,11 @@ async function runResearchProgressSession(
         requestID: progress.id
       }, {
         signal: progress.controller.signal,
-        onProgress: (event) => updateResearchProgressSession(progress, event)
+        onProgress: (event) => {
+          if (isCurrentAccountRequest(requestIdentity)) updateResearchProgressSession(progress, event);
+        }
       });
+      requireCurrentAccountRequest(requestIdentity);
       progress.status = "completed";
       progress.endedAt = Date.now();
       clearInterval(progress.timer);
@@ -17901,6 +18600,10 @@ async function runResearchProgressSession(
       );
       await onSuccess?.(result);
     } catch (error) {
+      if (!isCurrentAccountRequest(requestIdentity)) {
+        clearInterval(progress.timer);
+        return;
+      }
       const cancelled = error.name === "AbortError" || error.code === "RESEARCH_CANCELLED";
       const activeStage = researchProgressStages.find((stage) =>
         ["active", "retrying"].includes(progress.stages.get(stage.id))
@@ -17999,6 +18702,7 @@ function researchDisclosureIsAcknowledged() {
 }
 
 async function ensureResearchDisclosureAcknowledged(container) {
+  const requestIdentity = captureAccountRequest();
   if (researchDisclosureIsAcknowledged()) return true;
   const confirmed = await confirmWebWarning(
     "Before your first Research question",
@@ -18009,7 +18713,7 @@ async function ensureResearchDisclosureAcknowledged(container) {
       container
     }
   );
-  if (!confirmed) return false;
+  if (!isCurrentAccountRequest(requestIdentity) || !confirmed) return false;
   const key = researchDisclosureAcknowledgmentKey();
   researchDisclosureAcknowledgedAccounts.add(key);
   try {
@@ -20872,7 +21576,100 @@ async function openNotebookReference(project, foundation, reference, selectCard,
   );
 }
 
+function privateCacheFallbackAllowed(error) {
+  if (["ACCOUNT_CONTEXT_CHANGED", "OFFLINE_ACCOUNT_DELETED"].includes(error?.code)) return false;
+  const status = Number(error?.status || 0);
+  return status === 0 || status >= 500;
+}
+
+async function notebookDeviceRecoveryBundle(projectID, identity) {
+  requireCurrentAccountRequest(identity);
+  const snapshot = await offlineAccountRecoverySnapshot(identity.userID);
+  requireCurrentAccountRequest(identity);
+  const belongsHere = (record) => record.accountUserID === identity.userID && record.projectID === projectID;
+  const drafts = snapshot.drafts.filter(belongsHere);
+  const images = await Promise.all(snapshot.images.filter(belongsHere).map(async ({ blob, ...record }) => ({
+    ...record, ...(blob ? { dataURL: await blobDataURL(blob) } : {})
+  })));
+  requireCurrentAccountRequest(identity);
+  return { format: "permitext-device-draft-recovery", version: 1, projectID,
+    accountUserID: identity.userID, exportedAt: new Date().toISOString(), drafts, images,
+    instructions: "These are your local authored drafts and images. Review them before copying into a saved Note. This file does not import or synchronize changes." };
+}
+
+function notebookRecoveryPlainText(node) {
+  if (!node) return "";
+  if (typeof node === "string") return node;
+  if (Array.isArray(node)) return node.map(notebookRecoveryPlainText).join("");
+  if (Array.isArray(node.document)) return node.document.map(notebookRecoveryPlainText).join("\n\n");
+  if (node.type === "text") return String(node.text || "");
+  if (node.type === "permitextReference") return String(node.props?.label || "");
+  if (node.type === "image") return String(node.props?.caption || node.props?.name || "Image");
+  const body = (Array.isArray(node.content) ? node.content : []).map(notebookRecoveryPlainText).join(node.type === "doc" ? "\n\n" : "");
+  const children = (Array.isArray(node.children) ? node.children : []).map(notebookRecoveryPlainText);
+  return [body, ...children].filter(Boolean).join("\n");
+}
+
+async function appendNotebookDeviceRecovery(container, projectID, identity) {
+  try {
+    const drafts = (await pendingNotebookDrafts(identity.userID))
+      .filter((draft) => draft.accountUserID === identity.userID && draft.projectID === projectID);
+    requireCurrentAccountRequest(identity);
+    if (!drafts.length) return;
+    const region = document.createElement("section");
+    region.className = "notebook-device-recovery";
+    const heading = document.createElement("h3");
+    heading.textContent = "Your drafts on this device";
+    const description = document.createElement("p");
+    description.textContent = "Your local edits are preserved. You can read them here and download a recovery file with their images while Notebook access is unavailable.";
+    region.append(heading, description);
+    for (const draft of drafts) {
+      const details = document.createElement("details");
+      const summary = document.createElement("summary");
+      summary.textContent = draft.title || (draft.scope === "collaboration-note" ? "Project information draft" : "Untitled Note");
+      const text = document.createElement("pre");
+      text.textContent = notebookRecoveryPlainText(draft.document) || "This draft contains images or structured content. Download the recovery file to preserve all of it.";
+      details.append(summary, text);
+      region.append(details);
+    }
+    const download = document.createElement("button");
+    download.type = "button";
+    download.className = "notebook-recovery-download";
+    download.textContent = "Download drafts and images";
+    const status = document.createElement("p");
+    status.setAttribute("role", "status");
+    download.addEventListener("click", async () => {
+      if (!isCurrentAccountRequest(identity)) return;
+      download.disabled = true;
+      try {
+        const bundle = await notebookDeviceRecoveryBundle(projectID, identity);
+        requireCurrentAccountRequest(identity);
+        downloadCodeMemoBlob(new Blob([JSON.stringify(bundle, null, 2)], { type: "application/json" }), "permitext-device-drafts.json");
+        status.textContent = "Recovery file downloaded. Your drafts remain on this device.";
+      } catch (error) {
+        if (isCurrentAccountRequest(identity)) status.textContent = `Download could not finish: ${error.message}`;
+      } finally {
+        if (isCurrentAccountRequest(identity)) download.disabled = false;
+      }
+    });
+    region.append(download, status);
+    container.append(region);
+  } catch (error) {
+    if (!isCurrentAccountRequest(identity)) return;
+    const status = document.createElement("p");
+    status.setAttribute("role", "status");
+    status.textContent = "Device drafts could not be read. Keep this browser's site data and try again.";
+    container.append(status);
+  }
+}
+
 async function renderProjectNotebook(project) {
+  const requestIdentity = captureAccountRequest();
+  const accountUserID = requestIdentity.userID;
+  const notebookRequest = (path, values) => {
+    requireCurrentAccountRequest(requestIdentity);
+    return postResearch(path, values);
+  };
   const identity = projectIdentity(project);
   const projectID = projectDetailKey(identity);
   const paneID = paneIDForProjectNotebook(identity);
@@ -20923,6 +21720,69 @@ async function renderProjectNotebook(project) {
   let activeCard = null;
   let draftDocument = emptyNotebookDocument();
   let dirty = false;
+  let notebookRevision = 0;
+  let persistedRevision = -1;
+  let persistedCardID = null;
+  let persistedDraft = null;
+  let draftWriteQueue = Promise.resolve();
+  let saveConflict = false;
+  const draftStatus = document.createElement("p");
+  draftStatus.className = "notebook-status notebook-draft-status";
+  draftStatus.setAttribute("role", "status");
+  header.after(draftStatus);
+  const showDraftStatus = (message) => {
+    if (isCurrentAccountRequest(requestIdentity)) draftStatus.textContent = message;
+  };
+  function showNotebookRecoveryConflict(draft) {
+    if (!draft?.recoveryConflict) return false;
+    saveConflict = true;
+    if (!isCurrentAccountRequest(requestIdentity)) return true;
+    showDraftStatus("Device draft conflict · two different drafts are preserved. Download this draft before comparing it with the saved Note. Automatic saving is paused.");
+    const download = document.createElement("button");
+    download.type = "button";
+    download.className = "notebook-recovery-download";
+    download.textContent = "Download recovery draft";
+    download.addEventListener("click", () => {
+      if (!isCurrentAccountRequest(requestIdentity)) return;
+      const recovery = { format: "permitext-notebook-recovery", version: 1, projectID,
+        originalCardID: draft.cardID || "", acceptedCardID: draft.acceptedCardID || "",
+        title: activeCard?.title || draft.title || "", document: structuredClone(draftDocument),
+        evidenceLinks: structuredClone(activeCard?.evidenceLinks || draft.evidenceLinks || []) };
+      downloadCodeMemoBlob(new Blob([JSON.stringify(recovery, null, 2)], { type: "application/json" }), "permitext-notebook-recovery.json");
+    });
+    draftStatus.append(" ", download);
+    return true;
+  }
+  const persistFocusedDraft = () => {
+    if (!dirty || !activeCard) return draftWriteQueue.then(() => persistedDraft);
+    const revision = notebookRevision;
+    const cardID = activeCard.id || "";
+    const snapshot = {
+      accountUserID, projectID, cardID, scope: "notebook-card",
+      baseVersion: activeCard.version, cardType: activeCard.cardType || "finding",
+      title: activeCard.title || "", document: structuredClone(draftDocument),
+      evidenceLinks: structuredClone(activeCard.evidenceLinks || [])
+    };
+    const write = draftWriteQueue.catch(() => {}).then(async () => {
+      // A write captured while acknowledgement was rekeying a new Note may
+      // have the accepted ID. A detected collision belongs to the retained old
+      // draft; never apply those editor bytes to the other canonical-ID draft.
+      if (persistedDraft?.recoveryConflict && saveConflict && snapshot.cardID !== persistedDraft.cardID) {
+        snapshot.cardID = persistedDraft.cardID || "";
+        snapshot.baseVersion = persistedDraft.baseVersion;
+      }
+      if (persistedRevision === revision && persistedCardID === cardID && persistedDraft) return persistedDraft;
+      const saved = await saveNotebookDraft(snapshot);
+      persistedRevision = revision;
+      persistedCardID = snapshot.cardID;
+      persistedDraft = saved;
+      if (!showNotebookRecoveryConflict(saved)) showDraftStatus("Saved on this device · waiting to sync");
+      if (isCurrentAccountRequest(requestIdentity)) void refreshNotebookPendingStatus(requestIdentity).catch(() => {});
+      return saved;
+    });
+    draftWriteQueue = write;
+    return write;
+  };
   let notebookReadOnly = false;
   let disposed = false;
   const notebookObjectURLs = new Set();
@@ -20934,13 +21794,15 @@ async function renderProjectNotebook(project) {
   let refreshNotebookReferenceSources = async () => false;
   let refreshNotebookReportStatus = async () => false;
   const notebookImageUploaded = (event) => {
-    if (event.detail?.projectID !== projectID) return;
+    if (disposed || !isCurrentAccountRequest(requestIdentity) || event.detail?.accountUserID !== accountUserID || event.detail?.generation !== requestIdentity.generation || event.detail?.projectID !== projectID) return;
     editorMount?.replaceAssetURL?.(event.detail.localURL, event.detail.permanentURL);
   };
   window.addEventListener("permitext:notebook-image-uploaded", notebookImageUploaded);
 
   const mountState = {
     panel,
+    persistDraft: persistFocusedDraft,
+    async syncDraft() { return flushNotebookAutosave(); },
     activeCardID() {
       return activeCard?.id || "";
     },
@@ -20963,6 +21825,7 @@ async function renderProjectNotebook(project) {
       return refreshNotebookReportStatus();
     },
     dispose() {
+      void persistFocusedDraft().catch(() => {});
       disposed = true;
       window.clearTimeout(notebookAutosaveTimer);
       window.clearTimeout(notebookIdlePrefetchTimer);
@@ -21001,21 +21864,23 @@ async function renderProjectNotebook(project) {
       } else {
         [foundationPayload, cardPayload] = await Promise.all([
           identity.sharedOrganizationID
-            ? postResearch("/organizations/projects/snapshot", { projectID })
+            ? notebookRequest("/organizations/projects/snapshot", { projectID })
                 .then((payload) => payload.project)
-            : postResearch("/projects/foundation/state", { projectID }),
-          postResearch("/notebook/cards/list", { projectID })
+            : notebookRequest("/projects/foundation/state", { projectID }),
+          notebookRequest("/notebook/cards/list", { projectID })
         ]);
       }
       await saveNotebookProjectSnapshot({
-        accountUserID: activeAccount().userID,
+        accountUserID: accountUserID,
         projectID,
         foundation: foundationPayload,
         cardPayload
       }).catch(() => {});
     } catch (networkError) {
+      requireCurrentAccountRequest(requestIdentity);
+      if (!privateCacheFallbackAllowed(networkError)) throw networkError;
       const cached = await loadNotebookProjectSnapshot(
-        activeAccount().userID,
+        accountUserID,
         projectID
       ).catch(() => null);
       if (!cached?.foundation || !cached?.cardPayload) throw networkError;
@@ -21023,11 +21888,11 @@ async function renderProjectNotebook(project) {
       cardPayload = cached.cardPayload;
       status.textContent = "Offline Notebook · changes will synchronize when connectivity returns.";
     }
-    if (disposed) return panel;
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return panel;
     foundation = foundationPayload;
     cards = cardPayload.cards || [];
     notebookReadOnly = cardPayload.access?.readOnly === true;
-    shell.replaceChildren();
+    shell.replaceChildren(draftStatus);
     if (identity.sharedOrganizationID) {
       const accessNote = document.createElement("p");
       accessNote.className = "notebook-access-note";
@@ -21182,7 +22047,6 @@ async function renderProjectNotebook(project) {
     shell.append(rail, focus);
 
     let notebookAutosaveTask = null;
-    let notebookRevision = 0;
     let selectingCards = false;
     let cardSelectionBusy = false;
     const selectedCardIDs = new Set();
@@ -21201,7 +22065,7 @@ async function renderProjectNotebook(project) {
 
     function scheduleNotebookAutosave(delay = 700) {
       window.clearTimeout(notebookAutosaveTimer);
-      if (notebookReadOnly || disposed || !dirty || !activeCard) return;
+      if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || saveConflict || !dirty || !activeCard) return;
       if (!String(activeCard.title || "").trim()) return;
       notebookAutosaveTimer = window.setTimeout(() => {
         notebookAutosaveTimer = null;
@@ -21212,120 +22076,140 @@ async function renderProjectNotebook(project) {
     function markNotebookDirty() {
       dirty = true;
       notebookRevision += 1;
+      const addToReport = panel.querySelector(".notebook-add-to-report");
+      if (addToReport) addToReport.disabled = true;
+      void persistFocusedDraft().catch((error) => showDraftStatus(`Device save failed: ${error.message}. Keep this Note open and copy your work.`));
       scheduleNotebookAutosave();
     }
 
     async function saveActiveNotebookCard() {
       if (notebookAutosaveTask) return notebookAutosaveTask;
-      if (notebookReadOnly || disposed || !dirty || !activeCard) return true;
-      const title = String(activeCard.title || "").trim();
-      if (!title) return false;
+      if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || !dirty || !activeCard) return !dirty;
       const revisionAtStart = notebookRevision;
-      const documentAtStart = editorMount?.getDocument?.() || draftDocument;
       const cardAtStart = activeCard;
-      if (notebookDocumentAssetURLs(documentAtStart, "permitext-notebook-local:").length) {
-        await saveNotebookDraft({
-          accountUserID: activeAccount().userID,
-          projectID,
-          cardID: cardAtStart.id,
-          title,
-          document: documentAtStart,
-          evidenceLinks: cardAtStart.evidenceLinks || []
-        });
-        dirty = false;
-        return true;
-      }
       const saveTask = (async () => {
         try {
-          const payload = await postResearch("/notebook/cards/save", {
-            projectID,
-            cardID: cardAtStart.id || undefined,
-            expectedVersion: cardAtStart.version || 0,
-            cardType: cardAtStart.cardType,
-            title,
-            document: documentAtStart,
-            evidenceLinks: cardAtStart.evidenceLinks || []
-          });
-          if (disposed || activeCard !== cardAtStart) return true;
-          const changedDuringSave = notebookRevision !== revisionAtStart;
-          const localTitle = activeCard.title;
-          const localDocument = draftDocument;
-          const localEvidenceLinks = activeCard.evidenceLinks || [];
-          activeCard = changedDuringSave
-            ? {
-                ...payload.card,
-                title: localTitle,
-                document: localDocument,
-                evidenceLinks: localEvidenceLinks
-              }
-            : payload.card;
-          draftDocument = changedDuringSave ? localDocument : payload.card.document;
-          dirty = changedDuringSave;
+          const submittedDraft = await persistFocusedDraft();
+          requireCurrentAccountRequest(requestIdentity);
+          if (saveConflict || !submittedDraft || navigator.onLine === false) return false;
+          const payload = await synchronizeNotebookDraft(submittedDraft, requestIdentity, { deferAcknowledgement: true });
+          if (!payload) return false;
+          const acknowledgedDraft = payload.submittedDraft;
+          const ownsFocusedCard = activeCard === cardAtStart;
+          const hasNewerDeviceDraft = submittedDraft.revision !== acknowledgedDraft.revision;
+          // Change the local identity before scheduling the acknowledgement. Later edits capture
+          // the accepted card ID; already queued writes finish before its atomic rekey.
+          if (ownsFocusedCard) {
+            activeCard = { ...payload.card, title: activeCard.title, document: draftDocument,
+              evidenceLinks: activeCard.evidenceLinks || [] };
+          }
+          const acceptedFocusedCard = ownsFocusedCard ? activeCard : null;
+          const acknowledgement = draftWriteQueue.then(() => acknowledgeNotebookDraft(
+            accountUserID, projectID, acknowledgedDraft.cardID || "", acknowledgedDraft.revision, payload.card
+          ));
+          draftWriteQueue = acknowledgement;
+          const acknowledged = await acknowledgement;
+          if (acknowledged?.conflict && acknowledged.draft) {
+            persistedDraft = acknowledged.draft;
+            persistedCardID = acknowledged.draft.cardID || "";
+            persistedRevision = -1;
+            saveConflict = true;
+            dirty = true;
+            if (ownsFocusedCard && activeCard === acceptedFocusedCard) {
+              activeCard = { ...activeCard, id: acknowledged.draft.cardID || "", version: acknowledged.draft.baseVersion };
+            }
+          }
+          await saveNotebookCardSnapshot(accountUserID, projectID, payload.card);
+          await refreshNotebookPendingStatus(requestIdentity);
+          if (acknowledged?.conflict) {
+            if (!disposed && ownsFocusedCard) showNotebookRecoveryConflict(acknowledged.draft);
+            return false;
+          }
+          if (disposed || !isCurrentAccountRequest(requestIdentity) || !ownsFocusedCard || activeCard !== acceptedFocusedCard) return false;
+          const changedDuringSave = hasNewerDeviceDraft || notebookRevision !== revisionAtStart;
+          if (!changedDuringSave) {
+            activeCard = payload.card;
+            draftDocument = payload.card.document;
+            persistedDraft = null;
+            persistedRevision = -1;
+            persistedCardID = null;
+            dirty = false;
+          } else {
+            dirty = true;
+            persistedCardID = payload.card.id;
+            persistedDraft = await loadNotebookDraft(accountUserID, projectID, payload.card.id);
+            if (disposed || !isCurrentAccountRequest(requestIdentity) || activeCard !== acceptedFocusedCard) return false;
+          }
           const summary = notebookSummaryForCard(activeCard, payload.card);
           cards = [summary, ...cards.filter((card) => card.id !== summary.id)];
           foundation.artifacts = [
             ...(foundation.artifacts || []).filter((artifact) => artifact.envelope?.id !== payload.card.id),
             { envelope: { id: payload.card.id, type: "notebookCard" }, payload: payload.card }
           ];
-          await Promise.all([
-            deleteNotebookDraft(activeAccount().userID, projectID, cardAtStart.id).catch(() => {}),
-            cardAtStart.id ? Promise.resolve() : deleteNotebookDraft(activeAccount().userID, projectID, "").catch(() => {}),
-            finalizeNotebookImagesForDocument(
-              activeAccount().userID,
-              projectID,
-              cardAtStart.id,
-              notebookDocumentAssetURLs(documentAtStart, "permitext-notebook-asset:")
-            ).catch(() => {})
-          ]);
-          await saveNotebookProjectSnapshot({
-            accountUserID: activeAccount().userID,
-            projectID,
-            foundation,
-            cardPayload: { cards, access: { readOnly: notebookReadOnly } }
-          }).catch(() => {});
-          await saveNotebookCardSnapshot(
-            activeAccount().userID,
-            projectID,
-            payload.card
-          ).catch(() => {});
-          await reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
+          await saveNotebookProjectSnapshot({ accountUserID, projectID, foundation,
+            cardPayload: { cards, access: { readOnly: notebookReadOnly } } });
+          requireCurrentAccountRequest(requestIdentity);
+          if (disposed) return true;
+          showDraftStatus(dirty ? "Saved on this device · newer edits waiting to sync" : "Synced");
           renderCardList();
-          if (changedDuringSave) {
-            scheduleNotebookAutosave(180);
-          }
-          return true;
+          const addToReport = panel.querySelector(".notebook-add-to-report");
+          if (addToReport) addToReport.disabled = notebookReadOnly || dirty || !activeCard?.id;
+          if (dirty) scheduleNotebookAutosave(180);
+          void reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
+          return !dirty;
         } catch (error) {
-          if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT" && error.payload.card) {
-            const resolution = resolveNotebookVersionConflict(activeCard, draftDocument, error.payload.card);
-            activeCard = resolution.activeCard;
-            draftDocument = resolution.draftDocument;
-            dirty = resolution.dirty;
-            await renderFocusedCard();
-            await showWebNotice(
-              "Notebook save conflict",
-              "Another edit was saved first. Your local draft is preserved; review it before retrying the save."
-            );
+          if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
+          if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT") {
+            saveConflict = true;
+            showDraftStatus("Save conflict · your device draft is preserved. Compare it with the latest Note before saving another version.");
+            const latest = error.payload.card;
+            if (latest) {
+              const review = document.createElement("button");
+              review.type = "button";
+              review.textContent = "Review save conflict";
+              review.addEventListener("click", async () => {
+                const confirmed = await confirmWebWarning("Review the current Note",
+                  `Current saved Note: ${latest.title}\n\n${latest.plainText || "(No plain text)"}\n\nYour local draft remains in the editor. Save your draft as the next version only after comparing these changes.`,
+                  { confirmLabel: "Save my draft as next version" });
+                if (!confirmed || disposed || !isCurrentAccountRequest(requestIdentity)) return;
+                try {
+                  const reviewed = await persistFocusedDraft();
+                  requireCurrentAccountRequest(requestIdentity);
+                  const rebased = await rebaseNotebookDraftAfterReview(accountUserID, projectID,
+                    activeCard.id || "", reviewed.revision, latest);
+                  requireCurrentAccountRequest(requestIdentity);
+                  activeCard = { ...activeCard, id: rebased.cardID, version: rebased.baseVersion };
+                  persistedDraft = rebased;
+                  persistedCardID = rebased.cardID;
+                  persistedRevision = notebookRevision;
+                  saveConflict = false;
+                  showDraftStatus("Reviewed device draft · waiting to sync");
+                  scheduleNotebookAutosave(0);
+                } catch (error) {
+                  showDraftStatus(`Conflict review could not be applied: ${error.message}. Your device draft is preserved.`);
+                }
+              });
+              draftStatus.append(" ", review);
+            }
           } else {
-            await showWebNotice("Note not saved", error.message);
+            showDraftStatus(persistedDraft
+              ? `Saved on this device · sync pending: ${error.message}`
+              : `Device save failed: ${error.message}. Keep this Note open and copy your work.`);
           }
           return false;
         }
       })();
-      notebookAutosaveTask = saveTask.finally(() => {
-        notebookAutosaveTask = null;
-      });
+      notebookAutosaveTask = saveTask.finally(() => { notebookAutosaveTask = null; });
       return notebookAutosaveTask;
     }
 
     flushNotebookAutosave = async () => {
       window.clearTimeout(notebookAutosaveTimer);
       notebookAutosaveTimer = null;
-      while (dirty) {
-        if (!(await saveActiveNotebookCard())) return false;
-        window.clearTimeout(notebookAutosaveTimer);
-        notebookAutosaveTimer = null;
-      }
-      return true;
+      if (!dirty) return true;
+      await saveActiveNotebookCard();
+      try { await persistFocusedDraft(); return true; }
+      catch { return false; }
     };
 
     async function loadCard(cardID) {
@@ -21339,42 +22223,54 @@ async function renderProjectNotebook(project) {
       }
       let payload;
       try {
-        payload = await postResearch("/notebook/cards/get", { projectID, cardID });
+        payload = await notebookRequest("/notebook/cards/get", { projectID, cardID });
         await saveNotebookCardSnapshot(
-          activeAccount().userID,
+          accountUserID,
           projectID,
           payload.card
         ).catch(() => {});
       } catch (networkError) {
+        requireCurrentAccountRequest(requestIdentity);
+        if (!privateCacheFallbackAllowed(networkError)) throw networkError;
         const cached = await loadNotebookProjectSnapshot(
-          activeAccount().userID,
+          accountUserID,
           projectID
         ).catch(() => null);
         const cachedCard = cached?.cardDocuments?.[cardID];
         if (!cachedCard) throw networkError;
         payload = { card: cachedCard };
       }
+      requireCurrentAccountRequest(requestIdentity);
+      if (disposed) return;
       activeCard = payload.card;
-      const localDraft = await loadNotebookDraft(activeAccount().userID, projectID, cardID).catch(() => null);
-      const useLocalDraft = localDraft && String(localDraft.updatedAt) > String(activeCard.updatedAt || "");
-      draftDocument = await reconcileNotebookDocumentAssets(useLocalDraft ? localDraft.document : activeCard.document);
+      saveConflict = false;
+      const localDraft = await loadNotebookDraft(accountUserID, projectID, cardID).catch(() => null);
+      requireCurrentAccountRequest(requestIdentity);
+      const useLocalDraft = Boolean(localDraft);
+      draftDocument = await reconcileNotebookDocumentAssets(useLocalDraft ? localDraft.document : activeCard.document, projectID, requestIdentity);
       if (useLocalDraft) {
-        if (localDraft.title) activeCard.title = localDraft.title;
+        activeCard.version = localDraft.baseVersion;
+        activeCard.title = localDraft.title || "";
         activeCard.evidenceLinks = localDraft.evidenceLinks || activeCard.evidenceLinks || [];
       }
       dirty = useLocalDraft;
+      persistedDraft = localDraft || null;
+      persistedCardID = activeCard.id || "";
+      persistedRevision = localDraft ? notebookRevision : -1;
+      if (!showNotebookRecoveryConflict(localDraft)) showDraftStatus(useLocalDraft ? "Recovered device draft · waiting to sync" : "Synced");
       renderCardList();
       await renderFocusedCard();
+      if (useLocalDraft) scheduleNotebookAutosave();
     }
 
     function scheduleIdleNotebookPrefetch() {
-      if (disposed || navigator.onLine === false || cards.length < 2) return;
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || navigator.onLine === false || cards.length < 2) return;
       const prefetch = async () => {
         notebookIdlePrefetchHandle = null;
         notebookIdlePrefetchTimer = null;
-        if (disposed || navigator.onLine === false) return;
-        const accountUserID = activeAccount()?.userID;
-        if (!accountUserID) return;
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || navigator.onLine === false) return;
+        const currentAccountUserID = accountUserID;
+        if (!currentAccountUserID) return;
         const cached = await loadNotebookProjectSnapshot(
           accountUserID,
           projectID
@@ -21384,9 +22280,9 @@ async function renderProjectNotebook(project) {
           .filter((card) => card.id !== activeCard?.id && !cachedCardIDs.has(card.id))
           .slice(0, notebookIdlePrefetchLimit);
         for (const card of pendingCards) {
-          if (disposed || navigator.onLine === false) return;
+          if (disposed || !isCurrentAccountRequest(requestIdentity) || navigator.onLine === false) return;
           try {
-            const payload = await postResearch("/notebook/cards/get", {
+            const payload = await notebookRequest("/notebook/cards/get", {
               projectID,
               cardID: card.id
             });
@@ -21426,7 +22322,7 @@ async function renderProjectNotebook(project) {
       }
       if (trigger) trigger.disabled = true;
       try {
-        await postResearch("/notebook/cards/delete", {
+        await notebookRequest("/notebook/cards/delete", {
           projectID,
           cardID: target.id,
           expectedVersion: target.version
@@ -21436,8 +22332,8 @@ async function renderProjectNotebook(project) {
           (artifact) => artifact.envelope?.id !== target.id
         );
         await Promise.all([
-          deleteNotebookDraft(activeAccount().userID, projectID, target.id).catch(() => {}),
-          deleteNotebookCardSnapshot(activeAccount().userID, projectID, target.id).catch(() => {}),
+          deleteNotebookDraft(accountUserID, projectID, target.id).catch(() => {}),
+          deleteNotebookCardSnapshot(accountUserID, projectID, target.id).catch(() => {}),
           ...((target.imageAssets || []).map((assetID) =>
             deleteLocalNotebookImage(`permitext-notebook-local:${assetID}`).catch(() => {})
           ))
@@ -21463,7 +22359,7 @@ async function renderProjectNotebook(project) {
     async function setNotebookCardArchived(card, archived) {
       if (activeCard?.id === card.id && dirty && !(await flushNotebookAutosave())) return false;
       try {
-        const payload = await postResearch("/notebook/cards/archive", {
+        const payload = await notebookRequest("/notebook/cards/archive", {
           projectID,
           cardID: card.id,
           expectedVersion: activeCard?.id === card.id ? activeCard.version : card.version,
@@ -21478,7 +22374,7 @@ async function renderProjectNotebook(project) {
           await renderFocusedCard();
         }
         await saveNotebookProjectSnapshot({
-          accountUserID: activeAccount().userID,
+          accountUserID: accountUserID,
           projectID,
           foundation,
           cardPayload: { cards, access: { readOnly: notebookReadOnly } }
@@ -21575,7 +22471,7 @@ async function renderProjectNotebook(project) {
 
     refreshNotebookCards = async () => {
       if (disposed) return false;
-      const payload = await postResearch("/notebook/cards/list", { projectID });
+      const payload = await notebookRequest("/notebook/cards/list", { projectID });
       if (disposed) return false;
       let nextCards = payload.cards || [];
       notebookReadOnly = payload.access?.readOnly === true;
@@ -21592,7 +22488,7 @@ async function renderProjectNotebook(project) {
       cards = nextCards;
       renderCardList();
       await saveNotebookProjectSnapshot({
-        accountUserID: activeAccount()?.userID || "",
+        accountUserID: accountUserID,
         projectID,
         foundation,
         cardPayload: { cards, access: { readOnly: notebookReadOnly } }
@@ -21788,19 +22684,19 @@ async function renderProjectNotebook(project) {
       }
       const focusedCardID = activeCard.id;
       refreshNotebookReferenceSources = async ({ refreshFoundation = false } = {}) => {
-        if (disposed || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
         if (refreshFoundation) {
           foundation = identity.sharedOrganizationID
-            ? await postResearch("/organizations/projects/snapshot", { projectID })
+            ? await notebookRequest("/organizations/projects/snapshot", { projectID })
                 .then((payload) => payload.project)
-            : await postResearch("/projects/foundation/state", { projectID });
+            : await notebookRequest("/projects/foundation/state", { projectID });
         }
         const nextCandidates = (await notebookReferenceCandidates(identity, foundation, cards))
           .filter((reference) =>
             reference.referenceKind !== "notebookCard" ||
             reference.referenceID !== focusedCardID
           );
-        if (disposed || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
         candidates = nextCandidates;
         renderReferenceOptions();
         referenceToggle.disabled = notebookReadOnly || !candidates.length;
@@ -21860,9 +22756,9 @@ async function renderProjectNotebook(project) {
       applyReportStatus(existingReportBlock);
       reportButton.disabled = notebookReadOnly || !activeCard.id;
       refreshNotebookReportStatus = async () => {
-        if (disposed || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
         const reportBlock = await notebookCardReportBlock(identity, focusedCardID).catch(() => null);
-        if (disposed || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
         applyReportStatus(reportBlock);
         return true;
       };
@@ -21870,6 +22766,8 @@ async function renderProjectNotebook(project) {
         reportButton.disabled = true;
         try {
           if (!(await flushNotebookAutosave())) return;
+          if (dirty) throw new Error("This Note is saved on this device and must finish syncing before it can be added to the Report.");
+          requireCurrentAccountRequest(requestIdentity);
           await promoteNotebookCardToReport(identity, activeCard);
           reportStatus.textContent = "Report status: Added";
           reportButton.classList.add("is-in-report");
@@ -21905,42 +22803,29 @@ async function renderProjectNotebook(project) {
       focus.append(fields, toolbar, editorElement, footer);
 
       titleInput.addEventListener("input", () => {
+        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence) return;
         activeCard.title = titleInput.value;
         markNotebookDirty();
       });
 
       const module = await loadNotebookModule();
-      if (disposed || renderSequence !== editorRenderSequence) return;
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence) return;
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
         autofocus: !notebookReadOnly && !activeCard.id,
         editable: !notebookReadOnly,
-        uploadFile: (file) => uploadNotebookAsset(projectID, file, activeCard.id).catch((error) => {
+        uploadFile: (file) => uploadNotebookAsset(projectID, file, activeCard.id, requestIdentity).catch((error) => {
           void showWebNotice("Image not added", error.message);
           throw error;
         }),
         async resolveFileUrl(url) {
-          const resolved = await resolveNotebookAsset(projectID, url);
+          const resolved = await resolveNotebookAsset(projectID, url, requestIdentity);
           if (resolved.startsWith("blob:")) notebookObjectURLs.add(resolved);
           return resolved;
         },
         onChange(document) {
-          if (notebookReadOnly) return;
+          if (notebookReadOnly || disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence) return;
           draftDocument = document;
-          void saveNotebookDraft({
-            accountUserID: activeAccount().userID,
-            projectID,
-            cardID: activeCard.id,
-            title: activeCard.title,
-            document,
-            evidenceLinks: activeCard.evidenceLinks || []
-          }).catch(() => {});
-          void pruneUnusedPendingNotebookImages(
-            activeAccount().userID,
-            projectID,
-            activeCard.id,
-            document
-          );
           markNotebookDirty();
         },
         onOpenReference: null
@@ -22024,6 +22909,29 @@ async function renderProjectNotebook(project) {
         );
         if (!confirmed) return;
       }
+      requireCurrentAccountRequest(requestIdentity);
+      const pendingNewDraft = await loadNotebookDraft(accountUserID, projectID, "");
+      requireCurrentAccountRequest(requestIdentity);
+      if (pendingNewDraft) {
+        activeCard = { id: "", version: pendingNewDraft.baseVersion ?? 0,
+          cardType: pendingNewDraft.cardType || "finding", title: pendingNewDraft.title || "",
+          references: [], evidenceLinks: pendingNewDraft.evidenceLinks || [] };
+        draftDocument = await reconcileNotebookDocumentAssets(pendingNewDraft.document, projectID, requestIdentity);
+        dirty = true;
+        persistedDraft = pendingNewDraft;
+        persistedCardID = "";
+        persistedRevision = notebookRevision;
+        saveConflict = Boolean(pendingNewDraft.recoveryConflict);
+        if (!showNotebookRecoveryConflict(pendingNewDraft)) showDraftStatus("Recovered device draft · finish syncing this Note before creating another");
+        renderCardList();
+        await renderFocusedCard();
+        scheduleNotebookAutosave();
+        return;
+      }
+      persistedDraft = null;
+      persistedCardID = null;
+      persistedRevision = -1;
+      saveConflict = false;
       activeCard = {
         id: "",
         version: 0,
@@ -22040,23 +22948,27 @@ async function renderProjectNotebook(project) {
     });
 
     renderCardList();
-    const unsavedDraft = notebookReadOnly
-      ? null
-      : await loadNotebookDraft(activeAccount().userID, projectID, "").catch(() => null);
+    const unsavedDraft = await loadNotebookDraft(accountUserID, projectID, "").catch(() => null);
+    requireCurrentAccountRequest(requestIdentity);
     if (unsavedDraft?.document) {
       activeCard = {
         id: "",
-        version: 0,
+        version: unsavedDraft.baseVersion || 0,
         cardType: "finding",
         title: unsavedDraft.title || "",
         plainText: "",
         references: [],
         evidenceLinks: unsavedDraft.evidenceLinks || []
       };
-      draftDocument = await reconcileNotebookDocumentAssets(unsavedDraft.document);
+      draftDocument = await reconcileNotebookDocumentAssets(unsavedDraft.document, projectID, requestIdentity);
       dirty = true;
+      persistedDraft = unsavedDraft;
+      persistedRevision = notebookRevision;
+      persistedCardID = "";
+      if (!showNotebookRecoveryConflict(unsavedDraft)) showDraftStatus(notebookReadOnly ? "Recovered device draft · view only" : "Recovered device draft · waiting to sync");
       renderCardList();
       await renderFocusedCard();
+      scheduleNotebookAutosave();
     } else if (cards[0]) {
       const pendingCardID = pendingNotebookCardByProject.get(projectID);
       const initialCard = cards.find((card) => card.id === pendingCardID) || cards[0];
@@ -22067,9 +22979,11 @@ async function renderProjectNotebook(project) {
       await renderFocusedCard();
     }
   } catch (error) {
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return panel;
     status.textContent = error.payload?.code === "PRO_REQUIRED_NOTEBOOK"
       ? "The Project Notebook is included with Permitext Pro."
       : `Notebook unavailable: ${error.message}`;
+    await appendNotebookDeviceRecovery(shell, projectID, requestIdentity);
   }
   return panel;
 }
@@ -22421,6 +23335,9 @@ function printReportManifestAsPDF(manifest) {
 }
 
 async function renderProjectReportDraft(project) {
+  const requestIdentity = captureAccountRequest();
+  const accountUserID = requestIdentity.userID;
+  const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };
   const identity = projectIdentity(project);
   const projectID = projectDetailKey(identity);
   const paneID = paneIDForProjectReportDraft(identity);
@@ -22513,6 +23430,7 @@ async function renderProjectReportDraft(project) {
 
   const mountState = {
     panel,
+    hasUnsavedChanges: () => dirty,
     async confirmDiscardIfNeeded() {
       if (!dirty) return true;
       return confirmWebWarning(
@@ -22556,7 +23474,7 @@ async function renderProjectReportDraft(project) {
   const saveDraft = async () => {
     clearStatus();
     try {
-      const payload = await postResearch("/reports/drafts/save", {
+      const payload = await reportRequest("/reports/drafts/save", {
         projectID,
         draftID: activeDraft.id,
         expectedVersion: activeDraft.version || 0,
@@ -22583,7 +23501,7 @@ async function renderProjectReportDraft(project) {
   const openHistoricalReport = async (manifestID) => {
     clearStatus();
     try {
-      const payload = await postResearch("/reports/manifests/get", { manifestID });
+      const payload = await reportRequest("/reports/manifests/get", { manifestID });
       clearStatus();
       printReportManifestAsPDF(payload.manifest);
     } catch (error) {
@@ -22599,12 +23517,12 @@ async function renderProjectReportDraft(project) {
     }
     clearStatus();
     try {
-      const payload = await postResearch("/reports/generate", {
+      const payload = await reportRequest("/reports/generate", {
         projectID,
         draftID: activeDraft.id,
         reportTemplateID: selectedReportTemplateID
       });
-      const historyPayload = await postResearch("/reports/history/list", { projectID });
+      const historyPayload = await reportRequest("/reports/history/list", { projectID });
       history = historyPayload.reports || [];
       clearStatus();
       renderWorkspaceContent();
@@ -23050,7 +23968,7 @@ async function renderProjectReportDraft(project) {
   }
 
   function renderWorkspaceContent() {
-    if (disposed) return;
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
     resetEnhancedSelects(shell);
     shell.querySelectorAll(":scope > :not(.report-draft-status)").forEach((element) => element.remove());
 
@@ -23347,9 +24265,9 @@ async function renderProjectReportDraft(project) {
   }
 
   refreshReportSources = async () => {
-    if (disposed) return false;
-    const payload = await postResearch("/reports/sources/list", { projectID });
-    if (disposed) return false;
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
+    const payload = await reportRequest("/reports/sources/list", { projectID });
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
     sources = payload.sources || [];
     sourceWarnings = payload.warnings || [];
     const sourcePalette = panel.querySelector(".report-source-palette");
@@ -23360,13 +24278,13 @@ async function renderProjectReportDraft(project) {
   };
 
   refreshReportArtifacts = async () => {
-    if (disposed) return false;
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
     const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
-      postResearch("/reports/drafts/list", { projectID }),
-      postResearch("/reports/sources/list", { projectID }),
-      postResearch("/reports/history/list", { projectID })
+      reportRequest("/reports/drafts/list", { projectID }),
+      reportRequest("/reports/sources/list", { projectID }),
+      reportRequest("/reports/history/list", { projectID })
     ]);
-    if (disposed) return false;
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
     drafts = draftPayload.drafts || [];
     sources = sourcePayload.sources || [];
     sourceWarnings = sourcePayload.warnings || [];
@@ -23394,14 +24312,14 @@ async function renderProjectReportDraft(project) {
 
   try {
     const historyPayloadPromise = projectTransitionHubPayload(projectID)
-      .then((hubPayload) => hubPayload?.reports || postResearch("/reports/history/list", { projectID }));
+      .then((hubPayload) => hubPayload?.reports || reportRequest("/reports/history/list", { projectID }));
     const [draftPayload, sourcePayload, historyPayload, optionsPayload] = await Promise.all([
-      postResearch("/reports/drafts/list", { projectID }),
-      postResearch("/reports/sources/list", { projectID }),
+      reportRequest("/reports/drafts/list", { projectID }),
+      reportRequest("/reports/sources/list", { projectID }),
       historyPayloadPromise,
-      postResearch("/reports/options", { projectID })
+      reportRequest("/reports/options", { projectID })
     ]);
-    if (disposed) return panel;
+    if (disposed || !isCurrentAccountRequest(requestIdentity)) return panel;
     drafts = draftPayload.drafts || [];
     sources = sourcePayload.sources || [];
     sourceWarnings = sourcePayload.warnings || [];
@@ -23483,11 +24401,13 @@ async function archiveProject(project) {
 }
 
 async function refreshProjectOverviewPreservingSavedPanes(...additionalPaneIDs) {
+  const requestIdentity = captureAccountRequest();
   const savedIDs = savedPaneIDs();
   const results = await Promise.all(savedIDs.map(async (paneID) => ({
     paneID,
     refreshed: await refreshSavedPanelInPlace(paneID)
   })));
+  requireCurrentAccountRequest(requestIdentity);
   const failedSavedIDs = new Set(
     results.filter((result) => !result.refreshed).map((result) => result.paneID)
   );
@@ -23495,9 +24415,12 @@ async function refreshProjectOverviewPreservingSavedPanes(...additionalPaneIDs) 
     !savedIDs.includes(paneID) || failedSavedIDs.has(paneID)
   );
   await transitionWorkspace("utility", { refreshPaneIDs });
+  requireCurrentAccountRequest(requestIdentity);
 }
 
 async function archiveProjects(projects, options = {}) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
   const archived = archivedProjectIDSet();
   const eligibleProjects = projects.filter((project) => projectRecordID(project));
   if (!eligibleProjects.length) return false;
@@ -23525,15 +24448,18 @@ async function archiveProjects(projects, options = {}) {
     for (const project of archivedProjects) {
       try {
         await pushMutation(projectMutationForRecord(project, account));
+        requireCurrentAccountRequest(requestIdentity);
         state.localProjects = (state.localProjects || [])
           .filter((item) => projectRecordID(item) !== projectRecordID(project));
       } catch (error) {
+        requireCurrentAccountRequest(requestIdentity);
         if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
         // Keep the local archived overlay while the durable sync queue recovers.
       }
     }
     saveWorkspaceState();
   }
+  requireCurrentAccountRequest(requestIdentity);
   if (options.preserveSavedPanes) {
     await refreshProjectOverviewPreservingSavedPanes(...(state.utilities.archive ? ["utility:archive"] : []));
   } else {
@@ -23541,11 +24467,14 @@ async function archiveProjects(projects, options = {}) {
       refreshPaneIDs: projectOverviewRefreshPaneIDs(...(state.utilities.archive ? ["utility:archive"] : []))
     });
   }
+  requireCurrentAccountRequest(requestIdentity);
   track.scrollLeft = currentLeft;
   return true;
 }
 
 async function restoreArchivedProject(project) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
   const id = projectRecordID(project);
   if (!id) return;
   const restoredAt = new Date().toISOString();
@@ -23565,18 +24494,23 @@ async function restoreArchivedProject(project) {
   if (account) {
     try {
       await pushMutation(projectMutationForRecord(restoredProject, account));
+      requireCurrentAccountRequest(requestIdentity);
       state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
       saveWorkspaceState();
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
       // Keep the local restored overlay while the durable sync queue recovers.
     }
   }
+  requireCurrentAccountRequest(requestIdentity);
   await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs("utility:archive") });
+  requireCurrentAccountRequest(requestIdentity);
   track.scrollLeft = currentLeft;
 }
 
 async function deleteArchivedProject(project) {
+  const requestIdentity = captureAccountRequest();
   const id = projectRecordID(project);
   if (!id) return;
   const recordLabel = folderTypeLabel(project);
@@ -23586,20 +24520,25 @@ async function deleteArchivedProject(project) {
     `This will permanently delete ${name}. This cannot be undone.`,
     { confirmLabel: "Delete" }
   );
+  requireCurrentAccountRequest(requestIdentity);
   if (!confirmed) return;
   const currentLeft = track.scrollLeft;
   try {
     await deleteArchivedProjectData(project);
+    requireCurrentAccountRequest(requestIdentity);
   } catch (error) {
+    requireCurrentAccountRequest(requestIdentity);
     await showWebNotice(`Could not delete ${recordLabel.toLowerCase()}`, error.message || `The ${recordLabel.toLowerCase()} could not be deleted.`);
     return;
   }
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs("utility:archive") });
+  requireCurrentAccountRequest(requestIdentity);
   track.scrollLeft = currentLeft;
 }
 
 async function deleteArchivedProjects(projects, options = {}) {
+  const requestIdentity = captureAccountRequest();
   const eligibleProjects = projects.filter((project) => projectRecordID(project));
   if (!eligibleProjects.length) return false;
   const count = eligibleProjects.length;
@@ -23609,6 +24548,7 @@ async function deleteArchivedProjects(projects, options = {}) {
     `This will permanently delete ${recordLabel}. This cannot be undone.`,
     { confirmLabel: "Delete" }
   );
+  requireCurrentAccountRequest(requestIdentity);
   if (!confirmed) return false;
   const currentLeft = track.scrollLeft;
   let deletedCount = 0;
@@ -23616,14 +24556,17 @@ async function deleteArchivedProjects(projects, options = {}) {
   for (const project of eligibleProjects) {
     try {
       await deleteArchivedProjectData(project);
+      requireCurrentAccountRequest(requestIdentity);
       deletedCount += 1;
       deletedIDs.add(projectRecordID(project));
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       const progress = deletedCount > 0 ? ` Deleted ${deletedCount} of ${count}.` : "";
       await showWebNotice(
         "Could not delete selected records",
         `${error.message || `The selected ${recordLabel} could not be deleted.`}${progress}`
       );
+      requireCurrentAccountRequest(requestIdentity);
       break;
     }
   }
@@ -23635,11 +24578,15 @@ async function deleteArchivedProjects(projects, options = {}) {
   } else {
     await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs("utility:archive") });
   }
+  requireCurrentAccountRequest(requestIdentity);
   track.scrollLeft = currentLeft;
   return deletedCount > 0;
 }
 
 async function deleteArchivedProjectData(project) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
+  const account = activeAccount();
   const id = projectRecordID(project);
   if (!id) return;
   const workboardID = workboardProjectID(projectIdentity(project));
@@ -23659,25 +24606,30 @@ async function deleteArchivedProjectData(project) {
     ...membershipTombstones
   ];
   saveWorkspaceState();
-  if (activeAccount()) {
+  if (account) {
     try {
-      const account = activeAccount();
       membershipTombstones.forEach((record) => enqueueSyncMutation({ projectSection: record }, account));
       enqueueSyncMutation(deletedProjectMutationForRecord(project), account);
       await flushSyncOutbox({ refresh: true });
+      requireCurrentAccountRequest(requestIdentity);
     } catch (error) {
+      requireCurrentAccountRequest(requestIdentity);
       if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
       // Keep the local deletion tombstone while sync recovers.
     }
   }
-  if (activeAccount()) {
+  requireCurrentAccountRequest(requestIdentity);
+  if (account) {
     try {
       await deleteSyncedWorkboard(workboardID);
+      requireCurrentAccountRequest(requestIdentity);
     } catch {
+      requireCurrentAccountRequest(requestIdentity);
       // The project deletion must survive a missing or stale Workboard record.
     }
   }
   await deleteLocalWorkboard(workboardID);
+  requireCurrentAccountRequest(requestIdentity);
   closeProjectDetailForProject(project);
   state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
 }
@@ -24092,6 +25044,11 @@ async function projectCollaborationRefresh(identity) {
 }
 
 function projectNoteEditor(identity, note, options = {}) {
+  const requestIdentity = captureAccountRequest();
+  const accountUserID = requestIdentity.userID;
+  let localRevision = 0;
+  let localDraftRecord = null;
+  let draftWriteQueue = Promise.resolve();
   const editable = options.editable !== false;
   const container = document.createElement("div");
   container.className = "project-note-block-editor";
@@ -24142,6 +25099,14 @@ function projectNoteEditor(identity, note, options = {}) {
   const projectID = projectDetailKey(identity);
   const localScopeID = "project-information";
   const objectURLs = new Set();
+  let saveConflict = false;
+  const draftStatus = document.createElement("p");
+  draftStatus.className = "notebook-status project-information-draft-status";
+  draftStatus.setAttribute("role", "status");
+  container.append(draftStatus);
+  const setDraftStatus = (message) => {
+    if (isCurrentAccountRequest(requestIdentity) && container.isConnected) draftStatus.textContent = message;
+  };
 
   const imageUploaded = (event) => {
     if (!container.isConnected) {
@@ -24150,46 +25115,115 @@ function projectNoteEditor(identity, note, options = {}) {
       objectURLs.clear();
       return;
     }
-    if (event.detail?.projectID !== projectID) return;
+    if (!isCurrentAccountRequest(requestIdentity) || event.detail?.accountUserID !== accountUserID || event.detail?.generation !== requestIdentity.generation || event.detail?.projectID !== projectID) return;
     editorMount?.replaceAssetURL?.(event.detail.localURL, event.detail.permanentURL);
   };
   window.addEventListener("permitext:notebook-image-uploaded", imageUploaded);
 
   const saveDraft = async () => {
-    if (!editable || !editorMount) return;
+    if (!editable || !editorMount || saveConflict || !isCurrentAccountRequest(requestIdentity)) return;
     if (saveInFlight) {
       saveQueued = true;
       return;
     }
     saveInFlight = true;
-    const documentToSave = draftDocument;
-    if (notebookDocumentAssetURLs(documentToSave, "permitext-notebook-local:").length) {
-      saveInFlight = false;
-      return;
-    }
+    const revisionToSave = localRevision;
     try {
+      // Freeze the journal within the same queue as editor checkpoints. A
+      // later edit can advance the local draft but cannot change this request.
+      const preparation = draftWriteQueue.then(async () => {
+        const draft = await loadNotebookDraft(accountUserID, projectID, localScopeID);
+        requireCurrentAccountRequest(requestIdentity);
+        if (!draft) return null;
+        const preparedDocument = await reconcileNotebookDocumentAssets(draft.pendingSave?.document || draft.document, projectID, requestIdentity);
+        requireCurrentAccountRequest(requestIdentity);
+        if (notebookDocumentAssetURLs(preparedDocument, "permitext-notebook-local:").length) {
+          setDraftStatus("Saved on this device · image upload pending");
+          return null;
+        }
+        return beginNotebookDraftSave(accountUserID, projectID, localScopeID, draft.revision,
+          { document: preparedDocument, noteID: currentNote?.id || "" });
+      });
+      draftWriteQueue = preparation.then(() => {});
+      void draftWriteQueue.catch(() => {});
+      const submittedDraft = await preparation;
+      if (!submittedDraft) return;
+      requireCurrentAccountRequest(requestIdentity);
+      setDraftStatus("Saved on this device · syncing Project information");
       const payload = await postResearch("/projects/collaboration/notes/save", {
         projectID,
-        noteID: currentNote?.id || undefined,
-        expectedVersion: currentNote?.version || 0,
-        title: "Project information",
-        document: documentToSave
+        noteID: submittedDraft.noteID || undefined,
+        expectedVersion: submittedDraft.baseVersion,
+        clientMutationID: submittedDraft.revision,
+        title: submittedDraft.title,
+        document: submittedDraft.document
       });
+      requireCurrentAccountRequest(requestIdentity);
       currentNote = payload.note;
-      await Promise.all([
-        deleteNotebookDraft(activeAccount().userID, projectID, localScopeID).catch(() => {}),
-        finalizeNotebookImagesForDocument(
-          activeAccount().userID,
-          projectID,
-          localScopeID,
-          notebookDocumentAssetURLs(documentToSave, "permitext-notebook-asset:")
-        ).catch(() => {})
-      ]);
+      let checkpointFailure = null;
+      const acknowledgement = draftWriteQueue.catch((error) => { checkpointFailure = error; }).then(async () => {
+        const result = await acknowledgeNotebookDraft(accountUserID, projectID, localScopeID, submittedDraft.revision,
+          { ...payload.note, id: localScopeID });
+        localDraftRecord = result.draft;
+        return result;
+      });
+      draftWriteQueue = acknowledgement.then(() => {});
+      void draftWriteQueue.catch(() => {});
+      const acknowledged = await acknowledgement;
+      await finalizeNotebookImagesForDocument(accountUserID, projectID, localScopeID,
+        notebookDocumentAssetURLs(submittedDraft.document, "permitext-notebook-asset:")).catch(() => {});
+      requireCurrentAccountRequest(requestIdentity);
+      await refreshNotebookPendingStatus(requestIdentity);
+      if (checkpointFailure) throw checkpointFailure;
+      setDraftStatus(acknowledged.draft ? "Saved on this device · newer Project information waiting to sync" : "Synced");
+      if (acknowledged.draft) saveQueued = true;
     } catch (error) {
-      await showWebNotice("Project note not saved", error.message);
+      if (!isCurrentAccountRequest(requestIdentity)) return;
+      if (error.payload?.code === "PROJECT_NOTE_VERSION_CONFLICT") {
+        saveConflict = true;
+        setDraftStatus("Project information conflict · your device draft and its original version are preserved. Review the saved version before continuing.");
+        const latest = error.payload.note;
+        if (latest && container.isConnected) {
+          const review = document.createElement("button");
+          review.type = "button";
+          review.textContent = "Review Project information conflict";
+          review.addEventListener("click", async () => {
+            const confirmed = await confirmWebWarning("Review saved Project information",
+              `${latest.body || "(No plain text)"}\n\nYour device draft remains in the editor. Save it as the next version only after comparing the changes.`,
+              { confirmLabel: "Save my draft as next version" });
+            if (!confirmed || !container.isConnected || !isCurrentAccountRequest(requestIdentity)) return;
+            try {
+              const rebase = draftWriteQueue.then(async () => {
+                const draft = await loadNotebookDraft(accountUserID, projectID, localScopeID);
+                requireCurrentAccountRequest(requestIdentity);
+                if (!draft) throw new Error("The retained draft is no longer available.");
+                const rebased = await rebaseNotebookDraftAfterReview(accountUserID, projectID, localScopeID, draft.revision,
+                  { ...latest, id: localScopeID });
+                localDraftRecord = rebased;
+                return rebased;
+              });
+              draftWriteQueue = rebase.then(() => {});
+              void draftWriteQueue.catch(() => {});
+              await rebase;
+              requireCurrentAccountRequest(requestIdentity);
+              currentNote = latest;
+              saveConflict = false;
+              setDraftStatus("Reviewed device draft · waiting to sync");
+              saveTimer = window.setTimeout(saveDraft, 0);
+            } catch (error) {
+              setDraftStatus(`Conflict review could not be applied: ${error.message}. Your device draft is preserved.`);
+            }
+          });
+          draftStatus.append(" ", review);
+        }
+      } else {
+        setDraftStatus(error.code === "PROJECT_INFORMATION_DEVICE_SAVE_FAILED"
+          ? `Device save failed: ${error.message}. Keep Project information open and copy your work.`
+          : `Saved on this device · sync pending: ${error.message}`);
+      }
     } finally {
       saveInFlight = false;
-      if (saveQueued || draftDocument !== documentToSave) {
+      if (isCurrentAccountRequest(requestIdentity) && !saveConflict && container.isConnected && (saveQueued || localRevision !== revisionToSave)) {
         saveQueued = false;
         saveTimer = window.setTimeout(saveDraft, 100);
       }
@@ -24198,48 +25232,55 @@ function projectNoteEditor(identity, note, options = {}) {
 
   void Promise.all([
     loadNotebookModule(),
-    loadNotebookDraft(activeAccount().userID, projectID, localScopeID).catch(() => null)
+    loadNotebookDraft(accountUserID, projectID, localScopeID).catch(() => null)
   ])
     .then(async ([module, localDraft]) => {
-      if (localDraft && String(localDraft.updatedAt) > String(currentNote?.updatedAt || "")) {
+      requireCurrentAccountRequest(requestIdentity);
+      if (localDraft) {
         draftDocument = localDraft.document;
+        localDraftRecord = localDraft;
+        currentNote = { ...(currentNote || {}), version: localDraft.baseVersion };
       }
-      draftDocument = await reconcileNotebookDocumentAssets(draftDocument);
+      draftDocument = await reconcileNotebookDocumentAssets(draftDocument, projectID, requestIdentity);
+      requireCurrentAccountRequest(requestIdentity);
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
         editable,
         autofocus: false,
         ariaLabel: "Project information",
-        uploadFile: (file) => uploadNotebookAsset(projectID, file, localScopeID).catch((error) => {
+        uploadFile: (file) => uploadNotebookAsset(projectID, file, localScopeID, requestIdentity).catch((error) => {
           void showWebNotice("Image not added", error.message);
           throw error;
         }),
         async resolveFileUrl(url) {
-          const resolved = await resolveNotebookAsset(projectID, url);
+          const resolved = await resolveNotebookAsset(projectID, url, requestIdentity);
           if (resolved.startsWith("blob:")) objectURLs.add(resolved);
           return resolved;
         },
         onReady() {
           editorReady = true;
+          if (localDraftRecord) {
+            setDraftStatus("Recovered Project information on this device · waiting to sync");
+            if (editable) saveTimer = window.setTimeout(saveDraft, 0);
+          }
         },
         onChange(document) {
+          if (!editable || !editorReady || !isCurrentAccountRequest(requestIdentity)) return;
           draftDocument = document;
-          if (!editable || !editorReady) return;
-          void saveNotebookDraft({
-            accountUserID: activeAccount().userID,
-            projectID,
-            cardID: localScopeID,
-            title: "Project information",
-            document
-          }).catch(() => {});
-          void pruneUnusedPendingNotebookImages(
-            activeAccount().userID,
-            projectID,
-            localScopeID,
-            document
-          );
+          localRevision += 1;
+          const snapshot = { accountUserID, projectID, cardID: localScopeID,
+            scope: "collaboration-note", baseVersion: currentNote?.version ?? 0,
+            title: "Project information", document: structuredClone(document) };
+          draftWriteQueue = draftWriteQueue.catch(() => {}).then(async () => {
+            try { localDraftRecord = await saveNotebookDraft(snapshot); }
+            catch (error) { error.code = "PROJECT_INFORMATION_DEVICE_SAVE_FAILED"; throw error; }
+            if (isCurrentAccountRequest(requestIdentity)) void refreshNotebookPendingStatus(requestIdentity).catch(() => {});
+          });
+          void draftWriteQueue.catch((error) => {
+            if (isCurrentAccountRequest(requestIdentity)) void showWebNotice("Device save failed", `${error.message}. Keep the Project information open and copy your work.`);
+          });
           window.clearTimeout(saveTimer);
-          saveTimer = window.setTimeout(saveDraft, 800);
+          if (!saveConflict) saveTimer = window.setTimeout(saveDraft, 800);
         }
       });
     })
@@ -26424,6 +27465,7 @@ function populateSavedEvidenceSection(section, savedInstance, folder, ...childre
 }
 
 function appendSavedProjectFactEditor(container, folder, identity) {
+  const requestIdentity = captureAccountRequest();
   const factsSection = document.createElement("section");
   factsSection.className = "saved-project-facts-section";
   const heading = document.createElement("div");
@@ -26498,6 +27540,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   };
   let saveSequence = Promise.resolve();
   const save = () => {
+    if (!isCurrentAccountRequest(requestIdentity)) return Promise.resolve();
     const next = {
       address: address.value.trim(),
       description: description.value.trim(),
@@ -26508,17 +27551,16 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       next.description === saved.description &&
       JSON.stringify(next.structuredFacts) === JSON.stringify(saved.structuredFacts)
     ) return saveSequence;
-    saveSequence = saveSequence.then(async () => {
-      await updateProjectFolder(folder, {
+    saveSequence = updateProjectFolder(folder, {
         name: folder.name || folder.title || identity.name,
         address: next.address,
         description: next.description,
         structuredFacts: next.structuredFacts,
         color: projectColor(folder),
         folderType: folderType(folder)
-      });
-      saved = next;
-    }).catch((error) => {
+      }).then(() => {
+        if (isCurrentAccountRequest(requestIdentity)) saved = next;
+      }).catch((error) => {
       void showWebNotice("Project context not saved", error.message || "Could not save Project context");
     });
     return saveSequence;
@@ -26526,7 +27568,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   let structuredSaveTimer = 0;
   const scheduleStructuredSave = () => {
     window.clearTimeout(structuredSaveTimer);
-    structuredSaveTimer = window.setTimeout(() => void save(), 300);
+    void save();
   };
 
   const structuredSection = document.createElement("section");
@@ -29136,6 +30178,8 @@ function enqueueSettingsBulkClear(scope, options = {}) {
 }
 
 async function clearSettingsBookmarks() {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
   const summary = currentContentSummary();
   const records = bookmarkRecordsForSettings();
   const projectSections = (summary.projectSections || [])
@@ -29176,10 +30220,13 @@ async function clearSettingsBookmarks() {
   enqueueSettingsBulkClear("bookmarks", { operationGroupID });
   saveWorkspaceState();
   if (account) await flushSyncOutbox({ refresh: true }).catch(() => {});
+  requireCurrentAccountRequest(requestIdentity);
   return records.length;
 }
 
 async function clearSettingsNotes() {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
   const records = currentContentSummary().annotations || [];
   const uniqueTargets = new Map();
   records.forEach((record) => {
@@ -29195,10 +30242,13 @@ async function clearSettingsNotes() {
   enqueueSettingsBulkClear("notes");
   saveWorkspaceState();
   if (activeAccount()) await flushSyncOutbox({ refresh: true }).catch(() => {});
+  requireCurrentAccountRequest(requestIdentity);
   return uniqueTargets.size;
 }
 
 async function performSettingsClearAction(action) {
+  requirePrivateWorkspaceWritable();
+  const requestIdentity = captureAccountRequest();
   if (action === "searches") {
     state.recentSearches = [];
     state.recentSearchHistory = [];
@@ -29241,6 +30291,7 @@ async function performSettingsClearAction(action) {
     }
     saveWorkspaceState();
     if (account) await flushSyncOutbox({ refresh: true }).catch(() => {});
+    requireCurrentAccountRequest(requestIdentity);
     return 0;
   }
   if (action === "bookmarks") return clearSettingsBookmarks();
@@ -30099,10 +31150,12 @@ function wireSettingsCardCollapsing(panel) {
 }
 
 function renderSettings() {
+  const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   const accountCopy = panel.querySelector(".account-status-copy");
+  appendLinkedAccountRecoveryControls(accountCopy.closest(".settings-card"), settingsIdentity);
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const planUsage = panel.querySelector(".settings-plan-usage");
   const researchPacks = panel.querySelector(".settings-research-packs");
@@ -30313,6 +31366,7 @@ function renderSettings() {
     updateProjectSelection();
   });
   projectDelete.addEventListener("click", async () => {
+    if (!isCurrentAccountRequest(settingsIdentity)) return;
     const selectedProjects = settingsProjects.filter((project) => selectedProjectIDs.has(projectRecordID(project)));
     const count = selectedProjects.length;
     if (!count) return;
@@ -30322,20 +31376,24 @@ function renderSettings() {
       `This will permanently delete ${recordLabel} from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
       { confirmLabel: "Delete" }
     );
+    if (!isCurrentAccountRequest(settingsIdentity)) return;
     if (!confirmed) return;
     projectDelete.disabled = true;
     try {
       for (const project of selectedProjects) {
         await deleteArchivedProjectData(project);
+        requireCurrentAccountRequest(settingsIdentity);
       }
       setStatus(`${recordLabel} deleted.`);
       await renderWorkspace();
     } catch (error) {
+      if (!isCurrentAccountRequest(settingsIdentity)) return;
       setStatus(error.message || `Could not delete ${recordLabel}.`, true);
       projectDelete.disabled = false;
     }
   });
   projectClearAll.addEventListener("click", async () => {
+    if (!isCurrentAccountRequest(settingsIdentity)) return;
     const count = settingsProjects.length;
     if (!count) return;
     const recordLabel = folderRecordCountLabel(settingsProjects);
@@ -30344,15 +31402,18 @@ function renderSettings() {
       `This will permanently delete ${recordLabel}, including archived records, from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
       { confirmLabel: "Delete All" }
     );
+    if (!isCurrentAccountRequest(settingsIdentity)) return;
     if (!confirmed) return;
     projectClearAll.disabled = true;
     try {
       for (const project of settingsProjects) {
         await deleteArchivedProjectData(project);
+        requireCurrentAccountRequest(settingsIdentity);
       }
       setStatus(`${recordLabel} deleted.`);
       await renderWorkspace();
     } catch (error) {
+      if (!isCurrentAccountRequest(settingsIdentity)) return;
       setStatus(error.message || `Could not delete ${recordLabel}.`, true);
       projectClearAll.disabled = false;
     }
@@ -30557,52 +31618,59 @@ function renderSettings() {
   });
   signOutButton.addEventListener("click", async () => {
     const account = activeAccount();
-    if (account) {
-      const pending = (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID).length +
-        (state.codeQuestionOutbox || []).filter((item) => item.accountUserID === account.userID).length;
-      const conflicts = (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID).length +
-        (state.codeQuestionConflicts || []).filter((item) => item.accountUserID === account.userID).length;
-      if (pending > 0 || conflicts > 0) {
-        const details = [
-          pending > 0 ? `${pending} ${pending === 1 ? "change is" : "changes are"} waiting to sync` : "",
-          conflicts > 0 ? `${conflicts} sync ${conflicts === 1 ? "conflict needs" : "conflicts need"} review` : ""
-        ].filter(Boolean).join(", and ");
-        const confirmed = await confirmWebWarning(
-          "Sign out with unfinished sync?",
-          `${details}. This work will remain on this device and can resume when you sign back in to this account.`,
-          { confirmLabel: "Sign Out" }
-        );
-        if (!confirmed) return;
-      }
-    }
+    const requestIdentity = captureAccountRequest();
     signOutButton.disabled = true;
     try {
+      await Promise.all(Array.from(notebookMounts.values()).map((mount) => mount.persistDraft?.()));
+      requireCurrentAccountRequest(requestIdentity);
       if (account) {
-        await postJSON("/account/sign-out", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
+        const drafts = await pendingNotebookDrafts(account.userID);
+        requireCurrentAccountRequest(requestIdentity);
+        const pending = (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID).length +
+          (state.codeQuestionOutbox || []).filter((item) => item.accountUserID === account.userID).length + drafts.length;
+        const conflicts = (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID).length +
+          (state.codeQuestionConflicts || []).filter((item) => item.accountUserID === account.userID).length;
+        if (pending > 0 || conflicts > 0) {
+          const details = [
+            pending > 0 ? `${pending} ${pending === 1 ? "change is" : "changes are"} waiting to sync` : "",
+            conflicts > 0 ? `${conflicts} sync ${conflicts === 1 ? "conflict needs" : "conflicts need"} review` : ""
+          ].filter(Boolean).join(", and ");
+          const confirmed = await confirmWebWarning(
+            "Sign out with unfinished sync?",
+            `${details}. This work will remain on this device and can resume when you sign back in to this account.`,
+            { confirmLabel: "Sign Out" }
+          );
+          requireCurrentAccountRequest(requestIdentity);
+          if (!confirmed) return;
+        }
+        try {
+          await postJSON("/account/sign-out", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
+        } catch (error) {
+          requireCurrentAccountRequest(requestIdentity);
+          // Offline sign-out keeps this account's durable local work for its next session.
+        }
       }
-    } catch {
-      // Clear the local session even if the network is unavailable.
-    } finally {
-      if (window.Clerk?.isSignedIn) {
-        await window.Clerk.signOut().catch(() => {});
-      }
-      await disableOfflineFeature().catch(() => {});
+      requireCurrentAccountRequest(requestIdentity);
+      if (window.Clerk?.isSignedIn) await window.Clerk.signOut().catch(() => {});
+      if (!isCurrentAccountRequest(requestIdentity)) return;
       if (account) persistCodeQuestionAccountState(account.userID);
-      stopForegroundSyncLoop();
-      unloadCodeQuestionAccountState();
-      clearResearchAccountRuntime();
-      state.account = null;
-      organizationWorkspace = null;
-      organizationLoadPromise = null;
-      persistAccountSession(null);
-      syncedContent = null;
-      saveWorkspaceState();
+      replaceActiveAccount(null);
+      await disableOfflineFeature().catch(() => {});
       await renderWorkspace();
+    } catch (error) {
+      if (isCurrentAccountRequest(requestIdentity)) {
+        setStatus(`Sign-out paused: ${error.message || "the local draft could not be saved"}`, true);
+      }
+    } finally {
+      if (isCurrentAccountRequest(requestIdentity)) signOutButton.disabled = false;
     }
   });
   deleteAccountButton.addEventListener("click", async () => {
+    if (!isCurrentAccountRequest(settingsIdentity)) return;
     const account = activeAccount();
     if (!account) return;
+    const deletionIdentity = captureAccountRequest();
+    let deletionClerkUser = null;
     const entitlement = currentEntitlement();
     const appleManaged = [
       entitlement?.source,
@@ -30614,6 +31682,7 @@ function renderSettings() {
     ].some((source) => source === "webSubscription");
     const lifetimeGrant = entitlement?.source === "lifetimeGrant";
     const confirmed = await confirmAccountDeletion({ appleManaged, stripeManaged, lifetimeGrant });
+    if (!isCurrentAccountRequest(deletionIdentity)) return;
     if (!confirmed) return;
 
     deleteAccountButton.disabled = true;
@@ -30621,78 +31690,15 @@ function renderSettings() {
     const progress = openAccountDeletionProgress();
     progress.setStage("billing", "active");
     progress.setStage("data", "active");
-    const localProjectIDs = accountScopedWorkboardProjectIDs(account);
-
-    const clearThisBrowser = async () => {
-      const failures = [];
-      for (const projectID of localProjectIDs) {
-        try {
-          await deleteLocalWorkboard(projectID);
-        } catch (error) {
-          failures.push(`Workboard ${projectID}: ${error.message || "could not be removed"}`);
-        }
-      }
-      try {
-        await disableOfflineFeature();
-      } catch (error) {
-        failures.push(`Offline library: ${error.message || "could not be removed"}`);
-      }
-      try {
-        stopForegroundSyncLoop();
-        clearResearchRequestRecoveries(localStorage, { accountUserID: account.userID });
-        clearResearchAccountRuntime();
-        state.account = null;
-        state.localProjects = [];
-        state.localSavedItems = [];
-        state.localProjectSections = [];
-        state.localAnnotations = [];
-        state.localBulkClears = [];
-        state.syncOutbox = [];
-        state.syncConflicts = [];
-        state.archivedProjectIDs = [];
-        state.sectionNotes = {};
-        state.localSavedSectionIDs = [];
-        state.recentSearches = [];
-        state.recentSearchHistory = [];
-        state.pinnedSearches = [];
-        state.recentlyViewedSections = [];
-        state.continuityAppliedAt = null;
-        setOpenProjectDetails([]);
-        state.workboards = [];
-        state.notebooks = [];
-        state.reportDrafts = [];
-        syncedContent = null;
-        organizationWorkspace = null;
-        organizationLoadPromise = null;
-        unloadCodeQuestionAccountState();
-        removeCodeQuestionAccountState(localStorage, account.userID);
-        persistAccountSession(null);
-        Object.keys(localStorage)
-          .filter((key) =>
-            key.startsWith(`${baseWorkspaceKey}:detached:`) ||
-            key.startsWith(workspaceStateKeyPrefix)
-          )
-          .forEach((key) => localStorage.removeItem(key));
-        localStorage.removeItem(workspaceRegistryKey);
-        sessionStorage.removeItem(tabWorkspaceKey);
-        sessionStorage.removeItem(activeWorkspaceSessionKey);
-        workspaceRegistry = normalizeWorkspaceRegistry(null);
-        activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
-        applyStoredWorkspaceLayout(emptyWorkspaceLayout());
-        saveWorkspaceState();
-      } catch (error) {
-        failures.push(`Browser storage: ${error.message || "could not be cleared"}`);
-      }
-      return failures;
-    };
+    // Retired Workboard caches use unowned Project-only keys. Preserve those
+    // legacy bytes until ownership is established instead of erasing another
+    // account's copy of a shared Project.
+    const clearThisBrowser = () => clearDeletedAccountBrowserData(account, deletionIdentity);
 
     const removeClerkIdentity = async () => {
       if (account.authProvider !== "clerk") return "notApplicable";
-      const config = await clerkWebSignInConfig();
-      if (!config.available) throw new Error("Secure sign-in is not configured in this browser.");
-      const clerk = await loadClerkScript(config);
-      if (!clerk?.user) throw new Error("The signed-in Clerk identity is unavailable.");
-      await clerk.user.delete();
+      if (!deletionClerkUser) throw new Error("The original sign-in identity is unavailable. Sign in to that identity to finish deletion.");
+      await deletionClerkUser.delete();
       return "deleted";
     };
 
@@ -30719,8 +31725,9 @@ function renderSettings() {
       progress.finish({
         title: error.payload?.partial ? "Deletion incomplete" : "Deletion stopped",
         message: error.payload?.error || error.message || "Permitext could not complete account deletion.",
-        retryLabel: "Retry deletion",
+        retryLabel: isCurrentAccountRequest(deletionIdentity) ? "Retry deletion" : "",
         onRetry: () => {
+          if (!isCurrentAccountRequest(deletionIdentity)) return;
           progress.close();
           deleteAccountButton.disabled = false;
           deleteAccountButton.click();
@@ -30730,14 +31737,15 @@ function renderSettings() {
 
     let payload;
     try {
-      payload = await postJSON(
-        "/account/delete",
-        {
-          auth: { accountUserID: account.userID },
-          confirmation: "DELETE"
-        },
-        { token: account.sessionToken }
-      );
+      requireCurrentAccountRequest(deletionIdentity);
+      if (account.authProvider === "clerk") {
+        const config = await clerkWebSignInConfig();
+        requireCurrentAccountRequest(deletionIdentity);
+        const clerk = await loadClerkScript(config);
+        requireCurrentAccountRequest(deletionIdentity);
+        deletionClerkUser = clerk?.user || null;
+      }
+      payload = await deleteCapturedAccount(account, deletionIdentity);
     } catch (error) {
       setStatus(error.message || "Could not delete this account.", true);
       deleteAccountButton.disabled = false;
@@ -30764,7 +31772,7 @@ function renderSettings() {
       progress.setStage(
         "device",
         deviceFailures.length ? "failed" : "complete",
-        deviceFailures.length ? deviceFailures.join(" ") : "Permitext data stored in this browser was cleared."
+        deviceFailures.length ? deviceFailures.join(" ") : "Account-scoped browser data was cleared. Unattributed legacy data remains isolated."
       );
 
       progress.setStage("identity", "active");
@@ -30796,7 +31804,7 @@ function renderSettings() {
           title: incomplete ? "Permitext data deleted; cleanup incomplete" : "Permitext account deleted",
           message: incomplete
             ? "The stages marked Needs attention remain. Retry cleanup or contact support; the result above shows exactly what was completed."
-            : "Your Permitext account, synchronized data, browser data, and Permitext sign-in identity were handled as shown above.",
+            : "Your account and data were handled as shown above. Unattributed legacy browser data remains isolated for ownership review.",
           retryLabel: incomplete ? "Retry cleanup" : "",
           onRetry: incomplete ? async () => {
             if (deviceFailures.length) {
@@ -30810,7 +31818,7 @@ function renderSettings() {
               progress.setStage(
                 "device",
                 deviceFailures.length ? "failed" : "complete",
-                deviceFailures.length ? deviceFailures.join(" ") : "Permitext data stored in this browser was cleared."
+                deviceFailures.length ? deviceFailures.join(" ") : "Account-scoped browser data was cleared. Unattributed legacy data remains isolated."
               );
             }
             if (identityError) {
@@ -31717,6 +32725,13 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
       behavior
     });
   }
+}
+
+function keepFocusedWorkspacePaneVisible() {
+  requestAnimationFrame(() => {
+    const pane = document.activeElement?.closest(".workspace-panel[data-pane-id]");
+    if (pane && track.contains(pane)) scrollPaneIntoView(pane.dataset.paneId, "auto");
+  });
 }
 
 function readerContentScrollKey(reader) {
@@ -35534,18 +36549,46 @@ function bindImmediateUtilityControls() {
   });
 }
 
+function refreshVisibleReaderTrust() {
+  track.querySelectorAll(".reader-panel[data-reader-id]").forEach((panel) => {
+    const reader = state.readers.find((item) => item.id === panel.dataset.readerId);
+    if (reader) renderReaderTrust(panel, reader);
+  });
+}
+
+function loadStartupCatalogs() {
+  if (startupCatalogPromise) return startupCatalogPromise;
+  codeTrustProfilesStatus = "loading";
+  refreshVisibleReaderTrust();
+  const chapterRequest = api("/code/chapters?view=startup").then((payload) => {
+    chapters = payload.chapters || [];
+  }).catch(() => {
+    // Reader selectors fetch the requested code family independently. Search
+    // retains its complete built-in code choices when this optional index fails.
+    console.warn("Startup chapter metadata unavailable; requested code navigation remains available.");
+  });
+  const trustRequest = api("/code/libraries").then((payload) => {
+    codeTrustProfiles = payload.codeTrustProfiles || [];
+    codeTrustProfilesStatus = codeTrustProfiles.length ? "ready" : "unavailable";
+  }).catch(() => {
+    codeTrustProfilesStatus = "unavailable";
+  }).finally(refreshVisibleReaderTrust);
+  const request = Promise.all([chapterRequest, trustRequest]).finally(() => {
+    if (startupCatalogPromise === request) startupCatalogPromise = null;
+  });
+  startupCatalogPromise = request;
+  return request;
+}
+
 async function start() {
   if (detachedWorkboardRoute && !detachedProjectWindow) {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
   }
   if (!detachedProjectWindow) {
     bindImmediateUtilityControls();
-    const [chapterPayload, libraryPayload] = await Promise.all([
-      api("/code/chapters?view=startup"),
-      api("/code/libraries")
-    ]);
-    chapters = chapterPayload.chapters || [];
-    codeTrustProfiles = libraryPayload.codeTrustProfiles || [];
+    // Public metadata supplements the shell. Authentication restoration still
+    // completes before any private workspace is rendered.
+    void loadStartupCatalogs();
     await resumeClerkSignInReturn();
   }
   updateConnectionStatus();
@@ -35569,6 +36612,7 @@ async function start() {
     }
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
+  window.addEventListener("resize", keepFocusedWorkspacePaneVisible, { passive: true });
   window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates);
   bindWorkspaceKeyboardNavigation();
@@ -35589,14 +36633,8 @@ async function start() {
         nextAccount = null;
       }
       if (clientValuesMatch(state.account || null, nextAccount)) return;
-      const previousUserID = state.account?.userID || "";
-      if (previousUserID) persistCodeQuestionAccountState(previousUserID);
-      if (previousUserID !== (nextAccount?.userID || "")) stopForegroundSyncLoop();
-      state.account = nextAccount;
-      if (previousUserID !== (state.account?.userID || "")) clearResearchAccountRuntime();
+      replaceActiveAccount(nextAccount);
       codeQuestionUnauthorizedAccountUserID = "";
-      loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
-      syncedContent = null;
       if (activeAccount()) {
         startForegroundSyncLoop({ immediate: true });
       } else {
@@ -35769,6 +36807,15 @@ async function start() {
     saveWorkspaceState();
   }
   await renderWorkspace();
+  void refreshNotebookPendingStatus().catch(() => {});
+  if (workspaceRestoreError) {
+    void showWebNotice("Saved workspace recovery needed", "This browser could not restore your saved workspace. The original data is preserved. Reload to retry before making changes; this temporary workspace will not be saved. Avoid clearing site data.");
+  }
+  if (workspaceMigrationError && activeAccount()?.userID === initialPersistedAccount?.userID) {
+    void showWebNotice("Saved workspace recovery needed", "This browser could not finish moving your existing workspace into account-specific storage. The original saved data is still present. Free browser storage, then reload to retry; avoid clearing site data.");
+  } else if (!workspaceRestoreError && privateWorkspaceMigrationStatus(localStorage).status === "quarantined") {
+    presentWorkspaceIssue("Older browser workspace data was kept separately because its account ownership could not be verified. Your current workspace is available. Contact support to review recovery; avoid clearing site data.");
+  }
   track.scrollLeft = Math.min(
     Number(state.trackScrollLeft) || 0,
     Math.max(0, track.scrollWidth - track.clientWidth)

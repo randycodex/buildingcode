@@ -58,8 +58,8 @@ assert(
   "Notebook images must use authenticated private Project storage."
 );
 assert(
-  webClient.includes('uploadNotebookAsset(projectID, file, cardID = "")') &&
-    webClient.includes("resolveNotebookAsset(projectID, assetURL)") &&
+  webClient.includes('uploadNotebookAsset(projectID, file, cardID = "", requestIdentity = captureAccountRequest())') &&
+    webClient.includes("resolveNotebookAsset(projectID, assetURL, requestIdentity = captureAccountRequest())") &&
     webClient.includes('notebookClientVersion = "20260903-tiptap-security-v14"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );

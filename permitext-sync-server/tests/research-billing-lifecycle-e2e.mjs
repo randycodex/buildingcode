@@ -3,10 +3,11 @@ import { spawn } from "node:child_process";
 import { createHmac } from "node:crypto";
 import { once } from "node:events";
 import { createServer } from "node:net";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
+import { withFileStoreLock, writeJSONFileAtomically } from "../file-store-coordinator.mjs";
 import {
   applyResearchConversationMessageCommit,
   applyResearchUsageReservation,
@@ -206,19 +207,21 @@ async function main() {
     assert.equal(invalidReturn.response.status, 400);
     assert.match(invalidReturn.json.error, /Permitext origin/);
 
-    const storeBeforeUsage = JSON.parse(await readFile(dataPath, "utf8"));
-    storeBeforeUsage.researchUsageByUserID ||= {};
-    storeBeforeUsage.researchUsageByUserID[owner.userID] = [{
-      id: "included-turn-completed",
-      model: "test-model",
-      mode: "openai",
-      fundingSource: "included",
-      inputTokens: 1,
-      outputTokens: 1,
-      totalTokens: 2,
-      createdAt: new Date().toISOString()
-    }];
-    await writeFile(dataPath, `${JSON.stringify(storeBeforeUsage, null, 2)}\n`);
+    await withFileStoreLock(dataPath, async () => {
+      const storeBeforeUsage = JSON.parse(await readFile(dataPath, "utf8"));
+      storeBeforeUsage.researchUsageByUserID ||= {};
+      storeBeforeUsage.researchUsageByUserID[owner.userID] = [{
+        id: "included-turn-completed",
+        model: "test-model",
+        mode: "openai",
+        fundingSource: "included",
+        inputTokens: 1,
+        outputTokens: 1,
+        totalTokens: 2,
+        createdAt: new Date().toISOString()
+      }];
+      await writeJSONFileAtomically(dataPath, storeBeforeUsage);
+    });
 
     const exhaustedUsage = await usage(owner);
     assert.equal(exhaustedUsage.includedRemaining, 0);
@@ -311,86 +314,90 @@ async function main() {
       successfulRequestID
     );
     const committedAt = new Date().toISOString();
-    const persistedStore = JSON.parse(await readFile(dataPath, "utf8"));
-    const reservation = applyResearchUsageReservation(persistedStore, owner.userID, {
-      id: reservationID,
-      since: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-      periodEnd: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
-      limit: 1,
-      paidContinuationEnabled: true,
-      maximumRequestUSD: 0.5,
-      pricingVersion: "research-billing-e2e",
-      requestFingerprint: researchRequestQuestionFingerprint(successfulQuestion),
-      createdAt: committedAt
-    });
-    assert.equal(reservation.reserved, true);
-    assert.equal(reservation.fundingSource, "purchased");
-    const messageIdentity = researchRequestMessageIdentity(
-      owner.userID,
-      conversationCreate.json.conversation.id,
-      successfulRequestID
-    );
-    const committedAnswer = {
-      id: `${messageIdentity}:answer`,
-      conversationID: conversationCreate.json.conversation.id,
-      projectID: null,
-      question: successfulQuestion,
-      answer: { answerText: "The cited enacted provision controls." },
-      evidence: [],
-      createdAt: committedAt
-    };
-    const committedConversation = {
-      ...conversationCreate.json.conversation,
-      messages: [
-        ...(conversationCreate.json.conversation.messages || []),
-        {
-          id: `${messageIdentity}:question`,
-          role: "user",
-          question: successfulQuestion,
-          researchRequestID: successfulRequestID,
+    let persistedStore;
+    let committedConversation;
+    await withFileStoreLock(dataPath, async () => {
+      persistedStore = JSON.parse(await readFile(dataPath, "utf8"));
+      const reservation = applyResearchUsageReservation(persistedStore, owner.userID, {
+        id: reservationID,
+        since: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        periodEnd: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+        limit: 1,
+        paidContinuationEnabled: true,
+        maximumRequestUSD: 0.5,
+        pricingVersion: "research-billing-e2e",
+        requestFingerprint: researchRequestQuestionFingerprint(successfulQuestion),
+        createdAt: committedAt
+      });
+      assert.equal(reservation.reserved, true);
+      assert.equal(reservation.fundingSource, "purchased");
+      const messageIdentity = researchRequestMessageIdentity(
+        owner.userID,
+        conversationCreate.json.conversation.id,
+        successfulRequestID
+      );
+      const committedAnswer = {
+        id: `${messageIdentity}:answer`,
+        conversationID: conversationCreate.json.conversation.id,
+        projectID: null,
+        question: successfulQuestion,
+        answer: { answerText: "The cited enacted provision controls." },
+        evidence: [],
+        createdAt: committedAt
+      };
+      committedConversation = {
+        ...conversationCreate.json.conversation,
+        messages: [
+          ...(conversationCreate.json.conversation.messages || []),
+          {
+            id: `${messageIdentity}:question`,
+            role: "user",
+            question: successfulQuestion,
+            researchRequestID: successfulRequestID,
+            createdAt: committedAt
+          },
+          {
+            id: committedAnswer.id,
+            role: "assistant",
+            researchRequestID: successfulRequestID,
+            answer: committedAnswer.answer,
+            createdAt: committedAt
+          }
+        ],
+        updatedAt: committedAt
+      };
+      const commitPayload = {
+        reservationID,
+        usageEntry: {
+          model: "test-provider",
+          mode: "openai",
+          inputTokens: 10,
+          outputTokens: 10,
+          totalTokens: 20,
           createdAt: committedAt
         },
-        {
-          id: committedAnswer.id,
-          role: "assistant",
-          researchRequestID: successfulRequestID,
-          answer: committedAnswer.answer,
-          createdAt: committedAt
-        }
-      ],
-      updatedAt: committedAt
-    };
-    const commitPayload = {
-      reservationID,
-      usageEntry: {
-        model: "test-provider",
-        mode: "openai",
-        inputTokens: 10,
-        outputTokens: 10,
-        totalTokens: 20,
-        createdAt: committedAt
-      },
-      answer: committedAnswer,
-      conversation: committedConversation,
-      events: []
-    };
-    assert.equal(
-      applyResearchConversationMessageCommit(
-        persistedStore,
-        owner.userID,
-        commitPayload
-      ).replayed,
-      false
-    );
-    assert.equal(
-      applyResearchConversationMessageCommit(
-        persistedStore,
-        owner.userID,
-        commitPayload
-      ).replayed,
-      true
-    );
-    await writeFile(dataPath, `${JSON.stringify(persistedStore, null, 2)}\n`);
+        answer: committedAnswer,
+        conversation: committedConversation,
+        events: []
+      };
+      assert.equal(
+        applyResearchConversationMessageCommit(
+          persistedStore,
+          owner.userID,
+          commitPayload
+        ).replayed,
+        false
+      );
+      assert.equal(
+        applyResearchConversationMessageCommit(
+          persistedStore,
+          owner.userID,
+          commitPayload
+        ).replayed,
+        true
+      );
+      await writeJSONFileAtomically(dataPath, persistedStore);
+    });
     assert.equal((await usage(owner)).purchasedRemaining, 24);
     assert.equal(
       persistedStore.researchCreditsByUserID[owner.userID]

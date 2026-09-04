@@ -13479,7 +13479,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-card-tile:hover strong,
 .notebook-card-tile[aria-pressed="true"] strong,
 .notebook-card-row.is-selected .notebook-card-tile strong {
-  color: var(--project-color);
+  color: color-mix(in srgb, var(--project-color) 35%, var(--text-primary));
 }
 
 .notebook-card-tile small {
@@ -13494,6 +13494,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.notebook-device-recovery { padding: 16px; color: var(--text-primary); }
+.notebook-device-recovery details { margin: 12px 0; }
+.notebook-device-recovery summary { min-height: 44px; cursor: pointer; }
+.notebook-device-recovery pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.notebook-device-recovery button { min-height: 44px; }
 
 .notebook-card-tile small {
   grid-column: 2;
@@ -16275,4 +16281,57 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
     color: #a8a8af;
     font: 450 1rem/1.5 var(--ui-font-family);
   }
+}
+
+/* A collapsed Project section must also leave layout and keyboard navigation. */
+.project-section-motion-body[hidden] { display: none !important; }
+
+/* The find field remains visible before a query has replaced the chapter body. */
+.reader-panel:has(.reader-internal-search:not([hidden])) .reader-content {
+  padding-top: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
+}
+.reader-panel:has(.reader-internal-search:not([hidden]))::before {
+  height: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
+}
+
+/* Tablet controls occupy two rows so workspace actions cannot overlap Research or the brand. */
+@media (max-width: 760px) {
+  .topbar .topbar-actions > #add-reader {
+    width: 100%;
+    min-width: 0;
+    flex-basis: auto;
+  }
+  .topbar .topbar-actions > .toolbar-button { font-size: 10px !important; }
+}
+
+@media (min-width: 761px) and (max-width: 1180px) {
+  :root { --header-height: 106px; }
+  .topbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-rows: 44px 44px;
+    gap: 4px 8px;
+    padding: 6px 16px;
+  }
+  .topbar-actions {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding-right: 124px;
+    overflow: visible;
+  }
+  .topbar-workspaces { grid-column: 1; grid-row: 2; }
+  .topbar-layout-actions { grid-column: 2; grid-row: 2; justify-self: start; }
+  .topbar-settings-button { grid-column: 3; grid-row: 2; }
+  .topbar-account-state { display: contents; }
+  .topbar .connection-status { grid-column: 4; grid-row: 2; }
+  .topbar-brand {
+    left: auto;
+    right: 16px;
+    top: 28px;
+    transform: translateY(-50%);
+  }
+  .topbar .topbar-actions > .toolbar-button,
+  .topbar .topbar-layout-actions > .toolbar-button,
+  .topbar .workspace-actions-button,
+  .topbar .topbar-settings-button { min-height: 44px; height: 44px; }
 }

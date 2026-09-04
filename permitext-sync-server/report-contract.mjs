@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { normalizeNotebookEvidenceLinks } from "./notebook-contract.mjs";
+import { normalizedResearchProjectStructuredFacts, projectFactProjectionVersion } from "./project-fact-projection.mjs";
 
 export const reportDraftSchemaVersion = 1;
 export const reportDraftSchemaVersionV2 = 2;
@@ -423,7 +424,11 @@ function normalizeProjectFactsManifestItem(item, base) {
     sourceID: requiredText(item.sourceID, "Report Project facts source ID", 256),
     title: requiredText(item.title || "Project facts", "Report Project facts title", 500),
     address: optionalText(item.address, 2_000),
-    facts: requiredText(item.facts, "Report Project facts", maximumAuthoredTextLength)
+    facts: requiredText(item.facts, "Report Project facts", maximumAuthoredTextLength),
+    ...(Array.isArray(item.structuredFacts) ? {
+      structuredFacts: normalizedResearchProjectStructuredFacts({ structuredFacts: item.structuredFacts }),
+      projectionVersion: optionalText(item.projectionVersion || projectFactProjectionVersion, 256)
+    } : {})
   };
 }
 

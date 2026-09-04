@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { confirmedAccountLinkRecovery } from "../public/private-workspace-state.js";
 
 import {
   acknowledgeCodeQuestionMutation,
@@ -300,11 +301,18 @@ assert.ok(appSource.includes('renderWorkspace({ persist: false })'));
 assert.ok(appSource.includes("if (clientValuesMatch(incomingDomain, currentDomain)) return;"));
 assert.ok(appSource.includes("preservePresentation: true"));
 assert.ok(appSource.includes('conflictCode: "CODE_QUESTION_DEPENDENCY_CONFLICT"'));
-assert.ok(appSource.includes("migrateCodeQuestionAccountState(localStorage, previousUserID, account.appUserID)"));
+assert.ok(appSource.includes("recordConfirmedAccountLinkRecovery(localStorage, payload.mergedAccount, previousUserID, account.appUserID)"));
+const signInSource = appSource.slice(appSource.indexOf("function storeSignedInAccount("), appSource.indexOf("function linkedAccountRecoverySources("));
+assert.doesNotMatch(signInSource, /migrateCodeQuestionAccountState\(/,
+  "Sign-in must preserve the original local Code Question namespace instead of replaying it into the linked account.");
 assert.ok(
-  appSource.includes("if (previousUserID && payload.mergedAccount?.sourceUserID === previousUserID)"),
-  "Fresh sign-in must not run account-merge migration without a source account."
+  signInSource.includes("confirmedAccountLinkRecovery(payload.mergedAccount, previousUserID, account.appUserID)"),
+  "Linked-account recovery must validate the exact source and destination receipt."
 );
+assert.throws(() => confirmedAccountLinkRecovery({ sourceUserID: accountA, targetUserID: accountB }, null, accountB),
+  /does not match/, "Fresh sign-in must not gain another account's retained local work without a source account.");
+assert.throws(() => confirmedAccountLinkRecovery({ sourceUserID: accountB, targetUserID: accountA }, accountA, accountB), /does not match/);
+assert.equal(confirmedAccountLinkRecovery({ sourceUserID: accountA, targetUserID: accountB }, accountA, accountB).access, "export-only");
 assert.ok(appSource.includes("evictDeniedCodeQuestionCache(error"));
 assert.ok(appSource.includes("context.sessionToken === account?.sessionToken"));
 assert.ok(appSource.includes("(!context.trackProject || context.projectID === activeProjectIDForCodeQuestions())"));

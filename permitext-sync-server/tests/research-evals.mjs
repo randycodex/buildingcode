@@ -2010,10 +2010,16 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases, w
     }
   });
   const currentProjectFacts = currentConversation.conversation.projectInformation?.facts || [];
+  const currentAddressFact = `Zoning Fact — Address: ${currentAddress} (user-confirmed; not independently verified).`;
+  const currentDescriptionFact = `Additional Project facts (user wording; not independently verified): ${currentDescription}`;
+  const containsPreviousProjectFacts = (facts) => facts.some((fact) =>
+    fact.includes(projectRecord.address) || fact.includes(projectRecord.description));
   assert(
-    currentProjectFacts.includes(`Zoning Fact — Address: ${currentAddress} (user-confirmed; not independently verified)`) &&
-      currentProjectFacts.includes(`Additional Project facts: ${currentDescription}`) &&
-      !currentProjectFacts.some((fact) => fact.includes("100 Initial Avenue")),
+    currentConversation.conversation.projectInformation?.address === currentAddress &&
+      currentConversation.conversation.projectInformation?.description === currentDescription &&
+      currentProjectFacts.includes(currentAddressFact) &&
+      currentProjectFacts.includes(currentDescriptionFact) &&
+      !containsPreviousProjectFacts(currentProjectFacts),
     "Research did not refresh current Project address and description from the Project record."
   );
   const { answerID } = await askEvaluationQuestion(
@@ -2032,10 +2038,12 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases, w
   });
   const snapshot = historicalAnswer.answer.projectContextSnapshot;
   assert(
-    snapshot?.projectInformation?.facts?.includes(`Zoning Fact — Address: ${currentAddress} (user-confirmed; not independently verified)`) &&
-      snapshot?.projectInformation?.facts?.includes(`Additional Project facts: ${currentDescription}`) &&
-      snapshot?.combinedFacts?.includes(`Zoning Fact — Address: ${currentAddress} (user-confirmed; not independently verified)`) &&
-      snapshot?.combinedFacts?.includes(`Additional Project facts: ${currentDescription}`),
+    snapshot?.projectInformation?.facts?.includes(currentAddressFact) &&
+      snapshot?.projectInformation?.facts?.includes(currentDescriptionFact) &&
+      snapshot?.combinedFacts?.includes(currentAddressFact) &&
+      snapshot?.combinedFacts?.includes(currentDescriptionFact) &&
+      !containsPreviousProjectFacts(snapshot.projectInformation.facts) &&
+      !containsPreviousProjectFacts(snapshot.combinedFacts),
     "Research did not use and preserve the current Project information as non-authoritative model context."
   );
 }

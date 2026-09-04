@@ -389,9 +389,29 @@ const foregroundSyncSource = functionSource(appSource, "performForegroundSync");
 assert.match(foregroundSyncSource, /refreshSyncedWorkspaceInPlace\(\{ accountUserID \}\)/);
 assert.equal(
   (foregroundSyncSource.match(/renderWorkspace\(\)/g) || []).length,
-  2,
-  "Foreground sync may fully render only in its two account-identity change guards."
+  0,
+  "Foreground sync must stop on an account change without remounting another account's workspace."
 );
+let foregroundAccountCurrent = true;
+let continueForegroundImages;
+let continuedDraftSyncs = 0;
+const foregroundImages = new Promise((resolve) => { continueForegroundImages = resolve; });
+const guardedForegroundSync = new Function(
+  "canRunForegroundSync", "captureAccountRequest", "activeAccount",
+  "flushPendingNotebookImages", "requireCurrentAccountRequest", "flushPendingNotebookDrafts",
+  "isCurrentAccountRequest", "updateConnectionStatus",
+  `let foregroundSyncPromise = null; let syncedContent = null; ${foregroundSyncSource}; return performForegroundSync;`
+)(
+  () => true, () => ({ userID: "account-A" }), () => ({ userID: "account-A" }),
+  () => foregroundImages,
+  () => { if (!foregroundAccountCurrent) throw new Error("ACCOUNT_CONTEXT_CHANGED"); },
+  () => { continuedDraftSyncs += 1; }, () => foregroundAccountCurrent, () => {}
+);
+const interruptedForegroundSync = guardedForegroundSync();
+foregroundAccountCurrent = false;
+continueForegroundImages();
+await assert.rejects(interruptedForegroundSync, /ACCOUNT_CONTEXT_CHANGED/);
+assert.equal(continuedDraftSyncs, 0, "The prior account's sync must stop before touching the next account's drafts.");
 assert.match(functionSource(appSource, "closeAllColumns"), /state\.coordinations = \[\][\s\S]*?state\.coordinationThreads = \[\][\s\S]*?state\.projectHostPaneID = ""/);
 assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordinationFilters = \{\}/);
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
@@ -766,7 +786,7 @@ assert.match(stylesSource, /\.search-jump-open \{[\s\S]*?padding: var\(--space-1
 assert.match(stylesSource, /\.notebook-reference-chip \{[\s\S]*?display: inline-grid;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;[\s\S]*?box-shadow: none;/, "Notebook links must read as compact evidence previews rather than pills.");
 assert.match(stylesSource, /\.notebook-card-title \{[^}]*height: 40px;[^}]*padding: 0 10px;[\s\S]*?\.notebook-card-title \{[^}]*line-height: 40px;/, "Notebook Note titles must remain vertically centered in their title row.");
 assert.match(stylesSource, /\.notebook-reference-meta \{[\s\S]*?color: var\(--text-tertiary\);[\s\S]*?\.notebook-reference-title \{[\s\S]*?font-weight: 700;[\s\S]*?\.notebook-reference-preview \{[\s\S]*?-webkit-line-clamp: 2;/, "Notebook references must expose a compact source, title, and preview hierarchy.");
-assert.match(stylesSource, /\.notebook-card-tile:hover strong,[\s\S]*?\.notebook-card-row\.is-selected \.notebook-card-tile strong \{[\s\S]*?color: var\(--project-color\);/, "Notebook card selection must change only the title color.");
+assert.match(stylesSource, /\.notebook-card-tile:hover strong,[\s\S]*?\.notebook-card-row\.is-selected \.notebook-card-tile strong \{[^}]*color: color-mix\(in srgb, var\(--project-color\) 35%, var\(--text-primary\)\);/, "Notebook card selection must keep a readable Project tint on its title.");
 assert.match(stylesSource, /\.notebook-card-row\.is-selected \{[\s\S]*?background: transparent;/, "Notebook card selection must not use a filled row highlight.");
 assert.match(stylesSource, /\.workspace-context-menu \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?\.workspace-context-menu button \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;[\s\S]*?max-width: 100%;/, "Workspace menu rows must remain within the menu card.");
 assert.match(stylesSource, /\.workspace-context-menu \.workspace-context-switch \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;[\s\S]*?overflow: hidden;/, "Long workspace names must truncate before the fixed Current label.");

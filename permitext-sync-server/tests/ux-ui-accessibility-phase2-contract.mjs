@@ -76,7 +76,8 @@ assert.doesNotMatch(`${htmlReaderSource}\n${nativeReaderSource}`, /theme\.fontSi
 assert.doesNotMatch(htmlReaderSource, /maximum-scale=1\.0|user-scalable=no/);
 assert.match(htmlReaderSource, /maximumZoomScale = 5/);
 assert.doesNotMatch(htmlReaderSource, /func viewForZooming[\s\S]*?\bnil\b/);
-assert.match(researchSource, /Tap the sparkle icon to start Research\./);
+assert.match(researchSource, /Tap the plus button to start Research\./);
+assert.match(researchSource, /Image\(systemName: "plus"\)[\s\S]*?\.accessibilityLabel\("New Research"\)/);
 assert.doesNotMatch(researchSource, /tap the Astroid/i);
 
 function dynamicColorCases(propertyName) {

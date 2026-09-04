@@ -102,6 +102,11 @@ const foregroundSignalHarness = new Function(
       entitlementFingerprint: "before"
     };
     let foregroundSyncLastFullPullAt = 0;
+    const captureAccountRequest = () => ({ userID: activeAccount()?.userID });
+    const isCurrentAccountRequest = (identity) => identity.userID === activeAccount()?.userID;
+    const requireCurrentAccountRequest = (identity) => {
+      if (!isCurrentAccountRequest(identity)) throw new Error("Synthetic account changed");
+    };
     ${foregroundSignalHandlerSource}
     return {
       handle: handleForegroundSyncSignal,

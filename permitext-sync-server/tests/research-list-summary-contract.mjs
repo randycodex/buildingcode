@@ -152,16 +152,17 @@ const structuredProjectInformation = researchProjectInformation("project-structu
   ]
 });
 assert.deepEqual(structuredProjectInformation.facts, [
-  "Building / Code Fact — Occupancy: Group R-2 (user-confirmed; not independently verified)",
-  "Building / Code Fact — Stories Above Grade: 6 (user-stated; not independently verified)",
-  "Zoning Fact — Address: 214 West 118th Street (user-confirmed; not independently verified)",
-  "Zoning Fact — Tax Lot(s): 52, 53, 54, 55 (user-stated; not independently verified)",
-  "Zoning Fact — Zoning Lot Composition: Tax Lots 52, 53, 54 and 55 comprise one zoning lot. (user-stated; not independently verified)",
-  "Zoning Fact — Zoning District(s): C4-4D, R7-2 (user-stated; not independently verified)",
-  "Zoning Fact — Street Frontage(s): Third Avenue — Wide Street; East 120th Street — Narrow Street (user-stated; not independently verified)",
-  "Zoning Fact — BBL: 1017190052 (NYC Planning sourced data; verify current official records)",
-  "Custom Fact — Travel Distance: 95 feet (user-stated; not independently verified)",
-  "Additional Project facts: An existing six-story Group R-2 building of Type IIIA construction."
+  "Building / Code Fact — Occupancy: Group R-2 (user-confirmed; not independently verified).",
+  "Building / Code Fact — Stories Above Grade: 6 (user-stated; not independently verified).",
+  "Zoning Fact — Address: 214 West 118th Street (user-confirmed; not independently verified).",
+  "Zoning Fact — Tax Lot(s): 52, 53, 54, 55 (user-stated; not independently verified).",
+  "Zoning Fact — Zoning Lot Composition: Tax Lots 52, 53, 54 and 55 comprise one zoning lot. (user-stated; not independently verified).",
+  "Zoning Fact — Zoning District(s): C4-4D, R7-2 (user-stated; not independently verified).",
+  "Zoning Fact — Street Frontage(s): Third Avenue — Wide Street; East 120th Street — Narrow Street (user-stated; not independently verified).",
+  "Zoning Fact — BBL: 1017190052 (sourced data; verify current official records). Original user/source wording: NYC Planning MapPLUTO",
+  "Custom Fact — Travel Distance: 95 feet (user-stated; not independently verified).",
+  "Unknown: Custom Fact — Sprinkler status: Unknown (unknown; not established; preserve the stated negation, scope and uncertainty).",
+  "Additional Project facts (user wording; not independently verified): An existing six-story Group R-2 building of Type IIIA construction."
 ]);
 assert.equal(structuredProjectInformation.structuredFacts.length, 11);
 assert.equal(structuredProjectInformation.structuredFacts[0].usedInResearch, true);
@@ -173,7 +174,7 @@ assert.equal(structuredProjectInformation.customFacts.length, 1);
 assert.equal(structuredProjectInformation.missingFactsAreUnknown, true);
 assert.equal(structuredProjectInformation.facts.some((fact) => fact.includes("Commercial Overlay")), false);
 assert.notEqual(structuredProjectInformation.zoningFacts.find((fact) => fact.key === "tax-lots")?.value, structuredProjectInformation.zoningFacts.find((fact) => fact.key === "zoning-lot-composition")?.value);
-assert.equal(structuredProjectInformation.facts.at(-1).startsWith("Additional Project facts:"), true);
+assert.equal(structuredProjectInformation.facts.at(-1).startsWith("Additional Project facts (user wording; not independently verified):"), true);
 assert.match(appSource, /A missing fact is unknown, not false, none, or inapplicable\. Identify a material missing fact instead of guessing it\./);
 assert.match(clientSource, /structuredFacts: projectStructuredFacts\(project\)/, "Project mutations do not preserve structured facts.");
 assert.doesNotMatch(clientSource, /Research may use as user-provided context\. Blank fields are ignored\./, "The removed Structured Facts helper text returned.");
@@ -656,12 +657,12 @@ assert.match(functionSource(clientSource, "refreshProjectSourceConsumers"), /not
 assert.match(clientSource, /async refreshReferenceSources\(options = \{\}\)[\s\S]*?refreshNotebookReferenceSources\(options\)/, "Mounted Notebooks do not expose an editor-safe reference refresh.");
 assert.match(clientSource, /refreshNotebookReferenceSources = async[\s\S]*?notebookReferenceCandidates\(identity, foundation, cards\)[\s\S]*?renderReferenceOptions\(\)/, "Notebook source refresh must rebuild only the reference menu from current Project evidence.");
 assert.match(clientSource, /async refreshSources\(\)[\s\S]*?refreshReportSources\(\)/, "Mounted Reports do not expose an editor-safe source refresh.");
-assert.match(clientSource, /refreshReportSources = async[\s\S]*?postResearch\("\/reports\/sources\/list"[\s\S]*?sourcePalette\.replaceChildren\(\)[\s\S]*?renderSourcePalette\(sourcePalette\)/, "Report source refresh must replace only the source palette instead of remounting the editor.");
+assert.match(clientSource, /refreshReportSources = async[\s\S]*?reportRequest\("\/reports\/sources\/list"[\s\S]*?sourcePalette\.replaceChildren\(\)[\s\S]*?renderSourcePalette\(sourcePalette\)/, "Report source refresh must replace only the source palette instead of remounting the editor.");
 assert.match(functionSource(clientSource, "persistSectionFolderSelection"), /refreshOpenSavedPanes\(\)[\s\S]*?refreshProjectSourceConsumers\(touchedProjects\)/, "Project assignment changes must update Saved, Notebook, and Report consumers after persistence.");
 assert.match(clientSource, /postResearch\("\/notebook\/cards\/save"[\s\S]*?reportDraftMounts\.get\(projectID\)\?\.refreshSources/, "Saving a Notebook Note must update an open Report's available Note sources.");
-assert.match(clientSource, /postResearch\("\/notebook\/cards\/delete"[\s\S]*?reportDraftMounts\.get\(projectID\)\?\.refreshSources/, "Deleting a Notebook Note must remove it from an open Report's source choices.");
-assert.match(functionSource(clientSource, "setNotebookCardArchived"), /postResearch\("\/notebook\/cards\/archive"[\s\S]*?reportDraftMounts\.get\(projectID\)\?\.refreshSources/, "Archiving or restoring a Notebook Note must update an open Report's source choices.");
-assert.match(clientSource, /postResearch\("\/reports\/drafts\/save"[\s\S]*?notebookMounts\.get\(projectID\)\?\.refreshReportStatus/, "Saving a Report must update the focused Notebook Note's Report status.");
+assert.match(clientSource, /notebookRequest\("\/notebook\/cards\/delete"[\s\S]*?reportDraftMounts\.get\(projectID\)\?\.refreshSources/, "Deleting a Notebook Note must remove it from an open Report's source choices.");
+assert.match(functionSource(clientSource, "setNotebookCardArchived"), /notebookRequest\("\/notebook\/cards\/archive"[\s\S]*?reportDraftMounts\.get\(projectID\)\?\.refreshSources/, "Archiving or restoring a Notebook Note must update an open Report's source choices.");
+assert.match(clientSource, /reportRequest\("\/reports\/drafts\/save"[\s\S]*?notebookMounts\.get\(projectID\)\?\.refreshReportStatus/, "Saving a Report must update the focused Notebook Note's Report status.");
 assert.match(functionSource(clientSource, "deleteResearchConversationFromList"), /refreshProjectSourceConsumers\(\[conversation\.primaryProjectID\][\s\S]*?refreshNotebookFoundation: true[\s\S]*?refreshPaneIDs: \["utility:analysis", \.\.\.projectPaneIDs\]/, "Deleting Research must update its Project, Notebook references, and Report sources together.");
 assert.match(functionSource(clientSource, "refreshResearchProjectAssignmentConsumers"), /refreshProjectSourceConsumers\(visibleProjectIDs,[\s\S]*?refreshNotebookFoundation: true[\s\S]*?refreshVisibleProjectArtifactSummaries\(projectID\)/, "Moving Research must invalidate both its old and new Project source consumers and refresh their visible summaries.");
 assert.equal((clientSource.match(/refreshResearchProjectAssignmentConsumers\(\[previousProjectID, targetProjectID\]\)/g) || []).length, 2, "Both Research Project assignment controls must refresh the old and new Project consumers.");

@@ -25,9 +25,10 @@ build 53 from the shared baseline; it is not a build of this repair branch.
 
 ## First repair batch
 
-Status: implementation and local verification complete, including the offline
-compatibility follow-up; isolated on the repair branch. Remaining findings below
-are open.
+Status: implementation and local verification complete in `38ed70d08` and
+`cf0cf0be1`, including the offline compatibility follow-up; isolated on the repair
+branch. The second batch below addresses the remaining source defects. Local
+verification does not close production or release acceptance.
 
 1. **P0-1, canonical citation edition identity.** Resolve citations using canonical
    section identity; verify the expected edition; fail visibly when the exact
@@ -48,14 +49,26 @@ are open.
    links, and immutable Report sources. Use imported historical test fixtures,
    rather than a production endpoint, to exercise read compatibility.
 
-## Remaining critical findings
+## Second repair batch: current status
 
-| ID | Finding | Acceptance criteria |
-| --- | --- | --- |
-| P0-2 | Research moved between Projects retains prior active facts/history. | Bind active context to Project/context revision. Moving or unassigning preserves historical answers but starts fresh active context. All generation/retrieval history consumers honor the boundary. Reject a pre-move in-flight completion; preserve retry and usage idempotency. |
-| P0-3 | Account transitions do not isolate all private transient state and async results. | Scope web overlays, caches, pending pulls, success/error effects, and native Research view state to captured account/session/conversation identities. Delayed responses cannot affect a new account or conversation. |
-| P0-4 | Offline cleanup can remove unsynchronized Notebook drafts and images. | Separate disposable downloads from durable private work. Test draft/image survival through sign-out, session expiry, entitlement loss, upload failure, and reconnect. Distinguish device save from completed synchronization. |
-| P0-6 | Concurrent Notebook and Research updates can overwrite changes despite successful responses. | Use atomic expected-version updates, conflict responses, and completion-time context checks. Test simultaneous edits and Research generation racing with Project assignment. Preserve consistency of linked records and usage. |
+The second batch is implemented on `codex/production-readiness-fixes`. Native
+changes are committed as `d13a24c4e`; the web/server/test batch has passed combined
+verification and is ready to commit. The readiness contracts, client builds,
+smoke, main check, and postcheck passed. Precheck passed across its original run
+and the resumed tail after obsolete assertions were updated for the repaired
+contracts. This is aggregate suite evidence, not a single uninterrupted
+`npm run check` invocation. Final candidate and release acceptance remain separate.
+
+## Critical findings
+
+| ID | Finding | Implementation and local evidence | Remaining acceptance |
+| --- | --- | --- | --- |
+| P0-1 | Historical citations can open a different provision or edition. | First-batch canonical identity and offline compatibility repairs are complete. Citation contracts pass; the browser rendered the distinct 2014 and 2022 same-number provisions with the correct edition. | Verify saved-citation, refresh, offline, and native paths in the final release candidate; no fresh paid Research acceptance is claimed. |
+| P0-2 | Research moved between Projects retains prior active facts/history. | Implemented Project/context revision boundaries, fresh active history/facts after move or unassign, and rejection of generation started under the old context. Historical answers remain immutable. Context and concurrent HTTP contracts pass. | Run live PostgreSQL concurrency acceptance and the final cross-platform Project → Research → Report workflow. |
+| P0-3 | Account transitions fail to isolate private state and async results. | Implemented owner/session/generation guards, per-account and guest workspace storage, conservative legacy quarantine, native account-scoped state, and guarded mutation/timer/error/finally paths. Deferred actual-function tests include A → B → A, stale 401, SDK callbacks, and captured-owner deletion cleanup. Linking checkpoints local work and fences same-tab editing; confirmed source work has an export-only recovery path. | Complete final candidate account-switch/deletion tests and review the explicit legacy and account-link recovery limits below. Cross-tab merging is not a transaction and source work is not automatically replayed. |
+| P0-4 | Offline cleanup deletes unsynchronized Notebook drafts/images. | Public code cleanup preserves private stores. Draft metadata, immutable pending-save journals, conditional acknowledgement, conflict review, owner deletion tombstones, and exact-owner recovery exports are implemented. Transactional storage tests pass. A synthetic browser 503 → 403 → reopen/export → restored-access flow preserved the Note title and returned to Synced. | Exercise device storage pressure, background termination, image upload/reconnect, and deletion failure recovery on the final native/browser candidates. Retained unattributed legacy bytes are not claimed deleted. |
+| P0-5 | Retired Workboard writers do not enforce read-only compatibility. | First-batch authenticated 410 responses and per-record mixed-sync rejection are complete. Historical reads, previews, and immutable Report sources pass imported-fixture HTTP regressions. | Verify final deployment/candidate compatibility; no live PostgreSQL write test or production exploit was performed. |
+| P0-6 | Concurrent Notebook/Research writes lose changes despite success. | Implemented atomic expected-version/context checks and exact retry receipts for Notebook, Research completion, and Project information. Newer drafts survive acknowledgement and reopen. File-adapter Research metrics, credit and usage updates now hold the lock across the entire mutation. Deterministic overlap tests preserve unrelated answers, debit balances, and metrics; the old metric mechanism reproduced the 25-versus-24 overwrite. | Live PostgreSQL and final cross-device concurrency acceptance remain required. PostgreSQL evidence currently checks transaction protocol, not a live database. |
 
 The original audit classified security, lost work, incorrect citation relationships,
 and credible cross-project contamination as P0. Isolated reproductions and source
@@ -64,40 +77,74 @@ production customer incidents.
 
 ## High-priority findings
 
-| ID | Finding | Acceptance criteria |
-| --- | --- | --- |
-| P1-1 | Automatic fact normalization loses negation, partial scope, and assumptions. | Preserve original language and qualification; promote only unambiguous assertions. Test partial sprinkler systems, negated building status, embedded hypothetical language, and follow-ups. Do not make generation and verification blindly trust the same extraction. |
-| P1-2 | Streaming errors omit recovery fields available in JSON responses. | Use one safe public error envelope; verify streamed source-change/prerequisite failures produce the correct visible action and current conversation state. |
-| P1-3 | Native cache lifecycle incompletely handles account deletion and revoked/deleted content. | Purge all private cache classes on account deletion; distinguish transport failures from authorization/deletion/revocation; label retained offline freshness accurately. |
-| P1-4 | Release acceptance does not substantiate the complete paid-product scope. | Retain Research/Zoning gates until current release-shaped professional review passes. Verify final native archive/privacy aggregation, account reconciliation/deletion, payment lifecycle, and the exact supported platform workflows. |
+| ID | Finding | Implementation and local evidence | Remaining acceptance |
+| --- | --- | --- | --- |
+| P1-1 | Fact normalization loses negation, partial scope, and assumptions. | Shared qualification/projection helpers preserve original wording and qualifiers; only unambiguous assertions become established facts. Partial sprinklers, negated status, embedded hypotheticals, legacy inflated facts, and follow-ups pass focused tests. | Professional evaluation must verify meaning survives actual generation and verification. Extraction tests do not establish Research answer quality. |
+| P1-2 | Streaming errors discard recovery information. | JSON/stream responses share a safe error envelope. Web recovery preserves conflict/source/prerequisite details, offers current-state review, and rejects obsolete account responses. Recovery contracts pass. | Verify current-source review and retry with representative final-candidate workflows and provider failures; no new paid run is included. |
+| P1-3 | Private cache deletion/revocation lifecycle is incomplete. | Implemented owner-scoped native/web cleanup, persistent deletion tombstones, and authorization/deletion-sensitive cache fallback. Authored device work has a separate recovery route when access is unavailable. Native and web contracts pass. | Complete candidate account-deletion/privacy verification, stale independent-writer tests on actual devices, and explicit treatment of unattributed legacy bytes. |
+| P1-4 | Release acceptance does not substantiate the paid-product scope. | Remains open. Source fixes and local tests improve readiness but do not clear professional Research/Zoning, payment/support, privacy, or platform release gates. | Retain current fail-closed gates until owner-reviewed, release-shaped evaluation passes. Verify final archive/privacy aggregation, account reconciliation/deletion, payment lifecycle, and supported platform workflows. |
 
 ## Medium-priority findings
 
-| ID | Finding | Acceptance criteria |
-| --- | --- | --- |
-| P2-1 | Collapsed Project facts remain keyboard-focusable/exposed. | Hidden controls leave both tab order and accessibility tree; focus returns to a visible, appropriate control. |
-| P2-2 | Report ignores structured Project facts used by Research. | A shared qualified fact projection feeds Report selection and preserves source/status and immutable report-time context. |
-| P2-3 | Native Notebook initial-load errors appear empty/read-only. | Distinct loading/error/empty/cached/permission states; retry available when first load fails. |
-| P2-4 | Reader chrome does not consistently show edition. | Historical and current reading positions identify code family and edition without relying on remembered navigation. |
-| P2-5 | Tablet toolbar collisions and restricted phone-web scope. | Verify 320/375/390/430/768/1024/1280/1440 layouts and touch behavior. Correct tablet collisions and describe supported mobile capabilities honestly. |
-| P2-6 | Exact-match search behavior is insufficiently explained. | Zero-result recovery clarifies matching and offers a broader search path without presenting relevance as authority. |
-| P2-7 | Startup waits on catalog requests and a large central client. | Profile the critical path; decouple usable shell restoration from secondary catalog/feature work where safe. Verify meaningful improvement on representative devices. |
+| ID | Finding | Implementation and local evidence | Remaining acceptance |
+| --- | --- | --- | --- |
+| P2-1 | Collapsed Project facts remain focusable/exposed. | Hidden controls are removed from focus/accessibility exposure. Root browser verification covered collapse and accessibility state. | Complete final keyboard and assistive-technology acceptance across supported layouts. |
+| P2-2 | Report omits structured Project facts used by Research. | Shared qualified projection feeds Report sources and immutable manifests. Helper/Report contracts pass; actual browser Report revision 2 retained the qualified text. | Review the full professional handoff and reopen/export on the final native/browser candidates. |
+| P2-3 | Native Notebook initial-load errors appear empty/read-only. | Loading/error/permission/device-recovery states and retry behavior are implemented and locally tested. Web recovery also preserves authored drafts through 503/403 failures. | Final-device offline, revocation, and restored-access verification remains required. |
+| P2-4 | Reader chrome inconsistently identifies edition. | Native/web edition labels and citation identity repairs are implemented; actual browser 2014/2022 rendering was verified. | Confirm visible and accessible labels at arbitrary scroll positions in the final candidate. |
+| P2-5 | Tablet toolbars collide and phone-web scope is unclear. | Root checked 320/375/390/430/768/1024/1280/1440 widths with no observed overlap, and 44-pixel tablet targets. Supported mobile scope remains explicit. | These browser checks do not replace physical touch, native wide-table, or VoiceOver acceptance. |
+| P2-6 | Exact-match search behavior is insufficiently explained. | Exact-match disclosure and term-search recovery are implemented, tested, and verified in the actual browser. Results retain their source/edition boundary. | Final-candidate search recovery and accessibility acceptance remain open. |
+| P2-7 | Startup waits on secondary catalogs and a large central client. | Usable workspace restoration is decoupled from secondary catalogs/trust metadata; authentication precedes private rendering. Controlled request-latency tests improved usable-shell time from about 250 ms to 42 ms. Restore tests cover initialization ordering and malformed snapshots; actual browser reload preserves panes. | This is a controlled timing result, not device paint or p50/p90 performance acceptance. Representative-device measurement and continued large-client performance review remain open. |
 
 ## Additional acceptance and polish
 
-- Reproduce the audit's final reload returning to guest state without an explicit
-  sign-out. Cause remains unresolved; do not conflate it with a proven session bug.
+- The second-batch reload defect was reproduced as initialization-order and
+  workspace-restore failures and repaired without replacing unreadable saved
+  layouts. The original audit's unexplained apparent guest transition is not
+  proven to have the same cause; retain a final candidate session/reload check.
 - Complete physical wide-table access. Mirroring did not establish direct finger
   scrolling failure or success for all table columns.
 - Complete native VoiceOver and web keyboard/contrast/touch-target checks.
 - Verify the professional path: Project → Research → exact cited provision →
   qualified notes/Notebook → Report → reopening on iOS.
-- Clarify the next action between Ask, Investigate, and Decide; a generated answer
-  is not automatically a reviewed professional decision.
-- Correct the stale native sparkle-icon instruction, transient empty history,
-  duplicate search progress wording, and pane positioning after viewport changes.
-- Check the historical Reader find field overlapping its section heading while
-  find-in-reader is open; observed during this batch's local browser verification.
+- Web and native answers now give a concrete next step: open cited provisions,
+  verify Project facts and assumptions, and record a human conclusion in a Note
+  before adding it to a Report. A generated answer is not a reviewed decision.
+- Native empty-history/loading wording and the obsolete sparkle instruction were
+  corrected. The focused web Reader now remains fully visible after window resize;
+  actual 768/1024-pixel and restored desktop checks verified both pane edges.
+  These changes do not close the data, authority, or release gates above.
+- The historical Reader find overlap received a bounded repair. Root's v33
+  browser check confirmed preserved body/table geometry and the header mask while
+  find was open. Final device and assistive-technology checks remain required.
+
+## Known recovery limits
+
+- **Unattributed legacy data:** ambiguous legacy workspace/Workboard bytes remain
+  retained and unavailable to normal guest/account hydration. No account is
+  assigned ownership by guessing. Scoped account deletion removes provably owned
+  current data; it does not claim to erase all unattributed legacy bytes.
+  An interrupted migration whose destination has subsequently changed preserves
+  both versions and quarantines the complete legacy snapshot. Exact-copy retries
+  can finish; quota/partial-copy/conflict regressions pass.
+- **Confirmed account merges:** the same-tab preflight checkpoints open Notes and
+  blocks on draft/image/queue/conflict/local-edit/storage failures or active work.
+  A write fence prevents new same-tab edits while connecting accounts. After an
+  exact server-confirmed source/destination receipt, source namespaces remain
+  intact and the destination can export retained source work for review. Source
+  bytes are not automatically retargeted or replayed.
+- **Cross-tab arrivals:** another tab can write source work after preflight. A
+  later recovery export reads those retained bytes, but this is not atomic
+  multi-tab migration or automatic synchronization into the destination.
+- **Lost merge receipt:** if the server completes a merge but its response is
+  permanently lost, source bytes remain, but no confirmed destination recovery
+  mapping is automatically reconstructed. This remains a recovery limitation.
+- **Successive merges:** for A → B → C, C currently receives the direct B recovery
+  mapping. A's older mapping remains retained within source metadata; a transitive
+  recovery allowlist is not automatically inferred.
+- **Recovery-index storage failure:** an in-memory confirmed receipt supports
+  immediate export and a visible warning to export before closing the page.
+  Durable recovery-index failure is not represented as a successful durable save.
 
 ## Development order and preserved strengths
 
@@ -114,7 +161,7 @@ bounded verification/repair, durable request identifiers, and explicit professio
 review gates. Do not start a framework or visual-system rewrite to address these
 bounded failures.
 
-## Verification ledger
+## Verification ledger: baseline and first batch
 
 - Baseline metadata: project/plist semantic equality confirmed; plist validation
   and privacy contract passed.
@@ -147,3 +194,62 @@ bounded failures.
 - No real account deletion, customer-data mutation, paid Research call, App Store
   submission, public release, pricing/allowance change, or rollout-gate activation
   forms part of this batch.
+
+## Verification ledger: second batch
+
+- **Source status:** native commit `d13a24c4e` is on the repair branch. Web/server
+  changes passed combined verification and are ready to commit at this checkpoint.
+  Neither this commit nor the remaining repairs are claimed deployed
+  to Production, TestFlight, or the App Store.
+- **Native:** 176 unit tests and seven UI tests passed. These are local test
+  results; physical wide-table interaction, VoiceOver, and the final candidate's
+  archive/privacy aggregation remain pending.
+- **Combined local checks:** `npm run test:readiness-recovery` and
+  `npm run build:clients` passed. The readiness script includes qualified facts,
+  Project fact projection, account isolation/mutation guards, durable Notebook
+  storage, Research context/concurrent HTTP, startup/restore, stream/search/device
+  recovery, Project information durability, and file-store concurrency contracts.
+- **Broad suite passed across resumed runs:** precheck evidence is retained in
+  `/private/tmp/permitext-readiness-full-check-verified-20260904.log` and its
+  completed tail in `/private/tmp/permitext-readiness-precheck-tail-20260904.log`.
+  `npm run --ignore-scripts check` and `npm run --ignore-scripts postcheck` both
+  exited zero; their logs are `/private/tmp/permitext-readiness-main-check-agent-20260904.log`
+  and `/private/tmp/permitext-readiness-postcheck-agent-20260904.log`.
+  `node tests/smoke.mjs` separately passed; its record is
+  `/private/tmp/permitext-readiness-smoke-agent-20260904.log`. Obsolete literal
+  expectations were updated to assert the repaired account guards, retained
+  recovery namespaces, qualified facts, startup, journal, and mobile behavior.
+  Actual deferred account-switch and exact merge-receipt assertions were added.
+- **Persistence and billing:** file-adapter overlap tests use disposable synthetic
+  stores and deterministic barriers. They preserve unrelated committed answers,
+  credit debits, and other accounts' metrics; a negative control reproduces the
+  former stale metric snapshot overwrite. Reservation/credit duplicate and stale
+  reconciliation behavior remains covered. The isolated Research billing
+  lifecycle, turn, credit-ledger, and idempotency checks passed without providers.
+- **PostgreSQL boundary:** local contracts verify expected transaction/locking
+  protocol and conflict outcomes. A live PostgreSQL database was not exercised;
+  adapter protocol checks are not a live database acceptance result.
+- **Actual browser:** root verified the eight listed widths, tablet targets,
+  collapsed facts' accessibility state, exact-search term recovery, historical and
+  current edition rendering, qualified Report text in revision 2, v33 Reader
+  find/body/header behavior, and v34 focused-pane visibility after resize.
+  A synthetic Notebook unavailable/forbidden/reopen
+  recovery flow retained authored work for read/export; restoring access loaded
+  the preserved title and returned to Synced.
+- **Selected-passage browser handoff:** an isolated mock-provider question began
+  from BC 107.9.1 with the assigned Project. The completed answer visibly retained
+  "Only the cellar is sprinklered" and the unverified upper-floor assumption,
+  disclosed that the facts were not independently verified, and offered the next
+  human review/Note/Report step. Its supporting citation opened canonical section
+  1567, BC 903.1.2 Construction documents, with Building Code (2022) visible.
+  This is workflow evidence with a synthetic provider, not professional answer
+  quality or paid-generation acceptance.
+- **Evaluation gates:** no new professional Research/Zoning cohort or paid model
+  run was performed. Retained Zoning V2.1 evidence remains 12 of 30 cases both
+  delivering an answer and passing, with 13 delivered, five verifier blocks, and
+  12 prerequisite boundaries; this does not clear the public release gate. Current release-shaped
+  professional review and full-service cost evidence remain required.
+- **Scope:** checks used local synthetic fixtures or the stated read-only/rendered
+  inspection. No customer-data cleanup, production exploit, real account deletion,
+  payment execution, deployment, release submission, price/allowance change, or
+  rollout-gate activation is authorized or claimed by this second-batch ledger.

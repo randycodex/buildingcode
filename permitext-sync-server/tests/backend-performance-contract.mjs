@@ -297,7 +297,8 @@ assert(
 );
 assert(
   webAppSource.includes("hubPayload?.foundation && hubPayload?.notebook") &&
-    webAppSource.includes('hubPayload?.reports || postResearch("/reports/history/list", { projectID })') &&
+    webAppSource.includes('hubPayload?.reports || reportRequest("/reports/history/list", { projectID })') &&
+    webAppSource.includes('const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };') &&
     webAppSource.includes("foundation = hubPayload?.foundation ||"),
   "Notebook, Report history, and Saved do not share the Project transition bootstrap payload."
 );
