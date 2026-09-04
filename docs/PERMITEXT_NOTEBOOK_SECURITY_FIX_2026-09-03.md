@@ -1,6 +1,6 @@
 # Notebook dependency security correction — September 3, 2026
 
-Status: **Implemented locally; not merged, pushed, or deployed.** App Store submission and release remain the owner's final steps and are not authorized.
+Status: **Merged, pushed, and verified in website/backend Production after separate owner approval.** App Store submission and release remain the owner's final steps and are not authorized. See the exact publication evidence below.
 
 ## Scope and cause
 
@@ -33,4 +33,18 @@ Status: **Implemented locally; not merged, pushed, or deployed.** App Store subm
 
 ## Remaining release boundaries
 
-Obtain separate approval before merging/pushing/deploying this patch. Then verify live asset versions, Production health and the updated Dependabot result. No paid Research call is needed to validate this dependency fix. No TestFlight build was created, and no Apple field, submission, or public-release action was changed.
+The owner separately approved merging, pushing, and deploying the prepared website/backend changes. This does not authorize App Store submission, TestFlight upload, new policy wording, paid Research calls, or UI/UX and screenshot work. No TestFlight build was created, and no Apple field, submission, or public-Beta activation was changed.
+
+## Authorized Production publication
+
+- Final deployed source: `0688e6b0564d44a92c803af3e1cfbbe6f87a2911`. Local `main`, `origin/main`, and fresh GitHub `ls-remote` checks match. Both integrations were fast-forwards; the owner's Xcode project/Info.plist diff checksum and unrelated untracked files were preserved.
+- The first deployment of `0f9328200`, `dpl_JBuRCMV6yHNYhBxtf4pAudNfBtF1`, failed because `.vercelignore` excludes `tests/`, which originally contained the new prebuild security check. Both public origins continued serving healthy prior source `573d4bc1a`; the failed build was not promoted.
+- Follow-up `0688e6b05` moves the same gate to `scripts/verify-notebook-dependencies.mjs` and adds a packaging contract. It retains test-fixture exclusion and all security checks. Local `npm run build:clients`, build-output/governance contracts, and clean-diff checks pass; the generated Notebook JavaScript hash is unchanged. Vercel's replacement build also executes and passes the security gate.
+- Final deployment: `dpl_5ETSni7gSRwdDDVuzryEb8HJF7Js`, **READY**, [deployment URL](https://permitext-sync-8rzp9zq0h-randycodexs-projects-b72fc111.vercel.app). Created `2026-09-04T01:20:08.491Z`, building `01:20:09.828Z`, READY `01:22:56.056Z` (September 3 EDT). Build output reports 46 seconds; creation-to-READY was approximately 168 seconds. Node.js backend, Node 24, no framework preset.
+- On both `https://permitext.com` and `https://permitext-sync.vercel.app`, `/release` returns HTTP 200, the exact final SHA, and `production`. Health passes PostgreSQL `normalized-v4`, commercial readiness and live Clerk configuration. AASA passes with `57BY95X97H.com.randycodex.permitext`; all three approved policies pass strict live byte/hash publication checks.
+- Both origins' served `app.js`, `offline-storage.js`, service worker and Notebook JavaScript match the local files byte-for-byte by SHA-256. The HTML references `20260903-notebook-security-v24`; Notebook version is `20260903-tiptap-security-v14`. Notebook SHA-256 remains `02d6e5c40ac6399c12958d8c83b30394674714ee80d96e13cbb68904f3d602af`.
+- Full no-cost `npm run check` and local `node tests/smoke.mjs` passed on `0f9328200` before publication. The unchanged security logic and packaging-only follow-up received focused build/contracts and the actual Vercel build; the full suite was not redundantly rerun on that follow-up. PostgreSQL rate-limit integration skipped without a database URL. Logs: `/private/tmp/permitext-publication-check-20260903.log` and `/private/tmp/permitext-publication-smoke-20260903.log`.
+- GitHub Dependabot alert 25 now reports **fixed**, timestamp `2026-09-04T01:17:39Z`; refreshed after final deployment.
+- Deployment-scoped error/fatal scan from READY through approximately `2026-09-04T01:24:12.419Z` returned zero entries and zero parse errors. It emits no raw messages/customer identifiers. No health request appears in this error-only sample; the independent direct-health checks above passed. This is a short early observation, not hour-long coverage or live Research acceptance.
+- Vercel reports zero configured drains; the previously owner-accepted alerts/daily-review alternative remains in place, and the protected build passes external-monitoring configuration. No alert-delivery or spend-hard-stop drill was performed.
+- No environment, spending cap, model, price, allowance, subscription, provider configuration, approved public-policy bytes, UI/UX, screenshot asset, or Apple setting was changed. Privacy declarations are in source, not a newly uploaded native binary. No paid Research request or customer-data mutation was made.
