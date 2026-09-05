@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Offline draft durability checks</title>
+<style>body{font:16px system-ui;max-width:900px;margin:40px auto;padding:0 24px;background:#fafafa;color:#17232d}button{font:inherit;padding:10px 18px}li{margin:12px 0}.pass{color:#176538}.fail{color:#aa2020}pre{white-space:pre-wrap;font-size:12px}iframe{display:none}</style>
+<main><h1>Offline draft durability checks</h1>
+<p>Two independent browser contexts use the real IndexedDB implementation. All records are synthetic and isolated on this temporary origin. No server APIs or customer accounts are used.</p>
+<button id="run">Run durability checks</button><p id="status" role="status">Ready</p><ol id="results"></ol>
+<details><summary>Machine-readable evidence</summary><pre id="report"></pre></details>
+<section><h2>Recovery control example</h2><p>The app's actual comparison control, using synthetic text.</p><div id="review"></div></section>
+<dialog id="confirmation"><h2 id="confirmation-title"></h2><p id="confirmation-body"></p><button id="confirm">Confirm</button> <button id="cancel">Cancel</button></dialog></main>
+<script type="module" src="/runner.js"></script></html>

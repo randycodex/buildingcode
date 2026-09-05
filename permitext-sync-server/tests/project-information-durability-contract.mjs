@@ -9,6 +9,7 @@ const begin = source.indexOf("function projectNoteEditor(");
 const actualEditor = source.slice(begin, source.indexOf("\n}", begin) + 2);
 assert.ok(actualEditor.includes("return container;"));
 const storageFunctions = offline.slice(offline.indexOf("function notebookDraftKey("), offline.indexOf("function notebookProjectKey(")).replaceAll("export ", "");
+const reviewUI = source.slice(source.indexOf("function notebookRecoveryPlainText("), source.indexOf("async function appendNotebookDeviceRecovery("));
 function deferred() { let resolve; let reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; }
 async function reached(predicate, label) { for (let i = 0; i < 700; i += 1) { if (predicate()) return; await Promise.resolve(); } assert.fail(`Did not reach ${label}`); }
 function node() { return { children: [], isConnected: true, style: {}, callbacks: {}, classList: { add() {}, remove() {} }, setAttribute() {}, append(...values) { this.children.push(...values); }, addEventListener(type, callback) { this.callbacks[type] = callback; }, getBoundingClientRect: () => ({ height: 300 }) }; }
@@ -44,6 +45,7 @@ function harness() {
   const context = vm.createContext(sandbox);
   vm.runInContext(`${storageFunctions}
     const saveActual = saveNotebookDraft; saveNotebookDraft = (input) => saveBoundary(input, saveActual);
+    ${reviewUI}
     ${actualEditor}; globalThis.openEditor = projectNoteEditor;`, context);
   return { requests, elements, records: () => [...records.values()].map(clone),
     holdWrite() { const value = deferred(); writeDelay = value; return value; }, failWrite() { failWrite = true; },
@@ -52,6 +54,47 @@ function harness() {
     runTimer() { const entry = [...timers.entries()].at(-1); assert.ok(entry, "Save/retry timer required"); timers.delete(entry[0]); return entry[1](); },
     reply(index, override = {}) { const request = requests[index]; request.resolve({ note: { id: "remote-project-note", version: request.body.expectedVersion + 1, title: request.body.title, document: request.body.document, body: request.body.document.text, ...override } }); }
   };
+}
+
+// Two mounted editors loaded no local draft. The second must preserve the
+// first one's unsent work and stop before any HTTP write. Review must keep the
+// actual current editor text and its original server base version.
+{
+  const test = harness();
+  const a = await test.open({ version: 7 });
+  const b = await test.open({ version: 3 });
+  await test.edit(a.editor, "Unsent A");
+  await test.edit(b.editor, "Unsent B");
+  await test.runTimer();
+  assert.equal(test.requests.length, 0);
+  const draft = test.records()[0];
+  assert.equal(draft.document.text, "Unsent B");
+  assert.equal(draft.baseVersion, 3, "A stale editor cannot inherit another tab's newer server version");
+  assert.equal(draft.recoveryCopies[0].document.text, "Unsent A");
+  const keep = test.elements.findLast((element) => element.textContent === "Keep current editor version");
+  await keep.callbacks.click();
+  const saving = test.runTimer();
+  await reached(() => test.requests.length === 1, "reviewed B HTTP");
+  assert.equal(test.requests[0].body.document.text, "Unsent B");
+  assert.equal(test.requests[0].body.expectedVersion, 3);
+  test.reply(0); await saving;
+  assert.equal(test.records().length, 0);
+}
+
+// A's submitted request returns after B creates a device conflict. The receipt
+// cannot remove B, and A's comparison must show A as the editor version.
+{
+  const test = harness();
+  const a = await test.open(); const b = await test.open();
+  await test.edit(a.editor, "In-flight A"); const saving = test.runTimer();
+  await reached(() => test.requests.length === 1, "in-flight A HTTP");
+  await test.edit(b.editor, "Conflicting B");
+  test.reply(0); await saving;
+  const draft = test.records()[0];
+  assert.equal(draft.document.text, "In-flight A");
+  assert.ok(draft.recoveryCopies.some((copy) => copy.document.text === "Conflicting B"));
+  assert.equal(draft.recoveryConflict, true);
+  assert.equal(test.requests.length, 1);
 }
 
 // R2 is queued while R1 is in flight and the editor closes. The exact R1

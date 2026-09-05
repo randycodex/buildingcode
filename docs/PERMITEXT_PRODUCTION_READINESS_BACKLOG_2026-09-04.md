@@ -397,6 +397,13 @@ The prior build-33 screenshot package remains historical.
 
 ## Critical findings
 
+September 5 follow-up: real browser storage testing found and repaired a stale
+tab overwriting another tab's unsent Notebook/Project information text. Both
+versions now survive with guarded comparison and recovery exports. See the
+[device-draft concurrency repair and verification record](./PERMITEXT_WEB_DRAFT_CONCURRENCY_REPAIR_2026-09-05.md).
+This strengthens P0-4/P0-6 coverage without closing their remaining device and
+deployed-environment acceptance requirements.
+
 | ID | Finding | Implementation and local evidence | Remaining acceptance |
 | --- | --- | --- | --- |
 | P0-1 | Historical citations can open a different provision or edition. | First-batch canonical identity and offline compatibility repairs are complete. Citation contracts pass; the browser rendered the distinct 2014 and 2022 same-number provisions with the correct edition. | Verify saved-citation, refresh, offline, and native paths in the final release candidate; no fresh paid Research acceptance is claimed. |

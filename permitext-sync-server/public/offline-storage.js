@@ -16,8 +16,8 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v777";
-const shellAssetVersion = "20260905-saved-section-visibility-v38";
+const shellCacheName = "permitext-pro-shell-v778";
+const shellAssetVersion = "20260905-device-draft-conflicts-v39";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -26,16 +26,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260901-2014-code-assets-v15",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260905-saved-section-visibility-v38",
+  "/web/styles.css?v=20260905-device-draft-conflicts-v39",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260905-saved-section-visibility-v38",
+  "/web/app.js?v=20260905-device-draft-conflicts-v39",
   "/web/settings-copy.js?v=20260830-stripe-tax-copy-v4",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260826-research-request-recovery-v121",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260905-saved-section-visibility-v38",
-  "/web/research-intent-state.js?v=20260905-saved-section-visibility-v38",
+  "/web/offline-storage.js?v=20260905-device-draft-conflicts-v39",
+  "/web/research-intent-state.js?v=20260905-device-draft-conflicts-v39",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260811-research-columns-v3",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",
@@ -243,7 +243,7 @@ function draftMatches(record, accountUserID, projectID, cardID) {
   return record?.accountUserID === accountUserID && record.projectID === projectID && record.cardID === (cardID || "");
 }
 
-export async function saveNotebookDraft({ accountUserID, projectID, cardID, title, document, evidenceLinks = [], baseVersion, cardType, scope }) {
+export async function saveNotebookDraft({ accountUserID, projectID, cardID, title, document, evidenceLinks = [], baseVersion, cardType, scope, expectedRevision }) {
   if (!String(accountUserID || "").trim() || !String(projectID || "").trim()) {
     throw new Error("A Notebook draft must belong to an account and Project.");
   }
@@ -254,21 +254,52 @@ export async function saveNotebookDraft({ accountUserID, projectID, cardID, titl
     const key = notebookDraftKey(accountUserID, projectID, cardID);
     const previous = await requestResult(store.get(key), "Could not read this Notebook draft.");
     if (previous && !draftMatches(previous, accountUserID, projectID, cardID)) throw new Error("The Notebook draft identity does not match.");
+    // The comparison and preservation must share one IDB transaction. A tab
+    // may have loaded an older revision (or no draft) before another tab wrote.
+    // Keep both authored versions instead of letting the last checkpoint win.
+    const localConflict = previous && expectedRevision !== undefined && previous.revision !== expectedRevision;
+    const recoveryCopies = [...(previous?.recoveryCopies || [])];
+    if (localConflict) {
+      const { recoveryCopies: _copies, pendingSave: _pending, ...copy } = previous;
+      recoveryCopies.push(copy);
+    }
     const record = {
       key, accountUserID, projectID, cardID: cardID || "", title: String(title || ""), document, evidenceLinks,
-      baseVersion: Number.isSafeInteger(previous?.baseVersion) && Number.isSafeInteger(baseVersion)
+      baseVersion: localConflict ? baseVersion ?? (cardID ? null : 0)
+        : Number.isSafeInteger(previous?.baseVersion) && Number.isSafeInteger(baseVersion)
         ? Math.max(previous.baseVersion, baseVersion)
         : baseVersion != null ? baseVersion : previous?.baseVersion ?? (cardID ? null : 0),
       cardType: cardType || previous?.cardType || "finding",
       scope: scope || draftScope(previous || { cardID }),
       ...(previous?.pendingSave ? { pendingSave: previous.pendingSave } : {}),
-      ...(previous?.recoveryConflict ? { recoveryConflict: true,
+      ...(previous?.recoveryConflict || localConflict ? { recoveryConflict: true,
         acceptedCardID: previous.acceptedCardID, acceptedBaseVersion: previous.acceptedBaseVersion } : {}),
+      ...(recoveryCopies.length ? { recoveryCopies } : {}),
       revision: crypto.randomUUID(), updatedAt: new Date().toISOString()
     };
     store.put(record);
     return record;
   }, "Could not save this Notebook draft offline.", accountUserID);
+}
+
+// Called only after the user has compared the retained versions. Server
+// version checking and any immutable in-flight journal remain in force.
+export async function resolveNotebookDraftCopiesAfterReview(accountUserID, projectID, cardID, expectedRevision) {
+  return withOfflineStore(notebookDraftsStoreName, "readwrite", async (store) => {
+    const key = notebookDraftKey(accountUserID, projectID, cardID);
+    const current = await requestResult(store.get(key), "Could not read the device versions under review.");
+    if (!draftMatches(current, accountUserID, projectID, cardID) || !expectedRevision || current.revision !== expectedRevision) {
+      const error = new Error("The device draft changed during review. Compare the current versions again.");
+      error.code = "OFFLINE_DRAFT_REVISION_CHANGED";
+      throw error;
+    }
+    if (!current.recoveryCopies?.length) return current;
+    const { recoveryCopies: _copies, recoveryConflict: _conflict, ...content } = current;
+    const next = { ...content, ...(current.acceptedCardID ? { recoveryConflict: true } : {}),
+      revision: crypto.randomUUID(), updatedAt: new Date().toISOString() };
+    store.put(next);
+    return next;
+  }, "Could not retain the reviewed device draft.", accountUserID);
 }
 
 export async function loadNotebookDraft(accountUserID, projectID, cardID) {
@@ -329,9 +360,10 @@ export async function acknowledgeNotebookDraft(accountUserID, projectID, oldCard
     const key = notebookDraftKey(accountUserID, projectID, oldCardID);
     const current = await requestResult(store.get(key), "Could not read the submitted Notebook draft.");
     if (!draftMatches(current, accountUserID, projectID, oldCardID)) return { acknowledged: false, draft: null };
-    if (current.recoveryConflict || (current.pendingSave
+    if (current.recoveryConflict) return { acknowledged: false, conflict: true, draft: current };
+    if (current.pendingSave
       ? current.pendingSave.revision !== submittedRevision
-      : current.revision !== submittedRevision)) {
+      : current.revision !== submittedRevision) {
       return { acknowledged: false, stale: true, draft: current };
     }
     if (current.revision === submittedRevision) {
@@ -372,6 +404,11 @@ export async function rebaseNotebookDraftAfterReview(accountUserID, projectID, c
     if (!draftMatches(current, accountUserID, projectID, cardID) || current.revision !== expectedRevision) {
       const error = new Error("The local draft changed after review. Review its current text before saving.");
       error.code = "OFFLINE_DRAFT_REVISION_CHANGED";
+      throw error;
+    }
+    if (current.recoveryCopies?.length) {
+      const error = new Error("Compare the other device drafts before reviewing the server version.");
+      error.code = "OFFLINE_DRAFT_RECOVERY_REQUIRED";
       throw error;
     }
     const nextKey = notebookDraftKey(accountUserID, projectID, currentServerCard.id);

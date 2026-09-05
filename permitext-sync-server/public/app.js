@@ -72,6 +72,7 @@ import {
   offlineAccountRecoverySnapshot,
   reconcileOfflineFeatureAccess,
   rebaseNotebookDraftAfterReview,
+  resolveNotebookDraftCopiesAfterReview,
   pendingNotebookImages,
   pendingNotebookDrafts,
   saveNotebookDraft,
@@ -79,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260905-saved-section-visibility-v38";
+} from "./offline-storage.js?v=20260905-device-draft-conflicts-v39";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -114,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260905-saved-section-visibility-v38";
+} from "./research-intent-state.js?v=20260905-device-draft-conflicts-v39";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -21623,6 +21624,40 @@ function notebookRecoveryPlainText(node) {
   return [body, ...children].filter(Boolean).join("\n");
 }
 
+function appendNotebookDraftCopyReview(container, draft, identity, onResolve) {
+  if (!draft.recoveryCopies?.length) return;
+  const versions = document.createElement("details");
+  const heading = document.createElement("summary");
+  heading.textContent = `Compare ${draft.recoveryCopies.length + 1} device versions`;
+  versions.append(heading);
+  for (const [index, copy] of [draft, ...draft.recoveryCopies].entries()) {
+    const title = document.createElement("strong");
+    title.textContent = `${index === 0 ? "Current editor version" : `Other device version ${index}`} · ${copy.title || "Untitled"}`;
+    const text = document.createElement("pre");
+    text.style.whiteSpace = "pre-wrap";
+    text.textContent = notebookRecoveryPlainText(copy.document) || "This version contains structured content. Download the recovery file to inspect it.";
+    versions.append(title, text);
+  }
+  const keep = document.createElement("button");
+  keep.type = "button";
+  keep.textContent = "Keep current editor version";
+  const status = document.createElement("span");
+  status.setAttribute("role", "status");
+  keep.addEventListener("click", async () => {
+    if (!isCurrentAccountRequest(identity)) return;
+    const confirmed = await confirmWebWarning("Keep this device version?",
+      "Compare the device versions above first. Keeping the current editor version removes the other retained device versions. Download a recovery file first if you want to keep them. The saved server version will still be checked before syncing.",
+      { confirmLabel: "Keep current editor version" });
+    if (!confirmed || !isCurrentAccountRequest(identity)) return;
+    keep.disabled = true;
+    try { await onResolve(draft.revision); }
+    catch (error) {
+      if (isCurrentAccountRequest(identity)) status.textContent = `${error.message} All device versions remain available for review.`;
+    } finally { keep.disabled = false; }
+  });
+  container.append(versions, keep, status);
+}
+
 async function appendNotebookDeviceRecovery(container, projectID, identity) {
   try {
     const drafts = (await pendingNotebookDrafts(identity.userID))
@@ -21750,20 +21785,43 @@ async function renderProjectNotebook(project) {
     if (!draft?.recoveryConflict) return false;
     saveConflict = true;
     if (!isCurrentAccountRequest(requestIdentity)) return true;
-    showDraftStatus("Device draft conflict · two different drafts are preserved. Download this draft before comparing it with the saved Note. Automatic saving is paused.");
+    showDraftStatus("Device draft conflict · different versions are preserved. Compare them before continuing. Automatic saving is paused.");
     const download = document.createElement("button");
     download.type = "button";
     download.className = "notebook-recovery-download";
     download.textContent = "Download recovery draft";
-    download.addEventListener("click", () => {
+    download.addEventListener("click", async () => {
       if (!isCurrentAccountRequest(requestIdentity)) return;
-      const recovery = { format: "permitext-notebook-recovery", version: 1, projectID,
-        originalCardID: draft.cardID || "", acceptedCardID: draft.acceptedCardID || "",
-        title: activeCard?.title || draft.title || "", document: structuredClone(draftDocument),
-        evidenceLinks: structuredClone(activeCard?.evidenceLinks || draft.evidenceLinks || []) };
-      downloadCodeMemoBlob(new Blob([JSON.stringify(recovery, null, 2)], { type: "application/json" }), "permitext-notebook-recovery.json");
+      try {
+        const deviceRecovery = await notebookDeviceRecoveryBundle(projectID, requestIdentity);
+        requireCurrentAccountRequest(requestIdentity);
+        const recovery = { format: "permitext-notebook-recovery", version: 1, projectID,
+          originalCardID: draft.cardID || "", acceptedCardID: draft.acceptedCardID || "",
+          title: activeCard?.title || draft.title || "", document: structuredClone(draftDocument),
+          evidenceLinks: structuredClone(activeCard?.evidenceLinks || draft.evidenceLinks || []),
+          recoveryCopies: structuredClone(draft.recoveryCopies || []), deviceRecovery };
+        downloadCodeMemoBlob(new Blob([JSON.stringify(recovery, null, 2)], { type: "application/json" }), "permitext-notebook-recovery.json");
+      } catch (error) {
+        if (isCurrentAccountRequest(requestIdentity)) void showWebNotice("Recovery download failed", `${error.message}. Your device versions are still preserved.`);
+      }
     });
     draftStatus.append(" ", download);
+    appendNotebookDraftCopyReview(draftStatus, draft, requestIdentity, async (expectedRevision) => {
+      const resolution = draftWriteQueue.then(async () => {
+        requireCurrentAccountRequest(requestIdentity);
+        const resolved = await resolveNotebookDraftCopiesAfterReview(accountUserID, projectID, draft.cardID, expectedRevision);
+        persistedDraft = resolved;
+        return resolved;
+      });
+      draftWriteQueue = resolution.catch(() => {});
+      const resolved = await resolution;
+      requireCurrentAccountRequest(requestIdentity);
+      saveConflict = Boolean(resolved.recoveryConflict);
+      if (!showNotebookRecoveryConflict(resolved)) {
+        showDraftStatus("Reviewed device version · waiting to sync");
+        void flushNotebookAutosave();
+      }
+    });
     return true;
   }
   const persistFocusedDraft = () => {
@@ -21785,7 +21843,8 @@ async function renderProjectNotebook(project) {
         snapshot.baseVersion = persistedDraft.baseVersion;
       }
       if (persistedRevision === revision && persistedCardID === cardID && persistedDraft) return persistedDraft;
-      const saved = await saveNotebookDraft(snapshot);
+      const saved = await saveNotebookDraft({ ...snapshot,
+        expectedRevision: persistedDraft && persistedCardID === snapshot.cardID ? persistedDraft.revision : null });
       persistedRevision = revision;
       persistedCardID = snapshot.cardID;
       persistedDraft = saved;
@@ -22117,9 +22176,19 @@ async function renderProjectNotebook(project) {
               evidenceLinks: activeCard.evidenceLinks || [] };
           }
           const acceptedFocusedCard = ownsFocusedCard ? activeCard : null;
-          const acknowledgement = draftWriteQueue.then(() => acknowledgeNotebookDraft(
-            accountUserID, projectID, acknowledgedDraft.cardID || "", acknowledgedDraft.revision, payload.card
-          ));
+          const acknowledgement = draftWriteQueue.then(async () => {
+            const result = await acknowledgeNotebookDraft(
+              accountUserID, projectID, acknowledgedDraft.cardID || "", acknowledgedDraft.revision, payload.card
+            );
+            // Publish our own acknowledged checkpoint before the queue admits
+            // another edit, rather than after an unrelated cache/network await.
+            if (!result.conflict && ownsFocusedCard && activeCard === acceptedFocusedCard) {
+              persistedDraft = result.draft;
+              persistedCardID = result.draft?.cardID ?? null;
+              if (!result.draft) persistedRevision = -1;
+            }
+            return result;
+          });
           draftWriteQueue = acknowledgement;
           const acknowledged = await acknowledgement;
           if (acknowledged?.conflict && acknowledged.draft) {
@@ -22130,12 +22199,16 @@ async function renderProjectNotebook(project) {
             dirty = true;
             if (ownsFocusedCard && activeCard === acceptedFocusedCard) {
               activeCard = { ...activeCard, id: acknowledged.draft.cardID || "", version: acknowledged.draft.baseVersion };
+              // The other tab may own the database's current text. Retain it
+              // as a separate version before checkpointing this editor again.
+              persistedCardID = null;
+              await persistFocusedDraft();
             }
           }
           await saveNotebookCardSnapshot(accountUserID, projectID, payload.card);
           await refreshNotebookPendingStatus(requestIdentity);
           if (acknowledged?.conflict) {
-            if (!disposed && ownsFocusedCard) showNotebookRecoveryConflict(acknowledged.draft);
+            if (!disposed && ownsFocusedCard) showNotebookRecoveryConflict(persistedDraft);
             return false;
           }
           if (disposed || !isCurrentAccountRequest(requestIdentity) || !ownsFocusedCard || activeCard !== acceptedFocusedCard) return false;
@@ -22149,9 +22222,6 @@ async function renderProjectNotebook(project) {
             dirty = false;
           } else {
             dirty = true;
-            persistedCardID = payload.card.id;
-            persistedDraft = await loadNotebookDraft(accountUserID, projectID, payload.card.id);
-            if (disposed || !isCurrentAccountRequest(requestIdentity) || activeCard !== acceptedFocusedCard) return false;
           }
           const summary = notebookSummaryForCard(activeCard, payload.card);
           cards = [summary, ...cards.filter((card) => card.id !== summary.id)];
@@ -22172,7 +22242,11 @@ async function renderProjectNotebook(project) {
           return !dirty;
         } catch (error) {
           if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
-          if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT") {
+          if (error.code === "OFFLINE_DRAFT_RECOVERY_REQUIRED") {
+            persistedRevision = -1;
+            try { await persistFocusedDraft(); }
+            catch (checkpointError) { showDraftStatus(`Device save failed: ${checkpointError.message}. Keep this Note open and copy your work.`); }
+          } else if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT") {
             saveConflict = true;
             showDraftStatus("Save conflict · your device draft is preserved. Compare it with the latest Note before saving another version.");
             const latest = error.payload.card;
@@ -25120,6 +25194,46 @@ function projectNoteEditor(identity, note, options = {}) {
   const setDraftStatus = (message) => {
     if (isCurrentAccountRequest(requestIdentity) && container.isConnected) draftStatus.textContent = message;
   };
+  const showDeviceConflict = (draft) => {
+    if (!draft?.recoveryConflict) return false;
+    saveConflict = true;
+    if (!isCurrentAccountRequest(requestIdentity) || !container.isConnected) return true;
+    setDraftStatus("Project information conflict · device versions are preserved. Compare them before continuing. Automatic saving is paused.");
+    const download = document.createElement("button");
+    download.type = "button";
+    download.textContent = "Download recovery versions";
+    download.addEventListener("click", async () => {
+      if (!isCurrentAccountRequest(requestIdentity)) return;
+      try {
+        const deviceRecovery = await notebookDeviceRecoveryBundle(projectID, requestIdentity);
+        requireCurrentAccountRequest(requestIdentity);
+        const recovery = { format: "permitext-notebook-recovery", version: 1, projectID,
+          title: "Project information", document: structuredClone(draftDocument),
+          recoveryCopies: structuredClone(draft.recoveryCopies || []), deviceRecovery };
+        downloadCodeMemoBlob(new Blob([JSON.stringify(recovery, null, 2)], { type: "application/json" }), "permitext-project-information-recovery.json");
+      } catch (error) {
+        if (isCurrentAccountRequest(requestIdentity)) void showWebNotice("Recovery download failed", `${error.message}. Your device versions are still preserved.`);
+      }
+    });
+    draftStatus.append(download);
+    appendNotebookDraftCopyReview(draftStatus, draft, requestIdentity, async (expectedRevision) => {
+      const resolution = draftWriteQueue.then(async () => {
+        requireCurrentAccountRequest(requestIdentity);
+        const resolved = await resolveNotebookDraftCopiesAfterReview(accountUserID, projectID, localScopeID, expectedRevision);
+        localDraftRecord = resolved;
+        return resolved;
+      });
+      draftWriteQueue = resolution.catch(() => {});
+      const resolved = await resolution;
+      requireCurrentAccountRequest(requestIdentity);
+      saveConflict = Boolean(resolved.recoveryConflict);
+      if (!showDeviceConflict(resolved)) {
+        setDraftStatus("Reviewed device version · waiting to sync");
+        saveTimer = window.setTimeout(saveDraft, 0);
+      }
+    });
+    return true;
+  };
 
   const imageUploaded = (event) => {
     if (!container.isConnected) {
@@ -25145,9 +25259,16 @@ function projectNoteEditor(identity, note, options = {}) {
       // Freeze the journal within the same queue as editor checkpoints. A
       // later edit can advance the local draft but cannot change this request.
       const preparation = draftWriteQueue.then(async () => {
-        const draft = await loadNotebookDraft(accountUserID, projectID, localScopeID);
+        let draft = await loadNotebookDraft(accountUserID, projectID, localScopeID);
         requireCurrentAccountRequest(requestIdentity);
         if (!draft) return null;
+        if (draft.recoveryConflict && draft.revision !== localDraftRecord?.revision) {
+          draft = await saveNotebookDraft({ accountUserID, projectID, cardID: localScopeID,
+            scope: "collaboration-note", baseVersion: currentNote?.version ?? 0, title: "Project information",
+            document: structuredClone(draftDocument), expectedRevision: localDraftRecord?.revision ?? null });
+          localDraftRecord = draft;
+        }
+        if (showDeviceConflict(draft)) return null;
         const preparedDocument = await reconcileNotebookDocumentAssets(draft.pendingSave?.document || draft.document, projectID, requestIdentity);
         requireCurrentAccountRequest(requestIdentity);
         if (notebookDocumentAssetURLs(preparedDocument, "permitext-notebook-local:").length) {
@@ -25177,6 +25298,11 @@ function projectNoteEditor(identity, note, options = {}) {
       const acknowledgement = draftWriteQueue.catch((error) => { checkpointFailure = error; }).then(async () => {
         const result = await acknowledgeNotebookDraft(accountUserID, projectID, localScopeID, submittedDraft.revision,
           { ...payload.note, id: localScopeID });
+        if (result.conflict && result.draft?.revision !== localDraftRecord?.revision) {
+          result.draft = await saveNotebookDraft({ accountUserID, projectID, cardID: localScopeID,
+            scope: "collaboration-note", baseVersion: currentNote?.version ?? 0, title: "Project information",
+            document: structuredClone(draftDocument), expectedRevision: localDraftRecord?.revision ?? null });
+        }
         localDraftRecord = result.draft;
         return result;
       });
@@ -25188,6 +25314,7 @@ function projectNoteEditor(identity, note, options = {}) {
       requireCurrentAccountRequest(requestIdentity);
       await refreshNotebookPendingStatus(requestIdentity);
       if (checkpointFailure) throw checkpointFailure;
+      if (showDeviceConflict(acknowledged.draft)) return;
       setDraftStatus(acknowledged.draft ? "Saved on this device · newer Project information waiting to sync" : "Synced");
       if (acknowledged.draft) saveQueued = true;
     } catch (error) {
@@ -25272,7 +25399,7 @@ function projectNoteEditor(identity, note, options = {}) {
         },
         onReady() {
           editorReady = true;
-          if (localDraftRecord) {
+          if (localDraftRecord && !showDeviceConflict(localDraftRecord)) {
             setDraftStatus("Recovered Project information on this device · waiting to sync");
             if (editable) saveTimer = window.setTimeout(saveDraft, 0);
           }
@@ -25285,7 +25412,10 @@ function projectNoteEditor(identity, note, options = {}) {
             scope: "collaboration-note", baseVersion: currentNote?.version ?? 0,
             title: "Project information", document: structuredClone(document) };
           draftWriteQueue = draftWriteQueue.catch(() => {}).then(async () => {
-            try { localDraftRecord = await saveNotebookDraft(snapshot); }
+            try {
+              localDraftRecord = await saveNotebookDraft({ ...snapshot, expectedRevision: localDraftRecord?.revision ?? null });
+              showDeviceConflict(localDraftRecord);
+            }
             catch (error) { error.code = "PROJECT_INFORMATION_DEVICE_SAVE_FAILED"; throw error; }
             if (isCurrentAccountRequest(requestIdentity)) void refreshNotebookPendingStatus(requestIdentity).catch(() => {});
           });

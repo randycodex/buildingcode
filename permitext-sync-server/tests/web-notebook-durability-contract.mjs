@@ -14,6 +14,8 @@ const draftFunctions = sliceBetween(offlineSource, "function notebookDraftKey(",
 const syncFunctions = sliceBetween(appSource, "async function synchronizeNotebookDraft(", "async function flushPendingNotebookDrafts(");
 const editor = appSource.slice(appSource.indexOf("async function renderProjectNotebook("));
 const persistence = sliceBetween(editor, "  let editorMount = null;", "  const notebookImageUploaded =");
+const reviewUI = sliceBetween(appSource, "function notebookRecoveryPlainText(", "async function appendNotebookDeviceRecovery(");
+const recoveryBundle = sliceBetween(appSource, "async function notebookDeviceRecoveryBundle(", "function notebookRecoveryPlainText(");
 const saveActive = sliceBetween(editor, "    async function saveActiveNotebookCard()", "    flushNotebookAutosave =");
 function deferred() { let resolve; let reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; }
 async function reached(predicate, label) { for (let i = 0; i < 250; i += 1) { if (predicate()) return; await Promise.resolve(); } assert.fail(`Did not reach ${label}`); }
@@ -35,7 +37,7 @@ function harness() {
   const addToReport = { disabled: true };
   let pendingStatusRefreshes = 0;
   const pendingStatusSamples = [];
-  const createElement = () => { const element = { textContent: "", callbacks: new Map(), setAttribute() {}, append() {}, addEventListener(name, action) { this.callbacks.set(name, action); } }; elements.push(element); return element; };
+  const createElement = () => { const element = { textContent: "", style: {}, callbacks: new Map(), setAttribute() {}, append() {}, addEventListener(name, action) { this.callbacks.set(name, action); } }; elements.push(element); return element; };
   let confirmed = false;
   const identity = { userID: "synthetic-a", generation: 1 };
   const sandbox = {
@@ -68,11 +70,15 @@ function harness() {
     scheduleNotebookAutosave(delay) { scheduled.push(delay); },
     reportDraftMounts: new Map(), confirmWebWarning: async () => confirmed,
     downloadCodeMemoBlob: (blob, filename) => downloads.push({ blob, filename }),
+    async offlineAccountRecoverySnapshot() { return { drafts: [...records.values()].map(clone), images: [{ accountUserID: identity.userID, projectID: "project", blob: new Blob(["synthetic image"]) }] }; },
+    async blobDataURL(blob) { return `data:image/png;base64,${Buffer.from(await blob.arrayBuffer()).toString("base64")}`; },
     async saveDraftBoundary(input, actual) { if (writeDelay) { const delay = writeDelay; writeDelay = null; await delay.promise; } if (writeFailure) { const failure = writeFailure; writeFailure = null; throw failure; } return actual(input); }
   };
   const context = vm.createContext(sandbox);
   vm.runInContext(`
     ${draftFunctions}
+    ${reviewUI}
+    ${recoveryBundle}
     const actualSaveNotebookDraft = saveNotebookDraft;
     saveNotebookDraft = (input) => saveDraftBoundary(input, actualSaveNotebookDraft);
     ${syncFunctions}
@@ -169,12 +175,46 @@ function harness() {
   assert.equal(test.requests.length, 1, "Conflict drafts must not keep attempting automatic HTTP writes.");
   const download = test.elements.findLast((element) => element.className === "notebook-recovery-download");
   assert.ok(download, "Reopened/colliding drafts expose an explicit recovery action.");
-  download.callbacks.get("click")();
+  await download.callbacks.get("click")();
   const exported = JSON.parse(await test.downloads[0].blob.text());
   assert.equal(exported.document.text, "Retained editor bytes");
   assert.equal(exported.title, "Retained editor title");
   assert.equal(exported.acceptedCardID, "saved-card");
   assert.equal(test.records().length, 2, "Exporting must not delete either checkpoint.");
+}
+
+// An independent tab updates the same draft after this mounted editor read it.
+// Both byte sets survive; downloading and rejecting stale review are harmless.
+{
+  const test = harness();
+  const initial = await test.api.persist();
+  await test.api.directSave({ ...initial, title: "Other tab", document: { text: "Other tab unsent bytes" }, expectedRevision: initial.revision });
+  await test.api.edit("This editor", "This editor unsent bytes");
+  assert.equal(test.api.state().saveConflict, true);
+  assert.equal(await test.api.save(), false);
+  assert.equal(test.requests.length, 0);
+  const retained = test.records()[0];
+  assert.equal(retained.document.text, "This editor unsent bytes");
+  assert.equal(retained.recoveryCopies[0].document.text, "Other tab unsent bytes");
+  const download = test.elements.findLast((element) => element.className === "notebook-recovery-download");
+  await download.callbacks.get("click")();
+  const exported = JSON.parse(await test.downloads[0].blob.text());
+  assert.equal(exported.document.text, "This editor unsent bytes");
+  assert.equal(exported.recoveryCopies[0].document.text, "Other tab unsent bytes");
+  assert.ok(exported.deviceRecovery.images[0].dataURL.startsWith("data:image/png;base64,"));
+  assert.equal(exported.deviceRecovery.drafts[0].recoveryCopies[0].document.text, "Other tab unsent bytes");
+  const staleReview = test.elements.findLast((element) => element.textContent === "Keep current editor version");
+  await test.api.edit("This editor", "Edited during review");
+  test.confirmReview();
+  await staleReview.callbacks.get("click")();
+  assert.equal(test.records()[0].recoveryCopies.length, 1);
+  assert.ok(test.elements.some((element) => /changed during review/.test(element.textContent)));
+  // A stale dialog must not poison the checkpoint queue or prevent a fresh review.
+  const freshReview = test.elements.findLast((element) => element.textContent === "Keep current editor version");
+  await freshReview.callbacks.get("click")();
+  assert.equal(test.api.state().saveConflict, false);
+  assert.equal(test.records()[0].document.text, "Edited during review");
+  assert.equal(test.records()[0].recoveryCopies, undefined);
 }
 
 // Closing the pane while a save and a newer local write overlap must bind the
@@ -267,6 +307,22 @@ function harness() {
   assert.notEqual(test.requests[1].body.clientMutationID, failedMutation);
   test.respond(1);
   await retry;
+}
+
+// Edits after this writer's own acknowledgement must use its rekeyed local
+// revision immediately, even while the slower cache update is still pending.
+{
+  const test = harness();
+  const delayedSnapshot = test.holdNextSnapshot();
+  const saving = test.api.save();
+  await reached(() => test.requests.length === 1, "creation before queued edit");
+  await test.api.edit("Second", "Before receipt");
+  test.respond(0);
+  await reached(() => test.snapshots.length === 1, "receipt before slow cache");
+  await test.api.edit("Third", "After own receipt");
+  assert.equal(test.api.state().saveConflict, false, "This writer's own rekey is not a second tab conflict");
+  assert.equal(test.records()[0].document.text, "After own receipt");
+  delayedSnapshot.resolve(); await saving;
 }
 
 // A save acknowledgement may finish while another Note has loaded. Its durable
