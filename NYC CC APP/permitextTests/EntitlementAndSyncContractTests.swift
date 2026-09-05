@@ -2701,7 +2701,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(settingsSource.contains("Removing Permitext sign-in identity"))
         XCTAssertTrue(settingsSource.contains("Retry cleanup"))
         XCTAssertTrue(settingsSource.contains("Contact Support"))
-        XCTAssertTrue(settingsSource.contains(".presentationCompactAdaptation(.sheet)"))
+        XCTAssertTrue(settingsSource.contains(".sheet(isPresented: $showsAccountDeleteWarning)"))
         XCTAssertTrue(settingsSource.contains(".presentationDetents([.large])"))
         XCTAssertFalse(settingsSource.contains("try? await clerk.user?.delete()"))
         XCTAssertTrue(settingsSource.contains("guard user.id == account.authProviderUserID"))

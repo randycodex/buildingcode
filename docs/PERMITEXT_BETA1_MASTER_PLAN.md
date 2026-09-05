@@ -1,6 +1,6 @@
 # Permitext Beta 1 — Master Plan and Current Status
 
-Last updated: September 3, 2026
+Last updated: September 5, 2026
 
 This is the top-level Beta 1 plan. Detailed workstreams remain in their linked documents, but this file is the single place to see what is done, what is happening now, and what still blocks release.
 
@@ -16,6 +16,17 @@ This is the top-level Beta 1 plan. Detailed workstreams remain in their linked d
 - Zoning Research is now planned for Beta 1, but public access remains disabled until the official corpus is current and its citation, table, map, amendment, applicability, evaluation, cost, and cross-platform gates pass.
 
 ## Current position
+
+September 5 recovery checkpoint: the [readiness repair backlog](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md)
+and later publication records supersede older build/deployment snapshots below.
+The last recorded web application source is `0985728b26e5b247d758fce26c4e0739efef986f`;
+native TestFlight build 58 retains its separately recorded source and bounded
+device acceptance. Operator access and a Free-account export passed. A subsequent
+deletion removed Permitext content but left the Clerk identity because fresh
+verification was not presented. The [web/native reverification repair](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
+has passed local web/browser and native Simulator verification; publication is
+the next step. Complete account-lifecycle and final release gates
+remain open. No new paid repetition or public release is authorized by this update.
 
 September 3 evidence consolidation: the build-51 Reader/account/Project-selection observations and the final Notebook security publication record are being preserved in `main` before retiring their evidence branches. These are documentation-only changes. Build 51 is historical and superseded by build 52; its single paid authorization was consumed by the recorded 105-second failure, not left available for another submission. The [historical build-51 record](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), [build-52 release](./PERMITEXT_RESEARCH_RECOVERY_RELEASE_2026-09-03.md), and [separate live ramp result](./PERMITEXT_BUILD52_RAMP_LIVE_TEST_2026-09-03.md) retain their distinct scope and limitations. No new acceptance test or release gate is closed by consolidating these records.
 

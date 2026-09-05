@@ -20,6 +20,7 @@
 		A1000000000000000000000B /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000B /* SearchView.swift */; };
 		A1000000000000000000000C /* BookmarksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* BookmarksView.swift */; };
 		A1000000000000000000000D /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000D /* SettingsView.swift */; };
+		A1D311000000000000000001 /* AccountDeletionVerification.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2D311000000000000000001 /* AccountDeletionVerification.swift */; };
 		A1000000000000000000000E /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000E /* ReaderView.swift */; };
 		A10000000000000000000012 /* ReaderTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* ReaderTheme.swift */; };
 		A10000000000000000000013 /* ReaderThemeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* ReaderThemeStore.swift */; };
@@ -54,6 +55,7 @@
 		A10000000000000000000035 /* SourceSerif4Variable-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000035 /* SourceSerif4Variable-Italic.ttf */; };
 		A10000000000000000000036 /* Source-Serif-4-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000036 /* Source-Serif-4-OFL.txt */; };
 		B10000000000000000000001 /* EntitlementAndSyncContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */; };
+		B1D311000000000000000001 /* AccountDeletionVerificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2D311000000000000000001 /* AccountDeletionVerificationTests.swift */; };
 		C10000000000000000000001 /* NativeReaderPhysicalStressUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20000000000000000000001 /* NativeReaderPhysicalStressUITests.swift */; };
 		D10000000000000000000001 /* ClerkKit in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000001 /* ClerkKit */; };
 		D10000000000000000000002 /* ClerkKitUI in Frameworks */ = {isa = PBXBuildFile; productRef = D30000000000000000000002 /* ClerkKitUI */; };
@@ -91,6 +93,7 @@
 		A2000000000000000000000B /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		A2000000000000000000000C /* BookmarksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksView.swift; sourceTree = "<group>"; };
 		A2000000000000000000000D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A2D311000000000000000001 /* AccountDeletionVerification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDeletionVerification.swift; sourceTree = "<group>"; };
 		A2000000000000000000000E /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderView.swift; sourceTree = "<group>"; };
 		A2000000000000000000000F /* nyc_code_sample.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = nyc_code_sample.sqlite; sourceTree = "<group>"; };
 		A20000000000000000000010 /* Figures */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Figures; sourceTree = "<group>"; };
@@ -133,6 +136,7 @@
 		A20000000000000000000036 /* Source-Serif-4-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Source-Serif-4-OFL.txt"; sourceTree = "<group>"; };
 		B20000000000000000000000 /* permitextTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = permitextTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementAndSyncContractTests.swift; sourceTree = "<group>"; };
+		B2D311000000000000000001 /* AccountDeletionVerificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDeletionVerificationTests.swift; sourceTree = "<group>"; };
 		C20000000000000000000000 /* permitextPhysicalStressUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = permitextPhysicalStressUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C20000000000000000000001 /* NativeReaderPhysicalStressUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeReaderPhysicalStressUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -254,6 +258,7 @@
 				A2000000000000000000000B /* SearchView.swift */,
 				A2000000000000000000000C /* BookmarksView.swift */,
 				A2000000000000000000000D /* SettingsView.swift */,
+				A2D311000000000000000001 /* AccountDeletionVerification.swift */,
 				A20000000000000000000030 /* ResearchView.swift */,
 				A20000000000000000000031 /* NotebookView.swift */,
 				A2000000000000000000002B /* OrganizationProjectHubView.swift */,
@@ -312,6 +317,7 @@
 			isa = PBXGroup;
 			children = (
 				B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */,
+				B2D311000000000000000001 /* AccountDeletionVerificationTests.swift */,
 			);
 			path = permitextTests;
 			sourceTree = "<group>";
@@ -469,6 +475,7 @@
 				A1000000000000000000000B /* SearchView.swift in Sources */,
 				A1000000000000000000000C /* BookmarksView.swift in Sources */,
 				A1000000000000000000000D /* SettingsView.swift in Sources */,
+				A1D311000000000000000001 /* AccountDeletionVerification.swift in Sources */,
 				A10000000000000000000030 /* ResearchView.swift in Sources */,
 				A10000000000000000000031 /* NotebookView.swift in Sources */,
 				A10000000000000000000032 /* NativeReaderDocumentStore.swift in Sources */,
@@ -497,6 +504,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B10000000000000000000001 /* EntitlementAndSyncContractTests.swift in Sources */,
+				B1D311000000000000000001 /* AccountDeletionVerificationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

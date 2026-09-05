@@ -91,6 +91,44 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         keepScreenshot(named: name, from: app)
     }
 
+    func testAccountDeletionResultsRemainVisibleAfterSignOut() throws {
+#if !DEBUG
+        throw XCTSkip("Account deletion acceptance uses the isolated Debug transport.")
+#else
+        let app = XCUIApplication()
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk"]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase3-research-fixture-ready").waitForExistence(timeout: 45))
+        // This isolated legacy harness uses icon-only tabs; its first tab hosts Saved.
+        app.tabBars.buttons.element(boundBy: 0).tap()
+        app.buttons["Open Account"].tap()
+        let deleteAccount = app.buttons["Delete Account"]
+        reveal(deleteAccount, in: app)
+        XCTAssertTrue(deleteAccount.isHittable)
+        deleteAccount.tap()
+
+        let confirmation = app.textFields["account-deletion-confirmation"]
+        reveal(confirmation, in: app)
+        XCTAssertTrue(confirmation.isHittable)
+        confirmation.tap()
+        confirmation.typeText("DELETE")
+        let confirmDelete = app.buttons["account-deletion-submit"]
+        reveal(confirmDelete, in: app)
+        XCTAssertTrue(confirmDelete.isEnabled)
+        confirmDelete.tap()
+
+        let done = app.buttons["Done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 15), "Signing out must retain the cleanup results sheet.")
+        XCTAssertTrue(app.staticTexts["Removing Permitext sign-in identity"].exists)
+        XCTAssertTrue(app.staticTexts["No separate Clerk identity needed removal."].exists)
+        XCTAssertFalse(app.buttons["Retry cleanup"].exists, "The isolated account's device cleanup must finish.")
+        keepScreenshot(named: "Synthetic account deletion results after sign-out", from: app)
+        done.tap()
+        XCTAssertTrue(app.staticTexts["Sync status: Not signed in"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["Delete Account"].exists)
+#endif
+    }
+
     func testNativeNotebookFirstLoadFailureShowsRetryAndRecovers() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--native-notebook-retry-fixture"]

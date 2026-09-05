@@ -70,6 +70,16 @@ Gate ID: `production-auth-account-lifecycle`
 Status: **OPEN — persisted-account continuity retained through physical build 58 and current web; fresh/remaining providers and complete deletion remain open**
 Release-bound: **yes**
 
+Latest September 5 correction: operator access and the designated Free-account
+export passed after the owner replaced the administrator credential. The owner
+then completed the deletion action; backend and attributable browser content
+were absent, but Clerk identity removal required fresh verification and did not
+complete. Sign in recreated the same identity with empty Free-account content.
+The [reverification repair record](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
+supersedes the credential/export/deletion-pending statements in the earlier
+snapshot below. Full provider cleanup, fresh recreation, private-file and
+second-client acceptance remain open.
+
 September 5 follow-up: build 58 is processed and internally available, with its installation, displayed build identity and existing native account/plan/sync/Saved/Project-container continuity physically verified. Current web continuity and account-operation repairs are recorded in the [repair publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-58-upload-after-apple-sign-in-recovery). Fresh email registration is blocked by the unchanged hosted-provider configuration. The designated Free test account has four saved entries, one synthetic note and an empty collection, but its complete operator export, representative Project/Research/private-file coverage, reviewed deletion, provider cleanup and recreation remain open. The current Production operator credential is still required. These observations do not satisfy the fresh sign-in fields below.
 
 - Fresh-account email-code sign-in:
@@ -247,4 +257,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: obtain the current Production operator credential for the designated disposable account's export and finish the remaining final device/account workflows. Reviewed deletion and other owner-dependent checks remain separately scoped; keep the remaining gates open until their evidence is complete.
+- Next technical step: finish verification/publication of the web/native account-deletion reverification repair, then complete the remaining final device/account workflows. Operator access and the Free-account export already passed. Reviewed deletion and other owner-dependent checks remain separately scoped; keep the remaining gates open until their evidence is complete.

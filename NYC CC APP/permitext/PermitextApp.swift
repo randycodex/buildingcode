@@ -493,7 +493,8 @@ private struct Phase3EntitledResearchConfiguration {
                 accountBackendClient: PermitextBackendClient(transport: transport),
                 syncBackend: NoOpUserContentSyncBackend(),
                 loadsPersistedAccount: false,
-                initialSignedInAccount: account
+                initialSignedInAccount: account,
+                privateCacheDirectoryURL: testDirectory.appendingPathComponent("research-cache", isDirectory: true)
             )
             if ProcessInfo.processInfo.arguments.contains("--native-notebook-conflict-fixture") {
                 let draft = NativeNotebookDraft(cardID: "native-conflict-card", version: 1, title: "Local unsynchronized analysis",

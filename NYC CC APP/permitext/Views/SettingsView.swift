@@ -56,9 +56,13 @@ struct SettingsView: View {
     @State private var accountDeletionStages = AccountDeletionStage.initial
     @State private var accountDeletionHasStarted = false
     @State private var accountDeletionResultMessage: String?
+    @State private var accountDeletionPreflightMessage: String?
     @State private var accountDeletionDeviceError: String?
     @State private var accountDeletionIdentityError: String?
     @State private var deletedAccountForCleanup: SignedInAccount?
+    @State private var deletionClerkSessionID: String?
+    @State private var accountDeletionOperationInProgress = false
+    @StateObject private var deletionVerification = AccountDeletionVerificationModel()
     @State private var showsSignOutWarning = false
     @State private var didScrollToInitialSection = false
     @State private var pendingSyncConflictResolution: PendingSyncConflictResolution?
@@ -220,6 +224,18 @@ struct SettingsView: View {
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
         .onChange(of: library.folders.map(\.id)) { _, folderIDs in
             selectedProjectIDs.formIntersection(folderIDs)
+        }
+        .onChange(of: library.privateSessionID) { _, _ in deletionVerification.invalidateIfNeeded() }
+        .onChange(of: clerk?.session?.id) { _, _ in deletionVerification.invalidateIfNeeded() }
+        .onChange(of: showsAccountDeleteWarning) { _, visible in
+            if !visible { deletionVerification.cancel() }
+        }
+        .onDisappear { deletionVerification.cancel() }
+        // Keep the cleanup surface mounted after backend deletion signs out.
+        .sheet(isPresented: $showsAccountDeleteWarning) {
+            accountDeletePopover
+                .presentationDetents([.large])
+                .interactiveDismissDisabled(accountDeletionOperationInProgress && !deletionVerification.isPresented)
         }
     }
 
@@ -599,15 +615,6 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(library.isAccountBusy)
-                    .popover(
-                        isPresented: $showsAccountDeleteWarning,
-                        attachmentAnchor: .rect(.bounds),
-                        arrowEdge: .bottom
-                    ) {
-                        accountDeletePopover
-                            .presentationCompactAdaptation(.sheet)
-                            .presentationDetents([.large])
-                    }
                 }
             }
         }
@@ -982,7 +989,9 @@ struct SettingsView: View {
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.primary)
 
-                if accountDeletionHasStarted {
+                if deletionVerification.isPresented {
+                    AccountDeletionVerificationView(model: deletionVerification)
+                } else if accountDeletionHasStarted {
                     accountDeletionProgress
                 } else {
                     accountDeletionConfirmationView
@@ -991,7 +1000,7 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(24)
         }
-        .frame(width: 360, height: 540, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private var accountDeletionBillingMessage: String {
@@ -1013,6 +1022,11 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var accountDeletionConfirmationView: some View {
+        if let accountDeletionPreflightMessage {
+            Text(accountDeletionPreflightMessage)
+                .font(.footnote).foregroundStyle(.red)
+                .fixedSize(horizontal: false, vertical: true)
+        }
         Text("This is permanent and cannot be undone.")
             .font(.body.weight(.semibold))
             .foregroundStyle(.red)
@@ -1065,6 +1079,7 @@ struct SettingsView: View {
             Text("Type DELETE to confirm")
                 .font(.subheadline.weight(.semibold))
             TextField("DELETE", text: $accountDeletionConfirmation)
+                .accessibilityIdentifier("account-deletion-confirmation")
                 .textInputAutocapitalization(.characters)
                 .autocorrectionDisabled()
                 .textFieldStyle(.roundedBorder)
@@ -1081,12 +1096,13 @@ struct SettingsView: View {
             Button("Delete Account", role: .destructive) {
                 Task { await beginAccountDeletion() }
             }
+            .accessibilityIdentifier("account-deletion-submit")
             .buttonStyle(.borderedProminent)
             .tint(.red)
             .disabled(
                 accountDeletionConfirmation.trimmingCharacters(in: .whitespacesAndNewlines) != "DELETE" ||
                     (library.hasAppleManagedBillingForAccountDeletion && !accountDeletionAppleAcknowledged) ||
-                    library.isAccountBusy
+                    library.isAccountBusy || accountDeletionOperationInProgress
             )
         }
     }
@@ -1146,13 +1162,13 @@ struct SettingsView: View {
                     Task { await retryAccountDeletionCleanup() }
                 }
                 .buttonStyle(.bordered)
-                .disabled(library.isAccountBusy)
+                .disabled(library.isAccountBusy || accountDeletionOperationInProgress)
             } else if library.signedInAccount != nil {
                 Button("Retry deletion") {
                     Task { await beginAccountDeletion() }
                 }
                 .buttonStyle(.bordered)
-                .disabled(library.isAccountBusy)
+                .disabled(library.isAccountBusy || accountDeletionOperationInProgress)
             }
 
             Link("Contact Support", destination: URL(string: "mailto:permitext@gmail.com?subject=Account%20deletion%20cleanup")!)
@@ -1167,6 +1183,9 @@ struct SettingsView: View {
     }
 
     private func resetAccountDeletionFlow() {
+        deletionVerification.cancel()
+        deletionClerkSessionID = nil
+        accountDeletionPreflightMessage = nil
         accountDeletionConfirmation = ""
         accountDeletionAppleAcknowledged = false
         accountDeletionStages = AccountDeletionStage.initial
@@ -1189,7 +1208,44 @@ struct SettingsView: View {
 
     @MainActor
     private func beginAccountDeletion() async {
-        guard let account = library.signedInAccount else { return }
+        guard !accountDeletionOperationInProgress, let account = library.signedInAccount,
+              let identity = library.privateRequestIdentity else { return }
+        accountDeletionOperationInProgress = true
+        accountDeletionPreflightMessage = nil
+        defer { accountDeletionOperationInProgress = false }
+        do {
+            if account.authProvider == .clerk {
+                guard let clerk, let user = clerk.user, let session = clerk.session,
+                      user.id == account.authProviderUserID, user.deleteSelfEnabled else {
+                    throw AccountDeletionVerificationError.unavailable
+                }
+                deletionClerkSessionID = session.id
+                try await deletionVerification.verify(
+                    client: .clerk(session: session, hasSecondFactor: user.twoFactorEnabled),
+                    isCurrent: {
+                        library.privateRequestIdentity == identity &&
+                        clerk.user?.id == account.authProviderUserID && clerk.session?.id == session.id
+                    }
+                )
+            }
+            guard library.privateRequestIdentity == identity, !Task.isCancelled else {
+                throw AccountDeletionVerificationError.identityChanged
+            }
+            if account.authProvider == .clerk {
+                guard clerk?.user?.id == account.authProviderUserID,
+                      clerk?.session?.id == deletionClerkSessionID else {
+                    throw AccountDeletionVerificationError.identityChanged
+                }
+            }
+        } catch {
+            if library.privateRequestIdentity == identity {
+                accountDeletionPreflightMessage = error is CancellationError
+                    ? "Identity verification was canceled. No account data was deleted."
+                    : "\(error.localizedDescription) No account data was deleted."
+                library.statusMessage = accountDeletionPreflightMessage
+            }
+            return
+        }
         deletedAccountForCleanup = account
         accountDeletionHasStarted = true
         accountDeletionResultMessage = nil
@@ -1260,7 +1316,32 @@ struct SettingsView: View {
                 throw NSError(domain: "PermitextAccountDeletion", code: 2,
                     userInfo: [NSLocalizedDescriptionKey: "The active sign-in identity changed. Only the original account’s identity may be removed."])
             }
-            try await user.delete()
+            guard let session = clerk.session, session.id == deletionClerkSessionID,
+                  library.signedInAccount == nil else {
+                throw AccountDeletionVerificationError.identityChanged
+            }
+            let cleanupSessionID = library.privateSessionID
+            // Reverification can expire while backend/device cleanup is running.
+            // Retry only the captured Clerk deletion, never the backend deletion.
+            do {
+                try await user.delete()
+            } catch {
+                guard (error as? ClerkAPIError)?.code == "session_reverification_required" else { throw error }
+                try await deletionVerification.verify(
+                    client: .clerk(session: session, hasSecondFactor: user.twoFactorEnabled),
+                    isCurrent: {
+                        library.signedInAccount == nil && library.privateSessionID == cleanupSessionID &&
+                        clerk.user?.id == account.authProviderUserID &&
+                        clerk.session?.id == session.id
+                    }
+                )
+                guard library.signedInAccount == nil, library.privateSessionID == cleanupSessionID,
+                      clerk.user?.id == user.id,
+                      clerk.session?.id == session.id, !Task.isCancelled else {
+                    throw AccountDeletionVerificationError.identityChanged
+                }
+                try await user.delete()
+            }
             accountDeletionIdentityError = nil
             updateAccountDeletionStage("identity", status: .complete, detail: "The Permitext Clerk sign-in identity was removed.")
         } catch {
@@ -1271,7 +1352,9 @@ struct SettingsView: View {
 
     @MainActor
     private func retryAccountDeletionCleanup() async {
-        guard let account = deletedAccountForCleanup else { return }
+        guard !accountDeletionOperationInProgress, let account = deletedAccountForCleanup else { return }
+        accountDeletionOperationInProgress = true
+        defer { accountDeletionOperationInProgress = false }
         if accountDeletionDeviceError != nil {
             updateAccountDeletionStage("device", status: .active)
             accountDeletionDeviceError = library.retryDeletedAccountDeviceCleanup(accountID: account.appUserID)

@@ -94,8 +94,13 @@ export or deletion was performed at that stage. On September 5 the owner replace
 the operator credential and Production was redeployed from `0985728b2`.
 The disposable Free account's export and restore checklist then passed, matching
 four saves, one synthetic note, an empty saved collection and the visible browser
-state. No shared-ownership blocker or entitlement record was present. Deletion,
-identity cleanup, recreation and the broader client/content matrix remain open.
+state. No shared-ownership blocker or entitlement record was present. The owner
+subsequently performed deletion; saved checks confirmed backend/browser content
+removal but Clerk required fresh verification and retained the sign-in identity.
+The same identity then recreated an empty Free account. The [local verification
+repair](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md) addresses
+the web/native ordering and cleanup retry. Complete identity cleanup, fresh
+recreation and the broader client/content matrix remain open.
 See the [operator recovery and export evidence](./PERMITEXT_ACCOUNT_ACCEPTANCE_PREPARATION_2026-09-05.md)
 and the updated
 [account acceptance runbook](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance).

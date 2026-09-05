@@ -59,6 +59,13 @@ for a later explicitly approved deletion exercise.
 
 ## Remaining boundary
 
+**Later September 5 result:** the owner subsequently performed the designated
+deletion. Backend/attributable browser content was removed, but fresh Clerk
+verification was required and the sign-in identity remained. The same identity
+then recreated an empty Free account. The [reverification repair record](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
+supersedes the unsubmitted/deletion-not-performed status in the historical
+preparation snapshot below. Complete account-lifecycle acceptance remains open.
+
 This is successful operator-access and Free-account export verification, not
 completed account-deletion acceptance. No account, Clerk identity, customer
 record, or provider subscription was deleted. No Pro grant, purchase, paid

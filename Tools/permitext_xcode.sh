@@ -13,6 +13,7 @@ readonly build_lock="/private/tmp/permitext-xcode-wrapper.lock"
 usage() {
   print 'Usage:'
   print '  ./Tools/permitext_xcode.sh test-simulator [xcodebuild arguments]'
+  print '  ./Tools/permitext_xcode.sh test-ui-simulator [xcodebuild arguments]'
   print '  ./Tools/permitext_xcode.sh build-simulator [xcodebuild arguments]'
   print '  ./Tools/permitext_xcode.sh capture-simulator <simulator-identifier> [xcodebuild arguments]'
   print '  ./Tools/permitext_xcode.sh test-physical <device-identifier> [xcodebuild arguments]'
@@ -43,10 +44,14 @@ fi
 
 command_status=0
 case "$action" in
-  test-simulator)
+  test-simulator|test-ui-simulator)
+    test_scheme=permitext
+    if [[ "$action" == test-ui-simulator ]]; then
+      test_scheme=permitextPhysicalStress
+    fi
     xcodebuild test \
       -project "$project_path" \
-      -scheme permitext \
+      -scheme "$test_scheme" \
       -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
       -derivedDataPath "$derived_data_path" \
       -parallel-testing-enabled NO \

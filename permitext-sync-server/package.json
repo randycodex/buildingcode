@@ -9,7 +9,8 @@
     "prestart": "npm run build:clients",
     "start": "node server.mjs",
     "start:local-research": "zsh scripts/start-local-research.zsh",
-    "build:clients": "npm run build:notebook",
+    "build:clients": "npm run build:notebook && npm run build:account-verification",
+    "build:account-verification": "vite build --config vite.account-verification.config.js",
     "prebuild:notebook": "npm run test:notebook-security",
     "build:notebook": "vite build --config vite.notebook.config.js",
     "test:notebook-security": "node scripts/verify-notebook-dependencies.mjs",
@@ -161,13 +162,16 @@
     "test:account-data-export": "node --check account-lifecycle.mjs && node tests/account-lifecycle-contract.mjs && node --check account-data-export.mjs && node tests/account-deletion-ownership-contract.mjs && node --check account-private-assets.mjs && node tests/account-data-export-http.mjs && node tests/account-private-assets-http.mjs && node tests/account-private-assets-contract.mjs",
     "test:readiness-postgres": "node tests/postgres-readiness-concurrency.mjs",
     "test:file-research-concurrency": "node tests/file-research-metric-concurrency-contract.mjs && node tests/file-research-usage-concurrency-contract.mjs",
-    "test:readiness-recovery": "node tests/research-qualified-facts-contract.mjs && node tests/project-fact-projection-contract.mjs && node tests/web-account-isolation-contract.mjs && node tests/web-account-mutation-isolation-contract.mjs && node tests/account-link-recovery-http.mjs && node tests/account-link-lifecycle-http.mjs && node tests/offline-notebook-durability-contract.mjs && node tests/web-notebook-durability-contract.mjs && node tests/research-context-persistence-contract.mjs && node tests/research-notebook-concurrency-http.mjs && node tests/startup-critical-path-contract.mjs && node tests/workspace-startup-restore-contract.mjs && node tests/web-research-recovery-contract.mjs && node tests/reader-search-recovery-contract.mjs && node tests/notebook-device-recovery-contract.mjs && node tests/project-information-durability-contract.mjs && npm run test:file-research-concurrency"
+    "test:readiness-recovery": "node tests/research-qualified-facts-contract.mjs && node tests/project-fact-projection-contract.mjs && node tests/web-account-isolation-contract.mjs && node tests/web-account-mutation-isolation-contract.mjs && node tests/account-link-recovery-http.mjs && node tests/account-link-lifecycle-http.mjs && node tests/offline-notebook-durability-contract.mjs && node tests/web-notebook-durability-contract.mjs && node tests/research-context-persistence-contract.mjs && node tests/research-notebook-concurrency-http.mjs && node tests/startup-critical-path-contract.mjs && node tests/workspace-startup-restore-contract.mjs && node tests/web-research-recovery-contract.mjs && node tests/reader-search-recovery-contract.mjs && node tests/notebook-device-recovery-contract.mjs && node tests/project-information-durability-contract.mjs && npm run test:file-research-concurrency && npm run test:account-verification",
+    "test:account-verification": "node --check src/account-verification.js && node --check public/account-verification-assets/account-verification.js && node tests/account-deletion-reverification-contract.mjs"
   },
   "dependencies": {
     "@blocknote/core": "^0.52.1",
     "@blocknote/mantine": "^0.52.1",
     "@blocknote/react": "^0.52.1",
     "@clerk/backend": "^3.16.10",
+    "@clerk/react": "6.15.1",
+    "@clerk/shared": "4.31.0",
     "@mantine/core": "^9.5.0",
     "@mantine/hooks": "^9.5.0",
     "@neondatabase/serverless": "^1.0.0",

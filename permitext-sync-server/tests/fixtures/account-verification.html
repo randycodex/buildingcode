@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Account verification integration checks</title>
+<style>
+body{font:16px system-ui;margin:3rem auto;max-width:760px;padding:0 24px;color:#182b32;background:#f6f8f8}
+button{font:inherit;padding:12px 18px;margin:8px 8px 8px 0;border:1px solid #7f969c;border-radius:6px;background:white;cursor:pointer}
+dialog{border:1px solid #7f969c;border-radius:12px;padding:24px;max-width:420px}dialog::backdrop{background:#18303980}
+pre{white-space:pre-wrap;background:white;padding:20px;border:1px solid #d3dede}p{line-height:1.5}
+</style>
+<h1>Account verification integration checks</h1>
+<p>The application’s built React and Clerk hook run against a synthetic provider. This checks browser integration and callback handling; the provider dialog below is a test double. Network API requests are disabled.</p>
+<button id="run">Run integration checks</button><button id="manual">Open synthetic verification prompt</button>
+<pre id="results" role="status">Ready. No account data is used.</pre>
+<script type="module" src="/runner.js"></script></html>

@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260905-device-draft-conflicts-v39";
+} from "./offline-storage.js?v=20260905-account-verification-v40";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260905-device-draft-conflicts-v39";
+} from "./research-intent-state.js?v=20260905-account-verification-v40";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -4747,6 +4747,48 @@ async function deleteCapturedAccount(account, identity) {
   return payload;
 }
 
+function loadAccountVerification() {
+  return import("/web/account-verification-assets/account-verification.js?v=20260905-account-verification-v1");
+}
+
+async function prepareAccountDeletionIdentity(account, identity) {
+  requireCurrentAccountRequest(identity);
+  if (account.authProvider !== "clerk") return null;
+  const config = await clerkWebSignInConfig();
+  requireCurrentAccountRequest(identity);
+  const clerk = await loadClerkScript(config);
+  requireCurrentAccountRequest(identity);
+  const verification = await loadAccountVerification();
+  requireCurrentAccountRequest(identity);
+  const captured = verification.captureClerkDeletionIdentity(account, clerk);
+  const verified = await verification.runReverifiedClerkOperation({
+    clerk,
+    publishableKey: config.publishableKey,
+    operation: () => {
+      requireCurrentAccountRequest(identity);
+      return verification.clerkDeletionVerification(captured);
+    }
+  });
+  requireCurrentAccountRequest(identity);
+  verification.requireCapturedClerkIdentity(captured);
+  if (verified !== true) throw new Error("Identity verification did not finish. No account data was deleted.");
+  return { verification, captured, publishableKey: config.publishableKey };
+}
+
+async function removePreparedAccountDeletionIdentity(prepared) {
+  if (!prepared) return "notApplicable";
+  const { verification, captured, publishableKey } = prepared;
+  return verification.runReverifiedClerkOperation({
+    clerk: captured.clerk,
+    publishableKey,
+    operation: () => verification.removeCapturedClerkIdentity(captured, () => {
+      // The captured account's device cleanup signs it out first. A new active
+      // Permitext session must never be removed by an old cleanup continuation.
+      if (activeAccount()) throw accountContextChangedError();
+    })
+  });
+}
+
 async function clearDeletedAccountBrowserData(account, identity) {
   const failures = [];
   try { await deleteOfflineAccountData(account.userID); }
@@ -5228,7 +5270,17 @@ function openAccountDeletionProgress() {
   activeWebWarningClose = closeDialog;
   backdrop.addEventListener("keydown", (event) => trapWebModalFocus(dialog, event));
   dialog.focus({ preventScroll: true });
-  return { setStage, finish, close: closeDialog };
+  const withIdentityPrompt = async (operation) => {
+    backdrop.style.display = "none";
+    backdrop.inert = true;
+    try { return await operation(); }
+    finally {
+      backdrop.style.display = "";
+      backdrop.inert = false;
+      if (!closed) dialog.focus({ preventScroll: true });
+    }
+  };
+  return { setStage, finish, close: closeDialog, withIdentityPrompt };
 }
 
 /**
@@ -31814,7 +31866,7 @@ function renderSettings() {
     const account = activeAccount();
     if (!account) return;
     const deletionIdentity = captureAccountRequest();
-    let deletionClerkUser = null;
+    let preparedIdentity = null;
     const entitlement = currentEntitlement();
     const appleManaged = [
       entitlement?.source,
@@ -31830,6 +31882,20 @@ function renderSettings() {
     if (!confirmed) return;
 
     deleteAccountButton.disabled = true;
+    setStatus("Verifying your sign-in identity before deleting account data...");
+    try {
+      preparedIdentity = await prepareAccountDeletionIdentity(account, deletionIdentity);
+      requireCurrentAccountRequest(deletionIdentity);
+    } catch (error) {
+      if (isCurrentAccountRequest(deletionIdentity)) {
+        deleteAccountButton.disabled = false;
+        setStatus("Account deletion paused. No data was deleted.", true);
+        await showWebNotice("Account deletion paused", error.code === "reverification_cancelled"
+          ? "Identity verification was canceled. No account data was deleted."
+          : `${error.message || "Identity verification did not finish."} No account data was deleted.`);
+      }
+      return;
+    }
     setStatus("Deleting your account and synced data...");
     const progress = openAccountDeletionProgress();
     progress.setStage("billing", "active");
@@ -31841,9 +31907,7 @@ function renderSettings() {
 
     const removeClerkIdentity = async () => {
       if (account.authProvider !== "clerk") return "notApplicable";
-      if (!deletionClerkUser) throw new Error("The original sign-in identity is unavailable. Sign in to that identity to finish deletion.");
-      await deletionClerkUser.delete();
-      return "deleted";
+      return progress.withIdentityPrompt(() => removePreparedAccountDeletionIdentity(preparedIdentity));
     };
 
     const showBackendFailure = (error) => {
@@ -31882,13 +31946,6 @@ function renderSettings() {
     let payload;
     try {
       requireCurrentAccountRequest(deletionIdentity);
-      if (account.authProvider === "clerk") {
-        const config = await clerkWebSignInConfig();
-        requireCurrentAccountRequest(deletionIdentity);
-        const clerk = await loadClerkScript(config);
-        requireCurrentAccountRequest(deletionIdentity);
-        deletionClerkUser = clerk?.user || null;
-      }
       payload = await deleteCapturedAccount(account, deletionIdentity);
     } catch (error) {
       setStatus(error.message || "Could not delete this account.", true);
