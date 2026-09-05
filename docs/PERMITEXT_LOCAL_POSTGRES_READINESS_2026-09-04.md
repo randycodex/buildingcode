@@ -21,14 +21,20 @@ account linking: JSON constructors received untyped parameters. Source ancestry
 is now carried into the destination, and account/entitlement constructor inputs
 have explicit text casts.
 
-The final follow-up passed **907 SQL requests, 37 Serializable batches, maximum
+The final follow-up passed **946 SQL requests, 39 Serializable batches, maximum
 14 connections**, with the four earlier move/completion races. The added HTTP
 flow preserves a linked Project and Pro entitlement across A → B → C, returns
 both source identities on fresh sign-in after discarded merge responses, rejects
-old source sessions, and ignores client-supplied ancestry. No provider or external
+old source sessions, and ignores client-supplied ancestry. Recovery authorization
+is stored in a separate server-controlled migration checkpoint within the merge
+transaction. Forged account-attachment/sync metadata cannot replace it. The
+transaction locks both identities and rejects a consumed source; simultaneous
+links have one winner and the loser creates no recovery authorization. Sign-in
+reconfirms the issued session against the returned account before releasing its
+checkpoint. Historical client-writable account fields are never recovery proof. No provider or external
 database requests occurred. The disposable cluster was stopped, image detached,
 and its temporary runtime/data removed. Evidence:
-`/private/tmp/permitext-readiness-links-postgres-final-20260904.log`.
+`/private/tmp/permitext-readiness-links-ownership-session-final-20260904.log`.
 
 - Primary distribution: [Postgres.app downloads](https://postgresapp.com/downloads.html), [2.9.6 release](https://github.com/PostgresApp/PostgresApp/releases/tag/v2.9.6).
 - Asset: `Postgres-2.9.6-18.dmg`, 122,517,005 bytes. Its actual SHA-256 matched the release digest: `9fc7d0dc08cf46dfd94bb32cbaaad81b41b37847a42d6dcb2f9fbd292813defb`.

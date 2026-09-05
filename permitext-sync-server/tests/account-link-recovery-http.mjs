@@ -50,12 +50,14 @@ try {
   const recoveredB = await signIn("apple", "synthetic-link-b");
   assert.equal(recoveredB.mergedAccount, null);
   assert.deepEqual(recoveredB.account.mergedAccountIDs, [A.appUserID]);
+  assert.deepEqual(recoveredB.confirmedLinkedAccountIDs, [A.appUserID]);
   const B = recoveredB.account;
   await signIn("apple", "synthetic-link-c", { accountUserID: B.appUserID, sessionToken: B.backendSessionToken });
   const recoveredC = await signIn("apple", "synthetic-link-c");
   assert.equal(recoveredC.mergedAccount, null);
   assert.deepEqual([...recoveredC.account.mergedAccountIDs].sort(), [A.appUserID, B.appUserID].sort(),
     "A → B → C must preserve confirmed A and B ancestry after the source records are removed.");
+  assert.deepEqual([...recoveredC.confirmedLinkedAccountIDs].sort(), [A.appUserID, B.appUserID].sort());
   assert.equal(recoveredC.entitlement.grantedUserID, recoveredC.account.appUserID,
     "Successive links must preserve and retarget the existing entitlement.");
   const pulled = await fetch(`${base}/sync/pull`, { method: "POST",
@@ -75,6 +77,24 @@ try {
     { mergedAccountIDs: [A.appUserID, B.appUserID] });
   assert.deepEqual(unrelated.account.mergedAccountIDs || [], [],
     "Client-supplied credential metadata cannot grant access to another account's retained work.");
+  const forged = { mergedAccountIDs: [A.appUserID, B.appUserID],
+    confirmedLinkedAccountIDs: [A.appUserID, B.appUserID], authProvider: "forged-provider",
+    appleBillingAccountToken: "11111111-1111-4111-8111-111111111111" };
+  for (const [path, body] of [
+    ["/account/attach-local-data", { account: { ...unrelated.account, ...forged } }],
+    ["/sync/push", { auth: { accountUserID: unrelated.account.appUserID },
+      batch: { user: { id: unrelated.account.appUserID, ...forged }, mutations: [] } }]
+  ]) {
+    const response = await fetch(base + path, { method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${unrelated.account.backendSessionToken}` },
+      body: JSON.stringify(body) });
+    assert.equal(response.status, 200, path);
+  }
+  const untainted = await signIn("web", "synthetic-link-unrelated");
+  assert.deepEqual(untainted.confirmedLinkedAccountIDs, [], "Sync/attachment metadata cannot forge the server checkpoint.");
+  assert.equal(untainted.account.authProvider, "web");
+  assert.deepEqual(untainted.account.mergedAccountIDs || [], []);
+  assert.notEqual(untainted.account.appleBillingAccountToken, forged.appleBillingAccountToken);
   console.log("Account link recovery HTTP passed (lost receipts, successive merges, untrusted ancestry rejected).");
 } finally {
   globalThis.fetch = originalFetch;

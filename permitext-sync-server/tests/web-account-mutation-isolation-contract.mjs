@@ -422,7 +422,7 @@ for (const indexWriteFails of [false, true]) {
   h.c.replaceActiveAccount = (next) => h.switchTo(next);
   if (indexWriteFails) storage.setItem = () => { throw new Error("Synthetic recovery-index quota"); };
   h.c.storeSignedInAccount({ account: { appUserID: B.userID, backendSessionToken: B.sessionToken,
-    mergedAccountIDs: [A.userID, A.userID, "", null, {}, B.userID] } });
+    mergedAccountIDs: [unrelated.userID] }, confirmedLinkedAccountIDs: [A.userID, A.userID, "", null, {}, B.userID] });
   let recoveries = h.c.linkedAccountRecoverySources();
   assert.deepEqual([...recoveries].map((entry) => entry.sourceUserID), [A.userID]);
   assert.equal(Boolean(recoveries[0].storageWarning), indexWriteFails);
@@ -430,7 +430,7 @@ for (const indexWriteFails of [false, true]) {
   assert.equal(h.c.state.syncOutbox.length, 0);
   const C = { userID: "apple:synthetic-c", sessionToken: "synthetic-c" };
   h.c.storeSignedInAccount({ account: { appUserID: C.userID, backendSessionToken: C.sessionToken,
-    mergedAccountIDs: [A.userID, B.userID] }, mergedAccount: { sourceUserID: B.userID, targetUserID: C.userID } });
+    mergedAccountIDs: [unrelated.userID] }, confirmedLinkedAccountIDs: [A.userID, B.userID], mergedAccount: { sourceUserID: B.userID, targetUserID: C.userID } });
   recoveries = h.c.linkedAccountRecoverySources();
   assert.deepEqual([...recoveries.map((entry) => entry.sourceUserID)].sort(), [A.userID, B.userID].sort());
   assert.equal(recoveries.some((entry) => entry.sourceUserID === unrelated.userID), false);

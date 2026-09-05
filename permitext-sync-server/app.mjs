@@ -23844,9 +23844,15 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
     }
   }
   store.migrationCheckpointsByUserID ||= {};
+  const recoveryCheckpointName = "confirmed-account-link-recovery-v1";
+  const confirmedSourceUserIDs = [sourceUserID, ...[sourceUserID, targetUserID].flatMap((owner) => {
+    const ids = store.migrationCheckpointsByUserID[owner]?.[recoveryCheckpointName]?.sourceUserIDs;
+    return Array.isArray(ids) ? ids : [];
+  })].filter((owner) => typeof owner === "string" && owner.trim() && owner !== targetUserID);
   store.migrationCheckpointsByUserID[targetUserID] = {
     ...(store.migrationCheckpointsByUserID[sourceUserID] || {}),
-    ...(store.migrationCheckpointsByUserID[targetUserID] || {})
+    ...(store.migrationCheckpointsByUserID[targetUserID] || {}),
+    [recoveryCheckpointName]: { sourceUserIDs: [...new Set(confirmedSourceUserIDs)] }
   };
   delete store.migrationCheckpointsByUserID[sourceUserID];
 
@@ -24090,6 +24096,34 @@ function normalizedSinceEventID(body) {
   return Number.isSafeInteger(value) && value >= 0 ? value : null;
 }
 
+async function sendSignInResponse(response, adapter, payload) {
+  // Older clients could attach arbitrary account metadata. Only the separate
+  // server-written merge checkpoint authorizes retained-source recovery.
+  const owner = payload.account.appUserID;
+  const token = payload.account.backendSessionToken;
+  let identityConfirmed = false;
+  if (typeof adapter.authenticateUserSession === "function") {
+    const context = await adapter.authenticateUserSession(owner, token);
+    identityConfirmed = context?.account?.appUserID === owner;
+  } else {
+    const store = await adapter.read();
+    identityConfirmed = Boolean(token && store.sessions?.[owner] === token && store.users?.[owner]?.appUserID === owner);
+  }
+  if (!identityConfirmed) {
+    sendError(response, 401, "The signed-in account identity could not be confirmed. Sign in again.");
+    return;
+  }
+  const checkpoint = await adapter.migrationCheckpoint?.(
+    payload.account.appUserID, "confirmed-account-link-recovery-v1"
+  );
+  const sourceUserIDs = Array.isArray(checkpoint?.sourceUserIDs) ? checkpoint.sourceUserIDs : [];
+  const confirmedLinkedAccountIDs = [...new Set(sourceUserIDs)]
+    .filter((owner) => typeof owner === "string" && owner.trim() && owner !== payload.account.appUserID);
+  sendJSON(response, 200, { ...payload,
+    account: { ...payload.account, mergedAccountIDs: confirmedLinkedAccountIDs },
+    confirmedLinkedAccountIDs });
+}
+
 async function handleSignIn(request, response) {
   const body = await readJSON(request);
   const credential = body.credential || {};
@@ -24172,7 +24206,7 @@ async function handleSignIn(request, response) {
         directResult.account.backendSessionToken
       );
     }
-    sendJSON(response, 200, {
+    await sendSignInResponse(response, adapter, {
       account: {
         ...(finalContext?.account || signedInAccount),
         backendSessionToken: directResult.account.backendSessionToken
@@ -24191,7 +24225,7 @@ async function handleSignIn(request, response) {
           directResult.account.appUserID,
           directResult.account.backendSessionToken
         );
-        sendJSON(response, 200, {
+        await sendSignInResponse(response, adapter, {
           account: {
             ...(refreshed?.account || directResult.account),
             backendSessionToken: directResult.account.backendSessionToken
@@ -24201,7 +24235,7 @@ async function handleSignIn(request, response) {
         });
         return;
       }
-      sendJSON(response, 200, directResult);
+      await sendSignInResponse(response, adapter, directResult);
       return;
     }
     if (directResult.mergeConflictCode === "ACCOUNT_ENTITLEMENT_CONFLICT") {
@@ -24250,7 +24284,7 @@ async function handleSignIn(request, response) {
     store.users[account.appUserID] || storedAccount
   );
   const finalStore = activation ? await readStore() : store;
-  sendJSON(response, 200, {
+  await sendSignInResponse(response, adapter, {
     account: finalStore.users[account.appUserID] || storedAccount,
     entitlement: finalStore.entitlements[account.appUserID] ?? null,
     mergedAccount
@@ -24390,7 +24424,6 @@ async function handleAttachLocalData(request, response) {
   const adapter = await storeAdapter();
   if (typeof adapter.updateAccount === "function") {
     const migratedAccount = {
-      ...account,
       ...(context.account || {}),
       migrationState: "localDataAttached"
     };
@@ -24406,7 +24439,6 @@ async function handleAttachLocalData(request, response) {
   const store = await readStore();
   const existingAccount = store.users[account.appUserID] || {};
   const migratedAccount = {
-    ...account,
     ...existingAccount,
     migrationState: "localDataAttached"
   };
@@ -25340,7 +25372,8 @@ async function handlePush(request, response) {
   if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
     return;
   }
-  store.users[userID] = body.batch?.user ? { ...(store.users[userID] || {}), ...body.batch.user } : store.users[userID];
+  // A sync batch carries content, not authority to rewrite the authenticated
+  // identity, billing metadata, or confirmed account-link history.
 
   const existing = await canonicalizeMutations(store.mutationsByUserID[userID] || []);
   const planEnforcement = enforceFreePlanMutationBatch(

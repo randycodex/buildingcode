@@ -79,7 +79,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260904-readiness-recovery-v36";
+} from "./offline-storage.js?v=20260904-readiness-recovery-v37";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -114,7 +114,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260904-readiness-recovery-v36";
+} from "./research-intent-state.js?v=20260904-readiness-recovery-v37";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -8151,11 +8151,11 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   if (payload.mergedAccount) {
     confirmedRecoveries.push(confirmedAccountLinkRecovery(payload.mergedAccount, previousUserID, account.appUserID));
   }
-  // This entry point receives a fresh authenticated server response. Its
-  // server-owned ancestry also survives a lost merge response or a later link.
+  // This fresh authenticated response reads the server-owned merge checkpoint,
+  // which survives a lost response or a later link. Account metadata is not proof.
   // Never derive access from the previously open account, stored workspace
   // metadata, or an unconfirmed source-side recovery index.
-  for (const sourceUserID of new Set(Array.isArray(account.mergedAccountIDs) ? account.mergedAccountIDs : [])) {
+  for (const sourceUserID of new Set(Array.isArray(payload.confirmedLinkedAccountIDs) ? payload.confirmedLinkedAccountIDs : [])) {
     if (typeof sourceUserID !== "string" || !sourceUserID.trim() || sourceUserID === account.appUserID) continue;
     confirmedRecoveries.push(confirmedAccountLinkRecovery(
       { sourceUserID, targetUserID: account.appUserID }, sourceUserID, account.appUserID

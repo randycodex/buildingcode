@@ -253,6 +253,18 @@ export function createPostgresAccountRepository(sql, options = {}) {
     );
 
     const queries = [
+      // The preflight reads happen before the transaction. Lock both identities
+      // and fail the whole batch if a concurrent merge already consumed either
+      // one; otherwise a later transaction could mint a phantom recovery link.
+      sql`
+        WITH locked_accounts AS (
+          SELECT id FROM permitext_users
+          WHERE id IN (${sourceUserID}, ${targetUserID})
+          ORDER BY id FOR UPDATE
+        )
+        SELECT 1 / CASE WHEN count(*) = 2 THEN 1 ELSE 0 END AS identities_present
+        FROM locked_accounts
+      `,
       sql`
         SELECT record_id
         FROM permitext_user_content_records
@@ -687,6 +699,25 @@ export function createPostgresAccountRepository(sql, options = {}) {
         WHERE user_id = ${sourceUserID}
       `,
       sql`
+        INSERT INTO permitext_migration_checkpoints (user_id, checkpoint_name, checkpoint, updated_at)
+        VALUES (
+          ${targetUserID}, 'confirmed-account-link-recovery-v1',
+          jsonb_build_object('sourceUserIDs', (
+            SELECT COALESCE(jsonb_agg(DISTINCT ancestors.user_id), '[]'::jsonb)
+            FROM (
+              SELECT jsonb_array_elements_text(checkpoint->'sourceUserIDs') AS user_id
+              FROM permitext_migration_checkpoints
+              WHERE user_id IN (${sourceUserID}, ${targetUserID})
+                AND checkpoint_name = 'confirmed-account-link-recovery-v1'
+              UNION ALL SELECT ${sourceUserID}::text
+            ) AS ancestors
+            WHERE ancestors.user_id <> ${targetUserID}
+          )), now()
+        )
+        ON CONFLICT (user_id, checkpoint_name) DO UPDATE SET
+          checkpoint = EXCLUDED.checkpoint, updated_at = now()
+      `,
+      sql`
         DELETE FROM permitext_migration_checkpoints AS source
         USING permitext_migration_checkpoints AS target
         WHERE source.user_id = ${sourceUserID}
@@ -723,8 +754,14 @@ export function createPostgresAccountRepository(sql, options = {}) {
       queries.splice(queries.length - 1, 0, ...additionalMergeQueries);
     }
 
-    const results = await sql.transaction(queries, { isolationLevel: "Serializable" });
-    const sourceRows = results[0] || [];
+    let results;
+    try {
+      results = await sql.transaction(queries, { isolationLevel: "Serializable" });
+    } catch (error) {
+      if (error?.code === "22012") return null; // The identity guard rolled back the batch.
+      throw error;
+    }
+    const sourceRows = results[1] || [];
     const acceptedMutationIDs = sourceRows.map(({ record_id: recordID }) =>
       recordID.startsWith(`${sourceUserID}:`)
         ? `${targetUserID}:${recordID.slice(sourceUserID.length + 1)}`
@@ -736,7 +773,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
       movedMutationCount: sourceRows.length,
       acceptedMutationIDs,
       rejectedMutationIDs: [],
-      transferredEntitlement: Boolean(results[3]?.length)
+      transferredEntitlement: Boolean(results[4]?.length)
     };
   }
 

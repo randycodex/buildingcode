@@ -8,6 +8,7 @@ import { pathToFileURL } from "node:url";
 import { runInNewContext } from "node:vm";
 import { neon, neonConfig } from "@neondatabase/serverless";
 import { commitPostgresNotebookCardMutation } from "../notebook-persistence.mjs";
+import { createPostgresAccountRepository } from "../postgres-account-repository.mjs";
 import { researchConversationRevision, researchContextRevision, researchConversationConflict, resetResearchActiveContext, activeResearchMessages } from "../research-context-state.mjs";
 
 assert.equal(process.env.PERMITEXT_RUN_LOCAL_POSTGRES_READINESS, "1");
@@ -110,6 +111,22 @@ try {
     .replaceAll('"../app.mjs"', JSON.stringify(new URL("../app.mjs", import.meta.url).href));
   await import(`data:text/javascript;base64,${Buffer.from(linkCases).toString("base64")}`);
 
+  const accounts = createPostgresAccountRepository(sql);
+  for (const id of ["pg-link-source", "pg-link-left", "pg-link-right"]) {
+    await accounts.signIn({ appUserID: `web:${id}`, authProvider: "web", authProviderUserID: id,
+      displayName: "Synthetic concurrent link", signedInAt: new Date().toISOString() });
+  }
+  const targets = ["web:pg-link-left", "web:pg-link-right"];
+  const links = await Promise.allSettled(targets.map((target) => accounts.mergeAccounts("web:pg-link-source", target)));
+  assert.equal(links.filter((result) => result.status === "fulfilled" && result.value).length, 1,
+    "A source identity can be consumed by only one simultaneous account link.");
+  const receipts = await sql`SELECT user_id, checkpoint FROM permitext_migration_checkpoints
+    WHERE checkpoint_name = 'confirmed-account-link-recovery-v1' AND user_id IN (${targets[0]}, ${targets[1]})`;
+  assert.equal(receipts.length, 1, "The losing link must not create a recovery authorization.");
+  assert.deepEqual(receipts[0].checkpoint.sourceUserIDs, ["web:pg-link-source"]);
+  const losingTarget = targets.find((target) => target !== receipts[0].user_id);
+  assert.equal(await accounts.mergeAccounts("web:pg-link-source", losingTarget), null);
+
   // Additional real SQL acceptance for pre-move completions and atomic rollback.
   const owner = "apple:synthetic-cas-owner";
   const now = new Date().toISOString();
@@ -186,6 +203,7 @@ try {
   console.log(JSON.stringify({ result: "passed", postgresVersion: initial[0].version, requests, serializableBatches, maximumConnections,
     simultaneousMoveCompletionRaces: 4, chargedOnceAfterReplay: true, failedMutationRollback: true,
     accountLinkLostReceipt: true, successiveAccountLinkRecovery: true,
+    forgedAccountMetadataRejected: true, concurrentAccountLinkSingleWinner: true,
     productionHTTPHandlers: true, productionNeonQueryEncoder: true, transport: "test-only local node-postgres bridge", externalDatabaseRequests: 0, providerRequests: 0 }));
 } finally {
   delete globalThis.__permitextLocalPostgresAdapter;

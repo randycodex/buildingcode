@@ -62,25 +62,28 @@ contracts. This is aggregate suite evidence, not a single uninterrupted
 ## Account-link recovery follow-up
 
 Fresh authenticated sign-in now reconstructs export-only access from the server's
-confirmed merge history, including after a lost merge response. Both storage
+confirmed merge checkpoint, including after a lost merge response. Both storage
 adapters preserve source ancestry through A → B → C. Client-supplied credential
-metadata cannot create that history. Retained local work is never replayed or
+metadata cannot create that history. Sync batches and local-data attachment also
+cannot overwrite the authenticated account or billing fields. Retained local work is never replayed or
 retargeted automatically, and unrelated/current browser accounts confer no access.
 
 The extended real PostgreSQL test also reproduced an existing account-link HTTP
 500 (`42P18`, untyped JSON-constructor parameters). Explicit text casts repair the
 account and entitlement merge statements. The final local PostgreSQL run passed
-907 SQL requests and 37 Serializable batches, including linked Project and Pro
-entitlement transfer, old-session rejection, successive links, and the earlier
+946 SQL requests and 39 Serializable batches, including linked Project and Pro
+entitlement transfer, old-session rejection, successive links, forged-metadata
+rejection, one winner for competing links, and the earlier
 Research/Notebook concurrency cases. This does not prove the deployed lifecycle.
 
-Main check and the readiness-recovery contracts passed. Actual local browser
+The full `npm run check` completed successfully. The subsequent sign-in response
+sanitization passed targeted account and authentication regressions. Actual local browser
 sign-out/reopen/sign-in after a deliberately withheld link response restored the
 source export control; clicking it reported a downloaded recovery file. The
 browser fixture had no retained source draft bytes; the actual-function contracts
 separately verify exact-owner drafts/images, quota warnings, and no automatic
-replay. Web assets are synchronized at `20260904-readiness-recovery-v36` and shell
-`permitext-pro-shell-v775`. Native source is unchanged by this follow-up.
+replay. Web assets are synchronized at `20260904-readiness-recovery-v37` and shell
+`permitext-pro-shell-v776`. Native source is unchanged by this follow-up.
 
 ## Critical findings
 
@@ -232,8 +235,9 @@ until the exact candidate and remaining evidence satisfy its requirements.
   access using server-confirmed ancestry. Recovery requires that fresh response;
   the client does not infer ownership while offline.
 - **Successive merges:** A → B → C now preserves both sources in C's server
-  history. Ancestry already discarded by older server versions cannot be guessed
-  back into existence. Those older retained bytes still require ownership review.
+  checkpoint. Legacy account metadata was client-writable and is not proof of
+  ownership. Older merges without a server checkpoint or an existing confirmed
+  local receipt still require ownership review; their source bytes remain intact.
 - **Recovery-index storage failure:** an in-memory confirmed receipt supports
   immediate export and a visible warning to export before closing the page.
   Durable recovery-index failure is not represented as a successful durable save.
