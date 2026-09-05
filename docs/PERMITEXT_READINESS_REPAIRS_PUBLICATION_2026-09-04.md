@@ -5,11 +5,16 @@ TestFlight. This record distinguishes publication from the wider acceptance
 requirements in the [repair backlog](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md).
 It does not authorize public App Store submission or close those requirements.
 
-Latest web publication: the [September 5 account-deletion verification repair](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md#verified-web-publication-and-build-59)
-is live at `7a283d5f27d14df59cf3b18cdb81b143939b5e62` (PRs #46–47, client v41).
-Build 59 uploaded successfully; Apple processing and physical verification are
-pending. Build 58 remains the last physically verified installation. Earlier
-publication entries below are retained as history.
+Latest repair checkpoint: the [September 5 account-deletion verification repair](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
+includes PRs #46–49. The final loader source is
+`38ba9536d36ae5099376482dbbe4cf44f0ea5142` (client v43), verified on both
+Production origins with six byte-identical assets per origin. Live Clerk
+verification, safe cancellation, approved empty-account deletion, independent
+Clerk identity-removal evidence and signed-out reload passed. Build 59 is processed and available to Internal
+Testers. TestFlight update, launch, the in-app build-59 footer and bounded existing
+account/plan/sync/Project-container/Saved continuity passed on the physical phone.
+The native deletion disclosure opened and canceled with no deletion submitted.
+Earlier publication entries below are retained as history.
 
 ## Source and Production
 

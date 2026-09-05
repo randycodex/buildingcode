@@ -139,7 +139,7 @@ recorded below.
   packaging correction by fast-forward to
   `7a283d5f27d14df59cf3b18cdb81b143939b5e62`. Local `main`, GitHub `main` and the
   repair branch matched at the publication checkpoint.
-- Final Production deployment `dpl_G66zX8VntFbCaV5MFBouTPrSYNPu` is READY.
+- At that checkpoint, Production deployment `dpl_G66zX8VntFbCaV5MFBouTPrSYNPu` was READY.
   Both `https://permitext.com` and `https://permitext-sync.vercel.app` returned
   that exact source. On both origins, index, app, offline storage, service
   worker, styles and the verification bundle matched local committed bytes.
@@ -223,8 +223,7 @@ loaded instance. No provider settings or CSP permissions were changed.
 `clerk-loader-contract.mjs` covers UI-before-SDK ordering, constructor handoff,
 concurrent/later callers, UI/SDK/initialization failure retries, missing UI and
 already-loaded headless rejection. It is included in `npm run test:auth`, which
-passed alongside offline and smoke checks. The real provider UI and approved
-account deletion still require a live retry after this loader publication.
+passed alongside offline and smoke checks. The final live checkpoint below records this loader on Production.
 Native source and build 59 are unchanged.
 
 ## Build 59 physical checkpoint
@@ -232,7 +231,9 @@ Native source and build 59 are unchanged.
 App Store Connect completed build 59 processing and showed Ready to Submit,
 Internal Testers and one invitation. Build record:
 `54435438-201e-4c99-b138-1478fc33786d`. TestFlight on the owner's phone offered
-`1.0 (59)`; Update completed and changed to Open. After launch, existing Project
+`1.0 (59)`; Update completed and changed to Open. The app's own Account footer
+independently showed `Permitext 1.0 (Build 59)` at approximately
+`2026-09-05T18:06Z`. After launch, existing Project
 containers and the saved Electrical provision remained visible. Account still
 showed Lifetime Pro active, 98 included Research turns and Synced. The deletion
 disclosure rendered correctly with the Lifetime grant consequence, empty
@@ -240,14 +241,71 @@ confirmation field and disabled submit. Cancel returned to Account. No deletion
 was submitted on the phone and no Research call was made. This confirms bounded
 update continuity and disclosure, not live native verification or deletion.
 
+## Final loader publication and live cancellation
+
+PR [#49](https://github.com/randycodex/buildingcode/pull/49) passed Preview and
+merged by fast-forward at `2026-09-05T18:04:37Z`. Application source
+`38ba9536d36ae5099376482dbbe4cf44f0ea5142` is served by READY Production deployment
+`dpl_sbzU139pE8RNCUz4mdQKjEbPUqPx`. Both canonical origins returned the exact SHA;
+all six public assets matched committed bytes. Health passed on both origins,
+AASA matched the intended app, and the strict canonical approved-policy audit
+passed. Native runtime/project inputs are unchanged from the build-59 archive.
+
+The browser rendered release `38ba9536d36a`. The actual Clerk verification modal
+opened before any Permitext deletion, requested an email code, and closed with
+the explicit canceled/no-data-deleted message when canceled. An independent
+operator export/checklist at `2026-09-05T18:08:38.829Z` confirmed the exact
+disposable account and session still present, no entitlement, zero mutations and
+zero content/artifact/ownership records (one session-metadata record remains).
+The private summary is `after-live-verification-cancel-summary.json` in the
+retained disposable-account evidence directory; no raw export was saved.
+
+## Approved deletion and provider removal
+
+The same approved deletion was reopened, and the owner supplied the current
+verification code. Clerk accepted it and the browser completed the account flow,
+returning to signed-out Account. No verification code is copied into repository
+files or retained evidence. There was no cleanup-retry warning or browser console
+warning/error in the final observed state.
+
+The operator export/checklist at `2026-09-05T18:10:27.856Z` confirmed the exact
+account, session and entitlement absent. Every mutation and normalized record
+family, including session metadata, was zero. A second export after browser
+reload at `2026-09-05T18:13:11.174Z` returned the identical aggregate/export hash
+`d7727b14767f73017eb0aa57a3fa58f247e194df75e045570b16486a858735cb`.
+The signed-out workspace and retained legacy-ownership warning survived reload;
+no sign-in or fresh account recreation was attempted.
+
+Independently, the authenticated Clerk dashboard showed the **Permitext** app
+and **production** environment. Searching the Users directory's All tab for the
+exact approved email returned **No users found** at approximately
+`2026-09-05T18:12Z`. The search input was verified against the approved target.
+This establishes provider removal without retrieving a server credential or
+changing provider settings. The distinct phone account was never a deletion
+target.
+
+Private aggregate evidence (no raw exports or verification codes):
+
+- `after-approved-deletion-summary.json`
+- `after-deletion-reload-summary.json`
+- `provider-cleanup-summary.json`
+
+These are under `/private/tmp/permitext-disposable-account-acceptance-20260905`.
+The exact target hash matches the earlier preparation/approval record. This live
+exercise used an already-empty Free account. It establishes verification,
+cancellation safety, deletion and provider removal for that scope; it does not
+establish removal of populated private assets or second-client copies.
+
 ## Acceptance boundary
 
-The verification hook is on Production; its Clerk UI loader follow-up awaits
-publication. Build 59 is available internally and passed the bounded physical
-continuity/disclosure check above.
-No account deletion, provider cleanup, new paid Research call, or provider
-configuration change was performed in this recovery task. Live Clerk prompt
-and full account-lifecycle acceptance remain open, including private-file and
-second-client coverage. Any destructive exercise requires the exact currently
-reviewed disposable target/scope; preserved historical evidence is not a new
-destructive authorization. Public-release gates remain open.
+The web repair is on Production and build 59 is internally available with bounded
+physical continuity/disclosure acceptance. Live web verification, safe
+cancellation, the approved disposable account's backend deletion, Clerk identity
+removal and signed-out reload have passed. No paid Research call, purchase or
+provider configuration change was performed. Full account-lifecycle acceptance
+remains open for fresh recreation, fresh/existing provider combinations,
+populated private-file and second-client coverage. Native live verification and
+deletion also remain separate from Simulator and physical disclosure evidence.
+All ten machine gates remain false and no final shared release SHA is selected.
+Public-release approval, operations/spend evidence and the final Apple/privacy
+package remain separate requirements.

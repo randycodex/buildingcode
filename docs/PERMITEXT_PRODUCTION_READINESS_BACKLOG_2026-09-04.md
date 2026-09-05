@@ -97,10 +97,16 @@ four saves, one synthetic note, an empty saved collection and the visible browse
 state. No shared-ownership blocker or entitlement record was present. The owner
 subsequently performed deletion; saved checks confirmed backend/browser content
 removal but Clerk required fresh verification and retained the sign-in identity.
-The same identity then recreated an empty Free account. The [local verification
+The same identity then recreated an empty Free account. The [verification
 repair](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md) addresses
-the web/native ordering and cleanup retry. Complete identity cleanup, fresh
-recreation and the broader client/content matrix remain open.
+the web/native ordering and cleanup retry. Build 59 is internally available and
+passed physical update/build-footer/account/plan/sync/Saved/Project-container
+continuity plus initial deletion disclosure/cancellation. The exact empty Free
+web account has been exported again and its deletion is explicitly approved;
+the final loader is verified on Production. Live verification/cancellation,
+approved empty-account deletion, independent Clerk-directory absence and
+signed-out reload passed. Fresh recreation, native live verification/deletion
+and the broader populated-content/second-client matrix remain open.
 See the [operator recovery and export evidence](./PERMITEXT_ACCOUNT_ACCEPTANCE_PREPARATION_2026-09-05.md)
 and the updated
 [account acceptance runbook](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance).

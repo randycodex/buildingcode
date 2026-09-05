@@ -33,7 +33,18 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-- Last verified application source: `9a89e54e7b70ccb7567b784443b232df005a10ac`, deployment `dpl_HWoChFH39P9eYKeCE3uNvBJUaDd3`, READY.
+Latest September 5 recovery evidence: the [verification repair record](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
+tracks verified web source `38ba9536d36ae5099376482dbbe4cf44f0ea5142` through
+PRs #46–49 (both origins, six byte-identical assets each) and native build 59, archived from
+`68efc23956939bfd79d592173db8cce5628cc3a8`. The later web-only changes preserve
+its native runtime/project inputs. Build 59 completed Apple processing and is
+available internally. Physical TestFlight installation, the in-app build-59 footer,
+existing account/plan/sync/Project-container/Saved continuity, and deletion
+initial disclosure/cancellation passed. Live native verification/deletion and
+the full device matrix remain open. Earlier checkpoints below retain their
+original sources and do not select the final release.
+
+- Historical application checkpoint: `9a89e54e7b70ccb7567b784443b232df005a10ac`, deployment `dpl_HWoChFH39P9eYKeCE3uNvBJUaDd3`, READY.
 - Both canonical origins returned that exact application SHA, Production environment and deployment host at `2026-09-05T05:09:38Z`.
 - Served app, offline-storage, service-worker and stylesheet bytes matched the tested source on both origins. The HTML and rendered browser loaded client `20260905-saved-section-visibility-v38`.
 - PostgreSQL `normalized-v4` health, AASA and approved-policy publication checks passed. The bounded deployment error/fatal aggregate was empty; this is not sustained-load or latency evidence.
@@ -67,7 +78,7 @@ The controlled monetary and entitlement lifecycle does not need another paid Bet
 ## Production authentication and account lifecycle
 
 Gate ID: `production-auth-account-lifecycle`
-Status: **OPEN — persisted-account continuity retained through physical build 58 and current web; fresh/remaining providers and complete deletion remain open**
+Status: **OPEN — persisted-account continuity retained through physical build 59 and current web; fresh/remaining providers and full populated deletion matrix remain open**
 Release-bound: **yes**
 
 Latest September 5 correction: operator access and the designated Free-account
@@ -77,10 +88,15 @@ were absent, but Clerk identity removal required fresh verification and did not
 complete. Sign in recreated the same identity with empty Free-account content.
 The [reverification repair record](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
 supersedes the credential/export/deletion-pending statements in the earlier
-snapshot below. Full provider cleanup, fresh recreation, private-file and
-second-client acceptance remain open.
+snapshot below. The owner approved retrying deletion of the same freshly exported empty Free
+account after the repair. Live verification and safe cancellation passed, then the approved deletion
+completed. Independent exports proved account/session/entitlement/all records
+absent; the Production Clerk directory returned no user for the exact approved
+email. Signed-out reload passed. The phone's Lifetime Pro account is separate and was
+not a deletion target. Provider cleanup is complete for this empty account. Fresh recreation,
+populated private-file and second-client acceptance remain open.
 
-September 5 follow-up: build 58 is processed and internally available, with its installation, displayed build identity and existing native account/plan/sync/Saved/Project-container continuity physically verified. Current web continuity and account-operation repairs are recorded in the [repair publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-58-upload-after-apple-sign-in-recovery). Fresh email registration is blocked by the unchanged hosted-provider configuration. The designated Free test account has four saved entries, one synthetic note and an empty collection, but its complete operator export, representative Project/Research/private-file coverage, reviewed deletion, provider cleanup and recreation remain open. The current Production operator credential is still required. These observations do not satisfy the fresh sign-in fields below.
+Earlier September 5 snapshot (superseded by the correction above): build 58 is processed and internally available, with its installation, displayed build identity and existing native account/plan/sync/Saved/Project-container continuity physically verified. Current web continuity and account-operation repairs are recorded in the [repair publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-58-upload-after-apple-sign-in-recovery). Fresh email registration is blocked by the unchanged hosted-provider configuration. The designated Free test account has four saved entries, one synthetic note and an empty collection, but its complete operator export, representative Project/Research/private-file coverage, reviewed deletion, provider cleanup and recreation remain open. The current Production operator credential is still required. These observations do not satisfy the fresh sign-in fields below.
 
 - Fresh-account email-code sign-in:
 - Fresh-account Apple sign-in:
