@@ -215,8 +215,11 @@ other membership so the retained foreign artifact alone had to stop deletion of
 the organization owner. The run made 1,575 local database
 requests, including 48 Serializable and 45 repeatable-read/read-only batches,
 with zero external database or provider requests. Authentication, broad smoke,
-and the full `npm run check` (precheck, main check, and postcheck) passed. This
-repair is not published.
+and the full `npm run check` (precheck, main check, and postcheck) passed. PR #41
+published this repair at `42483d6d5`. Both canonical Production release endpoints
+and the rendered account footer returned that commit. Production health, Apple
+universal links, approved policy hashes, and disposable-account reopening passed.
+See the publication record for the exact deployment and evidence boundaries.
 
 This closes neither reviewed legacy recovery/disposal nor full account-deletion
 acceptance. A safe stop preserves affected data; it does not migrate it or prove

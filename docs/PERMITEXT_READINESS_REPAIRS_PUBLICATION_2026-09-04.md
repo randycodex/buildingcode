@@ -164,3 +164,49 @@ Production export/deletion, interrupted-guard recovery, legacy shared-Project
 ownership, and the remaining final-candidate acceptance gates are still open.
 No Production deletion or exploit was performed. The owner-facing reminder to
 revisit Project/workspace navigation is separate from this publication.
+
+## Legacy shared-data preservation follow-up publication
+
+PR [#41](https://github.com/randycodex/buildingcode/pull/41) merged by fast-forward
+at `2026-09-05T03:22:54Z`, publishing
+`42483d6d54d0383334f15baba5d225eb9fe898c3`. Local and remote `main` and the repair
+branch matched that commit before this evidence update. Deletion now stops
+before billing or file cleanup when retained ownership records or organization
+dependencies require shared-data review. Legacy Project transfers also register
+the organization owner's operation guard.
+
+- Preview `dpl_9oUkdgiVCEqLHRWBAUPmxwwBAazA` became READY, passed its GitHub
+  deployment check, and served the tested commit from its protected `/release`
+  route through the authenticated Vercel CLI.
+- Production deployment `dpl_BrgsykNHmNv1TqvduN2yFHgoEBwP` is READY at
+  `permitext-sync-by2hfkrw2-randycodexs-projects-b72fc111.vercel.app`. At
+  `2026-09-05T03:30:29Z`, both canonical `/release` endpoints returned that host,
+  Production environment, and the exact commit.
+- Production PostgreSQL health and Apple universal links passed. The strict
+  live policy audit returned `publicationReady: true` at
+  `2026-09-05T03:30:05Z`, with all three approved policy hashes matching the
+  served bytes.
+- A deployment-scoped error/fatal aggregate scan beginning at `03:25Z` returned
+  no entries. The browser captured no console errors during the rendered check.
+  These bounded observations do not establish sustained-load or latency acceptance.
+- Reloading the designated disposable account preserved its Free plan, Synced
+  status, two saved passages, one synthetic note, one empty saved collection,
+  and Building Code (2022) Reader. The account footer displayed
+  `Release: 42483d6d54d0`. The existing legacy workspace recovery notice remained.
+- The complete local `npm run check`, targeted authentication, and broad smoke
+  passed. Isolated PostgreSQL 18.6 validation passed both owners, stale ownership
+  JSON, missing registry or organization columns, a foreign artifact as the sole
+  retained dependency, and transfer/deletion exclusion in both orders. The run
+  made 1,575 local database requests, including 48 Serializable and 45
+  repeatable-read/read-only batches, with zero external database or provider
+  requests. File-backed HTTP checks preserved both full inventories and the
+  private file. The disposable PostgreSQL cluster was stopped and removed.
+- Native runtime tree `f9bbba46ca2df24487604cf235fc4ec7acfef2e3` still matches
+  build 56's archived source inputs. This server repair needed no new native
+  archive or TestFlight build.
+
+This is a preservation safeguard, not completed legacy migration or disposal.
+Affected accounts remain subject to reviewed recovery before deletion can
+continue. Full Production export/deletion acceptance, interrupted-operation
+recovery, and the remaining final-candidate gates stay open. No Production
+deletion, exploit, entitlement grant, or purchase was performed.
