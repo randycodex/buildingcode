@@ -43,6 +43,8 @@ export function auditProductionAuthentication({
   const configuration = clerkConfigurationStatus(productionEnvironment);
   const authConfig = clerkEnvironment?.auth_config || {};
   const displayConfig = clerkEnvironment?.display_config || {};
+  const userSettings = clerkEnvironment?.user_settings || {};
+  const emailAttribute = userSettings.attributes?.email_address || {};
   const firstFactors = new Set(Array.isArray(authConfig.first_factors) ? authConfig.first_factors : []);
   const identificationStrategies = new Set(
     Array.isArray(authConfig.identification_strategies) ? authConfig.identification_strategies : []
@@ -76,6 +78,16 @@ export function auditProductionAuthentication({
         `${provider} must remain available as both a configured identity strategy and first factor.`
       );
     }),
+    check(
+      "email-sign-up",
+      userSettings.sign_up?.mode === "public" &&
+        emailAttribute.enabled === true &&
+        emailAttribute.required === true &&
+        emailAttribute.verify_at_sign_up === true &&
+        Array.isArray(emailAttribute.verifications) &&
+        emailAttribute.verifications.includes("email_code"),
+      "The hosted Account Portal must offer public email-code sign-up with a required, verified email address. Configured sign-in factors alone do not prove that new email accounts can register."
+    ),
     check(
       "email-verification",
       Array.isArray(authConfig.email_address_verification_strategies) &&

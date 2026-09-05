@@ -24,6 +24,17 @@ const clerkEnvironment = {
     sign_in_url: "https://accounts.permitext.com/sign-in",
     sign_up_url: "https://accounts.permitext.com/sign-up",
     home_url: "https://permitext.com"
+  },
+  user_settings: {
+    attributes: {
+      email_address: {
+        enabled: true,
+        required: true,
+        verify_at_sign_up: true,
+        verifications: ["email_code"]
+      }
+    },
+    sign_up: { mode: "public" }
   }
 };
 
@@ -53,6 +64,32 @@ const complete = auditProductionAuthentication({
 assert.equal(complete.configurationReady, true);
 assert.equal(complete.manualAcceptanceComplete, true);
 assert.equal(complete.releaseReady, true);
+
+// The live hosted portal offered email sign-in but no email sign-up field when
+// email was optional. First factors and verification strategies still passed.
+for (const [label, userSettings] of [
+  ["missing sign-up settings", undefined],
+  ["optional email", { ...clerkEnvironment.user_settings, attributes: { email_address: { ...clerkEnvironment.user_settings.attributes.email_address, required: false } } }],
+  ["disabled email", { ...clerkEnvironment.user_settings, attributes: { email_address: { ...clerkEnvironment.user_settings.attributes.email_address, enabled: false } } }],
+  ["unverified sign-up email", { ...clerkEnvironment.user_settings, attributes: { email_address: { ...clerkEnvironment.user_settings.attributes.email_address, verify_at_sign_up: false } } }],
+  ["missing sign-up code", { ...clerkEnvironment.user_settings, attributes: { email_address: { ...clerkEnvironment.user_settings.attributes.email_address, verifications: [] } } }],
+  ["closed sign-up", { ...clerkEnvironment.user_settings, sign_up: { mode: "restricted" } }]
+]) {
+  const result = auditProductionAuthentication({
+    environment,
+    clerkEnvironment: { ...clerkEnvironment, user_settings: userSettings },
+    appleAssociation,
+    acceptanceEvidence: {
+      freshAccountProviders: ["email", "apple", "google", "microsoft"],
+      existingAccountProviders: ["email", "apple", "google", "microsoft"],
+      accountExportDeletion: true
+    }
+  });
+  assert.equal(result.checks.configuration.find((item) => item.id === "provider-email").ready, true);
+  assert.equal(result.checks.configuration.find((item) => item.id === "email-sign-up").ready, false, label);
+  assert.equal(result.configurationReady, false, label);
+  assert.equal(result.releaseReady, false, `${label} must fail even with claimed manual evidence.`);
+}
 
 for (const [label, overrides] of [
   ["test instance", { clerkEnvironment: { ...clerkEnvironment, auth_config: { ...clerkEnvironment.auth_config, test_mode: true } } }],

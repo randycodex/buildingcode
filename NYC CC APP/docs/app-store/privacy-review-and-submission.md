@@ -4,13 +4,15 @@ This is the working checklist for App Store version 1.0. It separates preparatio
 
 September 3 live audit: see [current observed Apple state](../../../docs/PERMITEXT_APP_STORE_READONLY_AUDIT_2026-09-03.md). App Store submission and release are the owner's final steps and are not authorized. Older configuration notes below are not proof that Apple fields have been saved.
 
+September 4 repair publication update: [Production and build 56 evidence](../../../docs/PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md) supersedes the earlier build-52 upload status. Build 56 is available to Internal Testers and passed installation, launch, displayed build identity, and existing account/plan/sync/saved-section/Project-container continuity on the iPhone 17 Pro. This is bounded physical acceptance, not completion of the submission matrix. No App Store build selection or submission was performed.
+
 ## Configuration and previously recorded setup
 
 Build/upload and app availability were rechecked September 3. Agreement, bank, tax, and subscription-price entries below retain earlier evidence and need a final live confirmation; do not treat this entire list as a new audit.
 
 - Bundle ID: `com.randycodex.permitext`
 - Version: `1.0`
-- Latest uploaded TestFlight build verified September 3: `52`; no App Store build is selected
+- Latest verified uploaded/internal TestFlight build: `56` (September 4); no App Store build was selected during the repair publication
 - App Store Connect/TestFlight build: confirm the exact live build before selecting the submission candidate
 - Minimum iOS: `17.0`
 - Device family: iPhone only
@@ -30,7 +32,7 @@ Build/upload and app availability were rechecked September 3. Agreement, bank, t
 
 These answers are derived from the app privacy manifest and the published privacy policy. They must be checked against App Store Connect's current wording before being submitted.
 
-September 3 source audit corrected Search History, Performance Data, and Other Diagnostic Data. The owner subsequently approved applying the provider disclosure proposal to the local release package: Device ID, Coarse Location, and Analytics purposes for User ID and Product Interaction are now also reflected in the local manifest. See the [source-to-declaration evidence](../../../docs/PERMITEXT_PRIVACY_DATA_FLOW_AUDIT_2026-09-03.md) and [approved local scope](../../../docs/PERMITEXT_PRIVACY_PROVIDER_DISCLOSURE_PROPOSAL_2026-09-03.md). These corrections are not published App Store answers or a replacement TestFlight binary. Exact policy wording/publication, remaining provider review and final candidate privacy aggregation remain separate gates.
+September 3 source audit corrected Search History, Performance Data, and Other Diagnostic Data. The owner subsequently approved applying the provider disclosure proposal to the local release package: Device ID, Coarse Location, and Analytics purposes for User ID and Product Interaction are now also reflected in the manifest included in uploaded build 56. See the [source-to-declaration evidence](../../../docs/PERMITEXT_PRIVACY_DATA_FLOW_AUDIT_2026-09-03.md) and [approved local scope](../../../docs/PERMITEXT_PRIVACY_PROVIDER_DISCLOSURE_PROPOSAL_2026-09-03.md). Semantic aggregation of all privacy manifests physically present in the signed build-56 archive verified 13 collected categories, three required-reason API groups, and no tracking. This is not an Apple Organizer PDF or a provider-policy attestation, and the App Store questionnaire has not been published. The strict live audit also verified the exact previously approved policy artifacts; remaining provider-disclosure wording review and final client consent acceptance remain separate.
 
 ### Tracking
 
@@ -130,7 +132,7 @@ Review-access plan (requires approval and verification before submission):
 
 ## Version 1.0 items still required in App Store Connect
 
-- Select the exact final version 1.0 build only after its upload and physical-device acceptance; build 52 is uploaded but not selected for App Store review
+- Select the exact final version 1.0 build only after its upload and required physical-device acceptance; build 56 is uploaded and has bounded continuity evidence but has not been selected for App Store review
 - Recapture and inspect final release-build iPhone screenshots before upload; the old build-33 Reader image contains a debug control
 - Enter description, keywords, URLs, and copyright
 - Add the app's free price schedule
@@ -161,16 +163,17 @@ The production endpoint is `https://permitext.com/billing/apple/notifications` a
 
 ## Completed StoreKit evidence
 
-- TestFlight sandbox purchase granted Pro to the signed-in Permitext account
-- Pro persisted after relaunch
-- Restore Subscription restored the entitlement
-- An Apple purchase did not leak to a different Permitext account
-- An accelerated sandbox renewal was observed through continuing Pro access
+The [isolated Apple Sandbox lifecycle record](../../../docs/PERMITEXT_APPLE_APP_STORE_CONNECT_READINESS_EVIDENCE_2026-08-28.md) records the completed August 28–29 exercise on staging-targeted builds 44–48. It must not be represented as a production purchase or a build-56 purchase test.
+
+- Purchase, signed ownership binding, relaunch continuity, Restore, and mismatched-account isolation
+- Cancellation-period access retention and expiration back to Free
+- Renewal, billing failure/recovery, refund form submission and refund revocation
+- Apple-created delayed notification recovery and strict duplicate delivery
 
 Not yet completed:
 
-- Observe accelerated sandbox expiration and verify the account returns to Free without deleting user work
-- Final physical-device smoke test of the exact submission build
+- Complete the remaining physical-device acceptance matrix for the exact submission build; build 56 installation and the documented continuity observations already passed
+- Verify the actual reviewer subscription and backend-feature path on the final candidate; local Sandbox Pro and staging-verified Pro are distinct from Production backend entitlement
 - Production purchase lifecycle after Apple approves the subscription and app
 
 ## Final submission boundary

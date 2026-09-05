@@ -41,6 +41,18 @@ See the [publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-0
 This supersedes the unpublished status in the historical ledgers below; it does
 not close the remaining acceptance items or authorize public App Store submission.
 
+## Post-publication authentication acceptance
+
+Fresh email registration is currently blocked in the Production hosted Account
+Portal: sign-in accepts an email identifier, but sign-up offers only the three
+social providers. The Clerk dashboard and public environment show optional email.
+The readiness audit now rejects this configuration instead of accepting email
+sign-in factors as sufficient configuration evidence. See the
+[current authentication record](./PERMITEXT_PRODUCTION_AUTH_CONFIGURATION_EVIDENCE_2026-08-29.md).
+The live setting has not been changed, and the new audit guard is on this repair
+branch. Disposable-account setup and its later export/deletion approval remain
+separate from the already completed publication.
+
 ## First repair batch
 
 Status: implementation and local verification complete in `38ed70d08` and

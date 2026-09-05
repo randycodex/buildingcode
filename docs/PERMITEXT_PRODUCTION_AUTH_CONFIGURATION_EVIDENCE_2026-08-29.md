@@ -2,6 +2,58 @@
 
 ## Result
 
+**September 4 final-Production refresh supersedes the configuration-ready result below.**
+On release `553e82e074eb3751edf72be8c7579990f91e3bd3`, a fresh, owner-designated
+disposable email was rejected by the hosted sign-in page as an unknown account.
+The linked sign-up page displayed Apple, Google, and Microsoft but no email field.
+The Production Clerk dashboard and public environment agree: email sign-up and
+code verification are enabled, but `Require email address` is off
+(`user_settings.attributes.email_address.required: false`).
+
+The permanent audit now checks public hosted email sign-up separately from
+existing-account email sign-in. It fails closed unless email is enabled, required,
+verified at sign-up by code, and public sign-up is enabled. Live provider evidence
+fails that new check. The earlier ten passing checks did not test this setting;
+they must not be cited as proof that fresh email registration works.
+
+No live Clerk setting was changed. Before enabling the required-email setting,
+review its effect on existing and fresh Apple/Google/Microsoft identities,
+including Apple's private relay and the previously accepted iOS flow that avoids
+asking users to re-enter their email. Clerk's
+[email-code configuration instructions](https://clerk.com/docs/guides/development/custom-flows/authentication/email-sms-otp)
+require an email address and verification at sign-up for this flow. Final rendered
+registration and provider regression checks remain required after a configuration
+repair. A custom email flow would need its own product/security review and is not
+assumed as an alternative that already works.
+
+The test address and account exports are not recorded here. An initial automatic
+Google return reused the existing owner identity and was excluded from fresh
+test-account acceptance. After the owner completed Google verification, the
+operator explicitly selected the disposable identity in Google's chooser. Clerk
+recorded its creation on September 4; Permitext returned an empty Free account
+with Synced status and no owner records. The operator added one BC 2022 section
+101.1 saved passage, one synthetic note, and one synthetic saved collection.
+Policy links and the unchecked, enabled consent control rendered on the final
+Free-account page; the upgrade button remained disabled. No policy agreement,
+purchase, paid Research, or deletion was submitted. Independent-client sync,
+complete export and deletion acceptance remain open.
+
+The local operator credential was rejected with HTTP 401 by the read-only
+restore-checklist endpoint. No raw export was obtained and no privileged write was
+attempted. The representative Project/private-image/Research-history portion also
+requires a separately reviewed preparation route: the Free UI permits saved
+collections but disables Projects. Do not grant Pro or make a purchase merely to
+fill that gap without an approved test scope.
+
+Verification: the updated `npm run test:auth` suite and the real-entry-point
+`web-account-mutation-isolation-contract.mjs` passed. The auth run first exposed an
+obsolete Workboard-deletion source assertion; it now checks the repaired captured
+owner cleanup and preserves unowned legacy Workboard bytes. The live public audit
+at `2026-09-05T00:56:28Z` passed the nine other public checks and failed
+`email-sign-up`; that request did not inspect hidden server environment values.
+
+### Historical August 29 result
+
 The read-only Production authentication configuration audit passes at the Clerk provider and checked-in server-contract layers. This is configuration evidence, not proof that every fresh and existing account can complete every provider flow after the final deployment.
 
 The permanent audit reports:
