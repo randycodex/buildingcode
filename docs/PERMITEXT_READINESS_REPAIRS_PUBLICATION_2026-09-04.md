@@ -5,7 +5,24 @@ TestFlight. This record distinguishes publication from the wider acceptance
 requirements in the [repair backlog](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md).
 It does not authorize public App Store submission or close those requirements.
 
-Latest repair checkpoint: PR [#51](https://github.com/randycodex/buildingcode/pull/51)
+Latest repair checkpoint: PR [#52](https://github.com/randycodex/buildingcode/pull/52)
+publishes `ae40953603cf9308a64d6da5657c27cf9175d99b` (client v45). Production
+`dpl_8oTbEHtNFGLHTXftsvV7MPvM1zQx` is READY; both origins, six assets each,
+and health match. The visible Note-to-Report refresh, exact-revision export and
+bounded simultaneous-edit rejection passed. Build 60's native Project-facts PDF
+repair passed its generated-PDF test and visual inspection. Its signed archive
+uploaded and is available to Internal Testers; physical installation and the
+actual qualified-facts PDF export passed. The temporary test grant is revoked,
+with the phone's Free plan and explicit Notebook permission state verified in the
+[execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md).
+
+The separately approved populated test-account deletion then passed on build 60:
+native identity verification, account/device/provider completion, zero remaining
+account/session/record counts, all five private Blob files absent, and signed-out
+web reload without account resurrection. Historical unknown-owner cache bytes
+remain disclosed and are not claimed erased.
+
+Preceding repair checkpoint: PR [#51](https://github.com/randycodex/buildingcode/pull/51)
 published the secure sign-out repair at `41ba0314dbfc9de17698b5dca37bbb7d74bd4490`
 (client v44). Production `dpl_6EYL8gqmari9dcq9B3NJEnZchiew` is READY; both
 canonical origins and six byte-identical assets per origin match. Health and the
@@ -13,8 +30,8 @@ actual reload → sign-out → authentication-page regression passed. The approv
 required-email configuration and fresh email registration also passed. Current
 recovery evidence and temporary disposable-account access are in the
 [September 5 execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md).
-Native runtime inputs remain build 59; only four synthetic UI test launch
-arguments changed under the native project.
+At that preceding checkpoint, native runtime inputs remained build 59; only four
+synthetic UI test launch arguments changed under the native project.
 
 Preceding checkpoint: the [September 5 account-deletion verification repair](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
 includes PRs #46–49. The final loader source is

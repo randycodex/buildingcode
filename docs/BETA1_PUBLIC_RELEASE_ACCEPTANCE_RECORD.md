@@ -34,12 +34,24 @@ Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-releas
 Release-bound: **yes**
 
 Latest September 5 web recovery evidence: the [audit execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md)
+tracks PR #52 at `ae40953603cf9308a64d6da5657c27cf9175d99b`, Production
+`dpl_8oTbEHtNFGLHTXftsvV7MPvM1zQx`, exact assets/health and the live Report
+snapshot/export/concurrency checks. The native Project-facts PDF repair passed
+its test and two-page visual inspection. Build 60 is uploaded, internally
+available and physically installed; its actual PDF export preserves the qualified
+facts. Temporary Pro test access is revoked and the native permission message
+and Free plan were verified. Separately approved populated-account deletion
+passed on build 60, with independent zero-record/private-file checks, Clerk
+Production lookup and signed-out web reload. Broader release acceptance remains
+separate; unknown-owner historical caches are not claimed erased.
+
+Preceding September 5 web recovery evidence in that record
 tracks PR #51 at `41ba0314dbfc9de17698b5dca37bbb7d74bd4490`, Production
 `dpl_6EYL8gqmari9dcq9B3NJEnZchiew`, matching release/asset checks on both
 origins, PostgreSQL health and the rendered secure sign-out regression.
 The owner-approved email requirement and fresh email registration passed.
-Native runtime remains build 59; broader cross-device and final release gates
-remain open in that execution record.
+Native runtime at that preceding checkpoint remained build 59; broader
+cross-device and final release gates remain open in that execution record.
 
 Preceding September 5 recovery evidence: the [verification repair record](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
 tracks verified web source `38ba9536d36ae5099376482dbbe4cf44f0ea5142` through
@@ -226,10 +238,19 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN — Production and internally available TestFlight build 58 share source; final device acceptance remains incomplete**
+Status: **OPEN — Report repair verified on Production and physical TestFlight build 60; final device acceptance remains incomplete**
 Release-bound: **yes**
 
 ### Current candidate and latest verified clients
+
+- Latest repair source: `ae40953603cf9308a64d6da5657c27cf9175d99b`, Production deployment `dpl_8oTbEHtNFGLHTXftsvV7MPvM1zQx`, with both origins, six assets each, and PostgreSQL health verified. The final public-release candidate remains unselected.
+- Build 60 archived from that source; executable SHA-256 `b6af915ada081303619352c299cecaac78e91ff4e754c3a519e844869e2b928e`. Upload succeeded at `2026-09-05T20:38:47.421Z`; Apple processing and the existing Internal Testers group with one invite were verified at 20:48 UTC.
+- The owner installed 1.0 (60); physical TestFlight displayed Open at approximately `2026-09-05T20:59Z`. The disposable account and synthetic Project recovered. The actual iOS PDF saved successfully and visibly preserved the qualified Project facts, reconciled Report edits and professional-use notice.
+- Final temporary-grant revocation was independently confirmed at `2026-09-05T21:02:53.869Z`, with synthetic records retained and zero Research usage. The phone showed an explicit requires-Pro Notebook message and Free Active/Billing None/Synced. Broader physical offline, unsent-draft, account-lifecycle and professional Research acceptance remain open.
+- The owner separately approved populated-account deletion. Build 60 completed native verification/deletion; exact-target checks at `2026-09-05T21:16:47.510Z` and after web reload at `2026-09-05T21:18:43.672Z` confirm all account/session/record counts zero and all five private Blob files absent. Clerk Production lookup returned no matching identity/email. Native cleanup disclosed retained unknown-owner historical caches; this bounded result does not close the full privacy/account-link/device matrix.
+- Evidence: [September 5 audit execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md).
+
+### Earlier build-58 observations retained with their original limits
 
 - Production application source: `9a89e54e7b70ccb7567b784443b232df005a10ac`, verified on both canonical origins at `2026-09-05T05:09:38Z`.
 - Uploaded native candidate: signed `1.0 (58)` archive from that same full source, executable SHA-256 `beb83a75f74b80eb96a44d121677a9e18155f050808de658e471672bb25d8316`. Archive signing, Production configuration, pinned dependencies and semantic privacy aggregation passed. The same archive was reused after Apple sign-in recovery; upload succeeded at `2026-09-05T12:32:56.741Z` with export exit 0.
