@@ -23,6 +23,24 @@ and the shared Xcode Cloud manifest. It does not contain new audit repairs.
 Build 52 was inspected during the original audit. This publication then installed
 build 53 from the shared baseline; it is not a build of this repair branch.
 
+## Publication of the repairs
+
+After explicit owner approval, PR #38 was merged at the exact repair SHA
+`553e82e074eb3751edf72be8c7579990f91e3bd3`. Production deployment
+`dpl_H6LwjBEGcx5jby2KwdQPW7xw1phc` is READY; both canonical release endpoints
+and the served client files match that source. Production health, universal
+links, approved policy bytes, and the bounded rendered web check passed.
+
+iOS build 56 uploaded successfully from the verified archive. Its native input
+tree is identical to the published branch; its full repository source revision
+is earlier because the last follow-up only changed web/server recovery. Apple
+processing completed and Internal Testers assignment is verified. TestFlight
+installation, launch, the app's build-56 footer, and existing account/plan/sync,
+Project-container and saved-section continuity passed on the iPhone 17 Pro.
+See the [publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md).
+This supersedes the unpublished status in the historical ledgers below; it does
+not close the remaining acceptance items or authorize public App Store submission.
+
 ## First repair batch
 
 Status: implementation and local verification complete in `38ed70d08` and
