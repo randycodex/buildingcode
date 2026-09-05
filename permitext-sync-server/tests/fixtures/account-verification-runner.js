@@ -5,7 +5,7 @@ const output = document.querySelector("#results");
 const publishableKey = "pk_test_" + btoa("synthetic.clerk.accounts.dev$");
 const account = { userID: "clerk:synthetic-user", authProvider: "clerk" };
 function assert(value, message) { if (!value) throw new Error(message); }
-function provider(onPrompt) {
+function provider(onPrompt, { notifyStatus = true } = {}) {
   let fresh = false, deleted = 0;
   const listeners = new Map();
   const clerk = {
@@ -15,7 +15,7 @@ function provider(onPrompt) {
     client: { sessions: [] }, organization: null,
     __internal_updateProps() {},
     addListener(callback) { callback({ user: this.user, session: this.session, client: this.client, organization: null }); return () => {}; },
-    on(event, callback, options) { listeners.set(callback, event); if (options?.notify && event === "status") callback("ready"); },
+    on(event, callback, options) { listeners.set(callback, event); if (notifyStatus && options?.notify && event === "status") callback("ready"); },
     off(_event, callback) { listeners.delete(callback); },
     __internal_openReverification(options) {
       assert(options.level === "second_factor" || options.level === undefined, "Strict verification reaches the SDK modal callback");
@@ -104,6 +104,12 @@ document.querySelector("#run").onclick = async (event) => {
       const captured = verification.captureClerkDeletionIdentity(account, p.clerk);
       for (let i = 0; i < 3; i++) await run(p.clerk, () => verification.clerkDeletionVerification(captured));
       assert(p.clerk.user.id === "synthetic-user" && p.clerk.session.id === "synthetic-session", "Existing session remains");
+    });
+    await check("Already-loaded SDK needs no new ready-status event", async () => {
+      const p = provider(({ complete }) => complete(), { notifyStatus: false });
+      const captured = verification.captureClerkDeletionIdentity(account, p.clerk);
+      assert(await run(p.clerk, () => verification.clerkDeletionVerification(captured)) === true, "Loaded session remains usable without another status event");
+      assert(p.count() === 0, "Preflight itself never deletes the account");
     });
     output.textContent += `\n\n${results.length}/${results.length} integration checks passed. No provider API requests or real deletion.`;
   } catch (error) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { ClerkLoaded, ClerkProvider, useReverification } from "@clerk/react";
+import { ClerkProvider, useReverification } from "@clerk/react";
 import { isReverificationHint } from "@clerk/shared/authorization-errors";
 export {
   captureClerkDeletionIdentity,
@@ -52,14 +52,14 @@ export async function runReverifiedClerkOperation({ clerk, publishableKey, opera
       )), 15000);
       root.render(React.createElement(VerificationBoundary, { onError: reject },
         React.createElement(ClerkProvider, { Clerk: clerk, publishableKey },
-          React.createElement(ClerkLoaded, null,
-            React.createElement(VerificationRequest, {
-              operation,
-              onStart: () => window.clearTimeout(startupTimeout),
-              onSuccess: resolve,
-              onError: reject
-            })
-          )
+          // The supplied instance is already loaded. Waiting for ClerkLoaded
+          // can miss its earlier ready event when this lazy provider mounts.
+          React.createElement(VerificationRequest, {
+            operation,
+            onStart: () => window.clearTimeout(startupTimeout),
+            onSuccess: resolve,
+            onError: reject
+          })
         )
       ));
     });

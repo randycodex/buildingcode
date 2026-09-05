@@ -5,9 +5,10 @@ TestFlight. This record distinguishes publication from the wider acceptance
 requirements in the [repair backlog](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md).
 It does not authorize public App Store submission or close those requirements.
 
-Latest web publication: the [September 5 device-draft concurrency repair](./PERMITEXT_WEB_DRAFT_CONCURRENCY_REPAIR_2026-09-05.md#production-publication)
-is live at `0985728b26e5b247d758fce26c4e0739efef986f` (PR #45, client v39).
-TestFlight build 58 remains current with unchanged native source. Earlier
+Latest web publication: the [September 5 account-deletion verification repair](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md#verified-web-publication-and-build-59)
+is live at `7a283d5f27d14df59cf3b18cdb81b143939b5e62` (PRs #46–47, client v41).
+Build 59 uploaded successfully; Apple processing and physical verification are
+pending. Build 58 remains the last physically verified installation. Earlier
 publication entries below are retained as history.
 
 ## Source and Production
