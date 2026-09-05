@@ -15,6 +15,16 @@ installation. Production subsequently advanced to web-only repair
 the full source SHAs differ. The final common candidate remains unselected. See
 the [build 57 and current Production evidence](../../../docs/PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-57-source-alignment-candidate).
 
+Later September 5 update: the native navigation-label repair and inspected local
+build-58 screenshot candidate are recorded in the [latest publication record](../../../docs/PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-navigation-labels-and-build-58).
+Production and the verified build-58 archive now share full source
+`9a89e54e7b70ccb7567b784443b232df005a10ac`. Apple account access blocked export/upload
+before transfer; this archive has not been uploaded. Restore Apple sign-in
+and retry the retained archive. Build 57 remains the latest confirmed internally
+available build, with build 56 the last physically checked installation. The
+signed build-58 archive again passed semantic privacy aggregation; no public
+questionnaire, screenshot upload, build selection or submission was performed.
+
 ## Configuration and previously recorded setup
 
 Build/upload and app availability were rechecked September 3. Agreement, bank, tax, and subscription-price entries below retain earlier evidence and need a final live confirmation; do not treat this entire list as a new audit.

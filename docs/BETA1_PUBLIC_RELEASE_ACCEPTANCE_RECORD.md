@@ -33,13 +33,13 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-- Last verified application source: `1afdafd19ca4947d19e46350748506668c90790c`, deployment `dpl_8QPPG8v7i62Ey5rXFsdXuUMKP1oQ`, READY.
-- Both canonical origins returned that exact application SHA, Production environment and deployment host at `2026-09-05T04:26:53Z`.
+- Last verified application source: `9a89e54e7b70ccb7567b784443b232df005a10ac`, deployment `dpl_HWoChFH39P9eYKeCE3uNvBJUaDd3`, READY.
+- Both canonical origins returned that exact application SHA, Production environment and deployment host at `2026-09-05T05:09:38Z`.
 - Served app, offline-storage, service-worker and stylesheet bytes matched the tested source on both origins. The HTML and rendered browser loaded client `20260905-saved-section-visibility-v38`.
-- PostgreSQL `normalized-v4` health, AASA and approved-policy publication checks passed. The bounded deployment error/fatal aggregate and captured browser console errors were empty; this is not sustained-load or latency evidence.
-- The designated disposable account retained four saved entries, one synthetic note and one empty collection. Its previously hidden whole-section save is visible after reload; 2022 Gates and 2014 Slope reopen in their correct Reader editions. The legacy workspace ownership warning remains.
-- Evidence: [Saved visibility publication](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#whole-section-saved-visibility-publication), following account-export, private-file ownership, account-operation and shared-data repairs in that same record.
-- Internal TestFlight build 57 is available from full source `acafd9642a07e049c218f9816432341de8aec0cc`. Its native runtime tree is unchanged by this subsequent web-only repair, but the full repository SHAs differ. Build 56 remains the last physically verified installation. See [build 57 evidence](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-57-source-alignment-candidate).
+- PostgreSQL `normalized-v4` health, AASA and approved-policy publication checks passed. The bounded deployment error/fatal aggregate was empty; this is not sustained-load or latency evidence.
+- The designated disposable account retained four saved entries, one synthetic note and one empty collection after reload. Gates and Slope remain visible, the 2014 Reader is retained, and the legacy workspace ownership warning remains. Correct edition reopening was verified in the preceding Saved visibility publication, whose client bytes are unchanged.
+- Evidence: [native navigation repair publication](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-navigation-labels-and-build-58), following Saved visibility, account-export, private-file ownership, account-operation and shared-data repairs in that same record.
+- The signed build-58 archive matches the current full Production source and passed verification, but Apple account access blocked its upload. Internal TestFlight build 57 from `acafd9642a07e049c218f9816432341de8aec0cc` remains the latest confirmed available build and does not contain the newer native navigation-label repair. Build 56 remains the last physically verified installation. Restore Apple sign-in and retry the retained build-58 archive before claiming shared web/TestFlight source acceptance.
 - Historical build-51 binding to `195de4f31229d785760eef570a658208f1f4e47d` remains in its [physical-iPhone record](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
 The final shared web/TestFlight candidate remains unselected. Source publication, TestFlight availability, physical acceptance and owner go/no-go are separate evidence layers; all machine gates remain open.

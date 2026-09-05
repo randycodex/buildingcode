@@ -378,10 +378,13 @@ Simulator capture command; it requires the signed-out UI before collecting the
 four named submission captures. Raw failure diagnostics still require restricted
 handling and visual review before any sharing.
 
-This is local Release and accessibility-tree evidence, not physical VoiceOver
-acceptance. Production/internal-TestFlight publication of this native repair
-remains pending; the currently available internal build is still 57. The owner
-is away, and no phone, account deletion, paid Research or public App Store
+PR #44 published full source `9a89e54e7b70ccb7567b784443b232df005a10ac` to
+Production, and the signed build-58 archive from that source passed verification.
+Apple rejected export/upload because its account requires renewed sign-in; retain
+and retry the same archive after access is restored. Build 57 remains the latest
+confirmed internal TestFlight build. See the [publication and retry record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-navigation-labels-and-build-58).
+Local Release/accessibility-tree checks do not establish physical VoiceOver
+acceptance. No phone, account deletion, paid Research or public App Store
 submission was used. The prior build-33 screenshot package remains historical.
 
 ## Critical findings

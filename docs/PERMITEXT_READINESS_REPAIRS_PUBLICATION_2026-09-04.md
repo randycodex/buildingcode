@@ -342,3 +342,68 @@ open. Physical build-57 verification, Production operator export, reviewed
 deletion and the remaining owner/provider acceptance steps await their required
 access or approval. No phone use, account deletion, paid Research, purchase,
 entitlement grant, App Store submission or navigation redesign occurred.
+
+## Native navigation labels and build 58
+
+PR [#44](https://github.com/randycodex/buildingcode/pull/44) merged by fast-forward
+at `2026-09-05T05:06:37Z`, retaining exact source
+`9a89e54e7b70ccb7567b784443b232df005a10ac`.
+
+- The actual Release Simulator hierarchy exposed Saved as `Move`, both Readers
+  by their SF Symbol identifiers, and a chapter card as `Chapter Chapter 7`.
+  Destination labels now belong to the tab-item images, and chapter cards use
+  their existing chapter/appendix display label once.
+- The initial Release UI capture failed on the missing Saved label. The repaired
+  capture passed all five tab names, chapter/edition identity, Reader debug-control
+  absence, search and Saved navigation. The final run also checked every tab was
+  hittable before capture and allowed the keyboard/tab-bar transition to settle.
+- Four current `1320 × 2868` PNGs and JPEG copies are retained in the
+  [build 58 screenshot candidate](../NYC%20CC%20APP/docs/app-store/screenshots/build58-candidate/provenance.json).
+  All four settled PNGs and the Reader JPEG were visually inspected; every JPEG
+  passed dimension and no-alpha checks. No application pixels were retouched.
+  The capture used the signed-out iPhone 17 Pro Max Simulator on iOS 26.5.
+- Preview `dpl_9kp7by7yuqFCTScjR5vrYciMxD5g` passed its build check. The authenticated
+  CLI returned exact source `9a89e54e7b70ccb7567b784443b232df005a10ac`, Preview
+  environment and `permitext-sync-brx41dmcq-randycodexs-projects-b72fc111.vercel.app`.
+  The MCP fetch returned an SSO redirect, which was not counted as release proof.
+- Production `dpl_HWoChFH39P9eYKeCE3uNvBJUaDd3` became READY at
+  `2026-09-05T05:09:11.176Z`. Both canonical origins returned the exact source,
+  Production environment and
+  `permitext-sync-8gfq1dak3-randycodexs-projects-b72fc111.vercel.app` at
+  `2026-09-05T05:09:38.183Z`. Client bytes remain identical to the verified v38
+  Saved repair. Health, universal links and strict approved-policy checks passed;
+  the bounded deployment error/fatal aggregate was empty.
+- The Production browser displayed release `9a89e54e7b70`, returned to Synced
+  after reload, and retained four saves, one synthetic note, Gates/Slope entries,
+  the 2014 Reader and the legacy ownership warning. The Account panel was closed
+  after verification. No customer cleanup or new paid request was performed.
+- GitHub subsequently reported both Vercel and Apple `permitext | Default`
+  successful for this commit. Apple CI job
+  `c76c4ce2-9d9e-4c43-9b90-f8941b0d4963` is distinct from a TestFlight upload.
+
+Build 58 was archived from that same full source. The retained archive is
+`/private/tmp/permitext-1.0-58-9a89e54e7.xcarchive`. Strict deep signing, team and
+entitlement comparison, Production backend/live Clerk configuration, clean pinned
+dependency checkouts, and semantic privacy aggregation passed. Its native runtime
+tree is `52dbb515963108de06568fa85baab5994ea5511f`, matching the captured source;
+the signed executable SHA-256 is
+`beb83a75f74b80eb96a44d121677a9e18155f050808de658e471672bb25d8316`.
+Privacy aggregation remains 13 categories, three required-reason API groups and
+no tracking, with the previously stated provider/Organizer evidence limits.
+
+**Upload stopped on Apple account access.** Xcode export returned exit 70 with
+`Failed to Use Accounts` and required App Store Connect access for team
+`57BY95X97H`. The browser independently showed Apple's sign-in form. Build 58
+was not uploaded; restore authorized Apple account access and retry export/upload
+using this same archive. Do not rebuild or increment solely for this authentication
+failure. Build 57 remains the latest confirmed internally available build, and
+build 56 remains the last physically verified installation. Final shared-client,
+VoiceOver, account-lifecycle and public release acceptance remain open.
+
+Retained local evidence: `/private/tmp/permitext-store-capture58-settled.xcresult`,
+`/private/tmp/permitext-build58-final-evidence.json`,
+`/private/tmp/permitext-build58-privacy-aggregate.json`,
+`/private/tmp/permitext-build58-upload.log`, and
+`/private/tmp/permitext-native-navigation-production-release.json` with the
+matching health, policy, AASA and browser evidence files. No phone use, App Store
+screenshot upload, build selection or public submission occurred.
