@@ -380,12 +380,17 @@ handling and visual review before any sharing.
 
 PR #44 published full source `9a89e54e7b70ccb7567b784443b232df005a10ac` to
 Production, and the signed build-58 archive from that source passed verification.
-Apple rejected export/upload because its account requires renewed sign-in; retain
-and retry the same archive after access is restored. Build 57 remains the latest
-confirmed internal TestFlight build. See the [publication and retry record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-navigation-labels-and-build-58).
+The initial Apple account-access failure was resolved after the owner restored
+sign-in. The same archive uploaded successfully at `2026-09-05T12:32:56.741Z`;
+build 58 is processed and available to Internal Testers. See the
+[publication and retry record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-58-upload-after-apple-sign-in-recovery).
 Local Release/accessibility-tree checks do not establish physical VoiceOver
-acceptance. No phone, account deletion, paid Research or public App Store
-submission was used. The prior build-33 screenshot package remains historical.
+acceptance. The owner installed build 58 through TestFlight; the running app's
+Account footer independently confirmed the build. Existing account/plan/sync,
+Saved/Project containers and the Fuel Gas Code 2022 selection were retained.
+Physical VoiceOver confirmation and the broader final-device matrix remain open.
+No account deletion, paid Research or public App Store submission was used.
+The prior build-33 screenshot package remains historical.
 
 ## Critical findings
 

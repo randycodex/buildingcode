@@ -18,10 +18,14 @@ the [build 57 and current Production evidence](../../../docs/PERMITEXT_READINESS
 Later September 5 update: the native navigation-label repair and inspected local
 build-58 screenshot candidate are recorded in the [latest publication record](../../../docs/PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-navigation-labels-and-build-58).
 Production and the verified build-58 archive now share full source
-`9a89e54e7b70ccb7567b784443b232df005a10ac`. Apple account access blocked export/upload
-before transfer; this archive has not been uploaded. Restore Apple sign-in
-and retry the retained archive. Build 57 remains the latest confirmed internally
-available build, with build 56 the last physically checked installation. The
+`9a89e54e7b70ccb7567b784443b232df005a10ac`. The initial Apple account-access failure
+was resolved after the owner restored sign-in. The same archive uploaded at
+`2026-09-05T12:32:56.741Z`; build 58 is now processed and available to Internal
+Testers. Its installation, displayed build identity and bounded existing-account
+continuity were subsequently verified on the iPhone 17 Pro; build 58 is now the
+last physically checked installation. Broader final-device acceptance remains
+open. See the
+[successful retry record](../../../docs/PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-58-upload-after-apple-sign-in-recovery). The
 signed build-58 archive again passed semantic privacy aggregation; no public
 questionnaire, screenshot upload, build selection or submission was performed.
 
@@ -31,7 +35,7 @@ Build/upload and app availability were rechecked September 3. Agreement, bank, t
 
 - Bundle ID: `com.randycodex.permitext`
 - Version: `1.0`
-- Latest verified uploaded/internal TestFlight build: `57` (September 5); no App Store build was selected during the repair publication
+- Latest verified uploaded/internal TestFlight build: `58` (September 5); no App Store build was selected during the repair publication
 - App Store Connect/TestFlight build: confirm the exact live build before selecting the submission candidate
 - Minimum iOS: `17.0`
 - Device family: iPhone only
@@ -152,7 +156,7 @@ Review-access plan (requires approval and verification before submission):
 
 ## Version 1.0 items still required in App Store Connect
 
-- Select the exact final version 1.0 build only after its upload and required physical-device acceptance; build 57 is internally available, while build 56 has the latest bounded physical continuity evidence. Neither this checklist nor the repair publication selects a final App Store build.
+- Select the exact final version 1.0 build only after its upload and required physical-device acceptance; build 58 is internally available and has bounded physical installation/continuity evidence, while the broader matrix remains open. Neither this checklist nor the repair publication selects a final App Store build.
 - The build-58 Release screenshot candidate has been captured and inspected. Confirm it matches the selected final source before uploading; recapture if that source changes the pictured UI. Preserve the old build-33 package as historical evidence because its Reader image contains a debug control.
 - Enter description, keywords, URLs, and copyright
 - Add the app's free price schedule

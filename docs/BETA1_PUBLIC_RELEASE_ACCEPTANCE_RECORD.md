@@ -39,7 +39,7 @@ Release-bound: **yes**
 - PostgreSQL `normalized-v4` health, AASA and approved-policy publication checks passed. The bounded deployment error/fatal aggregate was empty; this is not sustained-load or latency evidence.
 - The designated disposable account retained four saved entries, one synthetic note and one empty collection after reload. Gates and Slope remain visible, the 2014 Reader is retained, and the legacy workspace ownership warning remains. Correct edition reopening was verified in the preceding Saved visibility publication, whose client bytes are unchanged.
 - Evidence: [native navigation repair publication](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-navigation-labels-and-build-58), following Saved visibility, account-export, private-file ownership, account-operation and shared-data repairs in that same record.
-- The signed build-58 archive matches the current full Production source and passed verification, but Apple account access blocked its upload. Internal TestFlight build 57 from `acafd9642a07e049c218f9816432341de8aec0cc` remains the latest confirmed available build and does not contain the newer native navigation-label repair. Build 56 remains the last physically verified installation. Restore Apple sign-in and retry the retained build-58 archive before claiming shared web/TestFlight source acceptance.
+- The signed build-58 archive matches the current full Production source and passed verification. After the owner restored Apple sign-in, the same archive uploaded successfully and is processed and available to Internal Testers. Both canonical Production origins still returned that source at `2026-09-05T12:31:34Z`. Build 58 subsequently passed installation, displayed build identity and bounded existing account/plan/sync/Saved/Project-container continuity on the iPhone 17 Pro. Broader device/account acceptance remains open. See the [successful retry and device record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-58-upload-after-apple-sign-in-recovery).
 - Historical build-51 binding to `195de4f31229d785760eef570a658208f1f4e47d` remains in its [physical-iPhone record](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
 The final shared web/TestFlight candidate remains unselected. Source publication, TestFlight availability, physical acceptance and owner go/no-go are separate evidence layers; all machine gates remain open.
@@ -67,10 +67,10 @@ The controlled monetary and entitlement lifecycle does not need another paid Bet
 ## Production authentication and account lifecycle
 
 Gate ID: `production-auth-account-lifecycle`
-Status: **OPEN — persisted-account continuity retained through physical build 56 and current web; fresh/remaining providers and complete deletion remain open**
+Status: **OPEN — persisted-account continuity retained through physical build 58 and current web; fresh/remaining providers and complete deletion remain open**
 Release-bound: **yes**
 
-September 5 follow-up: build 56 retained the existing native account/plan/sync and Saved/Project-container state; build 57 is processed and internally available but not yet physically checked. Current web continuity and account-operation repairs are recorded in the [repair publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md). Fresh email registration is blocked by the unchanged hosted-provider configuration. The designated Free test account has four saved entries, one synthetic note and an empty collection, but its complete operator export, representative Project/Research/private-file coverage, reviewed deletion, provider cleanup and recreation remain open. The current Production operator credential is still required. These observations do not satisfy the fresh sign-in fields below.
+September 5 follow-up: build 58 is processed and internally available, with its installation, displayed build identity and existing native account/plan/sync/Saved/Project-container continuity physically verified. Current web continuity and account-operation repairs are recorded in the [repair publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-58-upload-after-apple-sign-in-recovery). Fresh email registration is blocked by the unchanged hosted-provider configuration. The designated Free test account has four saved entries, one synthetic note and an empty collection, but its complete operator export, representative Project/Research/private-file coverage, reviewed deletion, provider cleanup and recreation remain open. The current Production operator credential is still required. These observations do not satisfy the fresh sign-in fields below.
 
 - Fresh-account email-code sign-in:
 - Fresh-account Apple sign-in:
@@ -192,18 +192,18 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN — Production and verified build-58 archive share source; Apple sign-in blocks upload and final device acceptance remains incomplete**
+Status: **OPEN — Production and internally available TestFlight build 58 share source; final device acceptance remains incomplete**
 Release-bound: **yes**
 
 ### Current candidate and latest verified clients
 
 - Production application source: `9a89e54e7b70ccb7567b784443b232df005a10ac`, verified on both canonical origins at `2026-09-05T05:09:38Z`.
-- Prepared native candidate: signed `1.0 (58)` archive from that same full source, executable SHA-256 `beb83a75f74b80eb96a44d121677a9e18155f050808de658e471672bb25d8316`. Archive signing, Production configuration, pinned dependencies and semantic privacy aggregation passed. Export/upload failed on Apple account access before transfer; retry this retained archive after sign-in is restored.
-- Latest confirmed internally available TestFlight build: `1.0 (57)` from `acafd9642a07e049c218f9816432341de8aec0cc`. It lacks build 58's native navigation-label repair and has not received physical acceptance.
-- Last physically verified installation: `1.0 (56)` on the iPhone 17 Pro at approximately `2026-09-05T00:39Z`. Installation, launch, displayed build identity and existing account/plan/sync/saved-section/Project-container continuity passed. This does not establish all final-candidate workflows.
+- Uploaded native candidate: signed `1.0 (58)` archive from that same full source, executable SHA-256 `beb83a75f74b80eb96a44d121677a9e18155f050808de658e471672bb25d8316`. Archive signing, Production configuration, pinned dependencies and semantic privacy aggregation passed. The same archive was reused after Apple sign-in recovery; upload succeeded at `2026-09-05T12:32:56.741Z` with export exit 0.
+- Latest confirmed internally available TestFlight build: `1.0 (58)`, App Store Connect record `c2408f97-fe34-4a83-9e3e-07e5ea779197`. Upload status is Complete and build status is Ready to Submit, with Internal Testers and one invitation. Bounded physical installation and continuity passed; broader acceptance remains open.
+- Last physically verified installation: `1.0 (58)` on the iPhone 17 Pro, independently confirmed in the running app Account footer at approximately `2026-09-05T12:45Z` after the owner installed the TestFlight update. Existing signed-in account, Lifetime Pro, 98 remaining included turns, Synced status, saved Building Code passage, Project containers and Fuel Gas Code 2022 selection were retained. Saved, First reader and Account navigation passed. This does not establish all final-candidate workflows.
 - Build 58's Release Simulator capture passed destination accessibility names, chapter/edition identity, Reader, Search and Saved navigation. Four inspected screenshot candidates are retained. These checks do not replace physical VoiceOver, offline/recovery, account-lifecycle or professional-handoff acceptance.
 - Earlier physical wide-table and VoiceOver observations remain bounded build-54 evidence. They are not a build-58 device result.
-- Evidence: [current publication and archive/upload outcome](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-navigation-labels-and-build-58), [build-57 availability](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-57-source-alignment-candidate), and [build-56 device continuity](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-archive-and-upload).
+- Evidence: [build-58 publication and verification](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-navigation-labels-and-build-58), [successful upload and availability](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-58-upload-after-apple-sign-in-recovery), and [build-56 device continuity](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-archive-and-upload).
 
 ### Earlier build-51/52 observations retained with their original limits
 
@@ -245,4 +245,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: restore authorized Apple account access and retry the retained build-58 upload. The Production operator credential and final account/device checks also require owner participation; keep the remaining gates open until their evidence is complete.
+- Next technical step: finish build-58 physical VoiceOver and the remaining final device/account workflows. The Production operator credential and remaining account checks require owner participation; keep the remaining gates open until their evidence is complete.

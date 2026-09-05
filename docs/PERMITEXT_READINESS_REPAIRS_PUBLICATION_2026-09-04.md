@@ -391,14 +391,14 @@ the signed executable SHA-256 is
 Privacy aggregation remains 13 categories, three required-reason API groups and
 no tracking, with the previously stated provider/Organizer evidence limits.
 
-**Upload stopped on Apple account access.** Xcode export returned exit 70 with
+**Initial upload stopped on Apple account access.** Xcode export returned exit 70 with
 `Failed to Use Accounts` and required App Store Connect access for team
-`57BY95X97H`. The browser independently showed Apple's sign-in form. Build 58
-was not uploaded; restore authorized Apple account access and retry export/upload
-using this same archive. Do not rebuild or increment solely for this authentication
-failure. Build 57 remains the latest confirmed internally available build, and
-build 56 remains the last physically verified installation. Final shared-client,
-VoiceOver, account-lifecycle and public release acceptance remain open.
+`57BY95X97H`. The browser independently showed Apple's sign-in form. At that point,
+build 58 had not uploaded, build 57 was the latest confirmed internally available
+build and build 56 was the last physically verified installation. The subsequent
+[same-archive retry](#build-58-upload-after-apple-sign-in-recovery) resolved the
+upload blocker. Final shared-client, VoiceOver, account-lifecycle and public release
+acceptance remain open.
 
 Retained local evidence: `/private/tmp/permitext-store-capture58-settled.xcresult`,
 `/private/tmp/permitext-build58-final-evidence.json`,
@@ -407,3 +407,41 @@ Retained local evidence: `/private/tmp/permitext-store-capture58-settled.xcresul
 `/private/tmp/permitext-native-navigation-production-release.json` with the
 matching health, policy, AASA and browser evidence files. No phone use, App Store
 screenshot upload, build selection or public submission occurred.
+
+## Build 58 upload after Apple sign-in recovery
+
+On September 5 the owner restored Xcode and App Store Connect sign-in. The
+existing build-58 archive was reused without a rebuild or build-number change.
+Before retrying, strict deep signature verification and executable SHA-256
+comparison passed, and the checkout's native runtime tree still matched the
+archived/captured source. The prior account-access failure remains historical
+evidence rather than the current upload outcome.
+
+- Xcode reported `Upload succeeded` at `2026-09-05T12:32:56.741Z`, followed by
+  `EXPORT SUCCEEDED` and exit 0.
+- App Store Connect subsequently displayed version `1.0 (58)` as Complete and
+  Ready to Submit, assigned to Internal Testers with one invitation. Build record
+  `c2408f97-fe34-4a83-9e3e-07e5ea779197` was recorded at
+  `2026-09-05T12:42:57Z`.
+- The owner installed the update through TestFlight and opened Permitext on the
+  iPhone 17 Pro. Mirroring independently showed `Permitext 1.0 (Build 58)` in the
+  Account footer at approximately `2026-09-05T12:45Z`. The existing signed-in
+  account, Lifetime Pro, 98 remaining included Research turns, Synced status,
+  Project containers and a saved Building Code passage remained present. The
+  Reader retained Fuel Gas Code and 2022 Construction Codes. Saved, First reader
+  and Account navigation passed; physical VoiceOver confirmation is pending.
+- Both canonical Production origins still returned full source
+  `9a89e54e7b70ccb7567b784443b232df005a10ac` at `2026-09-05T12:31:34Z`, matching
+  the verified archive. This release-identity recheck does not repeat the earlier
+  health, policy, browser or sustained-operation tests.
+- Retry evidence is retained in
+  `/private/tmp/permitext-build58-upload-retry-20260905.log` and
+  `/private/tmp/permitext-build58-upload-retry-20260905.json`; the final archive
+  evidence records the successful retry and preserves the initial failure.
+  Bounded device evidence is retained in
+  `/private/tmp/permitext-build58-physical-acceptance-20260905.json` without the
+  account email or private Project names.
+
+Public App Store submission, screenshot upload and final release acceptance
+remain separate. No account cleanup, purchase or new paid Research request was
+performed for this upload.
