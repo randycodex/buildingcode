@@ -2,6 +2,7 @@ import XCTest
 import SQLite3
 import UIKit
 import CryptoKit
+import PDFKit
 @testable import permitext
 
 private final class ScopedPermitextURLProtocol: URLProtocol {
@@ -308,6 +309,45 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
 }
 
 final class EntitlementAndSyncContractTests: XCTestCase {
+    @MainActor
+    func testNativeReportPDFPreservesQualifiedProjectFacts() throws {
+        let qualification = "Only the cellar is sprinklered. The building is not fully sprinklered. Upper-floor conversion remains an assumption, not established work."
+        let facts = (1...24).map { "Synthetic item \($0): \(qualification)" }.joined(separator: "\n")
+            + "\nRetained ending qualification."
+        let fixture: [String: Any] = [
+            "id": "synthetic-facts-manifest", "immutable": true, "schemaVersion": 1,
+            "generatorVersion": "synthetic-acceptance", "draftID": "synthetic-draft",
+            "title": "Synthetic qualified Project facts", "reportDate": "2026-09-05T00:00:00Z",
+            "project": ["id": "synthetic-project", "name": "Synthetic project", "address": "100 Synthetic Test Street", "description": qualification],
+            "author": ["userID": "synthetic-user", "displayName": "Synthetic reviewer"],
+            "codeEdition": "2022", "reportVersion": 1, "sourceVersions": ["draftVersion": 2],
+            "createdAt": "2026-09-05T00:00:00Z", "contentHash": String(repeating: "a", count: 64),
+            "disclaimers": ["Synthetic acceptance artifact; verify enacted sources."],
+            "items": [["id": "facts", "kind": "projectFacts", "order": 0,
+                       "sourceClassification": "project-material", "title": "Project facts",
+                       "address": "100 Synthetic Test Street", "facts": facts]]
+        ]
+        let manifest = try JSONDecoder().decode(ProjectReportManifest.self, from: JSONSerialization.data(withJSONObject: fixture))
+        XCTAssertEqual(manifest.items.first?.facts, facts)
+        let url = try ProjectReportExportBuilder(manifest: manifest).build()
+        let document = try XCTUnwrap(PDFDocument(url: url))
+        let text = try XCTUnwrap(document.string).split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        XCTAssertGreaterThan(document.pageCount, 1)
+        XCTAssertTrue(text.contains("100 Synthetic Test Street"))
+        XCTAssertTrue(text.contains(qualification))
+        XCTAssertTrue(text.contains("Synthetic item 24:"))
+        XCTAssertTrue(text.contains("Retained ending qualification."))
+        XCTAssertTrue(text.contains("verify enacted sources."))
+        XCTAssertFalse(text.contains("Included Project material"))
+        let attachment = XCTAttachment(data: try Data(contentsOf: url), uniformTypeIdentifier: "com.adobe.pdf")
+        attachment.name = "native-qualified-project-facts.pdf"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        let historical = try JSONDecoder().decode(ProjectReportManifestItem.self, from: Data(#"{"id":"old","kind":"paragraph","order":0,"sourceClassification":"user-authored","text":"Historical note"}"#.utf8))
+        XCTAssertNil(historical.facts)
+        XCTAssertEqual(historical.text, "Historical note")
+    }
+
     func testPublishedHTMLStoreResolvesFlat2014ChapterFilesByCodeFamily() throws {
         let resourceURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-flat-2014-html-\(UUID().uuidString)", isDirectory: true)

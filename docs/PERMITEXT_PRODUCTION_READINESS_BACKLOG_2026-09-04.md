@@ -47,8 +47,9 @@ not close the remaining acceptance items or authorize public App Store submissio
 Fresh email registration completed on Production, and all 10 public provider
 configuration checks passed. The final audit execution also confirmed 7/7 browser
 storage cases, 4/4 native recovery UI cases, and a qualified Note/Project-facts
-Report export and reopen. A further reproduced sign-out defect after reload is
-being repaired and verified. See the
+Report export and reopen. The further reproduced sign-out defect after reload
+is repaired and verified on Production `41ba0314dbfc` (PR #51). The synthetic
+Project, Note, image and Report also survived reload before sign-out. See the
 [current execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md)
 for exact evidence and remaining boundaries.
 

@@ -5711,6 +5711,15 @@ async function main() {
         staleReportDraft.json.draft.version === 1,
       "The Report Draft accepted a stale explicit revision."
     );
+    for (const expectedVersion of [0, 2, null, "1"]) {
+      const staleExport = await request("/reports/generate", {
+        method: "POST", token: signIn.json.account.backendSessionToken,
+        body: { auth: { accountUserID: userID }, projectID: researchProjectIDs[0],
+          draftID: reportDraftID, expectedVersion }
+      });
+      assert(staleExport.response.status === 409 && staleExport.json.code === "REPORT_DRAFT_VERSION_CONFLICT" &&
+        staleExport.json.draft.version === 1, "Export must reject an unseen or invalid Report revision.");
+    }
     const generatedProjectReport = await request("/reports/generate", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -5718,6 +5727,7 @@ async function main() {
         auth: { accountUserID: userID },
         projectID: researchProjectIDs[0],
         draftID: reportDraftID,
+        expectedVersion: 1,
         reportTemplateID: "smoke-client-report"
       }
     });

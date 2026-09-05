@@ -558,6 +558,20 @@ struct ProjectReportExportBuilder: Sendable {
             kern: 0.7
         )
         switch item.kind {
+        case "projectFacts":
+            append(
+                "\(item.title ?? "Project facts")\n",
+                to: result,
+                font: .systemFont(ofSize: 13, weight: .semibold),
+                spacingAfter: 5
+            )
+            append(
+                [item.address, item.facts].compactMap { $0 }
+                    .filter { !$0.isEmpty }.joined(separator: "\n") + "\n",
+                to: result,
+                font: .systemFont(ofSize: 10.5),
+                spacingAfter: 10
+            )
         case "evidence":
             let heading = [
                 item.codeBook,

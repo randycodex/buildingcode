@@ -33,7 +33,15 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest September 5 recovery evidence: the [verification repair record](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
+Latest September 5 web recovery evidence: the [audit execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md)
+tracks PR #51 at `41ba0314dbfc9de17698b5dca37bbb7d74bd4490`, Production
+`dpl_6EYL8gqmari9dcq9B3NJEnZchiew`, matching release/asset checks on both
+origins, PostgreSQL health and the rendered secure sign-out regression.
+The owner-approved email requirement and fresh email registration passed.
+Native runtime remains build 59; broader cross-device and final release gates
+remain open in that execution record.
+
+Preceding September 5 recovery evidence: the [verification repair record](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
 tracks verified web source `38ba9536d36ae5099376482dbbe4cf44f0ea5142` through
 PRs #46–49 (both origins, six byte-identical assets each) and native build 59, archived from
 `68efc23956939bfd79d592173db8cce5628cc3a8`. The later web-only changes preserve

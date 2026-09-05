@@ -5,7 +5,18 @@ TestFlight. This record distinguishes publication from the wider acceptance
 requirements in the [repair backlog](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md).
 It does not authorize public App Store submission or close those requirements.
 
-Latest repair checkpoint: the [September 5 account-deletion verification repair](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
+Latest repair checkpoint: PR [#51](https://github.com/randycodex/buildingcode/pull/51)
+published the secure sign-out repair at `41ba0314dbfc9de17698b5dca37bbb7d74bd4490`
+(client v44). Production `dpl_6EYL8gqmari9dcq9B3NJEnZchiew` is READY; both
+canonical origins and six byte-identical assets per origin match. Health and the
+actual reload → sign-out → authentication-page regression passed. The approved
+required-email configuration and fresh email registration also passed. Current
+recovery evidence and temporary disposable-account access are in the
+[September 5 execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md).
+Native runtime inputs remain build 59; only four synthetic UI test launch
+arguments changed under the native project.
+
+Preceding checkpoint: the [September 5 account-deletion verification repair](./PERMITEXT_ACCOUNT_DELETION_REVERIFICATION_REPAIR_2026-09-05.md)
 includes PRs #46–49. The final loader source is
 `38ba9536d36ae5099376482dbbe4cf44f0ea5142` (client v43), verified on both
 Production origins with six byte-identical assets per origin. Live Clerk

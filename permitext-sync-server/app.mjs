@@ -16164,6 +16164,17 @@ async function handleReportGenerate(request, response) {
     sendError(response, 404, "Report not found.");
     return;
   }
+  // Older clients omit the revision. Current editors bind generation to the
+  // exact snapshot they displayed, even if another client has since saved.
+  if (context.body.expectedVersion !== undefined &&
+      (!Number.isSafeInteger(context.body.expectedVersion) || context.body.expectedVersion !== draft.envelope.version)) {
+    sendJSON(response, 409, {
+      error: "This Report changed after you opened it. Review the updated content, then export again.",
+      code: "REPORT_DRAFT_VERSION_CONFLICT",
+      draft: reportDraftForClient(draft, [access.projectID])
+    });
+    return;
+  }
   if (!privateProjectAssetStorageConfigured()) {
     sendError(response, 503, "Private Report PDF storage is not configured.");
     return;

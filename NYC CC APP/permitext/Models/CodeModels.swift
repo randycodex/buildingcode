@@ -1861,6 +1861,8 @@ struct ProjectReportManifestItem: Codable, Hashable, Identifiable, Sendable {
     let contentType: String?
     let contentHash: String?
     let readPath: String?
+    let address: String?
+    let facts: String?
 }
 
 struct ProjectReportManifest: Codable, Hashable, Identifiable, Sendable {

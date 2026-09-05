@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260905-provider-signout-v44";
+} from "./offline-storage.js?v=20260905-report-snapshot-v45";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260905-provider-signout-v44";
+} from "./research-intent-state.js?v=20260905-report-snapshot-v45";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -22954,6 +22954,7 @@ async function renderProjectNotebook(project) {
           reportButton.textContent = "Update in Report";
           reportButton.title = "Update this Note's existing Report item with a new independent snapshot";
         } catch (error) {
+          if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
           await showWebNotice(existingReportBlock ? "Report item not updated" : "Note not added to Report", error.message);
         } finally {
           reportButton.disabled = notebookReadOnly || !activeCard?.id;
@@ -23190,9 +23191,20 @@ async function notebookCardReportBlock(project, cardID) {
 }
 
 async function promoteNotebookCardToReport(project, card) {
+  const requestIdentity = captureAccountRequest();
+  const reportRequest = (path, values) => { requireCurrentAccountRequest(requestIdentity); return postResearch(path, values); };
   const identity = projectIdentity(project);
   const projectID = projectDetailKey(identity);
-  const payload = await postResearch("/reports/drafts/list", { projectID });
+  const requireSavedReportEdits = () => {
+    requireCurrentAccountRequest(requestIdentity);
+    if (reportDraftMounts.get(projectID)?.hasUnsavedChanges?.()) {
+      throw new Error("Save your open Report edits before updating it from a Note.");
+    }
+  };
+  requireSavedReportEdits();
+  card = structuredClone(card);
+  const payload = await reportRequest("/reports/drafts/list", { projectID });
+  requireSavedReportEdits();
   const draft = structuredClone(payload.drafts?.[0] || emptyProjectReportDraft(identity));
   const existingBlockIndex = (draft.blocks || []).findIndex((block) =>
     block.derivedFrom?.kind === "notebookCard" && block.derivedFrom.id === card.id
@@ -23218,7 +23230,7 @@ async function promoteNotebookCardToReport(project, card) {
   } else {
     draft.blocks = [...(draft.blocks || []), promotedBlock];
   }
-  const saved = await postResearch("/reports/drafts/save", {
+  const saved = await reportRequest("/reports/drafts/save", {
     projectID,
     draftID: draft.id,
     expectedVersion: draft.version || 0,
@@ -23227,9 +23239,22 @@ async function promoteNotebookCardToReport(project, card) {
     introduction: draft.introduction,
     blocks: draft.blocks
   });
+  requireCurrentAccountRequest(requestIdentity);
   pendingReportDraftByProject.set(projectID, saved.draft.id);
   await notebookMounts.get(projectID)?.refreshReportStatus?.().catch(() => false);
+  requireCurrentAccountRequest(requestIdentity);
   await openProjectReportDraft(identity);
+  requireCurrentAccountRequest(requestIdentity);
+  // Opening an existing pane preserves its editor. Explicitly refresh the saved
+  // snapshot, while retaining any edits made during the asynchronous promotion.
+  const mounted = reportDraftMounts.get(projectID);
+  await mounted?.refreshArtifacts?.({ draftID: saved.draft.id });
+  requireCurrentAccountRequest(requestIdentity);
+  if (mounted?.hasUnsavedChanges?.()) {
+    await showWebNotice("Note saved to Report", "Your unsaved Report edits are still open. Copy those edits before reopening the Report to review its saved update.");
+  } else {
+    pendingReportDraftByProject.delete(projectID);
+  }
 }
 
 function reportSourceClassificationLabel(value) {
@@ -23622,8 +23647,8 @@ async function renderProjectReportDraft(project) {
     async refreshSources() {
       return refreshReportSources();
     },
-    async refreshArtifacts() {
-      return refreshReportArtifacts();
+    async refreshArtifacts(options = {}) {
+      return refreshReportArtifacts(options);
     },
     dispose() {
       disposed = true;
@@ -23700,6 +23725,7 @@ async function renderProjectReportDraft(project) {
       const payload = await reportRequest("/reports/generate", {
         projectID,
         draftID: activeDraft.id,
+        expectedVersion: activeDraft.version,
         reportTemplateID: selectedReportTemplateID
       });
       const historyPayload = await reportRequest("/reports/history/list", { projectID });
@@ -23711,6 +23737,11 @@ async function renderProjectReportDraft(project) {
         refreshPaneIDs: [paneIDForProjectDetail(identity)]
       });
     } catch (error) {
+      if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+      if (error.payload?.code === "REPORT_DRAFT_VERSION_CONFLICT" && !dirty) {
+        await refreshReportArtifacts();
+        if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
+      }
       showStatusError(error.message === "Report text is too long."
         ? "A Report item exceeds the supported text length. Shorten that item and try again."
         : error.message || "The Report could not be generated.");
@@ -24457,7 +24488,7 @@ async function renderProjectReportDraft(project) {
     return true;
   };
 
-  refreshReportArtifacts = async () => {
+  refreshReportArtifacts = async (options = {}) => {
     if (disposed || !isCurrentAccountRequest(requestIdentity)) return false;
     const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
       reportRequest("/reports/drafts/list", { projectID }),
@@ -24482,7 +24513,7 @@ async function renderProjectReportDraft(project) {
       }
       return true;
     }
-    const nextActiveDraft = drafts.find((draft) => draft.id === activeDraft.id) || drafts[0];
+    const nextActiveDraft = drafts.find((draft) => draft.id === (options.draftID || activeDraft.id)) || drafts[0];
     activeDraft = nextActiveDraft
       ? structuredClone(nextActiveDraft)
       : emptyProjectReportDraft(identity);
