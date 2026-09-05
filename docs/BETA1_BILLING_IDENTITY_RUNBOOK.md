@@ -242,6 +242,7 @@ Do not improvise, recreate the account, or repeatedly restart the full deletion 
 
 - `STRIPE_CANCELLATION_FAILED`: billing cancellation was not confirmed and no Permitext account data was deleted.
 - `PRIVATE_ASSET_DELETION_FAILED`: applicable Stripe cancellation may already be complete, while the Permitext account and remaining data still exist.
+  A `causeCode` of `PRIVATE_ASSET_OWNERSHIP_UNRESOLVED` or `PRIVATE_ASSET_OWNER_CONFLICT` means file ownership must be resolved through support before retrying. The inventory stops before deleting private files or account data in these cases. Do not bypass this check by editing authored text, guessing ownership from a Project ID, or deleting an entire shared Project directory. The normal inventory covers typed image/report metadata, pending Code Memo outputs, and new account-scoped Notebook upload directories; unknown historical files are not claimed removed.
 - `ACCOUNT_DATA_DELETION_FAILED`: applicable Stripe cancellation and private-image deletion may already be complete, while deletion of the remaining account data was not confirmed.
 - Server success followed by device or Clerk failure: do not repeat server deletion. Use only the client's **Retry cleanup** action for the unfinished local or identity stage.
 

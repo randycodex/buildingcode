@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
+import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
@@ -10,7 +11,8 @@ const assetRoot = join(temporary, "assets");
 const A = "web:account-export-a", B = "web:account-export-b";
 const adminToken = "synthetic-export-admin";
 const now = new Date().toISOString();
-const assetPath = "project-assets/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/test.png";
+const hash = (value) => createHash("sha256").update(value).digest("hex").slice(0, 32);
+const assetPath = `project-assets/${hash("project-a")}/notebook/${hash("image-a")}.png`;
 const userCollections = ["foundationArtifacts", "projectLinks", "researchAnswers", "activityEvents",
   "researchConversations", "researchUsage", "researchOperations", "researchCredits", "researchFeedback",
   "codeQuestionPendingIssuance", "codeQuestionOutbox"];
@@ -43,6 +45,8 @@ for (const name of userCollections) store[`${name}ByUserID`] = {
   [A]: [{ id: `${name}-a`, envelope: { id: `${name}-a`, type: "notebookCard" }, payload: { title: "Synthetic Notebook", pathname: assetPath } }],
   [B]: [{ id: `${name}-b`, title: "DO-NOT-EXPORT-OTHER-ACCOUNT" }]
 };
+store.foundationArtifactsByUserID[A].push({ envelope: { id: "image-a", type: "notebookImageAsset" },
+  payload: { projectID: "project-a", storageKey: assetPath, storageProvider: "local-filesystem", contentType: "image/png" } });
 await mkdir(dirname(join(assetRoot, assetPath)), { recursive: true });
 await writeFile(join(assetRoot, assetPath), "synthetic private asset");
 await writeFile(dataPath, JSON.stringify(store));
@@ -79,7 +83,7 @@ try {
   assert.equal(exported.body.hasSession, true);
   assert.deepEqual(exported.body.passkeyCredentialIDs, ["synthetic-credential-a"]);
   assert.equal(exported.body.mutations.length, 2);
-  for (const name of userCollections) assert.equal(exported.body.records[name].length, 1, name);
+  for (const name of userCollections) assert.equal(exported.body.records[name].length, name === "foundationArtifacts" ? 2 : 1, name);
   for (const name of ["migrationCheckpoints", "artifactRevisions", "codeQuestionCounters", "organizations", "organizationMemberships", "projectMemberships", "projectOwnerships", "organizationInvitations", "researchPurchaseClaims"]) assert.equal(exported.body.records[name].length, 1, name);
   const serialized = JSON.stringify(exported.body);
   assert.equal(serialized.includes("DO-NOT-EXPORT-OTHER-ACCOUNT"), false);
@@ -89,7 +93,7 @@ try {
   const checklist = await post("/admin/accounts/restore-checklist", { userID: A });
   assert.equal(checklist.body.researchConversationCount, 1);
   assert.equal(checklist.body.researchAnswerCount, 1);
-  assert.deepEqual(checklist.body.artifactCounts, { notebookCard: 1 });
+  assert.deepEqual(checklist.body.artifactCounts, { notebookCard: 1, notebookImageAsset: 1 });
   assert.equal(checklist.body.recordCounts.codeQuestionOutbox, 1);
   assert.equal(checklist.body.recordCounts.organizations, 1);
   assert.equal(await readFile(dataPath, "utf8"), beforeBytes, "Export/checklist must not mutate storage.");

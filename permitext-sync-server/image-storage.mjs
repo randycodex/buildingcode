@@ -1,4 +1,4 @@
-import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { resolveContainedPrivatePath } from "./private-path-containment.mjs";
 
@@ -17,6 +17,14 @@ export class ImageStorageProvider {
 
   async delete() {
     throw new Error("Image storage does not support deletion.");
+  }
+
+  async deleteMany(storageKeys) {
+    for (const key of storageKeys) await this.delete(key);
+  }
+
+  async list(prefix) {
+    throw new Error("Image storage does not support inventory.");
   }
 }
 
@@ -58,6 +66,20 @@ export class LocalFilesystemImageStorage extends ImageStorageProvider {
       throw error;
     }
   }
+
+  async list(prefix) {
+    const directory = resolveContainedPrivatePath(this.root, prefix.replace(/\/$/, ""));
+    try {
+      // Current account-scoped Notebook keys contain files immediately inside
+      // this directory. Never traverse links, nested directories, or other roots.
+      const entries = await readdir(directory, { withFileTypes: true });
+      if (entries.some((entry) => !entry.isFile())) throw new Error("Unexpected private-image storage entry requires review.");
+      return entries.map((entry) => `${prefix}${entry.name}`);
+    } catch (error) {
+      if (error?.code === "ENOENT") return [];
+      throw error;
+    }
+  }
 }
 
 export class VercelBlobImageStorage extends ImageStorageProvider {
@@ -95,6 +117,30 @@ export class VercelBlobImageStorage extends ImageStorageProvider {
     const { del } = await this.loadBlobModule();
     await del(storageKey);
     return true;
+  }
+
+  async deleteMany(storageKeys) {
+    const { del } = await this.loadBlobModule();
+    for (let index = 0; index < storageKeys.length; index += 100) await del(storageKeys.slice(index, index + 100));
+  }
+
+  async list(prefix) {
+    const { list } = await this.loadBlobModule();
+    const paths = [];
+    const seen = new Set();
+    let cursor;
+    do {
+      const page = await list({ prefix, ...(cursor ? { cursor } : {}) });
+      for (const blob of page.blobs || []) {
+        if (typeof blob.pathname !== "string" || !blob.pathname.startsWith(prefix)) throw new Error("Private-image inventory escaped its account prefix.");
+        paths.push(blob.pathname);
+      }
+      if (!page.hasMore) break;
+      if (!page.cursor || seen.has(page.cursor)) throw new Error("Private-image inventory pagination did not complete.");
+      cursor = page.cursor;
+      seen.add(cursor);
+    } while (true);
+    return paths;
   }
 }
 

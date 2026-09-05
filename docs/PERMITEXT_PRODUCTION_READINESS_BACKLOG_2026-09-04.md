@@ -91,6 +91,47 @@ The available local operator credential returned HTTP 401; no live export or
 deletion was performed. See the updated
 [account acceptance runbook](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance).
 
+## Post-publication private-file ownership repair
+
+**P0 follow-up, reproduced only with synthetic local accounts:** account cleanup
+treated path-shaped authored text as permission to delete a private file. The
+legacy Notebook read path also trusted a client-supplied Project identifier as
+sufficient file ownership. Both could cross the intended account boundary.
+
+The repair enumerates typed, server-stored binary metadata and checks conflicting
+ownership before deleting files. New Notebook uploads use account-scoped paths,
+while metadata-backed historical images remain readable. A bare Project ID or
+authored reference cannot authorize legacy reads or deletion. Historical
+Workboards retain account-hash or registered Project ownership requirements;
+unknown or conflicting ownership stops cleanup with an actionable error before
+private files or the account are removed. Confirmed account-link ancestry is
+preserved. Unattributed historical files are not silently claimed deleted.
+
+The same inventory covers generated Report files and deterministic pending Code
+Memo outputs. It inventories only the new account-scoped Notebook upload
+directories to remove unconfirmed uploads; it does not sweep shared Project
+directories. Recorded storage providers are resolved before deletion, Blob
+pagination is checked, and Blob deletes retain batching. Conflicting image IDs
+now return HTTP 409 instead of claiming that rejected metadata was saved.
+
+Validation:
+
+- `npm run test:auth`, private-file inventory/storage tests, and the broad
+  `node tests/smoke.mjs` passed with synthetic data.
+- The shipped upload/read/delete HTTP handlers passed against file storage and
+  disposable PostgreSQL 18.6. Foreign references and colliding Project IDs did
+  not expose or delete the second account's image. Legitimate reads, rejected
+  upload cleanup, unconfirmed-upload cleanup, and account deletion passed.
+- PostgreSQL conflicting historical ownership stopped before account deletion;
+  the existing transaction-rollback checks also passed. The isolated run used
+  1,231 local database requests and 24 repeatable-read/read-only batches, with
+  zero external database or provider requests. Its cluster was removed.
+
+Publication and live acceptance are separate from these local results. No
+Production exploit or real-account deletion was attempted. The native runtime
+source remains identical to the previously published build-56 inputs; the only
+subsequent file under the native project is an acceptance-document update.
+
 ## First repair batch
 
 Status: implementation and local verification complete in `38ed70d08` and

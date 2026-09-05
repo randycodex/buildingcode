@@ -7,7 +7,7 @@ import {
   timingSafeEqual,
   verify as verifySignature
 } from "node:crypto";
-import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
@@ -16,6 +16,14 @@ import {
   existingOptionalAccountRecordTables,
   postgresAccountRecordExport
 } from "./account-data-export.mjs";
+import {
+  accountNotebookUploadPrefixes,
+  binaryAssetPathnames,
+  notebookImageConflict,
+  postgresPrivateAssetOwnerConflicts,
+  privateAssetsFromAccountRecords,
+  sameNotebookImage
+} from "./account-private-assets.mjs";
 import {
   appleBillingAccountTokens,
   createPostgresAccountRepository,
@@ -985,6 +993,19 @@ export function createFileStoreAdapter() {
     async exportAccountRecords(userID) {
       return accountRecordExportFromStore(await this.read(), userID);
     },
+    async privateAssetOwnerConflicts(userID, pathnames) {
+      const store = await this.read();
+      const requested = new Set(pathnames);
+      const conflicts = new Set();
+      const owners = new Set([...Object.keys(store.foundationArtifactsByUserID || {}), ...Object.keys(store.mutationsByUserID || {})]);
+      for (const owner of owners) {
+        if (owner === userID) continue;
+        for (const pathname of binaryAssetPathnames(store.foundationArtifactsByUserID?.[owner] || [], store.mutationsByUserID?.[owner] || [])) {
+          if (requested.has(pathname)) conflicts.add(pathname);
+        }
+      }
+      return [...conflicts];
+    },
     async write(store) {
       // Serialize bare writes so concurrent request handlers cannot clobber each other
       // when the process-wide request lock is intentionally skipped for long-running work.
@@ -1274,6 +1295,18 @@ export function createFileStoreAdapter() {
         if (index === -1) entries.push(artifact);
         else entries[index] = artifact;
         store.foundationArtifactsByUserID[userID] = entries;
+        return artifact;
+      });
+    },
+    async createNotebookImageAsset(userID, artifact) {
+      return this.withMutation((store) => {
+        for (const [owner, entries] of Object.entries(store.foundationArtifactsByUserID || {})) {
+          const existing = entries.find((item) => item.envelope?.id === artifact.envelope.id);
+          if (!existing) continue;
+          if (owner === userID && sameNotebookImage(existing, artifact)) return existing;
+          throw notebookImageConflict();
+        }
+        (store.foundationArtifactsByUserID[userID] ||= []).push(artifact);
         return artifact;
       });
     },
@@ -3540,6 +3573,10 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return postgresAccountRecordExport(sql, userID);
     },
+    async privateAssetOwnerConflicts(userID, pathnames) {
+      await ensureSchema();
+      return postgresPrivateAssetOwnerConflicts(sql, userID, pathnames);
+    },
     async write(store) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -4150,6 +4187,21 @@ async function createPostgresStoreAdapter() {
           AND permitext_foundation_artifacts.updated_at <= EXCLUDED.updated_at
       `;
       return artifact;
+    },
+    async createNotebookImageAsset(userID, artifact) {
+      await ensureSchema();
+      const { envelope, payload } = artifact;
+      const rows = await sql`
+        INSERT INTO permitext_foundation_artifacts (
+          id, user_id, artifact_type, envelope, payload, created_at, updated_at
+        ) VALUES (${envelope.id}, ${userID}, 'notebookImageAsset', ${JSON.stringify(envelope)}::jsonb,
+          ${JSON.stringify(payload)}::jsonb, ${envelope.createdAt}::timestamptz, ${envelope.updatedAt}::timestamptz)
+        ON CONFLICT (id) DO NOTHING RETURNING id
+      `;
+      if (rows.length) return artifact;
+      const existing = (await this.listFoundationArtifacts(userID, { ids: [envelope.id] }))[0];
+      if (sameNotebookImage(existing, artifact)) return existing;
+      throw notebookImageConflict();
     },
     async saveFoundationArtifactCompareAndSwap(userID, artifact, expectedVersion) {
       await ensureSchema();
@@ -7119,8 +7171,8 @@ function notebookAssetExtension(contentType) {
   }[contentType] || "";
 }
 
-function notebookAssetPathname(projectID, assetID, contentType) {
-  return `${notebookAssetPrefix(projectID)}${safeWorkboardPathHash(assetID)}.${notebookAssetExtension(contentType)}`;
+function notebookAssetPathname(userID, projectID, assetID, contentType) {
+  return `${notebookAssetPrefix(projectID)}${safeWorkboardPathHash(userID)}/${safeWorkboardPathHash(assetID)}.${notebookAssetExtension(contentType)}`;
 }
 
 function notebookAssetPathBelongsToProject(pathname, projectID) {
@@ -14603,6 +14655,29 @@ async function notebookArtifactWithIdentity(userID, artifactID) {
   ) || null;
 }
 
+async function notebookImageWithStorageKey(userID, pathname) {
+  return (await listStoredFoundationArtifacts(userID)).find((artifact) =>
+    artifact.envelope?.type === "notebookImageAsset" && !artifact.envelope.deletedAt &&
+    artifact.payload?.storageKey === pathname
+  ) || null;
+}
+
+async function legacyNotebookPathAllowed(userID, projectID, pathname) {
+  const asset = await notebookImageWithStorageKey(userID, pathname);
+  let allowed = asset
+    ? await notebookImageAccessibleFromProject(userID, projectID, asset.envelope.id)
+    : false;
+  if (!asset) {
+    const ownership = await storedProjectOwnership(projectID);
+    const suffix = String(pathname || "").slice(notebookAssetPrefix(projectID).length);
+    allowed = ownership?.storageOwnerUserID === userID &&
+      notebookAssetPathBelongsToProject(pathname, projectID) && /^[a-f0-9]{32}\.(?:gif|jpg|png|webp)$/.test(suffix);
+  }
+  if (!allowed) return false;
+  const adapter = await storeAdapter();
+  return !(await adapter.privateAssetOwnerConflicts(userID, [pathname])).length;
+}
+
 async function notebookImageAccessibleFromProject(userID, projectID, assetID) {
   const asset = await ownedNotebookImageAsset(userID, assetID);
   if (!asset) return false;
@@ -14628,7 +14703,10 @@ async function validateNotebookImageAssets(userID, projectID, imageAssets) {
   for (const encodedIdentity of imageAssets || []) {
     let identity = encodedIdentity;
     try { identity = decodeURIComponent(encodedIdentity); } catch { /* legacy literal */ }
-    if (notebookAssetPathBelongsToProject(identity, projectID)) continue;
+    if (notebookAssetPathBelongsToProject(identity, projectID)) {
+      if (await legacyNotebookPathAllowed(userID, projectID, identity)) continue;
+      throw new Error("A legacy Notebook image has no verified ownership for this Project.");
+    }
     const accessible = await notebookImageAccessibleFromProject(userID, projectID, identity);
     if (!accessible) {
       throw new Error("A Notebook image is unavailable or belongs to another Project.");
@@ -14651,6 +14729,10 @@ async function deleteOrphanedNotebookImageAssets(userID, projectID, candidateIDs
     const provider = notebookImageStorage(asset.payload?.storageProvider);
     try {
       if (!provider) throw new Error(`Storage provider ${asset.payload?.storageProvider || "unknown"} is not configured.`);
+      const adapter = await storeAdapter();
+      if ((await adapter.privateAssetOwnerConflicts(userID, [asset.payload.storageKey])).length) {
+        throw new Error("Private-image ownership must be resolved before deleting this file.");
+      }
       await provider.delete(asset.payload.storageKey);
       await saveStoredFoundationArtifact(userID, {
         ...asset,
@@ -24620,68 +24702,43 @@ async function handleSignOut(request, response) {
   sendJSON(response, 200, { signedOut: true });
 }
 
-function privateProjectAssetPathname(value) {
-  const pathname = String(value || "").trim();
-  const segments = pathname.split("/");
-  if (
-    segments.some((segment) =>
-      !segment || segment === "." || segment === ".." || !/^[a-zA-Z0-9._-]+$/.test(segment)
-    )
-  ) {
-    return false;
-  }
-  return /^project-assets\/[a-f0-9]{32}\//.test(pathname) ||
-    /^workboards\/[a-f0-9]{32}\/[a-f0-9]{32}\//.test(pathname);
-}
-
-function collectPrivateProjectAssetPathnames(value, pathnames = new Set()) {
-  if (typeof value === "string") {
-    if (privateProjectAssetPathname(value)) pathnames.add(value);
-    return pathnames;
-  }
-  if (Array.isArray(value)) {
-    value.forEach((item) => collectPrivateProjectAssetPathnames(item, pathnames));
-    return pathnames;
-  }
-  if (value && typeof value === "object") {
-    Object.values(value).forEach((item) => collectPrivateProjectAssetPathnames(item, pathnames));
-  }
-  return pathnames;
-}
-
-async function privateProjectAssetPathnamesForAccount(userID) {
+async function privateProjectAssetsForAccount(userID) {
   const adapter = await storeAdapter();
-  const values = [await listStoredFoundationArtifacts(userID)];
-  if (typeof adapter.pullUserContent === "function") {
-    const pull = await adapter.pullUserContent(userID, { since: null, sinceEventID: null });
-    values.push(pull.allMutations || pull.mutations || []);
-  } else {
-    const store = await readStore();
-    values.push(store.mutationsByUserID?.[userID] || []);
+  const exported = await adapter.exportAccountRecords(userID);
+  const assets = privateAssetsFromAccountRecords(exported);
+  const paths = new Set(assets.map((asset) => asset.pathname));
+  const provider = notebookImageStorage();
+  const prefixes = accountNotebookUploadPrefixes(exported);
+  if (prefixes.length && !provider) throw new Error("Private-image storage is unavailable for account cleanup inventory.");
+  if (provider) {
+    for (const prefix of prefixes) {
+      for (const pathname of await provider.list(prefix)) {
+        const suffix = pathname.slice(prefix.length);
+        if (!/^[a-f0-9]{32}\.(?:gif|jpg|png|webp)$/.test(suffix)) throw new Error("Unexpected private-image key requires ownership review.");
+        if (!paths.has(pathname)) {
+          assets.push({ pathname, storageProvider: provider.name });
+          paths.add(pathname);
+        }
+      }
+    }
   }
-  return Array.from(collectPrivateProjectAssetPathnames(values));
+  if ((await adapter.privateAssetOwnerConflicts(userID, assets.map((asset) => asset.pathname))).length) {
+    throw Object.assign(new Error("A private-file ownership conflict requires review before account cleanup."), { code: "PRIVATE_ASSET_OWNER_CONFLICT" });
+  }
+  return assets;
 }
 
-async function deletePrivateProjectAssetPathnames(pathnames) {
-  if (!pathnames.length) return;
-  if (blobStorageConfigured()) {
-    const { del } = await vercelBlob();
-    for (let index = 0; index < pathnames.length; index += 100) {
-      await del(pathnames.slice(index, index + 100));
-    }
-    return;
+async function deletePrivateProjectAssets(assets) {
+  // Resolve every recorded provider before the first deletion. A missing
+  // provider must not silently target a different store with the same pathname.
+  const groups = new Map();
+  for (const asset of assets) {
+    const provider = notebookImageStorage(asset.storageProvider);
+    if (!provider) throw new Error("A recorded private-file storage provider is unavailable.");
+    if (!groups.has(provider.name)) groups.set(provider.name, { provider, pathnames: [] });
+    groups.get(provider.name).pathnames.push(asset.pathname);
   }
-  const root = localPrivateAssetRoot() || notebookLocalAssetRoot();
-  if (!root) {
-    throw new Error("Private project storage is unavailable for account deletion.");
-  }
-  for (const pathname of pathnames) {
-    try {
-      await unlink(resolveContainedPrivatePath(root, pathname));
-    } catch (error) {
-      if (error?.code !== "ENOENT") throw error;
-    }
-  }
+  for (const { provider, pathnames } of groups.values()) await provider.deleteMany(pathnames);
 }
 
 function accountDeletionBillingStage(billingCancellation) {
@@ -24745,15 +24802,19 @@ async function handleAccountDelete(request, response) {
     return;
   }
 
-  let pathnames;
+  let privateAssets;
   try {
-    pathnames = await privateProjectAssetPathnamesForAccount(userID);
-    await deletePrivateProjectAssetPathnames(pathnames);
+    privateAssets = await privateProjectAssetsForAccount(userID);
+    await deletePrivateProjectAssets(privateAssets);
   } catch (error) {
     console.error("Account deletion stopped because private asset cleanup failed.", error);
+    const ownershipUnresolved = ["PRIVATE_ASSET_OWNERSHIP_UNRESOLVED", "PRIVATE_ASSET_OWNER_CONFLICT"].includes(error?.code);
     sendJSON(response, 500, {
-      error: "Permitext handled applicable billing, but could not delete private images. Your Permitext account and remaining data were not deleted. Retry cleanup or contact support.",
+      error: ownershipUnresolved
+        ? "Permitext handled applicable billing, but could not verify ownership of older private files. Your private files, account, and remaining data were not deleted. Contact support to resolve file ownership before retrying cleanup."
+        : "Permitext handled applicable billing, but could not delete private images. Your Permitext account and remaining data were not deleted. Retry cleanup or contact support.",
       code: "PRIVATE_ASSET_DELETION_FAILED",
+      ...(ownershipUnresolved ? { causeCode: error.code } : {}),
       partial: billingCancellation.canceledSubscriptions.length > 0,
       stages: accountDeletionStages({
         billingCancellation,
@@ -24774,25 +24835,25 @@ async function handleAccountDelete(request, response) {
     sendJSON(response, 500, {
       error: "Permitext deleted private images but could not confirm deletion of the account and remaining data. Retry cleanup or contact support.",
       code: "ACCOUNT_DATA_DELETION_FAILED",
-      partial: pathnames.length > 0 || billingCancellation.canceledSubscriptions.length > 0,
+      partial: privateAssets.length > 0 || billingCancellation.canceledSubscriptions.length > 0,
       stages: accountDeletionStages({
         billingCancellation,
         permitextDataStatus: "failed",
         privateAssetsStatus: "deleted",
-        deletedPrivateAssetCount: pathnames.length
+        deletedPrivateAssetCount: privateAssets.length
       })
     });
     return;
   }
   sendJSON(response, 200, {
     deleted: true,
-    deletedPrivateAssetCount: pathnames.length,
+    deletedPrivateAssetCount: privateAssets.length,
     partial: false,
     stages: accountDeletionStages({
       billingCancellation,
       permitextDataStatus: "deleted",
       privateAssetsStatus: "deleted",
-      deletedPrivateAssetCount: pathnames.length
+      deletedPrivateAssetCount: privateAssets.length
     }),
     billingCancellation: {
       stripe: billingCancellation.canceledSubscriptions.length
@@ -25015,7 +25076,7 @@ async function handleNotebookAssetUpload(request, response) {
     });
     return;
   }
-  const pathname = notebookAssetPathname(access.projectID, assetID, contentType);
+  const pathname = notebookAssetPathname(access.storageOwnerUserID, access.projectID, assetID, contentType);
   let storedPathname = "";
   try {
     const existingBody = await imageStorage.get(pathname);
@@ -25070,9 +25131,18 @@ async function handleNotebookAssetUpload(request, response) {
     }
   };
   try {
-    await saveStoredFoundationArtifact(access.storageOwnerUserID, asset);
+    const adapter = await storeAdapter();
+    await adapter.createNotebookImageAsset(access.storageOwnerUserID, asset);
   } catch (error) {
-    await imageStorage.delete(storedPathname).catch(() => {});
+    if (error?.code === "NOTEBOOK_IMAGE_ID_CONFLICT") {
+      // A concurrent successful upload can now own this exact key. Delete only
+      // a confirmed rejected key with no matching binary metadata. Uncertain
+      // failures retain account-scoped bytes for retry or account cleanup.
+      const retained = await notebookImageWithStorageKey(access.storageOwnerUserID, storedPathname);
+      if (!retained) await imageStorage.delete(storedPathname).catch(() => {});
+      sendJSON(response, 409, { error: error.message, code: error.code });
+      return;
+    }
     throw error;
   }
   await retryPendingNotebookImageDeletions(access.storageOwnerUserID);
@@ -25111,7 +25181,7 @@ async function handleNotebookAssetRead(request, response) {
   if (!access) return;
   const asset = assetID
     ? await ownedNotebookImageAsset(access.storageOwnerUserID, assetID)
-    : null;
+    : await notebookImageWithStorageKey(access.storageOwnerUserID, legacyPathname);
   if (assetID && !asset) {
     sendError(response, 404, "Notebook image was not found.");
     return;
@@ -25121,11 +25191,16 @@ async function handleNotebookAssetRead(request, response) {
     (asset && !await notebookImageAccessibleFromProject(
       access.storageOwnerUserID,
       access.projectID,
-      assetID
+      asset.envelope.id
     )) ||
-    (!asset && !notebookAssetPathBelongsToProject(pathname, access.projectID))
+    (!asset && !await legacyNotebookPathAllowed(access.storageOwnerUserID, access.projectID, pathname))
   ) {
     sendError(response, 403, "This Notebook image does not belong to the authenticated Project.");
+    return;
+  }
+  const adapter = await storeAdapter();
+  if ((await adapter.privateAssetOwnerConflicts(access.storageOwnerUserID, [pathname])).length) {
+    sendError(response, 403, "Private-image ownership requires review before this file can be accessed.");
     return;
   }
   const imageStorage = notebookImageStorage(asset?.payload?.storageProvider || "");
@@ -25217,6 +25292,22 @@ async function handleWorkboardAssetRead(request, response) {
   if (!access) return;
   if (!workboardAssetPathBelongsToProject(pathname, access.storageOwnerUserID, projectID)) {
     sendError(response, 403, "This Workboard image does not belong to the authenticated project.");
+    return;
+  }
+  const adapter = await storeAdapter();
+  const snapshot = await adapter.exportAccountRecords(access.storageOwnerUserID);
+  const board = snapshot.mutations.find((mutation) => mutation.workboard?.projectID === projectID &&
+    Object.values(mutation.workboard.assets || {}).some((asset) => asset?.pathname === pathname));
+  let verified = false;
+  if (board) {
+    try {
+      const inventory = privateAssetsFromAccountRecords({ ...snapshot, mutations: [board],
+        records: { ...snapshot.records, foundationArtifacts: [], codeQuestionPendingIssuance: [] } });
+      verified = inventory.some((asset) => asset.pathname === pathname);
+    } catch { /* Historical ownership must be resolved before access. */ }
+  }
+  if (!verified || (await adapter.privateAssetOwnerConflicts(access.storageOwnerUserID, [pathname])).length) {
+    sendError(response, 403, "This historical Workboard image has no verified ownership for the Project.");
     return;
   }
   if (!blobStorageConfigured()) {

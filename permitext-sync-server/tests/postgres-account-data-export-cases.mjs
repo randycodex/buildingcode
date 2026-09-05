@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
+import { createHash } from "node:crypto";
 import { createPostgresAccountRepository } from "../postgres-account-repository.mjs";
 import { existingOptionalAccountRecordTables } from "../account-data-export.mjs";
 
@@ -98,6 +99,22 @@ export async function runPostgresAccountDataExportCases({ sql, auxiliaryAdapter 
     assert.deepEqual(checklist.body.artifactCounts, { notebookCard: 1 });
     assert.ok(Object.values(checklist.body.recordCounts).every((count) => count === 1));
     assert.deepEqual(await exported(A), before, "Export and checklist must leave account records unchanged.");
+
+    const sharedProject = "synthetic-historical-collision";
+    const sharedPath = `project-assets/${createHash("sha256").update(sharedProject).digest("hex").slice(0, 32)}/workboard-previews/conflict.png`;
+    for (const userID of [A, B]) {
+      const id = `${userID}:conflicting-preview`;
+      await sql`INSERT INTO permitext_foundation_artifacts (id, user_id, artifact_type, envelope, payload)
+        VALUES (${id}, ${userID}, 'workboardPreview', ${JSON.stringify({ id, type: "workboardPreview" })}::jsonb,
+          ${JSON.stringify({ projectID: sharedProject, pathname: sharedPath })}::jsonb)`;
+    }
+    const ambiguousDelete = await post("/account/delete", { auth: { accountUserID: A }, confirmation: "DELETE" }, token);
+    assert.equal(ambiguousDelete.status, 500);
+    assert.equal(ambiguousDelete.body.code, "PRIVATE_ASSET_DELETION_FAILED");
+    assert.equal((await exported(A)).account.appUserID, A, "Conflicting asset ownership must stop before account deletion.");
+    for (const userID of [A, B]) await sql`DELETE FROM permitext_foundation_artifacts WHERE id = ${userID + ":conflicting-preview"} AND user_id = ${userID}`;
+    assert.deepEqual(await exported(A), before);
+    assert.deepEqual(await exported(B), beforeB);
 
     // Force the final account-delete statement to fail. All preceding family
     // deletes, including optional Code Question tables, must roll back together.
