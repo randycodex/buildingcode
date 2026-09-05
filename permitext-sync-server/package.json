@@ -172,7 +172,7 @@
     "@clerk/backend": "^3.16.10",
     "@clerk/react": "6.15.1",
     "@clerk/shared": "4.31.0",
-    "@mantine/core": "^9.5.0",
+    "@mantine/core": "^9.6.0",
     "@mantine/hooks": "^9.5.0",
     "@neondatabase/serverless": "^1.0.0",
     "@vercel/blob": "^2.6.1",
