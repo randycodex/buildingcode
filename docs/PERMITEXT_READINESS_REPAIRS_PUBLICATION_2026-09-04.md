@@ -254,3 +254,39 @@ Production export/deletion, interrupted-operation recovery, final provider/clien
 acceptance, and the owner release gates remain open. No Production account was
 linked or deleted during these checks. No paid Research, purchase, entitlement
 grant, App Store submission, or navigation redesign was performed.
+
+## Build 57 source-alignment candidate
+
+Apple's automatic Xcode Cloud build 244 for `acafd9642a07e049c218f9816432341de8aec0cc`
+completed successfully. Its workflow archived the app but did not publish a new
+TestFlight build. A separate local build 57 was prepared and uploaded under the
+owner's existing Production/internal-TestFlight publication authorization.
+
+- Clean detached source: `acafd9642a07e049c218f9816432341de8aec0cc`, matching the
+  account-link repair running on Production at archive time.
+- Version `1.0 (57)`, bundle `com.randycodex.permitext`, team `57BY95X97H`.
+- Archive: `/private/tmp/permitext-1.0-57-acafd9642.xcarchive`.
+- Native runtime tree: `f9bbba46ca2df24487604cf235fc4ec7acfef2e3`, unchanged from
+  build 56. Pinned Clerk, Nuke and PhoneNumberKit checkouts were clean and matched
+  their resolved revisions.
+- Strict deep signing verification, Production backend/live Clerk configuration,
+  signed-entitlement comparison, and provisioning-profile validity passed.
+- Archived executable SHA-256:
+  `0bd45a45135de6ac61282a17aac64961b4aa70fa830ad954aed3dbf88b0c14ba`.
+- The semantic union of archived privacy manifests retains 13 collected-data
+  categories, three required-reason API groups and no tracking. This remains
+  archive evidence, not an Apple Organizer privacy report or provider attestation.
+- Xcode reported `Upload succeeded` at `2026-09-05T04:11:53.220Z`, followed by
+  `EXPORT SUCCEEDED` and exit 0. App Store Connect showed build 57 Processing;
+  processed internal availability and physical installation remain unverified.
+- Local verification and upload evidence is retained in
+  `/private/tmp/permitext-build57-final-evidence.json`,
+  `/private/tmp/permitext-build57-privacy-aggregate.json`,
+  `/private/tmp/permitext-build57-archive-xcode.log`, and
+  `/private/tmp/permitext-build57-upload.log`.
+
+The subsequent whole-section Saved visibility check identified a web-only repair
+on the working branch. Build 57 does not claim full-repository SHA equality with
+that later change. Final shared-candidate selection, remaining client/account
+acceptance and public release authorization remain open. No phone access or App
+Store submission was performed for this upload.

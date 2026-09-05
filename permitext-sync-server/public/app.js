@@ -79,7 +79,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260904-readiness-recovery-v37";
+} from "./offline-storage.js?v=20260905-saved-section-visibility-v38";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -114,7 +114,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260904-readiness-recovery-v37";
+} from "./research-intent-state.js?v=20260905-saved-section-visibility-v38";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -28201,8 +28201,9 @@ function unassignedSavedEvidenceKeys(savedItems, projectSections, projects = [])
     .filter((item) => projectRecords.some((project) => projectSectionBelongsToProject(item, project)))
     .map((item) => savedEvidenceKey(item)));
   return new Set((savedItems || [])
+    .filter((item) => String(item?.sectionID || item?.savedSectionID || item?.itemID || "").trim())
     .map((item) => savedEvidenceKey(item))
-    .filter((sectionID) => !sectionID.endsWith(":") && !linkedSectionIDs.has(sectionID)));
+    .filter((sectionID) => !linkedSectionIDs.has(sectionID)));
 }
 
 function savedEvidenceMatchesQuery(item, query) {

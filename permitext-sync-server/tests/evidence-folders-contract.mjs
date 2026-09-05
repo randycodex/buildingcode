@@ -131,6 +131,34 @@ assert.notEqual(
   "Two selected paragraphs in the same section must remain independent saved records."
 );
 
+const unassignedSavedEvidenceKeys = new Function(
+  "savedEvidenceKey", "activeFolderRecords", "projectSectionBelongsToProject",
+  `${functionSource(appSource, "unassignedSavedEvidenceKeys")}; return unassignedSavedEvidenceKeys;`
+)(savedEvidenceKey, (projects) => projects.filter((project) => !project.deletedAt),
+  (link, project) => link.folderClientID === project.id);
+const wholeSectionSave = { codeVersion: "library-a", sectionID: 101 };
+const historicalSectionSave = { codeVersion: "library-b", sectionID: 101 };
+const paragraphSave = { ...wholeSectionSave, blockID: "paragraph-1" };
+const savedScopeFixture = [wholeSectionSave, historicalSectionSave, paragraphSave,
+  { codeVersion: "library-a", blockID: "orphan-block" }, null];
+assert.deepEqual(
+  [...unassignedSavedEvidenceKeys(savedScopeFixture, [])],
+  [wholeSectionSave, historicalSectionSave, paragraphSave].map(savedEvidenceKey),
+  "Unassigned Saved must retain whole-section Search saves and paragraph saves across editions, while rejecting records without a section."
+);
+assert.deepEqual(
+  [...unassignedSavedEvidenceKeys(savedScopeFixture,
+    [{ ...wholeSectionSave, folderClientID: "collection" }], [{ id: "collection" }])],
+  [historicalSectionSave, paragraphSave].map(savedEvidenceKey),
+  "Assigning a whole section must only remove that exact edition and scope from Unassigned Saved."
+);
+assert.deepEqual(
+  [...unassignedSavedEvidenceKeys(savedScopeFixture,
+    [{ ...wholeSectionSave, folderClientID: "collection" }], [{ id: "collection", deletedAt: "2026-09-05" }])],
+  [wholeSectionSave, historicalSectionSave, paragraphSave].map(savedEvidenceKey),
+  "A deleted collection must not hide its former whole-section saves."
+);
+
 const readerChapterSectionSource = functionSource(appSource, "renderReaderChapterSection");
 assert.match(
   readerChapterSectionSource,

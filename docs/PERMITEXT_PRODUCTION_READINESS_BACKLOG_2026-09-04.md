@@ -330,6 +330,31 @@ separately verify exact-owner drafts/images, quota warnings, and no automatic
 replay. Web assets are synchronized at `20260904-readiness-recovery-v37` and shell
 `permitext-pro-shell-v776`. Native source is unchanged by this follow-up.
 
+## Whole-section saves missing from Unassigned Saved
+
+**Acceptance follow-up, reproduced with the disposable Production account:**
+saving Building Code (2022) 1010.2, Gates, directly from Search increased the saved
+quota count, but the section was missing from Unassigned Saved. A paragraph save
+of Building Code (2014) 1010.2, Slope, remained visible. Reload retained the quota
+count and the omission; this was a visibility defect, not a demonstrated deletion.
+
+Canonical saved keys now include a block component. The unassigned filter still
+treated a trailing colon as a missing section, excluding valid whole-section
+saves whose block component is empty. It now checks the actual section identifier
+before constructing the key, then excludes only exact records linked to an active
+Project or collection. The existing edition and paragraph boundaries remain.
+
+The new regression failed before the fix: it omitted both valid whole-section
+editions and admitted a malformed record with a block but no section. It passes
+afterward, including exact-scope assignment and a deleted collection. Evidence,
+Saved-summary, and offline contracts pass. The full `npm run check` (including
+precheck and postcheck) and broad smoke also passed. The isolated browser's Search save now
+appears in Unassigned Saved, survives reload, and reopens Gates in the 2022 Reader;
+no browser console error was captured. Local served client bytes match the repair.
+Web asset version is `20260905-saved-section-visibility-v38`, shell
+`permitext-pro-shell-v777`. Production publication and the live reopening check
+remain pending for this follow-up; it changes no native runtime source.
+
 ## Critical findings
 
 | ID | Finding | Implementation and local evidence | Remaining acceptance |
