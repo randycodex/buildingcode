@@ -46,8 +46,8 @@ secrets are not copied into this document.
 - The Debug account fixture now isolates its private cache alongside its other
   temporary data. The guarded Xcode wrapper supports `test-ui-simulator` using
   the existing UI scheme, shared build directory, lock and nonparallel testing.
-- Web shell keys advance together to `20260905-account-verification-v40` and
-  `permitext-pro-shell-v779`; the verification bundle remains lazily loaded.
+- Web shell keys advance together to `20260905-account-verification-env-v41`
+  and `permitext-pro-shell-v780`; verification bundle URL v2 remains lazily loaded.
 
 Implementation references: [Clerk reverification guide](https://clerk.com/docs/guides/secure/reverification)
 and [supported React hook](https://clerk.com/docs/react/reference/hooks/use-reverification),
@@ -69,8 +69,8 @@ was changed.
   and choose **Run integration checks**.
 - `npm run check`, `npm run test:auth`, `node tests/smoke.mjs`, and
   `npm run build:clients` passed. The final generated bundle also passed the
-  account-deletion and offline source contracts. Bundle size: 421,399 bytes;
-  SHA-256: `507ba4c5c698d8ed9a26da1986256a54274e636a4fb6696f9188ad74ca73c9e9`.
+  account-deletion and offline source contracts. Final bundle size: 421,325 bytes;
+  SHA-256: `742a0b5061414e4423ee3b7a4d6b598e82e392c978416f05eef4cb63ef4d83a9`.
 - The isolated native UI test passed **1/1** on iPhone 17 Pro / iOS 27 Simulator:
   open Account, confirm deletion, retain completed backend/device results after
   sign-out, dismiss with Done, and confirm the signed-out Account state. Its
@@ -112,9 +112,28 @@ Native reproduction (with the selected Xcode developer directory):
   -only-testing:permitextTests/EntitlementAndSyncContractTests/testAccountDeletionCompletionDoesNotClearAnotherAccount
 ```
 
+## Publication packaging correction
+
+PR #46 published source `68efc23956939bfd79d592173db8cce5628cc3a8` after
+its preview passed. Production health, approved policy bytes and AASA checks
+passed on both canonical origins. The byte-identity check caught a difference
+in the new bundle: Vite included local/hosting `VITE_*` configuration metadata
+through a dependency's environment lookup. The remaining application assets
+were unchanged by this finding.
+
+The bounded web follow-up disables environment-file loading and automatic
+environment-prefix exposure for this standalone bundle. Clerk and its public
+key continue to arrive through the existing runtime instance. Two builds with
+different synthetic environment values produced identical final bytes; neither
+the synthetic value nor local/hosting configuration entries were embedded.
+All six actual-hook browser checks and the account-deletion/offline contracts
+passed again. Native inputs did not change; build 59 was archived from the
+original repair source above. Follow-up Production byte verification is pending.
+
 ## Acceptance boundary
 
-This repair is local and has not been published or uploaded to TestFlight.
+The first repair is on Production; the packaging correction and build 59 upload
+remain in progress at this checkpoint.
 No account deletion, provider cleanup, new paid Research call, or provider
 configuration change was performed in this recovery task. Live Clerk prompt
 and full account-lifecycle acceptance remain open, including private-file and

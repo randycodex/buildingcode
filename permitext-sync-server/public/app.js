@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260905-account-verification-v40";
+} from "./offline-storage.js?v=20260905-account-verification-env-v41";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260905-account-verification-v40";
+} from "./research-intent-state.js?v=20260905-account-verification-env-v41";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -4748,7 +4748,7 @@ async function deleteCapturedAccount(account, identity) {
 }
 
 function loadAccountVerification() {
-  return import("/web/account-verification-assets/account-verification.js?v=20260905-account-verification-v1");
+  return import("/web/account-verification-assets/account-verification.js?v=20260905-account-verification-v2");
 }
 
 async function prepareAccountDeletionIdentity(account, identity) {

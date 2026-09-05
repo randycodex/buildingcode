@@ -8243,15 +8243,13 @@ var he = (e) => !!e?.cloudflare?.env, ge = (e) => !!e?.env, _e = (e, t) => {
 		DEV: !1,
 		MODE: "production",
 		PROD: !0,
-		SSR: !1,
-		VITE_NEON_AUTH_URL: "[SENSITIVE]"
+		SSR: !1
 	}[e] == "string") return {
 		BASE_URL: "/web/account-verification-assets/",
 		DEV: !1,
 		MODE: "production",
 		PROD: !0,
-		SSR: !1,
-		VITE_NEON_AUTH_URL: "[SENSITIVE]"
+		SSR: !1
 	}[e];
 	if (he(t)) return t.cloudflare.env[e] || "";
 	if (ge(t)) return t.env[e] || "";
