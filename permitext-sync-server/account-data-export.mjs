@@ -33,6 +33,7 @@ function validateUserID(userID) {
 
 function completeExport(userID, data, storage) {
   const account = withoutCredentials(data.account);
+  const ownershipReview = accountDeletionOwnershipReview({ userID, records: data.records });
   return {
     schema: "permitext-account-record-export-v2",
     userID,
@@ -42,10 +43,12 @@ function completeExport(userID, data, storage) {
     passkeyCredentialIDs: data.passkeyCredentialIDs || [],
     mutations: data.mutations || [],
     records: data.records,
+    deletionOwnershipReview: ownershipReview,
     scope: {
       storage,
-      accountRecords: "Records owned by this account, its owned organization metadata, and its own memberships and invitations.",
-      otherMembersContentIncluded: false,
+      accountRecords: "Records stored under this account, its owned organization and Project-ownership metadata, and its own memberships and invitations. Stored legacy shared records require ownership review before disposal.",
+      otherMembersContentIncluded: ownershipReview.required ? null : false,
+      sharedContentReviewRequired: ownershipReview.required,
       authenticationSecretsIncluded: false,
       privateAssetBytesIncluded: false,
       excludedOperationalRecords: "Global operational audit logs, provider replay-protection ledgers, and duplicate sync journals are not part of this content snapshot or its deletion inventory.",
@@ -69,8 +72,26 @@ export function accountRecordExportFromStore(store, userID) {
   records.organizationInvitations = Object.values(store.organizationInvitationsByID || {})
     .filter((record) => [record.invitedUserID, record.invitedByUserID, record.acceptedByUserID].includes(userID))
     .map(withoutCredentials);
+  const ownedOrganizations = new Set(records.organizations.map((record) => record.id));
   records.projectOwnerships = Object.values(store.projectOwnerships || {})
-    .filter((record) => record.storageOwnerUserID === userID || (record.owner?.kind === "user" && record.owner.id === userID));
+    .filter((record) => record.storageOwnerUserID === userID ||
+      (record.owner?.kind === "user" && record.owner.id === userID) ||
+      (record.owner?.kind === "organization" && ownedOrganizations.has(record.owner.organizationID || record.owner.id)));
+  const sharedRecords = [
+    ...Object.values(store.foundationArtifactsByUserID || {}).flatMap(values).map((record) => record.envelope),
+    ...["projectLinksByUserID", "activityEventsByUserID", "researchAnswersByUserID", "evidenceSnapshotsByUserID", "commentsByUserID"]
+      .flatMap((key) => Object.values(store[key] || {}).flatMap(values)).map((record) => record.comment || record)
+  ];
+  records.organizationDeletionDependencies = records.organizations.map((organization) => ({
+    organizationID: organization.id,
+    otherMemberCount: [
+      ...values(store.organizationMembershipsByOrganizationID?.[organization.id]),
+      ...Object.values(store.projectMembershipsByProjectID || {}).flatMap(values)
+        .filter((record) => record.organizationID === organization.id)
+    ].filter((record) => record.userID !== userID).length,
+    sharedRecordCount: sharedRecords.filter((record) => record?.owner?.kind === "organization" &&
+      (record.owner.organizationID || record.owner.id) === organization.id).length
+  }));
   records.migrationCheckpoints = Object.entries(store.migrationCheckpointsByUserID?.[userID] || {})
     .map(([name, checkpoint]) => ({ name, checkpoint }));
   records.artifactRevisions = Object.entries(store.artifactRevisionsByUserID?.[userID] || {})
@@ -112,10 +133,23 @@ const postgresCollections = Object.freeze([
   ["evidenceSnapshots", "permitext_evidence_snapshots", "t.snapshot", "user_id = $1", "id"],
   ["researchPurchaseClaims", "permitext_research_purchase_claims", "to_jsonb(t) - 'credited_user_id'", "credited_user_id = $1", "id"],
   ["organizations", "permitext_organizations", "t.organization", "owner_user_id = $1", "id"],
+  ["organizationDeletionDependencies", "permitext_organizations", `jsonb_build_object(
+    'organizationID', t.id,
+    'otherMemberCount', (SELECT count(*) FROM permitext_organization_memberships m WHERE m.organization_id = t.id AND m.user_id <> $1)
+      + (SELECT count(*) FROM permitext_project_memberships m WHERE m.organization_id = t.id AND m.user_id <> $1),
+    'sharedRecordCount', ${[
+      ["permitext_foundation_artifacts", "envelope->'owner'"],
+      ["permitext_project_links", "link->'owner'"],
+      ["permitext_project_activity", "event->'owner'"],
+      ["permitext_research_answers", "answer->'owner'"],
+      ["permitext_evidence_snapshots", "snapshot->'owner'"],
+      ["permitext_comments", "COALESCE(mutation->'comment'->'owner', mutation->'owner')"]
+    ].map(([table, owner]) => `(SELECT count(*) FROM ${table} r WHERE (${owner})->>'kind' = 'organization' AND COALESCE((${owner})->>'organizationID', (${owner})->>'id') = t.id)`).join(" + ")}
+  )`, "owner_user_id = $1", "id"],
   ["organizationMemberships", "permitext_organization_memberships", "t.membership", "user_id = $1", "id"],
   ["projectMemberships", "permitext_project_memberships", "t.membership", "user_id = $1", "id"],
   ["organizationInvitations", "permitext_organization_invitations", "t.invitation - ARRAY['token', 'tokenHash', 'token_hash', 'invitationToken']", "invited_user_id = $1 OR invitation->>'invitedByUserID' = $1 OR invitation->>'acceptedByUserID' = $1", "id"],
-  ["projectOwnerships", "permitext_project_ownerships", "t.ownership", "storage_owner_user_id = $1 OR (owner_kind = 'user' AND owner_id = $1)", "project_id"],
+  ["projectOwnerships", "permitext_project_ownerships", "t.ownership || jsonb_build_object('projectID', t.project_id, 'owner', jsonb_build_object('kind', t.owner_kind, 'id', t.owner_id, 'organizationID', CASE WHEN t.owner_kind = 'organization' THEN COALESCE(t.organization_id, t.owner_id) ELSE NULL END), 'storageOwnerUserID', t.storage_owner_user_id)", "storage_owner_user_id = $1 OR (owner_kind = 'user' AND owner_id = $1) OR organization_id IN (SELECT id FROM permitext_organizations WHERE owner_user_id = $1) OR (owner_kind = 'organization' AND owner_id IN (SELECT id FROM permitext_organizations WHERE owner_user_id = $1))", "project_id"],
   ["codeQuestionCounters", "permitext_code_question_counters", "to_jsonb(t) - 'user_id'", "user_id = $1", "scope, scope_key", true],
   ["codeQuestionPendingIssuance", "permitext_code_question_pending_issuance", "t.record", "user_id = $1", "id", true],
   ["codeQuestionOutbox", "permitext_code_question_outbox", "t.entry", "user_id = $1", "id", true]
@@ -177,6 +211,49 @@ export async function postgresAccountRecordExport(sql, userID) {
   }, "postgres");
 }
 
+// Storage attribution is not permission to dispose of a legacy shared Project.
+// Inspect only server-recorded ownership scopes, never path-shaped authored text.
+export function accountDeletionOwnershipReview({ userID, records }) {
+  const projectIDs = new Set();
+  const organizationIDs = new Set();
+  let sharedRecordCount = 0;
+  const inspect = (owner, projectID) => {
+    if (!owner || (owner.kind === "user" && owner.id === userID)) return false;
+    sharedRecordCount += 1;
+    if (projectID) projectIDs.add(projectID);
+    if (owner.kind === "organization" && (owner.organizationID || owner.id)) {
+      organizationIDs.add(owner.organizationID || owner.id);
+    }
+    return true;
+  };
+  for (const ownership of records.projectOwnerships || []) {
+    const shared = inspect(ownership.owner, ownership.projectID);
+    if (!shared && ownership.storageOwnerUserID && ownership.storageOwnerUserID !== userID) {
+      sharedRecordCount += 1;
+      if (ownership.projectID) projectIDs.add(ownership.projectID);
+    }
+  }
+  for (const artifact of records.foundationArtifacts || []) {
+    inspect(artifact.envelope?.owner, artifact.payload?.projectID || artifact.payload?.project?.id);
+  }
+  for (const family of ["projectLinks", "activityEvents", "researchAnswers", "evidenceSnapshots", "comments"]) {
+    for (const entry of records[family] || []) {
+      const record = entry.comment || entry;
+      inspect(record.owner, record.projectID);
+    }
+  }
+  const dependentOrganizations = (records.organizationDeletionDependencies || [])
+    .filter((record) => record.otherMemberCount > 0 || record.sharedRecordCount > 0);
+  for (const record of dependentOrganizations) organizationIDs.add(record.organizationID);
+  return {
+    required: sharedRecordCount > 0 || dependentOrganizations.length > 0,
+    projectCount: projectIDs.size,
+    organizationCount: organizationIDs.size,
+    sharedRecordCount,
+    dependentOrganizationCount: dependentOrganizations.length
+  };
+}
+
 export function accountRestoreChecklist(exported) {
   const counts = {};
   for (const mutation of exported.mutations) {
@@ -207,6 +284,7 @@ export function accountRestoreChecklist(exported) {
     projectLinkCount: records.projectLinks.length,
     activityEventCount: records.activityEvents.length,
     recordCounts: Object.fromEntries(Object.entries(records).map(([name, entries]) => [name, entries.length])),
+    deletionOwnershipReview: accountDeletionOwnershipReview(exported),
     latestContinuity: exported.mutations.filter((mutation) => mutation.continuity)
       .sort((a, b) => String(a.continuity.updatedAt || "").localeCompare(String(b.continuity.updatedAt || ""))).at(-1) || null
   };

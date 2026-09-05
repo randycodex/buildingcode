@@ -196,8 +196,31 @@ Firm administration and collaboration are retired, with existing records retaine
 for compatibility under `PERMITEXT_DEFERRED_FEATURES.md`. Cleanup must respect the
 stored ownership boundary and identify shared records for reviewed legacy
 recovery or disposal. Restoring firm administration is not part of this repair.
-The issue remains open; PostgreSQL, concurrent ownership changes, and the
-preservation/recovery path still need verification.
+The repair now checks explicit Project and artifact/link ownership before
+billing or private-file cleanup. `ACCOUNT_SHARED_DATA_REVIEW_REQUIRED` returns
+HTTP 409 with every deletion stage `notStarted`. The operator inventory includes
+Project ownership held by an owned organization even when storage belongs to
+another account. It uses the PostgreSQL ownership columns over a stale JSON copy
+and reports retained organization membership and scoped-record dependencies,
+including records whose Project registry or separate organization column is
+missing. Shared-data exports no
+longer claim that other members' contributions are certainly excluded.
+
+The legacy transfer route also registers the organization owner's operation
+guard before changing ownership. File-backed HTTP checks preserved both complete
+account inventories and the private file. Actual isolated PostgreSQL 18.6 checks
+passed both owners, incomplete registries, stale ownership JSON, and
+transfer/deletion exclusion in both orders. The final exercise also removed the
+other membership so the retained foreign artifact alone had to stop deletion of
+the organization owner. The run made 1,575 local database
+requests, including 48 Serializable and 45 repeatable-read/read-only batches,
+with zero external database or provider requests. Authentication, broad smoke,
+and the full `npm run check` (precheck, main check, and postcheck) passed. This
+repair is not published.
+
+This closes neither reviewed legacy recovery/disposal nor full account-deletion
+acceptance. A safe stop preserves affected data; it does not migrate it or prove
+that an account can subsequently be deleted. Those outcomes remain open.
 
 ## First repair batch
 

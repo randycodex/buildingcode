@@ -12,6 +12,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createFileAccountLifecycle, createPostgresAccountLifecycle } from "./account-lifecycle.mjs";
 import {
+  accountDeletionOwnershipReview,
   accountRecordExportFromStore,
   accountRestoreChecklist,
   existingOptionalAccountRecordTables,
@@ -13420,6 +13421,10 @@ async function handleOrganizationProjectTransfer(request, response) {
     sendError(response, 404, "Personal Project not found.");
     return;
   }
+  // A legacy transfer changes what deletion of the organization owner's account
+  // would remove. Register that owner too before adding shared ownership.
+  if (access.organization.ownerUserID !== context.userID &&
+      !await protectAccountOperation(request, response, access.organization.ownerUserID)) return;
   const projectID = projectIdentityForRecord(project, context.userID) || requestedProjectID;
   const existingOwnership = await storedProjectOwnership(projectID);
   if (existingOwnership?.owner?.kind === "organization") {
@@ -24780,9 +24785,8 @@ async function handleSignOut(request, response) {
   sendJSON(response, 200, { signedOut: true });
 }
 
-async function privateProjectAssetsForAccount(userID) {
+async function privateProjectAssetsForAccount(userID, exported) {
   const adapter = await storeAdapter();
-  const exported = await adapter.exportAccountRecords(userID);
   const assets = privateAssetsFromAccountRecords(exported);
   const paths = new Set(assets.map((asset) => asset.pathname));
   const provider = notebookImageStorage();
@@ -24872,6 +24876,17 @@ async function handleAccountDelete(request, response) {
     throw error;
   }
   try {
+    const exported = await (await storeAdapter()).exportAccountRecords(userID);
+    const ownershipReview = accountDeletionOwnershipReview(exported);
+    if (ownershipReview.required) {
+      sendJSON(response, 409, {
+        error: "This account is connected to older shared Project records. Contact support to review and preserve that data before deleting the account. Your billing, files, and account have not been changed.",
+        code: "ACCOUNT_SHARED_DATA_REVIEW_REQUIRED",
+        partial: false,
+        stages: accountDeletionStages()
+      });
+      return;
+    }
     let billingCancellation;
     try {
       billingCancellation = await cancelStripeSubscriptionsForAccount({
@@ -24891,7 +24906,7 @@ async function handleAccountDelete(request, response) {
 
     let privateAssets;
     try {
-      privateAssets = await privateProjectAssetsForAccount(userID);
+      privateAssets = await privateProjectAssetsForAccount(userID, exported);
       await deletePrivateProjectAssets(privateAssets);
     } catch (error) {
       console.error("Account deletion stopped because private asset cleanup failed.", error);

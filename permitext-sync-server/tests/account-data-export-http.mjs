@@ -109,6 +109,37 @@ try {
   await lifecycle.finish(A, "synthetic-late-file-write");
   await fileAdapter.write(staleDuringGuard);
   assert.deepEqual((await fileAdapter.exportAccountRecords(A)).records.accountLifecycle, [], "A stale file write cannot resurrect a finished guard.");
+
+  // Imported shared records remain possible after firm administration retirement.
+  // Both the storage account and organization owner must preserve the shared file.
+  const personal = await fileAdapter.read();
+  const shared = structuredClone(personal);
+  shared.projectOwnerships["project-a"].owner = { kind: "organization", id: "org-b", organizationID: "org-b" };
+  shared.projectMembershipsByProjectID["project-a"].push({ userID: B, organizationID: "org-b", role: "owner" });
+  await fileAdapter.write(shared);
+  const sharedBeforeA = await fileAdapter.exportAccountRecords(A);
+  const sharedBeforeB = await fileAdapter.exportAccountRecords(B);
+  assert.equal(sharedBeforeB.records.projectOwnerships.length, 1, "The organization owner must see Project ownership held under another storage account.");
+  for (const owner of [A, B]) {
+    const snapshot = await fileAdapter.exportAccountRecords(owner);
+    assert.equal(snapshot.deletionOwnershipReview.required, true);
+    assert.equal(snapshot.deletionOwnershipReview.projectCount, 1);
+    assert.equal(snapshot.scope.otherMembersContentIncluded, null, "Shared records must not be labeled as excluding other members' contributions.");
+    const review = await post("/admin/accounts/restore-checklist", { userID: owner });
+    assert.deepEqual(review.body.deletionOwnershipReview, snapshot.deletionOwnershipReview);
+    const blocked = await post("/account/delete", { auth: { accountUserID: owner }, confirmation: "DELETE" }, store.sessions[owner]);
+    assert.equal(blocked.status, 409, JSON.stringify(blocked.body));
+    assert.equal(blocked.body.code, "ACCOUNT_SHARED_DATA_REVIEW_REQUIRED");
+    assert.equal(blocked.body.partial, false);
+    assert.equal(blocked.body.stages.stripeBilling.status, "notStarted");
+    assert.equal(blocked.body.stages.privateAssets.status, "notStarted");
+    assert.equal(blocked.body.stages.permitextData.status, "notStarted");
+    assert.equal(await readFile(join(assetRoot, assetPath), "utf8"), "synthetic private asset");
+    assert.deepEqual(await fileAdapter.exportAccountRecords(A), sharedBeforeA);
+    assert.deepEqual(await fileAdapter.exportAccountRecords(B), sharedBeforeB);
+  }
+  // Restore only this disposable test fixture; this is not a support migration.
+  await fileAdapter.write(personal);
   const deleted = await post("/account/delete", { auth: { accountUserID: A }, confirmation: "DELETE" }, store.sessions[A]);
   assert.equal(deleted.status, 200, JSON.stringify(deleted.body));
   assert.equal(deleted.body.deleted, true);

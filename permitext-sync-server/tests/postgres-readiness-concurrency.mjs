@@ -11,6 +11,7 @@ import { commitPostgresNotebookCardMutation } from "../notebook-persistence.mjs"
 import { createPostgresAccountRepository } from "../postgres-account-repository.mjs";
 import { researchConversationRevision, researchContextRevision, researchConversationConflict, resetResearchActiveContext, activeResearchMessages } from "../research-context-state.mjs";
 import { runPostgresAccountDataExportCases } from "./postgres-account-data-export-cases.mjs";
+import { runPostgresSharedOwnershipCases } from "./postgres-account-shared-ownership-cases.mjs";
 
 assert.equal(process.env.PERMITEXT_RUN_LOCAL_POSTGRES_READINESS, "1");
 const connectionString = process.env.PERMITEXT_LOCAL_POSTGRES_URL;
@@ -206,6 +207,8 @@ try {
   await runPostgresAccountDataExportCases({ sql, auxiliaryAdapter });
   // Independent acceptance scenarios share one disposable loopback address.
   // Reset only their local rate buckets; do not alter deployed limits.
+  await sql`DELETE FROM permitext_rate_limit_buckets`;
+  await runPostgresSharedOwnershipCases({ sql });
   await sql`DELETE FROM permitext_rate_limit_buckets`;
   let assetCases = await readFile(new URL("./account-private-assets-http.mjs", import.meta.url), "utf8");
   assetCases = assetCases.replace('"PERMITEXT_SYNC_DATABASE_URL", ', "")
