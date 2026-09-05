@@ -168,7 +168,7 @@
   "dependencies": {
     "@blocknote/core": "^0.52.1",
     "@blocknote/mantine": "^0.52.1",
-    "@blocknote/react": "^0.52.1",
+    "@blocknote/react": "^0.54.0",
     "@clerk/backend": "^3.16.10",
     "@clerk/react": "6.15.1",
     "@clerk/shared": "4.31.0",
