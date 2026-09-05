@@ -490,6 +490,12 @@ until the exact candidate and remaining evidence satisfy its requirements.
 
 ## Known recovery limits
 
+The [account recovery support procedure](./BETA1_OPERATIONS_RUNBOOK.md#account-cleanup-and-linking-recovery)
+now covers operation blockers, partial cleanup, shared ownership, restricted
+exports and the separate device/provider outcomes. It documents investigation;
+it does not claim that interrupted guards or shared-data disposal were exercised
+in Production.
+
 - **Unattributed legacy data:** ambiguous legacy workspace/Workboard bytes remain
   retained and unavailable to normal guest/account hydration. No account is
   assigned ownership by guessing. Scoped account deletion removes provably owned

@@ -15,6 +15,58 @@ Use the same operating loop for every report: acknowledge and set the next updat
 
 Before public Beta, complete the three synthetic scenarios in [BETA1_SUPPORT_TABLETOP_RECORD.md](./BETA1_SUPPORT_TABLETOP_RECORD.md). The document contract is automated, but only a timed operator-run record can confirm the process is operable.
 
+## Account cleanup and linking recovery
+
+The account safeguards published in September 2026 can stop deletion or linking
+while another request is active, or when older shared records need review. A
+stopped request is not a completed deletion or merge. Use the returned code and
+stage results to distinguish these cases:
+
+| Response code | Meaning and next step |
+| --- | --- |
+| `ACCOUNT_OPERATION_IN_PROGRESS` / `ACCOUNT_LINK_OPERATION_IN_PROGRESS` (409) | Another operation prevents deletion or linking. Let known active work finish, preserve local drafts, then retry the already authorized operation. A persistent blocker needs the investigation below. |
+| `ACCOUNT_DELETION_IN_PROGRESS` (409) | A deletion claim blocks new account work. Inspect the original attempt's result and cleanup stages before retrying; elapsed time alone does not establish completion. |
+| `ACCOUNT_SHARED_DATA_REVIEW_REQUIRED` (409) | Stored shared Project or organization dependencies require review. This response returns every deletion stage as `notStarted`; billing, files and account data remain unchanged by this attempt. Preserve all affected owners' records before preparing a separately reviewed recovery or disposal plan. |
+| `PRIVATE_ASSET_DELETION_FAILED` / `ACCOUNT_DATA_DELETION_FAILED` | Cleanup did not fully finish. Applicable billing or some file deletion may already have happened. Read `stages`, `partial` and any ownership `causeCode`; do not describe the entire attempt as rolled back. |
+
+For a persistent blocker or uncertain cleanup result:
+
+1. Record the exact serving commit, platform/build, attempt time, response code
+   and stage results. Confirm the intended account through authenticated evidence;
+   an email address alone does not establish ownership or authorize deletion.
+2. With the current operator credential, use the existing account export and
+   restore-checklist routes for the exact account. Check export schema
+   `permitext-account-record-export-v2`, `records.accountLifecycle`, and
+   `deletionOwnershipReview`. Keep raw exports in restricted operator storage;
+   retain only redacted counts and evidence references in source control or
+   support records. An unavailable credential is a stop, not a reason to bypass
+   the endpoint through direct database access.
+3. Preserve referenced private files separately: the record export excludes their
+   bytes. Check owned organizations, memberships, Project ownership and dependency
+   counts before treating an inventory as exclusively personal content.
+4. Correlate retained operation IDs, kinds and start times with the actual
+   request/deployment evidence, including any `ACCOUNT_OPERATION_RELEASE_FAILED`
+   event. Guards have no time-based expiry. A timeout, closed browser or newer
+   deployment does not prove an older writer stopped. Do not clear a guard merely
+   because it is old; unresolved writer status remains blocked for engineering
+   review. This runbook does not authorize manual database edits or a forced
+   recovery procedure.
+5. Before any destructive retry or provider cleanup, present the exact account,
+   records, private files, billing effects, retained shared/legacy data and backup
+   evidence for the required approval. A Permitext deletion response does not
+   establish Clerk deletion, Apple subscription cancellation, or cleanup on an
+   independent device. Verify each applicable outcome separately.
+6. For confirmed account linking, use the retained source-work recovery export
+   and review it before any replay. Do not clear local storage or assume another
+   tab's later edits moved to the destination. The detailed
+   [legacy and merge recovery limits](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md#known-recovery-limits)
+   remain applicable.
+
+These instructions document safe investigation of the published behavior.
+Interrupted-operation recovery, reviewed shared-data disposal and final
+Production account-lifecycle acceptance remain open; the previously passed
+support tabletop is retained with its original scope.
+
 ## Monitoring baseline
 
 Permitext emits structured Vercel runtime events for:

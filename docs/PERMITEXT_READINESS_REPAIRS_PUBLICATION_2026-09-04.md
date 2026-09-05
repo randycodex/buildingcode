@@ -328,6 +328,10 @@ branch matched before this documentation update.
   `npm run check`, including precheck/postcheck, broad smoke and the focused
   evidence, Saved-summary and offline contracts passed. No new PostgreSQL
   concurrency exercise was needed for this client-only filter correction.
+- GitHub reported the same commit's automatic Apple `permitext | Default` check
+  successful by `2026-09-05T04:33Z`, alongside Vercel success. Apple CI job
+  `6a8006b3-ffaa-439d-8e97-6805db715f8e` is build-check evidence; it does not
+  establish a new TestFlight upload or physical installation.
 
 Local evidence includes `/private/tmp/permitext-unassigned-section-browser-evidence.json`,
 `/private/tmp/permitext-unassigned-section-production-release.json`, and the
