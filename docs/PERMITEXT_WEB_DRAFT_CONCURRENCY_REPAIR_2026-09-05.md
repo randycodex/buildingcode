@@ -73,3 +73,39 @@ Production export checks. No public App Store submission is implied.
 The native source is unchanged from the previously uploaded and physically
 spot-checked TestFlight build 58. This is a web repair; a new full repository SHA
 does not imply a new iOS binary or repeat of native acceptance.
+
+## Production publication
+
+Under the owner's existing repair-publication authorization, PR
+[#45](https://github.com/randycodex/buildingcode/pull/45) merged by fast-forward at
+`2026-09-05T13:47:26Z`. Local `main`, `origin/main`, the repair branch and GitHub
+matched `0985728b26e5b247d758fce26c4e0739efef986f` at publication.
+
+Vercel deployment `dpl_JEcWTHNrTGZYbUA4qM24utdX7LpY` reached READY for Production
+with both canonical aliases. Both `/release` endpoints returned the exact
+published SHA at approximately `2026-09-05T13:51:03Z`. Served `app.js`,
+`offline-storage.js`, `service-worker.js` and `index.html` bytes matched the
+tested source at both origins. Deployment host:
+`permitext-sync-n40rvin12-randycodexs-projects-b72fc111.vercel.app`.
+
+Production PostgreSQL `normalized-v4` health, configured Clerk authentication,
+Apple universal links and the strict approved-policy byte audit passed. The
+deployment-scoped error/fatal log query for `13:47:26Z`–`13:51:23Z` returned no
+matching entries; this is a brief observation, not long-term reliability evidence.
+
+The existing signed-in browser reloaded client v39, returned to Synced, retained
+four saved sections, one existing synthetic note, the saved collection and the
+Building Code (2014) Reader. Account displayed `Release: 0985728b26e5`. The
+previous legacy-ownership recovery notice remained visible. No customer content
+was changed, no Research turn was made, and the Account panel was closed after
+inspection. The isolated test tab/server were also closed; the normal local
+server was preserved.
+
+Private local evidence: `/private/tmp/permitext-device-draft-production-20260905.json`,
+`/private/tmp/permitext-device-draft-policy-20260905.json`,
+`/private/tmp/permitext-device-draft-check-20260905.log`, and
+`/private/tmp/permitext-device-draft-recovery-final-20260905.log`.
+
+GitHub's Vercel check passed. The separate Apple cloud Archive check was still
+pending when this web publication was recorded; it is not a new TestFlight
+upload or additional physical-device acceptance.

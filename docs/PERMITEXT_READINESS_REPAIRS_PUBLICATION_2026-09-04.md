@@ -5,6 +5,11 @@ TestFlight. This record distinguishes publication from the wider acceptance
 requirements in the [repair backlog](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md).
 It does not authorize public App Store submission or close those requirements.
 
+Latest web publication: the [September 5 device-draft concurrency repair](./PERMITEXT_WEB_DRAFT_CONCURRENCY_REPAIR_2026-09-05.md#production-publication)
+is live at `0985728b26e5b247d758fce26c4e0739efef986f` (PR #45, client v39).
+TestFlight build 58 remains current with unchanged native source. Earlier
+publication entries below are retained as history.
+
 ## Source and Production
 
 - PR [#38](https://github.com/randycodex/buildingcode/pull/38) merged by a fast-forward
