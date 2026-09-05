@@ -14,6 +14,7 @@ usage() {
   print 'Usage:'
   print '  ./Tools/permitext_xcode.sh test-simulator [xcodebuild arguments]'
   print '  ./Tools/permitext_xcode.sh build-simulator [xcodebuild arguments]'
+  print '  ./Tools/permitext_xcode.sh capture-simulator <simulator-identifier> [xcodebuild arguments]'
   print '  ./Tools/permitext_xcode.sh test-physical <device-identifier> [xcodebuild arguments]'
   print '  ./Tools/permitext_xcode.sh archive [xcodebuild arguments]'
 }
@@ -61,6 +62,26 @@ case "$action" in
       -configuration Debug \
       -destination 'generic/platform=iOS Simulator' \
       -derivedDataPath "$derived_data_path" \
+      CODE_SIGNING_ALLOWED=NO \
+      "$@" || command_status=$?
+    ;;
+  capture-simulator)
+    if (( $# == 0 )); then
+      usage
+      exit 2
+    fi
+    readonly simulator_identifier="$1"
+    shift
+    xcodebuild test \
+      -project "$project_path" \
+      -scheme permitextPhysicalStress \
+      -configuration Release \
+      -destination "platform=iOS Simulator,id=${simulator_identifier}" \
+      -derivedDataPath "$derived_data_path" \
+      -parallel-testing-enabled NO \
+      -parallel-testing-worker-count 1 \
+      -maximum-parallel-testing-workers 1 \
+      -only-testing:permitextPhysicalStressUITests/NativeReaderPhysicalStressUITests/testAppStoreReleaseScreenshots \
       CODE_SIGNING_ALLOWED=NO \
       "$@" || command_status=$?
     ;;

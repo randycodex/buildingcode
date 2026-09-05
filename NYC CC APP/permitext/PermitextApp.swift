@@ -1046,30 +1046,30 @@ private struct PermitextTabNavigation: View {
             BookmarksView()
                 .tabItem {
                     Image(systemName: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
+                        .accessibilityLabel("Saved")
                 }
-                .accessibilityLabel("Saved")
                 .tag(AppTab.bookmarks)
 
             BrowseView(browserContext: .primary)
                 .environment(\.isBrowserTabActive, library.selectedTab == .browse)
                 .tabItem {
                     Image(systemName: "text.line.first.and.arrowtriangle.forward")
+                        .accessibilityLabel("First reader")
                 }
-                .accessibilityLabel("First reader")
                 .tag(AppTab.browse)
 
             IndependentReaderHost(browserContext: .secondary)
                 .tabItem {
                     Image(systemName: "text.line.last.and.arrowtriangle.forward")
+                        .accessibilityLabel("Second reader")
                 }
-                .accessibilityLabel("Second reader")
                 .tag(AppTab.browseSecondary)
 
             SearchView()
                 .tabItem {
                     Image(systemName: "magnifyingglass")
+                        .accessibilityLabel("Search")
                 }
-                .accessibilityLabel("Search")
                 .tag(AppTab.search)
 
             ResearchView()

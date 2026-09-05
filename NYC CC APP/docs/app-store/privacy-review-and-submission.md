@@ -6,13 +6,22 @@ September 3 live audit: see [current observed Apple state](../../../docs/PERMITE
 
 September 4 repair publication update: [Production and build 56 evidence](../../../docs/PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md) supersedes the earlier build-52 upload status. Build 56 is available to Internal Testers and passed installation, launch, displayed build identity, and existing account/plan/sync/saved-section/Project-container continuity on the iPhone 17 Pro. This is bounded physical acceptance, not completion of the submission matrix. No App Store build selection or submission was performed.
 
+September 5 update: build 57 (`1.0`) is processed and available to Internal Testers
+from `acafd9642a07e049c218f9816432341de8aec0cc`. Its signed archive passed the same
+semantic privacy aggregation, with 13 collected categories, three required-reason
+API groups and no tracking. Build 56 remains the last physically verified
+installation. Production subsequently advanced to web-only repair
+`1afdafd19ca4947d19e46350748506668c90790c`; the native runtime is unchanged, but
+the full source SHAs differ. The final common candidate remains unselected. See
+the [build 57 and current Production evidence](../../../docs/PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-57-source-alignment-candidate).
+
 ## Configuration and previously recorded setup
 
 Build/upload and app availability were rechecked September 3. Agreement, bank, tax, and subscription-price entries below retain earlier evidence and need a final live confirmation; do not treat this entire list as a new audit.
 
 - Bundle ID: `com.randycodex.permitext`
 - Version: `1.0`
-- Latest verified uploaded/internal TestFlight build: `56` (September 4); no App Store build was selected during the repair publication
+- Latest verified uploaded/internal TestFlight build: `57` (September 5); no App Store build was selected during the repair publication
 - App Store Connect/TestFlight build: confirm the exact live build before selecting the submission candidate
 - Minimum iOS: `17.0`
 - Device family: iPhone only
@@ -133,7 +142,7 @@ Review-access plan (requires approval and verification before submission):
 
 ## Version 1.0 items still required in App Store Connect
 
-- Select the exact final version 1.0 build only after its upload and required physical-device acceptance; build 56 is uploaded and has bounded continuity evidence but has not been selected for App Store review
+- Select the exact final version 1.0 build only after its upload and required physical-device acceptance; build 57 is internally available, while build 56 has the latest bounded physical continuity evidence. Neither this checklist nor the repair publication selects a final App Store build.
 - Recapture and inspect final release-build iPhone screenshots before upload; the old build-33 Reader image contains a debug control
 - Enter description, keywords, URLs, and copyright
 - Add the app's free price schedule
@@ -151,6 +160,7 @@ Review-access plan (requires approval and verification before submission):
 
 ## Prepared screenshot package
 
+- September 5: four local build-58 Release Simulator captures and JPEG copies are prepared in `screenshots/build58-candidate/`. The signed-out flow, tab/chapter accessibility labels and absence of the Reader debug control passed the UI check. All four settled PNGs were inspected; dimensions and JPEG alpha checks passed. This candidate has not been uploaded to App Store Connect or bound to a selected final submission build. See the current section of `screenshots/README.md` and its provenance manifest.
 - Four historical portrait screenshots have the accepted iPhone 6.9-inch size: `1320 × 2868`; they are not the final approved upload set.
 - The upload copies are JPEGs without alpha channels.
 - The screenshots show the code library, native reader, search results, and a saved section.

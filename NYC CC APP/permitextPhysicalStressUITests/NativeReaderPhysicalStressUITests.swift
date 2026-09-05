@@ -9,6 +9,88 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         executionTimeAllowance = 7_200
     }
 
+    func testAppStoreReleaseScreenshots() throws {
+#if DEBUG || !targetEnvironment(simulator)
+        throw XCTSkip("App Store capture requires a Release Simulator build.")
+#else
+        let app = XCUIApplication()
+        app.launch()
+        let explore = app.buttons["phase5-first-use-explore"]
+        if explore.waitForExistence(timeout: 5) { explore.tap() }
+
+        let savedTab = app.tabBars.buttons["Saved"]
+        XCTAssertTrue(savedTab.waitForExistence(timeout: 45))
+        for label in ["First reader", "Second reader", "Search", "Research"] {
+            XCTAssertTrue(app.tabBars.buttons[label].exists, "The tab must expose its destination name: \(label).")
+        }
+        savedTab.tap()
+        app.buttons["Open Account"].tap()
+        XCTAssertTrue(app.buttons["Sign in or create an account"].waitForExistence(timeout: 15),
+                      "Capture must use an anonymous Simulator, without customer account data.")
+        app.terminate()
+        app.launch()
+
+        let readerTab = app.tabBars.buttons["First reader"]
+        XCTAssertTrue(readerTab.waitForExistence(timeout: 20))
+        readerTab.tap()
+        let sourceEdition = app.staticTexts["reader-source-edition"]
+        XCTAssertTrue(sourceEdition.waitForExistence(timeout: 45))
+        XCTAssertEqual(sourceEdition.label, "2022 Construction Codes")
+        XCTAssertTrue(app.buttons["Building Code"].exists)
+        XCTAssertFalse(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Chapter Chapter")).firstMatch.exists)
+        keepAppStoreScreenshot(named: "01-code-library", from: app)
+
+        let chapter = app.buttons.matching(NSPredicate(
+            format: "label BEGINSWITH %@", "Chapter 7:"
+        )).firstMatch
+        for _ in 0..<5 where !chapter.isHittable { app.swipeUp() }
+        XCTAssertTrue(chapter.isHittable, "Building Code Chapter 7 must be reachable.")
+        chapter.tap()
+        XCTAssertTrue(app.buttons["Jump within chapter"].waitForExistence(timeout: 45))
+        XCTAssertFalse(app.buttons["Internal reader mode"].exists,
+                       "Release captures must not contain the Reader debug control.")
+        keepAppStoreScreenshot(named: "02-code-reader", from: app)
+
+        let bookmark = app.buttons[bookmarkIdentifier]
+        XCTAssertTrue(bookmark.waitForExistence(timeout: 10))
+        if bookmark.value as? String != "Saved" {
+            bookmark.tap()
+            if app.alerts["Saved"].waitForExistence(timeout: 3) {
+                app.alerts["Saved"].buttons["Done"].tap()
+            }
+        }
+
+        app.tabBars.buttons["Search"].tap()
+        let search = app.textFields["Search codes"]
+        XCTAssertTrue(search.waitForExistence(timeout: 10))
+        search.tap()
+        search.typeText("fire resistance\n")
+        let results = app.staticTexts.matching(NSPredicate(
+            format: "label MATCHES %@", "[1-9][0-9]* results? in .*"
+        )).firstMatch
+        XCTAssertTrue(results.waitForExistence(timeout: 45))
+        XCTAssertFalse(app.keyboards.firstMatch.exists)
+        keepAppStoreScreenshot(named: "03-search-results", from: app)
+
+        app.tabBars.buttons["Saved"].tap()
+        let savedPassage = app.buttons.matching(NSPredicate(
+            format: "identifier BEGINSWITH %@", savedRowIdentifierPrefix
+        )).firstMatch
+        XCTAssertTrue(savedPassage.waitForExistence(timeout: 10))
+        keepAppStoreScreenshot(named: "04-saved-section", from: app)
+#endif
+    }
+
+    private func keepAppStoreScreenshot(named name: String, from app: XCUIApplication) {
+        // The keyboard and system tab-bar animations can continue after the
+        // accessibility tree reports its final state. Capture the settled UI.
+        Thread.sleep(forTimeInterval: 1)
+        for label in ["Saved", "First reader", "Second reader", "Search", "Research"] {
+            XCTAssertTrue(app.tabBars.buttons[label].isHittable)
+        }
+        keepScreenshot(named: name, from: app)
+    }
+
     func testNativeNotebookFirstLoadFailureShowsRetryAndRecovers() {
         let app = XCUIApplication()
         app.launchArguments += ["--phase3-entitled-research-fixture", "--native-notebook-retry-fixture"]

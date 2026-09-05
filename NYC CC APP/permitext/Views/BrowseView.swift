@@ -1209,7 +1209,7 @@ private struct ChapterTile: View {
         .frame(minHeight: 110)
         .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Chapter \(chapter.displayLabel): \(chapter.title)"))
+        .accessibilityLabel(Text("\(chapter.displayLabel): \(chapter.title)"))
     }
 
     private var tileFill: Color {

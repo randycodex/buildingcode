@@ -1,0 +1,73 @@
+{
+  "schema": "permitext-simulator-screenshot-candidate-v1",
+  "version": "1.0",
+  "build": "58",
+  "configuration": "Release",
+  "device": "iPhone 17 Pro Max",
+  "runtime": "iOS 26.5",
+  "sdk": "iphonesimulator27.0",
+  "bundleID": "com.randycodex.permitext",
+  "nativeRuntimeTree": "52dbb515963108de06568fa85baab5994ea5511f",
+  "sourceBaseCommit": "a53ae57d5ce59fe874beffa6497fc1849cc8c319",
+  "sourceFilesSHA256": {
+    "NYC CC APP/permitext/PermitextApp.swift": "9a6c52b1d10a2d469798ae82e969819775123f31a5974c3d1f2d2358fffe736f",
+    "NYC CC APP/permitext/Views/BrowseView.swift": "b02e2f80d64c8c28384f82a03e82e004f8e9ae39d38201625cfb41ad10ca0c86",
+    "NYC CC APP/permitextPhysicalStressUITests/NativeReaderPhysicalStressUITests.swift": "8c98303e88eb0daeb16ee34cf2f5528954a618e7b99adb63837085ab2cf52763"
+  },
+  "simulatorExecutableSHA256": "5d5244c2e59b1bbe306d1edcad56e9fdb426aa09c78d581caa37a0270655866c",
+  "test": "NativeReaderPhysicalStressUITests/testAppStoreReleaseScreenshots",
+  "testPassed": true,
+  "testLog": "/private/tmp/permitext-store-capture58-settled.log",
+  "resultBundle": "/private/tmp/permitext-store-capture58-settled.xcresult",
+  "signedOutUIVerified": true,
+  "visualInspection": "All four settled PNG captures inspected; no visible account identity, private notes or debug control; complete tab icons visible.",
+  "statusBarOverride": "Simulator 9:41, Wi-Fi, full battery; application pixels not retouched.",
+  "conversion": "sips JPEG quality 95; original dimensions retained.",
+  "submissionBoundary": "Local candidate only. No App Store upload, build selection, submission or physical-device acceptance is established by these images.",
+  "files": [
+    {
+      "name": "01-code-library",
+      "capturedAtUTC": "2026-09-05T04:56:32.058000+00:00",
+      "png": "iphone-6.9/01-code-library.png",
+      "pngSHA256": "16390b0c549a8f93510cd046bbd8f9038b509589a0be5c6fd3831ac00e1450ae",
+      "jpeg": "iphone-6.9/submission/01-code-library.jpg",
+      "jpegSHA256": "053df23770f8ec6156760a171f6a138e069bdb2164e2821af52accfcb5f797c8",
+      "width": 1320,
+      "height": 2868,
+      "jpegHasAlpha": false
+    },
+    {
+      "name": "02-code-reader",
+      "capturedAtUTC": "2026-09-05T04:56:40.277000+00:00",
+      "png": "iphone-6.9/02-code-reader.png",
+      "pngSHA256": "9e24e5daa933e2680f23d43fd6be7d5e32096b3a86716718c051682ed720cb8a",
+      "jpeg": "iphone-6.9/submission/02-code-reader.jpg",
+      "jpegSHA256": "293bb02d4042b15efa65f6770b8be4f971ccb3eacb07302271c33a22f14c7c76",
+      "width": 1320,
+      "height": 2868,
+      "jpegHasAlpha": false
+    },
+    {
+      "name": "03-search-results",
+      "capturedAtUTC": "2026-09-05T04:56:51.608000+00:00",
+      "png": "iphone-6.9/03-search-results.png",
+      "pngSHA256": "d5ca79b25bd28cfa22f145c8194887516da895a7a63937ebbea349e2b6aaf50b",
+      "jpeg": "iphone-6.9/submission/03-search-results.jpg",
+      "jpegSHA256": "f9bfbe33a45c89fc648e800d344afd07a8617ef27c480c5e35ea4b6be3dabf2a",
+      "width": 1320,
+      "height": 2868,
+      "jpegHasAlpha": false
+    },
+    {
+      "name": "04-saved-section",
+      "capturedAtUTC": "2026-09-05T04:56:56.018000+00:00",
+      "png": "iphone-6.9/04-saved-section.png",
+      "pngSHA256": "2a70fa9aaa4182eef5ec19ef04384278af0854649d631d5739a70916285ee7ca",
+      "jpeg": "iphone-6.9/submission/04-saved-section.jpg",
+      "jpegSHA256": "7973ff4c630c7ceb4759e08bda4ebdcb9f25cd227de1ef13d8bb2b2dae2df099",
+      "width": 1320,
+      "height": 2868,
+      "jpegHasAlpha": false
+    }
+  ]
+}

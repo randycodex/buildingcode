@@ -360,6 +360,30 @@ Reader. Health, universal links, approved policy hashes and the bounded browser
 console check passed. This follow-up changes no native runtime source. See the
 [publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#whole-section-saved-visibility-publication).
 
+## Native navigation accessibility follow-up
+
+The Release Simulator capture exposed a P2 navigation-label defect. Its actual
+accessibility hierarchy named Saved as `Move` and both Readers by their SF Symbol
+identifiers. The destination labels were applied to each tab's content instead
+of its tab-item image. Chapter cards also announced `Chapter Chapter 7` because
+the display label already included the prefix.
+
+The repair puts each destination label on the tab item and uses the existing
+chapter/appendix display label once. The initial Release UI capture failed to
+find Saved by its destination name; after repair, all five tab names passed.
+The final local build-58 capture also verified the 2022 Building Code chapter
+picker, Chapter 7 Reader without its debug control, search results and anonymous
+Saved content. The existing Xcode wrapper now provides a serial, Release-only
+Simulator capture command; it requires the signed-out UI before collecting the
+four named submission captures. Raw failure diagnostics still require restricted
+handling and visual review before any sharing.
+
+This is local Release and accessibility-tree evidence, not physical VoiceOver
+acceptance. Production/internal-TestFlight publication of this native repair
+remains pending; the currently available internal build is still 57. The owner
+is away, and no phone, account deletion, paid Research or public App Store
+submission was used. The prior build-33 screenshot package remains historical.
+
 ## Critical findings
 
 | ID | Finding | Implementation and local evidence | Remaining acceptance |
