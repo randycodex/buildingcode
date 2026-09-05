@@ -251,7 +251,10 @@ batches, with zero external database or provider requests. File-backed HTTP
 checks passed unchanged blocked inventories for both owners and normal retry.
 Authentication, session hot-path, lifecycle, runbook, and broad smoke checks
 passed. The full `npm run check`, including precheck, main check, and postcheck,
-also passed. This repair is not published.
+also passed. PR #42 published the repair at `acafd9642`. Both canonical
+Production endpoints and the rendered account footer returned that commit;
+health, universal links, approved policy hashes, and account continuity passed.
+See the publication record for the deployment and remaining acceptance limits.
 
 Interrupted-operation recovery and the final Production account-link/deletion
 acceptance remain open. This guard does not replay unsent work from another

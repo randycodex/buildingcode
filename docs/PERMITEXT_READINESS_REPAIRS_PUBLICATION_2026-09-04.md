@@ -210,3 +210,47 @@ Affected accounts remain subject to reviewed recovery before deletion can
 continue. Full Production export/deletion acceptance, interrupted-operation
 recovery, and the remaining final-candidate gates stay open. No Production
 deletion, exploit, entitlement grant, or purchase was performed.
+
+## Account-link operation follow-up publication
+
+PR [#42](https://github.com/randycodex/buildingcode/pull/42) merged by fast-forward
+at `2026-09-05T03:52:59Z`, publishing
+`acafd9642a07e049c218f9816432341de8aec0cc`. Local and remote `main` and the repair
+branch matched before this documentation update. Account linking now rejects
+overlapping operations and deletion claims on either account, including a writer
+that registers just after the merge's Serializable snapshot begins.
+
+- Preview `dpl_4qgsdFjQBANQro58Pk2NA8TqfJFS` became READY and passed its GitHub
+  deployment check. Its protected `/release` returned the exact commit and
+  Preview environment through the authenticated Vercel CLI at `03:52:50Z`.
+- Production deployment `dpl_oRvJsuvqHUgoTdst4wyyrd6izCVM` is READY at
+  `permitext-sync-i0trqqdfl-randycodexs-projects-b72fc111.vercel.app`. Both canonical
+  `/release` endpoints returned that host, Production environment, and the exact
+  commit at `2026-09-05T03:56:06Z`.
+- Production PostgreSQL health and Apple universal links passed. All three
+  approved policy hashes matched the live bytes in the strict audit at
+  `2026-09-05T03:56:04Z`.
+- Deployment-scoped error/fatal aggregate counts were empty for
+  `03:55:40Z`–`03:56:42Z`. The browser captured no console errors. This is a
+  bounded publication check, not sustained-load or latency acceptance.
+- Reloading the designated disposable account preserved Free plan, Synced
+  status, two saved passages, one synthetic note, one empty saved collection,
+  and the Building Code (2022) Reader. The account footer showed
+  `Release: acafd9642a07`; the legacy workspace recovery notice remained.
+- Full `npm run check` passed, including precheck, main check, and postcheck.
+  Authentication policy, session hot-path, lifecycle, runbook, broad smoke, and
+  file-backed HTTP checks passed. Isolated PostgreSQL 18.6 tests covered both
+  race orders, both owners, deletion claims, forged exclusions, a stale snapshot,
+  retained image access, and automatic Apple-identity repair. The final run made
+  1,775 local database requests, including 62 Serializable and 46
+  repeatable-read/read-only batches, with zero external database/provider calls.
+  The disposable cluster was stopped and removed.
+- Native runtime tree `f9bbba46ca2df24487604cf235fc4ec7acfef2e3` remains identical
+  to build 56's archived inputs. No replacement native archive was created by
+  this local repair workflow. The separate automatic Apple CI check on this
+  commit is not evidence of a verified replacement TestFlight installation.
+
+Production export/deletion, interrupted-operation recovery, final provider/client
+acceptance, and the owner release gates remain open. No Production account was
+linked or deleted during these checks. No paid Research, purchase, entitlement
+grant, App Store submission, or navigation redesign was performed.
