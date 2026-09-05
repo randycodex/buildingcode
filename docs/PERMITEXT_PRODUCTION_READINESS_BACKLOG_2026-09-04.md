@@ -49,8 +49,8 @@ social providers. The Clerk dashboard and public environment show optional email
 The readiness audit now rejects this configuration instead of accepting email
 sign-in factors as sufficient configuration evidence. See the
 [current authentication record](./PERMITEXT_PRODUCTION_AUTH_CONFIGURATION_EVIDENCE_2026-08-29.md).
-The live setting has not been changed, and the new audit guard is on this repair
-branch. Disposable-account setup and its later export/deletion approval remain
+The live setting has not been changed. The new audit guard was published in
+PR #39 at `4a3c7a740`. Disposable-account setup and its later export/deletion approval remain
 separate from the already completed publication.
 
 ## Post-publication account export repair
@@ -83,8 +83,9 @@ Validation on this repair branch:
   metadata. The run observed 15 repeatable-read/read-only batches and made zero
   external database or provider requests. The cluster was stopped and removed.
 
-This repair has not been deployed. It does not close the Production acceptance
-gate: the designated Free account has a synthetic saved passage, note, and saved
+This repair was published in PR #39 at `4a3c7a740`; both canonical Production
+release endpoints returned that exact commit. It does not close the acceptance
+gate: the designated Free account has two saved passages, a synthetic note, and a saved
 collection, but second-client sync, full Project/Research/private-image coverage,
 operator export, reviewed deletion, identity cleanup, and recreation remain.
 The available local operator credential returned HTTP 401; no live export or
@@ -127,6 +128,9 @@ Validation:
   1,231 local database requests and 24 repeatable-read/read-only batches, with
   zero external database or provider requests. Its cluster was removed.
 
+PR #39 published this repair at `4a3c7a740`; Production health, universal links,
+approved policy hashes, and the disposable account's reload continuity passed.
+See the [publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#account-export-and-private-file-follow-up-publication).
 Publication and live acceptance are separate from these local results. No
 Production exploit or real-account deletion was attempted. The native runtime
 source remains identical to the previously published build-56 inputs; the only

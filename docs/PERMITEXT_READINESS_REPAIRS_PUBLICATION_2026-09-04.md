@@ -86,3 +86,42 @@ Archives and unredacted local logs are not source-control artifacts. Broader
 authentication/deletion, device recovery, professional handoff, operating
 acceptance, and final owner go/no-go requirements remain open. No new paid cohort,
 price/allowance change, customer deletion, or public App Store submission occurred.
+
+## Account export and private-file follow-up publication
+
+PR [#39](https://github.com/randycodex/buildingcode/pull/39) merged by fast-forward
+at `2026-09-05T01:55:14Z`. Local and remote `main` and the repair branch matched
+`4a3c7a740d29ffb46aacb20aa6cf853766d78ec6`. This publishes the normalized account
+export repair, the fresh-email registration readiness guard, and private-file
+ownership enforcement described in the repair backlog.
+
+- Production deployment `dpl_42LcG9Xp9KBkyoMk9mR8aGYQarZT` is READY. Its host is
+  `permitext-sync-e2vl3oirn-randycodexs-projects-b72fc111.vercel.app`.
+- Both canonical `/release` endpoints returned the exact `4a3c7a740` commit and
+  that deployment host at approximately `2026-09-05T02:01Z`.
+- Production PostgreSQL health and Apple universal-link checks passed. The
+  strict policy audit returned `publicationReady: true` at
+  `2026-09-05T02:01:07Z`, with all three approved policy hashes matching.
+- Deployment-scoped error/fatal counts returned no matching entries for the
+  bounded `01:57Z`–`02:03Z` observation. This is not a sustained-load result.
+- Reloading the designated disposable account retained Synced status, two saved
+  Building Code (2022) passages, one synthetic note, and one empty saved
+  collection. The Reader restored paragraph 101.2. The legacy workspace recovery
+  notice remained visible; its unverified older bytes were not cleared.
+- `npm run test:auth`, private-file storage tests, and broad smoke checks passed
+  locally. The isolated PostgreSQL 18.6 HTTP exercise made 1,231 local database
+  requests, including 24 repeatable-read/read-only batches, and no external
+  database or provider requests. Foreign-account image reads/deletes were
+  blocked, the legitimate owner's image survived, rejected and unconfirmed
+  uploads were cleaned up, and deletion rollback passed.
+- The `NYC CC APP/permitext` runtime tree is
+  `f9bbba46ca2df24487604cf235fc4ec7acfef2e3` at both `553e82e074` and `4a3c7a740`.
+  Build 56 remains the applicable TestFlight runtime. A native documentation
+  update means the entire native project directory is not claimed identical.
+
+The live Clerk email-registration setting remains unchanged and fails the new
+readiness guard. The locally available operator credential returned HTTP 401
+before this publication; a Production account export, approved deletion, identity
+cleanup, and recreation have not passed. No Production exploit or account
+deletion was performed. The saved-passage column discussion remains a proposal;
+this publication contains no layout change.
