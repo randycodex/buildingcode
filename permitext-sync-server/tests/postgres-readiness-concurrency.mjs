@@ -10,6 +10,7 @@ import { neon, neonConfig } from "@neondatabase/serverless";
 import { commitPostgresNotebookCardMutation } from "../notebook-persistence.mjs";
 import { createPostgresAccountRepository } from "../postgres-account-repository.mjs";
 import { researchConversationRevision, researchContextRevision, researchConversationConflict, resetResearchActiveContext, activeResearchMessages } from "../research-context-state.mjs";
+import { runPostgresAccountDataExportCases } from "./postgres-account-data-export-cases.mjs";
 
 assert.equal(process.env.PERMITEXT_RUN_LOCAL_POSTGRES_READINESS, "1");
 const connectionString = process.env.PERMITEXT_LOCAL_POSTGRES_URL;
@@ -25,7 +26,7 @@ const driverPath = process.env.PERMITEXT_LOCAL_PG_DRIVER;
 assert.match(driverPath, /^\/private\/tmp\/permitext-pg-acceptance\.[^/]+\/transport\/node_modules\/pg\/lib\/index\.js$/);
 const { default: pg } = await import(pathToFileURL(driverPath));
 const externalFetch = globalThis.fetch;
-let requests = 0, serializableBatches = 0, activeConnections = 0, maximumConnections = 0;
+let requests = 0, serializableBatches = 0, repeatableReadOnlyBatches = 0, activeConnections = 0, maximumConnections = 0;
 neonConfig.fetchEndpoint = "http://127.0.0.1/permitext-readiness-neon";
 neonConfig.fetchFunction = async (url, options) => {
   assert.equal(url, neonConfig.fetchEndpoint);
@@ -43,7 +44,9 @@ neonConfig.fetchFunction = async (url, options) => {
       const levels = { Serializable: "SERIALIZABLE", RepeatableRead: "REPEATABLE READ", ReadCommitted: "READ COMMITTED" };
       assert.ok(levels[isolation], `Unsupported isolation ${isolation}`);
       if (isolation === "Serializable") serializableBatches += 1;
-      await client.query(`BEGIN ISOLATION LEVEL ${levels[isolation]}`);
+      const readOnly = options.headers["Neon-Batch-Read-Only"] === "true";
+      if (isolation === "RepeatableRead" && readOnly) repeatableReadOnlyBatches += 1;
+      await client.query(`BEGIN ISOLATION LEVEL ${levels[isolation]}${readOnly ? " READ ONLY" : ""}`);
     }
     const results = [];
     for (const query of queries) {
@@ -199,11 +202,15 @@ try {
     events: [{ id: "pg-notebook-rollback-event", projectID: cardLink.projectID, action: "test", objectKind: "notebookCard", objectID: card.envelope.id, createdAt: now }] }), { code: "NOTEBOOK_VERSION_CONFLICT" });
   assert.deepEqual((await sql`SELECT envelope, payload FROM permitext_foundation_artifacts WHERE id = ${card.envelope.id}`)[0], card);
   assert.equal((await sql`SELECT id FROM permitext_project_activity WHERE id = 'pg-notebook-rollback-event'`).length, 0);
+  const auxiliaryAdapter = runInNewContext(`({${["allocateCodeQuestionCounter", "saveCodeQuestionPendingIssuance", "saveCodeQuestionOutboxEntry"].map(actualMethod).join(",\n")}})`, { sql, ensureSchema: async () => {} });
+  await runPostgresAccountDataExportCases({ sql, auxiliaryAdapter });
+  assert.ok(repeatableReadOnlyBatches >= 5, "Account exports must use repeatable read, read-only transactions.");
   assert.ok(serializableBatches > 5 && maximumConnections > 1);
-  console.log(JSON.stringify({ result: "passed", postgresVersion: initial[0].version, requests, serializableBatches, maximumConnections,
+  console.log(JSON.stringify({ result: "passed", postgresVersion: initial[0].version, requests, serializableBatches, repeatableReadOnlyBatches, maximumConnections,
     simultaneousMoveCompletionRaces: 4, chargedOnceAfterReplay: true, failedMutationRollback: true,
     accountLinkLostReceipt: true, successiveAccountLinkRecovery: true,
     forgedAccountMetadataRejected: true, concurrentAccountLinkSingleWinner: true,
+    accountExportNormalizedRecords: true, accountDeletionInventory: true, accountDeletionRollback: true,
     productionHTTPHandlers: true, productionNeonQueryEncoder: true, transport: "test-only local node-postgres bridge", externalDatabaseRequests: 0, providerRequests: 0 }));
 } finally {
   delete globalThis.__permitextLocalPostgresAdapter;

@@ -11,6 +11,12 @@ import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  accountRecordExportFromStore,
+  accountRestoreChecklist,
+  existingOptionalAccountRecordTables,
+  postgresAccountRecordExport
+} from "./account-data-export.mjs";
+import {
   appleBillingAccountTokens,
   createPostgresAccountRepository,
   mergedAppleBillingAccountTokens
@@ -976,6 +982,9 @@ export function createFileStoreAdapter() {
     async read() {
       return readUnlocked();
     },
+    async exportAccountRecords(userID) {
+      return accountRecordExportFromStore(await this.read(), userID);
+    },
     async write(store) {
       // Serialize bare writes so concurrent request handlers cannot clobber each other
       // when the process-wide request lock is intentionally skipped for long-running work.
@@ -1076,6 +1085,11 @@ export function createFileStoreAdapter() {
         }
       }
       delete store.researchFeedbackByUserID[userID];
+      delete store.codeQuestionCountersByUserID[userID];
+      delete store.codeQuestionPendingIssuanceByUserID[userID];
+      delete store.codeQuestionOutboxByUserID[userID];
+      if (store.commentsByUserID) delete store.commentsByUserID[userID];
+      if (store.evidenceSnapshotsByUserID) delete store.evidenceSnapshotsByUserID[userID];
 
       for (const [credentialID, ownerUserID] of Object.entries(store.passkeyCredentials || {})) {
         if (ownerUserID === userID) delete store.passkeyCredentials[credentialID];
@@ -3521,6 +3535,11 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return readNormalizedStore();
     },
+    async exportAccountRecords(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return postgresAccountRecordExport(sql, userID);
+    },
     async write(store) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -3703,6 +3722,7 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       const existingRows = await sql`SELECT id FROM permitext_users WHERE id = ${userID} LIMIT 1`;
       if (!existingRows.length) return false;
+      const auxiliaryTables = await existingOptionalAccountRecordTables(sql);
 
       await sql.transaction([
         sql`
@@ -3770,6 +3790,7 @@ async function createPostgresStoreAdapter() {
           WHERE credited_user_id = ${userID}
         `,
         sql`DELETE FROM permitext_research_conversations WHERE user_id = ${userID}`,
+        ...auxiliaryTables.map((table) => sql.query(`DELETE FROM ${table} WHERE user_id = $1`, [userID])),
         sql`DELETE FROM permitext_user_content_records WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_account_sessions WHERE user_id = ${userID}`,
         sql`DELETE FROM permitext_sessions WHERE user_id = ${userID}`,
@@ -26981,86 +27002,28 @@ function mutationCounts(mutations) {
 }
 
 async function handleRestoreChecklist(request, response) {
-  if (!requireAdmin(request, response)) {
-    return;
-  }
-
+  if (!requireAdmin(request, response)) return;
   const body = await readJSON(request);
   const userID = body.userID || body.appUserID;
-  if (!userID) {
-    sendError(response, 400, "Missing userID.");
+  if (typeof userID !== "string" || !userID.trim() || userID !== userID.trim() || userID.length > 512) {
+    sendError(response, 400, "Missing or invalid userID.");
     return;
   }
-
-  const store = await readStore();
-  const account = store.users[userID] || null;
-  const mutations = store.mutationsByUserID[userID] || [];
-  const counts = mutationCounts(mutations);
-  const passkeyCredentialIDs = Object.entries(store.passkeyCredentials || {})
-    .filter(([, ownerUserID]) => ownerUserID === userID)
-    .map(([credentialID]) => credentialID);
-  const continuityMutations = mutations.filter((mutation) => Object.keys(mutation)[0] === "continuity");
-  const artifacts = store.foundationArtifactsByUserID?.[userID] || [];
-  const artifactCounts = artifacts.reduce((counts, artifact) => {
-    const type = String(artifact?.envelope?.type || "other").trim() || "other";
-    counts[type] = (counts[type] || 0) + 1;
-    return counts;
-  }, {});
-
-  sendJSON(response, 200, {
-    userID,
-    hasAccount: Boolean(account),
-    authProvider: account?.authProvider || null,
-    publicUsername: account?.publicUsername || null,
-    displayName: account?.displayName || null,
-    entitlement: store.entitlements[userID] || null,
-    hasSession: await userHasActiveSession(userID, store),
-    passkeyCredentialCount: passkeyCredentialIDs.length,
-    passkeyCredentialIDs,
-    mutationCounts: {
-      savedItem: counts.savedItem || 0,
-      annotation: counts.annotation || 0,
-      project: counts.project || 0,
-      projectSection: counts.projectSection || 0,
-      workboard: counts.workboard || 0,
-      continuity: counts.continuity || 0,
-      codeVersionClear: counts.codeVersionClear || 0
-    },
-    researchConversationCount: store.researchConversationsByUserID?.[userID]?.length || 0,
-    researchAnswerCount: store.researchAnswersByUserID?.[userID]?.length || 0,
-    artifactCounts,
-    projectLinkCount: store.projectLinksByUserID?.[userID]?.length || 0,
-    activityEventCount: store.activityEventsByUserID?.[userID]?.length || 0,
-    latestContinuity: continuityMutations.at(-1) || null
-  });
+  const adapter = await storeAdapter();
+  const exported = await adapter.exportAccountRecords(userID);
+  sendJSON(response, 200, accountRestoreChecklist(exported));
 }
 
 async function handleAccountExport(request, response) {
-  if (!requireAdmin(request, response)) {
-    return;
-  }
-
+  if (!requireAdmin(request, response)) return;
   const body = await readJSON(request);
   const userID = body.userID || body.appUserID;
-  if (!userID) {
-    sendError(response, 400, "Missing userID.");
+  if (typeof userID !== "string" || !userID.trim() || userID !== userID.trim() || userID.length > 512) {
+    sendError(response, 400, "Missing or invalid userID.");
     return;
   }
-
-  const store = await readStore();
-  const account = store.users[userID] || null;
-  const passkeyCredentialIDs = Object.entries(store.passkeyCredentials || {})
-    .filter(([, ownerUserID]) => ownerUserID === userID)
-    .map(([credentialID]) => credentialID);
-
-  sendJSON(response, 200, {
-    userID,
-    account,
-    entitlement: store.entitlements[userID] || null,
-    hasSession: await userHasActiveSession(userID, store),
-    passkeyCredentialIDs,
-    mutations: store.mutationsByUserID[userID] || []
-  });
+  const adapter = await storeAdapter();
+  sendJSON(response, 200, await adapter.exportAccountRecords(userID));
 }
 
 async function handleStorageSummary(request, response) {

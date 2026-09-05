@@ -53,6 +53,44 @@ The live setting has not been changed, and the new audit guard is on this repair
 branch. Disposable-account setup and its later export/deletion approval remain
 separate from the already completed publication.
 
+## Post-publication account export repair
+
+The operator export and restore checklist used the legacy sync snapshot. On
+PostgreSQL that snapshot does not load Research, Notebook, Report, and other
+foundation records, so the checklist could report false zero counts. Both routes
+now read the exact account's normalized records in a repeatable-read, read-only
+transaction. The file adapter exposes the same record families. The versioned
+export omits authentication secrets and explicitly excludes private file bytes,
+other members' content, global operational logs, duplicate sync journals, and
+separate provider replay-protection ledgers. Referenced images still need their
+own backup and deletion checks.
+
+The new local deletion exercise also found retained Code Question counters,
+pending issuance, and outbox records. Both adapters now remove those account
+records during deletion; PostgreSQL includes them in its existing transaction
+without creating unused feature tables.
+
+Validation on this repair branch:
+
+- `npm run test:auth` passed, including the new file-backed HTTP export/deletion
+  test, operator authorization, credential exclusion, isolation, and removal of
+  the synthetic private file.
+- The opt-in PostgreSQL 18.6 exercise passed against a fresh disposable loopback
+  database using the shipped HTTP handlers and Neon query encoder. Every tested
+  account-record family exported before deletion and was empty afterward; the
+  second account's complete tested inventory was unchanged. An injected final
+  delete failure rolled back the preceding deletes, including Code Question
+  metadata. The run observed 15 repeatable-read/read-only batches and made zero
+  external database or provider requests. The cluster was stopped and removed.
+
+This repair has not been deployed. It does not close the Production acceptance
+gate: the designated Free account has a synthetic saved passage, note, and saved
+collection, but second-client sync, full Project/Research/private-image coverage,
+operator export, reviewed deletion, identity cleanup, and recreation remain.
+The available local operator credential returned HTTP 401; no live export or
+deletion was performed. See the updated
+[account acceptance runbook](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance).
+
 ## First repair batch
 
 Status: implementation and local verification complete in `38ed70d08` and
