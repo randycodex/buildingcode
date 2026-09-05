@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260905-account-verification-ready-v42";
+} from "./offline-storage.js?v=20260905-account-verification-ui-v43";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260905-account-verification-ready-v42";
+} from "./research-intent-state.js?v=20260905-account-verification-ui-v43";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -8037,30 +8037,46 @@ async function clerkWebSignInConfig() {
   return clerkWebConfigPromise;
 }
 
-function loadClerkScript(config) {
-  if (window.Clerk) return Promise.resolve(window.Clerk);
-  if (clerkScriptPromise) return clerkScriptPromise;
-  clerkScriptPromise = new Promise((resolve, reject) => {
+function loadClerkComponentScript(config, path) {
+  return new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    script.src = `${config.frontendAPIURL}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`;
+    script.src = `${config.frontendAPIURL}/npm/${path}`;
     script.async = true;
     script.crossOrigin = "anonymous";
     script.dataset.clerkPublishableKey = config.publishableKey;
-    script.onload = async () => {
-      try {
-        if (!window.Clerk) throw new Error("ClerkJS did not initialize.");
-        await window.Clerk.load();
-        resolve(window.Clerk);
-      } catch (error) {
-        clerkScriptPromise = null;
-        reject(error);
-      }
+    const fail = () => {
+      window.clearTimeout(timeout);
+      script.remove();
+      reject(new Error("Could not load secure sign-in. Reload and try again."));
     };
-    script.onerror = () => {
-      clerkScriptPromise = null;
-      reject(new Error("Could not load secure sign-in."));
-    };
+    const timeout = window.setTimeout(fail, 15000);
+    script.onload = () => { window.clearTimeout(timeout); resolve(); };
+    script.onerror = fail;
     document.head.append(script);
+  });
+}
+
+function loadClerkScript(config) {
+  if (clerkScriptPromise) return clerkScriptPromise;
+  clerkScriptPromise = (async () => {
+    // ClerkJS 6 ships its prebuilt verification UI separately. Supply it on the
+    // first load of the shared instance, as in Clerk's JavaScript quickstart.
+    if (window.Clerk?.loaded && !window.Clerk.uiVersion) {
+      throw new Error("Secure sign-in needs to reload before identity verification. Reload and try again.");
+    }
+    if (!window.__internal_ClerkUICtor) {
+      await loadClerkComponentScript(config, "@clerk/ui@1/dist/ui.browser.js");
+    }
+    if (!window.__internal_ClerkUICtor) throw new Error("Secure sign-in UI did not initialize.");
+    if (!window.Clerk) {
+      await loadClerkComponentScript(config, "@clerk/clerk-js@6/dist/clerk.browser.js");
+    }
+    if (!window.Clerk) throw new Error("ClerkJS did not initialize.");
+    await window.Clerk.load({ ui: { ClerkUI: window.__internal_ClerkUICtor } });
+    return window.Clerk;
+  })().catch((error) => {
+    clerkScriptPromise = null;
+    throw error;
   });
   return clerkScriptPromise;
 }

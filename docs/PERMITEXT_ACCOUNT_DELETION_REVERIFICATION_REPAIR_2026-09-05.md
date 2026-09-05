@@ -46,8 +46,8 @@ secrets are not copied into this document.
 - The Debug account fixture now isolates its private cache alongside its other
   temporary data. The guarded Xcode wrapper supports `test-ui-simulator` using
   the existing UI scheme, shared build directory, lock and nonparallel testing.
-- Web shell keys advance together to `20260905-account-verification-ready-v42`
-  and `permitext-pro-shell-v781`; verification bundle URL v3 remains lazily loaded.
+- Web shell keys advance together to `20260905-account-verification-ui-v43`
+  and `permitext-pro-shell-v782`; verification bundle URL v3 remains lazily loaded.
 
 Implementation references: [Clerk reverification guide](https://clerk.com/docs/guides/secure/reverification)
 and [supported React hook](https://clerk.com/docs/react/reference/hooks/use-reverification),
@@ -200,13 +200,51 @@ using the SDK's queued operation support without waiting for another render.
 The corrected bundle passes all **7/7** browser checks plus account-deletion and
 offline contracts. Its size is 421,145 bytes and SHA-256 is
 `e01b0c0614af928b73b62bc13c68e643ca462878fd3605cb6155292cbf7c4146`.
-Native inputs are unchanged. Publication and another live
-attempt remain pending; the existing exact-account approval is retained.
+PR [#48](https://github.com/randycodex/buildingcode/pull/48) published this
+correction at `59558d2f113a94b78d88b503ccc0288552d3a66c`. Production deployment
+`dpl_Fqmo1wSbbnWo3m8PKMUS2GyvsMmw` reached READY, both origins returned the exact
+source and all six assets matched committed bytes. Production PostgreSQL health
+passed. An independent operator export after the timeout confirmed the designated
+account/session remained present with no entitlement and zero content records.
+
+### Clerk UI loader correction
+
+The next live preflight reached the SDK and stopped safely with
+`Clerk was not loaded with Ui components`. The workspace had initialized ClerkJS 6
+without its separately shipped UI constructor. The loader now follows Clerk's
+[JavaScript quickstart](https://clerk.com/docs/js-frontend/getting-started/quickstart):
+load the UI script, load ClerkJS, and supply the constructor on the shared
+instance's first `load` call. Concurrent callers share initialization. Script
+failure clears the pending request and removes the failed script so it can retry;
+an already-loaded headless instance requests a reload before verification.
+The public SDK source confirmed that a second `load` does not reinitialize a
+loaded instance. No provider settings or CSP permissions were changed.
+
+`clerk-loader-contract.mjs` covers UI-before-SDK ordering, constructor handoff,
+concurrent/later callers, UI/SDK/initialization failure retries, missing UI and
+already-loaded headless rejection. It is included in `npm run test:auth`, which
+passed alongside offline and smoke checks. The real provider UI and approved
+account deletion still require a live retry after this loader publication.
+Native source and build 59 are unchanged.
+
+## Build 59 physical checkpoint
+
+App Store Connect completed build 59 processing and showed Ready to Submit,
+Internal Testers and one invitation. Build record:
+`54435438-201e-4c99-b138-1478fc33786d`. TestFlight on the owner's phone offered
+`1.0 (59)`; Update completed and changed to Open. After launch, existing Project
+containers and the saved Electrical provision remained visible. Account still
+showed Lifetime Pro active, 98 included Research turns and Synced. The deletion
+disclosure rendered correctly with the Lifetime grant consequence, empty
+confirmation field and disabled submit. Cancel returned to Account. No deletion
+was submitted on the phone and no Research call was made. This confirms bounded
+update continuity and disclosure, not live native verification or deletion.
 
 ## Acceptance boundary
 
-The final web repair is on Production and build 59 has uploaded; Apple processing
-and physical checks remain in progress at this checkpoint.
+The verification hook is on Production; its Clerk UI loader follow-up awaits
+publication. Build 59 is available internally and passed the bounded physical
+continuity/disclosure check above.
 No account deletion, provider cleanup, new paid Research call, or provider
 configuration change was performed in this recovery task. Live Clerk prompt
 and full account-lifecycle acceptance remain open, including private-file and
