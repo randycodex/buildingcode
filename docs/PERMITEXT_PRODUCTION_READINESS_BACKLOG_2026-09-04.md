@@ -43,13 +43,22 @@ not close the remaining acceptance items or authorize public App Store submissio
 
 ## Post-publication authentication acceptance
 
-Fresh email registration is currently blocked in the Production hosted Account
+**September 5 update:** the owner-approved required-email change is live.
+Fresh email registration completed on Production, and all 10 public provider
+configuration checks passed. The final audit execution also confirmed 7/7 browser
+storage cases, 4/4 native recovery UI cases, and a qualified Note/Project-facts
+Report export and reopen. A further reproduced sign-out defect after reload is
+being repaired and verified. See the
+[current execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md)
+for exact evidence and remaining boundaries.
+
+The following describes the earlier September 4 blocker. Fresh email registration was blocked in the Production hosted Account
 Portal: sign-in accepts an email identifier, but sign-up offers only the three
 social providers. The Clerk dashboard and public environment show optional email.
 The readiness audit now rejects this configuration instead of accepting email
 sign-in factors as sufficient configuration evidence. See the
 [current authentication record](./PERMITEXT_PRODUCTION_AUTH_CONFIGURATION_EVIDENCE_2026-08-29.md).
-The live setting has not been changed. The new audit guard was published in
+At that earlier checkpoint, the live setting had not been changed. The new audit guard was published in
 PR #39 at `4a3c7a740`. Disposable-account setup and its later export/deletion approval remain
 separate from the already completed publication.
 

@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260905-account-verification-ui-v43";
+} from "./offline-storage.js?v=20260905-provider-signout-v44";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260905-account-verification-ui-v43";
+} from "./research-intent-state.js?v=20260905-provider-signout-v44";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -8115,6 +8115,31 @@ async function completeClerkPermitextSignIn(config) {
     return storeSignedInAccount(payload, displayName);
   };
   return linkFrom ? withAccountLinkWriteFence(requestIdentity, completeSignIn) : completeSignIn();
+}
+
+async function signOutCapturedClerkSession(account, requestIdentity) {
+  requireCurrentAccountRequest(requestIdentity);
+  if (account?.authProvider !== "clerk" && !account?.userID?.startsWith("clerk:")) return;
+  // Reloaded workspaces restore the Permitext session before lazily loading
+  // Clerk. An absent window.Clerk does not mean the provider is signed out.
+  const config = await clerkWebSignInConfig();
+  requireCurrentAccountRequest(requestIdentity);
+  if (!config.available) throw new Error("Secure sign-out is unavailable. Reconnect and try again.");
+  const clerk = await loadClerkScript(config);
+  requireCurrentAccountRequest(requestIdentity);
+  if (clerk.status !== "ready") throw new Error("Secure sign-out could not connect. Reconnect and try again.");
+  const session = clerk.session;
+  if (!session && !clerk.isSignedIn) return;
+  if (!session?.id || `clerk:${clerk.user?.id}` !== account.userID) {
+    throw new Error("The secure sign-in account changed. Reload before signing out.");
+  }
+  // Target only the captured provider session. The callback prevents provider
+  // navigation from interrupting Permitext's remaining sign-out cleanup.
+  await clerk.signOut(() => {}, { sessionId: session.id });
+  requireCurrentAccountRequest(requestIdentity);
+  if (clerk.session?.id === session.id) {
+    throw new Error("Secure sign-out did not finish. Reconnect and try again.");
+  }
 }
 
 async function signInWithClerkWeb(config) {
@@ -31855,6 +31880,8 @@ function renderSettings() {
           requireCurrentAccountRequest(requestIdentity);
           if (!confirmed) return;
         }
+        await signOutCapturedClerkSession(account, requestIdentity);
+        requireCurrentAccountRequest(requestIdentity);
         try {
           await postJSON("/account/sign-out", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
         } catch (error) {
@@ -31863,7 +31890,6 @@ function renderSettings() {
         }
       }
       requireCurrentAccountRequest(requestIdentity);
-      if (window.Clerk?.isSignedIn) await window.Clerk.signOut().catch(() => {});
       if (!isCurrentAccountRequest(requestIdentity)) return;
       if (account) persistCodeQuestionAccountState(account.userID);
       replaceActiveAccount(null);

@@ -2,7 +2,27 @@
 
 ## Result
 
-**September 4 final-Production refresh supersedes the configuration-ready result below.**
+**September 5 repair supersedes the email-registration blocker below.**
+The owner approved requiring an email address after reviewing Apple relay and
+phone-only Apple-account effects. The setting was saved in Clerk Production;
+the public configuration passed all 10 provider checks at
+`2026-09-05T18:41:06Z`. The actual hosted sign-up page displayed the email field,
+and owner-provided email verification created a fresh, empty, Synced Free
+Permitext account on release `0a50c8a751ba`. Clerk independently confirmed its
+new creation timestamp, verified primary email and absence of social accounts.
+No purchase or policy checkbox was submitted. See the
+[audit execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md).
+
+The returning-account check found a separate sign-out defect after browser
+reload: lazy Clerk initialization allowed the Permitext session to end while
+the provider session remained active. The captured-session repair and its
+publication/verification state are tracked in that execution record. Provider
+configuration, fresh email registration, existing-email verification, social
+sign-in and final release acceptance remain separate evidence.
+
+### Historical September 4 blocker
+
+The September 4 final-Production refresh superseded the August configuration-ready result below.
 On release `553e82e074eb3751edf72be8c7579990f91e3bd3`, a fresh, owner-designated
 disposable email was rejected by the hosted sign-in page as an unknown account.
 The linked sign-up page displayed Apple, Google, and Microsoft but no email field.

@@ -131,7 +131,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
     func testNativeNotebookFirstLoadFailureShowsRetryAndRecovers() {
         let app = XCUIApplication()
-        app.launchArguments += ["--phase3-entitled-research-fixture", "--native-notebook-retry-fixture"]
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-retry-fixture"]
         app.launch()
         let retry = app.buttons["native-notebook-retry"]
         XCTAssertTrue(retry.waitForExistence(timeout: 30), "First-load failure must be visible and recoverable.")
@@ -144,7 +144,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
     func testNativeNotebookConflictRequiresReviewAndDeletionDoesNotRestoreDraft() {
         let app = XCUIApplication()
-        app.launchArguments += ["--phase3-entitled-research-fixture", "--native-notebook-conflict-fixture"]
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--native-notebook-conflict-fixture"]
         app.launch()
         let review = app.buttons["native-notebook-review-conflict"]
         XCTAssertTrue(review.waitForExistence(timeout: 30))
@@ -167,7 +167,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
     func testResearchLateCompletionCannotReplaceNewConversation() {
         let app = XCUIApplication()
-        app.launchArguments += ["--phase3-entitled-research-fixture", "--phase3-seeded-selection-fixture", "--research-delayed-response-fixture"]
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--phase3-seeded-selection-fixture", "--research-delayed-response-fixture"]
         app.launch()
         let composer = element(in: app, identifier: "research-composer")
         XCTAssertTrue(composer.waitForExistence(timeout: 45), phase3LaunchFailureDescription(in: app))
@@ -190,7 +190,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
 
     func testResearchAnswerGuidesReviewBeforeNotebookAndWebReport() {
         let app = XCUIApplication()
-        app.launchArguments += ["--phase3-entitled-research-fixture", "--phase3-seeded-selection-fixture"]
+        app.launchArguments += ["--phase3-entitled-research-fixture", "--permitext-disable-clerk", "--phase3-seeded-selection-fixture"]
         app.launch()
         let composer = element(in: app, identifier: "research-composer")
         XCTAssertTrue(composer.waitForExistence(timeout: 45))
