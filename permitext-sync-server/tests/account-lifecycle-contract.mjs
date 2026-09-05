@@ -1,0 +1,38 @@
+import assert from "node:assert/strict";
+import { createFileAccountLifecycle } from "../account-lifecycle.mjs";
+
+let store = { users: { A: {}, B: {} }, sessions: { A: "session-a", B: "session-b" } };
+const lifecycle = createFileAccountLifecycle(async (mutation) => {
+  const next = structuredClone(store);
+  const result = mutation(next);
+  store = next;
+  return result;
+});
+await assert.rejects(lifecycle.begin("A", "wrong-session", { sessionToken: "session-b" }), { code: "ACCOUNT_SESSION_INACTIVE" });
+await Promise.all(["one", "two"].map(id => lifecycle.begin("A", id, { sessionToken: "session-a" })));
+await lifecycle.begin("B", "other", { sessionToken: "session-b" });
+await assert.rejects(lifecycle.claimDeletion("A", "delete"), { code: "ACCOUNT_OPERATION_IN_PROGRESS" });
+await lifecycle.finish("A", "one");
+await lifecycle.finish("A", "one");
+assert.deepEqual(Object.keys(store.accountLifecycleByUserID.A.operations), ["two"]);
+store.accountLifecycleByUserID.A.operations.two.startedAt = "2000-01-01T00:00:00Z";
+await assert.rejects(lifecycle.claimDeletion("A", "delete"), { code: "ACCOUNT_OPERATION_IN_PROGRESS" });
+await lifecycle.finish("A", "two");
+await lifecycle.claimDeletion("A", "delete");
+await assert.rejects(lifecycle.begin("A", "late", { sessionToken: "session-a" }), { code: "ACCOUNT_DELETION_IN_PROGRESS" });
+await lifecycle.releaseDeletion("A", "wrong-delete");
+await assert.rejects(lifecycle.claimDeletion("A", "second-delete"), { code: "ACCOUNT_DELETION_IN_PROGRESS" });
+await lifecycle.releaseDeletion("A", "delete");
+await lifecycle.begin("A", "after-failure", { sessionToken: "session-a" });
+await lifecycle.finish("A", "after-failure");
+assert.deepEqual(Object.keys(store.accountLifecycleByUserID.B.operations), ["other"]);
+delete store.users.A;
+delete store.sessions.A;
+await assert.rejects(lifecycle.begin("A", "deleted"), { code: "ACCOUNT_SESSION_INACTIVE" });
+store.users.A = {};
+store.sessions.A = "recreated-session";
+await assert.rejects(lifecycle.begin("A", "old-session", { sessionToken: "session-a" }), { code: "ACCOUNT_SESSION_INACTIVE" });
+await assert.rejects(lifecycle.claimDeletion("A", "old-deletion", { sessionToken: "session-a" }), { code: "ACCOUNT_SESSION_INACTIVE" });
+await lifecycle.begin("A", "new-session", { sessionToken: "recreated-session" });
+await lifecycle.finish("A", "new-session");
+console.log("Account lifecycle guards passed: overlapping work, deletion exclusivity, no timeout-based release, exact guard release, other-account isolation, and recreated-session rejection.");

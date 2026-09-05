@@ -204,9 +204,13 @@ try {
   assert.equal((await sql`SELECT id FROM permitext_project_activity WHERE id = 'pg-notebook-rollback-event'`).length, 0);
   const auxiliaryAdapter = runInNewContext(`({${["allocateCodeQuestionCounter", "saveCodeQuestionPendingIssuance", "saveCodeQuestionOutboxEntry"].map(actualMethod).join(",\n")}})`, { sql, ensureSchema: async () => {} });
   await runPostgresAccountDataExportCases({ sql, auxiliaryAdapter });
+  // Independent acceptance scenarios share one disposable loopback address.
+  // Reset only their local rate buckets; do not alter deployed limits.
+  await sql`DELETE FROM permitext_rate_limit_buckets`;
   let assetCases = await readFile(new URL("./account-private-assets-http.mjs", import.meta.url), "utf8");
   assetCases = assetCases.replace('"PERMITEXT_SYNC_DATABASE_URL", ', "")
-    .replaceAll('"../app.mjs"', JSON.stringify(new URL("../app.mjs", import.meta.url).href));
+    .replaceAll('"../app.mjs"', JSON.stringify(new URL("../app.mjs", import.meta.url).href))
+    .replaceAll('"../image-storage.mjs"', JSON.stringify(new URL("../image-storage.mjs", import.meta.url).href));
   await import(`data:text/javascript;base64,${Buffer.from(assetCases).toString("base64")}`);
   assert.ok(repeatableReadOnlyBatches >= 5, "Account exports must use repeatable read, read-only transactions.");
   assert.ok(serializableBatches > 5 && maximumConnections > 1);

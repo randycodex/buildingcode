@@ -54,7 +54,7 @@ Object.assign(process.env, { NODE_ENV: "test", VERCEL: "", VERCEL_ENV: "",
   PERMITEXT_SYNC_DATA_PATH: dataPath, PERMITEXT_SYNC_ADMIN_TOKEN: adminToken,
   PERMITEXT_LOCAL_PRIVATE_ASSET_PATH: assetRoot, PERMITEXT_RESEARCH_KILL_SWITCH: "1" });
 for (const key of ["OPENAI_API_KEY", "DATABASE_URL", "PERMITEXT_SYNC_DATABASE_URL", "POSTGRES_URL", "NEON_DATABASE_URL", "STORAGE_URL", "BLOB_READ_WRITE_TOKEN", "VERCEL_OIDC_TOKEN", "BLOB_STORE_ID", "STRIPE_SECRET_KEY"]) delete process.env[key];
-const { handleRequest } = await import("../app.mjs");
+const { handleRequest, createFileStoreAdapter } = await import("../app.mjs");
 const server = createServer(handleRequest);
 await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 const base = `http://127.0.0.1:${server.address().port}`;
@@ -98,6 +98,17 @@ try {
   assert.equal(checklist.body.recordCounts.organizations, 1);
   assert.equal(await readFile(dataPath, "utf8"), beforeBytes, "Export/checklist must not mutate storage.");
 
+  const fileAdapter = createFileStoreAdapter();
+  const staleBeforeGuard = await fileAdapter.read();
+  const lifecycle = await fileAdapter.accountLifecycle();
+  await lifecycle.begin(A, "synthetic-late-file-write", { sessionToken: store.sessions[A] });
+  await fileAdapter.write(staleBeforeGuard);
+  const whileBusy = await fileAdapter.exportAccountRecords(A);
+  assert.equal(whileBusy.records.accountLifecycle.length, 1, "A stale file write cannot discard an active guard.");
+  const staleDuringGuard = await fileAdapter.read();
+  await lifecycle.finish(A, "synthetic-late-file-write");
+  await fileAdapter.write(staleDuringGuard);
+  assert.deepEqual((await fileAdapter.exportAccountRecords(A)).records.accountLifecycle, [], "A stale file write cannot resurrect a finished guard.");
   const deleted = await post("/account/delete", { auth: { accountUserID: A }, confirmation: "DELETE" }, store.sessions[A]);
   assert.equal(deleted.status, 200, JSON.stringify(deleted.body));
   assert.equal(deleted.body.deleted, true);

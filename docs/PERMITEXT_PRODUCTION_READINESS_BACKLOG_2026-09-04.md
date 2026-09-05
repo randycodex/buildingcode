@@ -136,6 +136,50 @@ Production exploit or real-account deletion was attempted. The native runtime
 source remains identical to the previously published build-56 inputs; the only
 subsequent file under the native project is an acceptance-document update.
 
+## Account deletion and in-flight requests
+
+**P0 follow-up, reproduced with local PostgreSQL only:** a Notebook upload paused
+after authentication could resume after account deletion reported success. The
+old request returned HTTP 200 and recreated one private image and one orphaned
+image record, despite the account being absent.
+
+The repair adds a durable account-operation guard. Authenticated requests register
+their work before proceeding, including the storage owner reached through Project
+permission checks. Existing-account sign-in uses the same guard. Deletion claims
+the same database row before billing or private-file cleanup; it returns HTTP 409
+without beginning cleanup when work is active. A successful claim prevents new
+guarded requests until deletion finishes or an ordinary failed attempt releases
+the claim. Response completion follows guard release, including streamed
+responses. The account's final PostgreSQL transaction locks its parent row first,
+and the guard table cascades with that account. Guard acquisition rechecks the
+session while locking the account row, so a stale request cannot affect a newly
+recreated account. The file adapter retains its existing lock for requests it
+already serializes and registers other work durably. Stale file snapshots cannot
+remove an active guard or resurrect a finished one; an unchanged Project Hub
+read remains free of file-store rewrites.
+
+The operator export now includes nonempty `accountLifecycle` records. Guards do
+not expire based on time: a crashed process or uncertain release can leave a
+durable blocker that requires support investigation. Removing such a blocker
+without proof that its writer stopped would recreate this defect.
+
+Local PostgreSQL HTTP validation passed both race orders: an active upload stops
+deletion before files change, then finishes normally and is removed by the next
+deletion; a deletion paused during its inventory blocks a new upload and existing
+account sign-in. The deleted session receives HTTP 401. The second account's image
+remains readable. Export, isolation, transaction rollback, and old unfinished-guard
+checks also passed, including rejection of an old operation or deletion token
+after recreating an empty Free account. The isolated PostgreSQL 18.6 run made
+1,431 local database requests with 29 repeatable-read/read-only batches and zero
+external database or provider requests. The full `npm run check`, including its
+precheck and postcheck suites, passed. The broad smoke test and authentication,
+schema, and performance contracts also passed. This follow-up has not been
+published.
+
+This is not full deletion acceptance. Production export/deletion, interrupted
+operation recovery, shared-organization ownership, independent client/device
+cleanup, and identity recreation still require their own evidence.
+
 ## First repair batch
 
 The draft App Review metadata was also corrected after checking the native

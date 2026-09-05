@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { createHash } from "node:crypto";
 import { createPostgresAccountRepository } from "../postgres-account-repository.mjs";
+import { createPostgresAccountLifecycle } from "../account-lifecycle.mjs";
 import { existingOptionalAccountRecordTables } from "../account-data-export.mjs";
 
 // Called only by the guarded, empty, loopback PostgreSQL acceptance harness.
@@ -47,6 +48,7 @@ export async function runPostgresAccountDataExportCases({ sql, auxiliaryAdapter 
       const json = JSON.stringify(record);
       const projectID = `${userID}:project`, orgID = `${userID}:org`;
       await sql.transaction([
+        sql`INSERT INTO permitext_account_lifecycle (user_id, operations) VALUES (${userID}, '{"synthetic-export-operation":{"kind":"test","startedAt":"2000-01-01T00:00:00Z"}}'::jsonb)`,
         sql`INSERT INTO permitext_saved_items (record_id, user_id, code_version, section_id, mutation) VALUES (${userID + ":saved"}, ${userID}, 'synthetic-2022', 1, ${JSON.stringify({ savedItem: record })}::jsonb)`,
         sql`INSERT INTO permitext_annotations (record_id, user_id, code_version, section_id, mutation) VALUES (${userID + ":note"}, ${userID}, 'synthetic-2022', 1, ${JSON.stringify({ annotation: record })}::jsonb)`,
         sql`INSERT INTO permitext_projects (record_id, user_id, code_version, mutation) VALUES (${projectID}, ${userID}, 'synthetic-2022', ${JSON.stringify({ project: record })}::jsonb)`,
@@ -83,7 +85,7 @@ export async function runPostgresAccountDataExportCases({ sql, auxiliaryAdapter 
       assert.equal((await post(path, { userID: ` ${A}` })).status, 400);
     }
     const beforeB = await exported(B);
-    const before = await exported(A);
+    let before = await exported(A);
     assert.equal(before.schema, "permitext-account-record-export-v2");
     assert.equal(before.scope.storage, "postgres");
     assert.equal(before.scope.privateAssetBytesIncluded, false);
@@ -99,6 +101,14 @@ export async function runPostgresAccountDataExportCases({ sql, auxiliaryAdapter 
     assert.deepEqual(checklist.body.artifactCounts, { notebookCard: 1 });
     assert.ok(Object.values(checklist.body.recordCounts).every((count) => count === 1));
     assert.deepEqual(await exported(A), before, "Export and checklist must leave account records unchanged.");
+
+    const busy = await post("/account/delete", { auth: { accountUserID: A }, confirmation: "DELETE" }, token);
+    assert.equal(busy.status, 409, "Elapsed time alone must not expire an unfinished operation.");
+    assert.equal(busy.body.code, "ACCOUNT_OPERATION_IN_PROGRESS");
+    assert.deepEqual(await exported(A), before, "Busy deletion must not alter the account inventory.");
+    await sql`UPDATE permitext_account_lifecycle SET operations = '{}'::jsonb WHERE user_id = ${A}`;
+    before = await exported(A);
+    assert.deepEqual(before.records.accountLifecycle, []);
 
     const sharedProject = "synthetic-historical-collision";
     const sharedPath = `project-assets/${createHash("sha256").update(sharedProject).digest("hex").slice(0, 32)}/workboard-previews/conflict.png`;
@@ -143,6 +153,23 @@ export async function runPostgresAccountDataExportCases({ sql, auxiliaryAdapter 
     const claim = (await sql`SELECT credited_user_id, deleted_at FROM permitext_research_purchase_claims WHERE id = ${A + ":record"}`)[0];
     assert.equal(claim.credited_user_id, null);
     assert.ok(claim.deleted_at, "Retain the detached purchase replay tombstone.");
+    const recreated = await accounts.signIn({ appUserID: A, authProvider: "web", authProviderUserID: "pg-export-a", displayName: "Recreated synthetic A", signedInAt: new Date().toISOString() });
+    const lifecycle = createPostgresAccountLifecycle(sql);
+    await assert.rejects(lifecycle.begin(A, "stale-request", { sessionToken: token }), { code: "ACCOUNT_SESSION_INACTIVE" });
+    await assert.rejects(lifecycle.claimDeletion(A, "stale-deletion", { sessionToken: token }), { code: "ACCOUNT_SESSION_INACTIVE" });
+    const recreatedToken = recreated.account.backendSessionToken;
+    await lifecycle.begin(A, "recreated-operation", { sessionToken: recreatedToken });
+    await lifecycle.finish(A, "unrelated-old-operation");
+    await assert.rejects(lifecycle.claimDeletion(A, "busy-recreated-deletion", { sessionToken: recreatedToken }), { code: "ACCOUNT_OPERATION_IN_PROGRESS" });
+    await lifecycle.finish(A, "recreated-operation");
+    const fresh = await exported(A);
+    assert.equal(fresh.entitlement, null);
+    assert.deepEqual(fresh.mutations, []);
+    assert.deepEqual(fresh.records.foundationArtifacts, []);
+    assert.deepEqual(fresh.records.accountLifecycle, []);
+    const cleanup = await post("/account/delete", { auth: { accountUserID: A }, confirmation: "DELETE" }, recreatedToken);
+    assert.equal(cleanup.status, 200);
+    assert.equal((await exported(A)).account, null);
     console.log("PostgreSQL account export/deletion passed: normalized records, modern session metadata, no credentials, optional tables without DDL, isolation, rollback, and empty post-deletion inventory.");
   } finally {
     globalThis.fetch = originalFetch;

@@ -61,6 +61,8 @@ export function accountRecordExportFromStore(store, userID) {
   ));
   const ownMemberships = (map) => Object.values(map || {}).flatMap(values)
     .filter((record) => record.userID === userID);
+  const lifecycle = store.accountLifecycleByUserID?.[userID];
+  records.accountLifecycle = lifecycle && (lifecycle.deletionID || Object.keys(lifecycle.operations || {}).length) ? [lifecycle] : [];
   records.organizations = Object.values(store.organizations || {}).filter((record) => record.ownerUserID === userID);
   records.organizationMemberships = ownMemberships(store.organizationMembershipsByOrganizationID);
   records.projectMemberships = ownMemberships(store.projectMembershipsByProjectID);
@@ -94,6 +96,7 @@ export function accountRecordExportFromStore(store, userID) {
 // SQL identifiers and predicates come exclusively from this static inventory.
 // Only the exact account identifier is supplied by the caller, as parameter $1.
 const postgresCollections = Object.freeze([
+  ["accountLifecycle", "permitext_account_lifecycle", "jsonb_build_object('operations', t.operations, 'deletionID', t.deletion_id)", "user_id = $1 AND (deletion_id IS NOT NULL OR operations <> '{}'::jsonb)", "user_id"],
   ["foundationArtifacts", "permitext_foundation_artifacts", "jsonb_build_object('envelope', t.envelope, 'payload', t.payload)", "user_id = $1", "id"],
   ["projectLinks", "permitext_project_links", "t.link", "user_id = $1", "id"],
   ["researchAnswers", "permitext_research_answers", "t.answer", "user_id = $1", "id"],

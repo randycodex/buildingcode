@@ -4,6 +4,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { LocalFilesystemImageStorage } from "../image-storage.mjs";
 
 const temporary = await mkdtemp(join(tmpdir(), "permitext-account-assets-"));
 const dataPath = join(temporary, "sync.json"), assetRoot = join(temporary, "assets");
@@ -85,7 +86,78 @@ try {
     codeVersion, sectionID: 101, blockID: "", noteBody: other.pathname,
     updatedAt: new Date().toISOString() } });
   assert.ok(notePush.acceptedMutationIDs.includes(noteID));
-  const deleted = await post("/account/delete", { auth: { accountUserID: A.appUserID }, confirmation: "DELETE" }, A.backendSessionToken);
+  let latePath;
+  let pauseInventory;
+  let inventoryEntered;
+  let inventoryDeadline;
+  const originalList = LocalFilesystemImageStorage.prototype.list;
+  let deletion;
+  if (process.env.PERMITEXT_SYNC_DATABASE_URL) {
+    // Pause the real storage provider after authorization, before the write.
+    // PostgreSQL allows the deletion request to run on another connection.
+    const originalPut = LocalFilesystemImageStorage.prototype.put;
+    const lateID = randomUUID();
+    latePath = `project-assets/${hash(own.projectID)}/notebook/${hash(A.appUserID)}/${hash(lateID)}.png`;
+    let resumeUpload, uploadEntered, deadline;
+    const gate = new Promise(resolve => { resumeUpload = resolve; });
+    const entered = new Promise(resolve => { uploadEntered = resolve; });
+    LocalFilesystemImageStorage.prototype.put = async function(key, bytes, type) {
+      if (key === latePath) { uploadEntered(); await gate; }
+      return originalPut.call(this, key, bytes, type);
+    };
+    const upload = fetch(base + "/notebook/assets/upload?" + new URLSearchParams({ projectID: own.projectID, assetID: lateID }), {
+      method: "POST", headers: { authorization: `Bearer ${A.backendSessionToken}`,
+        "x-permitext-user-id": A.appUserID, "content-type": "image/png" }, body: image
+    });
+    try {
+      await Promise.race([entered, new Promise((_, reject) => { deadline = setTimeout(() => reject(new Error("Upload boundary not reached")), 20000); })]);
+      clearTimeout(deadline);
+      const busy = await post("/account/delete", { auth: { accountUserID: A.appUserID }, confirmation: "DELETE" }, A.backendSessionToken);
+      assert.equal(busy.status, 409, JSON.stringify(busy.body));
+      assert.equal(busy.body.code, "ACCOUNT_OPERATION_IN_PROGRESS");
+      assert.equal(busy.body.partial, false);
+      assert.deepEqual(await readFile(join(assetRoot, own.pathname)), image, "Busy deletion must not begin removing files.");
+    } finally {
+      clearTimeout(deadline);
+      resumeUpload();
+      LocalFilesystemImageStorage.prototype.put = originalPut;
+      const result = await upload;
+      assert.equal(result.status, 200, await result.text());
+    }
+    assert.deepEqual(await readFile(join(assetRoot, latePath)), image);
+
+    // Reverse order: hold deletion at its inventory boundary, while its durable
+    // claim is active. A second request must stop before starting file storage.
+    const inventoryGate = new Promise(resolve => { pauseInventory = resolve; });
+    const reached = new Promise(resolve => { inventoryEntered = resolve; });
+    LocalFilesystemImageStorage.prototype.list = async function(prefix) {
+      if (prefix.includes(hash(A.appUserID))) { inventoryEntered(); await inventoryGate; }
+      return originalList.call(this, prefix);
+    };
+    deletion = post("/account/delete", { auth: { accountUserID: A.appUserID }, confirmation: "DELETE" }, A.backendSessionToken);
+    try {
+      await Promise.race([reached,
+        deletion.then(result => { throw new Error(`Deletion stopped before inventory: ${JSON.stringify(result)}`); }),
+        new Promise((_, reject) => { inventoryDeadline = setTimeout(() => reject(new Error("Deletion boundary not reached")), 20000); })]);
+      clearTimeout(inventoryDeadline);
+      const rejected = await fetch(base + "/notebook/assets/upload?" + new URLSearchParams({ projectID: own.projectID, assetID: randomUUID() }), {
+        method: "POST", headers: { authorization: `Bearer ${A.backendSessionToken}`,
+          "x-permitext-user-id": A.appUserID, "content-type": "image/png" }, body: image
+      });
+      assert.equal(rejected.status, 409);
+      assert.equal((await rejected.json()).code, "ACCOUNT_DELETION_IN_PROGRESS");
+      const signin = await post("/account/sign-in", { credential: { provider: "web", providerUserID: "private-assets-a", displayName: "Synthetic private-file test" } });
+      assert.equal(signin.status, 409, "An existing account must not sign in during deletion.");
+      assert.equal(signin.body.code, "ACCOUNT_DELETION_IN_PROGRESS");
+    } finally {
+      clearTimeout(inventoryDeadline);
+      pauseInventory();
+      LocalFilesystemImageStorage.prototype.list = originalList;
+      await deletion;
+    }
+  }
+  const deleted = deletion ? await deletion : await post("/account/delete", { auth: { accountUserID: A.appUserID }, confirmation: "DELETE" }, A.backendSessionToken);
+  if (latePath) await assert.rejects(readFile(join(assetRoot, latePath)), { code: "ENOENT" });
   assert.equal(deleted.status, 200, JSON.stringify(deleted.body));
   await assert.rejects(readFile(join(assetRoot, own.pathname)), { code: "ENOENT" });
   await assert.rejects(readFile(join(assetRoot, orphanPath)), { code: "ENOENT" });
@@ -96,6 +168,8 @@ try {
   }, body: JSON.stringify({ auth: { accountUserID: B.appUserID }, projectID: other.projectID, assetID: other.assetID }) });
   assert.equal(readOther.status, 200);
   assert.deepEqual(Buffer.from(await readOther.arrayBuffer()), image);
+  const stale = await post("/sync/pull", { auth: { accountUserID: A.appUserID } }, A.backendSessionToken);
+  assert.equal(stale.status, 401, "The deleted account's old session must remain unusable.");
   console.log("Private account deletion HTTP passed: server-uploaded own image removed, another account's referenced image preserved and readable.");
 } finally {
   globalThis.fetch = originalFetch;

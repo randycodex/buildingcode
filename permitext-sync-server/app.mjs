@@ -10,6 +10,7 @@ import {
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createFileAccountLifecycle, createPostgresAccountLifecycle } from "./account-lifecycle.mjs";
 import {
   accountRecordExportFromStore,
   accountRestoreChecklist,
@@ -980,8 +981,15 @@ export function createFileStoreAdapter() {
   async function writeUnlocked(store) {
     await writeJSONFileAtomically(dataPath, store);
   }
+  const lifecycle = createFileAccountLifecycle((mutator) => withFileStoreLock(dataPath, async () => {
+    const store = await readUnlocked();
+    const result = await mutator(store);
+    await writeUnlocked(store);
+    return result;
+  }));
   return {
     kind: "file",
+    async accountLifecycle() { return lifecycle; },
     schema: "json-file",
     rateLimitMode: "local",
     async consumeRateLimit(input) {
@@ -1009,7 +1017,12 @@ export function createFileStoreAdapter() {
     async write(store) {
       // Serialize bare writes so concurrent request handlers cannot clobber each other
       // when the process-wide request lock is intentionally skipped for long-running work.
-      return withFileStoreLock(dataPath, () => writeUnlocked(store));
+      return withFileStoreLock(dataPath, async () => {
+        const current = await readUnlocked();
+        // Older snapshots must neither discard an active request's guard nor
+        // resurrect a guard already released by another request.
+        await writeUnlocked({ ...store, accountLifecycleByUserID: current.accountLifecycleByUserID || {} });
+      });
     },
     async withMutation(mutator) {
       return withFileStoreLock(dataPath, async () => {
@@ -1082,6 +1095,7 @@ export function createFileStoreAdapter() {
       );
 
       delete store.users[userID];
+      if (store.accountLifecycleByUserID) delete store.accountLifecycleByUserID[userID];
       delete store.entitlements[userID];
       delete store.sessions[userID];
       delete store.mutationsByUserID[userID];
@@ -2208,6 +2222,7 @@ function mutationRecordDeletedAt(record) {
 async function createPostgresStoreAdapter() {
   const { neon } = await import("@neondatabase/serverless");
   const sql = neon(databaseURL);
+  const lifecycle = createPostgresAccountLifecycle(sql);
   const organizationRepository = createPostgresOrganizationRepository(sql);
   const rateLimitRepository = createPostgresRateLimitRepository(sql);
   const accountRepository = createPostgresAccountRepository(sql, {
@@ -2248,6 +2263,13 @@ async function createPostgresStoreAdapter() {
         account JSONB NOT NULL DEFAULT '{}'::jsonb,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_account_lifecycle (
+        user_id TEXT PRIMARY KEY REFERENCES permitext_users(id) ON DELETE CASCADE,
+        operations JSONB NOT NULL DEFAULT '{}'::jsonb,
+        deletion_id TEXT
       )
     `;
     await sql`
@@ -3612,6 +3634,7 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return accountRepository.updateAccount(userID, account);
     },
+    async accountLifecycle() { await ensureSchema(); return lifecycle; },
     async accountExists(userID) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -3762,6 +3785,7 @@ async function createPostgresStoreAdapter() {
       const auxiliaryTables = await existingOptionalAccountRecordTables(sql);
 
       await sql.transaction([
+        sql`SELECT id FROM permitext_users WHERE id = ${userID} FOR UPDATE`,
         sql`
           DELETE FROM permitext_project_memberships
           WHERE user_id = ${userID}
@@ -7084,6 +7108,52 @@ function requireSessionToken(request, response, sessionToken, requestAccount) {
   return true;
 }
 
+const accountRequestGuards = new WeakMap();
+
+function sendAccountLifecycleError(response, error) {
+  if (!["ACCOUNT_OPERATION_IN_PROGRESS", "ACCOUNT_DELETION_IN_PROGRESS", "ACCOUNT_SESSION_INACTIVE"].includes(error?.code)) return false;
+  sendJSON(response, error.statusCode, { error: error.message, code: error.code, partial: false });
+  return true;
+}
+
+async function protectAccountOperation(request, response, userID, sessionToken = null, { throwOnFailure = false } = {}) {
+  if (normalizePath(request.url) === "account/delete") return true;
+  const adapter = await storeAdapter();
+  // The file coordinator already holds these requests until all their work
+  // finishes. Register only requests that can overlap its deletion lock; avoid
+  // turning an unchanged local Project Hub read into two full-store writes.
+  if (adapter.kind === "file" && requestMutatesFileStore(request)) return true;
+  let state = accountRequestGuards.get(response);
+  if (!state) {
+    state = { request, entries: new Map() };
+    accountRequestGuards.set(response, state);
+  }
+  if (state.entries.has(userID)) return true;
+  const lifecycle = await adapter.accountLifecycle();
+  const id = randomUUID();
+  try {
+    await lifecycle.begin(userID, id, { sessionToken, kind: requestTelemetryRoute(normalizePath(request.url)) });
+  } catch (error) {
+    if (throwOnFailure) throw error;
+    if (sendAccountLifecycleError(response, error)) return false;
+    throw error;
+  }
+  state.entries.set(userID, { lifecycle, id });
+  return true;
+}
+
+async function finishAccountRequest(response) {
+  const state = accountRequestGuards.get(response);
+  if (!state) return;
+  accountRequestGuards.delete(response);
+  const results = await Promise.allSettled([...state.entries].map(([userID, { lifecycle, id }]) => lifecycle.finish(userID, id)));
+  if (results.some((result) => result.status === "rejected")) {
+    // A failed release must remain a durable blocker. Never expire a guard or
+    // claim deletion success merely because the original request timed out.
+    console.error(JSON.stringify({ code: "ACCOUNT_OPERATION_RELEASE_FAILED", failedCount: results.filter((result) => result.status === "rejected").length }));
+  }
+}
+
 async function authenticatedUserContext(request, response, userID, requestAccount, store = null) {
   const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
   if (!suppliedToken) {
@@ -7100,6 +7170,7 @@ async function authenticatedUserContext(request, response, userID, requestAccoun
     if (!await enforceAuthenticatedRateLimit(request, response, userID)) {
       return null;
     }
+    if (!await protectAccountOperation(request, response, userID, suppliedToken)) return null;
     return { ...context, sessionToken: suppliedToken };
   }
 
@@ -7110,6 +7181,7 @@ async function authenticatedUserContext(request, response, userID, requestAccoun
   if (!await enforceAuthenticatedRateLimit(request, response, userID)) {
     return null;
   }
+  if (!await protectAccountOperation(request, response, userID, suppliedToken)) return null;
   return {
     account: localStore.users[userID] || null,
     entitlement: localStore.entitlements[userID] || null,
@@ -11994,6 +12066,9 @@ async function requireProjectPermission(response, userID, projectID, permission)
     });
     return null;
   }
+  const state = accountRequestGuards.get(response);
+  if (state && access.storageOwnerUserID !== userID &&
+      !await protectAccountOperation(state.request, response, access.storageOwnerUserID)) return null;
   return access;
 }
 
@@ -24256,6 +24331,9 @@ async function handleSignIn(request, response) {
     sendError(response, 400, "Missing account.");
     return;
   }
+  const lifecycleAdapter = await storeAdapter();
+  if (await lifecycleAdapter.accountExists(account.appUserID) &&
+      !await protectAccountOperation(request, response, account.appUserID)) return;
   const linkFrom = body.linkFrom || {};
   const sourceUserID = linkFrom.accountUserID || linkFrom.userID;
   const adapter = await storeAdapter();
@@ -24785,92 +24863,104 @@ async function handleAccountDelete(request, response) {
   const context = await authenticatedUserContext(request, response, userID, body.auth);
   if (!context) return;
 
-  let billingCancellation;
+  const lifecycle = await (await storeAdapter()).accountLifecycle();
+  const deletionID = randomUUID();
   try {
-    billingCancellation = await cancelStripeSubscriptionsForAccount({
-      userID,
-      entitlement: context.entitlement
-    });
+    await lifecycle.claimDeletion(userID, deletionID, { sessionToken: context.sessionToken });
   } catch (error) {
-    console.error("Account deletion stopped because Stripe cancellation failed.", error);
-    sendJSON(response, 502, {
-      error: "Permitext could not confirm that Stripe billing was canceled. Your account and data were not deleted. Try again or manage the subscription from Settings.",
-      code: "STRIPE_CANCELLATION_FAILED",
+    if (sendAccountLifecycleError(response, error)) return;
+    throw error;
+  }
+  try {
+    let billingCancellation;
+    try {
+      billingCancellation = await cancelStripeSubscriptionsForAccount({
+        userID,
+        entitlement: context.entitlement
+      });
+    } catch (error) {
+      console.error("Account deletion stopped because Stripe cancellation failed.", error);
+      sendJSON(response, 502, {
+        error: "Permitext could not confirm that Stripe billing was canceled. Your account and data were not deleted. Try again or manage the subscription from Settings.",
+        code: "STRIPE_CANCELLATION_FAILED",
+        partial: false,
+        stages: accountDeletionStages({ billingStatus: "failed" })
+      });
+      return;
+    }
+
+    let privateAssets;
+    try {
+      privateAssets = await privateProjectAssetsForAccount(userID);
+      await deletePrivateProjectAssets(privateAssets);
+    } catch (error) {
+      console.error("Account deletion stopped because private asset cleanup failed.", error);
+      const ownershipUnresolved = ["PRIVATE_ASSET_OWNERSHIP_UNRESOLVED", "PRIVATE_ASSET_OWNER_CONFLICT"].includes(error?.code);
+      sendJSON(response, 500, {
+        error: ownershipUnresolved
+          ? "Permitext handled applicable billing, but could not verify ownership of older private files. Your private files, account, and remaining data were not deleted. Contact support to resolve file ownership before retrying cleanup."
+          : "Permitext handled applicable billing, but could not delete private images. Your Permitext account and remaining data were not deleted. Retry cleanup or contact support.",
+        code: "PRIVATE_ASSET_DELETION_FAILED",
+        ...(ownershipUnresolved ? { causeCode: error.code } : {}),
+        partial: billingCancellation.canceledSubscriptions.length > 0,
+        stages: accountDeletionStages({
+          billingCancellation,
+          privateAssetsStatus: "failed"
+        })
+      });
+      return;
+    }
+
+    const adapter = await storeAdapter();
+    let accountDeleted = false;
+    try {
+      accountDeleted = typeof adapter.deleteAccount === "function" && await adapter.deleteAccount(userID);
+    } catch (error) {
+      console.error("Account deletion failed after private asset cleanup.", error);
+    }
+    if (!accountDeleted) {
+      sendJSON(response, 500, {
+        error: "Permitext deleted private images but could not confirm deletion of the account and remaining data. Retry cleanup or contact support.",
+        code: "ACCOUNT_DATA_DELETION_FAILED",
+        partial: privateAssets.length > 0 || billingCancellation.canceledSubscriptions.length > 0,
+        stages: accountDeletionStages({
+          billingCancellation,
+          permitextDataStatus: "failed",
+          privateAssetsStatus: "deleted",
+          deletedPrivateAssetCount: privateAssets.length
+        })
+      });
+      return;
+    }
+    sendJSON(response, 200, {
+      deleted: true,
+      deletedPrivateAssetCount: privateAssets.length,
       partial: false,
-      stages: accountDeletionStages({ billingStatus: "failed" })
-    });
-    return;
-  }
-
-  let privateAssets;
-  try {
-    privateAssets = await privateProjectAssetsForAccount(userID);
-    await deletePrivateProjectAssets(privateAssets);
-  } catch (error) {
-    console.error("Account deletion stopped because private asset cleanup failed.", error);
-    const ownershipUnresolved = ["PRIVATE_ASSET_OWNERSHIP_UNRESOLVED", "PRIVATE_ASSET_OWNER_CONFLICT"].includes(error?.code);
-    sendJSON(response, 500, {
-      error: ownershipUnresolved
-        ? "Permitext handled applicable billing, but could not verify ownership of older private files. Your private files, account, and remaining data were not deleted. Contact support to resolve file ownership before retrying cleanup."
-        : "Permitext handled applicable billing, but could not delete private images. Your Permitext account and remaining data were not deleted. Retry cleanup or contact support.",
-      code: "PRIVATE_ASSET_DELETION_FAILED",
-      ...(ownershipUnresolved ? { causeCode: error.code } : {}),
-      partial: billingCancellation.canceledSubscriptions.length > 0,
       stages: accountDeletionStages({
         billingCancellation,
-        privateAssetsStatus: "failed"
-      })
-    });
-    return;
-  }
-
-  const adapter = await storeAdapter();
-  let accountDeleted = false;
-  try {
-    accountDeleted = typeof adapter.deleteAccount === "function" && await adapter.deleteAccount(userID);
-  } catch (error) {
-    console.error("Account deletion failed after private asset cleanup.", error);
-  }
-  if (!accountDeleted) {
-    sendJSON(response, 500, {
-      error: "Permitext deleted private images but could not confirm deletion of the account and remaining data. Retry cleanup or contact support.",
-      code: "ACCOUNT_DATA_DELETION_FAILED",
-      partial: privateAssets.length > 0 || billingCancellation.canceledSubscriptions.length > 0,
-      stages: accountDeletionStages({
-        billingCancellation,
-        permitextDataStatus: "failed",
+        permitextDataStatus: "deleted",
         privateAssetsStatus: "deleted",
         deletedPrivateAssetCount: privateAssets.length
-      })
+      }),
+      billingCancellation: {
+        stripe: billingCancellation.canceledSubscriptions.length
+          ? {
+              status: "canceled",
+              subscriptionCount: billingCancellation.canceledSubscriptions.length
+            }
+          : { status: "notApplicable", subscriptionCount: 0 },
+        apple: billingCancellation.appleSubscriptionPresent
+          ? {
+              status: "userManaged",
+              managementURL: "https://apps.apple.com/account/subscriptions"
+            }
+          : { status: "notApplicable" },
+        lifetimeGrantRemoved: billingCancellation.lifetimeGrantPresent
+      }
     });
-    return;
+  } finally {
+    await lifecycle.releaseDeletion(userID, deletionID);
   }
-  sendJSON(response, 200, {
-    deleted: true,
-    deletedPrivateAssetCount: privateAssets.length,
-    partial: false,
-    stages: accountDeletionStages({
-      billingCancellation,
-      permitextDataStatus: "deleted",
-      privateAssetsStatus: "deleted",
-      deletedPrivateAssetCount: privateAssets.length
-    }),
-    billingCancellation: {
-      stripe: billingCancellation.canceledSubscriptions.length
-        ? {
-            status: "canceled",
-            subscriptionCount: billingCancellation.canceledSubscriptions.length
-          }
-        : { status: "notApplicable", subscriptionCount: 0 },
-      apple: billingCancellation.appleSubscriptionPresent
-        ? {
-            status: "userManaged",
-            managementURL: "https://apps.apple.com/account/subscriptions"
-          }
-        : { status: "notApplicable" },
-      lifetimeGrantRemoved: billingCancellation.lifetimeGrantPresent
-    }
-  });
 }
 
 function workboardPreviewSummary(artifact) {
@@ -27338,6 +27428,10 @@ async function handleAppleWebCallback(request, response) {
       { expectedNonce: oauthState.nonce }
     );
     const adapter = await storeAdapter();
+    if (await adapter.accountExists(account.appUserID)) {
+      await protectAccountOperation(request, response, account.appUserID, null, { throwOnFailure: true });
+    }
+
     if (oauthState.linkFrom?.accountUserID && !compatibilityAccountMergeAllowed(adapter)) {
       sendCallbackHTML(appleCallbackHTML({
         title: "permitext sign in",
@@ -31502,7 +31596,7 @@ function observeVercelRequest(request, response) {
   });
 }
 
-export async function handleRequest(request, response) {
+async function handleRequestWithStoreLock(request, response) {
   observeVercelRequest(request, response);
   if (!requestMutatesFileStore(request)) {
     await handleRequestUnlocked(request, response);
@@ -31530,5 +31624,27 @@ export async function handleRequest(request, response) {
       requestID: request.headers?.["x-vercel-id"]
     })));
     sendError(response, 500, "Internal server error.");
+  }
+}
+
+export async function handleRequest(request, response) {
+  const end = response.end;
+  let endArguments;
+  response.end = function (...args) {
+    endArguments ||= args;
+    return this;
+  };
+  try {
+    await handleRequestWithStoreLock(request, response);
+  } finally {
+    try {
+      await finishAccountRequest(response);
+    } finally {
+      // Finish storage work before the response completes. Besides avoiding a
+      // false busy result on an immediate next request, this keeps serverless
+      // response completion from suspending the durable guard release.
+      response.end = end;
+      if (endArguments) end.apply(response, endArguments);
+    }
   }
 }

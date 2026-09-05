@@ -1,6 +1,7 @@
-export const postgresNormalizedSchemaReadinessVersion = "normalized-v4-20260828";
+export const postgresNormalizedSchemaReadinessVersion = "normalized-v4-20260904-lifecycle";
 
 export const postgresNormalizedSchemaRequiredTables = Object.freeze([
+  "permitext_account_lifecycle",
   "permitext_account_sessions",
   "permitext_annotations",
   "permitext_apple_notification_states",
