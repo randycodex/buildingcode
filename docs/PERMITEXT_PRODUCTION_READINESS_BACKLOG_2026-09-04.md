@@ -352,8 +352,13 @@ precheck and postcheck) and broad smoke also passed. The isolated browser's Sear
 appears in Unassigned Saved, survives reload, and reopens Gates in the 2022 Reader;
 no browser console error was captured. Local served client bytes match the repair.
 Web asset version is `20260905-saved-section-visibility-v38`, shell
-`permitext-pro-shell-v777`. Production publication and the live reopening check
-remain pending for this follow-up; it changes no native runtime source.
+`permitext-pro-shell-v777`. PR #43 published the repair at
+`1afdafd19ca4947d19e46350748506668c90790c`. Both Production origins returned that
+exact revision and matching client bytes. The same disposable account now shows
+all four saved entries; Gates reopens in the 2022 Reader and Slope in the 2014
+Reader. Health, universal links, approved policy hashes and the bounded browser
+console check passed. This follow-up changes no native runtime source. See the
+[publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#whole-section-saved-visibility-publication).
 
 ## Critical findings
 

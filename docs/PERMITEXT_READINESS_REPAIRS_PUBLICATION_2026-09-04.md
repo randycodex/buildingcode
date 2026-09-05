@@ -277,8 +277,11 @@ owner's existing Production/internal-TestFlight publication authorization.
   categories, three required-reason API groups and no tracking. This remains
   archive evidence, not an Apple Organizer privacy report or provider attestation.
 - Xcode reported `Upload succeeded` at `2026-09-05T04:11:53.220Z`, followed by
-  `EXPORT SUCCEEDED` and exit 0. App Store Connect showed build 57 Processing;
-  processed internal availability and physical installation remain unverified.
+  `EXPORT SUCCEEDED` and exit 0. App Store Connect subsequently showed Complete
+  and Ready to Submit for build `c4f99fc4-f577-438d-8079-6a153f0b59d3`, assigned
+  to Internal Testers with one invitation at approximately `2026-09-05T04:24Z`.
+  Physical installation and launch remain unverified; build 56 is the last
+  physically verified installation.
 - Local verification and upload evidence is retained in
   `/private/tmp/permitext-build57-final-evidence.json`,
   `/private/tmp/permitext-build57-privacy-aggregate.json`,
@@ -290,3 +293,48 @@ on the working branch. Build 57 does not claim full-repository SHA equality with
 that later change. Final shared-candidate selection, remaining client/account
 acceptance and public release authorization remain open. No phone access or App
 Store submission was performed for this upload.
+
+## Whole-section Saved visibility publication
+
+PR [#43](https://github.com/randycodex/buildingcode/pull/43) merged by fast-forward
+at `2026-09-05T04:23:37Z`, publishing
+`1afdafd19ca4947d19e46350748506668c90790c`. Local and remote `main` and the repair
+branch matched before this documentation update.
+
+- Preview `dpl_GnYTpLK6ovgJanJjABZPrUHswbrq` became READY and passed its GitHub
+  check. Its protected `/release` returned the exact commit, Preview environment
+  and `permitext-sync-gf4avo2vl-randycodexs-projects-b72fc111.vercel.app` host at
+  `2026-09-05T04:23:35Z`.
+- Production deployment `dpl_8QPPG8v7i62Ey5rXFsdXuUMKP1oQ` became READY at
+  `2026-09-05T04:25:51Z`. Both canonical origins returned the exact commit,
+  Production environment and
+  `permitext-sync-koi5ydfsa-randycodexs-projects-b72fc111.vercel.app` host at
+  `2026-09-05T04:26:53Z`.
+- Both origins served `app.js`, `offline-storage.js`, `service-worker.js` and
+  `styles.css` bytes identical to the tested source. The HTML and actual browser
+  loaded client `20260905-saved-section-visibility-v38`; shell is
+  `permitext-pro-shell-v777`.
+- PostgreSQL `normalized-v4` health, Apple universal links and the strict approved
+  policy-byte audit passed. Deployment-scoped error/fatal counts were empty for
+  the bounded post-publication observation. This is not long-term reliability
+  evidence.
+- The same disposable account's Unassigned Saved count changed from three to
+  four without recreating the missing save. Both Gates (2022, whole section) and
+  Slope (2014, paragraph) were visible after reload and reopened in the correct
+  Reader editions. The original two passages, synthetic note and empty saved
+  collection remained. The legacy ownership-recovery warning was retained.
+  Browser console errors were empty.
+- The new regression failed before the repair and passed afterward. Full
+  `npm run check`, including precheck/postcheck, broad smoke and the focused
+  evidence, Saved-summary and offline contracts passed. No new PostgreSQL
+  concurrency exercise was needed for this client-only filter correction.
+
+Local evidence includes `/private/tmp/permitext-unassigned-section-browser-evidence.json`,
+`/private/tmp/permitext-unassigned-section-production-release.json`, and the
+matching `permitext-unassigned-section-*.log` files. Build 57 is available to
+Internal Testers with the unchanged native runtime, but its full source SHA is
+the preceding account-link repair. Final shared-candidate selection remains
+open. Physical build-57 verification, Production operator export, reviewed
+deletion and the remaining owner/provider acceptance steps await their required
+access or approval. No phone use, account deletion, paid Research, purchase,
+entitlement grant, App Store submission or navigation redesign occurred.

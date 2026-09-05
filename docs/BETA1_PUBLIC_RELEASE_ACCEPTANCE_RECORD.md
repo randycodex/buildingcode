@@ -33,15 +33,16 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-- Last verified application source: `0688e6b0564d44a92c803af3e1cfbbe6f87a2911`, deployment `dpl_5ETSni7gSRwdDDVuzryEb8HJF7Js`, READY.
-- Protected build passed commercial configuration, live Stripe, exact release identity, external-monitoring configuration and the Notebook security build gate.
-- Both canonical origins returned the exact application SHA and environment `production`; health passed PostgreSQL `normalized-v4` and live Clerk configuration.
-- App shell, offline-storage, service worker and Notebook asset bytes matched the tested local source. AASA and approved-policy publication checks passed on both origins.
-- Early deployment-scoped error/fatal scan through approximately `2026-09-04T01:24:12.419Z` returned no entries. This is not comprehensive customer-workflow or long-duration error coverage.
-- Evidence: [Notebook security publication](./PERMITEXT_NOTEBOOK_SECURITY_FIX_2026-09-03.md#authorized-production-publication). Documentation-only descendants can advance Git without changing application bytes; reverify serving identity after any automatic deployment.
-- Historical build-51 binding to `195de4f31229d785760eef570a658208f1f4e47d` is preserved in its [physical-iPhone record](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), not represented as today's release.
+- Last verified application source: `1afdafd19ca4947d19e46350748506668c90790c`, deployment `dpl_8QPPG8v7i62Ey5rXFsdXuUMKP1oQ`, READY.
+- Both canonical origins returned that exact application SHA, Production environment and deployment host at `2026-09-05T04:26:53Z`.
+- Served app, offline-storage, service-worker and stylesheet bytes matched the tested source on both origins. The HTML and rendered browser loaded client `20260905-saved-section-visibility-v38`.
+- PostgreSQL `normalized-v4` health, AASA and approved-policy publication checks passed. The bounded deployment error/fatal aggregate and captured browser console errors were empty; this is not sustained-load or latency evidence.
+- The designated disposable account retained four saved entries, one synthetic note and one empty collection. Its previously hidden whole-section save is visible after reload; 2022 Gates and 2014 Slope reopen in their correct Reader editions. The legacy workspace ownership warning remains.
+- Evidence: [Saved visibility publication](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#whole-section-saved-visibility-publication), following account-export, private-file ownership, account-operation and shared-data repairs in that same record.
+- Internal TestFlight build 57 is available from full source `acafd9642a07e049c218f9816432341de8aec0cc`. Its native runtime tree is unchanged by this subsequent web-only repair, but the full repository SHAs differ. Build 56 remains the last physically verified installation. See [build 57 evidence](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-57-source-alignment-candidate).
+- Historical build-51 binding to `195de4f31229d785760eef570a658208f1f4e47d` remains in its [physical-iPhone record](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
-This is website/backend publication evidence. The final machine-selected release remains unselected; a shared final web/TestFlight acceptance and owner go/no-go are separate.
+The final shared web/TestFlight candidate remains unselected. Source publication, TestFlight availability, physical acceptance and owner go/no-go are separate evidence layers; all machine gates remain open.
 
 ## Controlled Production billing
 
@@ -66,8 +67,10 @@ The controlled monetary and entitlement lifecycle does not need another paid Bet
 ## Production authentication and account lifecycle
 
 Gate ID: `production-auth-account-lifecycle`
-Status: **OPEN — persisted-account continuity retained through build 52; fresh/remaining providers and complete deletion remain open**
+Status: **OPEN — persisted-account continuity retained through physical build 56 and current web; fresh/remaining providers and complete deletion remain open**
 Release-bound: **yes**
+
+September 5 follow-up: build 56 retained the existing native account/plan/sync and Saved/Project-container state; build 57 is processed and internally available but not yet physically checked. Current web continuity and account-operation repairs are recorded in the [repair publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md). Fresh email registration is blocked by the unchanged hosted-provider configuration. The designated Free test account has four saved entries, one synthetic note and an empty collection, but its complete operator export, representative Project/Research/private-file coverage, reviewed deletion, provider cleanup and recreation remain open. The current Production operator credential is still required. These observations do not satisfy the fresh sign-in fields below.
 
 - Fresh-account email-code sign-in:
 - Fresh-account Apple sign-in:
@@ -91,7 +94,7 @@ Gate ID: `exact-policy-publication`
 Status: **OPEN — exact current-candidate publication passes; final-client consent confirmation remains open**
 Release-bound: **yes**
 
-- Strict live publication audit returned `publicationReady: true` for Terms, Privacy, and Subscription/Refund policy: yes at `2026-09-03T10:33:44.038Z`.
+- Strict live publication audit returned `publicationReady: true` for Terms, Privacy, and Subscription/Refund policy: yes at `2026-09-03T10:33:44.038Z`. The September 5 exact-source repair publication also passed the strict live audit; see the [current publication evidence](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#whole-section-saved-visibility-publication).
 - Live document SHA-256 hashes equal the approved manifest: yes for all three canonical routes; the audit emitted hashes only, not policy bodies or customer data.
 - Production version identifiers equal the approved current versions: yes — the protected exact-candidate build reported approved policy versions ready.
 - Web purchase consent displays and records those exact versions:
