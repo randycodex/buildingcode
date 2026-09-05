@@ -125,3 +125,42 @@ before this publication; a Production account export, approved deletion, identit
 cleanup, and recreation have not passed. No Production exploit or account
 deletion was performed. The saved-passage column discussion remains a proposal;
 this publication contains no layout change.
+
+## In-flight account request follow-up publication
+
+PR [#40](https://github.com/randycodex/buildingcode/pull/40) merged by fast-forward
+at `2026-09-05T02:52:00Z`, publishing
+`0331bc844e01d3ebc8bff9c4af4eabe7ec7b2009`. Local and remote `main` and the repair
+branch matched that commit before this evidence update. The change coordinates
+authenticated requests and account deletion with durable operation guards.
+
+- Preview `dpl_HiPrcnWQb2JELnukfutFLitr3qSN` became READY, passed its GitHub
+  deployment check, and returned the exact commit from its protected `/release`
+  route through the authenticated Vercel CLI.
+- Production deployment `dpl_7XtKkzknnWHAAEbpWhc6s58nXJsL` is READY at
+  `permitext-sync-lcz82ha2t-randycodexs-projects-b72fc111.vercel.app`. Both canonical
+  `/release` endpoints returned that host, Production environment, and the exact
+  commit at `2026-09-05T02:55:36Z`.
+- Production PostgreSQL health and Apple universal links passed. The strict policy
+  publication audit passed at `2026-09-05T02:56:51Z`, with all three approved
+  policy hashes matching the served bytes.
+- Deployment-scoped error/fatal counts were empty for the bounded
+  `02:54Z`–`02:56:51Z` observation. The rendered browser check captured no console
+  errors. Neither observation is sustained-load or latency acceptance.
+- Reopening the designated disposable account preserved Free plan, Synced
+  status, two saved passages, one synthetic note, one empty saved collection,
+  and the Building Code (2022) Reader. The account footer displayed
+  `Release: 0331bc844e01`. The legacy workspace recovery notice remained visible.
+- The complete local `npm run check`, including precheck and postcheck, broad
+  smoke, and targeted authentication/schema/performance tests passed. The actual
+  isolated PostgreSQL 18.6 tests covered both upload/deletion race orders,
+  recreated-session rejection, account isolation, exports, and rollback; all
+  1,431 database requests were local, with zero external provider requests.
+- The native runtime tree remains `f9bbba46ca2df24487604cf235fc4ec7acfef2e3`,
+  identical to build 56's archived source inputs. No new native archive or
+  TestFlight build was needed for this server repair.
+
+Production export/deletion, interrupted-guard recovery, legacy shared-Project
+ownership, and the remaining final-candidate acceptance gates are still open.
+No Production deletion or exploit was performed. The owner-facing reminder to
+revisit Project/workspace navigation is separate from this publication.

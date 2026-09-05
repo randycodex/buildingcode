@@ -173,12 +173,31 @@ after recreating an empty Free account. The isolated PostgreSQL 18.6 run made
 1,431 local database requests with 29 repeatable-read/read-only batches and zero
 external database or provider requests. The full `npm run check`, including its
 precheck and postcheck suites, passed. The broad smoke test and authentication,
-schema, and performance contracts also passed. This follow-up has not been
-published.
+schema, and performance contracts also passed. PR #40 published this follow-up
+at `0331bc844`; both canonical Production endpoints and the rendered account
+footer returned that commit. Health, universal links, approved policy hashes,
+and disposable-account reopening passed. See the publication record.
 
 This is not full deletion acceptance. Production export/deletion, interrupted
 operation recovery, shared-organization ownership, independent client/device
 cleanup, and identity recreation still require their own evidence.
+
+### Retained shared-Project ownership follow-up
+
+A synthetic file-backed HTTP exercise reproduced a separate legacy-data risk:
+one account stored a Project whose ownership record assigned it to an organization
+owned by another account. Deleting the storage account returned HTTP 200 and
+removed the Project's ownership, the other member's Project access, and its
+private file, while the organization and its owner account remained. The test
+used a constructed historical snapshot; it does not establish that the current
+visible UI can create that ownership arrangement. No Production data was changed.
+
+Firm administration and collaboration are retired, with existing records retained
+for compatibility under `PERMITEXT_DEFERRED_FEATURES.md`. Cleanup must respect the
+stored ownership boundary and identify shared records for reviewed legacy
+recovery or disposal. Restoring firm administration is not part of this repair.
+The issue remains open; PostgreSQL, concurrent ownership changes, and the
+preservation/recovery path still need verification.
 
 ## First repair batch
 
