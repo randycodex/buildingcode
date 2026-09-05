@@ -81,6 +81,15 @@ For an existing Apple account with saved work and Pro access:
 7. Attempt an unverified or mismatched link and confirm that Permitext rejects it without changing either account.
 8. Attempt to link two test accounts with distinct Pro ownership records and confirm a 409/support-resolution result while both accounts, purchases, and entitlements remain unchanged.
 
+Account linking also requires both accounts' other operations to finish.
+`ACCOUNT_LINK_OPERATION_IN_PROGRESS` means that the merge did not proceed;
+wait for the original operation and retry linking. A retained deletion claim
+also blocks linking. Do not clear an operation record or use account linking
+to escape interrupted cleanup. An unresolved interrupted writer requires the
+same support investigation as an account-deletion blocker. The linking
+request's own server-created operation IDs are handled internally; client
+metadata cannot authorize excluding another writer.
+
 ## Stripe lifecycle evidence
 
 The August 28, 2026 local provider-simulated test-mode exercise covers authenticated Checkout creation, signed-event-only fulfillment, duplicate delivery, renewal, scheduled cancellation, failed invoices, partial and full refunds, provider cancellation, and delayed webhook delivery with zero paid provider calls. It found and fixed a defect where deletion of a fully refunded entitlement also deleted the only stale-event timestamp, allowing an older active event to restore Pro. Permitext now retains a durable per-subscription lifecycle cursor separately from the entitlement; terminal events win same-second ties, older and duplicate events are ignored, and cursor ownership cannot move between accounts. `npm run test:billing` retains the regression.

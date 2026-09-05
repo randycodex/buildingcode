@@ -12,6 +12,7 @@ import { createPostgresAccountRepository } from "../postgres-account-repository.
 import { researchConversationRevision, researchContextRevision, researchConversationConflict, resetResearchActiveContext, activeResearchMessages } from "../research-context-state.mjs";
 import { runPostgresAccountDataExportCases } from "./postgres-account-data-export-cases.mjs";
 import { runPostgresSharedOwnershipCases } from "./postgres-account-shared-ownership-cases.mjs";
+import { runPostgresAccountLinkLifecycleCases } from "./postgres-account-link-lifecycle-cases.mjs";
 
 assert.equal(process.env.PERMITEXT_RUN_LOCAL_POSTGRES_READINESS, "1");
 const connectionString = process.env.PERMITEXT_LOCAL_POSTGRES_URL;
@@ -28,6 +29,7 @@ assert.match(driverPath, /^\/private\/tmp\/permitext-pg-acceptance\.[^/]+\/trans
 const { default: pg } = await import(pathToFileURL(driverPath));
 const externalFetch = globalThis.fetch;
 let requests = 0, serializableBatches = 0, repeatableReadOnlyBatches = 0, activeConnections = 0, maximumConnections = 0;
+let statementHook = null;
 neonConfig.fetchEndpoint = "http://127.0.0.1/permitext-readiness-neon";
 neonConfig.fetchFunction = async (url, options) => {
   assert.equal(url, neonConfig.fetchEndpoint);
@@ -52,6 +54,7 @@ neonConfig.fetchFunction = async (url, options) => {
     const results = [];
     for (const query of queries) {
       activeStatement = query.query;
+      if (statementHook) await statementHook(query, client);
       const result = await client.query({ text: query.query, values: query.params, rowMode: "array" });
       results.push({ fields: result.fields.map((field) => ({ name: field.name, dataTypeID: field.dataTypeID })),
         rows: result.rows, command: result.command, rowCount: result.rowCount });
@@ -209,6 +212,8 @@ try {
   // Reset only their local rate buckets; do not alter deployed limits.
   await sql`DELETE FROM permitext_rate_limit_buckets`;
   await runPostgresSharedOwnershipCases({ sql });
+  await sql`DELETE FROM permitext_rate_limit_buckets`;
+  await runPostgresAccountLinkLifecycleCases({ sql, setStatementHook: hook => { statementHook = hook; } });
   await sql`DELETE FROM permitext_rate_limit_buckets`;
   let assetCases = await readFile(new URL("./account-private-assets-http.mjs", import.meta.url), "utf8");
   assetCases = assetCases.replace('"PERMITEXT_SYNC_DATABASE_URL", ', "")

@@ -225,6 +225,38 @@ This closes neither reviewed legacy recovery/disposal nor full account-deletion
 acceptance. A safe stop preserves affected data; it does not migrate it or prove
 that an account can subsequently be deleted. Those outcomes remain open.
 
+### Account linking and in-flight requests
+
+**P0 follow-up, reproduced with local PostgreSQL only:** an image upload paused
+at the storage provider could resume after account linking consumed its source
+identity. Both HTTP requests returned 200, and the late upload recreated one
+artifact under the absent source account. No Production account was used.
+
+The merge now locks both accounts and their lifecycle records inside its
+Serializable transaction. It allows only the current request's own server-created
+guards; active work or a deletion claim on either account stops linking with
+`ACCOUNT_LINK_OPERATION_IN_PROGRESS`. Lifecycle rows are established before the
+transaction snapshot so a writer registering just after that snapshot cannot be
+hidden from the guard. A conflicting snapshot rolls the merge back. The file
+adapter checks retained guards under its existing mutation lock. Explicit
+sign-in linking, browser repair, and automatic Apple-identity merge paths use
+the same boundary; client-supplied operation IDs cannot bypass it.
+
+Local PostgreSQL 18.6 validation passed the upload-first race, the merge-first
+race, both owners, retained deletion claims, forged exclusions, a deliberately
+stale Serializable snapshot, normal retry, retained private-image access, and
+automatic Apple-identity repair. The final isolated run made 1,775 local
+database requests, including 62 Serializable and 46 repeatable-read/read-only
+batches, with zero external database or provider requests. File-backed HTTP
+checks passed unchanged blocked inventories for both owners and normal retry.
+Authentication, session hot-path, lifecycle, runbook, and broad smoke checks
+passed. The full `npm run check`, including precheck, main check, and postcheck,
+also passed. This repair is not published.
+
+Interrupted-operation recovery and the final Production account-link/deletion
+acceptance remain open. This guard does not replay unsent work from another
+client or migrate quarantined browser data.
+
 ## First repair batch
 
 The draft App Review metadata was also corrected after checking the native

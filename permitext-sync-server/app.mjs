@@ -10,7 +10,7 @@ import {
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { createFileAccountLifecycle, createPostgresAccountLifecycle } from "./account-lifecycle.mjs";
+import { createFileAccountLifecycle, createPostgresAccountLifecycle, assertFileAccountsReadyForLink } from "./account-lifecycle.mjs";
 import {
   accountDeletionOwnershipReview,
   accountRecordExportFromStore,
@@ -3620,15 +3620,15 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return accountRepository.authenticate(userID, rawToken);
     },
-    async signInAccount(account) {
+    async signInAccount(account, mergeOptions = {}) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
-      return accountRepository.signIn(account);
+      return accountRepository.signIn(account, mergeOptions);
     },
-    async mergeUserAccounts(sourceUserID, targetUserID) {
+    async mergeUserAccounts(sourceUserID, targetUserID, mergeOptions = {}) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
-      return accountRepository.mergeAccounts(sourceUserID, targetUserID);
+      return accountRepository.mergeAccounts(sourceUserID, targetUserID, mergeOptions);
     },
     async updateAccount(userID, account) {
       await ensureSchema();
@@ -7111,8 +7111,16 @@ function requireSessionToken(request, response, sessionToken, requestAccount) {
 
 const accountRequestGuards = new WeakMap();
 
+function accountLinkOperationOptions(response) {
+  // Only server-created guards for this exact request may be excluded. Never
+  // accept operation IDs from a request body or credential metadata.
+  return { operationIDsByUserID: Object.fromEntries(
+    [...(accountRequestGuards.get(response)?.entries || [])].map(([userID, { id }]) => [userID, id])
+  ) };
+}
+
 function sendAccountLifecycleError(response, error) {
-  if (!["ACCOUNT_OPERATION_IN_PROGRESS", "ACCOUNT_DELETION_IN_PROGRESS", "ACCOUNT_SESSION_INACTIVE"].includes(error?.code)) return false;
+  if (!["ACCOUNT_OPERATION_IN_PROGRESS", "ACCOUNT_DELETION_IN_PROGRESS", "ACCOUNT_SESSION_INACTIVE", "ACCOUNT_LINK_OPERATION_IN_PROGRESS"].includes(error?.code)) return false;
   sendJSON(response, error.statusCode, { error: error.message, code: error.code, partial: false });
   return true;
 }
@@ -23955,6 +23963,7 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
   if (!sourceAccount || !targetAccount) {
     return null;
   }
+  assertFileAccountsReadyForLink(store, [sourceUserID, targetUserID]);
   if (accountMergeHasEntitlementConflict(
     store.entitlements[sourceUserID],
     store.entitlements[targetUserID]
@@ -24357,7 +24366,7 @@ async function handleSignIn(request, response) {
     })) {
       return;
     }
-    const directResult = await adapter.signInAccount(account);
+    const directResult = await adapter.signInAccount(account, accountLinkOperationOptions(response));
     if (directResult.requiresLegacyMerge) {
       sendError(
         response,
@@ -24371,7 +24380,7 @@ async function handleSignIn(request, response) {
     const targetUserID = directResult.account.appUserID;
     const mergedAccount = sourceUserID === targetUserID
       ? null
-      : await adapter.mergeUserAccounts(sourceUserID, targetUserID);
+      : await adapter.mergeUserAccounts(sourceUserID, targetUserID, accountLinkOperationOptions(response));
     if (sourceUserID !== targetUserID && !mergedAccount) {
       sendError(response, 404, "The source account could not be linked.");
       return;
@@ -24403,7 +24412,7 @@ async function handleSignIn(request, response) {
     return;
   }
   if (!sourceUserID && typeof adapter.signInAccount === "function") {
-    const directResult = await adapter.signInAccount(account);
+    const directResult = await adapter.signInAccount(account, accountLinkOperationOptions(response));
     if (!directResult.requiresLegacyMerge) {
       const activation = await activatePendingLifetimeGrantForAccount(directResult.account);
       if (activation) {
@@ -24508,7 +24517,7 @@ async function handleBrowserAccountLink(request, response) {
       return;
     }
     const sourceUserID = `web:${browserCredentialID}`;
-    const mergedAccount = await adapter.mergeUserAccounts(sourceUserID, targetUserID);
+    const mergedAccount = await adapter.mergeUserAccounts(sourceUserID, targetUserID, accountLinkOperationOptions(response));
     if (accountMergeHasConflict(mergedAccount)) {
       sendError(response, 409, accountEntitlementConflictMessage);
       return;
@@ -27461,7 +27470,7 @@ async function handleAppleWebCallback(request, response) {
       typeof adapter.signInAccount === "function" &&
       typeof adapter.mergeUserAccounts === "function"
     ) {
-      const directResult = await adapter.signInAccount(account);
+      const directResult = await adapter.signInAccount(account, accountLinkOperationOptions(response));
       if (directResult.requiresLegacyMerge) {
         sendCallbackHTML(appleCallbackHTML({
           title: "permitext sign in",
@@ -27478,7 +27487,7 @@ async function handleAppleWebCallback(request, response) {
       const targetUserID = directResult.account.appUserID;
       const mergedAccount = oauthState.linkFrom.accountUserID === targetUserID
         ? null
-        : await adapter.mergeUserAccounts(oauthState.linkFrom.accountUserID, targetUserID);
+        : await adapter.mergeUserAccounts(oauthState.linkFrom.accountUserID, targetUserID, accountLinkOperationOptions(response));
       if (oauthState.linkFrom.accountUserID !== targetUserID && !mergedAccount) {
         throw new Error("The source account could not be linked.");
       }
@@ -27513,7 +27522,7 @@ async function handleAppleWebCallback(request, response) {
       return;
     }
     if (!oauthState.linkFrom?.accountUserID && typeof adapter.signInAccount === "function") {
-      const directResult = await adapter.signInAccount(account);
+      const directResult = await adapter.signInAccount(account, accountLinkOperationOptions(response));
       if (!directResult.requiresLegacyMerge) {
         const finalAccount = directResult.account;
         sendCallbackHTML(appleCallbackHTML({
@@ -31519,6 +31528,7 @@ async function handleRequestUnlocked(request, response) {
     }
     await handler(request, response);
   } catch (error) {
+    if (sendAccountLifecycleError(response, error)) return;
     if (error instanceof RequestBodyTooLargeError) {
       sendError(response, 413, "Request body is too large.");
       return;

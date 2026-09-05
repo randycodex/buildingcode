@@ -20,6 +20,22 @@ export function inactiveAccountError() {
   });
 }
 
+export function accountLinkBusyError() {
+  return Object.assign(new Error("Another account operation is still in progress. Wait for it to finish, then retry linking. If the operation was interrupted and this message persists, contact support."), {
+    code: "ACCOUNT_LINK_OPERATION_IN_PROGRESS", statusCode: 409
+  });
+}
+
+export function assertFileAccountsReadyForLink(store, userIDs) {
+  // Called while the file request coordinator holds the mutation lock. Its
+  // linking request has no durable guard of its own; any retained guard belongs
+  // to overlapping external work or an interrupted operation.
+  if (userIDs.some(userID => {
+    const state = store.accountLifecycleByUserID?.[userID];
+    return state?.deletionID || Object.keys(state?.operations || {}).length;
+  })) throw accountLinkBusyError();
+}
+
 export function createFileAccountLifecycle(mutate) {
   return {
     async begin(userID, id, { sessionToken = null, kind = "request" } = {}) {

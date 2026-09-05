@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { accountMergeHasEntitlementConflict } from "./entitlement-contract.mjs";
 import { mergedPolicyAcceptances } from "./policy-acceptance.mjs";
+import { accountLinkBusyError } from "./account-lifecycle.mjs";
 
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) return fallback;
@@ -225,7 +226,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
     `;
   }
 
-  async function mergeAccounts(sourceUserID, targetUserID) {
+  async function mergeAccounts(sourceUserID, targetUserID, { operationIDsByUserID = {} } = {}) {
     if (!sourceUserID || !targetUserID || sourceUserID === targetUserID) return null;
     const [sourceContext, targetContext] = await Promise.all([
       contextForUser(sourceUserID),
@@ -252,6 +253,18 @@ export function createPostgresAccountRepository(sql, options = {}) {
       targetContext.account?.policyAcceptances
     );
 
+    // Make both lifecycle rows exist before the Serializable snapshot begins.
+    // Locking them in the transaction then detects an operation registered
+    // after that snapshot, including one that finished acquiring its parent
+    // lock just before the merge acquired its own. An absent lifecycle row
+    // must not hide such a writer from the transaction's snapshot.
+    await sql`
+      INSERT INTO permitext_account_lifecycle (user_id)
+      SELECT id FROM permitext_users WHERE id IN (${sourceUserID}, ${targetUserID})
+      ORDER BY id
+      ON CONFLICT (user_id) DO NOTHING
+    `;
+
     const queries = [
       // The preflight reads happen before the transaction. Lock both identities
       // and fail the whole batch if a concurrent merge already consumed either
@@ -264,6 +277,20 @@ export function createPostgresAccountRepository(sql, options = {}) {
         )
         SELECT 1 / CASE WHEN count(*) = 2 THEN 1 ELSE 0 END AS identities_present
         FROM locked_accounts
+      `,
+      sql`
+        WITH locked_lifecycle AS (
+          SELECT user_id, operations, deletion_id FROM permitext_account_lifecycle
+          WHERE user_id IN (${sourceUserID}, ${targetUserID})
+          ORDER BY user_id FOR UPDATE
+        )
+        SELECT 1 / CASE WHEN count(*) = 2 AND bool_and(
+          deletion_id IS NULL AND
+          (operations - CASE WHEN user_id = ${sourceUserID}
+            THEN ${operationIDsByUserID[sourceUserID] || ""}::text
+            ELSE ${operationIDsByUserID[targetUserID] || ""}::text END) = '{}'::jsonb
+        ) THEN 1 ELSE 0 END AS accounts_idle
+        FROM locked_lifecycle
       `,
       sql`
         SELECT record_id
@@ -758,10 +785,18 @@ export function createPostgresAccountRepository(sql, options = {}) {
     try {
       results = await sql.transaction(queries, { isolationLevel: "Serializable" });
     } catch (error) {
-      if (error?.code === "22012") return null; // The identity guard rolled back the batch.
+      if (error?.code === "40001") throw accountLinkBusyError();
+      if (error?.code === "22012") {
+        // Either the identity or operation guard rolled back the whole batch.
+        // A consumed identity remains a missing-source result; retained
+        // identities tell callers to retry linking after their other work.
+        const remaining = await sql`SELECT id FROM permitext_users WHERE id IN (${sourceUserID}, ${targetUserID})`;
+        if (remaining.length === 2) throw accountLinkBusyError();
+        return null;
+      }
       throw error;
     }
-    const sourceRows = results[1] || [];
+    const sourceRows = results[2] || [];
     const acceptedMutationIDs = sourceRows.map(({ record_id: recordID }) =>
       recordID.startsWith(`${sourceUserID}:`)
         ? `${targetUserID}:${recordID.slice(sourceUserID.length + 1)}`
@@ -773,11 +808,11 @@ export function createPostgresAccountRepository(sql, options = {}) {
       movedMutationCount: sourceRows.length,
       acceptedMutationIDs,
       rejectedMutationIDs: [],
-      transferredEntitlement: Boolean(results[4]?.length)
+      transferredEntitlement: Boolean(results[5]?.length)
     };
   }
 
-  async function signIn(account) {
+  async function signIn(account, mergeOptions = {}) {
     const incoming = withoutSessionToken(account);
     const candidates = await matchingAppleAccounts(incoming);
     const exact = candidates.find((candidate) => candidate.id === incoming.appUserID) || null;
@@ -791,7 +826,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
       });
     const preferredAlternative = alternatives[0] || null;
     if (exact && preferredAlternative) {
-      const mergedAccount = await mergeAccounts(exact.id, preferredAlternative.id);
+      const mergedAccount = await mergeAccounts(exact.id, preferredAlternative.id, mergeOptions);
       if (mergedAccount?.entitlementConflict) {
         return {
           account: null,
@@ -801,7 +836,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
           mergeConflictCode: "ACCOUNT_ENTITLEMENT_CONFLICT"
         };
       }
-      return signIn(account);
+      return signIn(account, mergeOptions);
     }
 
     const targetRow = preferredAlternative || exact;
