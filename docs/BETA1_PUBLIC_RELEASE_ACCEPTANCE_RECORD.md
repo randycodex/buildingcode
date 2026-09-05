@@ -192,10 +192,22 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN — build 52 bounded device and live-answer evidence retained; final-candidate acceptance remains incomplete**
+Status: **OPEN — Production and verified build-58 archive share source; Apple sign-in blocks upload and final device acceptance remains incomplete**
 Release-bound: **yes**
 
-- Website/backend application source last verified: `0688e6b0564d44a92c803af3e1cfbbe6f87a2911`; see the publication section above.
+### Current candidate and latest verified clients
+
+- Production application source: `9a89e54e7b70ccb7567b784443b232df005a10ac`, verified on both canonical origins at `2026-09-05T05:09:38Z`.
+- Prepared native candidate: signed `1.0 (58)` archive from that same full source, executable SHA-256 `beb83a75f74b80eb96a44d121677a9e18155f050808de658e471672bb25d8316`. Archive signing, Production configuration, pinned dependencies and semantic privacy aggregation passed. Export/upload failed on Apple account access before transfer; retry this retained archive after sign-in is restored.
+- Latest confirmed internally available TestFlight build: `1.0 (57)` from `acafd9642a07e049c218f9816432341de8aec0cc`. It lacks build 58's native navigation-label repair and has not received physical acceptance.
+- Last physically verified installation: `1.0 (56)` on the iPhone 17 Pro at approximately `2026-09-05T00:39Z`. Installation, launch, displayed build identity and existing account/plan/sync/saved-section/Project-container continuity passed. This does not establish all final-candidate workflows.
+- Build 58's Release Simulator capture passed destination accessibility names, chapter/edition identity, Reader, Search and Saved navigation. Four inspected screenshot candidates are retained. These checks do not replace physical VoiceOver, offline/recovery, account-lifecycle or professional-handoff acceptance.
+- Earlier physical wide-table and VoiceOver observations remain bounded build-54 evidence. They are not a build-58 device result.
+- Evidence: [current publication and archive/upload outcome](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-navigation-labels-and-build-58), [build-57 availability](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-57-source-alignment-candidate), and [build-56 device continuity](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#native-archive-and-upload).
+
+### Earlier build-51/52 observations retained with their original limits
+
+- Then-verified website/backend application source: `0688e6b0564d44a92c803af3e1cfbbe6f87a2911`; superseded by the current publication above.
 - Installed native archive: version `1.0 (52)`, source `1873ba6453bf6f3d1f076e34fa2ddfb96b9cf40c`, executable SHA-256 `abff19908971e29ef9c2cc99ea60ea8c474b08f300c69b75320ddde31fdc21c6`. No replacement binary was created by the later Notebook/privacy publication.
 - App Store Connect processing, Internal Testers assignment, owner installation and exact build identity: retained for build 52. This is not public App Store approval.
 - Physical-iPhone account/sync/representative continuity: existing signed-in account, Lifetime Pro, Synced, saved section and existing Projects observed on build 52. Fresh-provider and broader saved Project-item coverage remain open.
@@ -232,4 +244,5 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
-- Next permitted action without new authorization: read-only/local verification only
+- Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
+- Next technical step: restore authorized Apple account access and retry the retained build-58 upload. The Production operator credential and final account/device checks also require owner participation; keep the remaining gates open until their evidence is complete.

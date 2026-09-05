@@ -153,7 +153,7 @@ Review-access plan (requires approval and verification before submission):
 ## Version 1.0 items still required in App Store Connect
 
 - Select the exact final version 1.0 build only after its upload and required physical-device acceptance; build 57 is internally available, while build 56 has the latest bounded physical continuity evidence. Neither this checklist nor the repair publication selects a final App Store build.
-- Recapture and inspect final release-build iPhone screenshots before upload; the old build-33 Reader image contains a debug control
+- The build-58 Release screenshot candidate has been captured and inspected. Confirm it matches the selected final source before uploading; recapture if that source changes the pictured UI. Preserve the old build-33 package as historical evidence because its Reader image contains a debug control.
 - Enter description, keywords, URLs, and copyright
 - Add the app's free price schedule
 - Set primary and secondary categories
