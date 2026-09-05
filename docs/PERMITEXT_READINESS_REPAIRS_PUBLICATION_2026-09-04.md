@@ -461,3 +461,15 @@ evidence rather than the current upload outcome.
 Public App Store submission, screenshot upload and final release acceptance
 remain separate. No account cleanup, purchase or new paid Research request was
 performed for this upload.
+
+## Production administrator access restored
+
+On September 5 the owner replaced the unavailable administrator credential.
+The existing verified source `0985728b26e5b247d758fce26c4e0739efef986f` was
+redeployed as `dpl_6ZEsNtGcM5e5QsUFDXVWDGPFYPB3`. Both canonical origins and
+served client bytes matched; health, AASA and strict approved-policy checks
+passed. Authenticated operator export and restore-checklist reads then succeeded
+for the exact disposable Free account. See the [deployment, export comparison,
+and remaining deletion boundary](./PERMITEXT_ACCOUNT_ACCEPTANCE_PREPARATION_2026-09-05.md).
+No runtime code, native build, paid entitlement or account data was changed by
+this configuration recovery.

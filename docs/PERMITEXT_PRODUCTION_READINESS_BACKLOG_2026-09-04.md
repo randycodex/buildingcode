@@ -84,12 +84,20 @@ Validation on this repair branch:
   external database or provider requests. The cluster was stopped and removed.
 
 This repair was published in PR #39 at `4a3c7a740`; both canonical Production
-release endpoints returned that exact commit. It does not close the acceptance
-gate: the designated Free account has two saved passages, a synthetic note, and a saved
-collection, but second-client sync, full Project/Research/private-image coverage,
-operator export, reviewed deletion, identity cleanup, and recreation remain.
-The available local operator credential returned HTTP 401; no live export or
-deletion was performed. See the updated
+release endpoints returned that exact commit. This did not close the acceptance
+gate: at that stage the designated Free account had two saved passages, a
+synthetic note, and a saved collection; second-client sync, full
+Project/Research/private-image coverage, operator export, reviewed deletion,
+identity cleanup, and recreation remained open.
+The initially available local operator credential returned HTTP 401; no live
+export or deletion was performed at that stage. On September 5 the owner replaced
+the operator credential and Production was redeployed from `0985728b2`.
+The disposable Free account's export and restore checklist then passed, matching
+four saves, one synthetic note, an empty saved collection and the visible browser
+state. No shared-ownership blocker or entitlement record was present. Deletion,
+identity cleanup, recreation and the broader client/content matrix remain open.
+See the [operator recovery and export evidence](./PERMITEXT_ACCOUNT_ACCEPTANCE_PREPARATION_2026-09-05.md)
+and the updated
 [account acceptance runbook](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance).
 
 ## Post-publication private-file ownership repair
