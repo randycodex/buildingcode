@@ -138,6 +138,14 @@ subsequent file under the native project is an acceptance-document update.
 
 ## First repair batch
 
+The draft App Review metadata was also corrected after checking the native
+StoreKit account-binding policy: Sandbox transactions on a Production-targeted
+build authorize local test state, whereas backend Sandbox verification requires
+the isolated staging host. The draft no longer claims that the review purchase
+automatically activates Production backend Pro. The actual final-candidate
+reviewer access route remains an acceptance blocker; no entitlement, live
+configuration, App Store metadata, or submission was changed.
+
 Status: implementation and local verification complete in `38ed70d08` and
 `cf0cf0be1`, including the offline compatibility follow-up; isolated on the repair
 branch. The second batch below addresses the remaining source defects. Local

@@ -125,6 +125,7 @@ Review-access plan (requires approval and verification before submission):
 - Explain that reading and search work without an account.
 - Provide a dedicated synthetic reviewer-access plan for account-based features. Do not assume that asking Apple to create an account replaces verified reviewer access. See Apple's [review guidelines](https://developer.apple.com/app-store/review/guidelines/), Before You Submit and 2.1.
 - Verify the actual passwordless or identity-provider route without sharing the owner's credentials or introducing an authentication bypass. A demo mode is a separate product/security decision, not an automatic addition.
+- Resolve the subscription/backend-feature mismatch in the current Production-targeted candidate: Sandbox purchases bind locally and do not grant Production backend Pro. The draft metadata now states this boundary. Corrected instructions alone do not establish reviewer access; verify the complete route before submission.
 - The live sign-in-required checkbox is currently checked; it was not changed during the audit. Review notes and credentials are currently blank.
 - Review contact name: Higinio Jimenez Manzano
 - Review contact email: `permitext@gmail.com`

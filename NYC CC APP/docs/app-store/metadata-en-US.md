@@ -65,14 +65,18 @@ Account-based workspace, sync, and Pro features also require review. A dedicated
 
 Internal preparation only: reviewer identity/access method and Pro access are **not yet provisioned or verified**. Resolve these with owner approval, then replace this preparation note with complete review instructions. Reviewers must be able to inspect the enabled features without needing a live response from the owner to obtain each verification code.
 
-To review the in-app subscription:
+Subscription review flow to verify before submission:
 
 1. Open the account control and the Plan section.
 2. Sign in through the approved reviewer-access route.
 3. Open the Pro upgrade flow.
 4. Select Permitext Pro Monthly and confirm with the App Store test account supplied by Apple.
 
-The iOS app uses StoreKit for the purchase. A successful purchase is verified by the Permitext backend and attached to the signed-in Permitext account. Restore Subscription is available on the upgrade screen. Delete Account is available in the Account section and requires confirmation. Confirm these instructions on the final candidate before copying them to App Store Connect.
+The iOS app uses StoreKit. Production transactions require Permitext backend verification and account binding. On the current Production-targeted build, Sandbox transactions bind to the signed-in account on the device; they do not create a Production backend Pro entitlement. A local Pro display therefore does not demonstrate access to backend Pro features. Sandbox backend verification is enabled only for the separately configured isolated staging host.
+
+**Internal submission blocker:** verify the reviewer subscription and backend-feature path on the actual final candidate, and replace this preparation text with the observed, complete access instructions. Do not describe a Sandbox purchase as activating Production backend Pro, weaken the transaction-environment guard, or silently provision reviewer access. The completed staging Sandbox lifecycle does not establish this final-candidate path.
+
+Restore Subscription is available on the upgrade screen. Delete Account is available in the Account section and requires confirmation. Confirm these instructions on the final candidate before copying them to App Store Connect.
 
 Permitext Pro Monthly:
 
