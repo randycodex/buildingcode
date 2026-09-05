@@ -388,7 +388,10 @@ Local Release/accessibility-tree checks do not establish physical VoiceOver
 acceptance. The owner installed build 58 through TestFlight; the running app's
 Account footer independently confirmed the build. Existing account/plan/sync,
 Saved/Project containers and the Fuel Gas Code 2022 selection were retained.
-Physical VoiceOver confirmation and the broader final-device matrix remain open.
+The owner confirmed the VoiceOver chapter/navigation spot-check. Saved-source
+and Search-result reopening also passed at their exact 2022 provisions. The
+broader final-device matrix remains open; these checks do not establish full
+accessibility, offline, conflict, deletion or professional-handoff acceptance.
 No account deletion, paid Research or public App Store submission was used.
 The prior build-33 screenshot package remains historical.
 

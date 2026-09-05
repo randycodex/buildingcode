@@ -429,7 +429,18 @@ evidence rather than the current upload outcome.
   account, Lifetime Pro, 98 remaining included Research turns, Synced status,
   Project containers and a saved Building Code passage remained present. The
   Reader retained Fuel Gas Code and 2022 Construction Codes. Saved, First reader
-  and Account navigation passed; physical VoiceOver confirmation is pending.
+  and Account navigation passed.
+- The owner reported that VoiceOver reads the chapter card and bottom menu
+  buttons, and affirmed the chapter-number clarification. This is a bounded
+  user-reported navigation spot-check, not an independent audio recording of
+  every exact label or complete accessibility certification. The owner then
+  returned the phone with VoiceOver off.
+- The saved `101.4.1 Electrical` passage opened through its source link at the
+  exact provision in Building Code 2022, Chapter 1. The existing recent
+  `concrete` search returned 200 results; selecting `28-406.1` opened General
+  Administrative Provisions 2022, Chapter 4 at that exact provision. Native
+  Reader headings displayed the code and edition. Fuel Gas Chapter 5 restored
+  the prior `504.2` table position; no new horizontal-gesture result is claimed.
 - Both canonical Production origins still returned full source
   `9a89e54e7b70ccb7567b784443b232df005a10ac` at `2026-09-05T12:31:34Z`, matching
   the verified archive. This release-identity recheck does not repeat the earlier
