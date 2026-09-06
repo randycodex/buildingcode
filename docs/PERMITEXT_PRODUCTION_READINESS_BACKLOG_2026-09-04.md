@@ -473,6 +473,23 @@ production customer incidents.
 
 ## Release acceptance reconciliation
 
+The [September 6 local handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
+address the captured outside-authority reinsertion, hidden Note-linked answer
+panel, and Report presentation defects. The owner's usual phone account is
+restored. Publication and deployed/physical acceptance of these subsequent
+repairs remain distinct from PR #57's completed routing confirmation.
+
+The newer [PR #57 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
+verified Production `4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e` and completed
+one approved turn with 2014-only citations and no web lookup. P0-1's bounded
+routing repair is verified. P0-2/P1-1/P2-2 acceptance remains open: unrelated
+authority text survived verification, the Note's answer reference did not open,
+and the exported Report has edition, citation-label and formatting defects.
+Saved handoff artifacts and native source reopening provide separate evidence;
+a completed Research operation does not close these defects. The record retains
+exact no-provider reproduction inputs, accounting and cleanup status.
+
+
 The [Research handoff checkpoint](./PERMITEXT_RESEARCH_HANDOFF_ACCEPTANCE_2026-09-05.md)
 records PR #56 on Production `d30874a4d80ccf59566701c9d2558e45d5f8df3c` and
 the one separately approved confirmation. The unchanged synthetic 2014 ramp

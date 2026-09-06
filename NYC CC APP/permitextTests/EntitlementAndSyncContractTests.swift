@@ -348,6 +348,54 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(historical.text, "Historical note")
     }
 
+    @MainActor
+    func testNativeReportResearchPresentationUsesSavedEditionAndCitationLabels() throws {
+        let fixture: [String: Any] = [
+            "id": "synthetic-handoff-manifest", "immutable": true, "schemaVersion": 2,
+            "generatorVersion": "synthetic-acceptance", "draftID": "synthetic-draft",
+            "title": "Synthetic Research handoff", "reportDate": "2026-09-06T00:00:00Z",
+            "project": ["id": "synthetic-project", "name": "Synthetic project", "address": "No real property", "description": "Assumed 2014 applicability"],
+            "author": ["userID": "synthetic-user", "displayName": "Synthetic reviewer"],
+            "codeEdition": "2022 NYC Construction Codes", "reportVersion": 1, "sourceVersions": ["draftVersion": 2],
+            "createdAt": "2026-09-06T00:00:00Z", "contentHash": String(repeating: "b", count: 64),
+            "disclaimers": ["Synthetic acceptance artifact; verify enacted sources."],
+            "items": [
+                ["id": "intro", "kind": "paragraph", "order": 0, "sourceClassification": "user-authored", "text": "Research → Note → Report. Only the cellar is sprinklered."],
+                ["id": "answer", "kind": "researchAnswer", "order": 1, "sourceClassification": "ai-assisted",
+                 "question": "Summarize the selected 2014 ramp slope passage.",
+                 "conclusion": "**Use 1:12** for an *assumed* means-of-egress ramp; verify applicability.",
+                 "explanation": "The **1:7** garage exception remains conditional.",
+                 "supportedPoints": [["heading": "Conditional exception", "explanation": "No more than three stories; verify below-grade levels and nonaccessible egress."]],
+                 "codeEdition": "2014 NYC Construction Codes", "authorityLabel": "Conditional on Project facts",
+                 "codeBasis": ["disclosure": "Only the selected 2014 evidence was reviewed."],
+                 "sourceAsOf": "2026-09-06T00:00:00Z",
+                 "citations": [["sectionID": "internal-section", "sourceIDs": ["internal-source"], "codePrefix": "BC", "sectionNumber": "1010.2", "title": "Slope", "codeEdition": "2014 NYC Construction Codes"]],
+                 "limitations": ["Only the cellar is sprinklered; whole-building coverage is unconfirmed."],
+                 "disclaimer": "AI-assisted review, not an official determination."]
+            ]
+        ]
+        let manifest = try JSONDecoder().decode(ProjectReportManifest.self, from: JSONSerialization.data(withJSONObject: fixture))
+        let url = try ProjectReportExportBuilder(manifest: manifest).build()
+        let document = try XCTUnwrap(PDFDocument(url: url))
+        let text = try XCTUnwrap(document.string).split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        for expected in ["Project default: 2022", "Included Research basis: 2014", "BC · § 1010.2 · Slope", "Conditional on Project facts", "Only the selected 2014 evidence", "Conditional exception", "No more than three stories", "Only the cellar is sprinklered", "Research → Note → Report", "Use 1:12", "assumed", "1:7"] {
+            XCTAssertTrue(text.contains(expected), "Missing \(expected)")
+        }
+        for absent in ["**", "*assumed*", "internal-section", "internal-source"] {
+            XCTAssertFalse(text.contains(absent), "Unexpected \(absent)")
+        }
+        XCTAssertEqual(document.pageCount, 1, "This compact Report must not create a trailing page containing only its hash.")
+        let unknownCitation = try JSONDecoder().decode(ProjectReportCitation.self, from: Data("{}".utf8))
+        let unidentifiedEvidence = try JSONDecoder().decode(ProjectReportEvidenceSnapshot.self, from: Data(#"{"sectionNumber":"1010.2","codeEdition":"2022"}"#.utf8))
+        XCTAssertTrue(ProjectReportExportBuilder.citationLabel(unknownCitation, evidence: [unidentifiedEvidence], answerEdition: nil).contains("unavailable"))
+        XCTAssertEqual(manifest.items[1].conclusion, "**Use 1:12** for an *assumed* means-of-egress ramp; verify applicability.")
+        XCTAssertEqual(manifest.codeEdition, "2022 NYC Construction Codes")
+        let attachment = XCTAttachment(data: try Data(contentsOf: url), uniformTypeIdentifier: "com.adobe.pdf")
+        attachment.name = "native-research-handoff-presentation.pdf"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
+
     func testPublishedHTMLStoreResolvesFlat2014ChapterFilesByCodeFamily() throws {
         let resourceURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-flat-2014-html-\(UUID().uuidString)", isDirectory: true)

@@ -1,9 +1,12 @@
 # Selected-passage Research routing repair — September 6, 2026
 
-Status: two source-routing defects reproduced and repaired locally. Focused
-contracts, an isolated HTTP save/reopen test, full `npm run check` (including
-precheck/postcheck), and `npm run smoke` pass. Publication review is pending.
-No paid provider call or Production change occurred in this implementation step.
+Status: both source-routing repairs are published in PR #57, Production
+`4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e`. The separately approved live
+confirmation completed with 2014-only sources and no web lookup. Full handoff
+acceptance remains open for the findings in the
+[September 6 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md).
+The local implementation itself made no provider call; focused contracts,
+isolated HTTP save/reopen, full check and smoke passed before publication.
 
 This continues the original 17-finding production-readiness audit, particularly
 P0-1 source identity and the P0-2/P1-1/P2-2 professional handoff. The preceding
@@ -75,9 +78,10 @@ accepted. There are no native runtime changes.
   with provider credentials and paid-evaluation switches removed. The unchanged
   attribution and guidance-binding contracts pass within those suites.
 - `git diff --check` and the repair record's relative-link check pass.
-- The missing live draft remains unavailable. A new live confirmation would
-  require a separately approved publication and one bounded provider-backed
-  attempt; the two earlier approvals are consumed.
+- The two older failed drafts remain unavailable. A separately approved
+  PR #57 confirmation has now completed; all three recorded turn approvals
+  are consumed. Its saved answer provides exact evidence for the remaining
+  quality and downstream defects.
 
 Private local evidence is under
 `/private/tmp/permitext-selected-passage-repair-20260906/`, including
@@ -87,9 +91,10 @@ account identifiers, verification codes or raw account exports.
 
 ## Remaining acceptance
 
-Review and publish the finished backend repair, then obtain one verified live
-answer before continuing Research → authored Note → Report → physical build-61
-review and the historical-answer Project-reassignment check. A local mocked
-answer is not professional or live-provider acceptance. The existing test grant
-remains revoked and its session signed out; no phone or normal account session
-was operated during this repair.
+The one approved Production confirmation completed and the bounded source-routing
+repair is verified. The saved answer still has an unrelated authority footer
+and limitation. Further checks found a silent Note-reference opening failure
+and Report edition/citation/formatting defects. See the
+[confirmation and cleanup record](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
+for exact evidence and remaining work. A completed provider operation is not
+blanket professional or release acceptance.

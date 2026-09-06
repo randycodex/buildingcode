@@ -38,7 +38,7 @@ assert.equal(fixture.schema, "permitext-research-product-examples-v1");
 assert.equal(fixture.paidModelCallsAuthorized, false);
 assert.equal(fixture.cases.length, 7);
 assert.equal(new Set(fixture.cases.map((item) => item.id)).size, fixture.cases.length);
-assert.equal(researchAnswerPresentationVersion, "20260902-product-example-contract-v2");
+assert.equal(researchAnswerPresentationVersion, "20260906-outside-authority-boundary-v3");
 
 const codeSectionNames = new Map(
   (constructionBundle.codeSections || []).map((section) => [section.id, section.name])

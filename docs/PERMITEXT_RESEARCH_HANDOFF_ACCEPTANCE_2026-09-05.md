@@ -1,8 +1,9 @@
 # Research handoff acceptance — 2026-09-05
 
-Status: the bounded canonical-label correction is published in Production.
-The separately approved live confirmation still failed attribution verification;
-downstream acceptance remains open. Both temporary-access cycles are complete.
+Status: this record preserves the first two failed turns and completed access
+cycles. The subsequent [PR #57 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
+completed with 2014-only sources and no web lookup. Full downstream acceptance
+remains open for its captured quality, Note-navigation and Report defects.
 This continues the original production-readiness audit's 17 findings.
 
 ## Verified preparation
@@ -134,7 +135,7 @@ codes and raw account exports are excluded from this repository record.
 
 ## Remaining execution and restoration
 
-1. The [selected-passage routing repair](./PERMITEXT_RESEARCH_SELECTED_PASSAGE_REPAIR_2026-09-06.md) reproduces two upstream defects in the exact question: short edition-qualified citations added 2022 sources, and outside-library discovery overrode the selected-passage summary boundary. Focused local, mocked HTTP save/reopen, full regression and smoke checks pass; publication review remains pending. This does not replay the unavailable failed draft. Both paid approvals are consumed; a new live confirmation requires a concrete, separately authorized scope.
+1. The [selected-passage routing repair](./PERMITEXT_RESEARCH_SELECTED_PASSAGE_REPAIR_2026-09-06.md) is published in PR #57 and its [one approved confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md) completed. 2014-only routing and no unwanted web lookup are verified; all three turn approvals are consumed. Remaining quality and downstream defects now have retained answer/PDF evidence for a no-provider reproduction.
 2. If the answer is acceptable, preserve it in a clearly user-authored Note, include the intended evidence in a Report, and verify reopened source/answer/Note/Report state on the physical candidate. A single passage-summary case does not close the wider Research quality gate.
 3. Exercise the planned Project-context change with immutable historical-answer checks if the first boundary passes; additional paid generation requires its own scope.
 4. Any future test-access cycle must finish with revocation and restoration of any sessions changed during that cycle. Both recorded cycles are complete.

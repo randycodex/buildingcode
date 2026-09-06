@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260905-reader-navigation-v47";
+} from "./offline-storage.js?v=20260906-research-handoff-v48";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260905-reader-navigation-v47";
+} from "./research-intent-state.js?v=20260906-research-handoff-v48";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -17228,6 +17228,9 @@ async function openResearchConversation(conversationID, options = {}) {
     return null;
   }
   if (!researchOpenContextIsCurrent(openingContext)) return null;
+  // Every explicit entry point (including Note references) must reveal the
+  // conversation. Setting only its ID loads History but leaves the answer hidden.
+  researchConversationPaneOpened = true;
   activeResearchConversation = conversation;
   const codeQuestionProjectID = openingContext.projectID;
   const linkedQuestionID = String(conversation.linkedCodeDecisionID || "").trim();
@@ -21704,7 +21707,10 @@ async function openNotebookReference(project, foundation, reference, selectCard,
   if (reference.referenceKind === "researchAnswer") {
     const answer = notebookResearchAnswers(foundation)
       .find((candidate) => candidate.id === reference.referenceID);
-    if (answer?.conversationID) await openResearchConversation(answer.conversationID);
+    if (!answer?.conversationID) {
+      throw new Error("This saved Research reference is unavailable. Reload the Project and try again.");
+    }
+    await openResearchConversation(answer.conversationID);
     return;
   }
   if (reference.referenceKind === "notebookCard") {

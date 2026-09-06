@@ -368,12 +368,20 @@ export function validateNotebookDocument(input) {
 }
 
 function inlinePlainText(content) {
-  return (Array.isArray(content) ? content : []).map((node) => {
-    if (node.type === "text") return node.text;
-    if (node.type === "link") return inlinePlainText(node.content);
-    if (node.type === "permitextReference") return node.props.label;
-    return "";
-  }).join("");
+  const nodes = Array.isArray(content) ? content : [];
+  return nodes.reduce((result, node, index) => {
+    const value = node.type === "text" ? node.text
+      : node.type === "link" ? inlinePlainText(node.content)
+      : node.type === "permitextReference" ? node.props.label : "";
+    if (!value) return result;
+    // Reference chips have visual boundaries that concatenated plain text loses.
+    // Preserve authored text exactly, adding a separator only at chip edges.
+    const touchesReference = node.type === "permitextReference" ||
+      nodes[index - 1]?.type === "permitextReference";
+    const separator = touchesReference && /\S$/.test(result) && /^\S/.test(value) &&
+      !/^[,.;:!?)]/.test(value) ? " " : "";
+    return result + separator + value;
+  }, "");
 }
 
 function blockPlainText(block, depth = 0) {
