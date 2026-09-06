@@ -174,8 +174,8 @@ Private evidence: `/private/tmp/permitext-recovery-account-acceptance-20260905/`
 
 The next acceptance pass reproduced a physical wide-table gesture failure and a
 web code-selection race. The implementation, controlled browser recovery,
-Simulator evidence, verified Production publication, build-61 upload and pending
-physical acceptance are tracked in the
+Simulator evidence, verified Production publication, build-61 installation and
+the owner's successful physical table-pan confirmation are tracked in the
 [Reader acceptance repair record](./PERMITEXT_READER_ACCEPTANCE_REPAIRS_2026-09-05.md).
-This continuation preserves the original 17-finding scope and requires separate
-physical acceptance of the replacement native candidate.
+This continuation preserves the original 17-finding scope. The bounded physical
+table check passed; the broader release-acceptance boundaries remain open.

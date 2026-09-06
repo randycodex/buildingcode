@@ -19,8 +19,8 @@ second horizontal SwiftUI scroll view. The repair fits WebKit to the Reader and
 lets the authored HTML overflow handle horizontal movement. Decorative search
 borders cannot intercept touches. Authored HTML, merged cells, assets, fallback
 eligibility and the contained vertical viewport for unusually large tables are
-preserved. Physical confirmation on the replacement TestFlight candidate remains
-required.
+preserved. Physical confirmation on the replacement TestFlight candidate is
+recorded below.
 
 The Production web Reader briefly showed the previous Building Code text beneath
 a newly selected Fuel Gas label. The code-change handler awaited a chapter list
@@ -121,11 +121,33 @@ includes `build61-evidence.json`, `build61-archive.log`, `build61-upload.log`,
 `served-reader.json`, `reader-policy-publication.json` and
 `reader-monitoring-audit.json` in the evidence directory above.
 
+## Physical build 61 acceptance
+
+On September 5 at approximately 21:09 EDT (September 6, 01:09 UTC), the owner
+completed the TestFlight update and the native Account footer independently
+displayed **Permitext 1.0 (Build 61)**. Account still showed Lifetime Pro Active,
+Billing: Lifetime Grant, 98 included turns and Synced. The existing Project
+containers and saved Electrical passage remained visible. No owner content,
+entitlement or purchase was changed.
+
+The physical Reader reopened Fuel Gas Code (2022), Chapter 5, at the 504.2 table
+with later vent-diameter columns 4 and 5 and FAN/NAT values visible. Mirroring's
+horizontal scroll commands did not provide reliable movement evidence. The
+owner then checked the physical phone, reported that the tables looked okay,
+and explicitly answered **"Yes, the columns move"** when asked to swipe across
+the table in both directions. This closes the reported build-60 horizontal-pan
+failure on build 61. The search-highlighted gesture and historical figure/table
+compatibility have Simulator evidence; this physical check does not claim
+separate coverage of every highlight, table, layout or assistive technology.
+
+The original Building Code (2014), DOB consolidated archive Browse selection
+and Saved view were restored after the test. The physical installation, owner
+continuity and swipe confirmation are retained in the private
+`build61-evidence.json`; raw account identifiers are excluded from this record.
+
 ## Outstanding candidate work
 
-Install build 61 and confirm the physical table gesture. After repeated
-connection attempts, Mirroring most recently reports "iPhone Not Found"; the
-owner has been asked to make the locked phone available. Restore the
-owner's original 2014 Browse selection and Saved view after the device check.
-The broader remaining acceptance items in the original backlog, including P1-4
-and the final owner go/no-go, remain open.
+The broader remaining acceptance items in the original backlog, including
+VoiceOver, supported layouts, the other P1-4 boundaries and the final owner
+go/no-go, remain open. This bounded Reader check does not authorize public
+submission.
