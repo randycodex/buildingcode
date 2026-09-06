@@ -41,6 +41,25 @@ assert.deepEqual(
 );
 assert.equal(explicit2014.selected[0].applicabilityStatus, "prior-edition-case-specific");
 
+for (const question of [
+  "Using the selected 2014 BC 1010.2 passage, summarize the ramp slope rule and its stated exceptions for this synthetic Project.",
+  "Under the 2014 NYC Building Code, explain BC 1010.2.",
+  "What does 2014 NYC PC 403.1 require?",
+  "Summarize BC 1010.2 under the 2014 NYC Construction Codes."
+]) {
+  assert.deepEqual(routeResearchCorpora({
+    question, registry, projectCodeVersion: "nyc-2022"
+  }).selected.map((corpus) => corpus.id), ["nyc-2014-construction-codes"],
+  "An edition-qualified citation must not add the current corpus through its bare BC/PC cue.");
+}
+assert.deepEqual(routeResearchCorpora({
+  question: "Compare 2014 BC 1010.2 with 2022 BC 1012.2.", registry
+}).selected.map((corpus) => corpus.id), ["nyc-2022-construction-codes", "nyc-2014-construction-codes"]);
+assert.deepEqual(routeResearchCorpora({
+  question: "The building was constructed in 2014. What does BC 1012.2 require?", registry
+}).selected.map((corpus) => corpus.id), ["nyc-2022-construction-codes"],
+"A building's construction year is not an explicit code-edition selection.");
+
 const ambiguousAppendixP = routeResearchCorpora({
   question: "what BC-Appendix P",
   registry

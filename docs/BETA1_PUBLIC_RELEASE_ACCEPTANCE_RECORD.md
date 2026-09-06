@@ -33,7 +33,22 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest September 5 web recovery evidence: the [audit execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md)
+Latest September 5 session publication: the [Research handoff record](./PERMITEXT_RESEARCH_HANDOFF_ACCEPTANCE_2026-09-05.md)
+tracks owner-approved PR #56, merge commit
+`d30874a4d80ccf59566701c9d2558e45d5f8df3c`, release `d30874a4d80c`,
+Production `https://permitext-sync-f9sv4c81r-randycodexs-projects-b72fc111.vercel.app`
+(`dpl_dwSfH4LbgVq1DEWcRVsQ5APZZXV8`). Codex verified both origins' release and
+health at `2026-09-06T03:01:55.446Z`; Production health passed. The backend-only
+canonical-label correction preserves the previously installed build-61 native
+runtime. The separately approved one-question confirmation failed attribution
+verification on that exact new deployment, spent a conservative $0.204692 within
+its $0.50 cap, and deducted no customer turn. No answer was promoted into a Note
+or Report. Temporary test access is revoked and its browser session signed out.
+Final candidate binding and professional-handoff acceptance remain open.
+Build 61's bounded physical table-pan result is retained in the
+[Reader acceptance record](./PERMITEXT_READER_ACCEPTANCE_REPAIRS_2026-09-05.md).
+
+Preceding September 5 web recovery evidence: the [audit execution record](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md)
 tracks PR #52 at `ae40953603cf9308a64d6da5657c27cf9175d99b`, Production
 `dpl_8oTbEHtNFGLHTXftsvV7MPvM1zQx`, exact assets/health and the live Report
 snapshot/export/concurrency checks. The native Project-facts PDF repair passed
@@ -302,4 +317,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: finish verification/publication of the web/native account-deletion reverification repair, then complete the remaining final device/account workflows. Operator access and the Free-account export already passed. Reviewed deletion and other owner-dependent checks remain separately scoped; keep the remaining gates open until their evidence is complete.
+- Next technical step: review publication of the locally validated [selected-passage routing repair](./PERMITEXT_RESEARCH_SELECTED_PASSAGE_REPAIR_2026-09-06.md), then separately confirm a live answer before the Research → Note → Report → physical-device handoff and remaining original audit acceptance. Exact-question reproduction found mixed-edition retrieval and unwanted outside-library lookup; this does not replay the unavailable failed draft. The web/native populated-account deletion and bounded build-61 table repair retain their separate completed evidence. Both recorded ramp-test approvals are consumed, and test-access cleanup is complete.

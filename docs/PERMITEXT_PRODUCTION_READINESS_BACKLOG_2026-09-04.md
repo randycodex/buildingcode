@@ -473,6 +473,15 @@ production customer incidents.
 
 ## Release acceptance reconciliation
 
+The [Research handoff checkpoint](./PERMITEXT_RESEARCH_HANDOFF_ACCEPTANCE_2026-09-05.md)
+records PR #56 on Production `d30874a4d80ccf59566701c9d2558e45d5f8df3c` and
+the one separately approved confirmation. The unchanged synthetic 2014 ramp
+question still failed `wrong_attribution` after the canonical-label correction.
+Conservative cost was $0.204692 within the $0.50 cap, with no customer turn
+charged or saved answer. Temporary Pro is revoked and the test session signed
+out. P0-2, P1-1 and P2-2's professional-handoff acceptance remains open; neither
+the local fixture nor the successful deployment proves generated-answer quality.
+
 The controlling [Beta 1 acceptance record](./BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md)
 and [master plan](./PERMITEXT_BETA1_MASTER_PLAN.md#release-blockers-at-a-glance)
 separate accepted historical evidence from final candidate verification. P1-4

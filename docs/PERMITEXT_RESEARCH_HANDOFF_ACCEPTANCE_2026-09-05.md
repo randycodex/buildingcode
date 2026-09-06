@@ -1,7 +1,8 @@
 # Research handoff acceptance — 2026-09-05
 
-Status: the approved live answer failed attribution verification; a bounded
-local correction passes validation. Downstream acceptance remains open.
+Status: the bounded canonical-label correction is published in Production.
+The separately approved live confirmation still failed attribution verification;
+downstream acceptance remains open. Both temporary-access cycles are complete.
 This continues the original production-readiness audit's 17 findings.
 
 ## Verified preparation
@@ -49,12 +50,94 @@ The owner restored the usual phone identity. At approximately `2026-09-06T02:43Z
 
 The owner also completed Chrome sign-in. At approximately `2026-09-06T02:45Z`, the actual Chrome workspace independently showed the usual named identity, Lifetime Pro, Synced and its existing Projects. Chrome displayed the generic 100-turn monthly allowance rather than a remaining-turn count; the native 98 remaining is the observed balance. The temporary Chrome acceptance tab was closed after restoration. The account and synthetic evidence were retained; no account deletion occurred. This access/restoration cycle is complete.
 
+## Approved publication and one-turn confirmation
+
+The owner explicitly approved publishing PR #56 and one unchanged ramp-question
+confirmation, capped at **$0.50 cumulative per turn**, with no subsequent manual
+retry. This approval is consumed. The existing exact-account temporary-Pro and
+revocation authorization was reused; no purchase or account deletion occurred.
+
+PR [#56](https://github.com/randycodex/buildingcode/pull/56) merged at
+`2026-09-06T02:59:12Z`, from reviewed head
+`32d7d5611b254450b0e8cb4bd50d3844e28ca98b`, producing main commit
+`d30874a4d80ccf59566701c9d2558e45d5f8df3c`. Git triggered a fresh Production
+build, deployment `dpl_dwSfH4LbgVq1DEWcRVsQ5APZZXV8`, at
+`https://permitext-sync-f9sv4c81r-randycodexs-projects-b72fc111.vercel.app`.
+It became READY at `2026-09-06T03:01:22.169Z`. At
+`2026-09-06T03:01:55.446Z`, both public origins' `/release` and `/health`
+returned that exact commit, PostgreSQL `normalized-v4`, configured commercial
+authentication and external operations alerts. `npm run verify:production`
+passed. The preview was not promoted. There are no native runtime changes;
+the previously physically verified build 61 remains the installed candidate.
+
+The fresh baseline independently confirmed the designated test identity,
+absent entitlement, three saved items, two synthetic Projects, two prior Notes,
+one empty conversation, one failed operation and zero Research usage/answers.
+Temporary Pro activated at `2026-09-06T03:01:21.180Z`. The owner completed
+browser email verification. The browser showed the test identity, 100 remaining
+turns and release `d30874a4d80c`. The exact Project description, four qualified
+facts, selected 2014 passage and related 2014 source were unchanged.
+
+The retained question's Retry control submitted **the one newly approved
+confirmation**. It was not selected again after the result. Request
+`rk5dx-1788663784179-7f719f7b24bc` and operation
+`ef1f8dd2-2ebb-4b79-ac96-29f0d2b60e28` ran on the new Production commit.
+An in-flight export independently recorded the **$0.50** reservation. The
+browser displayed **Research interrupted** after approximately 45 seconds,
+with the question retained and Retry available.
+
+- The operation failed with `RESEARCH_VERIFICATION_FAILED` / `wrong_attribution`
+  after 45,843 ms. The runtime request independently reports the exact new
+  deployment and merge SHA; the failure was not a stale-backend observation.
+- Three provider requests completed: web support, initial interpretation and
+  one built-in revision. Verification attempt 1 flagged supported points 0 and
+  1 for `web_claim_overlap`; attempt 2 flagged points 0, 1 and 2. The retained
+  full log identifies the exact source/claim bindings.
+- Token-based provider cost estimate: **$0.077256**. Conservative accounting:
+  **$0.204692**, below the approved cap. These are application estimates, not
+  invoice-reconciled costs. No provider request remains pending.
+- `charged: false`; the reservation was released. The account now has two
+  failed operations, zero Research usage, zero saved answers and zero persisted
+  messages in this conversation. No new Note or Report was created from either
+  failed answer.
+
+The specific canonical-label regression remains locally proven and deployed,
+but it did not resolve this live workflow. The failed draft, exact web-claim
+text and overlapping tokens are not retained, so the log cannot distinguish
+a further false positive from actual web-only content in an enacted claim.
+Do not weaken attribution checks or claim a diagnosed root cause from these
+issue locations alone. The next repair needs a reproducible failing input and
+negative controls that preserve the enacted/guidance boundary before any new
+provider-backed confirmation is proposed.
+
+Temporary Pro was revoked at `2026-09-06T03:04:25.258Z`. The browser independently
+showed Free before normal sign-out, then Sign in. The final export at
+`2026-09-06T03:05:10.906Z` confirms absent entitlement, `hasSession: false`,
+retained synthetic records and zero usage/answers or purchase claims.
+Historical session metadata is retained. The owner's phone and Chrome sessions
+were not operated during this confirmation cycle; the previously restored
+sessions were left untouched. No new physical-device result is claimed.
+
+A separate preflight observation on the preceding `d6986c572924` deployment
+returned HTTP 503 for concurrent administrative export/checklist reads, with
+`Rate-limit enforcement failed: deadlock detected`. Subsequent reads succeeded;
+the private helper now serializes those reads. This is a captured administrative
+concurrency issue, not a claimed source repair or customer incident.
+
+Private confirmation evidence is under
+`/private/tmp/permitext-research-handoff-confirmation-20260905/`:
+`approval.json`, `production-verification.json`, `pre-submit-project-inspection.json`,
+`in-flight-project-inspection.json`, `result-project-inspection.json`,
+`runtime-failure.jsonl`, `confirmation-result.json`, `temporary-pro-revoke.json`,
+`final-summary.json` and `preflight-transient.json`. Credentials, verification
+codes and raw account exports are excluded from this repository record.
+
 ## Remaining execution and restoration
 
-1. Finish local validation and review of the bounded attribution correction. Obtain the scoped publication/paid-confirmation decision before another provider-backed attempt; the first approval is consumed.
+1. The [selected-passage routing repair](./PERMITEXT_RESEARCH_SELECTED_PASSAGE_REPAIR_2026-09-06.md) reproduces two upstream defects in the exact question: short edition-qualified citations added 2022 sources, and outside-library discovery overrode the selected-passage summary boundary. Focused local, mocked HTTP save/reopen, full regression and smoke checks pass; publication review remains pending. This does not replay the unavailable failed draft. Both paid approvals are consumed; a new live confirmation requires a concrete, separately authorized scope.
 2. If the answer is acceptable, preserve it in a clearly user-authored Note, include the intended evidence in a Report, and verify reopened source/answer/Note/Report state on the physical candidate. A single passage-summary case does not close the wider Research quality gate.
 3. Exercise the planned Project-context change with immutable historical-answer checks if the first boundary passes; additional paid generation requires its own scope.
-4. Any newly approved test-access cycle must finish with revocation and the same account-restoration checks. The current cycle is complete.
+4. Any future test-access cycle must finish with revocation and restoration of any sessions changed during that cycle. Both recorded cycles are complete.
 5. Reconcile verified results with the central acceptance record. No public release or App Store submission is implied.
 
 Private evidence is under `/private/tmp/permitext-research-handoff-acceptance-20260905/`: exact-target preflight/grant/revocation summaries, scoped Project/conversation inspections, `preflight.json`, `research-result-project-inspection.json`, `runtime-failure.jsonl` and `local-check.log`. Credentials, email verification codes and raw account exports are excluded from this repository record.

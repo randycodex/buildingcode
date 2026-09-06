@@ -1,4 +1,4 @@
-export const researchSourcePolicyVersion = "20260902-supporting-web-v13";
+export const researchSourcePolicyVersion = "20260906-supporting-web-v14";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -124,8 +124,13 @@ const selectedEvidenceBoundaryPattern =
   /(?:\b(?:current|selected|supplied|assembled|available)\b[^?\n]{0,120}\b(?:evidence|text|passages?|provisions?|library|corpus)\b[^?\n]{0,180}\b(?:prove|establish|confirm|support|show|demonstrate|sufficient|enough)\b|\bbased only on (?:the )?(?:current|selected|supplied|assembled|available)\b)/i;
 const namedProvisionBoundaryPattern =
   /\bbased on\b[^?\n]{0,260}\b(?:AC|BC|EBC|FC|FGC|MC|PC|ZR)\s*(?:(?:Sections?|Table)\s+|§\s*)?[A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*/i;
+// Summarizing selected enacted text has the same source boundary as asking
+// what that text establishes. A discovery suggestion is not a request to
+// investigate a separate authority. Explicit outside lookups still override it.
+const selectedPassageSummaryPattern =
+  /(?:\b(?:using|based on|from)\s+(?:only\s+)?(?:the\s+)?(?:selected|supplied|provided)\b[^?\n]{0,160}\b(?:passages?|provisions?|text|evidence)\b[^?\n]{0,60}\b(?:summari[sz]e|explain|restate)\b|\b(?:summari[sz]e|explain|restate)\b[^?\n]{0,80}\b(?:selected|supplied|provided)\b[^?\n]{0,120}\b(?:passages?|provisions?|text|evidence)\b)/i;
 const explicitExternalLookupPattern =
-  /\b(?:find|retrieve|locate|search|look up|open|quote|summarize|review|analy[sz]e|what does|according to|using)\b[^?\n]{0,140}\b(?:guidance|interpretation|bulletin|service notice|advisory|faq|agency practice|web|internet|online source|outside (?:the )?(?:library|corpus)|external source)\b/i;
+  /\b(?:find|retrieve|locate|search|look up|open|quote|summari[sz]e|review|analy[sz]e|check|verify|consult|what does|according to|using)\b[^?\n]{0,140}\b(?:guidance|interpretation|bulletin|service notice|advisory|faq|agency practice|web|website|webpage|internet|online source|outside (?:the )?(?:library|corpus)|external source|supporting source|referenced standard|manufacturer(?:'s)? (?:instructions|data|documentation))\b/i;
 const knownResearchAcronyms = new Set([
   "AC", "ADA", "BC", "DOB", "DOT", "FDNY", "FGC", "HPD", "IBC", "ICC",
   "IEBC", "IFGC", "IMC", "IPC", "MC", "MTA", "NFPA", "NYC", "NYS", "OMH", "PC", "ZR"
@@ -187,7 +192,9 @@ export function researchWebSupportTrigger(input = {}, environment = process.env)
   const question = normalizedText(input.question || input.query);
   const reasons = [];
   const selectedEvidenceBoundaryOnly =
-    (selectedEvidenceBoundaryPattern.test(question) || namedProvisionBoundaryPattern.test(question)) &&
+    (selectedEvidenceBoundaryPattern.test(question) || namedProvisionBoundaryPattern.test(question) ||
+      selectedPassageSummaryPattern.test(question)) &&
+    input.guidanceRequested !== true &&
     !explicitExternalLookupPattern.test(question);
   if (selectedEvidenceBoundaryOnly) reasons.push("selected_evidence_boundary");
   if (

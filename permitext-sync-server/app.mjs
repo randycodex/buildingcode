@@ -8993,8 +8993,17 @@ function mockResearchInterpretation(question, evidence, options = {}) {
     )
       ? "If the subject unit and bathroom are within the Type B+NYC scope, apply the cited Building Code rule; that applicability must be confirmed separately from any HCR requirement."
       : "";
+  // The local mock must honor the same edition-disclosure gate as a provider
+  // answer. It cannot label explicitly selected prior-edition text as 2022.
+  const mockEditions = [...new Set(answerEvidence.map((section) => section.codeEdition).filter(Boolean))];
+  const mockApplicability = [...new Set(answerEvidence.map((section) => section.applicabilityStatus))]
+    .map((status) => ({
+      historical: "Historical evidence is not the ordinary current code basis; legal applicability must be confirmed separately.",
+      "prior-edition-case-specific": "Prior-edition evidence is not the ordinary current code basis. Its applicability is project-specific and depends on the filing date.",
+      "future-effective": "Future-effective evidence is not yet effective and is not the ordinary current code basis."
+    })[status]).filter(Boolean).join(" ");
   return {
-    answerText: [directAnswer, application, ancestorScopeApplication, typeBNYCApplication].filter(Boolean).join("\n\n"),
+    answerText: [mockApplicability, directAnswer, application, ancestorScopeApplication, typeBNYCApplication].filter(Boolean).join("\n\n"),
     supportedPoints: answerEvidenceGroups.slice(0, maximumResearchSupportedPoints).map(({ section, sourceIDs }) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
       explanation: conversational
@@ -9003,7 +9012,7 @@ function mockResearchInterpretation(question, evidence, options = {}) {
       sectionID: section.sectionID,
       sourceIDs
     })),
-    assumptions: ["Only the enacted 2022 New York City Construction Code provisions assembled for this answer were treated as governing authority."],
+    assumptions: [`Only the assembled enacted sources (${mockEditions.join("; ") || "selected edition"}) were used; legal applicability must be confirmed separately.`],
     missingFacts: [
       typeBNYCApplication
         ? "Confirm whether the subject unit and bathroom are within the Type B+NYC scope."
