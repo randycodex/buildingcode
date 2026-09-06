@@ -652,6 +652,63 @@ const repairedAttribution = evaluateResearchWebAttribution({ answer, evidence, s
 assert.equal(repairedAttribution.pass, true);
 assert.deepEqual(researchWebAttributionRevisionIssues(repairedAttribution), []);
 
+// Synthetic counterexample for the live ramp failure class. The failed live
+// draft was not retained; this proves the metadata-only false positive without
+// claiming to replay that draft or making another provider request.
+const priorEditionRampEvidence = [{
+  sectionID: "41009495",
+  sectionNumber: "1010.2",
+  codePrefix: "BC",
+  codeEdition: "2014 NYC Construction Codes — DOB consolidated archive",
+  corpusLabel: "2014 NYC Construction Codes",
+  jurisdiction: "New York City",
+  title: "Slope.",
+  text: "Ramps used as part of a means of egress or part of an accessible route shall have a running slope not steeper than one unit vertical in 12 units horizontal (8-percent slope)."
+}];
+const priorEditionRampAnswer = {
+  supportedPoints: [{
+    heading: "2014 NYC Construction Codes ramp slope",
+    explanation: priorEditionRampEvidence[0].text,
+    sourceIDs: ["41009495"]
+  }],
+  supportingSourceUses: []
+};
+const rampOverviewSources = [{
+  id: "synthetic-ramp-overview",
+  title: "Official ramp overview",
+  attributedClaims: [{
+    id: "synthetic-overview-claim",
+    text: "The 2014 NYC Construction Codes provide a 1:12 running slope limit for ramps in an accessible route."
+  }]
+}];
+const rampAttributionInput = {
+  answer: priorEditionRampAnswer,
+  evidence: priorEditionRampEvidence,
+  supportingSources: rampOverviewSources
+};
+assert.equal(evaluateResearchWebAttribution(rampAttributionInput).pass, true,
+  "Canonical edition labels shared with a web overview must not turn enacted text into a web-only claim.");
+assert.equal(evaluateResearchWebAttribution({
+  ...rampAttributionInput,
+  evidence: priorEditionRampEvidence.map(({ title, text }) => ({ title, text }))
+}).pass, false, "Only labels actually supplied by canonical evidence receive this treatment.");
+const webOnlyRampClaim = "An accessibility waiver requires notarized approval.";
+const mixedRampAnswer = structuredClone(priorEditionRampAnswer);
+mixedRampAnswer.supportedPoints[0].explanation += ` ${webOnlyRampClaim}`;
+assert.equal(evaluateResearchWebAttribution({
+  ...rampAttributionInput,
+  answer: mixedRampAnswer,
+  supportingSources: [{
+    ...rampOverviewSources[0],
+    attributedClaims: [{ id: "synthetic-web-only-claim", text: webOnlyRampClaim }]
+  }]
+}).pass, false, "A correct code label must not exempt a substantive web-only clause.");
+const explicitlyAttributedRamp = structuredClone(priorEditionRampAnswer);
+explicitlyAttributedRamp.supportedPoints[0].explanation = "DOB guidance requires this ramp slope.";
+assert.equal(evaluateResearchWebAttribution({
+  ...rampAttributionInput, answer: explicitlyAttributedRamp
+}).pass, false, "Explicit guidance remains outside enacted supported points.");
+
 const droppedSourceUse = structuredClone(answer);
 droppedSourceUse.supportingSourceUses = [];
 const droppedResult = evaluateResearchWebAttribution({

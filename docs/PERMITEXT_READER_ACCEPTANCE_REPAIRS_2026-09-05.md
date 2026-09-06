@@ -19,8 +19,8 @@ second horizontal SwiftUI scroll view. The repair fits WebKit to the Reader and
 lets the authored HTML overflow handle horizontal movement. Decorative search
 borders cannot intercept touches. Authored HTML, merged cells, assets, fallback
 eligibility and the contained vertical viewport for unusually large tables are
-preserved. Physical confirmation on the replacement TestFlight candidate remains
-required.
+preserved. Physical confirmation on the replacement TestFlight candidate is
+recorded below.
 
 The Production web Reader briefly showed the previous Building Code text beneath
 a newly selected Fuel Gas label. The code-change handler awaited a chapter list
@@ -79,12 +79,75 @@ The deployment-bound monitoring audit since `2026-09-05T23:43:07Z` parsed 1,000
 entries, including 40 successful health checks, and reported zero actionable
 signals or invalid records. This was a capped sample, not an exhaustive review
 of all traffic. It contained no Research latency samples. These observations
-will need an exact-candidate check after publishing the Reader repair.
+describe the preceding candidate; the repaired candidate is verified below.
+
+## Published Reader candidate
+
+PR [55](https://github.com/randycodex/buildingcode/pull/55) merged at
+`2026-09-06T00:38:27Z`, publishing
+`d6986c572924061d2545c9ae693e82a1c50870de`. Production deployment
+`dpl_DiTyeVpyBvTZAzJExxdwtCrJfthL` is READY at that revision. Both public origins
+returned the exact release, healthy PostgreSQL/normalized-v4 storage and all four
+web shell assets with hashes matching the commit. `npm run verify:production`,
+the two-origin universal-link check and the three approved policy hash checks
+passed. The deployment-bound early monitoring sample contains 15 entries,
+including three successful health requests, with zero actionable signals or
+invalid records. It contains no Research latency samples and is not an
+exhaustive traffic review.
+
+The actual deployed browser showed cleared text and a loading state while
+switching from 2022 Fuel Gas to 2014 Building Code, followed by the correct text.
+Reader no-match guidance and clearing the search passed. Global no-match recovery
+offered shorter terms; selecting "electrical" returned 25 results. Opening
+"101.4.1 Electrical" displayed that provision with the Building Code (2022)
+label. These bounded paths carry the search checks forward to the repaired
+Production candidate.
+
+The signed 1.0 (61) archive was built from the same commit, with native runtime
+tree `cf848a29c8a5e5708d31c864487bfed33cdc78a8`. Strict deep signature verification
+passed. Its signed entitlements and packaged privacy-manifest semantic union
+match build 60; the three Swift dependency checkouts match their pinned
+revisions. This packaged comparison does not establish provider attestations or
+public-release acceptance. The app retains the live backend and
+`isolated-table-fallback` rollout configuration.
+
+Upload succeeded at `2026-09-06T00:43:48.077Z` and the export command exited zero.
+App Store Connect completed processing and lists build 61
+(`f2c7cff0-a357-49bc-baaa-58f6efe5dbac`) with the existing Internal Testers group
+and one tester. Its detail page confirms that group's access. No external group
+or public submission was added. The archive is retained
+at `/private/tmp/permitext-1.0-61-d6986c572.xcarchive`. Private candidate evidence
+includes `build61-evidence.json`, `build61-archive.log`, `build61-upload.log`,
+`served-reader.json`, `reader-policy-publication.json` and
+`reader-monitoring-audit.json` in the evidence directory above.
+
+## Physical build 61 acceptance
+
+On September 5 at approximately 21:09 EDT (September 6, 01:09 UTC), the owner
+completed the TestFlight update and the native Account footer independently
+displayed **Permitext 1.0 (Build 61)**. Account still showed Lifetime Pro Active,
+Billing: Lifetime Grant, 98 included turns and Synced. The existing Project
+containers and saved Electrical passage remained visible. No owner content,
+entitlement or purchase was changed.
+
+The physical Reader reopened Fuel Gas Code (2022), Chapter 5, at the 504.2 table
+with later vent-diameter columns 4 and 5 and FAN/NAT values visible. Mirroring's
+horizontal scroll commands did not provide reliable movement evidence. The
+owner then checked the physical phone, reported that the tables looked okay,
+and explicitly answered **"Yes, the columns move"** when asked to swipe across
+the table in both directions. This closes the reported build-60 horizontal-pan
+failure on build 61. The search-highlighted gesture and historical figure/table
+compatibility have Simulator evidence; this physical check does not claim
+separate coverage of every highlight, table, layout or assistive technology.
+
+The original Building Code (2014), DOB consolidated archive Browse selection
+and Saved view were restored after the test. The physical installation, owner
+continuity and swipe confirmation are retained in the private
+`build61-evidence.json`; raw account identifiers are excluded from this record.
 
 ## Outstanding candidate work
 
-Commit the reviewed changes, publish and verify the exact Production revision,
-archive/upload the replacement
-internal TestFlight build, and verify the physical table gesture. The broader
-remaining acceptance items in the original backlog, including P1-4 and the final
-owner go/no-go, remain open.
+The broader remaining acceptance items in the original backlog, including
+VoiceOver, supported layouts, the other P1-4 boundaries and the final owner
+go/no-go, remain open. This bounded Reader check does not authorize public
+submission.
