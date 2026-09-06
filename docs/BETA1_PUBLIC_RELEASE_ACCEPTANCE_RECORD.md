@@ -33,18 +33,20 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest September 5 session publication: the [Research handoff record](./PERMITEXT_RESEARCH_HANDOFF_ACCEPTANCE_2026-09-05.md)
-tracks owner-approved PR #56, merge commit
-`d30874a4d80ccf59566701c9d2558e45d5f8df3c`, release `d30874a4d80c`,
-Production `https://permitext-sync-f9sv4c81r-randycodexs-projects-b72fc111.vercel.app`
-(`dpl_dwSfH4LbgVq1DEWcRVsQ5APZZXV8`). Codex verified both origins' release and
-health at `2026-09-06T03:01:55.446Z`; Production health passed. The backend-only
-canonical-label correction preserves the previously installed build-61 native
-runtime. The separately approved one-question confirmation failed attribution
-verification on that exact new deployment, spent a conservative $0.204692 within
-its $0.50 cap, and deducted no customer turn. No answer was promoted into a Note
-or Report. Temporary test access is revoked and its browser session signed out.
-Final candidate binding and professional-handoff acceptance remain open.
+Latest publication: the [September 6 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
+tracks owner-approved PR #57, merge commit
+`4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e`, release `4ed4b5b9f4eb`,
+Production `https://permitext-sync-orugmme7o-randycodexs-projects-b72fc111.vercel.app`
+(`dpl_B8JvS8JLqUr7fSpuKTBZmGP2arNV`). Both origins' release and health were
+verified at `2026-09-06T03:39:42.064Z`; Production health passed. The backend-only
+repair preserves the previously installed build-61 native runtime. The one
+approved confirmation completed with 2014-only sources, no web lookup and
+conservative estimated cost $0.159382 within its $0.50 cap. One included test
+turn was deducted. Full handoff acceptance remains open for unrelated authority
+text after verification, a silent Note-reference failure, and Report
+edition/citation/formatting defects. See the confirmation record for retained
+artifacts, physical checks, cleanup and their limits. Final candidate binding
+and owner release approval remain open.
 Build 61's bounded physical table-pan result is retained in the
 [Reader acceptance record](./PERMITEXT_READER_ACCEPTANCE_REPAIRS_2026-09-05.md).
 
@@ -317,4 +319,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: review publication of the locally validated [selected-passage routing repair](./PERMITEXT_RESEARCH_SELECTED_PASSAGE_REPAIR_2026-09-06.md), then separately confirm a live answer before the Research → Note → Report → physical-device handoff and remaining original audit acceptance. Exact-question reproduction found mixed-edition retrieval and unwanted outside-library lookup; this does not replay the unavailable failed draft. The web/native populated-account deletion and bounded build-61 table repair retain their separate completed evidence. Both recorded ramp-test approvals are consumed, and test-access cleanup is complete.
+- Next technical step: reproduce and repair the retained [September 6 handoff defects](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md) without another provider call: verification/limitation consistency, Note-reference navigation, and Report edition/citation/formatting. PR #57 routing is verified on Production, but a completed turn does not establish full answer or handoff quality. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed; consult the latest confirmation for cleanup status.

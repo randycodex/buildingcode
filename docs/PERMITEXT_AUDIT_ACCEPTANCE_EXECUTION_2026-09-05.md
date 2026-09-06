@@ -189,3 +189,16 @@ repair did not unblock the live attribution check. Both attempts released their
 turn reservations without saving an answer. Temporary test access is revoked,
 the browser test session is signed out, and both recorded access/restoration
 cycles are complete. The Research → Note → Report acceptance remains open.
+
+
+The later [PR #57 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
+serves Production `4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e`. Its one
+approved turn completed with only 2014 sources and no web lookup, at conservative
+estimated cost $0.159382. Saved answer/Note/Report persistence and both native
+2014 citation destinations were observed. The context unassign/restore check
+preserved historical answer and artifact records without another turn.
+Acceptance remains open: unrelated authority text survived verification, the
+Note's answer reference silently failed to open, and the PDF has misleading
+cover edition, raw citation IDs and formatting defects. The exact saved answer
+and PDF support further no-provider repair work. See that record for cleanup
+and precise physical/browser limits.
