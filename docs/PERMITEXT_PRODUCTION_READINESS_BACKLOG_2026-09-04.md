@@ -5,6 +5,16 @@ that source revision, and starting repairs on a new branch. This document tracks
 the audit findings; it does not approve public release or claim that all findings
 are repaired. No paid Research evaluation is authorized by this work.
 
+Latest bounded acceptance: the [September 6 build-62 handoff record](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md)
+confirms physical installation/owner continuity, repaired web Note navigation,
+lower native Note fields and corrected web/native PDFs for the retained synthetic
+Report. Prior Research, Notes and Report history remain unchanged. The owner
+confirmed the Chrome Production PDF downloaded; the in-app browser download
+action does nothing and remains unaccepted. Temporary Pro is independently
+revoked and browser test sessions are signed out. The phone retains the Free,
+Synced test session at the owner's request for continued audit work. This updates
+the original audit findings without closing the broader release gates.
+
 ## Baseline and branch
 
 - Baseline `main` and `origin/main`: `176cca6f2e2d01db6495f29192f805ef7daddfbe`.

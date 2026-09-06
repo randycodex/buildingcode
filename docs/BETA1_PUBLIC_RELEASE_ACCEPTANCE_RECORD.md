@@ -44,8 +44,17 @@ policy checks passed. Build 62's signed archive from the same source passed
 configuration, signature, dependency and packaged privacy checks. Upload
 succeeded at `2026-09-06T14:10:03.283Z`; Apple processing is complete and build
 `1fc6a88c-1f12-494f-b9a1-7fe197349184` is available to Internal Testers with one
-tester. The owner is taking the phone temporarily; physical installation and
-handoff acceptance will wait for its return.
+tester. The owner subsequently installed build 62. Its Account footer, usual
+Lifetime Pro/98-turn/Synced state and saved-data continuity were independently
+verified. The [build-62 retained handoff check](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md)
+passed current web Note navigation, lower native Note review and both actual
+Report exports, with every PDF page inspected and existing Research/Note/history
+integrity verified. The owner confirmed the Chrome Production PDF download;
+the in-app browser's download action produced no result and remains unaccepted.
+Temporary Pro is independently revoked and both browser test sessions are signed
+out. At the owner's request, the phone retains the Free, Synced test session for
+continued audit work; repeated main-account restoration is no longer required.
+Final candidate binding stays open.
 No additional Research turn or public App Store submission is included.
 
 Preceding publication: the [September 6 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)

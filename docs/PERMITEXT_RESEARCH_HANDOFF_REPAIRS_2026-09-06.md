@@ -1,16 +1,21 @@
 # Research handoff repairs — September 6, 2026
 
-Status: Production publication verified; build 62 available to Internal Testers. Production
-now serves PR #58 (`e60ca415fe8b7b60be65449b7ef49baccc82eec3`); the phone remains
-on the previous build-61 candidate. This continues the three defects captured in the
+Status: Production publication verified; build 62 physically installed. Production
+serves PR #58 (`e60ca415fe8b7b60be65449b7ef49baccc82eec3`). The
+[build-62 acceptance record](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md)
+confirms current web Note navigation, retained native Note fields and web/native
+Report presentation. The owner confirmed the Chrome Production PDF download;
+the in-app browser download remains unaccepted. Temporary Pro is revoked and
+the phone intentionally retains the Free test session at the owner's request.
+This continues the three defects captured in the
 [approved confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md),
 within the original production-readiness audit. The local repair phase used no
 paid Research call or live content/entitlement change. The owner subsequently
 approved Production publication and the next TestFlight upload for PR #58.
 
-## Restored owner session
+## Restored owner session before publication
 
-The owner signed back into the usual account. The physical Account screen
+At that preceding checkpoint, the owner signed back into the usual account. The physical Account screen
 showed Lifetime Pro Active, 98 included turns and Synced. Existing Projects and
 the saved Building Code section were visible. Codex dismissed the Account sheet.
 The designated test account remains retained; its previous grant revocation and
@@ -100,9 +105,12 @@ production account identifiers and raw exports are excluded from this record.
 
 ## Remaining acceptance
 
-After the owner returns with the phone, install build 62, reopen the existing
-test answer/Note and export a new Report revision on the deployed web client and
-physical candidate. The old
+The owner returned with build 62 installed. The linked acceptance record tracks
+the retained Note, repaired web answer navigation and new web/native Report
+exports, owner-confirmed Chrome download and completed grant cleanup. The owner
+asked to retain the test account during the ongoing audit; repeated usual-account
+restoration is no longer a checkpoint requirement. The in-app browser download
+limitation and broader acceptance gates retain their separate status. The old
 saved answer's unsupported limitation must not be silently rewritten; a corrected
 answer requires its own authorized generation or an explicit reviewed correction
 workflow. The original question's existing paid approval is consumed.
