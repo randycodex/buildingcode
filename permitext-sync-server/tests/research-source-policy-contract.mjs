@@ -81,6 +81,33 @@ assert.equal(
   true
 );
 assert.equal(shouldUseResearchWebSupport({ question: "What does BC 1019.3 require?" }, {}), false);
+const selectedRampSummary = "Using the selected 2014 BC 1010.2 passage, summarize the ramp slope rule and its stated exceptions for this synthetic Project. Keep the Project’s assumptions and partial sprinkler coverage explicit; do not treat them as confirmed applicability or whole-building sprinkler protection. Identify what must be verified before applying the rule.";
+for (const question of [
+  selectedRampSummary,
+  "Summarize the selected BC 1010.2 passage and identify its limits.",
+  "Explain the supplied Building Code text and keep unconfirmed facts explicit.",
+  "From the provided passages, restate the rule and its exceptions."
+]) {
+  assert.deepEqual(researchWebSupportTrigger({
+    question, outsideLibraryRequired: true, referencedStandardUnavailable: true
+  }, {}).reasons, ["selected_evidence_boundary"],
+  "Outside-library discovery must not expand a selected-text summary into a web lookup.");
+  assert.equal(shouldUseResearchWebSupport({ question, outsideLibraryRequired: true }, {}), false);
+}
+for (const suffix of [
+  " Find and summarize Buildings Bulletin 2022-013.",
+  " Also check current official DOB guidance.",
+  " Consult the referenced standard outside the library.",
+  " Review the manufacturer's instructions.",
+  " Open the official DOB website and verify the current requirements."
+]) {
+  assert.equal(shouldUseResearchWebSupport({ question: selectedRampSummary + suffix }, {}), true,
+    `An explicit outside request must override the summary boundary: ${suffix}`);
+}
+assert.equal(shouldUseResearchWebSupport({ question: selectedRampSummary, guidanceRequested: true }, {}), true);
+assert.equal(shouldUseResearchWebSupport({
+  question: "What are all the requirements for designing a ramp?", outsideLibraryRequired: true
+}, {}), true, "A general design request must retain automatic outside-library support.");
 assert.deepEqual(
   researchWebSupportTrigger({
     question: "Does the current Permitext Construction Code evidence prove that this cellar bathroom is permitted under Buildings Bulletin 2011-010?",

@@ -134,7 +134,7 @@ codes and raw account exports are excluded from this repository record.
 
 ## Remaining execution and restoration
 
-1. Reproduce and repair the remaining source-attribution failure with no-provider fixtures. The canonical-label correction is already published; both paid approvals are consumed. A new paid attempt needs a concrete, separately authorized scope after the next repair is reviewable.
+1. The [selected-passage routing repair](./PERMITEXT_RESEARCH_SELECTED_PASSAGE_REPAIR_2026-09-06.md) reproduces two upstream defects in the exact question: short edition-qualified citations added 2022 sources, and outside-library discovery overrode the selected-passage summary boundary. Focused local, mocked HTTP save/reopen, full regression and smoke checks pass; publication review remains pending. This does not replay the unavailable failed draft. Both paid approvals are consumed; a new live confirmation requires a concrete, separately authorized scope.
 2. If the answer is acceptable, preserve it in a clearly user-authored Note, include the intended evidence in a Report, and verify reopened source/answer/Note/Report state on the physical candidate. A single passage-summary case does not close the wider Research quality gate.
 3. Exercise the planned Project-context change with immutable historical-answer checks if the first boundary passes; additional paid generation requires its own scope.
 4. Any future test-access cycle must finish with revocation and restoration of any sessions changed during that cycle. Both recorded cycles are complete.

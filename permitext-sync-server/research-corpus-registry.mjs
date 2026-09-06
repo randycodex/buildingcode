@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20260902-edition-identity-routing-v3";
+export const researchCorpusRegistryVersion = "20260906-edition-qualified-citations-v4";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -14,7 +14,8 @@ const fireCue = /\b(?:NYC\s+)?Fire\s+Code\b|\bFC\s*(?:§\s*)?[A-Z]?\d|\bFDNY\b|\
 const zoningCue = /\bZoning\s+Resolution\b|\bZR\s*(?:§\s*)?\d|\b(?:Sections?|Table|§{1,2})\s+\d{1,3}-\d{2,4}\b|\bzoning\s+(?:district|lot|map|text|use|floor\s+area|setback|bulk|applicability)\b|\b(?:special\s+purpose|special)\s+district\b|\boff[-\s]street\s+parking\b|\bparking\s+(?:requirement|required|spaces?|waiver|reduction)\b|\b(?:floor\s+area\s+ratio|FAR|use\s+group|lot\s+coverage|development\s+rights?)\b|\b(?:R\d{1,2}[A-Z]?|C\d(?:-\d[A-Z]?)?|M\d(?:-\d)?)\b/i;
 const projectDependentZoningCue = /\b(?:parking|floor\s+area|FAR|permitted\s+use|use\s+permitted|bulk|setback|yard|lot\s+coverage|development\s+rights?)\b/i;
 const futureExistingBuildingCue = /\b(?:2026\s+)?Existing\s+Building\s+Code\b|\bEBC\s*(?:§\s*)?[A-Z]?\d/i;
-const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas)\s+Code\b|\b(?:BC|AC|PC|MC|FGC)14\b/i;
+const historical2014ConstructionCue = /\b2014\s+(?:NYC\s+)?(?:(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas)\s+Codes?|(?:BC|AC|PC|MC|FGC))\b|\b(?:BC|AC|PC|MC|FGC)14\b/i;
+const current2022ConstructionCue = /\b2022\s+(?:NYC\s+)?(?:(?:Construction|Building|Plumbing|Mechanical|Fuel\s+Gas)\s+Codes?|(?:BC|AC|PC|MC|FGC))\b/i;
 const historicalBuildingCue = /\b1968\s+(?:NYC\s+)?Building\s+Code\b|\bBC68\b/i;
 const historical2014FollowUpCue = /\b(?:the\s+)?2014(?:\s+(?:edition|code))?\b/i;
 const current2022FollowUpCue = /\b(?:the\s+)?2022(?:\s+(?:edition|code))?\b/i;
@@ -184,7 +185,11 @@ export function routeResearchCorpora({
     appendixPCrossEditionCue.test(context) && !/\b(?:2014|2022)\b/.test(context);
   const buildingCodeOnlyScope =
     /\bbased only on (?:the )?(?:selected )?Building Code passages\b/i.test(currentQuestion);
-  const explicitCurrentConstructionCue = shorthand2022Requested || /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d|\b2022\s+(?:NYC\s+)?(?:Building|Construction|Plumbing|Mechanical|Fuel\s+Gas)\s+Code\b/i.test(context);
+  // An unqualified BC/PC/etc. citation follows the explicitly named 2014
+  // edition; it is not an independent request to also retrieve 2022. A named
+  // 2022 edition still permits intentional cross-edition comparisons.
+  const explicitCurrentConstructionCue = shorthand2022Requested || current2022ConstructionCue.test(context) ||
+    (!historical2014Requested && /\b(?:AC|BC|FGC|MC|PC)\s*(?:§\s*)?[A-Z]?\d/i.test(context));
   const constructionRequested = (constructionCue.test(context) || shorthand2022Requested) &&
     (!futureRequested && !historical2014Requested && !historicalRequested || explicitCurrentConstructionCue);
   const fireRequested = fireCue.test(context);
