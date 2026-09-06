@@ -79,12 +79,53 @@ The deployment-bound monitoring audit since `2026-09-05T23:43:07Z` parsed 1,000
 entries, including 40 successful health checks, and reported zero actionable
 signals or invalid records. This was a capped sample, not an exhaustive review
 of all traffic. It contained no Research latency samples. These observations
-will need an exact-candidate check after publishing the Reader repair.
+describe the preceding candidate; the repaired candidate is verified below.
+
+## Published Reader candidate
+
+PR [55](https://github.com/randycodex/buildingcode/pull/55) merged at
+`2026-09-06T00:38:27Z`, publishing
+`d6986c572924061d2545c9ae693e82a1c50870de`. Production deployment
+`dpl_DiTyeVpyBvTZAzJExxdwtCrJfthL` is READY at that revision. Both public origins
+returned the exact release, healthy PostgreSQL/normalized-v4 storage and all four
+web shell assets with hashes matching the commit. `npm run verify:production`,
+the two-origin universal-link check and the three approved policy hash checks
+passed. The deployment-bound early monitoring sample contains 15 entries,
+including three successful health requests, with zero actionable signals or
+invalid records. It contains no Research latency samples and is not an
+exhaustive traffic review.
+
+The actual deployed browser showed cleared text and a loading state while
+switching from 2022 Fuel Gas to 2014 Building Code, followed by the correct text.
+Reader no-match guidance and clearing the search passed. Global no-match recovery
+offered shorter terms; selecting "electrical" returned 25 results. Opening
+"101.4.1 Electrical" displayed that provision with the Building Code (2022)
+label. These bounded paths carry the search checks forward to the repaired
+Production candidate.
+
+The signed 1.0 (61) archive was built from the same commit, with native runtime
+tree `cf848a29c8a5e5708d31c864487bfed33cdc78a8`. Strict deep signature verification
+passed. Its signed entitlements and packaged privacy-manifest semantic union
+match build 60; the three Swift dependency checkouts match their pinned
+revisions. This packaged comparison does not establish provider attestations or
+public-release acceptance. The app retains the live backend and
+`isolated-table-fallback` rollout configuration.
+
+Upload succeeded at `2026-09-06T00:43:48.077Z` and the export command exited zero.
+App Store Connect completed processing and lists build 61
+(`f2c7cff0-a357-49bc-baaa-58f6efe5dbac`) with the existing Internal Testers group
+and one tester. Its detail page confirms that group's access. No external group
+or public submission was added. The archive is retained
+at `/private/tmp/permitext-1.0-61-d6986c572.xcarchive`. Private candidate evidence
+includes `build61-evidence.json`, `build61-archive.log`, `build61-upload.log`,
+`served-reader.json`, `reader-policy-publication.json` and
+`reader-monitoring-audit.json` in the evidence directory above.
 
 ## Outstanding candidate work
 
-Commit the reviewed changes, publish and verify the exact Production revision,
-archive/upload the replacement
-internal TestFlight build, and verify the physical table gesture. The broader
-remaining acceptance items in the original backlog, including P1-4 and the final
-owner go/no-go, remain open.
+Install build 61 and confirm the physical table gesture. After repeated
+connection attempts, Mirroring most recently reports "iPhone Not Found"; the
+owner has been asked to make the locked phone available. Restore the
+owner's original 2014 Browse selection and Saved view after the device check.
+The broader remaining acceptance items in the original backlog, including P1-4
+and the final owner go/no-go, remain open.
