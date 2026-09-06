@@ -33,7 +33,21 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest publication: the [September 6 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
+Latest publication: the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
+track owner-approved PR #58 at merge commit
+`e60ca415fe8b7b60be65449b7ef49baccc82eec3`, Production
+`https://permitext-sync-3wkca40x7-randycodexs-projects-b72fc111.vercel.app`
+(`dpl_5rp8vnZ9yZ6XBRWbFHofaD7jQqo9`), release `e60ca415fe8b`. At
+`2026-09-06T14:03:10.518Z`, Codex verified both origins returned the exact source,
+healthy storage and six matching web assets. Health, universal-link and approved
+policy checks passed. Build 62's signed archive from the same source passed
+configuration, signature, dependency and packaged privacy checks. Upload
+succeeded at `2026-09-06T14:10:03.283Z`; Apple processing is in progress. The
+owner is taking the phone temporarily; physical installation and handoff
+acceptance will wait for its return.
+No additional Research turn or public App Store submission is included.
+
+Preceding publication: the [September 6 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
 tracks owner-approved PR #57, merge commit
 `4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e`, release `4ed4b5b9f4eb`,
 Production `https://permitext-sync-orugmme7o-randycodexs-projects-b72fc111.vercel.app`
@@ -47,10 +61,9 @@ text after verification, a silent Note-reference failure, and Report
 edition/citation/formatting defects. See the confirmation record for retained
 artifacts, physical checks, cleanup and their limits. Final candidate binding
 and owner release approval remain open.
-Subsequent [local handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
-address the three captured defects and record completed owner-session
-restoration. Their local verification does not change the Production or
-TestFlight identity above.
+The subsequent handoff repairs above address these captured defects and record
+completed owner-session restoration. Their local checks and Production
+publication do not establish physical acceptance of the new native candidate.
 Build 61's bounded physical table-pan result is retained in the
 [Reader acceptance record](./PERMITEXT_READER_ACCEPTANCE_REPAIRS_2026-09-05.md).
 
@@ -323,4 +336,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: review the locally verified [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md), then bind their approved publication to deployed web and physical-candidate acceptance. The repairs cover application-injected outside-authority text, Note-reference navigation, and Report edition/citation/formatting without another provider call. PR #57 remains the published source; these new repairs are not yet Production or TestFlight evidence. Owner account restoration is complete. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed.
+- Next technical step: confirm Apple processing and Internal Testers access for uploaded build 62 and, after the owner returns with the phone, bind the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md) to physical-candidate and hosted handoff acceptance. PR #58 is verified on Production; its archive shares that source. Owner account restoration is complete. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed.
