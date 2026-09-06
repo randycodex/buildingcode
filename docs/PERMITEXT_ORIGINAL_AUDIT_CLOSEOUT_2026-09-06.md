@@ -28,8 +28,9 @@ paid evaluation cohort, release approval or new audit scope.
   revoke/regrant and final revocation; it was independently confirmed active at
   `2026-09-06T17:27:16.651Z`. The approved revoke/regrant check passed, with
   revocation at `18:13:22.432Z` and regrant at `18:15:57.452Z` on September 6.
-  Chrome and phone retain the designated test session. Final revocation is still
-  required. Repeated usual-account restoration is no
+  Final revocation was independently verified at `18:34:47.131Z`; the phone
+  confirmed Free, Synced and the same test identity. Chrome and phone retain the
+  designated test session. Repeated usual-account restoration is no
   longer a checkpoint requirement. No paid Research, purchase, merge or deletion
   is included in this authorization.
 - Chrome's hosted PDF download is owner-confirmed. The Codex in-app browser
@@ -48,16 +49,16 @@ each remaining check one home so it is not repeated for several findings.
 | P0-1 | Historical citations open the wrong provision/edition. | **Verified online symptom.** Production and physical build 60 reopened 2014 Slope and 2022 Gates correctly; build 61 opened both saved 2014 Research citations. Source/edition routing contracts pass. [Execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md#saved-citations-and-keyboard-access), [Research confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md). | B3: offline exact-citation reopening and the focused assistive-technology check. |
 | P0-2 | Moving Research retains the prior Project's active facts/history. | **Live A → B summary → A verified.** Production reset active context, captured B's qualified facts in a provider-free summary, and preserved both immutable answers and all original Notes/Reports. Physical build 62 showed B's synced summary and correct address. Local context/version, PostgreSQL races and the joined Note/Report flow also pass. | B1: controlled final-client context-change/stale-completion recovery. The successful move and summary do not need repeating. |
 | P0-3 | Account transitions leak private state or late async results. | **Partial live acceptance.** The repaired web sign-out, scoped account switches and build-60 populated deletion passed. Local delayed-callback, A → B → A, stale-401 and account-link recovery contracts pass. | B2: stale independent client during switch/revocation and the remaining link-recovery path. Retain the documented legacy/quarantine boundaries. |
-| P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Text-draft live path verified.** Browser storage failures preserve recoverable drafts; physical build 60 retained an independently unsent draft through failed transport and process termination, then reconciled it after a web edit. | B2: interrupted image upload/reconnect and failed cleanup recovery. B4: storage-pressure/OS-eviction coverage or an explicit recorded scope decision. |
+| P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Text and offline-image live paths verified.** Physical build 60 retained an unsent text draft through failed transport/termination and reconciled it after a web edit. The September 6 image survived offline close/reopen, reconnect/reload, server persistence and physical build-62 display. | B2: controlled failed-cleanup recovery. The image exercise did not interrupt a transfer mid-byte. B4: storage-pressure/OS-eviction coverage or an explicit recorded scope decision. |
 | P0-5 | Retired Workboard writers remain writable. | **Local HTTP repair verified.** Authenticated 410 responses, mixed-sync rejection and historical read/Report compatibility pass imported fixtures. Publication records bind the shipped repair. | B5: final candidate compatibility binding. The absence of a destructive Production write exercise is not a new authorization to attempt one. |
 | P0-6 | Concurrent Notebook/Research writes report success while losing changes. | **Notebook live path verified; Research races verified locally.** Physical stale-save rejection and reviewed version-3 reconciliation passed against Production. Local PostgreSQL tests cover atomic move/completion, rollback and replay accounting. | B1: deployed context/completion conflict evidence. B2: stale-writer lifecycle edges. The independent-device Notebook conflict already passed. |
-| P1-1 | Normalization loses negation, partial coverage and assumptions. | **Saved-workflow qualification verified.** Local qualification/projection tests plus actual build-60/62 Reports preserve qualifiers. The new local moved-Project handoff preserves partial coverage and assumptions in the current snapshot and Report. | B1: meaning/context on the actual moved-Project clients. Retain the previously accepted Beta Research limits; a new paid quality cohort is not part of closeout. |
+| P1-1 | Normalization loses negation, partial coverage and assumptions. | **Saved-workflow qualification verified.** Local qualification/projection tests plus actual build-60/62 Reports preserve qualifiers. The live moved-Project summary preserves B's partial coverage and assumptions; physical build 62 displays its matching question/address history card. | Retain the recorded native history-card limit and previously accepted Beta Research limits. Context-failure recovery is tracked once under B1; a new paid quality cohort is not part of closeout. |
 | P1-2 | Streaming errors discard recovery information. | **Local repair verified.** Structured JSON/stream errors retain actionable context; source-review recovery and stale-account suppression pass. The focused recovery contract passed again in this pass. | B1: representative final-client source/context-change failure and explicit recovery, using a controlled no-provider failure where available. |
 | P1-3 | Private cache deletion/revocation is incomplete. | **Bounded populated deletion verified.** Build 60, independent account exports, Clerk lookup and all five exact private-file checks passed; browser reload did not recreate the account. Unknown-owner historical cache retention was disclosed. | B2: independent stale writer during revoke/cleanup failure. Retain legacy-data limits; do not repeat the completed populated deletion without a newly justified, approved target. |
 | P1-4 | Final release acceptance is incomplete. | **Open release umbrella.** Existing Stripe and Apple test lifecycles, accepted monitoring, support/restore exercises, policy publication and source/archive evidence are retained. | B5: outstanding provider/consent, operations, Apple/privacy and final candidate/owner decision fields. |
 | P2-1 | Collapsed Project facts remain focusable. | **Verified reported symptom.** Actual Production keyboard traversal and accessibility-tree inspection exclude collapsed inputs and advance to Saved Evidence. | B3: focused assistive-technology/supported-layout spot-check; do not repeat the passed keyboard case. |
 | P2-2 | Reports omit the structured Project facts used by Research. | **Verified reported defect, including actual exports.** Build 60 fixed the omission; build 62 web/iOS PDFs preserve qualified facts and distinguish Project default from Research edition. All nine new PDF pages were inspected; Chrome download passed by owner confirmation. | The retained Note/Report/PDF cycle is complete. Moving to a different Project is tracked once under P0-2/B1. Final release binding is P1-4/B5. |
-| P2-3 | Notebook load failures look empty/read-only. | **Verified text/error/reconnect path.** Explicit 503/403/revoked-access states, device-only drafts, native Retry and stale-version review passed. The local authored-image recovery export remains owner/project scoped. | Image interruption/reconnect is B2; storage-pressure/OS-eviction coverage is B4. |
+| P2-3 | Notebook load failures look empty/read-only. | **Verified text/error/reconnect and offline-image paths.** Explicit 503/403/revoked-access states, device-only drafts, native Retry and stale-version review passed. The September 6 image survived offline reopening and reached Synced on web and physical build 62. | Controlled cleanup failure remains B2; storage-pressure/OS-eviction coverage is B4. |
 | P2-4 | Reader chrome inconsistently shows edition. | **Verified reported labels/race.** Production and physical saved routes show the right 2014/2022 edition; the web code-switch race clears stale text and loads the selected code. | B3: offline/scroll-position and focused assistive-technology coverage. |
 | P2-5 | Tablet toolbars collide; supported phone-web behavior is unclear. | **Verified reported layout/table cases.** The saved 320–1440-width checks found no toolbar overlap. Build 61's previously failing Fuel Gas table pans in both directions by owner confirmation. | B3: final supported-layout/VoiceOver spot-check and explicit browser/platform scope. This is not an all-table certification. |
 | P2-6 | Exact-match search is poorly explained. | **Verified reported behavior.** Production disclosure, no-match/clear, shorter-term recovery and correct result reopening passed; controlled local retry passed. | B3: focused accessibility check and B5 compatibility binding. |
@@ -185,21 +186,34 @@ was performed.
   and restoration; all other foundation artifacts and Research/usage records
   stayed identical. Receipt: `stale-client-revoke-regrant-result.json` in the
   private closeout directory.
-- Image recovery is **not yet exercised**: Chrome rejected automated file
-  selection with “Not allowed,” including after the owner reported enabling
-  file-URL access. Browser URL policy then blocked inspecting `chrome://extensions`;
-  no alternate inspection was attempted. The only new image block is empty.
-- Prepared the 417-byte blue/orange synthetic PNG in Downloads as
-  `Permitext-synthetic-image-recovery-2026-09-06.png`, SHA-256
+- **Offline image recovery passed.** After automated file selection was blocked,
+  the owner manually selected the prepared 417-byte, 128-by-128 blue/orange PNG
+  while the audit tab was offline. The image remained visible after closing and
+  reopening Notebook, with “Recovered device draft · waiting to sync.” An
+  independent export confirmed the server records were still unchanged.
+- Restored DevTools **Go online** and exercised page reload. The Note reached
+  Synced and advanced from version 4 to 5 with a permanent image reference.
+  The new image's stored metadata matches the original dimensions, 417 bytes
+  and SHA-256
   `0e4512b6d8e2b39f4c5e83501bb4861418e3ca9136aea7650cc66e0b46846f3d`.
-  The audit tab is intentionally offline through DevTools, ready for manual file
-  selection. Temporary Pro remains active for this unfinished image/device batch.
-  After selecting the PNG, verify failed upload/reopen, restore Go online, verify
-  recovery and finish grant cleanup. Do not count the blocked chooser as an
-  application upload failure or a passed image-recovery test.
+  Physical build 62 then opened that Note, displayed the complete blue/orange
+  checkerboard and reported Synced. All ten other original foundation artifacts,
+  both Research answers, four operations and the one usage record stayed unchanged.
+- This covers offline queuing/failed transport, draft reopening and recovery
+  after reconnect/reload. It does not establish interruption mid-transfer,
+  storage-pressure/OS-eviction behavior, or an independently downloaded raw asset.
+  Receipt: `image-recovery-result.json`; physical screenshot:
+  `image-recovered-build62.png`, both in the private evidence directory.
+- Final temporary-access revocation passed at `2026-09-06T18:34:47.131Z`.
+  A fresh independent export retained the recovered Note/image and all other
+  records unchanged. The phone confirmed Free, Synced and the test identity;
+  both test sessions remain signed in. Browser automation detached after the
+  successful recovery, so its final Free-plan reload was not independently
+  observed. The tab had already returned online and reached Synced.
 
-1. Interrupt one synthetic image upload, reopen the authored draft, reconnect
-   and confirm the image/document survives or offers an explicit recovery path.
+1. **Completed September 6 within the offline-queue scope above.** The synthetic
+   image/document survived offline reopening and reconnect/reload, then displayed
+   on the independent physical client. Do not repeat this successful path.
 2. **Pro-revocation stale-editor path completed above.** Controlled cleanup
    failure and account-transition/link-recovery boundaries remain separate;
    preserving drafts for the same signed-in owner does not certify account
