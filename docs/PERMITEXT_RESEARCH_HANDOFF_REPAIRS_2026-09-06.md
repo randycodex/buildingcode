@@ -1,6 +1,6 @@
 # Research handoff repairs — September 6, 2026
 
-Status: Production publication verified; build 62 uploaded and processing. Production
+Status: Production publication verified; build 62 available to Internal Testers. Production
 now serves PR #58 (`e60ca415fe8b7b60be65449b7ef49baccc82eec3`); the phone remains
 on the previous build-61 candidate. This continues the three defects captured in the
 [approved confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md),
@@ -100,8 +100,9 @@ production account identifiers and raw exports are excluded from this record.
 
 ## Remaining acceptance
 
-After the native candidate is available, reopen the existing test answer/Note and export a
-new Report revision on the deployed web client and physical candidate. The old
+After the owner returns with the phone, install build 62, reopen the existing
+test answer/Note and export a new Report revision on the deployed web client and
+physical candidate. The old
 saved answer's unsupported limitation must not be silently rewritten; a corrected
 answer requires its own authorized generation or an explicit reviewed correction
 workflow. The original question's existing paid approval is consumed.
@@ -141,9 +142,13 @@ Archive: `/private/tmp/permitext-1.0-62-e60ca415f.xcarchive`.
 Executable SHA-256:
 `f30608b112f42bf3b9f9603405ddd9386f966ec05381b915bdfbe4caebace624`.
 Xcode reported Upload succeeded at `2026-09-06T14:10:03.283Z`, followed by
-EXPORT SUCCEEDED and exit 0. Apple processing is in progress. The owner has
-temporarily taken the physical phone; installation and device checks will wait
-for its return. No owner session was changed during publication.
+EXPORT SUCCEEDED and exit 0. At `2026-09-06T14:19:11.568Z`, Codex confirmed that
+App Store Connect completed processing and lists
+build `1fc6a88c-1f12-494f-b9a1-7fe197349184` as Ready to Submit with the existing
+Internal Testers group and one tester. No external group or public submission
+was added. The owner has temporarily taken the physical phone; installation and
+device checks will wait for its return. No owner session was changed during
+publication.
 
 Private publication evidence:
 `/private/tmp/permitext-handoff-publication-20260906/`, including

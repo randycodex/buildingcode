@@ -42,9 +42,10 @@ track owner-approved PR #58 at merge commit
 healthy storage and six matching web assets. Health, universal-link and approved
 policy checks passed. Build 62's signed archive from the same source passed
 configuration, signature, dependency and packaged privacy checks. Upload
-succeeded at `2026-09-06T14:10:03.283Z`; Apple processing is in progress. The
-owner is taking the phone temporarily; physical installation and handoff
-acceptance will wait for its return.
+succeeded at `2026-09-06T14:10:03.283Z`; Apple processing is complete and build
+`1fc6a88c-1f12-494f-b9a1-7fe197349184` is available to Internal Testers with one
+tester. The owner is taking the phone temporarily; physical installation and
+handoff acceptance will wait for its return.
 No additional Research turn or public App Store submission is included.
 
 Preceding publication: the [September 6 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
@@ -336,4 +337,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: confirm Apple processing and Internal Testers access for uploaded build 62 and, after the owner returns with the phone, bind the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md) to physical-candidate and hosted handoff acceptance. PR #58 is verified on Production; its archive shares that source. Owner account restoration is complete. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed.
+- Next technical step: after the owner returns with the phone, install internally available build 62 and bind the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md) to physical-candidate and hosted handoff acceptance. PR #58 is verified on Production; build 62 shares that source. Owner account restoration is complete. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed.

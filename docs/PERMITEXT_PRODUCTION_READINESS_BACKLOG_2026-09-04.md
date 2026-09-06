@@ -478,9 +478,10 @@ address the captured outside-authority reinsertion, hidden Note-linked answer
 panel, and Report presentation defects. The owner's usual phone account is
 restored. PR #58 is verified on Production at
 `e60ca415fe8b7b60be65449b7ef49baccc82eec3`; build 62 shares that source and its
-verified archive uploaded successfully. Apple processing, hosted handoff and
-physical acceptance remain open. The owner has temporarily taken the phone, so those physical
-checks will resume after its return.
+verified archive uploaded successfully. Apple processing is complete and build
+62 is available to the existing Internal Testers group with one tester. Hosted
+handoff and physical acceptance remain open. The owner has temporarily taken
+the phone, so those physical checks will resume after its return.
 
 The preceding [PR #57 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
 verified Production `4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e` and completed
