@@ -12,9 +12,10 @@ paid evaluation cohort, release approval or new audit scope.
   These identities come from the saved [publication](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md#approved-publication)
   and [build-62 acceptance](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md)
   evidence, rather than a new deployment inspection in this reconciliation.
-- Reconciliation started at branch commit `7001a3b1d`. This pass changes tests
-  and documentation; the later owner-requested Account close control is local
-  commit `33f5cd41d`. Neither creates a new website deployment or TestFlight build.
+- Reconciliation started at branch commit `7001a3b1d`. The owner-requested
+  Account close control is local commit `33f5cd41d`. The later saved-citation
+  recovery repair below is also local. Neither creates a new website deployment
+  or TestFlight build.
 - The 17 IDs comprise 16 repair findings and the P1-4 release-acceptance umbrella.
   A repaired symptom, broader client coverage and public-release approval are
   separate statuses. The table below does not count a local pass as a physical
@@ -28,9 +29,12 @@ paid evaluation cohort, release approval or new audit scope.
   revoke/regrant and final revocation; it was independently confirmed active at
   `2026-09-06T17:27:16.651Z`. The approved revoke/regrant check passed, with
   revocation at `18:13:22.432Z` and regrant at `18:15:57.452Z` on September 6.
-  Final revocation was independently verified at `18:34:47.131Z`; the phone
-  confirmed Free, Synced and the same test identity. Chrome and phone retain the
-  designated test session. Repeated usual-account restoration is no
+  That batch's revocation was independently verified at `18:34:47.131Z`; the
+  phone confirmed Free, Synced and the same test identity. The approved access
+  was regranted for Pro offline checks at `18:59:13.524Z`, then finally revoked
+  at `19:24:30.621Z`. An independent export confirmed no paid entitlement and
+  unchanged retained content; the departing phone's final Free refresh was not
+  observed. Test sessions were not signed out. Repeated usual-account restoration is no
   longer a checkpoint requirement. No paid Research, purchase, merge or deletion
   is included in this authorization.
 - Chrome's hosted PDF download is owner-confirmed. The Codex in-app browser
@@ -46,7 +50,7 @@ each remaining check one home so it is not repeated for several findings.
 
 | ID | Original finding | Completed evidence and strongest layer | Remaining acceptance |
 | --- | --- | --- | --- |
-| P0-1 | Historical citations open the wrong provision/edition. | **Verified online symptom.** Production and physical build 60 reopened 2014 Slope and 2022 Gates correctly; build 61 opened both saved 2014 Research citations. Source/edition routing contracts pass. [Execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md#saved-citations-and-keyboard-access), [Research confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md). | B3: offline exact-citation reopening and the focused assistive-technology check. |
+| P0-1 | Historical citations open the wrong provision/edition. | **Verified online symptom; native offline pair owner-confirmed.** Production and physical build 60 reopened 2014 Slope and 2022 Gates correctly; build 61 opened both saved 2014 Research citations. The owner confirmed build-62 offline Slope/Gates checks, within the B3 evidence limits below. Source/edition routing contracts pass. [Execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md#saved-citations-and-keyboard-access), [Research confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md). | B3: web offline-library installation/reopening and the focused assistive-technology check. The reproduced web fetch-failure notice is repaired locally, not deployed. |
 | P0-2 | Moving Research retains the prior Project's active facts/history. | **Live A → B summary → A verified.** Production reset active context, captured B's qualified facts in a provider-free summary, and preserved both immutable answers and all original Notes/Reports. Physical build 62 showed B's synced summary and correct address. Local context/version, PostgreSQL races and the joined Note/Report flow also pass. | B1: controlled final-client context-change/stale-completion recovery. The successful move and summary do not need repeating. |
 | P0-3 | Account transitions leak private state or late async results. | **Partial live acceptance.** The repaired web sign-out, scoped account switches and build-60 populated deletion passed. Local delayed-callback, A → B → A, stale-401 and account-link recovery contracts pass. | B2: stale independent client during switch/revocation and the remaining link-recovery path. Retain the documented legacy/quarantine boundaries. |
 | P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Text and offline-image live paths verified.** Physical build 60 retained an unsent text draft through failed transport/termination and reconciled it after a web edit. The September 6 image survived offline close/reopen, reconnect/reload, server persistence and physical build-62 display. | B2: controlled failed-cleanup recovery. The image exercise did not interrupt a transfer mid-byte. B4: storage-pressure/OS-eviction coverage or an explicit recorded scope decision. |
@@ -59,7 +63,7 @@ each remaining check one home so it is not repeated for several findings.
 | P2-1 | Collapsed Project facts remain focusable. | **Verified reported symptom.** Actual Production keyboard traversal and accessibility-tree inspection exclude collapsed inputs and advance to Saved Evidence. | B3: focused assistive-technology/supported-layout spot-check; do not repeat the passed keyboard case. |
 | P2-2 | Reports omit the structured Project facts used by Research. | **Verified reported defect, including actual exports.** Build 60 fixed the omission; build 62 web/iOS PDFs preserve qualified facts and distinguish Project default from Research edition. All nine new PDF pages were inspected; Chrome download passed by owner confirmation. | The retained Note/Report/PDF cycle is complete. Moving to a different Project is tracked once under P0-2/B1. Final release binding is P1-4/B5. |
 | P2-3 | Notebook load failures look empty/read-only. | **Verified text/error/reconnect and offline-image paths.** Explicit 503/403/revoked-access states, device-only drafts, native Retry and stale-version review passed. The September 6 image survived offline reopening and reached Synced on web and physical build 62. | Controlled cleanup failure remains B2; storage-pressure/OS-eviction coverage is B4. |
-| P2-4 | Reader chrome inconsistently shows edition. | **Verified reported labels/race.** Production and physical saved routes show the right 2014/2022 edition; the web code-switch race clears stale text and loads the selected code. | B3: offline/scroll-position and focused assistive-technology coverage. |
+| P2-4 | Reader chrome inconsistently shows edition. | **Verified reported labels/race.** Production and physical saved routes show the right 2014/2022 edition; the web code-switch race clears stale text and loads the selected code. Build-62 offline reopening is owner-confirmed within the B3 limits. | B3: web offline reopening, independent scroll-position and focused assistive-technology coverage. |
 | P2-5 | Tablet toolbars collide; supported phone-web behavior is unclear. | **Verified reported layout/table cases.** The saved 320–1440-width checks found no toolbar overlap. Build 61's previously failing Fuel Gas table pans in both directions by owner confirmation. | B3: final supported-layout/VoiceOver spot-check and explicit browser/platform scope. This is not an all-table certification. |
 | P2-6 | Exact-match search is poorly explained. | **Verified reported behavior.** Production disclosure, no-match/clear, shorter-term recovery and correct result reopening passed; controlled local retry passed. | B3: focused accessibility check and B5 compatibility binding. |
 | P2-7 | Startup waits on secondary catalogs/large client code. | **Local critical-path repair verified.** Controlled delay tests show the workspace can render while secondary catalogs load, after authentication. Reload restores panes. | B4: representative browser/device measurements; the controlled timing is not device paint or p50/p90 acceptance. |
@@ -228,11 +232,61 @@ input instead of restoring the main account between cases.
 
 ### B3 — One focused client/device session
 
-Check offline reopening of one saved 2014/2022 citation pair, edition/scroll
-continuity, VoiceOver on the relevant Reader/table/Project/Search controls, and
-the supported layouts. Reuse the build-61 physical table-pan result unless its
-runtime path changed. Record the actual platform/browser scope and any limits.
-Keep this session bounded to the affected controls and representative sources.
+September 6 checkpoint: **the native offline pair is owner-confirmed; a web
+failure is repaired locally and browser offline installation remains blocked.**
+
+- On physical build 62 with the approved temporary Pro grant, the owner followed
+  the Airplane Mode on / Wi-Fi off instructions and reported opening the saved
+  2014 Slope citation offline. After reconnection, Mirroring independently showed
+  “Building Code · 2014,” but at a different chapter scroll position. This is
+  owner-confirmed offline opening, not an independently captured radio-off run
+  or exact target-position check.
+- For the second check, the owner selected 2022 Building Code and confirmed
+  “it worked” against the complete instruction to reopen Saved → “1010.2 Gates”
+  → its orange heading offline and check “Building Code · 2022” and Gates text.
+  That is owner-confirmed completion of the 2022 test. No additional physical
+  screenshot or VoiceOver check is claimed. The owner then took the phone.
+- The temporary HTTP proxy was restored to **Off** before these manual checks.
+  Its inactive Manual fields still contain the loopback test values; no active
+  proxy remains. The owner was instructed to restore Airplane Mode off and Wi-Fi
+  on before leaving; final radio state was not independently observed.
+- In Production Chrome, a Free account without an installed offline library
+  silently failed to open saved 2014 Slope when transport failed. The Reader
+  stayed closed without a recovery message, and a Saved chapter label exposed
+  its internal identifier. Free does not include offline reading; this verifies
+  an error-presentation defect, not failure of an installed Pro offline library.
+- The local repair catches failed saved-section loading, removes only the
+  abandoned detail state, and displays “Saved section unavailable” with recovery
+  instructions. Late results from a previous account or closed detail do not
+  show a notice or open a Reader. Saved headings use an actual chapter number
+  when available rather than an internal grouping ID. The public shell versions
+  were advanced together; no Production deployment occurred.
+- Seven focused local checks passed: Reader recovery, Research source edition
+  integrity, offline storage, accessibility Phase 2, Reader/save Phase 4,
+  workspace startup restoration and build output. JavaScript syntax and diff
+  checks passed. A synthetic loopback page using the actual handler/dialog and
+  stylesheet showed the notice, keyboard focus/dismissal and successful exact
+  2014 Slope reopening after restoring the fixture connection. It used no
+  account/API/provider access and does not replace hosted acceptance.
+- With Pro regranted, Chrome's actual **Download for Offline Use** reached
+  **466 of 467 chapters** and stayed there for at least ten minutes. A later
+  reload ended that attempt; Account reported **Not downloaded on this device**.
+  The exact stalled request or storage operation was not isolated. Do not count
+  the web package installed or the Pro web offline citation check passed.
+  Partial public install data was not cleared, and no private cache was purged.
+- Final temporary Pro revocation was independently verified at
+  `2026-09-06T19:24:30.621Z`. The `19:24:55.940Z` export retained all foundation
+  artifacts, Research answers, operations and usage unchanged. Chrome and phone
+  were left signed in; no final client Free refresh was observed. The local
+  preview server was stopped. Receipts: `citation-recovery-checkpoint.json`,
+  `offline-citation-free-web.txt` and `saved-citation-recovery-preview.png` in
+  the private evidence directory.
+
+Next, isolate the browser offline installer without the phone. The native
+owner-confirmed pair does not need repeating. VoiceOver on the affected
+Reader/table/Project/Search controls, independent scroll-position continuity and
+supported-layout scope remain open. Reuse the build-61 physical table-pan result
+unless its runtime path changes; keep further device work bounded.
 
 ### B4 — Performance and stress coverage
 
@@ -265,12 +319,16 @@ account deletion and additional paid testing are not authorized by this checklis
 
 ## Next execution point
 
-The local work and successful live A → B summary → A transition are complete.
-The owner-requested Account close button is locally built and visually checked.
-The next live step is the pending manual image selection in B2, then restoration
-of online mode and image recovery. The Pro revoke/regrant stale-editor check is
-complete. B1's controlled context failure, the remaining B2/B3 checks and B4/B5
-stay open; do not repeat the passed move, summary, revoke/regrant or PDF cycle. Reconcile
-B4/B5 in parallel through existing documents and local checks where possible;
-this describes work sequencing, not authorization to spawn agents or change
-live provider configuration.
+The next step is to isolate the browser offline-library installation stall at
+466/467 chapters and finish hosted acceptance of the saved-citation recovery
+repair after an approved deployment. This investigation does not need the phone.
+The Account close button and saved-citation repair remain local candidates.
+
+The move/summary/return, Pro revoke/regrant stale-editor check, offline image
+recovery, Note/Report/PDF cycle and owner-confirmed native offline pair are
+complete within their recorded scope. Do not repeat them. B1's controlled
+context failure, the remaining B2/B3 edges and B4/B5 remain open. Use existing
+documents and local checks to reconcile the remaining work without another
+phone session or main-account restoration. This is sequencing within the
+original audit, not authorization for paid Research, agent delegation, a new
+deployment, provider configuration changes or public release.

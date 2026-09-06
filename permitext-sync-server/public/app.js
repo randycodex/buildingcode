@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260906-research-handoff-v48";
+} from "./offline-storage.js?v=20260906-saved-citation-recovery-v49";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260906-research-handoff-v48";
+} from "./research-intent-state.js?v=20260906-saved-citation-recovery-v49";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15863,12 +15863,7 @@ async function renderSectionDetail(searchID, detail) {
   });
 
   backButton.addEventListener("click", () => {
-    closeLinkedReaderForSearch(searchID);
-    delete sectionDetailsBySearch()[searchID];
-    delete sectionDetailAnchorsBySearch()[searchID];
-    state.utilityInstances = (state.utilityInstances || []).filter((instance) =>
-      instance.id !== searchID || instance.key !== "sdc"
-    );
+    removeSectionDetail(searchID);
     saveWorkspaceState();
     void transitionWorkspace("utility");
   });
@@ -29992,7 +29987,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
         const chapterHeader = document.createElement("div");
         chapterHeader.className = "saved-chapter-header";
         const chapterNumber = document.createElement("strong");
-        chapterNumber.textContent = entry.chapterKey ? `Chapter ${entry.chapterKey}` : "Chapter";
+        chapterNumber.textContent = entry.item.chapterNumber ? `Chapter ${entry.item.chapterNumber}` : "Chapter";
         const chapterTitle = document.createElement("span");
         const normalizedChapterTitle = String(entry.item.chapterTitle || "")
           .replace(/^\s*chapter\s+\S+\s*[:—-]?\s*/i, "")
@@ -30378,26 +30373,31 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   return reader;
 }
 
+function removeSectionDetail(searchID) {
+  closeLinkedReaderForSearch(searchID);
+  delete sectionDetailsBySearch()[searchID];
+  delete sectionDetailAnchorsBySearch()[searchID];
+  const detailPaneID = paneIDForSectionDetail(searchID);
+  delete state.paneWeights[detailPaneID];
+  state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== detailPaneID);
+  state.utilityInstances = (state.utilityInstances || []).filter((instance) =>
+    instance.id !== searchID || instance.key !== "sdc"
+  );
+}
+
 function closeSavedItemDetailsForPane(savedPaneID) {
   const details = sectionDetailsBySearch();
   const anchors = sectionDetailAnchorsBySearch();
   Object.entries(anchors).forEach(([searchID, anchorPaneID]) => {
     if (anchorPaneID !== savedPaneID || !details[searchID]) return;
-    const detailPaneID = paneIDForSectionDetail(searchID);
-    closeLinkedReaderForSearch(searchID);
-    delete details[searchID];
-    delete anchors[searchID];
-    delete state.paneWeights[detailPaneID];
-    state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== detailPaneID);
-    state.utilityInstances = (state.utilityInstances || []).filter((instance) =>
-      instance.id !== searchID || instance.key !== "sdc"
-    );
+    removeSectionDetail(searchID);
   });
 }
 
 async function openSavedItemInReader(item, savedPaneID) {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
   if (!sectionID) return;
+  const requestIdentity = captureAccountRequest();
   const navigationItem = {
     ...item,
     id: sectionID,
@@ -30406,11 +30406,25 @@ async function openSavedItemInReader(item, savedPaneID) {
   closeSavedItemDetailsForPane(savedPaneID);
   const detailInstance = newUtilityInstance("sdc");
   state.utilityInstances = [...(state.utilityInstances || []), detailInstance];
-  await openSectionDetail(detailInstance.id, navigationItem, {
-    anchorPaneID: savedPaneID,
-    updateURL: false,
-    evidenceAnchor: item?.evidenceAnchor || null
-  });
+  try {
+    await openSectionDetail(detailInstance.id, navigationItem, {
+      anchorPaneID: savedPaneID,
+      updateURL: false,
+      evidenceAnchor: item?.evidenceAnchor || null
+    });
+  } catch {
+    if (!isCurrentAccountRequest(requestIdentity) || !sectionDetailsBySearch()[detailInstance.id]) return;
+    removeSectionDetail(detailInstance.id);
+    saveWorkspaceState();
+    await showWebNotice(
+      "Saved section unavailable",
+      navigator.onLine === false
+        ? "Connect to the internet, then open this saved section again. For offline reading, download the code library in Account while Pro is active."
+        : "This saved section could not be loaded. Check your connection, then open it again. Your saved item has not been removed."
+    );
+    return;
+  }
+  if (!isCurrentAccountRequest(requestIdentity)) return;
 
   const detail = sectionDetailsBySearch()[detailInstance.id];
   if (!detail) return;
