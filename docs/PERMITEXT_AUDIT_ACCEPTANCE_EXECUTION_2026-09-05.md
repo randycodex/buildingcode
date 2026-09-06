@@ -180,8 +180,12 @@ the owner's successful physical table-pan confirmation are tracked in the
 This continuation preserves the original 17-finding scope. The bounded physical
 table check passed; the broader release-acceptance boundaries remain open.
 
-The following bounded Project → Research → Note → Report preparation and pending
-live-answer authorization are checkpointed in the
+The following bounded Project → Research → Note → Report preparation, first
+live failure, PR #56 publication and separately approved failed confirmation
+are checkpointed in the
 [Research handoff acceptance record](./PERMITEXT_RESEARCH_HANDOFF_ACCEPTANCE_2026-09-05.md).
-Its temporary test access and account-restoration obligations remain open until
-that cycle is completed.
+Production serves `d30874a4d80ccf59566701c9d2558e45d5f8df3c`; the canonical-label
+repair did not unblock the live attribution check. Both attempts released their
+turn reservations without saving an answer. Temporary test access is revoked,
+the browser test session is signed out, and both recorded access/restoration
+cycles are complete. The Research → Note → Report acceptance remains open.
