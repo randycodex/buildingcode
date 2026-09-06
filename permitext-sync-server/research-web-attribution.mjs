@@ -68,8 +68,20 @@ function webDerivedSupportedPointMatches(answer, sources, evidence) {
       .filter(({ explicit }) => explicit)
       .map(({ index }) => ({ index, reason: "explicit_guidance_attribution", bindings: [] }));
   }
+  // Canonical source labels establish edition and location as well as the
+  // provision body. A web page repeating those labels is not evidence that an
+  // enacted point borrowed a web-only rule. Keep substantive web-only tokens
+  // and explicit guidance attribution subject to the checks below.
   const enactedTokens = materialTokens((Array.isArray(evidence) ? evidence : [])
-    .flatMap((item) => [item?.title, item?.text])
+    .flatMap((item) => [
+      item?.title,
+      item?.text,
+      item?.codeEdition,
+      item?.corpusLabel,
+      item?.jurisdiction,
+      item?.codePrefix,
+      item?.sectionNumber
+    ])
     .filter(Boolean)
     .join(" "));
   const distinctiveWebTokenSets = [...sources.values()].flatMap((source) =>

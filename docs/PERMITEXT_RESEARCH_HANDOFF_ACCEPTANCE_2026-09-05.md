@@ -1,6 +1,7 @@
 # Research handoff acceptance — 2026-09-05
 
-Status: preparation verified; live answer and downstream acceptance pending.
+Status: the approved live answer failed attribution verification; a bounded
+local correction passes validation. Downstream acceptance remains open.
 This continues the original production-readiness audit's 17 findings.
 
 ## Verified preparation
@@ -17,14 +18,41 @@ This continues the original production-readiness audit's 17 findings.
 
 > Using the selected 2014 BC 1010.2 passage, summarize the ramp slope rule and its stated exceptions for this synthetic Project. Keep the Project’s assumptions and partial sprinkler coverage explicit; do not treat them as confirmed applicability or whole-building sprinkler protection. Identify what must be verified before applying the rule.
 
-Fresh approval for exactly one answer is pending. Earlier paid-test approvals cover completed, different cases. No retry or budget increase is included. The exact tighter per-request Production cap is not exposed through the available read-only configuration. Serving-release health confirms `beta1ConfigurationReadiness`, which requires the approved $7 account-month ceiling and ordered request/day/month safeguards. The proposed test remains within that existing ceiling; $7 is an upper bound, not a forecast or a newly configured limit.
+The owner approved exactly one answer with **“ok keep going”** after reviewing the concrete one-answer request. That approval is consumed by the attempt below. No further retry or budget increase is included. Preflight exposed the existing $7 account-month upper bound; the actual request reservation independently revealed the tighter **$0.50 per-request maximum**. No limit was changed.
+
+## Live failure and accounting
+
+The first-use Research disclosure was reviewed and accepted for the synthetic test. One question was submitted. The visible browser progressed through citation checking, then displayed **Research interrupted** and explained that the generated response could not be verified against enacted evidence. The question remained visible with Retry. Retry was not selected.
+
+Production request `qwwjd-1788661848424-2ba95aa31db1` ran on the unchanged `d6986c572924061d2545c9ae693e82a1c50870de` deployment. The scoped account export at `2026-09-06T02:31:41.421Z` and runtime logs agree:
+
+- Operation `4a7b5a9b-e400-497d-ac30-4ccf58ee4df2` failed with `RESEARCH_VERIFICATION_FAILED` / `wrong_attribution` after 40,221 ms.
+- Three provider requests completed: official web support, initial interpretation and the pipeline's one bounded revision. Two deterministic verification attempts found `web_claim_overlap`; the first flagged supported points 0 and 1, and the second still flagged point 0. This is one user-requested turn, not three separately submitted questions.
+- Token-based provider cost estimate: **$0.067408**. Conservative accounting including allowances: **$0.19138**. No provider request remains pending. These are application accounting estimates, not an invoice reconciliation.
+- `charged: false`; the turn reservation was released. There are zero Research usage records, zero saved answers and zero persisted messages in the empty conversation. No generated answer was promoted into a Note or Report.
+
+The log retains issue locations and exact web source/claim bindings. It does not retain the failed draft or web-claim text, so this record cannot establish whether every flagged live claim was substantively correct or identify the exact overlapping words.
+
+## Bounded local attribution correction
+
+A no-provider counterexample reproduced a false rejection in the same deterministic check: an enacted ramp paragraph headed with its canonical **2014 NYC Construction Codes** label failed solely because an official-web overview repeated that label. `webDerivedSupportedPointMatches` considered provision title/body tokens, but omitted canonical edition, corpus, jurisdiction and section labels when identifying supposedly web-exclusive words.
+
+The local correction includes those canonical labels in that comparison. It does not exempt an answer merely because it cites a code edition: explicit guidance attribution, substantive web-only clauses and invalid source/claim bindings remain checked. Regression fixtures cover the valid labeled passage, the same passage without supplied canonical metadata, an added web-only waiver claim and explicit DOB guidance attribution. The focused source-specific attribution/revision contract and the complete `npm run check`, including precheck/postcheck, passed with paid-call environment variables unset. A direct before/after comparison independently confirms that the unchanged baseline rejects the synthetic canonical-label case and the local correction accepts it. Evidence: `local-verification.json` and `local-check.log`.
+
+This proves the specific local counterexample is repaired. It does **not** prove the unavailable live draft would pass, establish a generated-answer quality result, or complete the original Research handoff. A separately approved deployed confirmation is still needed.
+
+## Test access cleanup
+
+Temporary Pro was revoked at `2026-09-06T02:36:09.821Z`. The independent export at `2026-09-06T02:36:28.170Z` confirms entitlement absent, two synthetic Projects, the two pre-existing Notes, one empty Research conversation, one failed operation and zero Research usage/answers or purchase claims. The physical Account screen independently displayed **Free Active**, **Billing: None** and **Synced** before normal sign-out. The hosted browser then showed signed-out Free with Sign in; native also displayed Not signed in.
+
+The owner restored the usual phone identity. At approximately `2026-09-06T02:43Z`, its Account screen independently showed **Lifetime Pro Active**, **Billing: Lifetime Grant**, **98 included turns** and **Synced**. Existing Project containers and the saved BC 101.1 passage were visible before opening Account. The test did not change the owner's entitlement or Research allowance. Chrome still showed Sign in after refresh; its restoration or an explicit choice to leave it signed out remains pending. The account and synthetic evidence were retained; no account deletion occurred.
 
 ## Remaining execution and restoration
 
-1. On approval, send the prepared question once. Record actual outcome, provider cost/usage, code edition, citations, Project assumptions and any failure before proceeding.
+1. Finish local validation and review of the bounded attribution correction. Obtain the scoped publication/paid-confirmation decision before another provider-backed attempt; the first approval is consumed.
 2. If the answer is acceptable, preserve it in a clearly user-authored Note, include the intended evidence in a Report, and verify reopened source/answer/Note/Report state on the physical candidate. A single passage-summary case does not close the wider Research quality gate.
-3. Exercise the planned Project-context change with immutable historical-answer checks if the first boundary passes; additional paid generation is outside the pending one-answer request.
-4. Revoke temporary test access, retain synthetic evidence, sign out the test account and restore the usual phone account and 2014 Saved/Reader state. Also restore the usual Chrome Permitext session: the unused Google fallback signed that session out; it did not complete a provider login. Close the temporary fallback tab after restoration.
+3. Exercise the planned Project-context change with immutable historical-answer checks if the first boundary passes; additional paid generation requires its own scope.
+4. Complete restoration of the usual phone account and 2014 Saved/Reader state, and the usual Chrome Permitext session. The unused Google fallback signed the Chrome session out; it did not complete a provider login. Close the temporary fallback tab after restoration.
 5. Reconcile verified results with the central acceptance record. No public release or App Store submission is implied.
 
-Private evidence is under `/private/tmp/permitext-research-handoff-acceptance-20260905/`: exact-target preflight/grant summaries, scoped Project/conversation inspections and `preflight.json`. Credentials, email verification codes and raw account exports are excluded from this repository record.
+Private evidence is under `/private/tmp/permitext-research-handoff-acceptance-20260905/`: exact-target preflight/grant/revocation summaries, scoped Project/conversation inspections, `preflight.json`, `research-result-project-inspection.json`, `runtime-failure.jsonl` and `local-check.log`. Credentials, email verification codes and raw account exports are excluded from this repository record.
