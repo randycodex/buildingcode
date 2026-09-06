@@ -13,7 +13,8 @@ paid evaluation cohort, release approval or new audit scope.
   and [build-62 acceptance](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md)
   evidence, rather than a new deployment inspection in this reconciliation.
 - Reconciliation started at branch commit `7001a3b1d`. This pass changes tests
-  and documentation only; it creates no new website deployment or native build.
+  and documentation; the later owner-requested Account close control is local
+  commit `33f5cd41d`. Neither creates a new website deployment or TestFlight build.
 - The 17 IDs comprise 16 repair findings and the P1-4 release-acceptance umbrella.
   A repaired symptom, broader client coverage and public-release approval are
   separate statuses. The table below does not count a local pass as a physical
@@ -25,8 +26,10 @@ paid evaluation cohort, release approval or new audit scope.
   grant was revoked at `2026-09-06T16:15:33.094Z`. The owner then approved one
   temporary no-charge Pro grant for the remaining technical batch, including
   revoke/regrant and final revocation; it was independently confirmed active at
-  `2026-09-06T17:27:16.651Z`. Chrome and phone retain the designated test session.
-  Final revocation is still required. Repeated usual-account restoration is no
+  `2026-09-06T17:27:16.651Z`. The approved revoke/regrant check passed, with
+  revocation at `18:13:22.432Z` and regrant at `18:15:57.452Z` on September 6.
+  Chrome and phone retain the designated test session. Final revocation is still
+  required. Repeated usual-account restoration is no
   longer a checkpoint requirement. No paid Research, purchase, merge or deletion
   is included in this authorization.
 - Chrome's hosted PDF download is owner-confirmed. The Codex in-app browser
@@ -161,11 +164,46 @@ Do not widen this into another answer-quality cohort.
 
 ### B2 — Remaining recovery and account-isolation edges
 
+September 6 checkpoint: **the Pro-revocation stale-editor path passed.**
+The exact synthetic test account was independently verified before each grant
+change. No purchase, Research request, merge, deletion or usual-account switch
+was performed.
+
+- Created one synthetic Note in Project B. With the browser still holding its
+  editable Pro state, revoked test access and changed only that Note's title.
+  The server rejected the write; all eleven existing foundation artifacts and
+  the two Research answers/usage remained unchanged in an independent export.
+- The browser explicitly reported “Saved on this device · sync pending: The
+  Project Notebook requires Pro.” After reload, the cloud editor was unavailable
+  and “Your drafts on this device” retained the unsent title and authored text.
+  The recovery-download action reported success in the UI; a completed file was
+  not independently located, so this is not a verified download receipt.
+- Physical build 62 showed Free, Synced and the same designated test identity;
+  Pro-only Projects disappeared from Saved. Regranting access restored Projects
+  without sign-out. The browser reopened its retained draft and reached Synced.
+  The synthetic Note advanced from version 2 to version 4 after title recovery
+  and restoration; all other foundation artifacts and Research/usage records
+  stayed identical. Receipt: `stale-client-revoke-regrant-result.json` in the
+  private closeout directory.
+- Image recovery is **not yet exercised**: Chrome rejected automated file
+  selection with “Not allowed,” including after the owner reported enabling
+  file-URL access. Browser URL policy then blocked inspecting `chrome://extensions`;
+  no alternate inspection was attempted. The only new image block is empty.
+- Prepared the 417-byte blue/orange synthetic PNG in Downloads as
+  `Permitext-synthetic-image-recovery-2026-09-06.png`, SHA-256
+  `0e4512b6d8e2b39f4c5e83501bb4861418e3ca9136aea7650cc66e0b46846f3d`.
+  The audit tab is intentionally offline through DevTools, ready for manual file
+  selection. Temporary Pro remains active for this unfinished image/device batch.
+  After selecting the PNG, verify failed upload/reopen, restore Go online, verify
+  recovery and finish grant cleanup. Do not count the blocked chooser as an
+  application upload failure or a passed image-recovery test.
+
 1. Interrupt one synthetic image upload, reopen the authored draft, reconnect
    and confirm the image/document survives or offers an explicit recovery path.
-2. Hold a stale second client during test-access revocation or a controlled
-   cleanup failure; confirm private content does not reappear and authored local
-   work is treated according to the recovery contract.
+2. **Pro-revocation stale-editor path completed above.** Controlled cleanup
+   failure and account-transition/link-recovery boundaries remain separate;
+   preserving drafts for the same signed-in owner does not certify account
+   deletion or purging another identity's private cache.
 3. Complete or explicitly disposition the supported account-link recovery path,
    including retained source drafts and server-confirmed ancestry. A real merge
    or deletion needs exact disposable identities and reviewable consequences.
@@ -214,9 +252,11 @@ account deletion and additional paid testing are not authorized by this checklis
 ## Next execution point
 
 The local work and successful live A → B summary → A transition are complete.
-The owner-requested Account close button is locally built and visually checked. Resume
-with B1's controlled failure/recovery item, followed by the remaining B2/B3 phone
-checks; do not repeat the passed move, summary or PDF cycle. Reconcile
+The owner-requested Account close button is locally built and visually checked.
+The next live step is the pending manual image selection in B2, then restoration
+of online mode and image recovery. The Pro revoke/regrant stale-editor check is
+complete. B1's controlled context failure, the remaining B2/B3 checks and B4/B5
+stay open; do not repeat the passed move, summary, revoke/regrant or PDF cycle. Reconcile
 B4/B5 in parallel through existing documents and local checks where possible;
 this describes work sequencing, not authorization to spawn agents or change
 live provider configuration.
