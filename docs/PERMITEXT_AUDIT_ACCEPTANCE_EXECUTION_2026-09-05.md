@@ -1,5 +1,13 @@
 # Production-readiness audit acceptance — September 5, 2026
 
+September 6 reconciliation: use the [current original 17-finding checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md)
+for remaining work. This chronological record retains the earlier build-specific
+results. PR #58/build 62 subsequently passed retained Note review, repaired web
+Note navigation and actual web/native Report presentation; Chrome download was
+owner-confirmed. The phone now intentionally retains the Free test session at
+the owner's request. Historical account-restoration and PDF-defect pending
+statements below are superseded by the [build-62 acceptance record](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md).
+
 This continues the 17 findings in the [production-readiness backlog](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md), rather than expanding the task to the entire Beta 1 commercialization plan. Implementation and targeted checks had addressed 16 findings; P1-4 and the explicitly listed final-candidate acceptance boundaries remain open until supported by evidence.
 
 ## Candidate and scope

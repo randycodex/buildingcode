@@ -115,10 +115,11 @@ saved answer's unsupported limitation must not be silently rewritten; a correcte
 answer requires its own authorized generation or an explicit reviewed correction
 workflow. The original question's existing paid approval is consumed.
 
-The lower native Note fields, hosted browser download behavior, broader Project
-reassignment with different facts, final release binding and the other open
-original audit gates retain their separate acceptance status. These repairs do
-not authorize App Store submission or public paid Beta.
+The lower native Note fields and Chrome download passed the linked build-62
+check. The [current original-audit checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md)
+tracks broader Project reassignment with different facts, the in-app browser
+limitation, final release binding and the other open original audit gates.
+These repairs do not authorize App Store submission or public paid Beta.
 
 ## Approved publication
 
