@@ -473,6 +473,12 @@ production customer incidents.
 
 ## Release acceptance reconciliation
 
+The [September 6 local handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
+address the captured outside-authority reinsertion, hidden Note-linked answer
+panel, and Report presentation defects. The owner's usual phone account is
+restored. Publication and deployed/physical acceptance of these subsequent
+repairs remain distinct from PR #57's completed routing confirmation.
+
 The newer [PR #57 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
 verified Production `4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e` and completed
 one approved turn with 2014-only citations and no web lookup. P0-1's bounded

@@ -6,6 +6,11 @@ Production. Full professional handoff acceptance remains **OPEN** because
 answer-quality, Note navigation and Report presentation defects remain.
 This continues the original 17 findings; it does not authorize public release.
 
+The resumed [local repair record](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
+records the completed owner-session restoration, native PDF inspection and
+locally verified no-provider repairs. The observations below preserve the original
+Production confirmation and its pause checkpoint.
+
 ## Publication and bounded confirmation
 
 The owner approved PR #57 plus one unchanged synthetic ramp question on the

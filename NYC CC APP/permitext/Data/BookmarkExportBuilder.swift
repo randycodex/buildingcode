@@ -467,7 +467,7 @@ struct ProjectReportExportBuilder: Sendable {
             formattedDate(manifest.reportDate),
             manifest.author.displayName,
             "Report version \(manifest.reportVersion)",
-            manifest.codeEdition
+            Self.codeBasisLines(manifest).joined(separator: " · ")
         ].filter { !$0.isEmpty }.joined(separator: " · ")
         append(
             "\(reportMetadata)\n\n",
@@ -612,6 +612,11 @@ struct ProjectReportExportBuilder: Sendable {
                 font: .systemFont(ofSize: 13, weight: .semibold),
                 spacingAfter: 5
             )
+            appendBullets("Code basis", values: [
+                item.authorityLabel, item.codeBasis?.disclosure, item.codeBasis?.limitation,
+                item.codeEdition.map { "Edition: \($0)" },
+                item.sourceAsOf.map { "Research basis captured \($0.prefix(10))" }
+            ].compactMap { $0 }, to: result)
             append(
                 "Supported conclusion\n",
                 to: result,
@@ -619,14 +624,19 @@ struct ProjectReportExportBuilder: Sendable {
                 spacingAfter: 2
             )
             append(
-                "\(item.conclusion ?? "")\n",
+                "\(Self.researchText(item.conclusion ?? ""))\n",
                 to: result,
                 font: .systemFont(ofSize: 10.5),
                 spacingAfter: 6
             )
+            appendBullets("What the selected evidence establishes", values:
+                (item.supportedPoints ?? []).map { point in
+                    [point.heading, point.explanation].compactMap { $0 }
+                        .filter { !$0.isEmpty }.joined(separator: ": ")
+                }, to: result)
             if let explanation = item.explanation, !explanation.isEmpty {
                 append(
-                    "\(explanation)\n",
+                    "\(Self.researchText(explanation))\n",
                     to: result,
                     font: .systemFont(ofSize: 10),
                     spacingAfter: 7
@@ -641,10 +651,10 @@ struct ProjectReportExportBuilder: Sendable {
                 to: result
             )
             let citations = (item.citations ?? []).map { citation in
-                ([citation.sectionID].compactMap { $0 } + (citation.sourceIDs ?? []))
-                    .joined(separator: " · ")
+                Self.citationLabel(citation, evidence: item.evidence ?? [], answerEdition: item.codeEdition)
             }
             appendBullets("Citations", values: citations, to: result)
+            appendBullets("Professional-use notice", values: [item.disclaimer].compactMap { $0 }, to: result)
         default:
             append(
                 "\(item.title ?? "Project material")\n",
@@ -659,6 +669,49 @@ struct ProjectReportExportBuilder: Sendable {
                 spacingAfter: 10
             )
         }
+    }
+
+    // Presentation uses only the saved manifest; historical records are never changed.
+    static func researchText(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: #"\[([^\]]+)\]\((https?://[^\s)]+)\)"#, with: "$1 ($2)", options: .regularExpression)
+            .replacingOccurrences(of: #"(?<!\\)(\*\*|__)(?=\S)([\s\S]*?\S)\1"#, with: "$2", options: .regularExpression)
+            .replacingOccurrences(of: #"(?<![\\\w])([*_])(?=\S)([^\n]*?\S)\1(?!\w)"#, with: "$2", options: .regularExpression)
+            .replacingOccurrences(of: #"`([^`\n]+)`"#, with: "$1", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    static func citationLabel(_ citation: ProjectReportCitation, evidence: [ProjectReportEvidenceSnapshot], answerEdition: String?) -> String {
+        let source = evidence.first { source in
+            guard let sectionID = citation.sectionID, !sectionID.isEmpty else { return false }
+            return source.sectionID == sectionID && ((citation.sourceIDs ?? []).isEmpty ||
+                (citation.sourceIDs ?? []).contains { id in
+                    [source.sourceID, source.passageID, source.id].compactMap { $0 }.contains(id)
+                })
+        }
+        guard let number = citation.sectionNumber ?? source?.sectionNumber, !number.isEmpty else {
+            return "Citation details unavailable in this saved Report; review the original Research evidence."
+        }
+        let locator = [citation.codePrefix ?? source?.codeBook, "§ \(number)", citation.title ?? source?.title]
+            .compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ")
+        let edition = citation.codeEdition ?? source?.codeEdition ?? answerEdition ?? "Edition not recorded"
+        return "\(locator) — \(edition)"
+    }
+
+    static func codeBasisLines(_ manifest: ProjectReportManifest) -> [String] {
+        let research = manifest.items.filter { $0.kind == "researchAnswer" }
+        var editions: [String] = []
+        for item in research {
+            for edition in ([item.codeEdition] + (item.citations ?? []).map(\.codeEdition)).compactMap({ $0 }) {
+                if !edition.isEmpty && !editions.contains(edition) { editions.append(edition) }
+            }
+        }
+        var lines = ["Project default: \(manifest.codeEdition.isEmpty ? "not recorded" : manifest.codeEdition)"]
+        if !research.isEmpty {
+            lines.append("Included Research basis: \(editions.isEmpty ? "not recorded; review the original sources" : editions.joined(separator: "; "))")
+            lines.append("Source applicability must be verified for this Project.")
+        }
+        return lines
     }
 
     private func appendBullets(
@@ -679,7 +732,7 @@ struct ProjectReportExportBuilder: Sendable {
         )
         for value in normalized {
             append(
-                "• \(value)\n",
+                "• \(Self.researchText(value))\n",
                 to: result,
                 font: .systemFont(ofSize: 9.5),
                 spacingAfter: 2,

@@ -202,6 +202,7 @@ import {
 import { codeQuestionRolloutAccess } from "./code-question-rollout.mjs";
 import {
   notebookCardTypes,
+  notebookPlainText,
   normalizeNotebookCardPayload
 } from "./notebook-contract.mjs";
 import { codeTrustProfilesForLibraries } from "./code-trust-contract.mjs";
@@ -14692,7 +14693,8 @@ function notebookCardForClient(artifact, projectIDs = []) {
     archivedAt: artifact.envelope.archivedAt || null,
     deletedAt: artifact.envelope.deletedAt,
     projectIDs,
-    ...payload
+    ...payload,
+    plainText: payload.document ? notebookPlainText(payload.document) : (payload.plainText || "")
   };
 }
 
@@ -15667,7 +15669,9 @@ async function reportSourcesForProject(userID, projectID) {
           cardID: artifact.envelope.id,
           cardType: artifact.payload.cardType,
           title: artifact.payload.title,
-          plainText: artifact.payload.plainText || "",
+          plainText: artifact.payload.document
+            ? notebookPlainText(artifact.payload.document)
+            : (artifact.payload.plainText || ""),
           references: artifact.payload.references || []
         }
       });
@@ -19366,7 +19370,8 @@ async function handleResearchConversationMessage(request, response) {
         ...candidate,
         interpretation: applyResearchOutsideAuthorityStartingPoints(
           repairedInterpretation,
-          evidencePackage.discovery?.outsideCurrentLibrary
+          evidencePackage.discovery?.outsideCurrentLibrary,
+          { sourcePolicy: webSupportPolicyDecision }
         )
       };
     };

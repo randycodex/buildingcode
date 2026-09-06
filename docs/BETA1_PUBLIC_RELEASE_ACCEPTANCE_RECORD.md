@@ -47,6 +47,10 @@ text after verification, a silent Note-reference failure, and Report
 edition/citation/formatting defects. See the confirmation record for retained
 artifacts, physical checks, cleanup and their limits. Final candidate binding
 and owner release approval remain open.
+Subsequent [local handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
+address the three captured defects and record completed owner-session
+restoration. Their local verification does not change the Production or
+TestFlight identity above.
 Build 61's bounded physical table-pan result is retained in the
 [Reader acceptance record](./PERMITEXT_READER_ACCEPTANCE_REPAIRS_2026-09-05.md).
 
@@ -319,4 +323,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: reproduce and repair the retained [September 6 handoff defects](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md) without another provider call: verification/limitation consistency, Note-reference navigation, and Report edition/citation/formatting. PR #57 routing is verified on Production, but a completed turn does not establish full answer or handoff quality. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed; consult the latest confirmation for cleanup status.
+- Next technical step: review the locally verified [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md), then bind their approved publication to deployed web and physical-candidate acceptance. The repairs cover application-injected outside-authority text, Note-reference navigation, and Report edition/citation/formatting without another provider call. PR #57 remains the published source; these new repairs are not yet Production or TestFlight evidence. Owner account restoration is complete. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed.

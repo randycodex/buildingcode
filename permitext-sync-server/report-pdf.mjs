@@ -1,4 +1,6 @@
 import PDFDocument from "pdfkit";
+import { fileURLToPath } from "node:url";
+import { reportResearchPlainText, reportCitationLabel, reportCodeBasisLines } from "./report-presentation.mjs";
 
 const colors = Object.freeze({
   ink: "#171717",
@@ -47,7 +49,7 @@ function stringList(value) {
 }
 
 function researchDisplayText(value) {
-  return String(value || "")
+  return reportResearchPlainText(value)
     .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
     .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
     .replace(/\s+([,.;:!?])/g, "$1")
@@ -102,7 +104,7 @@ function drawClassification(document, classification) {
   const renderedLabel = label.toUpperCase();
   const fill = classificationColors[classification] || colors.projectMaterial;
   document
-    .font("Helvetica-Bold")
+    .font("Report-Bold")
     .fontSize(7.5);
   const width = Math.min(190, document.widthOfString(renderedLabel) + 18);
   const x = document.x;
@@ -111,6 +113,7 @@ function drawClassification(document, classification) {
   document
     .fillColor(colors.ink)
     .text(renderedLabel, x + 9, y + 5, { width: width - 18, lineBreak: false });
+  document.x = x;
   document.y = y + 27;
 }
 
@@ -120,14 +123,14 @@ function drawList(document, title, values) {
   ensureVerticalSpace(document, 50);
   document
     .fillColor(colors.ink)
-    .font("Helvetica-Bold")
+    .font("Report-Bold")
     .fontSize(8.5)
     .text(title.toUpperCase(), { characterSpacing: 0.6 });
   document.moveDown(0.35);
   items.forEach((item) => {
     document
       .fillColor(colors.ink)
-      .font("Helvetica")
+      .font("Report-Regular")
       .fontSize(9.5)
       .text(`- ${item}`, { indent: 8, paragraphGap: 4 });
   });
@@ -147,7 +150,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
   if (item.kind === "evidence") {
     document
       .fillColor(colors.ink)
-      .font("Helvetica-Bold")
+      .font("Report-Bold")
       .fontSize(12)
       .text(`${item.codeBook} ${item.sectionNumber}: ${item.title}`, { paragraphGap: 8 });
     const passageX = document.x + 12;
@@ -157,7 +160,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
       .moveTo(document.x, passageY)
       .lineTo(document.x, passageY + Math.max(28, document.heightOfString(item.passageText, {
         width: passageWidth,
-        font: "Helvetica",
+        font: "Report-Regular",
         fontSize: 9.5
       })))
       .lineWidth(2)
@@ -165,7 +168,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
       .stroke();
     document
       .fillColor(colors.ink)
-      .font("Helvetica")
+      .font("Report-Regular")
       .fontSize(9.5)
       .text(item.passageText, passageX, passageY, {
         width: passageWidth,
@@ -175,19 +178,19 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
   } else if (item.kind === "notebookCard") {
     document
       .fillColor(colors.ink)
-      .font("Helvetica-Bold")
+      .font("Report-Bold")
       .fontSize(12)
       .text(item.title, { paragraphGap: 7 });
     if (item.plainText) {
       document
-        .font("Helvetica")
+        .font("Report-Regular")
         .fontSize(9.5)
         .text(item.plainText, { lineGap: 2, paragraphGap: 8 });
     }
   } else if (item.kind === "researchAnswer") {
     document
       .fillColor(colors.ink)
-      .font("Helvetica-Bold")
+      .font("Report-Bold")
       .fontSize(12)
       .text(item.question, { paragraphGap: 7 });
     const sourceDate = researchSourceDate(item.sourceAsOf);
@@ -199,7 +202,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
     if (boundary) {
       document
         .fillColor(colors.muted)
-        .font("Helvetica")
+        .font("Report-Regular")
         .fontSize(8.5)
         .text(boundary, { lineGap: 1, paragraphGap: 7 });
     }
@@ -209,11 +212,11 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
     ].filter(Boolean));
     drawList(document, "Corpus basis", researchCorpusMetadataLines(item.codeBasis));
     document
-      .font("Helvetica-Bold")
+      .font("Report-Bold")
       .fontSize(9.5)
       .text("Supported conclusion", { paragraphGap: 3 });
     document
-      .font("Helvetica")
+      .font("Report-Regular")
       .fontSize(9.5)
       .text(researchDisplayText(item.conclusion), { lineGap: 2, paragraphGap: 7 });
     drawList(
@@ -227,13 +230,13 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
     );
     if (item.explanation) {
       document
-        .font("Helvetica-Bold")
+        .font("Report-Bold")
         .fontSize(9.5)
         .text(item.supportedPoints?.length ? "Practical application" : "Explanation", {
           paragraphGap: 3
         });
       document
-        .font("Helvetica")
+        .font("Report-Regular")
         .fontSize(9.5);
       document.text(researchDisplayText(item.explanation), { lineGap: 2, paragraphGap: 7 });
     }
@@ -245,14 +248,14 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
       document,
       "Citations",
       (item.citations || []).map((citation) =>
-        [citation.sectionID, ...(citation.sourceIDs || [])].filter(Boolean).join(" / ")
+        reportCitationLabel(citation, item.evidence || [], item.codeEdition)
       )
     );
     drawList(document, "Professional-use notice", [item.disclaimer].filter(Boolean));
   } else {
     document
       .fillColor(colors.ink)
-      .font("Helvetica-Bold")
+      .font("Report-Bold")
       .fontSize(12)
       .text(item.title || "Project material", { paragraphGap: 7 });
     const material = projectMaterialBySourceID.get(item.sourceID);
@@ -266,18 +269,19 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
         document.moveDown(0.6);
       } catch {
         document
-          .font("Helvetica")
+          .font("Report-Regular")
           .fontSize(9.5)
           .text("The stored Workboard preview could not be rendered.", { paragraphGap: 8 });
       }
     } else {
       document
-        .font("Helvetica")
+        .font("Report-Regular")
         .fontSize(9.5)
         .text(item.contentType || "Included Project material", { paragraphGap: 8 });
     }
   }
 
+  document.x = startX;
   document
     .moveDown(0.4)
     .strokeColor(colors.rule)
@@ -294,14 +298,14 @@ function drawCover(document, manifest) {
   document.moveDown(4);
   document
     .fillColor(presentation.accent)
-    .font("Helvetica-Bold")
+    .font("Report-Bold")
     .fontSize(9)
     .text(presentation.coverLabel.toUpperCase(), { characterSpacing: 1.25 });
   if (presentation.displayName.toLowerCase() !== presentation.coverLabel.toLowerCase()) {
     document
       .moveDown(0.5)
       .fillColor(colors.muted)
-      .font("Helvetica")
+      .font("Report-Regular")
       .fontSize(8)
       .text(
         [presentation.displayName, presentation.website].filter(Boolean).join("  /  "),
@@ -311,12 +315,12 @@ function drawCover(document, manifest) {
   document.moveDown(1.4);
   document
     .fillColor(colors.ink)
-    .font("Helvetica-Bold")
+    .font("Report-Bold")
     .fontSize(28)
     .text(manifest.title, { width: contentWidth, lineGap: 3 });
   document.moveDown(1.2);
   document
-    .font("Helvetica-Bold")
+    .font("Report-Bold")
     .fontSize(16)
     .text(manifest.project?.name || "Project");
   const metadata = [
@@ -324,12 +328,12 @@ function drawCover(document, manifest) {
     reportDate(manifest.reportDate),
     manifest.author?.displayName,
     `Report version ${manifest.reportVersion}`,
-    manifest.codeEdition
+    ...reportCodeBasisLines(manifest)
   ].filter(Boolean);
   document.moveDown(0.8);
   document
     .fillColor(colors.muted)
-    .font("Helvetica")
+    .font("Report-Regular")
     .fontSize(10)
     .text(metadata.join("  /  "), { lineGap: 3 });
   document.moveDown(3);
@@ -339,7 +343,7 @@ function drawCover(document, manifest) {
   document.moveDown(2);
   document
     .fillColor(colors.muted)
-    .font("Helvetica")
+    .font("Report-Regular")
     .fontSize(8)
     .text(`Manifest ${manifest.id}\nSHA-256 ${manifest.contentHash}`, {
       lineGap: 3
@@ -354,7 +358,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       ensureVerticalSpace(document, 70);
       document
         .fillColor(colors.ink)
-        .font("Helvetica-Bold")
+        .font("Report-Bold")
         .fontSize(17)
         .text(item.text, { paragraphGap: 10 });
       return;
@@ -363,13 +367,13 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       ensureVerticalSpace(document, 55);
       document
         .fillColor(colors.ink)
-        .font("Helvetica")
+        .font("Report-Regular")
         .fontSize(10)
         .text(item.text, { lineGap: 2, paragraphGap: 10 });
       if (item.derivedFrom?.kind === "notebookCard" && item.evidenceLinks?.length) {
         document
           .fillColor(colors.muted)
-          .font("Helvetica-Bold")
+          .font("Report-Bold")
           .fontSize(8)
           .text(`Evidence linked to ${item.derivedFrom.title}`, { paragraphGap: 3 });
         item.evidenceLinks.forEach((link) => {
@@ -380,7 +384,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
           if (!citation) return;
           document
             .fillColor(colors.muted)
-            .font("Helvetica")
+            .font("Report-Regular")
             .fontSize(8)
             .text(`- ${citation}`, { indent: 8, paragraphGap: 2 });
         });
@@ -393,7 +397,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       stringList(item.items).forEach((value) => {
         document
           .fillColor(colors.ink)
-          .font("Helvetica")
+          .font("Report-Regular")
           .fontSize(10)
           .text(`- ${value}`, { indent: 8, paragraphGap: 4 });
       });
@@ -405,11 +409,11 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       drawClassification(document, item.sourceClassification);
       document
         .fillColor(colors.ink)
-        .font("Helvetica-Bold")
+        .font("Report-Bold")
         .fontSize(12)
         .text(item.title || "Project facts", { paragraphGap: 7 });
       document
-        .font("Helvetica")
+        .font("Report-Regular")
         .fontSize(9.5)
         .text([item.address, item.facts].filter(Boolean).join(" / "), { lineGap: 2, paragraphGap: 8 });
       document.moveDown(0.8);
@@ -432,18 +436,18 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
     .moveDown(1);
   document
     .fillColor(colors.ink)
-    .font("Helvetica-Bold")
+    .font("Report-Bold")
     .fontSize(10)
     .text("Professional-use notice", { paragraphGap: 6 });
   stringList(manifest.disclaimers).forEach((value) => {
     document
       .fillColor(colors.muted)
-      .font("Helvetica")
+      .font("Report-Regular")
       .fontSize(8)
       .text(value, { lineGap: 2, paragraphGap: 5 });
   });
   document
-    .font("Helvetica")
+    .font("Report-Regular")
     .fontSize(7)
     .text(
       `Manifest ${manifest.id} / ${manifest.generatorVersion} / SHA-256 ${manifest.contentHash}`,
@@ -463,7 +467,7 @@ function drawPageFooters(document, manifest) {
     try {
       document
         .fillColor(colors.muted)
-        .font("Helvetica")
+        .font("Report-Regular")
         .fontSize(7)
         .text(
           `${footerLabel}  /  ${pageIndex + 1} of ${range.count}`,
@@ -499,6 +503,8 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
       ModDate: new Date(manifest.createdAt)
     }
   });
+  document.registerFont("Report-Regular", fileURLToPath(new URL("./fonts/DejaVuSans.ttf", import.meta.url)));
+  document.registerFont("Report-Bold", fileURLToPath(new URL("./fonts/DejaVuSans-Bold.ttf", import.meta.url)));
   const chunks = [];
   document.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
   const completed = new Promise((resolve, reject) => {

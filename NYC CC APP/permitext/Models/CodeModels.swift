@@ -1813,6 +1813,10 @@ struct ProjectReportPresentation: Codable, Hashable, Sendable {
 }
 
 struct ProjectReportCitation: Codable, Hashable, Sendable {
+    var codePrefix: String? = nil
+    var sectionNumber: String? = nil
+    var title: String? = nil
+    var codeEdition: String? = nil
     let sectionID: String?
     let sourceIDs: [String]?
     let evidenceSnapshotIDs: [String]?
@@ -1820,6 +1824,11 @@ struct ProjectReportCitation: Codable, Hashable, Sendable {
 }
 
 struct ProjectReportEvidenceSnapshot: Codable, Hashable, Sendable {
+    var sourceID: String? = nil
+    var passageID: String? = nil
+    var codeBook: String? = nil
+    var codeEdition: String? = nil
+    var title: String? = nil
     let id: String?
     let sectionID: String?
     let sectionNumber: String?
@@ -1828,6 +1837,12 @@ struct ProjectReportEvidenceSnapshot: Codable, Hashable, Sendable {
 }
 
 struct ProjectReportManifestItem: Codable, Hashable, Identifiable, Sendable {
+    var codeEdition: String? = nil
+    var authorityLabel: String? = nil
+    var sourceAsOf: String? = nil
+    var codeBasis: ResearchCodeBasis? = nil
+    var supportedPoints: [ResearchSupportedPoint]? = nil
+    var disclaimer: String? = nil
     let id: String
     let kind: String
     let order: Int

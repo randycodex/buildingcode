@@ -1,4 +1,4 @@
-export const researchAnswerPresentationVersion = "20260902-product-example-contract-v2";
+export const researchAnswerPresentationVersion = "20260906-outside-authority-boundary-v3";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
@@ -26,9 +26,14 @@ function normalizedStartingPoint(source) {
 
 export function applyResearchOutsideAuthorityStartingPoints(
   answer,
-  outsideCurrentLibrary = []
+  outsideCurrentLibrary = [],
+  { sourcePolicy } = {}
 ) {
   if (!answer || typeof answer !== "object") return answer;
+  // Discovery suggestions are not a request for another authority. Apply the
+  // same boundary used for retrieval, including after a verifier-directed
+  // revision, so presentation cannot reinsert rejected outside-library text.
+  if (sourcePolicy?.useWeb !== true) return answer;
   const answerText = String(answer.answerText || "").trim();
   const existingURLs = new Set([
     ...Array.from(answerText.matchAll(/https:\/\/[^\s)\]]+/g), (match) => match[0]),
