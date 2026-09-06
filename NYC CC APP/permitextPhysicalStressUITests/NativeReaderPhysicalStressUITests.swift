@@ -276,6 +276,46 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         add(attachment)
     }
 
+    func testFuelGasWideTableRevealsAdditionalColumns() {
+        verifyFuelGasWideTableScrolling(searchQuery: "")
+    }
+
+    func testFuelGasWideTableRevealsAdditionalColumnsWithSearchHighlight() {
+        verifyFuelGasWideTableScrolling(searchQuery: "Height")
+    }
+
+    private func verifyFuelGasWideTableScrolling(searchQuery: String) {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "--permitext-disable-clerk",
+            "--native-reader-phase9-source",
+            "2022-construction-codes/code-sections/fuel-gas-code/chapters/Chapter 5.html",
+            "--native-reader-phase9-width", "402",
+            "--native-reader-phase9-starting-block-id",
+            "a7908a861e51616537a08610301489546d5a2f778639c8988fb2287483e8fb0e",
+            "--native-reader-phase9-search", searchQuery
+        ]
+        app.launch()
+        XCTAssertTrue(element(in: app, identifier: "phase9-snapshot-ready").waitForExistence(timeout: 45))
+        let webView = app.webViews.firstMatch
+        XCTAssertTrue(webView.waitForExistence(timeout: 20))
+        let heightHeader = webView.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Height")).firstMatch
+        XCTAssertTrue(heightHeader.waitForExistence(timeout: 15), webView.debugDescription)
+        keepScreenshot(named: "Fuel Gas 504.2(1) before horizontal swipe", from: app)
+        XCTAssertTrue(heightHeader.isHittable, "The table must initially show its Height column.")
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.30))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.15, dy: 0.30))
+        start.press(forDuration: 0.05, thenDragTo: end)
+        // WebKit removes horizontally clipped cells from its accessibility tree.
+        // Query visibility, rather than requesting the old cell's remote frame.
+        let moved = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "hittable == false"), object: heightHeader
+        )
+        let outcome = XCTWaiter.wait(for: [moved], timeout: 5)
+        keepScreenshot(named: "Fuel Gas 504.2(1) after horizontal swipe", from: app)
+        XCTAssertEqual(outcome, .completed, "A sideways swipe must expose additional table columns.")
+    }
+
     func testBuildingCodeChapterThreeReaderLayoutRegression() {
         let app = XCUIApplication()
         app.launchArguments += [
@@ -324,8 +364,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "2014-construction-codes/chapters/bc-7.html",
             "--native-reader-phase9-width",
             "402",
-            "--native-reader-phase9-starting-block",
-            "137"
+            "--native-reader-phase9-starting-block-id",
+            "4a3b7d7a0dbf982ecaa5d49ef7fee970a187ed14556c16c3bf486eeb299f7e31"
         ]
         app.launch()
 
@@ -335,7 +375,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
 
         let figure7057 = app.buttons[
-            "native-reader-block-39e6573e633d19899c98f281568284d0eb7b282890b7baf6e64427b285f20af6"
+            "native-reader-block-4a3b7d7a0dbf982ecaa5d49ef7fee970a187ed14556c16c3bf486eeb299f7e31"
         ]
         XCTAssertTrue(figure7057.waitForExistence(timeout: 10))
         XCTAssertTrue(figure7057.label.localizedCaseInsensitiveContains("FIGURE 705.7"))
@@ -348,8 +388,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "2014-construction-codes/chapters/bc-7.html",
             "--native-reader-phase9-width",
             "402",
-            "--native-reader-phase9-starting-block",
-            "140"
+            "--native-reader-phase9-starting-block-id",
+            "d3aee5b764583aff8f6b3713382a571cb588c43e4600cdeff05f8740894dc4b9"
         ]
         app.launch()
 
@@ -359,7 +399,7 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
         let table7058 = element(
             in: app,
-            identifier: "native-reader-block-ec717d5216cdeb8d1520e4cd010353791fd2207ec571f171b07a42dfd34d3716"
+            identifier: "native-reader-block-d3aee5b764583aff8f6b3713382a571cb588c43e4600cdeff05f8740894dc4b9"
         )
         XCTAssertTrue(table7058.waitForExistence(timeout: 10))
         XCTAssertTrue(
@@ -383,8 +423,8 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
             "2014-construction-codes/chapters/bc-10.html",
             "--native-reader-phase9-width",
             "402",
-            "--native-reader-phase9-starting-block",
-            "114"
+            "--native-reader-phase9-starting-block-id",
+            "dbdc43066e5bd33db04c83d38806ebcb9bec8b760a50192c33bc7bd1ee5043b0"
         ]
         app.launch()
 

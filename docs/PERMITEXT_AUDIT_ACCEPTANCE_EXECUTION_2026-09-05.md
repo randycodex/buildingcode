@@ -169,3 +169,12 @@ The owner completed normal phone sign-in. At approximately `2026-09-05T23:34Z`, 
 The browser then signed out of the test account through its normal Account action. Its signed-out UI displayed Sign in, and the exact-account export at `2026-09-05T23:37:43.601Z` confirmed `hasSession: false`, no entitlement, and the synthetic records retained. Historical session metadata is not claimed erased.
 
 Private evidence: `/private/tmp/permitext-recovery-account-acceptance-20260905/`, including `citation-and-signin-checkpoint.json`, `recovery-execution-checkpoint.json`, `browser-conflict-before-resolution-notes.json`, `browser-reconciled-notes.json`, `phone-network-failure-draft-notes.json`, `phone-terminated-server-absence-notes.json`, `before-phone-reconnect-notes.json`, `native-conflict-rejected-notes.json`, `native-reconciled-notes.json`, `temporary-pro-revoke.json` and `recovery-final-free-summary.json`. Raw account exports, credentials, verification codes and personal network details are excluded from the repository record. These acceptance observations do not close P1-4 or authorize public release.
+
+## Reader acceptance continuation
+
+The next acceptance pass reproduced a physical wide-table gesture failure and a
+web code-selection race. The implementation, controlled browser recovery,
+Simulator evidence and remaining publication/device steps are tracked in the
+[Reader acceptance repair record](./PERMITEXT_READER_ACCEPTANCE_REPAIRS_2026-09-05.md).
+This continuation preserves the original 17-finding scope and requires separate
+physical acceptance of the replacement native candidate.

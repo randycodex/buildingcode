@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260905-report-snapshot-v45";
+} from "./offline-storage.js?v=20260905-reader-navigation-v47";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260905-report-snapshot-v45";
+} from "./research-intent-state.js?v=20260905-reader-navigation-v47";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -5846,7 +5846,7 @@ function resolveReaderNavigationChapterID(reader, readerChapters) {
   );
   if (containing) return containing.id;
   const children = readerChapters.filter((chapter) => String(chapter.sourceChapterID) === current);
-  return children[0]?.id || current;
+  return children[0]?.id || readerChapters[0]?.id || "";
 }
 
 function readerNavItemID(kind, id) {
@@ -5863,6 +5863,7 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
   const chapterSelect = panel.querySelector(".chapter-select");
   const nextChapterID = String(chapterID || reader.chapterID || "");
   const chapterChanged = nextChapterID && nextChapterID !== String(reader.chapterID || "");
+  const navigationToken = beginReaderNavigation(panel, { clearContent: Boolean(chapterChanged) });
   reader.chapterID = nextChapterID;
   if (chapterSelect) chapterSelect.value = reader.chapterID;
   if (chapterChanged) {
@@ -5871,7 +5872,16 @@ async function selectReaderNavigation(panel, reader, { chapterID, sectionID } = 
   }
   if (sectionID) {
     reader.sectionID = String(sectionID);
-    const chapter = await fetchChapter(reader.chapterID);
+    reader.sectionNumber = "";
+    reader.title = "Reader";
+    let chapter;
+    try {
+      chapter = await fetchChapter(reader.chapterID);
+    } catch {
+      if (panel.dataset.readerNavigationToken === navigationToken) await refreshReaderContent(panel, reader);
+      return;
+    }
+    if (panel.dataset.readerNavigationToken !== navigationToken) return;
     const summary = sectionTitleFromID(reader.sectionID, chapter);
     reader.sectionNumber = summary?.sectionNumber || "";
     reader.title = summary?.title || "Reader";
@@ -12540,7 +12550,7 @@ function splitAnnotatedCodeBlock(block, blockIndex = 0) {
   }));
 }
 
-async function populateReaderSelectors(panel, reader) {
+async function populateReaderSelectors(panel, reader, navigationToken = panel.dataset.readerNavigationToken) {
   const chapterSelect = panel.querySelector(".chapter-select");
   const sectionSelect = panel.querySelector(".section-select");
   clear(chapterSelect);
@@ -12548,6 +12558,7 @@ async function populateReaderSelectors(panel, reader) {
   reader.codePrefix = reader.codePrefix || "BC";
 
   const readerChapters = await fetchChapterList(reader.codePrefix, reader.codeVersion);
+  if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   if (!reader.chapterID) {
     reader.chapterID = readerChapters[0]?.id || "";
   } else {
@@ -12570,10 +12581,11 @@ async function populateReaderSelectors(panel, reader) {
     blankSection.value = "";
     blankSection.textContent = "Select a section";
     sectionSelect.append(blankSection);
-    return;
+    return true;
   }
 
   const chapter = await fetchChapter(reader.chapterID);
+  if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   const blankSection = document.createElement("option");
   blankSection.value = "";
   blankSection.textContent = "Select a section";
@@ -12585,6 +12597,7 @@ async function populateReaderSelectors(panel, reader) {
     sectionSelect.append(option);
   });
   sectionSelect.value = reader.sectionID || "";
+  return true;
 }
 
 function readerTargetSectionIndex(sections, reader) {
@@ -13039,7 +13052,7 @@ async function renderSectionContent(panel, reader) {
     return;
   }
 
-  const renderToken = `${reader.chapterID}:${reader.sectionID || "start"}:${Date.now()}`;
+  const renderToken = crypto.randomUUID();
   panel.dataset.readerRenderToken = renderToken;
   clear(content);
   emptyReader(content, "Loading section", "Opening the selected code text first.");
@@ -13088,6 +13101,7 @@ async function renderSectionContent(panel, reader) {
 
   if (reader.sectionID) {
     requestAnimationFrame(() => {
+      if (panel.dataset.readerRenderToken !== renderToken) return;
       const behavior = reader.shouldSmoothScrollToSection ? "smooth" : "auto";
       scrollReaderContentToSection(content, reader.sectionID, behavior, reader.sectionNumber);
       const highlightQuery = reader.pendingSearchHighlightQuery || panel.dataset.pendingSearchHighlightQuery || "";
@@ -13095,6 +13109,7 @@ async function renderSectionContent(panel, reader) {
         reader.pendingSearchHighlightQuery = "";
         delete panel.dataset.pendingSearchHighlightQuery;
         window.setTimeout(() => {
+          if (panel.dataset.readerRenderToken !== renderToken) return;
           flashSearchMatchInSection(content, reader.sectionID, reader.sectionNumber, highlightQuery);
         }, behavior === "smooth" ? 520 : 0);
       }
@@ -13691,20 +13706,76 @@ function sectionElementForInlineComment(commentWrapper) {
   return commentWrapper.closest(".chapter-section");
 }
 
+function beginReaderNavigation(panel, { clearContent = true } = {}) {
+  const token = crypto.randomUUID();
+  panel.dataset.readerNavigationToken = token;
+  if (clearContent) {
+    // Invalidate body, search and hydration work before waiting for a new catalog.
+    panel.dataset.readerRenderToken = token;
+    panel.dataset.readerSearchToken = token;
+    const content = panel.querySelector(".reader-content");
+    stopReaderProgressiveHydration(content);
+    content?.classList.remove("is-searching-reader");
+    clear(content);
+    emptyReader(content, "Loading chapter", "Opening the selected code text.");
+  }
+  return token;
+}
+
+async function changeReaderCode(panel, reader, selectedCode) {
+  reader.codePrefix = selectedCode.prefix;
+  reader.codeVersion = codeOptionVersion(selectedCode);
+  reader.chapterID = "";
+  reader.sectionID = "";
+  reader.sectionNumber = "";
+  reader.title = "Reader";
+  // refreshReaderContent starts the new navigation synchronously. An old chapter
+  // must never remain visible beneath the newly selected code and edition.
+  if (await refreshReaderContent(panel, reader)) {
+    saveWorkspaceState();
+    scheduleContinuitySync(reader);
+  }
+}
+
 async function refreshReaderContent(panel, reader) {
+  const navigationToken = beginReaderNavigation(panel);
   const saveButton = panel.querySelector(".reader-save");
   applyCodeTheme(panel, reader);
   renderReaderTrust(panel, reader);
   populateCodeSelect(panel, reader);
   resetEnhancedSelects(panel);
-  await populateReaderSelectors(panel, reader);
-  await renderSectionContent(panel, reader);
+  if (saveButton) saveButton.disabled = true;
+  try {
+    if (!await populateReaderSelectors(panel, reader, navigationToken)) return false;
+    await renderSectionContent(panel, reader);
+  } catch (error) {
+    if (panel.dataset.readerNavigationToken !== navigationToken) return false;
+    const content = panel.querySelector(".reader-content");
+    clear(content);
+    emptyReader(content, "Couldn’t open this chapter", "Check your connection and try again.");
+    const retry = document.createElement("button");
+    retry.type = "button";
+    retry.className = "ghost-button search-empty-action";
+    retry.textContent = "Try again";
+    retry.addEventListener("click", async () => {
+      if (panel.dataset.readerNavigationToken !== navigationToken) return;
+      if (await refreshReaderContent(panel, reader)) {
+        saveWorkspaceState();
+        scheduleContinuitySync(reader);
+      }
+    });
+    content.querySelector(".reader-empty")?.append(retry);
+    panel.querySelectorAll("select").forEach(enhanceSelect);
+    return false;
+  }
+  if (panel.dataset.readerNavigationToken !== navigationToken) return false;
   setTitle(panel, reader);
   panel.querySelectorAll("select").forEach(enhanceSelect);
   if (saveButton) {
     saveButton.hidden = !reader.sectionID;
     saveButton.disabled = !reader.sectionID;
   }
+  return true;
 }
 
 function updateReaderScrollIndicator(panel) {
@@ -14358,17 +14429,7 @@ async function renderReader(reader, options = {}) {
   });
   codeSelect.addEventListener("change", async () => {
     const selectedCode = codeOptions.find((option) => codeOptionValue(option) === codeSelect.value) || codeOptions[0];
-    reader.codePrefix = selectedCode.prefix;
-    reader.codeVersion = codeOptionVersion(selectedCode);
-    applyCodeTheme(panel, reader);
-    renderReaderTrust(panel, reader);
-    reader.chapterID = await firstChapterIDForCode(reader.codePrefix, reader.codeVersion);
-    reader.sectionID = "";
-    reader.sectionNumber = "";
-    reader.title = "Reader";
-    saveWorkspaceState();
-    scheduleContinuitySync(reader);
-    await refreshReaderContent(panel, reader);
+    await changeReaderCode(panel, reader, selectedCode);
   });
 
   internalSearchButton.addEventListener("click", async () => {
@@ -14405,6 +14466,7 @@ async function renderReader(reader, options = {}) {
   });
 
   closeButton.addEventListener("click", () => {
+    beginReaderNavigation(panel);
     if (options.isSearchResult) {
       state.searchResultReader = null;
       state.sectionDetail = null;
@@ -14423,38 +14485,17 @@ async function renderReader(reader, options = {}) {
   });
 
   chapterSelect.addEventListener("change", async () => {
-    reader.chapterID = chapterSelect.value;
-    state.recentChaptersByCode = state.recentChaptersByCode || {};
-    if (reader.chapterID) {
-      state.recentChaptersByCode[readerCodeSelectionKey(reader)] = reader.chapterID;
-    }
-    reader.sectionID = "";
-    reader.sectionNumber = "";
-    reader.title = "Reader";
-    saveWorkspaceState();
-    scheduleContinuitySync(reader);
-    await refreshReaderContent(panel, reader);
+    await selectReaderNavigation(panel, reader, { chapterID: chapterSelect.value });
   });
 
   sectionSelect.addEventListener("change", async () => {
-    reader.sectionID = sectionSelect.value;
-    if (reader.sectionID) {
-      const chapter = await fetchChapter(reader.chapterID);
-      const summary = sectionTitleFromID(reader.sectionID, chapter);
-      reader.sectionNumber = summary?.sectionNumber || "";
-      reader.title = summary?.title || "Reader";
-      updateBrowserSectionURL(reader.sectionID);
-    }
-    saveWorkspaceState();
-    scheduleContinuitySync(reader);
-    await navigateReaderToSection(panel, reader);
+    await selectReaderNavigation(panel, reader, { sectionID: sectionSelect.value });
   });
 
   if (options.isSearchResult && !reader.sectionID) {
     blankReader(panel.querySelector(".reader-content"));
   } else {
-    await populateReaderSelectors(panel, reader);
-    await renderSectionContent(panel, reader);
+    await refreshReaderContent(panel, reader);
   }
   panel.dataset.readerContentKey = readerContentScrollKey(reader);
 

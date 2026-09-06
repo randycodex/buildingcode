@@ -307,16 +307,11 @@ struct NativeReaderTableBlockView: View {
                     baseURL: baseURL,
                     searchQuery: searchQuery,
                     activeMatchIndex: activeMatchIndex,
-                    tableWidth: isolatedTableWidth,
                     maximumViewportHeight: usesContainedVerticalViewport ? 520 : nil,
                     accessibilityLabel: table.caption ?? "Code table"
                 )
             }
         }
-    }
-
-    private var isolatedTableWidth: CGFloat {
-        CGFloat(max(table.columnCount, 1)) * 132
     }
 
     private var usesContainedVerticalViewport: Bool {
@@ -532,35 +527,33 @@ private struct NativeReaderPreparedTableHTMLView: View {
     let baseURL: URL?
     let searchQuery: String
     let activeMatchIndex: Int?
-    let tableWidth: CGFloat
     let maximumViewportHeight: CGFloat?
     let accessibilityLabel: String
 
     @State private var html: String?
 
     var body: some View {
-        ScrollView(.horizontal) {
-            Group {
-                if let html {
-                    TableHTMLView(
-                        html: html,
-                        tableID: tableID,
-                        baseURL: baseURL,
-                        maximumHeight: maximumViewportHeight
-                    )
-                } else {
-                    HStack(spacing: 8) {
-                        ProgressView()
-                        Text("Preparing table")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(minHeight: 80, alignment: .leading)
+        // Keep the web viewport within the Reader. The authored table's HTML
+        // overflow owns horizontal gestures; nesting it in a second, full-table-
+        // width SwiftUI scroll view leaves WebKit competing for the same pan.
+        Group {
+            if let html {
+                TableHTMLView(
+                    html: html,
+                    tableID: tableID,
+                    baseURL: baseURL,
+                    maximumHeight: maximumViewportHeight
+                )
+            } else {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text("Preparing table")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
+                .frame(minHeight: 80, alignment: .leading)
             }
-            .frame(width: tableWidth)
         }
-        .scrollIndicators(.visible)
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityLabel(accessibilityLabel)
         .task(id: preparationID) {

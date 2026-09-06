@@ -1682,6 +1682,7 @@ private struct NativeReaderTextBlockView: View, Equatable {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .stroke(Color(uiColor: accentColor), lineWidth: activeBlockMatch ? 2 : 1)
                     .accessibilityHidden(true)
+                    .allowsHitTesting(false)
             }
         }
         .accessibilityValue(searchMatches.isEmpty ? "" : "\(searchMatches.count) search matches")
@@ -1765,10 +1766,14 @@ struct NativeReaderPhase9SnapshotConfiguration: Equatable {
     static let sourceArgument = "--native-reader-phase9-source"
     static let widthArgument = "--native-reader-phase9-width"
     static let startingBlockArgument = "--native-reader-phase9-starting-block"
+    static let searchArgument = "--native-reader-phase9-search"
+    static let startingBlockIDArgument = "--native-reader-phase9-starting-block-id"
 
     let relativeSourcePath: String
     let contentWidth: CGFloat
     let startingBlockIndex: Int
+    var searchQuery: String = ""
+    var startingBlockID: String = ""
 
     static var active: Self? {
         let arguments = ProcessInfo.processInfo.arguments
@@ -1801,7 +1806,13 @@ struct NativeReaderPhase9SnapshotConfiguration: Equatable {
         return Self(
             relativeSourcePath: relativeSourcePath,
             contentWidth: requestedWidth,
-            startingBlockIndex: requestedStartingBlock
+            startingBlockIndex: requestedStartingBlock,
+            searchQuery: arguments.firstIndex(of: searchArgument).flatMap { index in
+                arguments.indices.contains(index + 1) ? arguments[index + 1] : nil
+            } ?? "",
+            startingBlockID: arguments.firstIndex(of: startingBlockIDArgument).flatMap { index in
+                arguments.indices.contains(index + 1) ? arguments[index + 1] : nil
+            } ?? ""
         )
     }
 }
@@ -1846,9 +1857,12 @@ struct NativeReaderPhase9SnapshotHarness: View {
         route: NativeReaderDocumentRoute,
         preparedDocument: NativeReaderPreparedDocument
     ) -> some View {
-        ScrollView {
+        let startingIndex = preparedDocument.displayBlocks.firstIndex {
+            $0.id == configuration.startingBlockID
+        } ?? configuration.startingBlockIndex
+        return ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(preparedDocument.displayBlocks.dropFirst(configuration.startingBlockIndex)) { displayBlock in
+                ForEach(preparedDocument.displayBlocks.dropFirst(startingIndex)) { displayBlock in
                     NativeReaderTextBlockView(
                         block: displayBlock.block,
                         hierarchyIndentation: displayBlock.hierarchyIndentation,
@@ -1861,8 +1875,8 @@ struct NativeReaderPhase9SnapshotHarness: View {
                         onOpenLink: { _ in },
                         onOpenMedia: { _, _ in },
                         onMediaFailure: { _ in },
-                        searchQuery: "",
-                        searchMatches: [],
+                        searchQuery: configuration.searchQuery,
+                        searchMatches: NativeReaderSearchIndex.matches(query: configuration.searchQuery, in: [displayBlock]),
                         activeSearchMatchID: nil,
                         onResearchSelection: { _ in }
                     )
@@ -1896,6 +1910,11 @@ struct NativeReaderPhase9SnapshotHarness: View {
                 for: loadedRoute
             )
             guard !Task.isCancelled else { return }
+            if !configuration.startingBlockID.isEmpty,
+               !loadedDocument.displayBlocks.contains(where: { $0.id == configuration.startingBlockID }) {
+                failureMessage = "The requested snapshot block is absent from the validated chapter."
+                return
+            }
             route = loadedRoute
             preparedDocument = loadedDocument
         } catch {
