@@ -179,3 +179,9 @@ the owner's successful physical table-pan confirmation are tracked in the
 [Reader acceptance repair record](./PERMITEXT_READER_ACCEPTANCE_REPAIRS_2026-09-05.md).
 This continuation preserves the original 17-finding scope. The bounded physical
 table check passed; the broader release-acceptance boundaries remain open.
+
+The following bounded Project → Research → Note → Report preparation and pending
+live-answer authorization are checkpointed in the
+[Research handoff acceptance record](./PERMITEXT_RESEARCH_HANDOFF_ACCEPTANCE_2026-09-05.md).
+Its temporary test access and account-restoration obligations remain open until
+that cycle is completed.
