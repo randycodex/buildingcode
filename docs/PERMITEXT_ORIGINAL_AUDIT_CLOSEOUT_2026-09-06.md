@@ -21,10 +21,14 @@ paid evaluation cohort, release approval or new audit scope.
 - Passed checks stay passed unless relevant source/configuration changes or
   contradictory evidence invalidate them. Older build-specific observations keep
   their original scope and are not relabeled as new build-62 tests.
-- Keep the designated test account during continuing audit work. The phone
-  intentionally retains its Free, Synced session; temporary Pro was revoked at
-  `2026-09-06T16:15:33.094Z`. Browser test sessions were already signed out.
-  Repeated usual-account restoration is no longer a checkpoint requirement.
+- Keep the designated test account during continuing audit work. The earlier
+  grant was revoked at `2026-09-06T16:15:33.094Z`. The owner then approved one
+  temporary no-charge Pro grant for the remaining technical batch, including
+  revoke/regrant and final revocation; it was independently confirmed active at
+  `2026-09-06T17:27:16.651Z`. Chrome and phone retain the designated test session.
+  Final revocation is still required. Repeated usual-account restoration is no
+  longer a checkpoint requirement. No paid Research, purchase, merge or deletion
+  is included in this authorization.
 - Chrome's hosted PDF download is owner-confirmed. The Codex in-app browser
   download is a documented, unresolved compatibility limitation. It is not the
   next repair priority; final supported-client acceptance remains a release
@@ -39,7 +43,7 @@ each remaining check one home so it is not repeated for several findings.
 | ID | Original finding | Completed evidence and strongest layer | Remaining acceptance |
 | --- | --- | --- | --- |
 | P0-1 | Historical citations open the wrong provision/edition. | **Verified online symptom.** Production and physical build 60 reopened 2014 Slope and 2022 Gates correctly; build 61 opened both saved 2014 Research citations. Source/edition routing contracts pass. [Execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md#saved-citations-and-keyboard-access), [Research confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md). | B3: offline exact-citation reopening and the focused assistive-technology check. |
-| P0-2 | Moving Research retains the prior Project's active facts/history. | **Local behavior verified; live move coverage partial.** Context/version and PostgreSQL races passed. A live unassign/restore preserved historical records. This pass adds the complete local A → B → Note/Report → unassign flow with distinct qualified facts and unchanged historical answers/manifests. | B1: actual web/phone move between different Projects and current-context recovery. No new paid answer is required for the deterministic context check. |
+| P0-2 | Moving Research retains the prior Project's active facts/history. | **Live A → B summary → A verified.** Production reset active context, captured B's qualified facts in a provider-free summary, and preserved both immutable answers and all original Notes/Reports. Physical build 62 showed B's synced summary and correct address. Local context/version, PostgreSQL races and the joined Note/Report flow also pass. | B1: controlled final-client context-change/stale-completion recovery. The successful move and summary do not need repeating. |
 | P0-3 | Account transitions leak private state or late async results. | **Partial live acceptance.** The repaired web sign-out, scoped account switches and build-60 populated deletion passed. Local delayed-callback, A → B → A, stale-401 and account-link recovery contracts pass. | B2: stale independent client during switch/revocation and the remaining link-recovery path. Retain the documented legacy/quarantine boundaries. |
 | P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Text-draft live path verified.** Browser storage failures preserve recoverable drafts; physical build 60 retained an independently unsent draft through failed transport and process termination, then reconciled it after a web edit. | B2: interrupted image upload/reconnect and failed cleanup recovery. B4: storage-pressure/OS-eviction coverage or an explicit recorded scope decision. |
 | P0-5 | Retired Workboard writers remain writable. | **Local HTTP repair verified.** Authenticated 410 responses, mixed-sync rejection and historical read/Report compatibility pass imported fixtures. Publication records bind the shipped repair. | B5: final candidate compatibility binding. The absence of a destructive Production write exercise is not a new authorization to attempt one. |
@@ -84,15 +88,69 @@ each remaining check one home so it is not repeated for several findings.
 
 ## Remaining batches and explicit stopping points
 
+### September 6 live checkpoint
+
+- The owner approved the remaining technical batch and completed Chrome sign-in.
+  The physical phone showed the designated test identity, Lifetime Pro, 99 turns
+  and Synced. Production still identified product source `e60ca415fe8b`.
+- Created synthetic Project B `web-project-mtq37i3f`, with its own address,
+  ground-floor-only sprinkler coverage, assumed/unconfirmed Type IIIA and an
+  explicitly unestablished 2022 code basis. The retained conversation moved from
+  Project A to B through the actual web selector and confirmation dialog.
+- An independent export verified context revision 3, reset manual facts and
+  unchanged historical messages. The exact question “Summarize the saved Project
+  structured facts and address.” returned the deterministic `project_context`
+  response. The new immutable snapshot contains B's qualifiers and excludes A's
+  cellar facts. Its operation records zero provider calls, zero pending provider
+  calls and `charged: false`; the prior usage record is unchanged.
+- Build 62 displayed one Research history card in B with that question and the
+  correct B address. This observes the synced history card, not every native
+  evidence-control interaction. The prior PDF/Note presentation remains covered
+  by the completed build-62 acceptance.
+- Returned the conversation to A using the web confirmation. The independent
+  `2026-09-06T17:50:36.319Z` comparison confirms context revision 4, both answers
+  unchanged, usage/operations unchanged, and all ten original foundation
+  artifacts unchanged. Project B remains as a synthetic fixture.
+- Receipts: `live-project-b-summary-result.json`, `live-restore-a-result.json`
+  and `live-batch-plan.json` in the private closeout evidence directory above.
+  No secrets or raw account identity were added to this document.
+- The owner then requested a Liquid Glass X close button for the native Account
+  sheet. That UI change is a separate local candidate; installed build 62 and
+  Production do not acquire it until a later approved publication. Continue the
+  remaining recovery/device checks from this checkpoint rather than redoing the
+  successful move or restoring the owner's main account.
+
+### Owner-requested native Account close control
+
+- Added a top-right `xmark` toolbar button to `SettingsView`, using SwiftUI's
+  sheet dismissal action and the native toolbar material (Liquid Glass on
+  iOS 26+). Its accessible name is “Close Account” and identifier `account-close`.
+  It remains in the navigation toolbar when Account content scrolls.
+- The ordinary simulator build passed. Initial unsigned UI launches failed in
+  `Clerk.configure` before the Account screen appeared. A command-line-only
+  `CLERK_PUBLISHABLE_KEY=` override isolated the existing first-use/Account UI
+  test from authentication; that test passed on iPhone 17 Pro / iOS 26.5. No
+  repository or Production authentication setting changed.
+- A capture-only rerun of that existing test also passed. The rendered dark
+  Account sheet, already scrolled to its Account section, shows the circular
+  glass X clearly at the upper right. The screenshot is
+  `account-close-preview.png` in the private evidence directory. This verifies
+  appearance and Account opening; it does not claim a recorded tap of the new X
+  or physical-device acceptance. Dismissal wiring was inspected in source.
+- This is a local candidate for the next native build. Installed build 62 and
+  the existing Production source are unchanged. The original 17 audit IDs and
+  outstanding final-release gates remain intact.
+
 ### B1 — Different Project context and client recovery
 
-1. Use the designated synthetic account and two Projects with visibly different
-   addresses, code defaults and qualified facts. Move the retained conversation
-   A → B and inspect both clients. Verify the new active Project/context, reset
-   active history and retained historical answer attribution.
-2. Use the saved-Project-summary path if a new context response is needed. It
-   must remain deterministic, provider-free and uncharged. A legal/code Research
-   request or Retry requires its own separately bounded authorization.
+1. **Completed September 6, with the native history-card limit above.** Used the
+   designated synthetic account and two Projects with visibly different
+   addresses, code defaults and qualified facts. Moved the retained conversation
+   A → B and inspected both clients within the recorded scope. Verified the new
+   active Project/context, reset active history and retained historical answers.
+2. **Completed September 6.** The saved-Project summary remained deterministic,
+   provider-free and uncharged. A legal/code Research request or Retry requires
+   its own separately bounded authorization.
 3. Exercise a controlled context-change/stale-completion recovery and confirm
    the saved current state and error/review action. Local PostgreSQL race evidence
    already exists; a cloud result must be labeled independently. Reuse the
@@ -155,9 +213,10 @@ account deletion and additional paid testing are not authorized by this checklis
 
 ## Next execution point
 
-The no-phone local work above is complete. The next functional acceptance is B1
-on the designated account, followed by a combined B2/B3 phone session. Prepare
-the exact fixtures/access needs before requesting owner participation. Reconcile
+The local work and successful live A → B summary → A transition are complete.
+The owner-requested Account close button is locally built and visually checked. Resume
+with B1's controlled failure/recovery item, followed by the remaining B2/B3 phone
+checks; do not repeat the passed move, summary or PDF cycle. Reconcile
 B4/B5 in parallel through existing documents and local checks where possible;
 this describes work sequencing, not authorization to spawn agents or change
 live provider configuration.
