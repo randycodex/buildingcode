@@ -1,6 +1,11 @@
 # Permitext App Store Metadata — English (U.S.)
 
-Prepared for App Store version 1.0. The values in this file are drafts until they are entered and saved in App Store Connect.
+Prepared for App Store version 1.0. On September 7, the listing text, subtitle,
+categories, Free app price, manual release setting, English subscription-group
+name and subscription description were saved and independently reread in App
+Store Connect under the owner's standing closeout authorization. The app and
+subscription remain Prepare for Submission. Reviewer-access instructions below
+are still preparation material and have not been entered as final review notes.
 
 September 3 preparation update: **do not submit or release**. The owner wants App Store submission and public release last. The reviewer-access section remains incomplete until a dedicated, independently verified access method is approved; do not paste an incomplete draft into Apple review fields.
 
@@ -39,7 +44,7 @@ Save sections, add notes, and organize references around your Projects. Sign in 
 
 UPGRADE TO PERMITEXT PRO
 
-Permitext Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 Research turns per UTC calendar month. Research answers use identified evidence and citations. A turn is counted only when an answer is completed and saved; failed or interrupted requests do not use an included turn.
+Permitext Pro includes unlimited saved sections and notes, Projects, Notebook, Report, professional exports, offline access, and 100 Research turns per UTC calendar month. Research answers use identified evidence and citations. A turn is counted when an answer is completed and saved. Requests that fail without a saved answer do not use an included turn.
 
 Pro is $20.00 per month. There is no trial. Payment is charged to your Apple Account when the purchase is confirmed. The subscription renews monthly unless canceled at least 24 hours before the end of the current billing period. You can manage or cancel the subscription in your Apple Account settings. Code reading and search remain free after cancellation.
 
@@ -101,4 +106,6 @@ Support: `permitext@gmail.com`
 
 Use manual release for version 1.0 so approval does not publish the app before the final production and device checks are complete.
 
-The September 3 read-only audit found automatic release currently selected. This recommendation has not been applied. Do not use Add for Review, Submit for Review, or release controls without later explicit owner approval.
+Manual release was saved and verified after reload on September 7. No Add for
+Review, Submit for Review or public-release action has been performed. Final
+submission remains after the outstanding acceptance and reviewer-access work.

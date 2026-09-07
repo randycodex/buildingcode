@@ -33,7 +33,15 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest website/backend publication: the [approved PR #61 follow-up](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md#approved-follow-up-publication)
+Latest website/backend publication: the [approved PR #62 repairs](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md)
+are verified on Production source `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
+deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, web v55. Source/asset,
+cache-header and hosted Reader/session checks passed. Physical build 63 uses
+that source and passes the requested Account glass-X behavior, as recorded in
+the [build 63 receipt](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md).
+The shared final release candidate and remaining acceptance are still open.
+
+Preceding website/backend publication: the [approved PR #61 follow-up](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md#approved-follow-up-publication)
 merged as `aed30262742d1888f94555997c4140cbdcaa7b71`. Production deployment
 `dpl_BmE1MmRPw1rVGTG5Gmfx9GvZHL6s` reached READY at
 `2026-09-07T02:49:39.298Z`. Both canonical origins and six served assets per
@@ -188,7 +196,7 @@ Earlier September 5 snapshot (superseded by the correction above): build 58 is p
 - Fresh-account Microsoft sign-in:
 - Existing-account email-code sign-in retained the correct Permitext account/data: passed on web and phone for the designated existing test account, with retained Projects/Notes/Research and Synced status in later build-62 checks.
 - Existing-account Apple sign-in retained the correct Permitext account/data: historical build-51 owner observations and build-52 Mirroring observations retain the signed-in account, Lifetime Pro, Synced, saved content and Project containers. These are persisted-session checks, not fresh Apple sign-in. Build 51 additionally retained an explicitly selected Project in Research. Representative saved Project-item coverage was not established.
-- Existing-account Google sign-in retained the correct Permitext account/data:
+- Existing-account Google sign-in retained the correct Permitext account/data: passed September 7 through the real Google chooser for the designated test identity; three Projects, three saved passages, Free/Synced and independent before/after content/usage hashes were retained. This does not establish new-provider linking or account merge. See the [existing-Google receipt](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md#existing-google-identity-sign-in-september-7).
 - Existing-account Microsoft sign-in retained the correct Permitext account/data:
 - Dedicated disposable-account pre-deletion export and aggregate baseline captured safely: passed for the approved populated synthetic account: one Project, one Note, one image, two Report versions/four PDFs, zero Research usage or paid entitlements. Other ownership/Research categories retain their separate coverage boundary.
 - Customer-interface deletion reported every applicable billing, data, private-asset, device, and Clerk stage accurately: passed for that build-60 no-recurring-billing account, including disclosed retention of unknown-owner historical cache files. Paid billing and shared ownership are separate cases.
@@ -302,14 +310,15 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN — build-62 Note/Report acceptance and earlier bounded recovery/table checks passed; remaining device/context coverage and final candidate selection remain open**
+Status: **OPEN — build-63 Account X, build-62 Note/Report and earlier bounded recovery/table checks passed; remaining device/context coverage and final candidate selection remain open**
 Release-bound: **yes**
 
 ### Current candidate and latest verified clients
 
-- Latest verified product source: `e60ca415fe8b7b60be65449b7ef49baccc82eec3`, Production deployment `dpl_5rp8vnZ9yZ6XBRWbFHofaD7jQqo9`, physical Permitext 1.0 (62). The source/archive/upload/Apple-processing binding is in the [September 6 repair publication](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md#approved-publication).
+- Latest verified product source: `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`, Production deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, physical Permitext 1.0 (63). The [build-63 receipt](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md) binds source/archive/upload/Apple processing and the physical Account-X check. Broader observations below keep their original build scope.
 - [Build-62 acceptance](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md) passed current web Note navigation, lower native Note fields, both actual Report PDFs with all nine pages inspected, and immutable record integrity. Chrome Production PDF download is owner-confirmed. The in-app browser download remains unaccepted.
-- Temporary Pro is revoked; the phone shows Free Active/Billing None/Synced and intentionally retains the test identity at the owner's request. Both browser test sessions were signed out before that preference change.
+- Temporary Pro is revoked; the latest physical Account-X check showed the designated test identity, Free and Synced. The existing Google web session was restored on September 7. Test sessions are intentionally retained between checks at the owner's request.
+- VoiceOver and screenshot preparation are deferred by the owner's September 7 instructions. Screenshots resume after UI work is complete. Neither deferral is a passed acceptance result.
 - The final public-release candidate remains unselected. The [original 17-finding checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md) assigns the remaining client/context, recovery, accessibility/performance and release work. Existing passed checks below retain their original build scope.
 
 ### Earlier build-60 observations retained with their original limits
@@ -373,4 +382,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: after the owner returns with the phone, install internally available build 62 and bind the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md) to physical-candidate and hosted handoff acceptance. PR #58 is verified on Production; build 62 shares that source. Owner account restoration is complete. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed.
+- Next technical step: continue B1's server-side context/completion overlap, the remaining live provider/consent cases, B4 storage-pressure/eviction/interrupted-transfer coverage and B5 operations/reviewer/declaration evidence. The real-browser recovery file receipt is now complete within its isolated synthetic-provider scope. Build 63 is already installed and its Account X passed; do not repeat the build-62 handoff or completed deletion/table checks. Screenshots wait for the owner's UI work, VoiceOver is deferred, and final candidate selection/go-no-go remain open. All three recorded ramp-turn approvals are consumed. Follow the [current closeout checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md).
