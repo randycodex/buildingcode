@@ -82,9 +82,10 @@ the full phone Pro/purchase path remain step 2. See the
 
 Apple's exact form requires either necessary rights or otherwise lawful
 permission for third-party content. Neither answer was selected. The owner was
-asked whether written permissions/licensing documentation already exists; no
-answer has yet been received. A separate license is not the only possible legal
-basis, but this task has not established a documented basis to attest to Apple.
+asked whether written permissions/licensing documentation already exists. The
+owner answered No and clarified that Permitext republishes the code in its own
+format. A publisher license must not be treated as automatically necessary for
+enacted law. See the source review correction below.
 
 The specific existing source gate is
 `NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2026-enacted-administrative-code/SOURCE.md`.
@@ -102,3 +103,29 @@ remove the library or claim other sources cleared without appropriate evidence.
 Step 1 is therefore substantially prepared but not fully closed. Content-rights
 evidence remains outstanding; phone acceptance and owner-led UI/screenshots
 remain the already-separated steps 2 and 3.
+
+### Correction: enacted law versus publisher material and access terms
+
+The owner correctly distinguished the enacted law from a publisher's additions.
+The [U.S. Copyright Office Compendium, section 313.6(C)(2)](https://www.copyright.gov/comp3/chap300/ch300-copyrightable-authorship.pdf)
+identifies legislative enactments and public ordinances as government edicts
+that it will not register. The Supreme Court's
+[Georgia v. Public.Resource.Org opinion](https://www.supremecourt.gov/opinions/19pdf/18-1150_new_d18e.pdf)
+supports the government-edicts principle and distinguishes private authored
+explanatory material. Public availability alone is not the rule; enacted legal
+status matters. No license requirement for the enacted text is established here.
+
+The actual importer, `permitext-sync-server/scripts/import-nyc-enacted-admin-code.py`,
+skips `HIGHLIGHTER`, `ednote` styles and ALP-only marker paragraphs. A bounded
+scan of its bundled chapter HTML found no editor-note, American Legal Publishing,
+ednote or highlighter markers. These checks support the intended enacted-only
+boundary; they are not a full section-by-section provenance certification.
+
+American Legal's current [website terms](https://amlegal.com/terms-of-use) assert
+personal-use and republication restrictions. Those assertions are separate from
+copyright ownership of enacted law. Their application/enforceability for this
+specific bulk-archive acquisition has not been determined; do not assume either
+that the site owns NYC law or that a new presentation resolves every access-term
+question. The remaining item is source/provenance and access-terms verification,
+not an automatic instruction to obtain or buy an American Legal license. Apple's
+declaration remains unselected pending resolution of that narrower item.
