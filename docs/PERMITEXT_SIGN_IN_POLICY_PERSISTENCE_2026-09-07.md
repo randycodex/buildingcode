@@ -1,6 +1,6 @@
 # Sign-in loses stored policy acceptance — September 7, 2026
 
-Status: **REPRODUCED ON PRODUCTION; SOURCE CAUSE IDENTIFIED; REPAIR PENDING**
+Status: **REPRODUCED ON PRODUCTION; LOCAL REPAIR AND REAL POSTGRESQL ACCEPTANCE PASSED; PUBLICATION/LIVE RETEST PENDING**
 
 This finding belongs to the existing B2/B5 account and consent closeout. It
 qualifies the earlier bounded web-consent pass; it is not a new feature request.
@@ -39,17 +39,43 @@ fields. Server-owned metadata such as policy acceptances can disappear.
 The successful Microsoft fresh/returning checks used a new account without a
 policy acceptance, so those passes do not disprove this defect.
 
-## Remaining repair and acceptance
+## Repair and local acceptance
 
-1. Preserve the exact existing non-Apple account and its server-owned metadata
-   during sign-in; retain account-isolation and Apple merge safeguards.
-2. Add a real PostgreSQL regression covering consent plus unrelated account
-   metadata across returning Clerk sign-in, including a concurrent metadata
-   update where applicable. A file-store-only test is insufficient.
-3. Run the relevant auth, consent, PostgreSQL and required repository checks;
-   publish the reviewed candidate under the existing closeout authorization.
-4. Repeat the no-purchase consent → sign-out → real sign-in → independent export
+The sign-in upsert now merges with the existing row inside PostgreSQL's
+`ON CONFLICT` update. This preserves the current consent history, profile,
+migration state and billing metadata, including a metadata write that commits
+after the optional Apple candidate lookup. The sign-in response uses the
+`RETURNING` account from that same write. Existing Apple subject aliases are
+retained and new verified aliases are added; distinct Clerk identities are
+never merged on email alone. Clerk verified addresses refresh from the current
+provider lookup, including removal of stale addresses; consent and billing
+metadata remain intact. Session tokens remain hashed separately.
+
+The new `postgres-account-sign-in-metadata-cases.mjs` regression failed against
+the old source, reproducing the lost Clerk consent/profile/billing metadata.
+After the repair it passed for Clerk, web and Apple identities, including
+interleaved metadata updates, matching returned/persisted/authenticated records,
+same-email account isolation, and Apple subject continuity.
+
+The complete disposable PostgreSQL 18.6 acceptance run passed: 2,034 local
+database requests, 61 Serializable batches, 46 repeatable-read export batches,
+up to 14 concurrent connections, and zero external database/provider requests.
+Existing account-link, lifecycle, deletion, image isolation and Research races
+also passed. Auth hot-path, policy contract and local policy HTTP lifecycle
+checks, `npm run check` and the final auth suite passed. This is local evidence;
+it does not close Production durability.
+
+Private logs: `/private/tmp/permitext-pg-acceptance.leAngS/before-repair.log` and
+`final-repair.log`. The task's clusters were stopped and its verified official
+Postgres.app image detached after testing.
+
+## Remaining publication and acceptance
+
+1. Finish smoke verification and publish the reviewed candidate under the
+   existing closeout authorization.
+2. Repeat the no-purchase consent → sign-out → real sign-in → independent export
    check against that Production candidate. Do not treat the earlier immediate
    recording/duplicate-Checkout result as proof of sign-in durability.
 
-No runtime code, deployment or activation gate was changed in this checkpoint.
+The repair changes backend sign-in only. Publication is pending; no iOS build,
+purchase, historical-consent restoration or activation-gate change is claimed.

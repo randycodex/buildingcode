@@ -13,6 +13,7 @@ import { researchConversationRevision, researchContextRevision, researchConversa
 import { runPostgresAccountDataExportCases } from "./postgres-account-data-export-cases.mjs";
 import { runPostgresSharedOwnershipCases } from "./postgres-account-shared-ownership-cases.mjs";
 import { runPostgresAccountLinkLifecycleCases } from "./postgres-account-link-lifecycle-cases.mjs";
+import { runPostgresAccountSignInMetadataCases } from "./postgres-account-sign-in-metadata-cases.mjs";
 
 assert.equal(process.env.PERMITEXT_RUN_LOCAL_POSTGRES_READINESS, "1");
 const connectionString = process.env.PERMITEXT_LOCAL_POSTGRES_URL;
@@ -119,6 +120,7 @@ try {
   await import(`data:text/javascript;base64,${Buffer.from(linkCases).toString("base64")}`);
 
   const accounts = createPostgresAccountRepository(sql);
+  await runPostgresAccountSignInMetadataCases({ sql, setStatementHook: hook => { statementHook = hook; } });
   for (const id of ["pg-link-source", "pg-link-left", "pg-link-right"]) {
     await accounts.signIn({ appUserID: `web:${id}`, authProvider: "web", authProviderUserID: id,
       displayName: "Synthetic concurrent link", signedInAt: new Date().toISOString() });

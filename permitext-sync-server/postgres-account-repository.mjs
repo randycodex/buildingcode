@@ -861,7 +861,16 @@ export function createPostgresAccountRepository(sql, options = {}) {
     const rawToken = randomUUID();
     const hash = tokenHash(rawToken);
     const authProviderUserID = storedAccount.authProviderUserID || storedAccount.appleUserID || targetUserID;
+    // Clerk's verified addresses come from this sign-in's provider lookup.
+    // Removed addresses must not survive as account-link ownership evidence.
+    const verifiedIdentityUpdates = incoming.authProvider === "clerk" ? {
+      email: normalizedEmail(incoming),
+      verifiedEmails: incoming.verifiedEmails || []
+    } : {};
 
+    // Merge with the row locked by ON CONFLICT, not only the earlier Apple
+    // candidate snapshot. Returning Clerk/web sign-ins have no Apple candidate,
+    // and any provider can race a consent/profile/billing metadata update.
     const queries = [sql`
         INSERT INTO permitext_users (
           id, auth_provider, auth_provider_user_id, apple_user_id,
@@ -875,11 +884,30 @@ export function createPostgresAccountRepository(sql, options = {}) {
           ${storedAccount.signedInAt || new Date().toISOString()}::timestamptz, now()
         )
         ON CONFLICT (id) DO UPDATE SET
-          public_username = EXCLUDED.public_username,
-          display_name = EXCLUDED.display_name,
-          migration_state = EXCLUDED.migration_state,
-          account = EXCLUDED.account,
-          updated_at = now()
+          (public_username, display_name, migration_state, account, updated_at) = (
+            SELECT merged.account->>'publicUsername', merged.account->>'displayName',
+              merged.account->>'migrationState', merged.account, now()
+            FROM (
+              SELECT (EXCLUDED.account || permitext_users.account || jsonb_build_object(
+                'signedInAt', EXCLUDED.account->'signedInAt',
+                'email', COALESCE(NULLIF(EXCLUDED.account->>'email', ''), permitext_users.account->>'email', ''),
+                'migrationState', COALESCE(NULLIF(permitext_users.account->>'migrationState', ''), EXCLUDED.account->>'migrationState'),
+                'linkedAppleUserIDs', (
+                  SELECT COALESCE(jsonb_agg(subject ORDER BY first_position), '[]'::jsonb)
+                  FROM (
+                    SELECT subject, min(position) AS first_position
+                    FROM jsonb_array_elements_text(
+                      CASE WHEN jsonb_typeof(permitext_users.account->'linkedAppleUserIDs') = 'array'
+                        THEN permitext_users.account->'linkedAppleUserIDs' ELSE '[]'::jsonb END
+                      || (EXCLUDED.account->'linkedAppleUserIDs')
+                    ) WITH ORDINALITY AS subjects(subject, position)
+                    GROUP BY subject
+                  ) AS distinct_subjects
+                )
+              ) || ${JSON.stringify(verifiedIdentityUpdates)}::jsonb) - 'backendSessionToken' AS account
+            ) AS merged
+          )
+        RETURNING account
       `, sql`
         INSERT INTO permitext_account_sessions (
           token_hash, user_id, created_at, last_seen_at, expires_at
@@ -913,10 +941,11 @@ export function createPostgresAccountRepository(sql, options = {}) {
         WHERE expires_at <= now() OR revoked_at IS NOT NULL
       `);
     const transactionResults = await sql.transaction(queries);
+    const persistedAccount = safeJSON(transactionResults[0][0].account, {});
     const entitlementRows = transactionResults[entitlementIndex];
 
     return {
-      account: { ...storedAccount, backendSessionToken: rawToken },
+      account: { ...persistedAccount, backendSessionToken: rawToken },
       entitlement: entitlementRows[0]?.entitlement
         ? safeJSON(entitlementRows[0].entitlement, null)
         : null,

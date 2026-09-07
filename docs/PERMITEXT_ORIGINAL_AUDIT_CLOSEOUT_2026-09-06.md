@@ -498,8 +498,8 @@ for the detailed fields. Finish only the still-open evidence:
   visually verified Sandbox sign-in and clean app restart did not resolve it;
   isolate the tester queue or collect device-level diagnostics next. Later
   independent exports found that Google sign-in removed the stored web acceptance.
-  [Repair the PostgreSQL non-Apple sign-in metadata overwrite](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md),
-  then verify consent survives an actual returning sign-in. iOS consent,
+  [The PostgreSQL sign-in metadata repair passes locally, including real concurrent database tests](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
+  Publish it, then verify consent survives an actual returning sign-in. iOS consent,
   web sign-in durability and final shared-release binding remain open. The September 7
   [live delayed/duplicate Checkout replay](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md)
   reached current Production with HTTP 200 / `changed:false` and left the original deleted

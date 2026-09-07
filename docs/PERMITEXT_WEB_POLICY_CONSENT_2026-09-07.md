@@ -132,8 +132,9 @@ Private exact-account exports and the redacted comparison receipt are retained
 outside the repository under the existing September 6 live-test folder. Raw
 account, customer, session and acceptance IDs are not included here.
 
-This closes current Production web consent, including durable exact-version
-recording and same-policy retry. iOS consent, final shared-release selection and
+This confirms immediate exact-version recording and same-policy retry. The
+later sign-in loss qualifies that result: enduring consent retention remains
+open until the repair passes a live returning sign-in. iOS consent, final shared-release selection and
 the other B1–B5 gates remain separate. The acknowledgment is a retainable statement
 of subscription terms, not an authenticated transaction receipt; this pass did
 not exercise a new payment or a new successful-purchase redirect.
