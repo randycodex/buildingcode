@@ -32,6 +32,10 @@ Interim no-input evidence: [PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRIT
 **September 7 owner scope update:** active work is limited to Apple App Store
 requirements, concrete submitted-app defects and necessary web fixes. Follow the
 [App Store critical path](./PERMITEXT_APP_STORE_CRITICAL_PATH_2026-09-07.md).
+The owner has now paused execution. The current StoreKit diagnostic identified
+the beta OS transaction-finish encoding failure; Apple accepted completion of all
+11 verified expired Sandbox targets. Final phone checkout/native-consent
+verification remains open because the device was locked. Wait for explicit resume.
 The broader paid-Beta gates below remain an honest evidence record; deferred
 coverage is not passed and must not become an automatic App Store prerequisite.
 

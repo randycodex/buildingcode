@@ -1,5 +1,11 @@
 # Permitext — App Store critical path
 
+**PAUSED at the owner's request on September 7.** Finish no additional items
+until the owner explicitly resumes. The current transaction-cleanup attempt
+completed: Apple accepted all 11 verified expired Sandbox transactions. The
+final phone check was blocked by the locked device. Resume with that one check,
+using the [StoreKit diagnosis and cleanup receipt](./PERMITEXT_IOS_POLICY_CONSENT_2026-09-07.md#physical-storekit-diagnosis-and-scoped-cleanup--2034z).
+
 ## Controlling scope
 
 On September 7 the owner instructed: **“dont do anything that is not needed
@@ -25,8 +31,11 @@ repeated without a relevant change or failure.
 1. **Resolve the native purchase preflight blocker.** Build 63 repeatedly stops
    at the expired Sandbox transaction queue before Apple's confirmation sheet.
    The exact tester's history reset, verified sign-in and clean app restart did
-   not resolve it. Diagnose the StoreKit queue or isolate it with a fresh tester;
-   do not repeat the same sequence or weaken transaction/ownership guards.
+   not resolve it. The later physical Console capture identified iOS 27 beta's
+   transaction-finish request encoding error. Apple's server API has now completed
+   the 11 cryptographically verified expired Sandbox targets. Recheck the phone
+   after explicit owner resume; do not repeat the same reset sequence or weaken
+   transaction/ownership guards.
    Confirm native policy submission and purchase-sheet access using the existing
    no-purchase acceptance scope. See the [native consent evidence](./PERMITEXT_IOS_POLICY_CONSENT_2026-09-07.md).
 2. **Verify the sign-in options actually offered by the submission build and

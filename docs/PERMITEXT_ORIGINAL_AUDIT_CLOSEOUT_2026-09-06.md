@@ -5,6 +5,11 @@ Updated September 7, 2026. This is the current action list for the **original
 It reconciles completed evidence with remaining acceptance. It adds no feature,
 paid evaluation cohort, release approval or new audit scope.
 
+**Owner pause, September 7:** current work is saved; wait for an explicit resume.
+Apple accepted completion of 11 verified expired Sandbox transactions after the
+physical StoreKit diagnostic identified `requestEncodeFailed`. The locked phone
+prevented the final checkout recheck. See the [active checkpoint](./PERMITEXT_APP_STORE_CRITICAL_PATH_2026-09-07.md).
+
 **Scope narrowed by the owner on September 7:** “dont do anything that is not
 needed for the app to make it to the apple store.” The active execution list is
 now the [App Store critical path](./PERMITEXT_APP_STORE_CRITICAL_PATH_2026-09-07.md).
