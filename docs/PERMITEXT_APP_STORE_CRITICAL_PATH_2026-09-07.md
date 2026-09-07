@@ -32,12 +32,15 @@ Desktop work completed: the versioned provider privacy revision is live and
 Apple's matching App Privacy responses are published. Production source is
 `7b36fa180fbf6f26e6e2a516c10d2c58144d8943`. See the
 [publication receipt](./PERMITEXT_PRIVACY_DISCLOSURE_PUBLICATION_2026-09-07.md).
-The owner restored App Store Connect access. A standard password login passed
-for the designated test account on web, but Apple credential persistence failed
-and an owner password handoff remains pending. Full Pro access and the native
-route remain unverified. See the [reviewer-access checkpoint](./PERMITEXT_REVIEWER_ACCESS_2026-09-07.md),
-including the global pre-release password/Device Trust settings. The phone was
-not used; no new paid operation or Pro grant was performed.
+The owner restored App Store Connect access and completed the test-account
+password change; the replacement passed a new web sign-in. The owner sees its
+credentials in Apple's form. Age rating is saved at 18+ to match existing Terms,
+reviewer no-charge Pro is active and verified on web, and app/subscription notes
+are saved. Agreements, banking and U.S. tax status are Active. Content-rights
+evidence remains unresolved. See the [step 1 receipt](./PERMITEXT_APP_STORE_FORMS_2026-09-07.md)
+and [reviewer-access checkpoint](./PERMITEXT_REVIEWER_ACCESS_2026-09-07.md),
+including grant cleanup and the pre-release password/Device Trust settings.
+The phone was not used and no new paid operation was performed.
 
 1. **Resolve the native purchase preflight blocker.** Build 63 repeatedly stops
    at the expired Sandbox transaction queue before Apple's confirmation sheet.
@@ -54,10 +57,11 @@ not used; no new paid operation or Pro grant was performed.
    establish native acceptance. Use the final offered login paths and a stable
    review account/demo route; supply App Review notes and credentials through
    App Store Connect. Reuse existing account-deletion evidence.
-3. **Complete required App Store Connect material.** Privacy answers are now
-   published; retain final-build alignment. Finish age/content-rights declarations, subscription
-   material, reviewer notes/access, and any outstanding Apple agreements/tax/bank
-   requirements actually needed by this app. Do not invent business/legal facts.
+3. **Complete required App Store Connect material.** Privacy and age answers,
+   app/subscription review notes and active agreement/tax/bank checks are done.
+   Resolve the documented source-content-rights gate; retain final-build alignment
+   and finish the deferred subscription screenshot with the owner's UI assets.
+   Do not invent business/legal facts.
    Previously supplied reviewer contact details stay out of source control.
 4. **Bind the final submission build and perform focused acceptance.** Check
    the exact build's launch, offered login, purchase flow and core Saved/Reader/

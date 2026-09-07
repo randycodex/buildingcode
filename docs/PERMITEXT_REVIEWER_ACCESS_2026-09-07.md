@@ -1,8 +1,30 @@
 # App Review access preparation — September 7, 2026
 
-Status: password-based web sign-in passed; credential handoff, native acceptance
-and full Pro reviewer access remain incomplete. Do not submit this as a finished
-reviewer-access package.
+Status: the owner-set replacement password passed a new web sign-in. No-charge
+Pro is now active and the existing web Notebook/Research/Report are accessible.
+App and subscription review notes are saved in Apple. Native acceptance remains
+incomplete. See the [forms and grant receipt](./PERMITEXT_APP_STORE_FORMS_2026-09-07.md).
+
+The owner subsequently reported seeing the username and password in Apple with
+Save disabled. Treat the sensitive-field automation result as unavailable, not
+proof of empty credentials; do not repeat the completed password change.
+The earlier failed automation observations below remain historical.
+
+## Completed owner password handoff
+
+The owner completed the Clerk password change and replied Done. A new normal
+web session then passed using the supplied replacement: Sign Out → Sign in →
+email and password → the designated account's Synced workspace. The hosted
+sign-in page offered email and password together in this attempt; no email code
+was required. At that checkpoint the test account was Free and signed in. No password is
+retained in this receipt or any repository file.
+
+App Store Connect's reviewer fields still did not expose a reliable persisted
+result after standard input, keyboard/accessibility input, Save and reload.
+The owner was asked to enter the same username/password directly in Apple,
+save, reload and confirm retention. This remaining Apple save is separate from
+the now-completed Clerk password change. The earlier sequence below is retained
+as history, not a request to repeat that change.
 
 ## Exact scope and observed result
 
@@ -53,8 +75,10 @@ All 24 content/usage record groups were unchanged; only session metadata changed
 Entitlement was null before and after. No Pro grant, paid Research, purchase,
 deletion or merge was performed. Raw exports remain private outside the repo.
 
-Remaining: securely persist the owner-set reviewer credential; verify the
-submission build's actual login route when the phone returns; provision and
-verify the complete backend Pro reviewer path; then supply final truthful
-review notes. Sandbox purchases on the Production-targeted build do not grant
-Production backend Pro, so purchase-sheet access alone cannot close this item.
+Subsequent preparation enabled the explicit reviewer Pro grant and verified web
+access, with notes saved in Apple. The grant is retained through acceptance and
+App Review; revoke it once no longer needed. Remaining: verify the submission
+build's actual login and backend Pro route when the phone returns, and finalize
+any device-specific review instructions from that result. Sandbox purchases on
+the Production-targeted build do not grant Production backend Pro, so purchase-
+sheet access alone cannot close the native item.

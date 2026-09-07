@@ -16,9 +16,11 @@ match the source's existing iPhone-only support settings. The App Privacy
 questionnaire is now published with 13 linked types, two Analytics purposes and
 no tracking, matching the live September 7 privacy revision; see the
 [publication receipt](../../../docs/PERMITEXT_PRIVACY_DISCLOSURE_PUBLICATION_2026-09-07.md).
-Content rights, age rating, complete reviewer access and final submission remain
-open. Password-based web access passed, but secure Apple credential persistence,
-Pro access and native verification remain pending; see the
+Age rating is now saved at 18+ to match the existing Terms. Content rights,
+native reviewer acceptance and final submission remain open. Password-based web
+access and the explicit reviewer Pro grant passed; app/subscription review notes
+were saved and retained after reload. Agreements, banking and U.S. tax status
+were rechecked Active. See the [step 1 receipt](../../../docs/PERMITEXT_APP_STORE_FORMS_2026-09-07.md) and
 [reviewer-access checkpoint](../../../docs/PERMITEXT_REVIEWER_ACCESS_2026-09-07.md).
 The owner-provided App Review contact details were previously saved
 and verified after reload; the phone number is retained only in Apple, outside
@@ -159,7 +161,7 @@ Provider disclosure classifications below are synchronized with the app-owned ma
 ## App information declarations requiring final owner confirmation
 
 - Content Rights: confirm Permitext has the necessary rights to display every included code source and related content. The repository still identifies at least one source as requiring republication-rights review, so this must not be represented as cleared until that review is complete.
-- Age Rating: not yet configured. Answer the current questionnaire based on actual features and content; do not preselect a rating from older assumptions. Keep the platform rating distinct from the product's terms-of-use minimum age.
+- Age Rating: saved September 7. Apple calculated 13+ from the content answers; an 18+ override matches the existing Terms minimum. Incidental substance, mature-zoning and weapons references are marked Infrequent; complete answers and basis are in the step 1 receipt.
 - Primary category: Reference
 - Secondary category: Productivity
 - App price: Free
@@ -171,12 +173,12 @@ Review-access plan (authorized preparation; complete verification still required
 
 - Explain that reading and search work without an account.
 - Provide a dedicated synthetic reviewer-access plan for account-based features. Do not assume that asking Apple to create an account replaces verified reviewer access. See Apple's [review guidelines](https://developer.apple.com/app-store/review/guidelines/), Before You Submit and 2.1.
-- Standard password web sign-in passed for the designated test account; final credential handoff and native/Pro acceptance remain open. See the September 7 reviewer-access checkpoint above. No hidden demo mode was added.
+- Standard password web sign-in passed and complimentary Pro access was verified for the designated test account. The owner sees the supplied credentials in Apple's form; automation cannot reliably read those sensitive fields. Native acceptance remains step 2. No hidden demo mode was added.
 - Resolve the subscription/backend-feature mismatch in the current Production-targeted candidate: Sandbox purchases bind locally and do not grant Production backend Pro. The draft metadata now states this boundary. Corrected instructions alone do not establish reviewer access; verify the complete route before submission.
-- The live sign-in-required checkbox remains checked. Automated credential edits did not persist; final review notes are still incomplete. Verify owner-entered credentials after the pending handoff before claiming this section complete.
+- The live sign-in-required checkbox remains checked. App and subscription review notes were saved and retained after reload. Reconcile any device-specific instructions against the final phone check. The earlier automated sensitive-field reads do not establish that the owner's visible values are empty.
 - Review contact name: Higinio Jimenez Manzano
 - Review contact email: `permitext@gmail.com`
-- Review contact phone: already supplied and previously saved privately in Apple; never retain it in the repository. Current reload did not expose populated phone/email input values, so recheck their persistence with the reviewer credential handoff rather than request the same details again.
+- Review contact phone: already supplied and previously saved privately in Apple; never retain it in the repository. Sensitive-field values are not reliably exposed to automation; do not infer they were deleted or request the same details again from that alone.
 
 ## Version 1.0 items still required in App Store Connect
 
@@ -187,10 +189,10 @@ Review-access plan (authorized preparation; complete verification still required
 - Primary Reference and secondary Productivity categories: saved and reread September 7
 - Complete Content Rights
 - Complete Age Rating
-- Complete App Privacy
+- App Privacy: published and retained after reload September 7
 - English subscription-group localization: saved and reread September 7 as Permitext Pro, using the app name
 - Upload the subscription review screenshot after the owner finishes the UI
-- Subscription description updated September 7 to "Pro workspace and up to 100 Research turns"; final review notes still need verified reviewer access
+- Subscription description remains "Pro workspace and up to 100 Research turns". Review notes now describe the current Saved → Account → Plan flow, implemented sync, and the explicit complimentary reviewer grant; saved/reloaded September 7.
 - Add Permitext Pro Monthly to the version 1.0 submission
 - App Review contact information: saved and verified after reload September 7; private phone number kept out of the repository
 - Manual release: saved and verified September 7
