@@ -171,7 +171,10 @@ At `02:06:34Z`, the first `/admin/accounts/export` returned 503. Vercel reported
 `Rate-limit enforcement failed`, PostgreSQL `deadlock detected`, request
 `iad1::ngpfn-1788746794063-2329f14dafd3`, on this release. A later export and health
 check succeeded. The earlier one-minute clean log scan does not close this
-concurrency defect; rate-limit cleanup and upsert locking need investigation.
+concurrency defect. The actual SQL subsequently reproduced `40P01` locally and
+the separated increment/cleanup repair passed real PostgreSQL concurrency and
+allowance checks. It is not yet published; see
+[rate-limit repair](./PERMITEXT_RATE_LIMIT_DEADLOCK_REPAIR_2026-09-06.md).
 
 The account menu also displayed “Not downloaded on this device” after the v51
 upgrade. The earlier v50 installed/offline result remains passed. No cause has
@@ -180,8 +183,8 @@ upgrade regression without additional evidence.
 
 ## Next bounded step
 
-Prepare the locally verified follow-up for publication review, then address the
-observed rate-limit deadlock and B2 controlled failed-cleanup recovery. Keep a
+Prepare the locally verified Research and rate-limit repairs for publication
+review, then continue B2 controlled failed-cleanup recovery. Keep a
 server-side overlapping move/completion transaction race separate from the live
 Saved-selection test. Reuse the completed move/summary/return, Note/Report/PDF,
 image-recovery and device checks. B3–B5 retain their documented remaining scope.

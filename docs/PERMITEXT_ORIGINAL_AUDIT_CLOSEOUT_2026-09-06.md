@@ -374,8 +374,10 @@ as `2e4f7db2d`; Production health, matching assets on both origins, and the
 retained Chrome session's reload passed. The next live delayed completion found
 the still-visible A composer stranded after selecting Saved Project B. The v52
 follow-up is repaired and verified locally, awaiting publication review. A
-Production rate-limit PostgreSQL deadlock also caused one export 503 and remains
-open for repair. Continue with that defect and B2 failed-cleanup recovery, then
+Production rate-limit PostgreSQL deadlock also caused one export 503. It was
+reproduced and repaired in real local PostgreSQL; the exact concurrent allowance
+and locked-row cleanup checks pass. The [rate-limit repair](./PERMITEXT_RATE_LIMIT_DEADLOCK_REPAIR_2026-09-06.md)
+also awaits publication review. Continue with B2 failed-cleanup recovery, then
 the remaining B3 edges and B4/B5; preserve the separate server-side race scope.
 The native Account close button is merged source awaiting a
 separately selected iOS build; it is not part of installed build 62.
