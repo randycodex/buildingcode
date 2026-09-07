@@ -164,10 +164,16 @@ each remaining check one home so it is not repeated for several findings.
 2. **Completed September 6.** The saved-Project summary remained deterministic,
    provider-free and uncharged. A legal/code Research request or Retry requires
    its own separately bounded authorization.
-3. Exercise a controlled context-change/stale-completion recovery and confirm
-   the saved current state and error/review action. Local PostgreSQL race evidence
-   already exists; a cloud result must be labeled independently. Reuse the
-   completed build-62 Note/Report export evidence for unchanged presentation.
+3. **Concrete web defect reproduced and repaired locally September 6.** A late
+   successful response reopened A after the user selected B. Guarded callbacks
+   now preserve the current selection/draft and reject older context data.
+   The focused regression and real Chrome fixture passed late success/failure,
+   moved context, reload, failed review and successful review/retry with the
+   original request ID. The fixture uses actual handlers and recovery UI with
+   synthetic transport/current-state loaders; it is not hosted or native
+   acceptance. [Repair and evidence](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md).
+   Publication and cloud evidence remain separate. Local PostgreSQL race
+   evidence already exists; reuse the completed build-62 Note/Report exports.
 
 Stop after the named transitions have evidence or a concrete reproducible defect.
 Do not widen this into another answer-quality cohort.
@@ -350,14 +356,17 @@ The browser offline-library stall and saved-citation failure are repaired,
 published and accepted on the hosted web client. The complete installation
 survived reload, and the exact 2014/2022 pair reopened with simulated offline
 transport. Temporary access is revoked and the test session remains signed in.
-Continue with B1's bounded context-failure evidence, then the remaining B2/B3
-edges and B4/B5. The native Account close button is merged source awaiting a
+The next B1 check reproduced a late-response navigation defect, now repaired and
+verified in local contracts and a Chrome fixture. Publish that reviewed web
+candidate and bind the hosted evidence before calling the client repair live;
+then continue the remaining B2/B3 edges and B4/B5. The native Account close button is merged source awaiting a
 separately selected iOS build; it is not part of installed build 62.
 
 The move/summary/return, Pro revoke/regrant stale-editor check, offline image
 recovery, Note/Report/PDF cycle and owner-confirmed native offline pair are
-complete within their recorded scope. Do not repeat them. B1's controlled
-context failure, the remaining B2/B3 edges and B4/B5 remain open. Use existing
+complete within their recorded scope. Do not repeat them. B1's local recovery
+repair is verified; its publication/hosted acceptance, the remaining B2/B3 edges
+and B4/B5 remain open. Use existing
 documents and local checks to reconcile the remaining work without another
 phone session or main-account restoration. This is sequencing within the
 original audit, not authorization for paid Research, agent delegation, a new
