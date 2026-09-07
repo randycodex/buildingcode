@@ -40,6 +40,27 @@ the adjacent `.log`, and `permitext-account-close-20260907-attachments/`.
 Verification script and machine-readable package evidence are in
 `/private/tmp/permitext-build63-publication-20260907/`. Xcode reported upload
 success at `2026-09-07T15:26:29.161Z`, followed by `EXPORT SUCCEEDED` and exit 0.
-App Store Connect independently lists `1.0 (63)` as Processing. Processing
-completion and physical installation are separate next checkpoints.
+App Store Connect completed processing and lists `1.0 (63)`, build identifier
+`32d152cc-ed8f-4d74-bc33-62f8f62fa929`, Ready to Submit with the existing
+Internal Testers group and one tester. No external group was added.
 No public App Store submission or Beta activation has been performed.
+
+## Physical acceptance
+
+The owner installed build 63. An independent `devicectl` inventory confirms
+`com.randycodex.permitext`, version `1.0`, bundle version `63`; receipt:
+`/private/tmp/permitext-phone-build63-install-check.json`.
+
+At approximately 11:37–11:39 EDT, iPhone Mirroring screenshots confirmed the
+following on the physical phone in light appearance:
+
+1. Saved opens Account with the circular glass X visible at the upper right.
+2. Account shows the designated test identity, Free and Synced.
+3. Tapping X returns to the existing Saved screen.
+4. Reopening Account and scrolling moves its title/content while the X remains
+   fixed. Tapping X again returns to Saved.
+
+Those before/after screenshots are retained in the task's tool history.
+The phone was left on Saved with the test account signed in. This closes the
+requested physical Account-X acceptance; broader VoiceOver and supported-layout
+acceptance remain separate.

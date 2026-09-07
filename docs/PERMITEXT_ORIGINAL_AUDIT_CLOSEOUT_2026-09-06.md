@@ -12,14 +12,17 @@ paid evaluation cohort, release approval or new audit scope.
   owner approval through PR #62. Production source, ten public cache-header
   paths and the retained v55 session/Reader check passed. See the
   [Reader repair and publication record](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md).
-  Physical build 62 remains based on `e60ca415fe8b7b60be65449b7ef49baccc82eec3`
-  with its original [acceptance scope](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md).
+  Physical build 63 now uses the same selected source; its
+  [Account-X delivery and acceptance](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md)
+  are verified. Earlier build-62 receipts retain their original
+  [acceptance scope](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md).
 - Reconciliation started at branch commit `7001a3b1d`. The owner-requested
   Account close control is commit `33f5cd41d`, now merged and verified by a
   focused simulator UI test from both welcome and Saved, including dismissal
   after scrolling. Xcode Cloud archive 264 succeeded on the current source;
-  TestFlight still listed build 62 on September 7. Build 63 delivery is in
-  progress. A successful archive alone is not a TestFlight or phone pass.
+  TestFlight initially still listed build 62 on September 7. The separately
+  numbered build 63 is now processed, installed and physically verified for
+  the Account control. A successful archive alone is not a TestFlight or phone pass.
 - The 17 IDs comprise 16 repair findings and the P1-4 release-acceptance umbrella.
   A repaired symptom, broader client coverage and public-release approval are
   separate statuses. The table below does not count a local pass as a physical
@@ -60,21 +63,21 @@ each remaining check one home so it is not repeated for several findings.
 | --- | --- | --- | --- |
 | P0-1 | Historical citations open the wrong provision/edition. | **Verified online symptom; native offline pair owner-confirmed.** Production and physical build 60 reopened 2014 Slope and 2022 Gates correctly; build 61 opened both saved 2014 Research citations. The owner confirmed build-62 offline Slope/Gates checks, within the B3 evidence limits below. Source/edition routing contracts pass. [Execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md#saved-citations-and-keyboard-access), [Research confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md). | B3: focused assistive-technology coverage remains. Hosted web install/reopening and failure recovery passed on Production `6ccc2d4a8`. |
 | P0-2 | Moving Research retains the prior Project's active facts/history. | **Live A → B summary → A verified.** Production reset active context, captured B's qualified facts in a provider-free summary, and preserved both immutable answers and all original Notes/Reports. Physical build 62 showed B's synced summary and correct address. Local context/version, PostgreSQL races and the joined Note/Report flow also pass. | B1: controlled final-client context-change/stale-completion recovery. The successful move and summary do not need repeating. |
-| P0-3 | Account transitions leak private state or late async results. | **Partial live acceptance.** The repaired web sign-out, scoped account switches and build-60 populated deletion passed. Local delayed-callback, A → B → A, stale-401 and account-link recovery contracts pass. | B2: stale independent client during switch/revocation and the remaining link-recovery path. Retain the documented legacy/quarantine boundaries. |
+| P0-3 | Account transitions leak private state or late async results. | **Partial live acceptance.** The repaired web sign-out, scoped account switches and build-60 populated deletion passed. The live Pro revoke/regrant stale-editor check and existing-Google sign-in pass. Local delayed-callback, A → B → A, stale-401 and account-link recovery contracts pass. | B2: remaining live link/provider coverage and independent recovery-file receipt. Retain the documented legacy/quarantine boundaries. |
 | P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Text/image live paths and controlled web cleanup failure verified.** Physical build 60 retained an unsent text draft through failed transport/termination and reconciled it after a web edit. The September 6 image survived offline reopening, server persistence and physical build-62 display. B2's real Chrome IndexedDB/CacheStorage fault tests preserve drafts, exact pending saves and image bytes after restart/retry. | The image exercise did not interrupt a transfer mid-byte. B4: storage-pressure/OS-eviction coverage or an explicit recorded scope decision. |
 | P0-5 | Retired Workboard writers remain writable. | **Local HTTP repair verified.** Authenticated 410 responses, mixed-sync rejection and historical read/Report compatibility pass imported fixtures. Publication records bind the shipped repair. | B5: final candidate compatibility binding. The absence of a destructive Production write exercise is not a new authorization to attempt one. |
-| P0-6 | Concurrent Notebook/Research writes report success while losing changes. | **Notebook live path verified; Research races verified locally.** Physical stale-save rejection and reviewed version-3 reconciliation passed against Production. Local PostgreSQL tests cover atomic move/completion, rollback and replay accounting. | B1: deployed context/completion conflict evidence. B2: stale-writer lifecycle edges. The independent-device Notebook conflict already passed. |
+| P0-6 | Concurrent Notebook/Research writes report success while losing changes. | **Notebook live path verified; Research races verified locally.** Physical stale-save rejection and reviewed version-3 reconciliation passed against Production. Local PostgreSQL tests cover atomic move/completion, rollback and replay accounting. | B1: deployed context/completion conflict evidence. The independent-device Notebook conflict and B2 Pro revoke/regrant stale-editor check already passed. |
 | P1-1 | Normalization loses negation, partial coverage and assumptions. | **Saved-workflow qualification verified.** Local qualification/projection tests plus actual build-60/62 Reports preserve qualifiers. The live moved-Project summary preserves B's partial coverage and assumptions; physical build 62 displays its matching question/address history card. | Retain the recorded native history-card limit and previously accepted Beta Research limits. Context-failure recovery is tracked once under B1; a new paid quality cohort is not part of closeout. |
 | P1-2 | Streaming errors discard recovery information. | **Local repair verified.** Structured JSON/stream errors retain actionable context; source-review recovery and stale-account suppression pass. The focused recovery contract passed again in this pass. | B1: representative final-client source/context-change failure and explicit recovery, using a controlled no-provider failure where available. |
-| P1-3 | Private cache deletion/revocation is incomplete. | **Bounded populated deletion verified.** Build 60, independent account exports, Clerk lookup and all five exact private-file checks passed; browser reload did not recreate the account. Unknown-owner historical cache retention was disclosed. | B2: independent stale writer during revoke/cleanup failure. Retain legacy-data limits; do not repeat the completed populated deletion without a newly justified, approved target. |
+| P1-3 | Private cache deletion/revocation is incomplete. | **Bounded populated deletion verified.** Build 60, independent account exports, Clerk lookup and all five exact private-file checks passed; browser reload did not recreate the account. The B2 live Pro revoke/regrant stale-editor and controlled real-browser cleanup-failure checks also passed. Unknown-owner historical cache retention was disclosed. | B2: remaining recovery-file receipt and provider/link scope. Retain legacy-data limits; do not repeat the completed populated deletion without a newly justified, approved target. |
 | P1-4 | Final release acceptance is incomplete. | **Open release umbrella.** Existing Stripe and Apple test lifecycles, accepted monitoring, support/restore exercises, policy publication and source/archive evidence are retained. | B5: outstanding provider/consent, operations, Apple/privacy and final candidate/owner decision fields. |
 | P2-1 | Collapsed Project facts remain focusable. | **Verified reported symptom.** Actual Production keyboard traversal and accessibility-tree inspection exclude collapsed inputs and advance to Saved Evidence. | B3: focused assistive-technology/supported-layout spot-check; do not repeat the passed keyboard case. |
 | P2-2 | Reports omit the structured Project facts used by Research. | **Verified reported defect, including actual exports.** Build 60 fixed the omission; build 62 web/iOS PDFs preserve qualified facts and distinguish Project default from Research edition. All nine new PDF pages were inspected; Chrome download passed by owner confirmation. | The retained Note/Report/PDF cycle is complete. Moving to a different Project is tracked once under P0-2/B1. Final release binding is P1-4/B5. |
 | P2-3 | Notebook load failures look empty/read-only. | **Verified text/error/reconnect, offline-image and controlled browser cleanup-failure paths.** Explicit 503/403/revoked-access states, device-only drafts, native Retry and stale-version review passed. The September 6 image survived offline reopening and reached Synced on web and physical build 62. B2's real-browser database/cache failures preserved exact draft journals and image bytes after restart/retry. | Storage-pressure/OS-eviction coverage remains B4. |
-| P2-4 | Reader chrome inconsistently shows edition. | **Verified reported labels/race.** Production and physical saved routes show the right 2014/2022 edition; the web code-switch race clears stale text and loads the selected code. Build-62 offline reopening is owner-confirmed within the B3 limits. | B3: independent scroll-position and focused assistive-technology coverage. Hosted web offline reopening passed on Production `6ccc2d4a8`. |
+| P2-4 | Reader chrome inconsistently shows edition. | **Verified reported labels/race.** Production and physical saved routes show the right 2014/2022 edition; the web code-switch race clears stale text and loads the selected code. Build-62 offline reopening is owner-confirmed within the B3 limits. | B3: focused assistive-technology coverage. Independent Reader positions passed the PR #62 hosted check; hosted web offline reopening passed on Production `6ccc2d4a8`. |
 | P2-5 | Tablet toolbars collide; supported phone-web behavior is unclear. | **Verified reported layout/table cases.** The saved 320–1440-width checks found no toolbar overlap. Build 61's previously failing Fuel Gas table pans in both directions by owner confirmation. | B3: final supported-layout/VoiceOver spot-check and explicit browser/platform scope. This is not an all-table certification. |
 | P2-6 | Exact-match search is poorly explained. | **Verified reported behavior.** Production disclosure, no-match/clear, shorter-term recovery and correct result reopening passed; controlled local retry passed. | B3: focused accessibility check and B5 compatibility binding. |
-| P2-7 | Startup waits on secondary catalogs/large client code. | **Local critical-path repair verified.** Controlled delay tests show the workspace can render while secondary catalogs load, after authentication. Reload restores panes. | B4: representative browser/device measurements; the controlled timing is not device paint or p50/p90 acceptance. |
+| P2-7 | Startup waits on secondary catalogs/large client code. | **Repair and representative desktop measurement verified.** Controlled delays prove secondary catalogs do not block the workspace. Ten Production v55 Chrome traces now record warm/cold-network-cache p50/p90, with all selected workspace frames inspected. [Measurements](./PERMITEXT_WEB_STARTUP_MEASUREMENT_2026-09-07.md). | The desktop sample is not a universal phone/OS result. B4 storage-pressure, eviction and interrupted-transfer coverage remain separate. |
 
 ## This pass: completed local work
 
@@ -508,8 +511,9 @@ cannot be marked passed by authorization alone.
 
 - **B3 Account X:** the requested native glass control is already in the merged
   source. The new welcome/Saved/scroll/dismiss UI regression passes; both
-  screenshots were inspected. Physical inventory still reports build 62.
-  A signed, verified build 63 is being uploaded. Follow the
+  screenshots were inspected. Build 63 is now uploaded, processed and physically
+  installed. The actual phone's glass X stays fixed after scrolling and closes
+  Account back to Saved; the test identity remains Free and Synced. Follow the
   [build 63 delivery record](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md).
 - **B4 startup measurement:** ten valid Production v55 traces now complete the
   representative desktop measurement: five warm-cache and five disabled-cache
@@ -525,6 +529,23 @@ cannot be marked passed by authorization alone.
 - The Production test-account baseline remains Free, with retained content and
   no temporary grant. No new Research request, paid turn, provider link, account
   merge or deletion was performed in this checkpoint.
+
+### Existing Google identity sign-in, September 7
+
+The designated web test session was signed out and signed back in through the
+actual Google account chooser, selecting only the designated test address.
+The already-linked provider returned to Permitext successfully, restored its
+three Projects and three saved passages, and reached Free/Synced. The checkout
+button is disabled while the policy-consent checkbox is unchecked; no agreement
+checkbox or purchase was submitted.
+
+An independent exact-target export at `2026-09-07T15:35:53.127Z` matches the
+morning baseline's foundation, usage and operation hashes, record counts, and
+conversation revision/context/messages. Private receipts are
+`closeout-six-baseline-*` and `closeout-google-signin-*` under
+`/private/tmp/permitext-b1-live-20260906/`. This is a live existing-Google-user
+sign-in pass, not a new provider-link, account-merge, Apple/Microsoft or completed
+paid-consent pass. The test session remains signed in.
 
 Remaining six-step scope is unchanged: B1 deliberate server-side move/completion
 overlap; B2 live provider/consent and recovery file receipt; B3 selected-build
