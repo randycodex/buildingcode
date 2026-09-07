@@ -7,15 +7,19 @@ paid evaluation cohort, release approval or new audit scope.
 
 ## Evidence baseline and working rules
 
-- Latest verified web source: `4048aa28e65b67ff8eecd9dc95ab76f861f7d680`,
-  Production deployment `dpl_BJBGHbmKsFYJ5a5DGkoP2QJJ5ZA3`, published through
-  PR #63 under the owner's standing closeout authorization. The sole product
-  change from PR #62 is the acknowledgment's Settings → Account label;
-  [live HTML/script hashes and an actual retained PDF passed](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md#publication-and-retained-hosted-pdf).
-  Web consent recording/retry passed immediately before this publication; exact
-  policy configuration is unchanged. A later Google sign-in removed its stored
-  acceptance; [sign-in durability is now a confirmed open repair](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
-  The previous verified web source was
+- Latest verified web source: `02d320725c5df2f0c7df83026e0af445d62c1e5e`,
+  Production deployment `dpl_8ezS6HFV55ifNeXDkj5MKiyMuhs5`, published through
+  PR #64 under the owner's standing closeout authorization. The PostgreSQL
+  sign-in repair preserves consent/profile/billing metadata, handles concurrent
+  updates and refreshes current Clerk verified addresses. Real PostgreSQL,
+  full check/auth/smoke and hosted preview passed. Public health and the browser
+  identify the new source; the actual no-purchase consent → sign-out → Microsoft
+  sign-in → independent export check passed with the acceptance unchanged.
+  [Repair, publication and live durability evidence](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
+  Previous PR #63 source `4048aa28e65b67ff8eecd9dc95ab76f861f7d680`, deployment
+  `dpl_BJBGHbmKsFYJ5a5DGkoP2QJJ5ZA3`, retains its
+  [acknowledgment label and actual PDF acceptance](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md#publication-and-retained-hosted-pdf).
+  Earlier verified PR #62 web source was
   `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
   Production deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, published with
   owner approval through PR #62. Production source, ten public cache-header
@@ -498,9 +502,9 @@ for the detailed fields. Finish only the still-open evidence:
   visually verified Sandbox sign-in and clean app restart did not resolve it;
   isolate the tester queue or collect device-level diagnostics next. Later
   independent exports found that Google sign-in removed the stored web acceptance.
-  [The PostgreSQL sign-in metadata repair passes locally, including real concurrent database tests](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
-  Publish it, then verify consent survives an actual returning sign-in. iOS consent,
-  web sign-in durability and final shared-release binding remain open. The September 7
+  [The PostgreSQL sign-in metadata repair is published and its real returning-sign-in durability retest passed](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
+  The same acceptance survived unchanged, with only the account sign-in timestamp
+  changing. iOS consent and final shared-release binding remain open. The September 7
   [live delayed/duplicate Checkout replay](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md)
   reached current Production with HTTP 200 / `changed:false` and left the original deleted
   account/entitlement absent, with all 25 exported record groups unchanged

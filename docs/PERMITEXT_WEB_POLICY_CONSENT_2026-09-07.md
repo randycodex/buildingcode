@@ -1,12 +1,13 @@
 # Permitext web policy consent and subscription copy — September 7, 2026
 
-Status: **BOUNDED RECORDING/RETRY, STRIPE COPY AND HOSTED ACKNOWLEDGMENT PASSED; SIGN-IN DURABILITY FAILED**
+Status: **BOUNDED RECORDING/RETRY, STRIPE COPY, HOSTED ACKNOWLEDGMENT AND REPAIRED WEB SIGN-IN DURABILITY PASSED**
 
 Later September 7 evidence found that a real Google sign-in removed the stored
 acceptance from the designated account. The immediate recording and duplicate
-Checkout observations below remain valid within their original scope, but
-enduring consent retention is open. See the [Production reproduction and source
-cause](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
+Checkout observations below remain valid within their original scope. The shared
+PostgreSQL sign-in repair is now published through PR #64, and a real returning
+Microsoft sign-in retained the exact new acceptance on `02d320725c5d`. See the
+[Production reproduction, repair and live durability receipt](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
 
 ## Scope and identity
 
@@ -133,8 +134,9 @@ outside the repository under the existing September 6 live-test folder. Raw
 account, customer, session and acceptance IDs are not included here.
 
 This confirms immediate exact-version recording and same-policy retry. The
-later sign-in loss qualifies that result: enduring consent retention remains
-open until the repair passes a live returning sign-in. iOS consent, final shared-release selection and
+later sign-in loss was repaired separately through PR #64; its real web
+returning-sign-in/export retest passed with the acceptance unchanged.
+iOS consent, final shared-release selection and
 the other B1–B5 gates remain separate. The acknowledgment is a retainable statement
 of subscription terms, not an authenticated transaction receipt; this pass did
 not exercise a new payment or a new successful-purchase redirect.

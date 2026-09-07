@@ -36,15 +36,16 @@ The private target and export helper are retained outside the repository at
    Client ID, redirect URI, supported account types and existing scopes remained
    unchanged. Scopes are `openid`, `email`, `profile`, `offline_access` and
    `User.Read`; no mail, files or organization-wide permission was added.
-4. Final credential: `Permitext Clerk Production - 2026-09-07 active`, with
+4. Initial replacement credential: `Permitext Clerk Production - 2026-09-07 active`, with
    Microsoft-displayed expiry **March 6, 2027**. Its value was transferred directly
    through the browser clipboard into Clerk, then the temporary value and
-   clipboard were cleared. Rotate before that date.
+   clipboard were cleared. A later fresh login rejected this credential; it
+   has now been replaced and removed as recorded below.
 5. An intermediate generated credential appeared in diagnostic output. It was
    replaced again and explicitly deleted after the final credential passed an
    actual returning sign-in. The original invalid credential was also deleted.
-   A complete Entra reload confirmed **one** secret remains, with the final
-   label and expiry above; both superseded credentials were absent. No secret
+   A complete Entra reload at that checkpoint confirmed **one** secret, with the
+   label and expiry above; both earlier credentials were absent. No secret
    value is retained in this repository.
 
 Microsoft allows only two credentials for this application. A third-credential
@@ -52,7 +53,7 @@ attempt failed without creating a secret; discarding that failed form produced
 the owner's observed “Your unsaved edits will be discarded” confirmation.
 The confirmation stalled browser commands until dismissed. The supported
 JavaScript-dialog API then handled the remaining draft confirmation. The failed
-draft did not change the saved Terms/Privacy links or the working credential.
+draft did not change the saved Terms/Privacy links.
 
 ## Live acceptance
 
@@ -88,6 +89,37 @@ The saved mutation's
 SHA-256 after returning sign-in is
 `3a31f942400bae19ac8a0fd3a2ffd956a203d9b7f64ddb3662234331510d0e12`.
 
+## Final credential and durability retest
+
+A later fresh Microsoft exchange failed at `2026-09-07T19:54:51Z` with
+`AADSTS7000215` / `invalid_client`, Clerk event
+`01a07d70-11f4-7c29-bb20-433ad6ce8455`. This contradicts treating the earlier
+rotation checkpoint as final credential acceptance; the existing data-continuity
+observations remain historical evidence.
+
+In the same verified Permitext tenant/application, created the replacement
+`Permitext Clerk Production - 2026-09-07 verified`, credential ID
+`14138590-f25a-4301-9bbc-6014a0a672ca`, expiring **March 6, 2027**. Transferred
+the revealed **Value** column directly into Clerk without displaying it in tool
+output, verified the destination input matched, and saved the connection.
+Client ID, redirect and scopes were unchanged. The temporary value and clipboard
+were cleared. No value is written to this repository or the private receipts.
+
+After a fresh Microsoft login passed, removed the exact superseded `active`
+credential (`7e97edff-618e-466e-a9db-2b92b5b3ce2a`). A full Entra reload confirmed
+one credential, the new `verified` entry. Then explicitly signed out of Permitext
+and completed **another** real Microsoft login after that removal. Clerk records
+both `sign_in.completed` and `session.created` at `2026-09-07T20:01:44Z` for the
+same test identity. Permitext returned Free/Synced with the same collection.
+
+The independent `20:02:47.259480Z` export also proves the new web acceptance
+survived unchanged, including its ID, versions and original timestamp. Only
+`signedInAt` changed; the collection mutation and all 24 content/usage groups
+were unchanged, and entitlement remained null. See the
+[published consent repair and live receipt](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md#publication-and-live-returning-sign-in).
+The test session remains signed in; the sole retained credential must rotate
+before March 6, 2027.
+
 ## Publisher warning and remaining scope
 
 The correct tenant still uses its default `onmicrosoft.com` publisher domain.
@@ -97,11 +129,19 @@ registered multitenant apps, even a custom publisher domain alone does not remov
 the unverified label. Microsoft requires a verified Partner Program identity
 associated with the app for publisher verification.
 
-Next: verify `permitext.com` as this app's publisher domain, then inspect the
-available Partner Center verification prerequisites without inventing business
-facts. The app-specific domain proof uses
-`/.well-known/microsoft-identity-association.json`; no proof file or publisher
-domain change was published in this checkpoint.
+The local publisher-domain candidate adds the static public proof at
+`/.well-known/microsoft-identity-association.json`, containing only the exact
+authorized application ID above. The Entra "Verify a new domain" pane independently
+provides the same path, schema and ID. No client secret is part of this file.
+The proof is served from the existing Vercel public output without adding an API
+handler or changing authentication scopes. Its JSON shape and app identity are
+checked locally; publication and Entra's persisted verification remain separate
+acceptance steps until recorded below.
+
+Next: publish and verify the actual HTTPS JSON response, save `permitext.com` as
+the app's publisher domain, then inspect the available Partner Center verification
+prerequisites without inventing business facts. A custom app publisher domain is
+not itself a verified Partner Program identity or a DNS-verified tenant domain.
 
 Sources: [publisher domain](https://learn.microsoft.com/en-us/entra/identity-platform/howto-configure-publisher-domain),
 [publisher verification](https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview),
