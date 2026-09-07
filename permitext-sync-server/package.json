@@ -173,7 +173,7 @@
     "@clerk/react": "6.15.1",
     "@clerk/shared": "4.31.0",
     "@mantine/core": "^9.5.0",
-    "@mantine/hooks": "^9.5.0",
+    "@mantine/hooks": "^9.5.2",
     "@neondatabase/serverless": "^1.0.0",
     "@vercel/blob": "^2.6.1",
     "pdfkit": "^0.17.1",
