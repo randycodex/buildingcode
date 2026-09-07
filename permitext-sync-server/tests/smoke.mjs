@@ -528,7 +528,9 @@ async function main() {
       "Reader chrome no longer exposes legal-source status or a return-to-source control."
     );
 
-    const workspaceScript = await request("/web/app.js");
+    const workspaceScriptURL = webRoot.text.match(/<script[^>]*src="(\/web\/app\.js\?v=[^"]+)"/)?.[1];
+    assert(workspaceScriptURL, "Web HTML must select a versioned workspace script.");
+    const workspaceScript = await request(workspaceScriptURL);
     const workspaceStyles = await request("/web/styles.css");
     const sourceSerifFont = await requestBinary("/web/fonts/source-serif-4-latin-wght-normal.woff2?v=20260808-typography-v1");
     const workspaceStateScript = await request("/web/workspace-state.js");

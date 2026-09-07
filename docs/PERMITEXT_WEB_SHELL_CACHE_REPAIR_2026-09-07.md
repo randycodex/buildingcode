@@ -1,8 +1,8 @@
 # Web shell cache repair
 
 Original audit B4 startup measurement exposed a release-update defect. Status:
-**local repair and Chrome lifecycle check passed; hosted preview and publication
-pending**. This joins the Reader repair in PR #62. It does not change the public
+**local suites and Chrome lifecycle check passed; preview build ready, hosted
+header inspection and publication pending**. This joins the Reader repair in PR #62. It does not change the public
 Beta gate or installed iOS build 62.
 
 ## Observed failure
@@ -80,6 +80,21 @@ v54 complete-app Reader evidence remains separately recorded.
 Private diagnostic trace, request receipts and check logs are under
 `/private/tmp/permitext-startup-b4-20260907/`. Raw traces are not committed.
 No account grant, paid Research, phone action or private-data cleanup was used.
+The temporary loopback server stopped, its tab closed, and Production DevTools
+closed. The retained Permitext session remains signed in.
+
+`npm run check`, including its precheck and postcheck, passed. The first smoke
+run caught an obsolete test fetching unversioned `/web/app.js` while asserting
+versioned caching. The corrected smoke fetches the script URL selected by the
+actual HTML; the complete rerun passed. No application code changed after the
+full check suite and browser cache lifecycle result.
+
+Vercel preview `dpl_DtAu4cHynA74CxyBrpffjuwpgcEv` reached READY for source
+`f4bfcf01b46eaa9a52fd4ac0c6732a5f69ccd209`. The protected preview redirects
+both the connector's temporary access URL and Chrome to Vercel identity
+verification. Actual hosted headers have therefore not yet been inspected;
+Vercel sign-in was requested. Subsequent smoke/evidence-only changes require
+binding the final PR head to its own preview receipt before publication.
 
 ## Publication and remaining boundary
 
