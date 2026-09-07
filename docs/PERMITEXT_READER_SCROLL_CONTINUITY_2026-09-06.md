@@ -1,7 +1,7 @@
 # Reader scroll continuity repair
 
-Original audit batch B3, principally P2-4. Status: **local repair and actual
-browser acceptance passed; publication pending**. This does not change the
+Original audit batch B3, principally P2-4. Status: **published through PR #62;
+local and hosted browser acceptance passed**. This does not change the
 public Beta gate, installed build 62 or the remaining assistive-technology scope.
 
 ## Reproduced Production failure
@@ -96,9 +96,43 @@ Final `npm run check` (including its readiness-recovery precheck and UX/security
 postcheck), `npm run smoke` and `git diff --check` passed. No source changes
 followed the final v54 browser run; subsequent edits only recorded evidence.
 
-## Remaining boundary
+## Hosted acceptance, September 7
 
-The repaired behavior still needs approved publication and a hosted check.
+After explicit owner approval, PR #62 merged as
+`5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`. Vercel Production deployment
+`dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15` reached READY; `/health` reports that exact
+commit. Published app, stylesheet and worker bytes match the approved source.
+
+The retained Chrome test session initially still referenced v50. Navigating to
+the same `/web` path with `?release=5f1afb414fdd` loaded v55 without clearing site
+data or signing out; an ordinary reload retained v55 and the existing workspace.
+In the 2294 × 1267 viewport, the two existing BC 2022 Readers were independently
+scrolled. Removing the URL fragment left both panes and offsets untouched;
+restoring the same Project fragment invoked the actual full workspace renderer.
+
+| Reader | Section / block retained | Offset before | Settled offset after rebuild | Difference |
+| --- | --- | ---: | ---: | ---: |
+| Chapter 10, 1001.4 | `2122` / `rid-0-0-0-172822` | -71.109375 px | -71.5625 px | -0.453125 px |
+| Chapter 1, 101.4.6 | `10` / `rid-0-0-0-164266` | -18.203125 px | -18.09375 px | +0.109375 px |
+
+Both heading element IDs changed, confirming real pane reconstruction. The
+initial restored windows held 5 and 17 sections; the later settled check retained
+the same blocks and offsets. A full rendered screenshot was reviewed. The
+session finished **Synced** on v55; no Pro grant, authored content change, paid
+Research or phone was used. The existing legacy-workspace notice remained;
+its quarantined data was not modified.
+
+Private evidence is in
+`/private/tmp/permitext-startup-b4-20260907/pr62-reader-production.json`, alongside
+the publication/header receipts. Initial deployment-scoped log queries since
+`2026-09-07T14:18:02Z` returned no 5xx or error/fatal rows; this is a short initial
+scan, not ongoing monitoring. GitHub also showed the existing Apple `Default`
+CI workflow pending automatically after the main-branch merge. No manual iOS
+upload or App Store submission was performed, and no newly installed phone
+build is claimed.
+
+## Remaining audit boundary
+
 Focused VoiceOver, remaining supported-layout scope, B4 performance/eviction
 evidence and B5 release decisions remain open. Passed offline citations and
 physical table panning do not need repeating. No machine gate is changed.

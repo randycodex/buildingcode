@@ -1,8 +1,8 @@
 # Web shell cache repair
 
 Original audit B4 startup measurement exposed a release-update defect. Status:
-**local suites, Chrome lifecycle and hosted core-header checks passed;
-publication pending**. This joins the Reader repair in PR #62. It does not change the public
+**published through PR #62; local, preview and Production checks passed**.
+This joins the Reader repair in PR #62. It does not change the public
 Beta gate or installed iOS build 62.
 
 ## Observed failure
@@ -133,11 +133,31 @@ maps. Only unrelated extension errors appeared in the bounded preview log read.
 
 ## Publication and remaining boundary
 
-The combined candidate's local suites and hosted core headers now pass.
-PR #62 needs approval for this final scope before Production; a documentation-only
-evidence commit does not change the tested application/configuration bytes.
-After publication, verify both actual script version and Reader positions in
-the retained session before resuming B4's representative cold/warm samples.
+The owner approved PR #62, merged as
+`5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`. Its tree matched the approved
+candidate. Production `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15` reached READY at
+`2026-09-07T14:18:02.280Z`; canonical `/health` reports the same commit and host.
+
+Direct public HTTP checks on `permitext.com` returned HTTP 200 and the intended
+policy for all ten tested paths: `/`, `/web`, `/web/`, version-looking
+`/web/index.html`, the Clerk-return query, unversioned and v55 `app.js`, v55 CSS,
+`/service-worker.js`, and `/open/section/303`. App/CSS/worker bytes matched local
+approved source exactly. Unlike the earlier browser-blocked preview navigation,
+the direct Production HTTP check independently verifies the worker's `no-cache`
+header. This is HTTP evidence, not a browser service-worker installation test.
+
+The retained test session loaded v55 through a fresh same-origin release query,
+then retained v55 on ordinary reload. Both existing Reader passages survived
+the real Project-fragment workspace rebuild within half a pixel; the
+[Reader acceptance record](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md#hosted-acceptance-september-7)
+records the exact values. The session remains signed in and Synced, with legacy
+quarantined data untouched. No native build was manually uploaded or submitted.
+
+Private receipts `pr62-publication.json`, `pr62-production-headers.json` and
+`pr62-reader-production.json` share the existing evidence directory. Initial
+deployment-scoped 5xx and error/fatal log queries returned no rows. B4 can now
+resume representative startup measurements; no p50/p90 is claimed here.
+
 An already stored one-year immutable entry may need one deliberate hard refresh
 to obtain the revised headers. Do not clear site data or private drafts to do it.
 No automatic refresh of an actively edited workspace is introduced.

@@ -610,6 +610,36 @@ final class NativeReaderPhysicalStressUITests: XCTestCase {
         )
     }
 
+    func testAccountCloseFromWelcomeAndSavedAfterScrolling() {
+        let app = XCUIApplication()
+        app.launchArguments += ["--phase5-first-use-fixture", "--permitext-disable-clerk"]
+        app.launch()
+
+        let signIn = element(in: app, identifier: "phase5-first-use-sign-in")
+        XCTAssertTrue(signIn.waitForExistence(timeout: 45), launchFailureDescription(in: app))
+        signIn.tap()
+        let close = app.buttons["account-close"]
+        XCTAssertTrue(close.waitForExistence(timeout: 10))
+        XCTAssertTrue(close.isHittable)
+        close.tap()
+        XCTAssertTrue(waitForNonexistence(close), "Account must dismiss from the welcome route.")
+
+        let saved = app.tabBars.buttons["Saved"]
+        XCTAssertTrue(saved.waitForExistence(timeout: 10))
+        saved.tap()
+        app.buttons["Open Account"].tap()
+        XCTAssertTrue(close.waitForExistence(timeout: 10), "Saved must expose the Account close control.")
+        XCTAssertTrue(close.isHittable)
+        keepScreenshot(named: "account-close-saved-top", from: app)
+        app.swipeUp()
+        app.swipeUp()
+        XCTAssertTrue(close.isHittable, "The close control must stay available while Account scrolls.")
+        keepScreenshot(named: "account-close-saved-scrolled", from: app)
+        close.tap()
+        XCTAssertTrue(waitForNonexistence(close), "Account must dismiss after scrolling from Saved.")
+        XCTAssertTrue(app.buttons["Open Account"].isHittable)
+    }
+
     func testResearchVerificationFailureRemainsVisibleAfterReopeningConversation() {
         let app = XCUIApplication()
         app.launchArguments += [

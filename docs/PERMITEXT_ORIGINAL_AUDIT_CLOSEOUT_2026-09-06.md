@@ -1,22 +1,28 @@
 # Original production audit — current closeout checklist
 
-Updated September 6, 2026. This is the current action list for the **original
+Updated September 7, 2026. This is the current action list for the **original
 17 findings** in the [production-readiness backlog](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md).
 It reconciles completed evidence with remaining acceptance. It adds no feature,
 paid evaluation cohort, release approval or new audit scope.
 
 ## Evidence baseline and working rules
 
-- Latest verified web source: `aed30262742d1888f94555997c4140cbdcaa7b71`,
-  Production deployment `dpl_BmE1MmRPw1rVGTG5Gmfx9GvZHL6s`, published with
-  owner approval through PR #61. Both canonical origins and six assets per
-  origin were verified against the source. See the [publication evidence](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md#approved-follow-up-publication).
-  Physical build 62 remains based on `e60ca415fe8b7b60be65449b7ef49baccc82eec3`
-  with its original [acceptance scope](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md).
+- Latest verified web source: `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
+  Production deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, published with
+  owner approval through PR #62. Production source, ten public cache-header
+  paths and the retained v55 session/Reader check passed. See the
+  [Reader repair and publication record](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md).
+  Physical build 63 now uses the same selected source; its
+  [Account-X delivery and acceptance](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md)
+  are verified. Earlier build-62 receipts retain their original
+  [acceptance scope](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md).
 - Reconciliation started at branch commit `7001a3b1d`. The owner-requested
-  Account close control is commit `33f5cd41d`, now merged but not built for
-  TestFlight. The saved-citation recovery and offline-installer repairs are
-  deployed on the web. No new native build was made in this publication.
+  Account close control is commit `33f5cd41d`, now merged and verified by a
+  focused simulator UI test from both welcome and Saved, including dismissal
+  after scrolling. Xcode Cloud archive 264 succeeded on the current source;
+  TestFlight initially still listed build 62 on September 7. The separately
+  numbered build 63 is now processed, installed and physically verified for
+  the Account control. A successful archive alone is not a TestFlight or phone pass.
 - The 17 IDs comprise 16 repair findings and the P1-4 release-acceptance umbrella.
   A repaired symptom, broader client coverage and public-release approval are
   separate statuses. The table below does not count a local pass as a physical
@@ -57,21 +63,21 @@ each remaining check one home so it is not repeated for several findings.
 | --- | --- | --- | --- |
 | P0-1 | Historical citations open the wrong provision/edition. | **Verified online symptom; native offline pair owner-confirmed.** Production and physical build 60 reopened 2014 Slope and 2022 Gates correctly; build 61 opened both saved 2014 Research citations. The owner confirmed build-62 offline Slope/Gates checks, within the B3 evidence limits below. Source/edition routing contracts pass. [Execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md#saved-citations-and-keyboard-access), [Research confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md). | B3: focused assistive-technology coverage remains. Hosted web install/reopening and failure recovery passed on Production `6ccc2d4a8`. |
 | P0-2 | Moving Research retains the prior Project's active facts/history. | **Live A → B summary → A verified.** Production reset active context, captured B's qualified facts in a provider-free summary, and preserved both immutable answers and all original Notes/Reports. Physical build 62 showed B's synced summary and correct address. Local context/version, PostgreSQL races and the joined Note/Report flow also pass. | B1: controlled final-client context-change/stale-completion recovery. The successful move and summary do not need repeating. |
-| P0-3 | Account transitions leak private state or late async results. | **Partial live acceptance.** The repaired web sign-out, scoped account switches and build-60 populated deletion passed. Local delayed-callback, A → B → A, stale-401 and account-link recovery contracts pass. | B2: stale independent client during switch/revocation and the remaining link-recovery path. Retain the documented legacy/quarantine boundaries. |
-| P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Text/image live paths and controlled web cleanup failure verified.** Physical build 60 retained an unsent text draft through failed transport/termination and reconciled it after a web edit. The September 6 image survived offline reopening, server persistence and physical build-62 display. B2's real Chrome IndexedDB/CacheStorage fault tests preserve drafts, exact pending saves and image bytes after restart/retry. | The image exercise did not interrupt a transfer mid-byte. B4: storage-pressure/OS-eviction coverage or an explicit recorded scope decision. |
+| P0-3 | Account transitions leak private state or late async results. | **Partial live acceptance.** The repaired web sign-out, scoped account switches and build-60 populated deletion passed. The live Pro revoke/regrant stale-editor check and existing-Google sign-in pass. Local delayed-callback, A → B → A, stale-401 and account-link recovery contracts pass. The real-Chrome recovery export now has an independent file receipt within its synthetic-provider scope. | B2: remaining live link/provider/consent coverage. Retain the documented legacy/quarantine boundaries. |
+| P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Live text/image recovery and bounded failure paths verified.** Physical build 60 retained an unsent draft through failed transport/termination and reconciled a web edit. The image reached physical build 62. Real Chrome cleanup failures and interrupted HTTP transfers preserve draft/image bytes; the native cache also preserves durable files under actual macOS APFS exhaustion and recovers on retry. | B4: physical iOS pressure, OS/browser eviction and broader hosted/native transfers, or an explicit recorded scope decision. |
 | P0-5 | Retired Workboard writers remain writable. | **Local HTTP repair verified.** Authenticated 410 responses, mixed-sync rejection and historical read/Report compatibility pass imported fixtures. Publication records bind the shipped repair. | B5: final candidate compatibility binding. The absence of a destructive Production write exercise is not a new authorization to attempt one. |
-| P0-6 | Concurrent Notebook/Research writes report success while losing changes. | **Notebook live path verified; Research races verified locally.** Physical stale-save rejection and reviewed version-3 reconciliation passed against Production. Local PostgreSQL tests cover atomic move/completion, rollback and replay accounting. | B1: deployed context/completion conflict evidence. B2: stale-writer lifecycle edges. The independent-device Notebook conflict already passed. |
+| P0-6 | Concurrent Notebook/Research writes report success while losing changes. | **Notebook live path verified; Research races verified locally.** Physical stale-save rejection and reviewed version-3 reconciliation passed against Production. Local PostgreSQL tests cover atomic move/completion, rollback and replay accounting. | B1: deployed context/completion conflict evidence. The independent-device Notebook conflict and B2 Pro revoke/regrant stale-editor check already passed. |
 | P1-1 | Normalization loses negation, partial coverage and assumptions. | **Saved-workflow qualification verified.** Local qualification/projection tests plus actual build-60/62 Reports preserve qualifiers. The live moved-Project summary preserves B's partial coverage and assumptions; physical build 62 displays its matching question/address history card. | Retain the recorded native history-card limit and previously accepted Beta Research limits. Context-failure recovery is tracked once under B1; a new paid quality cohort is not part of closeout. |
 | P1-2 | Streaming errors discard recovery information. | **Local repair verified.** Structured JSON/stream errors retain actionable context; source-review recovery and stale-account suppression pass. The focused recovery contract passed again in this pass. | B1: representative final-client source/context-change failure and explicit recovery, using a controlled no-provider failure where available. |
-| P1-3 | Private cache deletion/revocation is incomplete. | **Bounded populated deletion verified.** Build 60, independent account exports, Clerk lookup and all five exact private-file checks passed; browser reload did not recreate the account. Unknown-owner historical cache retention was disclosed. | B2: independent stale writer during revoke/cleanup failure. Retain legacy-data limits; do not repeat the completed populated deletion without a newly justified, approved target. |
+| P1-3 | Private cache deletion/revocation is incomplete. | **Bounded populated deletion verified.** Build 60, independent account exports, Clerk lookup and all five exact private-file checks passed; browser reload did not recreate the account. The B2 live Pro revoke/regrant stale-editor, controlled real-browser cleanup-failure and independent recovery-file checks also passed. Unknown-owner historical cache retention was disclosed. | B2: remaining live provider/link/consent scope. Retain legacy-data limits; do not repeat the completed populated deletion without a newly justified, approved target. |
 | P1-4 | Final release acceptance is incomplete. | **Open release umbrella.** Existing Stripe and Apple test lifecycles, accepted monitoring, support/restore exercises, policy publication and source/archive evidence are retained. | B5: outstanding provider/consent, operations, Apple/privacy and final candidate/owner decision fields. |
 | P2-1 | Collapsed Project facts remain focusable. | **Verified reported symptom.** Actual Production keyboard traversal and accessibility-tree inspection exclude collapsed inputs and advance to Saved Evidence. | B3: focused assistive-technology/supported-layout spot-check; do not repeat the passed keyboard case. |
 | P2-2 | Reports omit the structured Project facts used by Research. | **Verified reported defect, including actual exports.** Build 60 fixed the omission; build 62 web/iOS PDFs preserve qualified facts and distinguish Project default from Research edition. All nine new PDF pages were inspected; Chrome download passed by owner confirmation. | The retained Note/Report/PDF cycle is complete. Moving to a different Project is tracked once under P0-2/B1. Final release binding is P1-4/B5. |
 | P2-3 | Notebook load failures look empty/read-only. | **Verified text/error/reconnect, offline-image and controlled browser cleanup-failure paths.** Explicit 503/403/revoked-access states, device-only drafts, native Retry and stale-version review passed. The September 6 image survived offline reopening and reached Synced on web and physical build 62. B2's real-browser database/cache failures preserved exact draft journals and image bytes after restart/retry. | Storage-pressure/OS-eviction coverage remains B4. |
-| P2-4 | Reader chrome inconsistently shows edition. | **Verified reported labels/race.** Production and physical saved routes show the right 2014/2022 edition; the web code-switch race clears stale text and loads the selected code. Build-62 offline reopening is owner-confirmed within the B3 limits. | B3: independent scroll-position and focused assistive-technology coverage. Hosted web offline reopening passed on Production `6ccc2d4a8`. |
+| P2-4 | Reader chrome inconsistently shows edition. | **Verified reported labels/race.** Production and physical saved routes show the right 2014/2022 edition; the web code-switch race clears stale text and loads the selected code. Build-62 offline reopening is owner-confirmed within the B3 limits. | B3: focused assistive-technology coverage. Independent Reader positions passed the PR #62 hosted check; hosted web offline reopening passed on Production `6ccc2d4a8`. |
 | P2-5 | Tablet toolbars collide; supported phone-web behavior is unclear. | **Verified reported layout/table cases.** The saved 320–1440-width checks found no toolbar overlap. Build 61's previously failing Fuel Gas table pans in both directions by owner confirmation. | B3: final supported-layout/VoiceOver spot-check and explicit browser/platform scope. This is not an all-table certification. |
 | P2-6 | Exact-match search is poorly explained. | **Verified reported behavior.** Production disclosure, no-match/clear, shorter-term recovery and correct result reopening passed; controlled local retry passed. | B3: focused accessibility check and B5 compatibility binding. |
-| P2-7 | Startup waits on secondary catalogs/large client code. | **Local critical-path repair verified.** Controlled delay tests show the workspace can render while secondary catalogs load, after authentication. Reload restores panes. | B4: representative browser/device measurements; the controlled timing is not device paint or p50/p90 acceptance. |
+| P2-7 | Startup waits on secondary catalogs/large client code. | **Repair and representative desktop measurement verified.** Controlled delays prove secondary catalogs do not block the workspace. Ten Production v55 Chrome traces now record warm/cold-network-cache p50/p90, with all selected workspace frames inspected. [Measurements](./PERMITEXT_WEB_STARTUP_MEASUREMENT_2026-09-07.md). | The desktop sample is not a universal phone/OS result. B4 storage-pressure, eviction and interrupted-transfer coverage remain separate. |
 
 ## This pass: completed local work
 
@@ -191,6 +197,14 @@ each remaining check one home so it is not repeated for several findings.
 
 Stop after the named transitions have evidence or a concrete reproducible defect.
 Do not widen this into another answer-quality cohort.
+
+September 7 hosted-overlap prerequisite check: the linked Vercel Production
+environment download completed, but protected values were returned as
+`[SENSITIVE]` placeholders. Neither the downloaded environment nor the retained
+local environment supplied a usable Clerk secret and PostgreSQL connection
+for a controlled hosted overlap. No row lock, overlapping request, environment
+change or new Research run was performed. The actual server-side race remains
+unverified; do not relabel the earlier browser-delayed response as that proof.
 
 ### B2 — Remaining recovery and account-isolation edges
 
@@ -400,7 +414,9 @@ chapter-1 Reader was clamped into its initial body window. The
 now preserves both visible passages within one pixel in the actual complete
 local Chrome app, including nearby-section loading. Keyboard chapter-tree
 navigation, focus return and native-select exclusion also passed. Publication
-and hosted scroll acceptance remain pending; this is not VoiceOver evidence.
+and hosted scroll acceptance subsequently passed through PR #62: the two
+Production Reader passages stayed within half a pixel after a real pane rebuild
+on v55. This is not VoiceOver evidence.
 VoiceOver on the affected Reader/table/Project/Search controls and
 supported-layout scope remain open. Reuse the build-61 physical table-pan result
 unless its runtime path changes; keep further device work bounded.
@@ -414,9 +430,12 @@ cache lifecycle check passes. See the [shell cache repair](./PERMITEXT_WEB_SHELL
 The combined Reader/cache candidate passes local check/smoke and Chrome cache
 lifecycle checks. Its READY preview at application head `eb001c9d1` confirms
 actual v55 loading, revalidated HTML and unversioned resources, and cached
-immutable versioned assets. Publication and hosted Reader acceptance remain
-pending; the broader header matrix retains its local/compiled-config boundary.
-The stale trace is diagnostic only; representative startup timing remains open.
+immutable versioned assets. Approved PR #62 then published as `5f1afb414fdd`.
+Canonical Production health/source checks and all ten public HTTP header paths
+passed; the retained session loaded v55 and passed the actual Reader rebuild
+check. Private-route exclusions remain compiled-config evidence.
+The stale trace is diagnostic only. The later September 7 ten-sample desktop
+startup measurement is recorded in the execution checkpoint below.
 Earlier retained-tab reload claims establish visible behavior, not the deployed
 script version unless that version was independently inspected in the DOM.
 
@@ -427,6 +446,26 @@ storage-pressure/OS-eviction conditions by controlled evidence or an explicit
 owner scope/risk decision. Until then, these remain unverified; a local delay
 test or ordinary app-switcher termination does not close them.
 
+September 7 interrupted-transfer checkpoint: the
+[real Chrome/HTTP exercise](./PERMITEXT_NOTEBOOK_INTERRUPTED_TRANSFER_2026-09-07.md)
+passed partial-body socket loss, full image commit with lost response, two
+page reloads and same-identity retry followed by one acknowledged Note save.
+Independent file inspection found one original image and one version-1 Note,
+with no unresolved device-local image reference. The local web pipeline now
+has actual interrupted-transfer evidence. Hosted/native transfer scope and
+OS eviction remain open; do not repeat this local pass as a substitute for
+those remaining conditions.
+
+September 7 storage-pressure checkpoint: the shipped native cache passed
+[actual APFS exhaustion and recovery](./PERMITEXT_NATIVE_STORAGE_PRESSURE_2026-09-07.md)
+on a disposable 128 MiB volume. Replacement/new writes returned Cocoa 640
+with underlying POSIX ENOSPC 28. Previously durable files remained byte-exact
+across a separate process restart; both retries became durable after freeing
+space, with the second account unchanged. This uses the real cache with a
+synthetic Codable payload on macOS, not an installed iOS app. Physical iOS
+pressure, OS/browser eviction and broader hosted/native transfer scope remain
+open. No runtime repair, deployment or phone interaction was needed.
+
 ### B5 — P1-4 release closeout
 
 Use the [public-release acceptance record](./BETA1_PUBLIC_RELEASE_ACCEPTANCE_RECORD.md)
@@ -434,8 +473,18 @@ for the detailed fields. Finish only the still-open evidence:
 
 - Remaining fresh/existing provider sign-ins and account-link/client consent
   coverage; retain passed email registration/sign-in and populated deletion.
-- Exact client policy consent/acknowledgment and remaining non-charge
-  billing replay/customer-cleanup reconciliation.
+- [Live web policy consent](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md) now passes:
+  exact versions were durably recorded before unpaid Checkout, with independent
+  before/after exports and same-policy retry. Stripe's stale billing-month
+  allowance copy is corrected and verified in fresh hosted Checkout. iOS consent,
+  acknowledgment publication/retention and final binding remain open. The September 7
+  [live delayed/duplicate Checkout replay](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md)
+  reached current Production with HTTP 200 / `changed:false` and left the original deleted
+  account/entitlement absent, with all 25 exported record groups unchanged
+  and empty. The exact disposable Stripe customer was then deleted and its
+  permanent-deletion state independently confirmed by exact-URL reload and
+  provider request/event logs. Both non-charge billing checks are complete;
+  retain their verified scope and final-release binding. No repeat charge is needed.
 - Spend notification/hard-stop evidence and the existing owner operations
   attestations. Preserve the accepted monitoring alternative and previously
   passed monetary lifecycles.
@@ -470,8 +519,10 @@ and integrated retained-byte account-link recovery checks now pass in real Chrom
 storage, with the local/synthetic boundaries recorded above. B3 reproduced a
 separate Reader scroll reset; its local repair and actual full-app Chrome
 acceptance pass in the [repair record](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md).
-Finish the reviewable candidate and approved publication/hosted check, then
-continue B3's remaining accessibility/layout scope and B4/B5; preserve the separate
+Approved PR #62 published the Reader and shell-cache repairs as `5f1afb414fdd`;
+Production health, matching source, ten public HTTP header paths and retained
+v55 session/Reader acceptance passed. Continue B3's remaining
+accessibility/layout scope and B4/B5; preserve the separate
 server-side race and live provider-link/consent scope.
 The native Account close button is merged source awaiting a
 separately selected iOS build; it is not part of installed build 62.
@@ -487,3 +538,107 @@ documents and local checks to reconcile the remaining work without another
 phone session or main-account restoration. This is sequencing within the
 original audit, not authorization for paid Research, agent delegation, a new
 deployment, provider configuration changes or public release.
+
+## September 7 execution checkpoint
+
+The owner subsequently authorized continuing the six closeout steps and routine
+recommended actions without repeated approval requests, using the designated
+test account and retaining its sessions. Earlier batch-specific restrictions
+above describe their historical authorizations. Verification codes and facts
+only the owner can supply still require input; unobserved release criteria
+cannot be marked passed by authorization alone.
+
+- **B3 Account X:** the requested native glass control is already in the merged
+  source. The new welcome/Saved/scroll/dismiss UI regression passes; both
+  screenshots were inspected. Build 63 is now uploaded, processed and physically
+  installed. The actual phone's glass X stays fixed after scrolling and closes
+  Account back to Saved; the test identity remains Free and Synced. Follow the
+  [build 63 delivery record](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md).
+- **B4 startup measurement:** ten valid Production v55 traces now complete the
+  representative desktop measurement: five warm-cache and five disabled-cache
+  reloads, with individually inspected workspace filmstrip frames. Median LCP
+  is 2.084 seconds warm and 1.990 seconds with network cache disabled. See the
+  [conditions, individual samples and limitations](./PERMITEXT_WEB_STARTUP_MEASUREMENT_2026-09-07.md).
+  OS pressure/eviction and interrupted-transfer coverage remain open.
+- **B2 recovery file, earlier attempt:** a new isolated synthetic run reached recovery after a
+  lost receipt, but did not produce an independently observed completed file.
+  The previous exact-byte fixture evidence remains valid; no new download pass
+  is claimed. The temporary fixture's browser database/local/session storage
+  and server-side file storage were removed afterward.
+- The Production test-account baseline remains Free, with retained content and
+  no temporary grant. No new Research request, paid turn, provider link, account
+  merge or deletion was performed in this checkpoint.
+
+### Existing Google identity sign-in, September 7
+
+The designated web test session was signed out and signed back in through the
+actual Google account chooser, selecting only the designated test address.
+The already-linked provider returned to Permitext successfully, restored its
+three Projects and three saved passages, and reached Free/Synced. The checkout
+button is disabled while the policy-consent checkbox is unchecked; no agreement
+checkbox or purchase was submitted.
+
+An independent exact-target export at `2026-09-07T15:35:53.127Z` matches the
+morning baseline's foundation, usage and operation hashes, record counts, and
+conversation revision/context/messages. Private receipts are
+`closeout-six-baseline-*` and `closeout-google-signin-*` under
+`/private/tmp/permitext-b1-live-20260906/`. This is a live existing-Google-user
+sign-in pass, not a new provider-link, account-merge, Apple/Microsoft or completed
+paid-consent pass. The test session remains signed in.
+
+Remaining six-step scope: B1 deliberate server-side move/completion overlap;
+B2 live provider/link/consent coverage; B3 selected-build supported-layout
+checks, with VoiceOver deferred; B4 storage failure coverage; B5 operational
+and release evidence; then exact candidate binding and final go/no-go. The
+recovery file receipt completed in the later checkpoint below. The actual
+Certificate of Authority effective date is awaiting the owner's answer.
+
+### September 7 priority adjustment and operations drill
+
+The owner explicitly instructed, “forget about voiceover for now, we can do
+that later.” Remaining VoiceOver acceptance is deferred out of the current
+closeout execution; it is not a pass and will not hold up the next technical
+checks. No VoiceOver or Caption Panel setting was enabled or changed. The
+build-63 Account X acceptance remains complete.
+
+The isolated manual Vercel pause/resume drill passed, with provider Activity,
+an actual `503 DEPLOYMENT_PAUSED`, exact recovered health/release bytes and the
+same deployment ID. The disposable project was removed afterward; all six
+pre-existing Production targets were preserved. The post-drill Production
+monitoring sample had zero actionable findings. See the
+[spend-control receipt](./BETA1_SPEND_CONTROL_ACCEPTANCE_RECORD.md#september-7-isolated-manual-pauserecovery-receipt).
+Actual spend-threshold notification delivery and automatic threshold linkage
+remain separate open results. Recovery, remaining provider/consent coverage,
+storage failure conditions and release reconciliation continue without phone
+VoiceOver work.
+
+### September 7 App Store preparation and recovery-file completion
+
+- The [App Store preparation receipt](./PERMITEXT_APP_STORE_READONLY_AUDIT_2026-09-03.md#september-7-preparation-receipt)
+  records saved/reloaded listing text, app categories, Free app pricing,
+  manual release, subscription localization and Production notification URL.
+  U.S.-only availability and the existing $20/month subscription price were
+  verified. Mac/Vision Pro availability now matches existing iPhone-only
+  build settings. The privacy policy URL and owner-provided App Review contact
+  details are saved and verified after reload. The private phone number is
+  retained only in Apple, not this repository.
+- The owner instructed, “no need for the screenshots now- i need to work on
+  the UI first.” Screenshot preparation/upload is deferred until the UI is
+  finalized. Earlier temporary captures were not added to the repository or
+  uploaded. The dedicated capture simulator was shut down and its status-bar
+  override cleared. This is a deferral, not completed screenshot acceptance.
+- The retained local recovery server and same-origin Chrome state were
+  revalidated, then the lost-response/tab-restart recovery completed all six
+  checks. The actual downloaded JSON independently preserved the Note,
+  pending-save journal, original image and later source edit while excluding
+  credentials and unknown-owner legacy work. Browser storage and the exact
+  temporary server/private-file store were cleaned afterward. See the
+  [recovery-file receipt](./PERMITEXT_ACCOUNT_LINK_RECOVERY_FILE_2026-09-07.md).
+  This closes the missing file receipt within the isolated synthetic-provider
+  scope; live provider/link/consent acceptance remains open.
+- No new product code, Research turn, purchase, App Store submission or public
+  Beta activation was part of this checkpoint. Reviewer access, content-rights
+  clearance, age/privacy declarations, actual signed Production Apple delivery,
+  threshold notification/automatic pause linkage and remaining B1/B4 coverage
+  still require their own evidence. Continue those independent checks while
+  the owner works on the UI; capture final screenshots afterward.

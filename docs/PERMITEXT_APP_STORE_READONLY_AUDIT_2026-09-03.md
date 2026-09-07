@@ -2,6 +2,12 @@
 
 Status: **Read-only live audit complete for the surfaces below; preparation remains open. Do not submit or release.**
 
+September 7 update: the historical read-only findings below are superseded for
+the fields in the [preparation receipt](#september-7-preparation-receipt).
+The owner subsequently authorized recommended work within the six-step
+closeout without repeated approvals. Draft configuration has now been saved;
+App Store submission and public release remain unperformed.
+
 Owner direction during this work: App Store submission/public release must be the last step. Keep preparing and testing; do not use **Add for Review**, **Submit for Review**, or public release controls without later explicit approval. No Apple settings were saved or changed during this audit.
 
 ## Fresh evidence
@@ -53,3 +59,49 @@ The local English metadata draft now corrects the allowance to 100 completed-and
 ## Local screenshot audit
 
 All four JPEGs in `NYC CC APP/docs/app-store/screenshots/iphone-6.9/submission/` were visually inspected and checked with `sips`: 1320 × 2868, no alpha. They show library, Reader, search, and Saved without visible personal account information. `02-code-reader.jpg` visibly includes the ladybug control corresponding to `readerDiagnosticSelector` in `ChapterHTMLReaderView.swift`. This contradicts the old package's clean-diagnostics claim; its README and checklist now explicitly require recapture from the final release configuration. The original files are retained unchanged. No fresh screenshot package is claimed ready.
+
+## September 7 preparation receipt
+
+The authenticated App Store Connect session was read, updated and reread after
+reload on September 7. App `6774385434` and subscription `6777744460` remain
+Prepare for Submission. No build selection, Add for Review, submission or
+release action was taken.
+
+| Item | Verified result |
+| --- | --- |
+| Listing text | Promotional text, description, keywords, support and marketing URLs, and copyright saved from the local English metadata file |
+| Turn-accounting wording | Clarified that completed-and-saved answers count; a failure without a saved answer does not. A disconnected client alone does not prove that no turn completed |
+| App information | Subtitle `NYC Codes, Search & Projects`; primary Reference; secondary Productivity; saved and retained after reload |
+| Release mode | Manual release checked after save and reload |
+| App price | Starting Free schedule saved; current U.S. price and proceeds both reread as `$0.00` |
+| App availability | `1 Available / 174 Not Available`; expanded tooltip names United States only |
+| Extra platforms | Mac and Vision Pro availability unchecked and retained after reload; matches the existing app build settings disabling those platforms and the archived `UIDeviceFamily: [1]` |
+| Group localization | English (U.S.), `Permitext Pro`, Use App Name; saved and reread |
+| Subscription localization | Existing name `Permitext Pro Monthly` retained; description saved as `Pro workspace and up to 100 Research turns` |
+| Subscription price | Read-only filter to countries selected for availability shows only United States, `$20.00`; one-month duration, zero introductory offers and zero upcoming changes |
+| Production notifications | Saved `https://permitext.com/billing/apple/notifications` and verified after reload; the current UI showed no notification-version selector |
+| Sandbox notifications | Existing `https://permitext-apple-sandbox.vercel.app/billing/apple/notifications` preserved and reread |
+| Privacy policy URL | `https://permitext.com/privacy` saved and reread; the privacy questionnaire remains incomplete |
+| App Review contact | Owner-provided name, phone and contact email saved; all four fields retained after native Chrome reload, with Save disabled. The private phone number is not recorded in this repository |
+
+The canonical Production health verifier passed against PostgreSQL
+`normalized-v4`. An unsigned empty notification probe at
+`2026-09-07T16:08:49.776Z` returned direct HTTP 400 with the expected missing
+signed-payload error. Source inspection confirms that rejection precedes
+ownership or entitlement changes. This verifies endpoint reachability and
+rejection, not actual Apple-signed delivery. Private receipt:
+`/private/tmp/permitext-apple-preparation-20260907/unsigned-notification-probe.json`.
+The configured route is the existing signed V2 handler; see Apple's
+[server-URL setup documentation](https://developer.apple.com/help/app-store-connect/configure-in-app-purchase-settings/enter-server-urls-for-app-store-server-notifications).
+
+The owner subsequently deferred screenshots until UI work is finished. No
+images were uploaded or added to the repository. The temporary capture
+simulator was shut down after its status-bar override was cleared. Remaining
+VoiceOver work is separately deferred, not passed.
+
+Remaining: final screenshots and subscription-review image after the UI work;
+verified reviewer access; actual content-rights clearance; truthful age/privacy
+declarations; signed Production notification delivery; remaining technical
+acceptance and final candidate/go-no-go. Historical subscription review notes
+still describe the old Settings navigation and will be replaced with the
+complete, tested reviewer route before submission.

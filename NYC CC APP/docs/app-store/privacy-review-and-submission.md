@@ -2,6 +2,24 @@
 
 This is the working checklist for App Store version 1.0. It separates preparation from public declarations and submission actions.
 
+September 7 current checkpoint: build 63 is uploaded, internally available and
+physically verified for Account close/scroll/dismiss behavior. Its signed
+archive's semantic privacy union matches build 62: 13 collected categories,
+three required-reason API groups, no tracking. See the
+[build 63 receipt](../../../docs/PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md).
+Listing text, subtitle, Reference/Productivity categories, Free app price,
+manual release, English subscription-group name and the updated subscription
+description are now saved in Apple. The Production notification URL is saved;
+actual Production signed-notification delivery remains separate. U.S.-only
+availability is verified. Mac and Vision Pro availability were disabled to
+match the source's existing iPhone-only support settings. The App Privacy
+questionnaire, content rights, age rating, reviewer access and final submission
+are not complete. The owner-provided App Review contact details are now saved
+and verified after reload; the phone number is retained only in Apple, outside
+the repository. Remaining VoiceOver testing is deferred by the owner's
+September 7 instruction. Screenshots are also deferred until the owner finishes
+the UI. Earlier dated entries below remain historical.
+
 September 3 live audit: see [current observed Apple state](../../../docs/PERMITEXT_APP_STORE_READONLY_AUDIT_2026-09-03.md). App Store submission and release are the owner's final steps and are not authorized. Older configuration notes below are not proof that Apple fields have been saved.
 
 September 4 repair publication update: [Production and build 56 evidence](../../../docs/PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md) supersedes the earlier build-52 upload status. Build 56 is available to Internal Testers and passed installation, launch, displayed build identity, and existing account/plan/sync/saved-section/Project-container continuity on the iPhone 17 Pro. This is bounded physical acceptance, not completion of the submission matrix. No App Store build selection or submission was performed.
@@ -35,7 +53,7 @@ Build/upload and app availability were rechecked September 3. Agreement, bank, t
 
 - Bundle ID: `com.randycodex.permitext`
 - Version: `1.0`
-- Latest verified uploaded/internal TestFlight build: `58` (September 5); no App Store build was selected during the repair publication
+- Latest verified uploaded/internal TestFlight build: `63` (September 7); no App Store build has been selected
 - App Store Connect/TestFlight build: confirm the exact live build before selecting the submission candidate
 - Minimum iOS: `17.0`
 - Device family: iPhone only
@@ -44,7 +62,7 @@ Build/upload and app availability were rechecked September 3. Agreement, bank, t
 - Paid Apps Agreement: active
 - U.S. tax form: active
 - Bank account: active
-- Permitext Pro Monthly price: $20.00 in the United States
+- Permitext Pro Monthly price: $20.00 in the United States; September 7 live pricing filtered to enabled territories shows United States as the only selected territory, zero introductory offers and zero upcoming changes
 - Public legal pages:
   - `https://permitext.com/privacy`
   - `https://permitext.com/terms`
@@ -156,24 +174,25 @@ Review-access plan (requires approval and verification before submission):
 
 ## Version 1.0 items still required in App Store Connect
 
-- Select the exact final version 1.0 build only after its upload and required physical-device acceptance; build 58 is internally available and has bounded physical installation/continuity evidence, while the broader matrix remains open. Neither this checklist nor the repair publication selects a final App Store build.
-- The build-58 Release screenshot candidate has been captured and inspected. Confirm it matches the selected final source before uploading; recapture if that source changes the pictured UI. Preserve the old build-33 package as historical evidence because its Reader image contains a debug control.
-- Enter description, keywords, URLs, and copyright
-- Add the app's free price schedule
-- Set primary and secondary categories
+- Select the exact final version 1.0 build after all required acceptance; build 63 is internally available with the Account-close physical receipt, while the remaining matrix is tracked in the original-audit closeout. No final App Store build has been selected.
+- Screenshots are deferred by the owner until the UI is finalized. The build-58 candidate and older build-33 package remain historical, not an approved final upload set.
+- Description, keywords, support/marketing URLs and copyright: saved and reread September 7
+- Free app price schedule: saved; U.S. current price reread as $0.00 on September 7
+- Primary Reference and secondary Productivity categories: saved and reread September 7
 - Complete Content Rights
 - Complete Age Rating
 - Complete App Privacy
-- Create the subscription group localization
-- Upload the subscription review screenshot
-- Update subscription review notes/localization to match the current product
+- English subscription-group localization: saved and reread September 7 as Permitext Pro, using the app name
+- Upload the subscription review screenshot after the owner finishes the UI
+- Subscription description updated September 7 to "Pro workspace and up to 100 Research turns"; final review notes still need verified reviewer access
 - Add Permitext Pro Monthly to the version 1.0 submission
-- Enter App Review contact information
-- Choose manual release
+- App Review contact information: saved and verified after reload September 7; private phone number kept out of the repository
+- Manual release: saved and verified September 7
 - Resolve any App Store Connect validation messages
 
 ## Prepared screenshot package
 
+- September 7 owner instruction: stop screenshot preparation until UI work is complete. Four temporary build-63 Release Simulator captures existed before that instruction; they were not copied into this repository or uploaded. The dedicated capture simulator's status-bar override was cleared and the simulator was shut down. These temporary captures are not a selected submission package.
 - September 5: four local build-58 Release Simulator captures and JPEG copies are prepared in `screenshots/build58-candidate/`. The signed-out flow, tab/chapter accessibility labels and absence of the Reader debug control passed the UI check. All four settled PNGs were inspected; dimensions and JPEG alpha checks passed. This candidate has not been uploaded to App Store Connect or bound to a selected final submission build. See the current section of `screenshots/README.md` and its provenance manifest.
 - Four historical portrait screenshots have the accepted iPhone 6.9-inch size: `1320 × 2868`; they are not the final approved upload set.
 - The upload copies are JPEGs without alpha channels.

@@ -33,7 +33,15 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest website/backend publication: the [approved PR #61 follow-up](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md#approved-follow-up-publication)
+Latest website/backend publication: the [approved PR #62 repairs](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md)
+are verified on Production source `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
+deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, web v55. Source/asset,
+cache-header and hosted Reader/session checks passed. Physical build 63 uses
+that source and passes the requested Account glass-X behavior, as recorded in
+the [build 63 receipt](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md).
+The shared final release candidate and remaining acceptance are still open.
+
+Preceding website/backend publication: the [approved PR #61 follow-up](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md#approved-follow-up-publication)
 merged as `aed30262742d1888f94555997c4140cbdcaa7b71`. Production deployment
 `dpl_BmE1MmRPw1rVGTG5Gmfx9GvZHL6s` reached READY at
 `2026-09-07T02:49:39.298Z`. Both canonical origins and six served assets per
@@ -133,22 +141,22 @@ The final shared web/TestFlight candidate remains unselected. Source publication
 ## Controlled Production billing
 
 Gate ID: `controlled-production-billing`
-Status: **CURRENT PRODUCTION LIFECYCLE PASSED — final-release binding and two non-charge cleanup/replay fields remain open**
+Status: **LIFECYCLE, LIVE DELETED-ACCOUNT REPLAY AND DISPOSABLE CUSTOMER CLEANUP PASSED — final shared-release binding remains open**
 Release-bound: **yes**
 
 Run only under separate immediate authorization. Use a dedicated disposable account and the exact serving release. Do not record card data, a raw receipt, an email address, or unredacted customer/provider identifiers.
 
 - Explicit charge/refund authorization and timestamp: yes — the owner separately authorized the live charge and later cancellation plus the full refund during the `2026-09-02T23:36:49Z`–`2026-09-02T23:44:06Z` exercise window.
-- Dedicated test-account opaque hash: no account identifier is retained in source control; the authenticated account was verified as Free immediately before Checkout.
+- Dedicated test-account SHA-256: `40d69e0c70327dd27e27eb71d2089a380c56be725d6648160a7732a9c13249e0`, independently matched against original subscription metadata before September 7 replay/cleanup. The authenticated account was verified as Free before the original Checkout; no raw account identifier is retained here.
 - Signed provider event granted Pro exactly once: yes — Permitext showed Pro with 100 included turns after three purchase-related webhook deliveries returned HTTP 200.
-- Duplicate/delayed event remained inert: not deliberately replayed against live Production; the permanent provider-backed Stripe sandbox and billing contract cover duplicate and delayed delivery without another charge.
+- Duplicate/delayed event remained inert: passed September 7 for the original live completed Checkout after refund/cancellation and account deletion. Provider redelivery reached current Production with HTTP 200; independent before/after exports retained an absent account/entitlement and 25 empty record groups. See the [live replay receipt](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md). The permanent provider-backed sandbox and billing contract retain broader ordering coverage.
 - Cancellation preserved only the intended prepaid period: yes before refund — the Customer Portal scheduled cancellation at the end of the paid month; the later full refund correctly superseded that schedule and ended access immediately.
 - Authorized refund completed and removed the intended entitlement: yes — Stripe showed the full `$21.78` refund and Permitext returned to Free.
-- Stripe subscription/customer cleanup confirmed: subscription canceled and ended; the disposable Stripe customer was not deleted during this exercise and remains part of the separate account-deletion cleanup boundary.
+- Stripe subscription/customer cleanup confirmed: the original subscription remains canceled/ended. September 7 cleanup deleted the exact disposable customer after verifying no active subscription, future invoice, pending invoice item or invoice balance. Stripe's deletion log returned HTTP 200; reloading the original customer URL confirmed permanent deletion. Historical payments/invoices remain retained by Stripe. See the [cleanup receipt](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md#customer-cleanup).
 - Permitext entitlement and provider state reconciled: yes — Stripe showed canceled/ended plus the refunded invoice, while Permitext showed Free.
 - Redacted event references, amounts, timestamps, and cleanup evidence: [Production Stripe lifecycle evidence](./PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md), bound to Git commit `cb7918b453988a07d57a7834f5982d523d0e3901` and deployment `dpl_2i2iRQjwqkuQaQChbzR5MGh6j8EW`.
 
-The controlled monetary and entitlement lifecycle does not need another paid Beta 1 repetition unless billing logic or Production configuration materially changes. This gate remains false in the activation JSON until the final shared web/TestFlight commit is selected and the remaining non-charge replay/customer-cleanup evidence is reconciled.
+The controlled monetary and entitlement lifecycle does not need another paid Beta 1 repetition unless billing logic or Production configuration materially changes. Both remaining non-charge checks are complete; do not reopen replay/customer cleanup without new evidence. This gate remains false in the activation JSON until the final shared web/TestFlight commit is selected and reconciled. The September 7 replay is bound to `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9` and retains its deleted-account scope.
 
 ## Production authentication and account lifecycle
 
@@ -188,7 +196,7 @@ Earlier September 5 snapshot (superseded by the correction above): build 58 is p
 - Fresh-account Microsoft sign-in:
 - Existing-account email-code sign-in retained the correct Permitext account/data: passed on web and phone for the designated existing test account, with retained Projects/Notes/Research and Synced status in later build-62 checks.
 - Existing-account Apple sign-in retained the correct Permitext account/data: historical build-51 owner observations and build-52 Mirroring observations retain the signed-in account, Lifetime Pro, Synced, saved content and Project containers. These are persisted-session checks, not fresh Apple sign-in. Build 51 additionally retained an explicitly selected Project in Research. Representative saved Project-item coverage was not established.
-- Existing-account Google sign-in retained the correct Permitext account/data:
+- Existing-account Google sign-in retained the correct Permitext account/data: passed September 7 through the real Google chooser for the designated test identity; three Projects, three saved passages, Free/Synced and independent before/after content/usage hashes were retained. This does not establish new-provider linking or account merge. See the [existing-Google receipt](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md#existing-google-identity-sign-in-september-7).
 - Existing-account Microsoft sign-in retained the correct Permitext account/data:
 - Dedicated disposable-account pre-deletion export and aggregate baseline captured safely: passed for the approved populated synthetic account: one Project, one Note, one image, two Report versions/four PDFs, zero Research usage or paid entitlements. Other ownership/Research categories retain their separate coverage boundary.
 - Customer-interface deletion reported every applicable billing, data, private-asset, device, and Clerk stage accurately: passed for that build-60 no-recurring-billing account, including disclosed retention of unknown-owner historical cache files. Paid billing and shared ownership are separate cases.
@@ -201,15 +209,15 @@ Follow [the detailed account export/deletion checklist](./BETA1_BILLING_IDENTITY
 ## Exact policy publication
 
 Gate ID: `exact-policy-publication`
-Status: **OPEN — exact current-candidate publication passes; final-client consent confirmation remains open**
+Status: **OPEN — exact publication and live web consent pass; iOS consent and final release binding remain open**
 Release-bound: **yes**
 
 - Strict live publication audit returned `publicationReady: true` for Terms, Privacy, and Subscription/Refund policy: yes at `2026-09-03T10:33:44.038Z`. The September 5 exact-source repair publication also passed the strict live audit; see the [current publication evidence](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#whole-section-saved-visibility-publication).
 - Live document SHA-256 hashes equal the approved manifest: yes for all three canonical routes; the audit emitted hashes only, not policy bodies or customer data.
 - Production version identifiers equal the approved current versions: yes — the protected exact-candidate build reported approved policy versions ready.
-- Web purchase consent displays and records those exact versions:
+- Web purchase consent displays and records those exact versions: yes on Production `5f1afb414fdd`, September 7. The unchecked gate, canonical document links, one durable server-dated acceptance and same-policy retry passed with independent account exports; hosted Checkout was opened and left unpaid. The stale Stripe allowance description was also corrected and verified in a fresh Checkout. [Evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md).
 - iOS purchase consent displays and records those exact versions:
-- Retainable post-purchase acknowledgment matches the selected release:
+- Retainable post-purchase acknowledgment matches the selected release: the current static page was inspected and its outdated Settings label corrected locally to Account. The corrected one-page Chrome print preview passed; hosted publication/retention and final selected-release binding remain open. [Evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md).
 - Canonical URLs are direct HTTPS 200 responses without redirect or fallback bytes: yes for `/terms`, `/privacy`, and `/refunds`.
 - Redacted evidence and timestamp: strict live audit at `2026-09-03T10:33:44.038Z`; exact release identity is retained in [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
@@ -302,14 +310,15 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN — build-62 Note/Report acceptance and earlier bounded recovery/table checks passed; remaining device/context coverage and final candidate selection remain open**
+Status: **OPEN — build-63 Account X, build-62 Note/Report and earlier bounded recovery/table checks passed; remaining device/context coverage and final candidate selection remain open**
 Release-bound: **yes**
 
 ### Current candidate and latest verified clients
 
-- Latest verified product source: `e60ca415fe8b7b60be65449b7ef49baccc82eec3`, Production deployment `dpl_5rp8vnZ9yZ6XBRWbFHofaD7jQqo9`, physical Permitext 1.0 (62). The source/archive/upload/Apple-processing binding is in the [September 6 repair publication](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md#approved-publication).
+- Latest verified product source: `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`, Production deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, physical Permitext 1.0 (63). The [build-63 receipt](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md) binds source/archive/upload/Apple processing and the physical Account-X check. Broader observations below keep their original build scope.
 - [Build-62 acceptance](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md) passed current web Note navigation, lower native Note fields, both actual Report PDFs with all nine pages inspected, and immutable record integrity. Chrome Production PDF download is owner-confirmed. The in-app browser download remains unaccepted.
-- Temporary Pro is revoked; the phone shows Free Active/Billing None/Synced and intentionally retains the test identity at the owner's request. Both browser test sessions were signed out before that preference change.
+- Temporary Pro is revoked; the latest physical Account-X check showed the designated test identity, Free and Synced. The existing Google web session was restored on September 7. Test sessions are intentionally retained between checks at the owner's request.
+- VoiceOver and screenshot preparation are deferred by the owner's September 7 instructions. Screenshots resume after UI work is complete. Neither deferral is a passed acceptance result.
 - The final public-release candidate remains unselected. The [original 17-finding checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md) assigns the remaining client/context, recovery, accessibility/performance and release work. Existing passed checks below retain their original build scope.
 
 ### Earlier build-60 observations retained with their original limits
@@ -373,4 +382,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: after the owner returns with the phone, install internally available build 62 and bind the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md) to physical-candidate and hosted handoff acceptance. PR #58 is verified on Production; build 62 shares that source. Owner account restoration is complete. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed.
+- Next technical step: continue B1's server-side context/completion overlap, the remaining live provider/consent cases, B4's device/OS/browser storage boundaries and broader hosted/native transfers, and B5 operations/reviewer/declaration evidence. B1's controlled hosted overlap is awaiting usable credentials; a Vercel Production download returned protected placeholders. The real-browser recovery file, actual local Chrome/HTTP interrupted transfers, and native-cache APFS exhaustion/retry now have bounded passes; do not repeat them as substitutes for the remaining conditions. Build 63 is already installed and its Account X passed; do not repeat the build-62 handoff or completed deletion/table checks. Screenshots wait for the owner's UI work, VoiceOver is deferred, and final candidate selection/go-no-go remain open. All three recorded ramp-turn approvals are consumed. Follow the [current closeout checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md).

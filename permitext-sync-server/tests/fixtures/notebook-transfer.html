@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Notebook interrupted-transfer recovery</title>
+<style>body{font:16px system-ui;max-width:900px;margin:32px auto;padding:0 24px}button{font:inherit;padding:10px;margin:5px}pre{white-space:pre-wrap;font-size:13px}</style>
+<main><h1>Notebook interrupted-transfer recovery</h1>
+<p>Isolated synthetic account. Real HTTP socket interruption, application upload/save handlers and Chrome IndexedDB. No external provider or purchase.</p>
+<button id="prepare">Prepare draft and interrupt upload</button>
+<button id="lost">After reload: retry and lose saved response</button>
+<button id="recover">After second reload: recover and save Note</button>
+<button id="cleanup">Clean up fixture</button>
+<p id="status" role="status">Ready</p><pre id="report" aria-label="Transfer evidence"></pre></main>
+<script type="module" src="/runner.js"></script></html>
