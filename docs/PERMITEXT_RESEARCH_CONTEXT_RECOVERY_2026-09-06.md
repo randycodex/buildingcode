@@ -114,11 +114,74 @@ receipts include `publication-result.json`, `served-production.json` and the
 hosted reload DOM/screenshot in the same evidence directory. The task's browser
 tab remains available with the test account signed in.
 
+## Live delayed completion and follow-up repair
+
+On September 6 (UTC September 7, 02:07–02:17), the exact designated synthetic
+account was independently verified and temporarily granted Pro. In Chrome on
+Production `2e4f7db2d`, one existing-conversation request asked:
+“Summarize the saved Project structured facts and address.” DevTools applied
+30,000 ms latency to the owned test tab. While `/research/conversations/message`
+was visibly pending, Saved switched from Project A to B; conversation A stayed
+open. The request returned HTTP 200 in 30.03 seconds.
+
+**Selection preservation passed; visible completion failed.** Saved remained on
+B, but A showed “Research complete” without rendering the new answer and kept
+its composer disabled. Closing DevTools did not release it. This is a real
+client navigation/completion test, not a server-side move/completion transaction
+race: the conversation itself remained assigned to A throughout.
+
+Independent exports confirmed revision 7 → 8, context revision unchanged at 4,
+and messages 4 → 6. One deterministic `project_context` answer/operation was added:
+`charged: false`, zero provider requests and zero tokens. All 12 foundation
+artifacts, the usage records and both original answers remained unchanged.
+The emulated 30.03 seconds is not a server-performance measurement; the recorded
+operation duration was 748 ms.
+
+The follow-up source repair distinguishes Saved selection from an open Research
+pane. Success and failure refresh only the existing conversation pane through
+the utility renderer, without reopening/navigating. Rebuilding the composer
+also replaces input handlers which captured a pending request's disabled state.
+Account/workspace checks, closed primary/supplemental pane checks and conversation
+context/revision rejection remain in force. Asset version is
+`20260906-research-pane-completion-v52`; shell constants agree at
+`permitext-pro-shell-v791`. This follow-up is locally verified, **not published**.
+
+The new regression failed against v51 before the patch. Nine focused contracts
+pass: Research client recovery, web recovery, Reader navigation races, web
+account mutation isolation, Research context persistence, source/edition integrity,
+build output, offline compatibility and offline installer recovery. JavaScript
+syntax and `git diff --check` pass. The expanded Chrome fixture extracts the
+actual composer code, including input/submit handlers, as well as the response
+handlers. Its Project panes, answer display and transport remain synthetic.
+Chrome verified the A-pane/B-selection success, an editable follow-up enabling
+Send, failure with recovery retained, review and same-request-ID retry, and the
+separate draft surviving successful retry. No provider was called by the fixture.
+
+Private receipts, native accessibility snapshots and the inspected local-browser
+screenshot are in `/private/tmp/permitext-b1-live-20260906/`. Temporary Pro was
+revoked and independently confirmed absent at `2026-09-07T02:16:46.550Z`.
+DevTools and the owned delayed test tab were closed, ending that tab's network
+emulation. The inactive custom delay profile may remain in Chrome settings.
+No account sign-out/restoration was performed; the phone was not used. The local
+fixture's storage was cleaned, its tab closed and its server stopped.
+
+### Separate observations retained for follow-up
+
+At `02:06:34Z`, the first `/admin/accounts/export` returned 503. Vercel reported
+`Rate-limit enforcement failed`, PostgreSQL `deadlock detected`, request
+`iad1::ngpfn-1788746794063-2329f14dafd3`, on this release. A later export and health
+check succeeded. The earlier one-minute clean log scan does not close this
+concurrency defect; rate-limit cleanup and upsert locking need investigation.
+
+The account menu also displayed “Not downloaded on this device” after the v51
+upgrade. The earlier v50 installed/offline result remains passed. No cause has
+been established for the later absence; do not label it storage eviction or an
+upgrade regression without additional evidence.
+
 ## Next bounded step
 
-The web repair is published and its hosted loading/source binding is verified.
-Keep the synthetic handler/recovery evidence and existing local PostgreSQL races
-distinct from a real cloud completion race, which was not newly exercised here.
-Record that remaining B1 scope independently. B1's successful live
-move/summary/return and the completed Note/Report/PDF cycle do not need repeating.
-The remaining B2/B3 edges and B4/B5 retain their existing scope.
+Prepare the locally verified follow-up for publication review, then address the
+observed rate-limit deadlock and B2 controlled failed-cleanup recovery. Keep a
+server-side overlapping move/completion transaction race separate from the live
+Saved-selection test. Reuse the completed move/summary/return, Note/Report/PDF,
+image-recovery and device checks. B3–B5 retain their documented remaining scope.

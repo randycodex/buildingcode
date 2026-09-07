@@ -178,6 +178,14 @@ each remaining check one home so it is not repeated for several findings.
    and hosted loading, not a deliberately overlapping cloud completion race.
    Local PostgreSQL race evidence already exists; reuse the completed build-62
    Note/Report exports.
+   A subsequent live delayed response preserved Saved Project B but stranded
+   the still-open conversation A with a disabled composer and no rendered new
+   answer. Its deterministic summary was saved with zero provider calls/charges;
+   all existing foundation artifacts, usage and original answers were retained.
+   The follow-up v52 repair refreshes the existing pane without navigating and
+   passes local contracts plus Chrome with the actual composer handlers. It is
+   not yet published. This changed Saved selection, not the conversation's
+   server-side Project assignment. See the linked repair record for evidence.
 
 Stop after the named transitions have evidence or a concrete reproducible defect.
 Do not widen this into another answer-quality cohort.
@@ -363,16 +371,21 @@ transport. Temporary access is revoked and the test session remains signed in.
 The next B1 check reproduced a late-response navigation defect, now repaired and
 verified in local contracts and a Chrome fixture. PR #60 published the repair
 as `2e4f7db2d`; Production health, matching assets on both origins, and the
-retained Chrome session's reload passed. Preserve the separate limit on a live
-cloud completion race, then continue the remaining B2/B3 edges and B4/B5.
+retained Chrome session's reload passed. The next live delayed completion found
+the still-visible A composer stranded after selecting Saved Project B. The v52
+follow-up is repaired and verified locally, awaiting publication review. A
+Production rate-limit PostgreSQL deadlock also caused one export 503 and remains
+open for repair. Continue with that defect and B2 failed-cleanup recovery, then
+the remaining B3 edges and B4/B5; preserve the separate server-side race scope.
 The native Account close button is merged source awaiting a
 separately selected iOS build; it is not part of installed build 62.
 
 The move/summary/return, Pro revoke/regrant stale-editor check, offline image
 recovery, Note/Report/PDF cycle and owner-confirmed native offline pair are
-complete within their recorded scope. Do not repeat them. B1's recovery repair,
-publication and hosted loading are verified; a deliberately overlapping cloud
-completion/context-change test was not added. Keep that scope, the remaining
+complete within their recorded scope. Do not repeat them. B1's first recovery
+repair, publication and hosted loading are verified; the live Saved-selection
+test produced the locally repaired follow-up above. A deliberately overlapping
+server-side move/completion test was not added. Keep that scope, the remaining
 B2/B3 edges and B4/B5 distinct. Use existing
 documents and local checks to reconcile the remaining work without another
 phone session or main-account restoration. This is sequencing within the

@@ -20,13 +20,19 @@ const conversation = (id, project, revision = 1, contextRevision = 0) => ({
 function harness() {
   const a = conversation("conversation-a", "project-a");
   const b = conversation("conversation-b", "project-b");
-  const requests = [], opens = [], writes = [], removed = [];
+  const requests = [], opens = [], writes = [], removed = [], refreshes = [];
+  const input = { disabled: true, value: "" }, sendButton = { disabled: true };
+  const controls = { ".research-question-input": input, ".research-send-button": sendButton,
+    ".research-composer-status": { textContent: "" } };
   const store = new Map([[a.id, a], [b.id, b]]);
   let refreshBarrier = null;
   const context = vm.createContext({
     Map, Date, AbortController, localStorage: {}, clearInterval() {},
-    document: { getElementById: () => null },
+    document: { getElementById: () => ({ parentElement: { querySelector: selector => controls[selector] } }) },
     state: { researchConversationID: a.id }, activeWorkspaceID: "workspace-a",
+    researchConversationPaneOpened: true,
+    researchConversationPaneIsOpen: () => context.researchConversationPaneOpened,
+    paneIDForResearchConversation: id => `research:conversation:${id}`,
     activeProjectIDForCodeQuestions: () => context.projectID,
     projectID: "project-a", activeResearchConversation: a,
     researchConversationList: [a, b], supplementalResearchConversations: new Map(),
@@ -44,6 +50,7 @@ function harness() {
     postResearchWithProgress(body) { const request = { body, ...deferred() }; requests.push(request); return request.promise; },
     async refreshProjectSourceConsumers() { if (refreshBarrier) await refreshBarrier.promise; },
     async refreshResearchConversationList() {},
+    async transitionWorkspace(mode, options) { refreshes.push({ mode, ids: Array.from(options.refreshPaneIDs) }); },
     async openResearchConversation(id) {
       opens.push(id); context.state.researchConversationID = id;
       context.activeResearchConversation = store.get(id); return store.get(id);
@@ -58,7 +65,7 @@ function harness() {
   const progress = { id: "request-a", conversationID: a.id, question: "Synthetic saved Project summary", status: "active",
     stages: new Map([["preparing_question", "active"]]), controller: new AbortController() };
   context.activeResearchProgress.set(a.id, progress);
-  return { context, a, b, progress, requests, opens, writes, removed,
+  return { context, a, b, progress, requests, opens, writes, removed, refreshes, input, sendButton,
     start: (supplemental = false) => context.runResearchProgressSession(progress, context.recoveredResearchProgressCallbacks(a.id, { supplemental })),
     select(value, { workspace = "workspace-a" } = {}) {
       context.activeWorkspaceID = workspace; context.projectID = value.primaryProjectID;
@@ -69,6 +76,25 @@ function harness() {
     },
     delayRefresh() { refreshBarrier = deferred(); return refreshBarrier; }
   };
+}
+
+// Live regression: Saved can select B while conversation A remains visible.
+// Refresh A's existing pane without invoking an open/navigation operation.
+for (const outcome of ["success", "failure"]) {
+  const t = harness(); const pending = t.start();
+  t.context.projectID = "project-b";
+  if (outcome === "success") t.requests[0].resolve({ conversation: {
+    ...t.a, revision: 2, messages: [{ role: "assistant", answer: "Saved summary for A" }]
+  } });
+  else t.requests[0].reject(new Error("Synthetic interrupted response"));
+  await pending;
+  assert.deepEqual(t.refreshes, [{ mode: "utility", ids: [`research:conversation:${t.a.id}`] }],
+    `${outcome}: the still-open conversation must refresh after selecting another Saved Project`);
+  assert.deepEqual(t.opens, [], "Completion refresh must not navigate or fetch by reopening A");
+  assert.equal(t.context.projectID, "project-b");
+  assert.equal(t.context.state.researchConversationID, t.a.id);
+  if (outcome === "success") assert.equal(t.context.activeResearchConversation.messages[0].answer, "Saved summary for A");
+  else assert.equal(t.removed.length, 0, "Failure keeps the recoverable question");
 }
 
 // A completed request belongs to its conversation; it must not steal selection
@@ -84,6 +110,7 @@ for (const outcome of ["success", "failure"]) {
   assert.equal(t.context.state.researchConversationID, t.b.id);
   assert.equal(t.context.researchQuestionDraft, "Unsent current Project question");
   assert.deepEqual(t.opens, [], "Background completion cannot navigate the current workspace");
+  assert.deepEqual(t.refreshes, [], "A different conversation must not be repainted by the old response");
   if (outcome === "success") assert.equal(t.context.researchProgressStatusLabel(t.progress), "Research complete");
 }
 
@@ -144,6 +171,29 @@ for (const project of ["project-b", "project-a"]) {
   assert.equal(t.context.supplementalResearchConversations.has(t.a.id), false);
 }
 
+// An open supplemental conversation also owns its completion independently of Saved.
+{
+  const t = harness(); t.context.supplementalResearchConversationIDs = [t.a.id];
+  t.context.supplementalResearchConversations.set(t.a.id, t.a);
+  const pending = t.start(true); t.select(t.b);
+  t.requests[0].resolve({ conversation: { ...t.a, revision: 2 } }); await pending;
+  assert.equal(t.context.supplementalResearchConversations.get(t.a.id).revision, 2);
+  assert.equal(t.context.activeResearchConversation.id, t.b.id);
+  assert.deepEqual(t.opens, []);
+  assert.deepEqual(t.refreshes, [{ mode: "utility", ids: [`research:conversation:${t.a.id}`] }]);
+}
+
+// Selecting a Saved Project during consumer refresh must not strand the composer.
+{
+  const t = harness(); const barrier = t.delayRefresh(); const pending = t.start();
+  t.requests[0].resolve({ conversation: { ...t.a, revision: 2 } });
+  await new Promise(resolve => setImmediate(resolve));
+  t.context.projectID = "project-b"; barrier.resolve(); await pending;
+  assert.equal(t.context.projectID, "project-b");
+  assert.deepEqual(t.opens, []);
+  assert.deepEqual(t.refreshes, [{ mode: "utility", ids: [`research:conversation:${t.a.id}`] }]);
+}
+
 // An account switch during consumer refresh cannot paint the previous identity.
 {
   const t = harness(); const barrier = t.delayRefresh(); const pending = t.start();
@@ -155,12 +205,20 @@ for (const project of ["project-b", "project-a"]) {
   assert.equal(t.context.activeResearchConversation.id, t.b.id);
 }
 
-// Ordinary current-context completion still refreshes and opens its saved answer.
+// A closed primary pane retains its selected ID but must not reopen on completion.
+{
+  const t = harness(); const pending = t.start(); t.context.researchConversationPaneOpened = false;
+  t.requests[0].resolve({ conversation: { ...t.a, revision: 2 } }); await pending;
+  assert.deepEqual(t.opens, []); assert.deepEqual(t.refreshes, []);
+}
+
+// Ordinary current-context completion refreshes its existing saved-answer pane.
 {
   const t = harness(); const pending = t.start();
   t.context.researchQuestionDraft = "A separate unsent follow-up";
   t.requests[0].resolve({ conversation: { ...t.a, revision: 2 } }); await pending;
-  assert.equal(t.progress.status, "completed"); assert.deepEqual(t.opens, [t.a.id]);
+  assert.equal(t.progress.status, "completed"); assert.deepEqual(t.opens, []);
+  assert.deepEqual(t.refreshes, [{ mode: "utility", ids: [`research:conversation:${t.a.id}`] }]);
   assert.equal(t.removed.length, 1);
   assert.equal(t.context.researchQuestionDraft, "A separate unsent follow-up");
 }

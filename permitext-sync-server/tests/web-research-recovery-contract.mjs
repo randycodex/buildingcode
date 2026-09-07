@@ -20,6 +20,7 @@ function harness() {
   const context = vm.createContext({
     Map, Date, AbortController, clearInterval() {}, localStorage: {}, progress,
     state: { researchConversationID: "conversation" }, activeWorkspaceID: "workspace",
+    researchConversationPaneIsOpen: () => true,
     activeProjectIDForCodeQuestions: () => "project",
     activeResearchConversation: { id: "conversation", primaryProjectID: "project", contextRevision: 0 },
     researchConversationList: [], supplementalResearchConversationIDs: [],
