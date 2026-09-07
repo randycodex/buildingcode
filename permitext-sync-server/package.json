@@ -169,7 +169,7 @@
     "@blocknote/core": "^0.52.1",
     "@blocknote/mantine": "^0.52.1",
     "@blocknote/react": "^0.52.1",
-    "@clerk/backend": "^3.16.10",
+    "@clerk/backend": "^3.17.0",
     "@clerk/react": "6.15.1",
     "@clerk/shared": "4.31.0",
     "@mantine/core": "^9.5.0",
