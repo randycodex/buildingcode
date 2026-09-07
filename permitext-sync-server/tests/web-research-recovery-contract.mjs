@@ -19,6 +19,10 @@ function harness() {
   const progress = { id: "stable-request", conversationID: "conversation", question: "Preserve this synthetic question", status: "active", stages: new Map([["preparing_question", "active"]]), controller: new AbortController() };
   const context = vm.createContext({
     Map, Date, AbortController, clearInterval() {}, localStorage: {}, progress,
+    state: { researchConversationID: "conversation" }, activeWorkspaceID: "workspace",
+    activeProjectIDForCodeQuestions: () => "project",
+    activeResearchConversation: { id: "conversation", primaryProjectID: "project", contextRevision: 0 },
+    researchConversationList: [], supplementalResearchConversationIDs: [],
     document: { createElement: element },
     researchProgressStages: [{ id: "preparing_question", label: "Preparing the question" }],
     captureAccountRequest: () => identity,
@@ -37,7 +41,8 @@ function harness() {
     async openResearchConversation(id) { opens.push(id); return returnConversation ? { id } : null; },
     async openSupplementalResearchConversation(id) { opens.push(id); return returnConversation ? { id } : null; }
   });
-  vm.runInContext(`${extract("runResearchProgressSession", true)}\n${extract("renderResearchProgressCard")}\nglobalThis.run = runResearchProgressSession; globalThis.render = renderResearchProgressCard;`, context);
+  const helpers = ["currentResearchProgressConversation", "captureResearchProgressView", "researchProgressViewIsCurrent", "researchProgressConversationConflict"].map(name => extract(name)).join("\n");
+  vm.runInContext(`${helpers}\n${extract("runResearchProgressSession", true)}\n${extract("renderResearchProgressCard")}\nglobalThis.run = runResearchProgressSession; globalThis.render = renderResearchProgressCard;`, context);
   return { context, progress, requests, writes, paints, opens, successes, failures,
     run: () => context.run(progress, { onSuccess: (payload) => successes.push(payload), onFailure: (error) => failures.push(error) }),
     switchAccount: () => { generation += 1; }, unavailable: () => { returnConversation = false; } };

@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260906-offline-install-recovery-v50";
+} from "./offline-storage.js?v=20260906-research-context-recovery-v51";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260906-offline-install-recovery-v50";
+} from "./research-intent-state.js?v=20260906-research-context-recovery-v51";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18553,11 +18553,11 @@ function researchProgressElapsed(startedAt, endedAt = Date.now()) {
 }
 
 function researchProgressStatusLabel(progress) {
+  if (progress.status === "completed") return "Research complete";
   const active = researchProgressStages.find((stage) =>
     ["active", "retrying"].includes(progress.stages.get(stage.id))
   );
   if (active) return active.label;
-  if (progress.status === "completed") return "Research complete";
   if (progress.status === "cancelled") return "Research cancelled";
   if (progress.status === "failed") return "Research interrupted";
   return "Preparing the question";
@@ -18640,6 +18640,7 @@ function renderResearchProgressCard(progress, { completed = false } = {}) {
           requireCurrentAccountRequest(requestIdentity);
           if (!conversation) throw new Error("The current conversation is not available");
           progress.recoveryReviewed = true;
+          progress.error = "Current Research reloaded. Review its Project context and sources, then retry your preserved question.";
           refreshResearchProgressCard(progress);
         } catch (error) {
           if (!isCurrentAccountRequest(requestIdentity)) return;
@@ -18699,6 +18700,55 @@ function updateResearchProgressSession(progress, event) {
   refreshResearchProgressCard(progress);
 }
 
+function currentResearchProgressConversation(conversationID) {
+  const candidates = [activeResearchConversation, supplementalResearchConversations.get(conversationID),
+    ...researchConversationList].filter((conversation) => conversation?.id === conversationID);
+  return candidates.reduce((current, candidate) => {
+    if (!current) return candidate;
+    const contextDifference = Number(candidate.contextRevision || 0) - Number(current.contextRevision || 0);
+    return contextDifference > 0 || (contextDifference === 0 && Number(candidate.revision || 0) > Number(current.revision || 0))
+      ? candidate : current;
+  }, null);
+}
+
+function captureResearchProgressView(conversationID) {
+  const conversation = currentResearchProgressConversation(conversationID);
+  return {
+    requestIdentity: captureAccountRequest(),
+    workspaceID: activeWorkspaceID,
+    projectID: activeProjectIDForCodeQuestions(),
+    conversationID,
+    supplemental: supplementalResearchConversationIDs.includes(conversationID),
+    conversation: conversation ? { ...conversation } : null
+  };
+}
+
+function researchProgressViewIsCurrent(view) {
+  if (!view || !isCurrentAccountRequest(view.requestIdentity) ||
+      view.workspaceID !== activeWorkspaceID || view.projectID !== activeProjectIDForCodeQuestions()) return false;
+  return view.supplemental
+    ? supplementalResearchConversationIDs.includes(view.conversationID) && supplementalResearchConversations.has(view.conversationID)
+    : state.researchConversationID === view.conversationID;
+}
+
+function researchProgressConversationConflict(view, incoming) {
+  if (!incoming) return null;
+  const current = currentResearchProgressConversation(view.conversationID) || view.conversation;
+  const currentContext = Number(current?.contextRevision || 0);
+  const incomingContext = Number(incoming.contextRevision || 0);
+  const contextChanged = current && (currentContext > incomingContext || (
+    currentContext === incomingContext && incoming.primaryProjectID !== undefined &&
+    String(current.primaryProjectID || "") !== String(incoming.primaryProjectID || "")
+  ));
+  const revisionChanged = current && incoming.revision !== undefined && incomingContext <= currentContext &&
+    Number(current.revision || 0) > Number(incoming.revision || 0);
+  if (incoming.id === view.conversationID && !contextChanged && !revisionChanged) return null;
+  const error = new Error("This Research conversation changed while the response was arriving. Review current Research before continuing. Your question is preserved.");
+  error.code = contextChanged ? "RESEARCH_CONTEXT_CHANGED" : "RESEARCH_CONVERSATION_CHANGED";
+  error.payload = { code: error.code, status: 409, ...(current ? { conversation: current } : {}) };
+  return error;
+}
+
 async function runResearchProgressSession(
   progress,
   { onSuccess, onFailure, onRetry } = {},
@@ -18708,8 +18758,9 @@ async function runResearchProgressSession(
   progress.requestIdentity = requestIdentity;
   const execute = async (retrying = false) => {
     if (!isCurrentAccountRequest(requestIdentity)) return;
+    const view = captureResearchProgressView(progress.conversationID);
     if (retrying) {
-      onRetry?.();
+      onRetry?.({ view });
       progress.stages = new Map(researchProgressStages.map((stage) => [stage.id, "pending"]));
       progress.stages.set("preparing_question", "retrying");
       progress.status = "retrying";
@@ -18736,6 +18787,8 @@ async function runResearchProgressSession(
         }
       });
       requireCurrentAccountRequest(requestIdentity);
+      const conflict = researchProgressConversationConflict(view, result.conversation);
+      if (conflict) throw conflict;
       progress.status = "completed";
       progress.endedAt = Date.now();
       clearInterval(progress.timer);
@@ -18744,7 +18797,8 @@ async function runResearchProgressSession(
         localStorage,
         researchRequestRecoveryScope(progress.conversationID, progress.id)
       );
-      await onSuccess?.(result);
+      refreshResearchProgressCard(progress);
+      if (researchProgressViewIsCurrent(view)) await onSuccess?.(result, { view });
     } catch (error) {
       if (!isCurrentAccountRequest(requestIdentity)) {
         clearInterval(progress.timer);
@@ -18765,7 +18819,7 @@ async function runResearchProgressSession(
       clearInterval(progress.timer);
       persistResearchProgressSession(progress);
       refreshResearchProgressCard(progress);
-      onFailure?.(error, { cancelled });
+      if (researchProgressViewIsCurrent(view)) onFailure?.(error, { cancelled, view });
     }
   };
   const callbacks = { onSuccess, onFailure, onRetry };
@@ -18783,25 +18837,29 @@ function recoveredResearchProgressCallbacks(conversationID, { supplemental = fal
     };
   };
   return {
-    onRetry: () => {
+    onRetry: ({ view } = {}) => {
+      if (view && !researchProgressViewIsCurrent(view)) return;
       const controls = composerControls();
       if (controls.input) controls.input.disabled = true;
       if (controls.sendButton) controls.sendButton.disabled = true;
       if (controls.status) controls.status.textContent = "";
     },
-    onSuccess: async (result) => {
+    onSuccess: async (result, { view = captureResearchProgressView(conversationID) } = {}) => {
+      if (!researchProgressViewIsCurrent(view) || researchProgressConversationConflict(view, result.conversation)) return;
       if (supplemental) supplementalResearchConversations.set(conversationID, result.conversation);
       else activeResearchConversation = result.conversation;
-      researchQuestionDraft = "";
       await refreshProjectSourceConsumers([result.conversation.primaryProjectID], {
         refreshNotebookFoundation: true
       });
+      if (!researchProgressViewIsCurrent(view) || researchProgressConversationConflict(view, result.conversation)) return;
       await refreshResearchConversationList();
+      if (!researchProgressViewIsCurrent(view) || researchProgressConversationConflict(view, result.conversation)) return;
       if (supplemental) await openSupplementalResearchConversation(conversationID);
       else await openResearchConversation(conversationID, { refreshList: true });
     },
-    onFailure: (error) => {
-      if (error.payload?.conversation) {
+    onFailure: (error, { view = captureResearchProgressView(conversationID) } = {}) => {
+      if (!researchProgressViewIsCurrent(view)) return;
+      if (error.payload?.conversation && !researchProgressConversationConflict(view, error.payload.conversation)) {
         if (supplemental) supplementalResearchConversations.set(conversationID, error.payload.conversation);
         else activeResearchConversation = error.payload.conversation;
       }
@@ -19022,16 +19080,7 @@ function renderNewResearchComposer(container, researchEnabled) {
       researchQuestionDraft = "";
       await refreshResearchConversationList();
       await openResearchConversation(conversationID, { refreshList: false });
-      await runResearchProgressSession(progress, {
-        onSuccess: async (result) => {
-          activeResearchConversation = result.conversation;
-          await refreshProjectSourceConsumers([result.conversation.primaryProjectID], {
-            refreshNotebookFoundation: true
-          });
-          await refreshResearchConversationList();
-          await openResearchConversation(conversationID, { refreshList: true });
-        }
-      });
+      await runResearchProgressSession(progress, recoveredResearchProgressCallbacks(conversationID));
     } catch (error) {
       clearInterval(progress.timer);
       progress.status = "failed";
@@ -20917,33 +20966,7 @@ async function renderResearchConversation(conversationID, options = {}) {
     thread.append(pendingQuestion, pendingAnswer);
     thread.scrollTop = thread.scrollHeight;
     startResearchProgressTimer(progress);
-    await runResearchProgressSession(progress, {
-      onRetry: () => {
-        input.disabled = true;
-        sendButton.disabled = true;
-        status.textContent = "";
-      },
-      onSuccess: async (result) => {
-        if (supplemental) supplementalResearchConversations.set(conversationID, result.conversation);
-        else activeResearchConversation = result.conversation;
-        researchQuestionDraft = "";
-        await refreshProjectSourceConsumers([result.conversation.primaryProjectID], {
-          refreshNotebookFoundation: true
-        });
-        await refreshResearchConversationList();
-        if (supplemental) await openSupplementalResearchConversation(conversationID);
-        else await openResearchConversation(conversationID, { refreshList: true });
-      },
-      onFailure: (error) => {
-        if (error.payload?.conversation) {
-          if (supplemental) supplementalResearchConversations.set(conversationID, error.payload.conversation);
-          else activeResearchConversation = error.payload.conversation;
-        }
-        status.textContent = "";
-        input.disabled = false;
-        sendButton.disabled = input.value.trim().length < 3;
-      }
-    });
+    await runResearchProgressSession(progress, recoveredResearchProgressCallbacks(conversationID, { supplemental }));
   });
   composerBox.append(input, sendButton);
   composer.append(projectPreview, researchComposerDisclosure(), composerBox, status);
