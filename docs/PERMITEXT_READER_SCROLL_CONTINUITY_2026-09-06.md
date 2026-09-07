@@ -6,11 +6,16 @@ public Beta gate, installed build 62 or the remaining assistive-technology scope
 
 ## Reproduced Production failure
 
-On Production `aed30262742d1888f94555997c4140cbdcaa7b71`, Chrome had two Readers
+While Production health reported `aed30262742d1888f94555997c4140cbdcaa7b71`, Chrome had two Readers
 open on 2022 Building Code chapters 10 and 1. Ordinary independent scrolling,
 opening Search and changing the Saved Project preserved the locations. Reopening
 the currently selected Project through its same-document link rebuilt both
 Reader panes and lost their positions:
+
+The later [HTML cache diagnostic](./PERMITEXT_WEB_SHELL_CACHE_REPAIR_2026-09-07.md)
+proved the retained browser could still execute v50 after an ordinary reload.
+The scroll reproduction is a hosted-client observation, not proof that this
+browser executed the v52 script associated with that health commit.
 
 - Chapter 10 moved from scrollTop 529 to 0. Its displayed-content key still
   identified chapter 1 after the earlier in-place chapter change.
@@ -40,6 +45,10 @@ precedence over deferred restoration.
 The shell assets advance together to
 `20260906-reader-scroll-continuity-v54` / `permitext-pro-shell-v793`.
 Temporary diagnostics are removed.
+
+The subsequent HTML cache repair advances the combined PR #62 candidate to
+`20260907-shell-revalidation-v55` / `permitext-pro-shell-v794`; the Reader
+implementation is unchanged from the v54 full-app browser result below.
 
 ## Verification
 

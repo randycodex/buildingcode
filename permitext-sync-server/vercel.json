@@ -7,6 +7,10 @@
       "source": "/",
       "headers": [
         {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
           "key": "Content-Security-Policy",
           "value": "default-src 'self'; script-src 'self' https://appleid.cdn-apple.com https://*.clerk.accounts.dev https://clerk.permitext.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://*.clerk.accounts.dev https://clerk.permitext.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://appleid.apple.com"
         },
@@ -63,6 +67,49 @@
     },
     {
       "source": "/web/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/web/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/open/section/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/web/(.*\\.(?:js|css|woff2?|png|jpe?g|svg|ico|webmanifest))",
+      "has": [
+        {
+          "type": "query",
+          "key": "v",
+          "value": ".+"
+        }
+      ],
       "headers": [
         {
           "key": "Cache-Control",

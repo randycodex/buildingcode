@@ -407,6 +407,15 @@ unless its runtime path changes; keep further device work bounded.
 
 ### B4 — Performance and stress coverage
 
+September 7 checkpoint: the first Chrome startup trace exposed an older v50
+HTML shell from the HTTP cache while fresh Production source was v52. The
+blanket one-year immutable `/web` policy is repaired locally, and Chrome's
+cache lifecycle check passes. See the [shell cache repair](./PERMITEXT_WEB_SHELL_CACHE_REPAIR_2026-09-07.md).
+PR #62 is draft while the combined Reader/cache candidate is revalidated.
+The stale trace is diagnostic only; representative startup timing remains open.
+Earlier retained-tab reload claims establish visible behavior, not the deployed
+script version unless that version was independently inspected in the DOM.
+
 Measure representative workspace startup separately from secondary catalog
 completion, using a named device/browser and reproducible cold/warm conditions.
 Record sample size and p50/p90 when measured. Separately resolve the untested

@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260906-reader-scroll-continuity-v54";
+} from "./offline-storage.js?v=20260907-shell-revalidation-v55";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260906-reader-scroll-continuity-v54";
+} from "./research-intent-state.js?v=20260907-shell-revalidation-v55";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
