@@ -1,6 +1,12 @@
 # Permitext web policy consent and subscription copy — September 7, 2026
 
-Status: **LIVE WEB CONSENT, STRIPE COPY AND RETAINED HOSTED ACKNOWLEDGMENT PASSED**
+Status: **BOUNDED RECORDING/RETRY, STRIPE COPY AND HOSTED ACKNOWLEDGMENT PASSED; SIGN-IN DURABILITY FAILED**
+
+Later September 7 evidence found that a real Google sign-in removed the stored
+acceptance from the designated account. The immediate recording and duplicate
+Checkout observations below remain valid within their original scope, but
+enduring consent retention is open. See the [Production reproduction and source
+cause](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
 
 ## Scope and identity
 

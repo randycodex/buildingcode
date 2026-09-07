@@ -12,8 +12,10 @@ paid evaluation cohort, release approval or new audit scope.
   PR #63 under the owner's standing closeout authorization. The sole product
   change from PR #62 is the acknowledgment's Settings → Account label;
   [live HTML/script hashes and an actual retained PDF passed](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md#publication-and-retained-hosted-pdf).
-  Web consent passed immediately before this publication; exact policy configuration
-  is unchanged. The previous verified web source was
+  Web consent recording/retry passed immediately before this publication; exact
+  policy configuration is unchanged. A later Google sign-in removed its stored
+  acceptance; [sign-in durability is now a confirmed open repair](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
+  The previous verified web source was
   `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
   Production deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, published with
   owner approval through PR #62. Production source, ten public cache-header
@@ -480,7 +482,12 @@ for the detailed fields. Finish only the still-open evidence:
 
 - Remaining fresh/existing provider sign-ins and account-link/client consent
   coverage; retain passed email registration/sign-in and populated deletion.
-- [Live web policy consent](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md) now passes:
+  [Fresh and returning personal-Microsoft web sign-ins now pass](./PERMITEXT_MICROSOFT_SIGN_IN_2026-09-07.md)
+  after replacing an invalid client secret and adding the consent policy links.
+  The exact authorized Permitext tenant was verified; the rejected workplace
+  identity is excluded from all Permitext work. Publisher verification, native
+  coverage and new-provider linking retain their separate open scope.
+- [Live web policy consent recording/retry](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md) passed:
   exact versions were durably recorded before unpaid Checkout, with independent
   before/after exports and same-policy retry. Stripe's stale billing-month
   allowance copy is corrected and verified in fresh hosted Checkout. The corrected
@@ -489,8 +496,11 @@ for the detailed fields. Finish only the still-open evidence:
   confirms the agreement switch gates Subscribe, but expired Sandbox transactions
   block the flow before policy recording. The exact tester's history reset,
   visually verified Sandbox sign-in and clean app restart did not resolve it;
-  isolate the tester queue or collect device-level diagnostics next. iOS consent
-  and final shared-release binding remain open. The September 7
+  isolate the tester queue or collect device-level diagnostics next. Later
+  independent exports found that Google sign-in removed the stored web acceptance.
+  [Repair the PostgreSQL non-Apple sign-in metadata overwrite](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md),
+  then verify consent survives an actual returning sign-in. iOS consent,
+  web sign-in durability and final shared-release binding remain open. The September 7
   [live delayed/duplicate Checkout replay](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md)
   reached current Production with HTTP 200 / `changed:false` and left the original deleted
   account/entitlement absent, with all 25 exported record groups unchanged
