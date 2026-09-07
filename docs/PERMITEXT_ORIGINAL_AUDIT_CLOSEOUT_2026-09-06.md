@@ -64,7 +64,7 @@ each remaining check one home so it is not repeated for several findings.
 | P0-1 | Historical citations open the wrong provision/edition. | **Verified online symptom; native offline pair owner-confirmed.** Production and physical build 60 reopened 2014 Slope and 2022 Gates correctly; build 61 opened both saved 2014 Research citations. The owner confirmed build-62 offline Slope/Gates checks, within the B3 evidence limits below. Source/edition routing contracts pass. [Execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md#saved-citations-and-keyboard-access), [Research confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md). | B3: focused assistive-technology coverage remains. Hosted web install/reopening and failure recovery passed on Production `6ccc2d4a8`. |
 | P0-2 | Moving Research retains the prior Project's active facts/history. | **Live A → B summary → A verified.** Production reset active context, captured B's qualified facts in a provider-free summary, and preserved both immutable answers and all original Notes/Reports. Physical build 62 showed B's synced summary and correct address. Local context/version, PostgreSQL races and the joined Note/Report flow also pass. | B1: controlled final-client context-change/stale-completion recovery. The successful move and summary do not need repeating. |
 | P0-3 | Account transitions leak private state or late async results. | **Partial live acceptance.** The repaired web sign-out, scoped account switches and build-60 populated deletion passed. The live Pro revoke/regrant stale-editor check and existing-Google sign-in pass. Local delayed-callback, A → B → A, stale-401 and account-link recovery contracts pass. The real-Chrome recovery export now has an independent file receipt within its synthetic-provider scope. | B2: remaining live link/provider/consent coverage. Retain the documented legacy/quarantine boundaries. |
-| P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Text/image live paths and controlled web cleanup failure verified.** Physical build 60 retained an unsent text draft through failed transport/termination and reconciled it after a web edit. The September 6 image survived offline reopening, server persistence and physical build-62 display. B2's real Chrome IndexedDB/CacheStorage fault tests preserve drafts, exact pending saves and image bytes after restart/retry. | The image exercise did not interrupt a transfer mid-byte. B4: storage-pressure/OS-eviction coverage or an explicit recorded scope decision. |
+| P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Live text/image recovery and bounded failure paths verified.** Physical build 60 retained an unsent draft through failed transport/termination and reconciled a web edit. The image reached physical build 62. Real Chrome cleanup failures and interrupted HTTP transfers preserve draft/image bytes; the native cache also preserves durable files under actual macOS APFS exhaustion and recovers on retry. | B4: physical iOS pressure, OS/browser eviction and broader hosted/native transfers, or an explicit recorded scope decision. |
 | P0-5 | Retired Workboard writers remain writable. | **Local HTTP repair verified.** Authenticated 410 responses, mixed-sync rejection and historical read/Report compatibility pass imported fixtures. Publication records bind the shipped repair. | B5: final candidate compatibility binding. The absence of a destructive Production write exercise is not a new authorization to attempt one. |
 | P0-6 | Concurrent Notebook/Research writes report success while losing changes. | **Notebook live path verified; Research races verified locally.** Physical stale-save rejection and reviewed version-3 reconciliation passed against Production. Local PostgreSQL tests cover atomic move/completion, rollback and replay accounting. | B1: deployed context/completion conflict evidence. The independent-device Notebook conflict and B2 Pro revoke/regrant stale-editor check already passed. |
 | P1-1 | Normalization loses negation, partial coverage and assumptions. | **Saved-workflow qualification verified.** Local qualification/projection tests plus actual build-60/62 Reports preserve qualifiers. The live moved-Project summary preserves B's partial coverage and assumptions; physical build 62 displays its matching question/address history card. | Retain the recorded native history-card limit and previously accepted Beta Research limits. Context-failure recovery is tracked once under B1; a new paid quality cohort is not part of closeout. |
@@ -197,6 +197,14 @@ each remaining check one home so it is not repeated for several findings.
 
 Stop after the named transitions have evidence or a concrete reproducible defect.
 Do not widen this into another answer-quality cohort.
+
+September 7 hosted-overlap prerequisite check: the linked Vercel Production
+environment download completed, but protected values were returned as
+`[SENSITIVE]` placeholders. Neither the downloaded environment nor the retained
+local environment supplied a usable Clerk secret and PostgreSQL connection
+for a controlled hosted overlap. No row lock, overlapping request, environment
+change or new Research run was performed. The actual server-side race remains
+unverified; do not relabel the earlier browser-delayed response as that proof.
 
 ### B2 — Remaining recovery and account-isolation edges
 
@@ -444,9 +452,19 @@ passed partial-body socket loss, full image commit with lost response, two
 page reloads and same-identity retry followed by one acknowledged Note save.
 Independent file inspection found one original image and one version-1 Note,
 with no unresolved device-local image reference. The local web pipeline now
-has actual interrupted-transfer evidence. Storage pressure/OS eviction and
-hosted/native transfer scope remain open; do not repeat this local pass as a
-substitute for those remaining conditions.
+has actual interrupted-transfer evidence. Hosted/native transfer scope and
+OS eviction remain open; do not repeat this local pass as a substitute for
+those remaining conditions.
+
+September 7 storage-pressure checkpoint: the shipped native cache passed
+[actual APFS exhaustion and recovery](./PERMITEXT_NATIVE_STORAGE_PRESSURE_2026-09-07.md)
+on a disposable 128 MiB volume. Replacement/new writes returned Cocoa 640
+with underlying POSIX ENOSPC 28. Previously durable files remained byte-exact
+across a separate process restart; both retries became durable after freeing
+space, with the second account unchanged. This uses the real cache with a
+synthetic Codable payload on macOS, not an installed iOS app. Physical iOS
+pressure, OS/browser eviction and broader hosted/native transfer scope remain
+open. No runtime repair, deployment or phone interaction was needed.
 
 ### B5 — P1-4 release closeout
 
