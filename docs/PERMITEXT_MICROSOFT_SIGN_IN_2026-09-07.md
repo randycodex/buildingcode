@@ -1,6 +1,6 @@
 # Microsoft sign-in repair and acceptance — September 7, 2026
 
-Status: **LIVE WEB FIRST-TIME AND RETURNING SIGN-IN PASSED; PUBLISHER VERIFICATION OPEN**
+Status: **LIVE WEB FIRST-TIME AND RETURNING SIGN-IN PASSED; APP DOMAIN SAVED; PUBLISHER BADGE DEFERRED**
 
 ## Authorized identity and scope
 
@@ -122,8 +122,9 @@ before March 6, 2027.
 
 ## Publisher warning and remaining scope
 
-The correct tenant still uses its default `onmicrosoft.com` publisher domain.
-This application's publisher is unverified. Adding policy links or fixing a
+Before the domain-proof publication below, the correct tenant still used its
+default `onmicrosoft.com` publisher domain. The application's publisher badge
+remains unverified. Adding policy links or fixing a
 client secret does not grant Microsoft's verified-publisher badge. For recently
 registered multitenant apps, even a custom publisher domain alone does not remove
 the unverified label. Microsoft requires a verified Partner Program identity
@@ -138,10 +139,41 @@ handler or changing authentication scopes. Its JSON shape and app identity are
 checked locally; publication and Entra's persisted verification remain separate
 acceptance steps until recorded below.
 
-Next: publish and verify the actual HTTPS JSON response, save `permitext.com` as
-the app's publisher domain, then inspect the available Partner Center verification
-prerequisites without inventing business facts. A custom app publisher domain is
-not itself a verified Partner Program identity or a DNS-verified tenant domain.
+### Published domain proof and App Store scope change
+
+PR #65 merged at `2026-09-07T20:20:48Z` and published source
+`96372e7ff0c217199c8342e0415b0b4e3fd1c436`, deployment
+`dpl_EZmsbJ4gepWdveuaGRttbmEe5tfN` (READY). The exact preview head
+`624f85b02229f500a79b84a337524a734965b0d5` passed the hosted build and proof
+response check. Both preview and public Production returned HTTP 200,
+`application/json; charset=utf-8`, and all 112 source bytes with SHA-256
+`47e630bc2d6e87a77679ae55d1375378279d92f6f10cab5a0eebcbc4c96291b8`.
+Production health independently identified that commit at
+`2026-09-07T20:24:10.757468Z`. `npm run build:clients` and diff checks passed;
+the build preserved the proof. No runtime/authentication code changed.
+
+In Entra, the already-submitted **Verify and save domain** action completed:
+the pane closed, the app's publisher-domain display changed to `permitext.com`,
+and the separate MPN-ID control became enabled. This is observed post-save UI,
+not a new sign-in or verified-publisher-badge pass. The receipt is
+`/private/tmp/permitext-microsoft-domain-public-receipt-20260907.json`.
+
+Partner Center independently showed the authorized personal Outlook identity,
+no usable Partner ID in Identifiers, and only other-program enrollment options.
+The Partner Program enrollment introduction required a work account. No
+registration/agreement was submitted. The owner confirmed that no working
+`@permitext.com` mailbox exists, then restricted work to what is needed for
+Apple App Store submission, subsequently allowing necessary web work too.
+The optional enrollment tab was closed. The current personal-Microsoft web
+sign-in pass does not depend on publisher verification; enterprise tenants may
+apply stricter consent policies, which remains deferred compatibility scope.
+
+**Publisher badge, Partner enrollment and mailbox setup are deferred.** A custom
+app publisher domain is not itself a verified Partner Program identity or a
+DNS-verified tenant domain. Microsoft publisher verification is not an Apple
+submission requirement; remaining native login functionality is still in scope.
+Continue the [App Store critical path](./PERMITEXT_APP_STORE_CRITICAL_PATH_2026-09-07.md)
+instead of further Microsoft business setup.
 
 Sources: [publisher domain](https://learn.microsoft.com/en-us/entra/identity-platform/howto-configure-publisher-domain),
 [publisher verification](https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview),

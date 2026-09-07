@@ -5,6 +5,21 @@ Updated September 7, 2026. This is the current action list for the **original
 It reconciles completed evidence with remaining acceptance. It adds no feature,
 paid evaluation cohort, release approval or new audit scope.
 
+**Owner pause, September 7:** current work is saved; wait for an explicit resume.
+Apple accepted completion of 11 verified expired Sandbox transactions after the
+physical StoreKit diagnostic identified `requestEncodeFailed`. The locked phone
+prevented the final checkout recheck. See the [active checkpoint](./PERMITEXT_APP_STORE_CRITICAL_PATH_2026-09-07.md).
+
+**Scope narrowed by the owner on September 7:** “dont do anything that is not
+needed for the app to make it to the apple store.” The active execution list is
+now the [App Store critical path](./PERMITEXT_APP_STORE_CRITICAL_PATH_2026-09-07.md).
+This broader audit remains an evidence inventory. Its open test coverage and
+optional Microsoft publisher badge must not automatically delay App Store work.
+Deferred coverage is not a pass; the paid-Beta machine gate remains separate.
+The owner's subsequent clarification also permits work needed for the web app.
+Necessary web fixes remain in scope; optional Microsoft branding/Partner setup
+does not, because personal Microsoft web sign-in is already verified working.
+
 ## Evidence baseline and working rules
 
 - Latest verified web source: `02d320725c5df2f0c7df83026e0af445d62c1e5e`,

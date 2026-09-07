@@ -1,6 +1,6 @@
 # Permitext iOS policy consent — September 7, 2026
 
-Status: **PARTIAL — physical consent control passed; expired Sandbox transactions block continuation**
+Status: **PARTIAL — StoreKit beta failure identified; 11 expired transactions completed through Apple API; phone recheck pending**
 
 ## Scope
 
@@ -85,3 +85,83 @@ usage or purchase entitlement was added.
 Private exports, the comparison receipt and bounded provider-log results are
 retained outside the repository in the existing September 6 live-test folder.
 The iOS consent gate and final shared-release binding remain open.
+
+## Physical StoreKit diagnosis and scoped cleanup — 20:34Z
+
+After the owner limited work to App Store readiness and necessary web fixes,
+the existing physical phone was available through CoreDevice and Mirroring.
+The installed app was freshly confirmed as build **63**. Account showed the
+designated test identity, Free, Billing: None and Synced. CoreDevice reports
+**iOS 27.0, build 24A5408d**, rather than the simulator's iOS version.
+
+One bounded preflight attempt was made with Console recording the physical
+device's logs. At `16:34:23`–`16:34:24 -0400`, `storekitd` logged
+`FinishTransactionRequest` for **11 exact Permitext TestFlight transaction IDs**,
+repeated across the three existing cleanup passes. Both `storekitd` and the
+Permitext process reported:
+
+```text
+Failed to encode request parameters (Never)
+NSCocoaErrorDomain Code=3840
+Error finishing transaction: requestEncodeFailed
+StoreKitInternalError.requestEncodeFailed
+environment: Optional("Testflight"), storefront: Optional("USA")
+```
+
+At `16:34:25.366323 -0400` the app logged the expired-subscription preflight
+failure. The Apple purchase-confirmation sheet never opened. This identifies
+failure inside Apple's transaction-finish request encoding, not a missing
+Permitext JSON field or a policy-server rejection. An independently authored
+[Apple Developer Forum report](https://developer.apple.com/forums/thread/842035)
+describes the same error on iOS 27 beta; its replies are not an Apple-confirmed
+fix. No purchase/ownership safeguard or product code was changed.
+
+### Verified exact transaction targets
+
+Apple's authenticated Sandbox Get Transaction Info endpoint returned HTTP 200
+for all 11 IDs observed in the phone logs. Before any completion operation:
+
+- Every signed JWS was cryptographically verified through its certificate chain
+  to the exact Apple Root CA G3 fetched from [Apple PKI](https://www.apple.com/certificateauthority/).
+  Root SHA-256: `63343abfb89a6a03ebb57e9b3f5fa7be7c4f5c756f3017b3a8c488c3653e9179`.
+- Every payload matched the exact observed ID, Permitext bundle, Pro Monthly
+  product and **Sandbox** environment. All 11 belong to one original transaction
+  history, and all expired between **June 29 and July 9, 2026**.
+- No active transaction, real Production purchase, account identity or unrelated
+  transaction was included. Raw IDs, payloads and signed receipts remain private.
+
+Apple documents a server-side [Finish Transaction](https://developer.apple.com/documentation/appstoreserverapi/finish-transaction)
+operation. Under the owner's existing test-cleanup authorization, immediately
+reverified all targets and called that Sandbox endpoint for those 11 transactions
+only, between `2026-09-07T20:44:57.834Z` and `20:44:58.705Z`.
+**All 11 returned HTTP 200.** No subscription purchase, refund, entitlement
+grant, account deletion or normal Apple-account change was requested.
+
+### Paused checkpoint
+
+The owner requested completing the current task and pausing until later.
+After the successful API cleanup, a single clean app relaunch was attempted for
+the final phone check. CoreDevice rejected launch because the physical device
+was **Locked** (`FBSOpenApplicationErrorDomain 7`). Mirroring had paused; its
+ordinary Resume action did not establish a usable final checkout observation.
+No further phone input or test item was requested.
+
+**The API completion is verified; the phone's refreshed unfinished queue,
+purchase-sheet access and native policy request are not yet verified.** On the
+owner's next explicit resume, reopen build 63 and perform one no-purchase preflight
+check; cancel Apple's confirmation sheet if it appears. Do not repeat the tester
+history reset or change purchase logic without new evidence.
+
+The purchase sheet was closed before relaunch was attempted. Console streaming
+was stopped, and its temporarily enabled informational-message option was restored.
+The test session remains retained. Private evidence is in
+`/private/tmp/permitext-storekit-diagnostic-20260907/`: the exact observed targets,
+signed API receipts, pinned-root verification summary, `finish-queue-receipt.json`,
+and the bounded diagnostic scripts. No bearer token or private key was written.
+The independent account exports remain in the existing live-test directory.
+
+The independent before/after-cleanup account comparison at `20:48:56Z` confirms
+the same account, unchanged account fields and saved mutations, no entitlement,
+zero policy acceptances, and all 24 content/usage groups unchanged. Only session
+metadata changed. Receipt: `account-integrity-after-finish.json` in the diagnostic
+directory. The historical lost web consent was not fabricated or backfilled.
