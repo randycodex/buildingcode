@@ -141,22 +141,22 @@ The final shared web/TestFlight candidate remains unselected. Source publication
 ## Controlled Production billing
 
 Gate ID: `controlled-production-billing`
-Status: **CURRENT PRODUCTION LIFECYCLE PASSED — final-release binding and two non-charge cleanup/replay fields remain open**
+Status: **LIFECYCLE, LIVE DELETED-ACCOUNT REPLAY AND DISPOSABLE CUSTOMER CLEANUP PASSED — final shared-release binding remains open**
 Release-bound: **yes**
 
 Run only under separate immediate authorization. Use a dedicated disposable account and the exact serving release. Do not record card data, a raw receipt, an email address, or unredacted customer/provider identifiers.
 
 - Explicit charge/refund authorization and timestamp: yes — the owner separately authorized the live charge and later cancellation plus the full refund during the `2026-09-02T23:36:49Z`–`2026-09-02T23:44:06Z` exercise window.
-- Dedicated test-account opaque hash: no account identifier is retained in source control; the authenticated account was verified as Free immediately before Checkout.
+- Dedicated test-account SHA-256: `40d69e0c70327dd27e27eb71d2089a380c56be725d6648160a7732a9c13249e0`, independently matched against original subscription metadata before September 7 replay/cleanup. The authenticated account was verified as Free before the original Checkout; no raw account identifier is retained here.
 - Signed provider event granted Pro exactly once: yes — Permitext showed Pro with 100 included turns after three purchase-related webhook deliveries returned HTTP 200.
-- Duplicate/delayed event remained inert: not deliberately replayed against live Production; the permanent provider-backed Stripe sandbox and billing contract cover duplicate and delayed delivery without another charge.
+- Duplicate/delayed event remained inert: passed September 7 for the original live completed Checkout after refund/cancellation and account deletion. Provider redelivery reached current Production with HTTP 200; independent before/after exports retained an absent account/entitlement and 25 empty record groups. See the [live replay receipt](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md). The permanent provider-backed sandbox and billing contract retain broader ordering coverage.
 - Cancellation preserved only the intended prepaid period: yes before refund — the Customer Portal scheduled cancellation at the end of the paid month; the later full refund correctly superseded that schedule and ended access immediately.
 - Authorized refund completed and removed the intended entitlement: yes — Stripe showed the full `$21.78` refund and Permitext returned to Free.
-- Stripe subscription/customer cleanup confirmed: subscription canceled and ended; the disposable Stripe customer was not deleted during this exercise and remains part of the separate account-deletion cleanup boundary.
+- Stripe subscription/customer cleanup confirmed: the original subscription remains canceled/ended. September 7 cleanup deleted the exact disposable customer after verifying no active subscription, future invoice, pending invoice item or invoice balance. Stripe's deletion log returned HTTP 200; reloading the original customer URL confirmed permanent deletion. Historical payments/invoices remain retained by Stripe. See the [cleanup receipt](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md#customer-cleanup).
 - Permitext entitlement and provider state reconciled: yes — Stripe showed canceled/ended plus the refunded invoice, while Permitext showed Free.
 - Redacted event references, amounts, timestamps, and cleanup evidence: [Production Stripe lifecycle evidence](./PERMITEXT_BETA1_PRODUCTION_STRIPE_LIFECYCLE_2026-09-02.md), bound to Git commit `cb7918b453988a07d57a7834f5982d523d0e3901` and deployment `dpl_2i2iRQjwqkuQaQChbzR5MGh6j8EW`.
 
-The controlled monetary and entitlement lifecycle does not need another paid Beta 1 repetition unless billing logic or Production configuration materially changes. This gate remains false in the activation JSON until the final shared web/TestFlight commit is selected and the remaining non-charge replay/customer-cleanup evidence is reconciled.
+The controlled monetary and entitlement lifecycle does not need another paid Beta 1 repetition unless billing logic or Production configuration materially changes. Both remaining non-charge checks are complete; do not reopen replay/customer cleanup without new evidence. This gate remains false in the activation JSON until the final shared web/TestFlight commit is selected and reconciled. The September 7 replay is bound to `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9` and retains its deleted-account scope.
 
 ## Production authentication and account lifecycle
 
