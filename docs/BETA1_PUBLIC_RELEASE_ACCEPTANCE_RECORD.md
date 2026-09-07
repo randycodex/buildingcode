@@ -33,7 +33,15 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest website/backend publication: the [approved PR #62 repairs](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md)
+Latest website/backend publication: [PR #63](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md#publication-and-retained-hosted-pdf)
+is verified on Production source `4048aa28e65b67ff8eecd9dc95ab76f861f7d680`,
+deployment `dpl_BJBGHbmKsFYJ5a5DGkoP2QJJ5ZA3`, completed at
+`2026-09-07T17:57:10.647Z`. The acknowledgment's Account navigation label,
+live asset hashes, unchanged policy configuration and retained hosted PDF passed.
+Web runtime remains v55. The installed native build remains 63 at the preceding
+source; no new physical installation or final shared candidate is claimed.
+
+Preceding website/backend publication: the [approved PR #62 repairs](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md)
 are verified on Production source `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
 deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, web v55. Source/asset,
 cache-header and hosted Reader/session checks passed. Physical build 63 uses
@@ -216,7 +224,7 @@ Release-bound: **yes**
 - Live document SHA-256 hashes equal the approved manifest: yes for all three canonical routes; the audit emitted hashes only, not policy bodies or customer data.
 - Production version identifiers equal the approved current versions: yes — the protected exact-candidate build reported approved policy versions ready.
 - Web purchase consent displays and records those exact versions: yes on Production `5f1afb414fdd`, September 7. The unchecked gate, canonical document links, one durable server-dated acceptance and same-policy retry passed with independent account exports; hosted Checkout was opened and left unpaid. The stale Stripe allowance description was also corrected and verified in a fresh Checkout. [Evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md).
-- iOS purchase consent displays and records those exact versions:
+- iOS purchase consent displays and records those exact versions: partial. The physical policy switch gates Subscribe, but expired Sandbox transactions stop the flow before policy recording or Apple's purchase sheet. The exact-tester history reset, visually verified Sandbox sign-in and clean app relaunch did not resolve it. The prior web acceptance is not an iOS pass. Further work must isolate the tester queue or collect device-level diagnostics rather than repeat the same sequence. [Evidence](./PERMITEXT_IOS_POLICY_CONSENT_2026-09-07.md).
 - Retainable post-purchase acknowledgment matches the selected release: current Production `4048aa28e65b` passed on September 7. The Settings label was corrected to Account through PR #63; canonical hosted HTML/script hashes matched, and Chrome's actual saved one-page PDF passed content, policy-link and rendered-page checks. No new purchase was made. Final shared-source/build selection remains open. [Evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md#publication-and-retained-hosted-pdf).
 - Canonical URLs are direct HTTPS 200 responses without redirect or fallback bytes: yes for `/terms`, `/privacy`, and `/refunds`.
 - Redacted evidence and timestamp: strict live audit at `2026-09-03T10:33:44.038Z`; exact release identity is retained in [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
@@ -315,7 +323,8 @@ Release-bound: **yes**
 
 ### Current candidate and latest verified clients
 
-- Latest verified product source: `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`, Production deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, physical Permitext 1.0 (63). The [build-63 receipt](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md) binds source/archive/upload/Apple processing and the physical Account-X check. Broader observations below keep their original build scope.
+- Latest verified web/backend source: `4048aa28e65b67ff8eecd9dc95ab76f861f7d680`, Production deployment `dpl_BJBGHbmKsFYJ5a5DGkoP2QJJ5ZA3`. [PR #63 evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md#publication-and-retained-hosted-pdf) retains the exact publication and hosted acknowledgment check.
+- Latest verified physical client: Permitext 1.0 (63), source `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`. The [build-63 receipt](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md) binds source/archive/upload/Apple processing and the physical Account-X check. Broader observations below keep their original build scope. Web and installed native source differ; final shared binding remains open.
 - [Build-62 acceptance](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md) passed current web Note navigation, lower native Note fields, both actual Report PDFs with all nine pages inspected, and immutable record integrity. Chrome Production PDF download is owner-confirmed. The in-app browser download remains unaccepted.
 - Temporary Pro is revoked; the latest physical Account-X check showed the designated test identity, Free and Synced. The existing Google web session was restored on September 7. Test sessions are intentionally retained between checks at the owner's request.
 - VoiceOver and screenshot preparation are deferred by the owner's September 7 instructions. Screenshots resume after UI work is complete. Neither deferral is a passed acceptance result.

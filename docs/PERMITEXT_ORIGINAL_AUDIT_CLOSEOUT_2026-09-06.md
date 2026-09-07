@@ -485,7 +485,12 @@ for the detailed fields. Finish only the still-open evidence:
   before/after exports and same-policy retry. Stripe's stale billing-month
   allowance copy is corrected and verified in fresh hosted Checkout. The corrected
   acknowledgment is published through PR #63 and its actual Chrome PDF is retained
-  and inspected. iOS consent and final shared-release binding remain open. The September 7
+  and inspected. [Physical iOS consent](./PERMITEXT_IOS_POLICY_CONSENT_2026-09-07.md)
+  confirms the agreement switch gates Subscribe, but expired Sandbox transactions
+  block the flow before policy recording. The exact tester's history reset,
+  visually verified Sandbox sign-in and clean app restart did not resolve it;
+  isolate the tester queue or collect device-level diagnostics next. iOS consent
+  and final shared-release binding remain open. The September 7
   [live delayed/duplicate Checkout replay](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md)
   reached current Production with HTTP 200 / `changed:false` and left the original deleted
   account/entitlement absent, with all 25 exported record groups unchanged
@@ -497,6 +502,12 @@ for the detailed fields. Finish only the still-open evidence:
   attestations. Preserve the accepted monitoring alternative and previously
   passed monetary lifecycles.
 - Apple metadata, privacy/reviewer material and approved Beta limitations.
+- [Apple's Production notification API prerequisite](./PERMITEXT_APPLE_PRODUCTION_API_PREREQUISITE_2026-09-07.md)
+  is now identified: the existing credential succeeds in Sandbox, while
+  Production returns 401 before the app has a Production release, consistent
+  with Apple's commerce-engineer guidance. Retain the signed Production TEST
+  delivery as a release-dependent follow-up; do not rotate keys or treat it as
+  passed. No release or machine-gate change was made.
 - Bind the final selected shared source/build/deployment, then record owner
   go/no-go. The existing build-62 publication/installation receipts are already
   available; final candidate selection is still open.
