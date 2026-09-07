@@ -6,10 +6,10 @@ export const approvedPolicyArtifacts = Object.freeze({
     sha256: "d15a253fd0886e9f091d0e76dfbba8ce0aa922ff57d7c84b66ab37c8d1fa8abc"
   }),
   privacy: Object.freeze({
-    version: "privacy-2026-08-28",
+    version: "privacy-2026-09-07",
     sourcePath: "public/privacy.html",
     publicPath: "/privacy",
-    sha256: "ab2a135482fe22bd02136672c37da2821fb2df5add866e02928ae284d7fdddef"
+    sha256: "7b7b68b785edd8e339556cdaf2102b2119d0ee2784d0281cb38146114c5c5677"
   }),
   subscriptionsAndRefunds: Object.freeze({
     version: "subscriptions-2026-08-28",

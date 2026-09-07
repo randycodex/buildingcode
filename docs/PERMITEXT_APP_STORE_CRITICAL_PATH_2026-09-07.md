@@ -1,9 +1,9 @@
 # Permitext — App Store critical path
 
-**PAUSED at the owner's request on September 7.** Finish no additional items
-until the owner explicitly resumes. The current transaction-cleanup attempt
-completed: Apple accepted all 11 verified expired Sandbox transactions. The
-final phone check was blocked by the locked device. Resume with that one check,
+**Resumed September 7 without the phone, as instructed by the owner.** Continue
+submission preparation and necessary web repairs; leave device work pending.
+Apple accepted all 11 verified expired Sandbox transactions. The
+final phone check was blocked by the locked device. When the phone returns, use that one check,
 using the [StoreKit diagnosis and cleanup receipt](./PERMITEXT_IOS_POLICY_CONSENT_2026-09-07.md#physical-storekit-diagnosis-and-scoped-cleanup--2034z).
 
 ## Controlling scope
@@ -27,6 +27,12 @@ Account-X and Note/Report checks retain their recorded scope and should not be
 repeated without a relevant change or failure.
 
 ## Remaining submission work
+
+Current desktop work: close the already-identified provider privacy-disclosure
+gap with a versioned policy revision. See the [revision receipt](./PERMITEXT_PRIVACY_DISCLOSURE_PUBLICATION_2026-09-07.md).
+App Store Connect's in-app browser session requires sign-in as of this resume;
+live questionnaire/reviewer fields cannot yet be reverified. No phone access
+or verification code was requested.
 
 1. **Resolve the native purchase preflight blocker.** Build 63 repeatedly stops
    at the expired Sandbox transaction queue before Apple's confirmation sheet.
