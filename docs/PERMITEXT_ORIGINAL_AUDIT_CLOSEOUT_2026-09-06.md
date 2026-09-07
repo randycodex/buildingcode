@@ -7,12 +7,19 @@ paid evaluation cohort, release approval or new audit scope.
 
 ## Evidence baseline and working rules
 
-- Latest verified web source: `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
+- Latest verified web source: `4048aa28e65b67ff8eecd9dc95ab76f861f7d680`,
+  Production deployment `dpl_BJBGHbmKsFYJ5a5DGkoP2QJJ5ZA3`, published through
+  PR #63 under the owner's standing closeout authorization. The sole product
+  change from PR #62 is the acknowledgment's Settings → Account label;
+  [live HTML/script hashes and an actual retained PDF passed](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md#publication-and-retained-hosted-pdf).
+  Web consent passed immediately before this publication; exact policy configuration
+  is unchanged. The previous verified web source was
+  `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
   Production deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, published with
   owner approval through PR #62. Production source, ten public cache-header
   paths and the retained v55 session/Reader check passed. See the
   [Reader repair and publication record](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md).
-  Physical build 63 now uses the same selected source; its
+  Physical build 63 uses that previous source; its
   [Account-X delivery and acceptance](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md)
   are verified. Earlier build-62 receipts retain their original
   [acceptance scope](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md).
@@ -476,8 +483,9 @@ for the detailed fields. Finish only the still-open evidence:
 - [Live web policy consent](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md) now passes:
   exact versions were durably recorded before unpaid Checkout, with independent
   before/after exports and same-policy retry. Stripe's stale billing-month
-  allowance copy is corrected and verified in fresh hosted Checkout. iOS consent,
-  acknowledgment publication/retention and final binding remain open. The September 7
+  allowance copy is corrected and verified in fresh hosted Checkout. The corrected
+  acknowledgment is published through PR #63 and its actual Chrome PDF is retained
+  and inspected. iOS consent and final shared-release binding remain open. The September 7
   [live delayed/duplicate Checkout replay](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md)
   reached current Production with HTTP 200 / `changed:false` and left the original deleted
   account/entitlement absent, with all 25 exported record groups unchanged
