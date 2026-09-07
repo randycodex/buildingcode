@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260906-research-pane-completion-v52";
+} from "./offline-storage.js?v=20260907-shell-revalidation-v55";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260906-research-pane-completion-v52";
+} from "./research-intent-state.js?v=20260907-shell-revalidation-v55";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -12890,7 +12890,10 @@ function collapseRepeatedReaderCatalogAliases(content) {
 
 function stopReaderProgressiveHydration(content) {
   content?._readerProgressiveCleanup?.();
-  if (content) delete content._readerProgressiveCleanup;
+  if (content) {
+    delete content._readerProgressiveCleanup;
+    cancelReaderScrollRestore(content);
+  }
 }
 
 async function progressivelyRenderReaderChapter(
@@ -12959,14 +12962,16 @@ async function progressivelyRenderReaderChapter(
       if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
       const fragment = document.createDocumentFragment();
       sections.slice(start, end).forEach((section) => {
-        fragment.append(
-          renderReaderChapterSection(
-            panel,
-            reader,
-            readerSectionWithWindowBody(section, windowChapter),
-            groupLabelsByFirstSection
-          )
+        const sectionNode = renderReaderChapterSection(
+          panel,
+          reader,
+          readerSectionWithWindowBody(section, windowChapter),
+          groupLabelsByFirstSection
         );
+        // A prepended batch participates in scroll-height compensation now;
+        // intrinsic placeholder heights would shift the passage after layout.
+        if (!loadingAfter) sectionNode.style.contentVisibility = "visible";
+        fragment.append(sectionNode);
       });
       if (loadingAfter) {
         content.insertBefore(fragment, status);
@@ -12989,6 +12994,7 @@ async function progressivelyRenderReaderChapter(
       } else {
         updateStatus();
       }
+      restorePendingReaderScrollPosition(panel);
       requestAnimationFrame(() => updateReaderScrollIndicator(panel));
     } catch (error) {
       if (panel.isConnected && panel.dataset.readerRenderToken === renderToken) {
@@ -13042,11 +13048,13 @@ async function progressivelyRenderReaderChapter(
   maybeHydrate();
 }
 
-async function renderSectionContent(panel, reader) {
+async function renderSectionContent(panel, reader, options = {}) {
   panel.dataset.readerSearchToken = `reader:${crypto.randomUUID()}`;
   const content = panel.querySelector(".reader-content");
   stopReaderProgressiveHydration(content);
   content?.classList.remove("is-searching-reader");
+  delete panel.dataset.readerContentKey;
+  if (content) delete content.dataset.chapterFullyLoaded;
   if (!reader.chapterID) {
     blankReader(content);
     return;
@@ -13068,7 +13076,8 @@ async function renderSectionContent(panel, reader) {
     emptyReader(content, "No sections", "This chapter does not contain readable sections.");
     return;
   }
-  const targetIndex = Math.max(0, readerTargetSectionIndex(sections, reader));
+  const scrollPosition = readerScrollPositionFor(reader, options.scrollPosition, sections);
+  const targetIndex = scrollPosition?.sectionIndex ?? Math.max(0, readerTargetSectionIndex(sections, reader));
   const maximumInitialStart = Math.max(0, sections.length - readerInitialSectionWindowSize);
   const initialStart = Math.min(
     Math.max(0, targetIndex - Math.floor(readerInitialSectionWindowSize / 2)),
@@ -13098,8 +13107,9 @@ async function renderSectionContent(panel, reader) {
   });
   cacheRecentlyViewedReaderPreview(reader, initialSections[targetIndex - initialStart]);
   collapseRepeatedReaderCatalogAliases(content);
+  panel.dataset.readerContentKey = readerContentScrollKey(reader);
 
-  if (reader.sectionID) {
+  if (reader.sectionID && !scrollPosition) {
     requestAnimationFrame(() => {
       if (panel.dataset.readerRenderToken !== renderToken) return;
       const behavior = reader.shouldSmoothScrollToSection ? "smooth" : "auto";
@@ -13239,6 +13249,7 @@ async function navigateReaderToSection(panel, reader, behavior = "auto") {
     await renderSectionContent(panel, reader);
     return;
   }
+  panel.dataset.readerContentKey = readerContentScrollKey(reader);
   scrollReaderContentToSection(content, reader.sectionID, behavior, reader.sectionNumber);
 }
 
@@ -13709,6 +13720,7 @@ function sectionElementForInlineComment(commentWrapper) {
 function beginReaderNavigation(panel, { clearContent = true } = {}) {
   const token = crypto.randomUUID();
   panel.dataset.readerNavigationToken = token;
+  delete panel.dataset.readerContentKey;
   if (clearContent) {
     // Invalidate body, search and hydration work before waiting for a new catalog.
     panel.dataset.readerRenderToken = token;
@@ -13737,7 +13749,7 @@ async function changeReaderCode(panel, reader, selectedCode) {
   }
 }
 
-async function refreshReaderContent(panel, reader) {
+async function refreshReaderContent(panel, reader, options = {}) {
   const navigationToken = beginReaderNavigation(panel);
   const saveButton = panel.querySelector(".reader-save");
   applyCodeTheme(panel, reader);
@@ -13747,7 +13759,7 @@ async function refreshReaderContent(panel, reader) {
   if (saveButton) saveButton.disabled = true;
   try {
     if (!await populateReaderSelectors(panel, reader, navigationToken)) return false;
-    await renderSectionContent(panel, reader);
+    await renderSectionContent(panel, reader, options);
   } catch (error) {
     if (panel.dataset.readerNavigationToken !== navigationToken) return false;
     const content = panel.querySelector(".reader-content");
@@ -14495,9 +14507,8 @@ async function renderReader(reader, options = {}) {
   if (options.isSearchResult && !reader.sectionID) {
     blankReader(panel.querySelector(".reader-content"));
   } else {
-    await refreshReaderContent(panel, reader);
+    await refreshReaderContent(panel, reader, { scrollPosition: options.scrollPosition });
   }
-  panel.dataset.readerContentKey = readerContentScrollKey(reader);
 
   return panel;
 }
@@ -33093,11 +33104,20 @@ function keepFocusedWorkspacePaneVisible() {
 }
 
 function readerContentScrollKey(reader) {
-  return [
+  return JSON.stringify([
     reader?.codePrefix || "BC",
+    reader?.codeVersion || "",
     reader?.chapterID || "",
     reader?.sectionID || ""
-  ].join(":");
+  ]);
+}
+
+function readerScrollPositionFor(reader, position, sections) {
+  if (!position?.sectionID || position.contentKey !== readerContentScrollKey(reader)) return null;
+  const sectionIndex = sections.findIndex((section) =>
+    String(section.id) === position.sectionID || section.readerAliasSectionIDs?.includes(position.sectionID)
+  );
+  return sectionIndex < 0 ? null : { ...position, sectionIndex };
 }
 
 function captureReaderScrollPositions() {
@@ -33105,10 +33125,20 @@ function captureReaderScrollPositions() {
   track.querySelectorAll('.workspace-panel[data-pane-id^="reader:"]').forEach((panel) => {
     const content = panel.querySelector(".reader-content");
     const contentKey = panel.dataset.readerContentKey || "";
-    if (!content || !contentKey) return;
+    if (!content || !contentKey || content.classList.contains("is-searching-reader")) return;
+    const top = content.getBoundingClientRect().top;
+    const section = Array.from(content.querySelectorAll(".chapter-section[data-section-id]"))
+      .find((node) => node.getBoundingClientRect().bottom > top);
+    if (!section) return;
+    const block = Array.from(section.querySelectorAll(".annotated-code-block[data-block-id]"))
+      .find((node) => node.getBoundingClientRect().bottom > top);
+    const anchor = block || section;
     positions.set(panel.dataset.paneId, {
       contentKey,
-      scrollTop: content.scrollTop
+      sectionID: section.dataset.sectionId,
+      blockID: block?.dataset.blockId || "",
+      anchorOffset: anchor.getBoundingClientRect().top - top,
+      sectionOffset: section.getBoundingClientRect().top - top
     });
   });
   return positions;
@@ -33116,26 +33146,75 @@ function captureReaderScrollPositions() {
 
 function restoreReaderScrollPositions(positions) {
   if (!positions?.size) return;
-  const restore = () => {
-    positions.forEach((position, paneID) => {
-      const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
-      const content = panel?.querySelector(".reader-content");
-      if (
-        !content ||
-        panel.dataset.readerContentKey !== position.contentKey
-      ) {
-        return;
+  positions.forEach((position, paneID) => {
+    const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    const content = panel?.querySelector(".reader-content");
+    if (!content || panel.dataset.readerContentKey !== position.contentKey) return;
+    const renderToken = panel.dataset.readerRenderToken;
+    // Select enhancement and the surrounding workspace finish their layout
+    // before the frame. Do not apply detached/pre-layout text measurements.
+    const controller = new AbortController();
+    for (const event of ["wheel", "touchstart", "pointerdown", "keydown"]) {
+      content.addEventListener(event, () => controller.abort(), { signal: controller.signal, passive: true });
+    }
+    requestAnimationFrame(() => {
+      if (!controller.signal.aborted && panel.dataset.readerRenderToken === renderToken) {
+        applyReaderScrollPosition(panel, position);
       }
-      const scrollTop = Math.min(
-        position.scrollTop,
-        Math.max(0, content.scrollHeight - content.clientHeight)
-      );
-      content.scrollTop = scrollTop;
-      updateReaderScrollIndicator(panel);
+      controller.abort();
     });
-  };
-  restore();
-  requestAnimationFrame(restore);
+  });
+}
+
+function cancelReaderScrollRestore(content) {
+  content?._readerScrollRestoreAbort?.abort();
+  if (content) {
+    delete content._readerScrollRestoreAbort;
+    delete content._readerPendingScrollPosition;
+  }
+}
+
+function applyReaderScrollPosition(panel, position) {
+  const content = panel?.querySelector(".reader-content");
+  if (!content || !panel.isConnected || panel.dataset.readerContentKey !== position?.contentKey) {
+    cancelReaderScrollRestore(content);
+    return;
+  }
+  // Only the small restored body window is loaded here. Measure its real text
+  // instead of content-visibility's off-screen intrinsic placeholders.
+  content.querySelectorAll(".chapter-section").forEach((node) => {
+    node.style.contentVisibility = "visible";
+  });
+  const section = content.querySelector(`.chapter-section[data-section-id="${CSS.escape(position.sectionID)}"]`);
+  if (!section) { cancelReaderScrollRestore(content); return; }
+  const block = position.blockID
+    ? section.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(position.blockID)}"]`)
+    : null;
+  const anchor = block || section;
+  const offset = block ? position.anchorOffset : position.sectionOffset;
+  const targetTop = Math.max(0, content.scrollTop + anchor.getBoundingClientRect().top - content.getBoundingClientRect().top - offset);
+  const maximumTop = Math.max(0, content.scrollHeight - content.clientHeight);
+  content.scrollTop = Math.min(targetTop, maximumTop);
+  if (targetTop > maximumTop + 1 && content.dataset.chapterFullyLoaded !== "true") {
+    // The first small window may be shorter than the viewport. Retry after
+    // nearby sections hydrate, but give control back as soon as the user acts.
+    content._readerPendingScrollPosition = position;
+    if (!content._readerScrollRestoreAbort) {
+      const controller = new AbortController();
+      content._readerScrollRestoreAbort = controller;
+      for (const event of ["wheel", "touchstart", "pointerdown", "keydown"]) {
+        content.addEventListener(event, () => cancelReaderScrollRestore(content), { signal: controller.signal, passive: true });
+      }
+    }
+  } else {
+    cancelReaderScrollRestore(content);
+  }
+  updateReaderScrollIndicator(panel);
+}
+
+function restorePendingReaderScrollPosition(panel) {
+  const position = panel.querySelector(".reader-content")?._readerPendingScrollPosition;
+  if (position) applyReaderScrollPosition(panel, position);
 }
 
 function codeQuestionPaneTitle(paneRole) {
@@ -36407,13 +36486,13 @@ async function renderWorkspace(options = {}) {
     panes.push(renderSettings());
   }
   for (const reader of state.readers) {
-    panes.push(await renderReader(reader));
+    panes.push(await renderReader(reader, { scrollPosition: readerScrollPositions.get(paneIDForReader(reader)) }));
   }
   if (renderGeneration !== workspaceRenderGeneration) return false;
   appendPaneSequence(panes);
-  restoreReaderScrollPositions(readerScrollPositions);
   bindAllReaderScrollIndicators();
   enhanceReaderSelects();
+  restoreReaderScrollPositions(readerScrollPositions);
   if (options.persist !== false) saveWorkspaceState();
   return true;
 }

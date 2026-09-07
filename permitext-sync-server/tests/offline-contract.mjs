@@ -145,6 +145,7 @@ const shellPrecacheURLs = [];
 const deletedCacheNames = [];
 let cachedNavigationResponse = null;
 let nextNetworkResponse = null;
+const navigationFetchOptions = [];
 const navigationCache = {
   async addAll(urls) {
     shellPrecacheURLs.push(...urls);
@@ -171,10 +172,12 @@ vm.runInNewContext(serviceWorker, {
       return true;
     }
   },
-  async fetch() {
+  async fetch(_request, options) {
+    navigationFetchOptions.push(options);
     return nextNetworkResponse || {
       ok: true,
       status: 200,
+      source: options?.cache === "no-cache" ? "current-network-shell" : "older-immutable-http-shell",
       clone() {
         return this;
       }
@@ -249,8 +252,13 @@ assert.equal(
   "Authentication callback navigation can overwrite the public app fallback."
 );
 assert.equal(navigationResponse("/health"), undefined, "Health navigation can overwrite the public app fallback.");
-await navigationResponse("/");
-await navigationResponse("/open/section/303");
+assert.equal((await navigationResponse("/")).source, "current-network-shell");
+assert.equal((await navigationResponse("/open/section/303")).source, "current-network-shell");
+assert.deepEqual(
+  navigationFetchOptions.map((options) => options?.cache),
+  ["no-cache", "no-cache"],
+  "Network-first shell navigation must revalidate any older immutable HTTP entry."
+);
 assert.deepEqual(
   navigationCacheWrites,
   ["/", "/"],
