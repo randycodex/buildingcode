@@ -393,8 +393,15 @@ their original scope; the final publication evidence follows them.
   for the evidence and browser-emulation limits.
 
 The hosted install/citation/failure checks and native owner-confirmed pair do
-not need repeating. VoiceOver on the affected
-Reader/table/Project/Search controls, independent scroll-position continuity and
+not need repeating. The next desktop check found a full workspace-render
+scroll reset on Production: chapter 10 returned to its top and the independent
+chapter-1 Reader was clamped into its initial body window. The
+[Reader scroll repair](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md)
+now preserves both visible passages within one pixel in the actual complete
+local Chrome app, including nearby-section loading. Keyboard chapter-tree
+navigation, focus return and native-select exclusion also passed. Publication
+and hosted scroll acceptance remain pending; this is not VoiceOver evidence.
+VoiceOver on the affected Reader/table/Project/Search controls and
 supported-layout scope remain open. Reuse the build-61 physical table-pan result
 unless its runtime path changes; keep further device work bounded.
 
@@ -447,8 +454,11 @@ was published in the same PR. Production health, matching source on both origins
 the read-only account export and hosted Free/Synced session passed; the initial
 two-minute log scan found no 5xx or rate-limit errors. B2's controlled cleanup-failure
 and integrated retained-byte account-link recovery checks now pass in real Chrome
-storage, with the local/synthetic boundaries recorded above. Continue with B3's
-remaining accessibility/scroll/layout edges and B4/B5; preserve the separate
+storage, with the local/synthetic boundaries recorded above. B3 reproduced a
+separate Reader scroll reset; its local repair and actual full-app Chrome
+acceptance pass in the [repair record](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md).
+Finish the reviewable candidate and approved publication/hosted check, then
+continue B3's remaining accessibility/layout scope and B4/B5; preserve the separate
 server-side race and live provider-link/consent scope.
 The native Account close button is merged source awaiting a
 separately selected iOS build; it is not part of installed build 62.

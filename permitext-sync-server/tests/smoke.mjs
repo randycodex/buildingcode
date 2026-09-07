@@ -2260,7 +2260,7 @@ async function main() {
         workspaceScript.text.includes("function restoreReaderScrollPositions(positions)") &&
         workspaceScript.text.includes("panel.dataset.readerContentKey = readerContentScrollKey(reader);") &&
         workspaceScript.text.match(/async function renderWorkspace\(options = \{\}\) \{[\s\S]*?const readerScrollPositions = suppressReaderScrollRestore \? new Map\(\) : captureReaderScrollPositions\(\);/) &&
-        workspaceScript.text.match(/appendPaneSequence\(panes\);\s+restoreReaderScrollPositions\(readerScrollPositions\);/) &&
+        workspaceScript.text.match(/appendPaneSequence\(panes\);\s+bindAllReaderScrollIndicators\(\);\s+enhanceReaderSelects\(\);\s+restoreReaderScrollPositions\(readerScrollPositions\);/) &&
         workspaceScript.text.includes("panel.dataset.readerContentKey !== position.contentKey"),
       "Full workspace refreshes no longer preserve independent Reader scroll positions for unchanged content."
     );

@@ -59,7 +59,7 @@ function harness({ delayChapters = false } = {}) {
   });
   vm.runInContext([
     "emptyReader", "resolveReaderNavigationChapterID", "beginReaderNavigation", "changeReaderCode", "refreshReaderContent",
-    "populateReaderSelectors", "renderSectionContent", "selectReaderNavigation"
+    "populateReaderSelectors", "renderSectionContent", "selectReaderNavigation", "readerContentScrollKey", "readerScrollPositionFor"
   ].map(actual).join("\n"), context);
   return { panel, reader, content, chapterSelect, sectionSelect, lists, chapters, bodies, persisted,
     run: (prefix, version) => context.changeReaderCode(panel, reader, { prefix, version }),
