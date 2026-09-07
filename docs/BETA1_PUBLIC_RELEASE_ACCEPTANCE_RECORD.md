@@ -29,11 +29,24 @@ Interim no-input evidence: [PERMITEXT_RESEARCH_COMMERCIALIZATION_BRANCH_INTEGRIT
 
 ## Production deployment
 
+**September 7 owner scope update:** active work is limited to Apple App Store
+requirements, concrete submitted-app defects and necessary web fixes. Follow the
+[App Store critical path](./PERMITEXT_APP_STORE_CRITICAL_PATH_2026-09-07.md).
+The broader paid-Beta gates below remain an honest evidence record; deferred
+coverage is not passed and must not become an automatic App Store prerequisite.
+
 Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest website/backend publication: [PR #64](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md#publication-and-live-returning-sign-in)
+Latest website/backend publication: [PR #65](./PERMITEXT_MICROSOFT_SIGN_IN_2026-09-07.md#published-domain-proof-and-app-store-scope-change),
+source `96372e7ff0c217199c8342e0415b0b4e3fd1c436`, deployment
+`dpl_EZmsbJ4gepWdveuaGRttbmEe5tfN` (READY). Public health and the exact static
+Microsoft application-domain proof passed at `2026-09-07T20:24:10.757468Z`.
+The already-submitted Entra save completed; its publisher-domain UI shows
+`permitext.com`. The optional Microsoft badge/Partner enrollment is deferred.
+
+Preceding website/backend publication: [PR #64](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md#publication-and-live-returning-sign-in)
 is verified on Production source `02d320725c5df2f0c7df83026e0af445d62c1e5e`,
 deployment `dpl_8ezS6HFV55ifNeXDkj5MKiyMuhs5`, with public health verified at
 `2026-09-07T19:52:15.989835Z`. The account metadata repair passed real PostgreSQL,
@@ -394,4 +407,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: configure the Microsoft app publisher domain and inspect verification prerequisites, then continue the remaining provider/client/linking and iOS consent checks. The PostgreSQL metadata repair is published; real web consent durability now passes. Personal-Microsoft web fresh/returning sign-in now passes after the credential repair; publisher verification and other provider/client/linking cases remain open. Continue B1's server-side context/completion overlap, B4's device/OS/browser storage boundaries and broader hosted/native transfers, and B5 operations/reviewer/declaration evidence. B1's controlled hosted overlap is awaiting usable credentials; a Vercel Production download returned protected placeholders. The real-browser recovery file, actual local Chrome/HTTP interrupted transfers, and native-cache APFS exhaustion/retry have bounded passes; do not repeat them as substitutes for remaining conditions. Build 63 is installed and its Account X passed; do not repeat the build-62 handoff or completed deletion/table checks. Screenshots wait for the owner's UI work, VoiceOver is deferred, and final candidate selection/go-no-go remain open. All three recorded ramp-turn approvals are consumed. Follow the [current closeout checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md).
+- Next technical step: follow the [App Store critical path](./PERMITEXT_APP_STORE_CRITICAL_PATH_2026-09-07.md), starting with the unresolved native Sandbox purchase preflight, offered native login/reviewer access and required submission material. Necessary reproduced web defects also remain in scope. The owner restricted work to what is needed for App Store or web functionality. Microsoft domain proof is published and its app-domain save completed; Partner enrollment, badge and mailbox setup are deferred. Preserve the prior audit gaps as untested coverage rather than automatic submission blockers. The PostgreSQL consent repair and personal-Microsoft web fresh/returning sign-in pass remain valid. Build 63's Account X is physically accepted; screenshots wait for owner UI work and VoiceOver remains deferred. No additional paid Research is authorized. Final submitted-build checks and App Store facts still require actual evidence.
