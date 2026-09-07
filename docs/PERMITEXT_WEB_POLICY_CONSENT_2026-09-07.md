@@ -1,6 +1,12 @@
 # Permitext web policy consent and subscription copy — September 7, 2026
 
-Status: **LIVE WEB CONSENT AND STRIPE COPY PASSED; ACKNOWLEDGMENT LABEL REPAIRED LOCALLY**
+Status: **BOUNDED RECORDING/RETRY, STRIPE COPY AND HOSTED ACKNOWLEDGMENT PASSED; SIGN-IN DURABILITY FAILED**
+
+Later September 7 evidence found that a real Google sign-in removed the stored
+acceptance from the designated account. The immediate recording and duplicate
+Checkout observations below remain valid within their original scope, but
+enduring consent retention is open. See the [Production reproduction and source
+cause](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
 
 ## Scope and identity
 
@@ -74,7 +80,51 @@ the original HTML, CSS and print script; it is not a new paid-purchase receipt.
 - Corrected HTML SHA-256: `1404f6a5d1dc256836d65ca6b9930c66642d8c417668a6eff6d08cb9344540f3`.
 - Existing public-surface and policy-acceptance contracts passed.
 - Existing HTTP smoke suite passed.
-- Publication and a retained hosted PDF remain to be recorded below.
+- Publication and the retained hosted PDF passed in the following checkpoint.
+
+## Publication and retained hosted PDF
+
+[PR #63](https://github.com/randycodex/buildingcode/pull/63) merged at
+`2026-09-07T17:54:58Z` after the exact-head Vercel preview and hosted acknowledgment
+check passed. The preview was `dpl_B5JREWCdd8Jz9tFNockv3gsq2XnS`, source
+`fbd43e7998a17c2e23fa7478a96d883c8aecbbe2`.
+
+Production deployment `dpl_BJBGHbmKsFYJ5a5DGkoP2QJJ5ZA3` completed at
+`2026-09-07T17:57:10.647Z`, serving merge commit
+`4048aa28e65b67ff8eecd9dc95ab76f861f7d680` from
+`permitext-sync-mcrb4bw7d-randycodexs-projects-b72fc111.vercel.app`.
+
+The independent live receipt at `2026-09-07T17:57:57.236Z` verified:
+
+- canonical `/release` and `/health` returned 200, the expected Production
+  commit and healthy PostgreSQL storage;
+- the entire `/policies/current` configuration was unchanged;
+- canonical acknowledgment HTML returned 200 and exactly matched the corrected
+  local hash above;
+- the original print script returned 200 and matched local SHA-256
+  `c240997fff62ee92ccadcb6784433f54c2e8d2d6b1026ca6d0f7ae559bb88905`.
+
+An exact-deployment Vercel 5xx query for `17:57:10Z` through `18:00:00Z` completed
+successfully with zero returned records. This is a bounded post-publication scan,
+not a replacement for the remaining operations/alert acceptance.
+
+Chrome opened the canonical live acknowledgment, displayed Account in its
+cancellation instruction and used the page's Print or save as PDF button.
+The actual PDF was saved outside the repository and independently reopened.
+At `2026-09-07T18:00:02.167656Z`, it was one page, 126,722 bytes, SHA-256
+`d0a6153fe9e8d5b32fb69d3f0f0afa006aaf556a9bc8e2db85a72b45a0b40894`.
+Text checks confirmed price, no trial, UTC calendar month, Account/Manage
+Subscription, the 72-hour window and the canonical page URL; PDF annotations
+retained the correct canonical Terms, Privacy and Refund links. The rendered
+page was inspected and was complete and legible. Text extraction required
+Unicode normalization for the `fi` ligature in the footer URL.
+
+This is a real retained copy of the current hosted acknowledgment. It does not
+claim a new successful purchase. The only product-source difference from the
+prior runtime is the one HTML navigation label; remaining changes merged with
+the branch are acceptance documentation and test tooling. Main's existing
+Xcode Cloud workflow started automatically; no new TestFlight installation or
+App Store submission is claimed. Build 63 retains its original source/acceptance.
 
 ## Boundaries and retained evidence
 
@@ -82,8 +132,9 @@ Private exact-account exports and the redacted comparison receipt are retained
 outside the repository under the existing September 6 live-test folder. Raw
 account, customer, session and acceptance IDs are not included here.
 
-This closes current Production web consent, including durable exact-version
-recording and same-policy retry. iOS consent, final shared-release selection and
+This confirms immediate exact-version recording and same-policy retry. The
+later sign-in loss qualifies that result: enduring consent retention remains
+open until the repair passes a live returning sign-in. iOS consent, final shared-release selection and
 the other B1–B5 gates remain separate. The acknowledgment is a retainable statement
 of subscription terms, not an authenticated transaction receipt; this pass did
 not exercise a new payment or a new successful-purchase redirect.
