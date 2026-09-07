@@ -129,11 +129,19 @@ registered multitenant apps, even a custom publisher domain alone does not remov
 the unverified label. Microsoft requires a verified Partner Program identity
 associated with the app for publisher verification.
 
-Next: verify `permitext.com` as this app's publisher domain, then inspect the
-available Partner Center verification prerequisites without inventing business
-facts. The app-specific domain proof uses
-`/.well-known/microsoft-identity-association.json`; no proof file or publisher
-domain change was published in this checkpoint.
+The local publisher-domain candidate adds the static public proof at
+`/.well-known/microsoft-identity-association.json`, containing only the exact
+authorized application ID above. The Entra "Verify a new domain" pane independently
+provides the same path, schema and ID. No client secret is part of this file.
+The proof is served from the existing Vercel public output without adding an API
+handler or changing authentication scopes. Its JSON shape and app identity are
+checked locally; publication and Entra's persisted verification remain separate
+acceptance steps until recorded below.
+
+Next: publish and verify the actual HTTPS JSON response, save `permitext.com` as
+the app's publisher domain, then inspect the available Partner Center verification
+prerequisites without inventing business facts. A custom app publisher domain is
+not itself a verified Partner Program identity or a DNS-verified tenant domain.
 
 Sources: [publisher domain](https://learn.microsoft.com/en-us/entra/identity-platform/howto-configure-publisher-domain),
 [publisher verification](https://learn.microsoft.com/en-us/entra/identity-platform/publisher-verification-overview),
