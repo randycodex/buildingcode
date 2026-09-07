@@ -552,3 +552,22 @@ overlap; B2 live provider/consent and recovery file receipt; B3 selected-build
 phone/accessibility/layout checks; B4 storage failure coverage; B5 operational
 and release evidence; then exact candidate binding and final go/no-go. The
 actual Certificate of Authority effective date is awaiting the owner's answer.
+
+### September 7 priority adjustment and operations drill
+
+The owner explicitly instructed, “forget about voiceover for now, we can do
+that later.” Remaining VoiceOver acceptance is deferred out of the current
+closeout execution; it is not a pass and will not hold up the next technical
+checks. No VoiceOver or Caption Panel setting was enabled or changed. The
+build-63 Account X acceptance remains complete.
+
+The isolated manual Vercel pause/resume drill passed, with provider Activity,
+an actual `503 DEPLOYMENT_PAUSED`, exact recovered health/release bytes and the
+same deployment ID. The disposable project was removed afterward; all six
+pre-existing Production targets were preserved. The post-drill Production
+monitoring sample had zero actionable findings. See the
+[spend-control receipt](./BETA1_SPEND_CONTROL_ACCEPTANCE_RECORD.md#september-7-isolated-manual-pauserecovery-receipt).
+Actual spend-threshold notification delivery and automatic threshold linkage
+remain separate open results. Recovery, remaining provider/consent coverage,
+storage failure conditions and release reconciliation continue without phone
+VoiceOver work.

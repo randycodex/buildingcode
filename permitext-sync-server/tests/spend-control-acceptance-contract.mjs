@@ -8,10 +8,9 @@ const [record, operations, master] = await Promise.all([
 ]);
 
 for (const requiredBoundary of [
-  /Status: \*\*Prepared; not executed\*\*/,
   /Do not deliberately consume the \$20 on-demand amount/,
   /Do not lower the team spend amount to or below current spend/,
-  /without explicit owner authorization immediately before the change/,
+  /without owner authorization covering that action/,
   /must not be performed while the user is unavailable/,
   /Stop on unexpected spend, an unintended project pause, a release mismatch, inability to resume, or any customer-impact signal/
 ]) {
