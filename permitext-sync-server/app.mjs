@@ -20776,7 +20776,13 @@ async function handleServiceWorker(response) {
   );
 }
 
-async function handleWebStatic(path, response) {
+export function webStaticCacheControl(fileName, version) {
+  return version && /\.(?:js|css|woff2?|png|jpe?g|svg|ico|webmanifest)$/.test(fileName)
+    ? immutableStaticCacheControl
+    : "public, max-age=0, must-revalidate";
+}
+
+async function handleWebStatic(request, path, response) {
   const fileName = decodeURIComponent(path.replace(/^web\//, ""));
   const segments = fileName.split("/");
   if (
@@ -20788,7 +20794,8 @@ async function handleWebStatic(path, response) {
   }
   try {
     const filePath = join(webPublicPath, ...segments);
-    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), immutableStaticCacheControl);
+    const version = new URL(request.url, "http://localhost").searchParams.get("v");
+    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), webStaticCacheControl(fileName, version));
   } catch (error) {
     if (error.code === "ENOENT") {
       sendNotFound(response);
@@ -31452,7 +31459,7 @@ async function handleRequestUnlocked(request, response) {
       return;
     }
     if (request.method === "GET" && path.startsWith("web/")) {
-      await handleWebStatic(path, response);
+      await handleWebStatic(request, path, response);
       return;
     }
     if (request.method === "GET" && path.startsWith("code/assets/")) {

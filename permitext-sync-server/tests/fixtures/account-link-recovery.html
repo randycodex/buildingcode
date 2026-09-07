@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Account link retained-work recovery</title>
+<style>body{font:16px system-ui;max-width:950px;margin:32px auto;padding:0 24px;color:#17232d;background:#fafafa}button{font:inherit;margin:5px;padding:10px}li{margin:10px 0}pre{white-space:pre-wrap;font-size:12px}iframe{display:none}.pass{color:#176538}</style>
+<main><h1>Account link retained-work recovery</h1>
+<p>Isolated synthetic accounts, local HTTP server and real IndexedDB. The application sign-in storage and recovery/download handlers run unchanged. Provider login, workspace hydration and background synchronization use explicit fixture adapters.</p>
+<button id="prepare">Prepare lost response and late source work</button>
+<button id="recover" disabled>Recover after reload</button>
+<button id="verify" disabled>Verify export and isolation</button>
+<button id="cleanup">Clean up fixture</button>
+<p id="status" role="status">Ready</p><ol id="checks"></ol>
+<section id="recovery"></section>
+<details open><summary>Machine-readable evidence</summary><pre id="report"></pre></details></main>
+<script type="module" src="/runner.js"></script></html>

@@ -33,7 +33,18 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest publication: the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
+Latest website/backend publication: the [approved PR #61 follow-up](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md#approved-follow-up-publication)
+merged as `aed30262742d1888f94555997c4140cbdcaa7b71`. Production deployment
+`dpl_BmE1MmRPw1rVGTG5Gmfx9GvZHL6s` reached READY at
+`2026-09-07T02:49:39.298Z`. Both canonical origins and six served assets per
+origin match the source; Production verification, hosted Free/Synced continuity
+and a read-only exact-test-account export passed. The initial bounded log scan
+found no 5xx or rate-limit errors. This publication fixes the stranded Research
+composer and PostgreSQL rate-limit deadlock; it does not select a final shared
+release or change installed iOS build 62. See the [current original-audit checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md)
+for intervening PR #59/#60 evidence and remaining B1–B5 acceptance.
+
+Preceding shared source/build publication: the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
 track owner-approved PR #58 at merge commit
 `e60ca415fe8b7b60be65449b7ef49baccc82eec3`, Production
 `https://permitext-sync-3wkca40x7-randycodexs-projects-b72fc111.vercel.app`

@@ -144,7 +144,8 @@ also replaces input handlers which captured a pending request's disabled state.
 Account/workspace checks, closed primary/supplemental pane checks and conversation
 context/revision rejection remain in force. Asset version is
 `20260906-research-pane-completion-v52`; shell constants agree at
-`permitext-pro-shell-v791`. This follow-up is locally verified, **not published**.
+`permitext-pro-shell-v791`. This follow-up was locally verified before the
+separately approved publication recorded below.
 
 The new regression failed against v51 before the patch. Nine focused contracts
 pass: Research client recovery, web recovery, Reader navigation races, web
@@ -173,7 +174,7 @@ At `02:06:34Z`, the first `/admin/accounts/export` returned 503. Vercel reported
 check succeeded. The earlier one-minute clean log scan does not close this
 concurrency defect. The actual SQL subsequently reproduced `40P01` locally and
 the separated increment/cleanup repair passed real PostgreSQL concurrency and
-allowance checks. It is not yet published; see
+allowance checks. It was subsequently published with this follow-up; see
 [rate-limit repair](./PERMITEXT_RATE_LIMIT_DEADLOCK_REPAIR_2026-09-06.md).
 
 The account menu also displayed “Not downloaded on this device” after the v51
@@ -184,11 +185,39 @@ after revocation, so the later absence is consistent with that cleanup. It is
 not evidence of an upgrade or eviction defect, and does not require repeating
 the previously passed installation/offline pair.
 
+## Approved follow-up publication
+
+The owner approved [PR #61](https://github.com/randycodex/buildingcode/pull/61),
+candidate `0f45fc8c97c2f4a767004d700ef7fb8b7f5555cc`. Full `npm run check` and
+`npm run smoke` passed, along with the focused contracts, local Chrome fixtures,
+local PostgreSQL regression and hosted preview build. The smoke run first caught
+an outdated assertion requiring three duplicated callbacks; its replacement
+checks the shared-handler wiring and executes actual answer propagation behavior.
+
+PR #61 merged at `2026-09-07T02:47:22Z` as
+`aed30262742d1888f94555997c4140cbdcaa7b71`. Production deployment
+`dpl_BmE1MmRPw1rVGTG5Gmfx9GvZHL6s` reached READY at `02:49:39.298Z`.
+Both canonical origins report that exact merge with healthy normalized-v4
+PostgreSQL storage; six served assets per origin match the approved source by
+SHA-256. `npm run verify:production` passed. Chrome displayed
+`Release: aed30262742d`, Free and Synced, retaining the three saved sections,
+synthetic Projects and existing account-ownership quarantine notice. The Account
+pane was closed afterward; the test session remains signed in for ongoing work.
+
+One read-only export at `02:50:49.081Z` returned successfully, confirmed the exact
+test identity and absent temporary entitlement, and retained all foundation,
+Research and usage records from the completed live check unchanged. No new
+Research request, grant, purchase, sign-in or phone input was required to publish.
+The deployment-specific scan from `02:49:39.298Z` through `02:51:51Z` found no
+5xx rows or rate-limit warning/error logs. This is a bounded early observation,
+not sustained monitoring or a new cloud concurrency test. Publication, served
+source, account export and hosted-browser receipts are in
+`/private/tmp/permitext-b1-live-20260906/`.
+
 ## Next bounded step
 
-Prepare the locally verified Research and rate-limit repairs for publication
-review. B2 controlled failed-cleanup recovery subsequently passed in real Chrome
-storage; continue its remaining account-link boundary. Keep a
+The two repairs are published. B2 controlled failed-cleanup recovery passed in
+real Chrome storage; continue its remaining account-link boundary. Keep a
 server-side overlapping move/completion transaction race separate from the live
 Saved-selection test. Reuse the completed move/summary/return, Note/Report/PDF,
 image-recovery and device checks. B3–B5 retain their documented remaining scope.

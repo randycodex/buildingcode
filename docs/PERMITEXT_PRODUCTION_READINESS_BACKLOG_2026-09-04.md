@@ -390,6 +390,18 @@ separately verify exact-owner drafts/images, quota warnings, and no automatic
 replay. Web assets are synchronized at `20260904-readiness-recovery-v37` and shell
 `permitext-pro-shell-v776`. Native source is unchanged by this follow-up.
 
+September 6 follow-up: the [current B2 checkpoint](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md#account-link-retained-bytes--september-6-late-checkpoint)
+closes that empty-fixture gap. Real Chrome storage, the actual local HTTP link
+and extracted application recovery handlers passed 6 checks with a retained Note,
+exact pending-save journal, original PNG bytes and independent late source work.
+Fresh sign-in after a discarded response reconstructed server-confirmed ancestry;
+unrelated accounts were denied, source work remained intact and no destination
+replay occurred in the fixture. Provider authentication and background hydration
+were explicit adapters. The export payload passed byte checks; no completed
+Chrome download file receipt was independently obtained. Production linking and
+client/provider consent remain release acceptance. The synthetic storage/server
+were cleaned up, and no product source or Production account changed.
+
 ## Whole-section saves missing from Unassigned Saved
 
 **Acceptance follow-up, reproduced with the disposable Production account:**

@@ -55,9 +55,15 @@ was stopped, its image detached and its task runtime removed. Evidence is in
 `/private/tmp/permitext-b1-live-20260906/rate-limit-{before,after}.txt`,
 `rate-limit-verification.json` and the retained synthetic PostgreSQL log.
 
-The repair is locally verified and not yet published. It does not change the
-accepted device/account tests or close B2–B5. Publication needs the concrete
-candidate review; afterward, check the deployed source and bounded runtime logs.
+The owner approved PR #61 after local and preview checks passed. It published as
+`aed30262742d1888f94555997c4140cbdcaa7b71`, READY at
+`2026-09-07T02:49:39.298Z`. Both canonical origins report that exact release;
+Production health and one read-only exact-test-account export passed. A scan
+through `02:51:51Z` found no deployment 5xx rows or rate-limit warnings/errors.
+This is early hosted verification, not sustained monitoring or a cloud stress
+test. See [publication evidence](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md#approved-follow-up-publication).
+The remaining B2–B5 scope is unchanged apart from the separately passed B2
+controlled public-cleanup failure check.
 
 ## Reproduction
 
