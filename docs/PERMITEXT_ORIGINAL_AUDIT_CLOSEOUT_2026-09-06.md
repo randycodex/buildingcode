@@ -473,7 +473,11 @@ for the detailed fields. Finish only the still-open evidence:
 
 - Remaining fresh/existing provider sign-ins and account-link/client consent
   coverage; retain passed email registration/sign-in and populated deletion.
-- Exact client policy consent/acknowledgment remains open. The September 7
+- [Live web policy consent](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md) now passes:
+  exact versions were durably recorded before unpaid Checkout, with independent
+  before/after exports and same-policy retry. Stripe's stale billing-month
+  allowance copy is corrected and verified in fresh hosted Checkout. iOS consent,
+  acknowledgment publication/retention and final binding remain open. The September 7
   [live delayed/duplicate Checkout replay](./PERMITEXT_PRODUCTION_STRIPE_REPLAY_2026-09-07.md)
   reached current Production with HTTP 200 / `changed:false` and left the original deleted
   account/entitlement absent, with all 25 exported record groups unchanged

@@ -209,15 +209,15 @@ Follow [the detailed account export/deletion checklist](./BETA1_BILLING_IDENTITY
 ## Exact policy publication
 
 Gate ID: `exact-policy-publication`
-Status: **OPEN — exact current-candidate publication passes; final-client consent confirmation remains open**
+Status: **OPEN — exact publication and live web consent pass; iOS consent and final release binding remain open**
 Release-bound: **yes**
 
 - Strict live publication audit returned `publicationReady: true` for Terms, Privacy, and Subscription/Refund policy: yes at `2026-09-03T10:33:44.038Z`. The September 5 exact-source repair publication also passed the strict live audit; see the [current publication evidence](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#whole-section-saved-visibility-publication).
 - Live document SHA-256 hashes equal the approved manifest: yes for all three canonical routes; the audit emitted hashes only, not policy bodies or customer data.
 - Production version identifiers equal the approved current versions: yes — the protected exact-candidate build reported approved policy versions ready.
-- Web purchase consent displays and records those exact versions:
+- Web purchase consent displays and records those exact versions: yes on Production `5f1afb414fdd`, September 7. The unchecked gate, canonical document links, one durable server-dated acceptance and same-policy retry passed with independent account exports; hosted Checkout was opened and left unpaid. The stale Stripe allowance description was also corrected and verified in a fresh Checkout. [Evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md).
 - iOS purchase consent displays and records those exact versions:
-- Retainable post-purchase acknowledgment matches the selected release:
+- Retainable post-purchase acknowledgment matches the selected release: the current static page was inspected and its outdated Settings label corrected locally to Account. The corrected one-page Chrome print preview passed; hosted publication/retention and final selected-release binding remain open. [Evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md).
 - Canonical URLs are direct HTTPS 200 responses without redirect or fallback bytes: yes for `/terms`, `/privacy`, and `/refunds`.
 - Redacted evidence and timestamp: strict live audit at `2026-09-03T10:33:44.038Z`; exact release identity is retained in [build 50 physical-iPhone acceptance](./PERMITEXT_BETA1_BUILD50_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md).
 
