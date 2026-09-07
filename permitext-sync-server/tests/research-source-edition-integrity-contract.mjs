@@ -353,12 +353,16 @@ const downloadContext = vm.createContext({
   defaultCodeVersion: defaultSyncCodeVersion, historicalConstructionSyncCodeVersion,
   syncCodeVersion, syncCodeVersionForPrefix, offlineLibrarySchemaVersion: 2, offlineAssetVersion: "fixture",
   prepareOfflineShell: async () => {},
+  offlineChapterBodyLimit: 25,
+  requireOfflineDownloadActive() {},
   fetchJSON: async (path) => {
     if (path === "/code/chapters") return { chapters: downloadFixtures.map(({ sections, ...chapter }) => chapter) };
     if (path === "/code/libraries") return { libraries: installMetadata.libraries };
     const id = path.match(/\/code\/chapters\/(\d+)/)?.[1];
     assert(id, "Download uses only fixture paths.");
-    return { chapter: downloadFixtures.find((chapter) => String(chapter.id) === id) };
+    const chapter = downloadFixtures.find((chapter) => String(chapter.id) === id);
+    return { chapter: { ...chapter, bodyRange: { start: 0, end: chapter.sections.length,
+      total: chapter.sections.length, complete: true } } };
   },
   mapWithConcurrency: async (items, _limit, operation) => Promise.all(items.map(operation)),
   offlineAssetNamesForChapter: () => [], cacheOfflineAssets: async () => 0,
@@ -368,6 +372,7 @@ const downloadContext = vm.createContext({
 });
 vm.runInContext([
   between(offlineSource, "function offlineSectionCodeVersion(", "function chapterSectionRecord("),
+  between(offlineSource, "async function downloadOfflineChapter(", "function normalizedOfflineAssetName("),
   between(offlineSource, "export async function downloadOfflineLibrary(", "export async function offlineLibraryStatus(")
     .replace("export async function", "async function")
 ].join("\n"), downloadContext);

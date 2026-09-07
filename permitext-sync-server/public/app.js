@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260906-saved-citation-recovery-v49";
+} from "./offline-storage.js?v=20260906-offline-install-recovery-v50";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260906-saved-citation-recovery-v49";
+} from "./research-intent-state.js?v=20260906-offline-install-recovery-v50";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -32284,7 +32284,7 @@ function renderSettings() {
         onProgress(progress) {
           offlineProgress.value = progress.percent || 0;
           offlineStatus.textContent = progress.total > 1
-            ? `${progress.phase} · ${progress.completed} of ${progress.total} ${progress.unit || "items"}`
+            ? `${progress.phase} · ${progress.completed} of ${progress.total} ${progress.unit || "items"}${progress.detail ? ` · ${progress.detail}` : ""}`
             : progress.phase;
         }
       });

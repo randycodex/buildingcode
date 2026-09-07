@@ -14,8 +14,8 @@ paid evaluation cohort, release approval or new audit scope.
   evidence, rather than a new deployment inspection in this reconciliation.
 - Reconciliation started at branch commit `7001a3b1d`. The owner-requested
   Account close control is local commit `33f5cd41d`. The later saved-citation
-  recovery repair below is also local. Neither creates a new website deployment
-  or TestFlight build.
+  recovery and offline-installer repairs below are also local. These do not
+  create a new website deployment or TestFlight build.
 - The 17 IDs comprise 16 repair findings and the P1-4 release-acceptance umbrella.
   A repaired symptom, broader client coverage and public-release approval are
   separate statuses. The table below does not count a local pass as a physical
@@ -232,8 +232,8 @@ input instead of restoring the main account between cases.
 
 ### B3 — One focused client/device session
 
-September 6 checkpoint: **the native offline pair is owner-confirmed; a web
-failure is repaired locally and browser offline installation remains blocked.**
+September 6 checkpoint: **the native offline pair is owner-confirmed; the web
+failure and installer are repaired locally. Hosted acceptance remains open.**
 
 - On physical build 62 with the approved temporary Pro grant, the owner followed
   the Airplane Mode on / Wi-Fi off instructions and reported opening the saved
@@ -271,8 +271,8 @@ failure is repaired locally and browser offline installation remains blocked.**
 - With Pro regranted, Chrome's actual **Download for Offline Use** reached
   **466 of 467 chapters** and stayed there for at least ten minutes. A later
   reload ended that attempt; Account reported **Not downloaded on this device**.
-  The exact stalled request or storage operation was not isolated. Do not count
-  the web package installed or the Pro web offline citation check passed.
+  At that checkpoint the exact failed request was not isolated. Do not count
+  that hosted package installed or its Pro web offline citation check passed.
   Partial public install data was not cleared, and no private cache was purged.
 - Final temporary Pro revocation was independently verified at
   `2026-09-06T19:24:30.621Z`. The `19:24:55.940Z` export retained all foundation
@@ -282,8 +282,19 @@ failure is repaired locally and browser offline installation remains blocked.**
   `offline-citation-free-web.txt` and `saved-citation-recovery-preview.png` in
   the private evidence directory.
 
-Next, isolate the browser offline installer without the phone. The native
-owner-confirmed pair does not need repeating. VoiceOver on the affected
+- The later no-phone investigation reproduced the 466/467 failure display and
+  found public full-chapter failures. The paged repair includes the missing
+  2014 catalog and prevents late workers from overwriting errors or cleanup.
+  A real Chrome loopback test installed all **578 chapters, 32,551 sections and
+  893 figures** from captured public responses, retained them after reload, and
+  reopened the exact 2014/2022 pair through the offline API. Controlled failure
+  and retry retained the previous install and synthetic private draft/image.
+  [Repair and verification evidence](./PERMITEXT_OFFLINE_INSTALLER_REPAIR_2026-09-06.md)
+  separates this local browser result from still-open hosted acceptance.
+
+Next, publish the reviewed web repair with approval and perform one hosted
+installation/reopening check. The native owner-confirmed pair does not need
+repeating. VoiceOver on the affected
 Reader/table/Project/Search controls, independent scroll-position continuity and
 supported-layout scope remain open. Reuse the build-61 physical table-pan result
 unless its runtime path changes; keep further device work bounded.
@@ -319,10 +330,11 @@ account deletion and additional paid testing are not authorized by this checklis
 
 ## Next execution point
 
-The next step is to isolate the browser offline-library installation stall at
-466/467 chapters and finish hosted acceptance of the saved-citation recovery
-repair after an approved deployment. This investigation does not need the phone.
-The Account close button and saved-citation repair remain local candidates.
+The browser offline-library stall is repaired and verified locally, including
+a complete captured-corpus browser install and persistence after reload. The
+next step is an approved publication of the web candidate, followed by hosted
+installation and saved-citation recovery acceptance. No phone is needed for
+that step. The native Account close button remains a separate local candidate.
 
 The move/summary/return, Pro revoke/regrant stale-editor check, offline image
 recovery, Note/Report/PDF cycle and owner-confirmed native offline pair are
