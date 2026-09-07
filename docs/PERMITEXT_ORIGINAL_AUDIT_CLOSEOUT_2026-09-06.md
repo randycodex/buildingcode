@@ -426,7 +426,8 @@ immutable versioned assets. Approved PR #62 then published as `5f1afb414fdd`.
 Canonical Production health/source checks and all ten public HTTP header paths
 passed; the retained session loaded v55 and passed the actual Reader rebuild
 check. Private-route exclusions remain compiled-config evidence.
-The stale trace is diagnostic only; representative startup timing remains open.
+The stale trace is diagnostic only. The later September 7 ten-sample desktop
+startup measurement is recorded in the execution checkpoint below.
 Earlier retained-tab reload claims establish visible behavior, not the deployed
 script version unless that version was independently inspected in the DOM.
 
@@ -436,6 +437,16 @@ Record sample size and p50/p90 when measured. Separately resolve the untested
 storage-pressure/OS-eviction conditions by controlled evidence or an explicit
 owner scope/risk decision. Until then, these remain unverified; a local delay
 test or ordinary app-switcher termination does not close them.
+
+September 7 interrupted-transfer checkpoint: the
+[real Chrome/HTTP exercise](./PERMITEXT_NOTEBOOK_INTERRUPTED_TRANSFER_2026-09-07.md)
+passed partial-body socket loss, full image commit with lost response, two
+page reloads and same-identity retry followed by one acknowledged Note save.
+Independent file inspection found one original image and one version-1 Note,
+with no unresolved device-local image reference. The local web pipeline now
+has actual interrupted-transfer evidence. Storage pressure/OS eviction and
+hosted/native transfer scope remain open; do not repeat this local pass as a
+substitute for those remaining conditions.
 
 ### B5 — P1-4 release closeout
 
