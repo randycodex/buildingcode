@@ -172,8 +172,12 @@ each remaining check one home so it is not repeated for several findings.
    original request ID. The fixture uses actual handlers and recovery UI with
    synthetic transport/current-state loaders; it is not hosted or native
    acceptance. [Repair and evidence](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md).
-   Publication and cloud evidence remain separate. Local PostgreSQL race
-   evidence already exists; reuse the completed build-62 Note/Report exports.
+   The owner then approved publication through PR #60: Production is READY at
+   `2e4f7db2d`, both origins serve matching source assets, and the retained Chrome
+   session reloaded Free/Synced with its Saved state. This closes publication
+   and hosted loading, not a deliberately overlapping cloud completion race.
+   Local PostgreSQL race evidence already exists; reuse the completed build-62
+   Note/Report exports.
 
 Stop after the named transitions have evidence or a concrete reproducible defect.
 Do not widen this into another answer-quality cohort.
@@ -357,16 +361,19 @@ published and accepted on the hosted web client. The complete installation
 survived reload, and the exact 2014/2022 pair reopened with simulated offline
 transport. Temporary access is revoked and the test session remains signed in.
 The next B1 check reproduced a late-response navigation defect, now repaired and
-verified in local contracts and a Chrome fixture. Publish that reviewed web
-candidate and bind the hosted evidence before calling the client repair live;
-then continue the remaining B2/B3 edges and B4/B5. The native Account close button is merged source awaiting a
+verified in local contracts and a Chrome fixture. PR #60 published the repair
+as `2e4f7db2d`; Production health, matching assets on both origins, and the
+retained Chrome session's reload passed. Preserve the separate limit on a live
+cloud completion race, then continue the remaining B2/B3 edges and B4/B5.
+The native Account close button is merged source awaiting a
 separately selected iOS build; it is not part of installed build 62.
 
 The move/summary/return, Pro revoke/regrant stale-editor check, offline image
 recovery, Note/Report/PDF cycle and owner-confirmed native offline pair are
-complete within their recorded scope. Do not repeat them. B1's local recovery
-repair is verified; its publication/hosted acceptance, the remaining B2/B3 edges
-and B4/B5 remain open. Use existing
+complete within their recorded scope. Do not repeat them. B1's recovery repair,
+publication and hosted loading are verified; a deliberately overlapping cloud
+completion/context-change test was not added. Keep that scope, the remaining
+B2/B3 edges and B4/B5 distinct. Use existing
 documents and local checks to reconcile the remaining work without another
 phone session or main-account restoration. This is sequencing within the
 original audit, not authorization for paid Research, agent delegation, a new

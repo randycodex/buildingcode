@@ -10,8 +10,9 @@ with actual `conversation-a`, expected `conversation-b`.
 The local repair and focused contracts pass. A real Chrome fixture verified the
 application's response handlers, recovery storage and review/retry controls with
 synthetic transport and Project transitions. This is not authenticated hosted
-acceptance, a live PostgreSQL race, or native-device acceptance. Production
-remains at `6ccc2d4a8cc2d605b13ee6d46dbd4e1a0070883a`; this pass did not publish.
+acceptance, a live PostgreSQL race, or native-device acceptance. The initial
+repair pass did not publish. The owner subsequently approved publication; the
+deployed source and hosted loading evidence are recorded below.
 
 ## Repair
 
@@ -84,10 +85,40 @@ DOM receipts and inspected screenshots are in
 storage was cleaned, its tab closed and loopback server stopped. Actual account
 sessions, grants, retained content and the physical phone were not touched.
 
+## Approved publication and hosted verification
+
+The owner approved publishing repair `08d1cb5d7acf5f8ef4d7e35914f733565bfab54b`.
+Both PR checks passed and [PR #60](https://github.com/randycodex/buildingcode/pull/60)
+merged at `2026-09-07T01:54:35Z` (September 6 in New York) as
+`2e4f7db2dd80828d5746e51143f81d46a28c5f09`. The merged product source matches the
+approved head. No unrelated untracked files were included.
+
+Vercel Production deployment `dpl_4jSAihqQqT4Vgh3XyUqEgQGL9uP9` reached READY at
+`2026-09-07T01:57:19.735Z`. Both `https://permitext.com` and
+`https://permitext-sync.vercel.app` report the exact merge SHA and healthy
+PostgreSQL/normalized-v4 storage. Six source assets per origin match the approved
+files by SHA-256, including the app, offline installer and service worker.
+`npm run verify:production` passed. Existing build gates were not bypassed.
+
+The retained Chrome session reloaded the deployed `v51` app and displayed
+`Release: 2e4f7db2dd80`, Free and Synced. The three saved sections and three
+synthetic Project rows remained visible. The previously disclosed unknown-owner
+legacy-workspace notice remained; no site data was cleared. This verifies hosted
+loading and session continuity, not a new independent content export or a
+deliberately overlapping cloud Research/context-change request. No grant,
+Research request, purchase, account change or phone interaction was needed.
+
+The deployment-specific 5xx scan from `01:57:19Z` to `01:58:18.991Z` returned no
+rows. This is an early bounded observation, not sustained monitoring. Private
+receipts include `publication-result.json`, `served-production.json` and the
+hosted reload DOM/screenshot in the same evidence directory. The task's browser
+tab remains available with the test account signed in.
+
 ## Next bounded step
 
-Review and publish this web candidate, then bind the deployed source/assets and
-record the hosted acceptance that is still missing. Keep synthetic handler
-evidence distinct from a real cloud completion race. B1's successful live
+The web repair is published and its hosted loading/source binding is verified.
+Keep the synthetic handler/recovery evidence and existing local PostgreSQL races
+distinct from a real cloud completion race, which was not newly exercised here.
+Record that remaining B1 scope independently. B1's successful live
 move/summary/return and the completed Note/Report/PDF cycle do not need repeating.
 The remaining B2/B3 edges and B4/B5 retain their existing scope.
