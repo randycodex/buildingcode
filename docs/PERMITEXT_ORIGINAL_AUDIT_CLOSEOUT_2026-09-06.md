@@ -411,7 +411,11 @@ September 7 checkpoint: the first Chrome startup trace exposed an older v50
 HTML shell from the HTTP cache while fresh Production source was v52. The
 blanket one-year immutable `/web` policy is repaired locally, and Chrome's
 cache lifecycle check passes. See the [shell cache repair](./PERMITEXT_WEB_SHELL_CACHE_REPAIR_2026-09-07.md).
-PR #62 is draft while the combined Reader/cache candidate is revalidated.
+The combined Reader/cache candidate passes local check/smoke and Chrome cache
+lifecycle checks. Its READY preview at application head `eb001c9d1` confirms
+actual v55 loading, revalidated HTML and unversioned resources, and cached
+immutable versioned assets. Publication and hosted Reader acceptance remain
+pending; the broader header matrix retains its local/compiled-config boundary.
 The stale trace is diagnostic only; representative startup timing remains open.
 Earlier retained-tab reload claims establish visible behavior, not the deployed
 script version unless that version was independently inspected in the DOM.

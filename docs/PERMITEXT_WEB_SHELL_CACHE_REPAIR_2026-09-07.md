@@ -1,8 +1,8 @@
 # Web shell cache repair
 
 Original audit B4 startup measurement exposed a release-update defect. Status:
-**local suites and Chrome lifecycle check passed; preview build ready, hosted
-header inspection and publication pending**. This joins the Reader repair in PR #62. It does not change the public
+**local suites, Chrome lifecycle and hosted core-header checks passed;
+publication pending**. This joins the Reader repair in PR #62. It does not change the public
 Beta gate or installed iOS build 62.
 
 ## Observed failure
@@ -92,14 +92,50 @@ full check suite and browser cache lifecycle result.
 Vercel preview `dpl_DtAu4cHynA74CxyBrpffjuwpgcEv` reached READY for source
 `f4bfcf01b46eaa9a52fd4ac0c6732a5f69ccd209`. The protected preview redirects
 both the connector's temporary access URL and Chrome to Vercel identity
-verification. Actual hosted headers have therefore not yet been inspected;
-Vercel sign-in was requested. Subsequent smoke/evidence-only changes require
-binding the final PR head to its own preview receipt before publication.
+verification; Vercel sign-in was requested and the owner completed it.
+
+### Hosted preview acceptance
+
+On September 7, the final smoke/evidence head
+`eb001c9d1bb1e7ccb0b902b8e19676ece0f5cf29` had a READY preview:
+`dpl_6KTniyAGBT2AK41brRPqfoiTnFW1`, hosted at
+`permitext-sync-4qef48zbf-randycodexs-projects-b72fc111.vercel.app`.
+GitHub's Vercel checks passed. The actual Chrome DOM selected the v55 app script
+and stylesheet. With network/CPU throttling off and Disable cache unchecked,
+a DevTools reload trace captured these HTTP 200 responses:
+
+| Resource | Cache-Control | Browser cache used |
+| --- | --- | --- |
+| `/web` HTML | `public, max-age=0, must-revalidate` | No |
+| v55 `app.js` | `public, max-age=31536000, s-maxage=31536000, immutable` | Yes |
+| v55 `styles.css` | `public, max-age=31536000, s-maxage=31536000, immutable` | Yes |
+| Unversioned Source Serif font | `public, max-age=0, must-revalidate` | No |
+
+None came from a service worker. This confirms the platform's critical
+HTML/versioned-asset/unversioned-asset distinction on the deployed candidate.
+The page remained signed out of Permitext; its Production session was untouched.
+The completed preview tab and DevTools were closed afterward.
+
+The broad alias/query/private-route matrix remains compiled-config/local HTTP
+evidence. The preview's version-looking HTML URL and trailing-slash shell opened,
+but the additional trace was not exported after Chrome use resumed. Direct
+navigation to `service-worker.js` was blocked by the browser client and is not
+a hosted worker-header result. No attempt was made to bypass that restriction.
+The unchanged worker-script header and revised navigation behavior are covered
+by the local contracts. These observations do not constitute a new offline
+installation, full Reader acceptance, authenticated preview journey or B4 timing
+sample.
+
+Private receipts: `pr62-final-preview-build.json`,
+`pr62-preview-headers.json.gz` and `pr62-preview-response-headers.json` in the
+same private evidence directory. The trace excludes resource bodies and source
+maps. Only unrelated extension errors appeared in the bounded preview log read.
 
 ## Publication and remaining boundary
 
-PR #62 remains draft until the combined candidate's suites and hosted preview
-headers pass. It needs approval for this final scope before Production.
+The combined candidate's local suites and hosted core headers now pass.
+PR #62 needs approval for this final scope before Production; a documentation-only
+evidence commit does not change the tested application/configuration bytes.
 After publication, verify both actual script version and Reader positions in
 the retained session before resuming B4's representative cold/warm samples.
 An already stored one-year immutable entry may need one deliberate hard refresh
