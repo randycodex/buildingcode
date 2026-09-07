@@ -33,7 +33,31 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest publication: the [September 6 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
+Latest publication: the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
+track owner-approved PR #58 at merge commit
+`e60ca415fe8b7b60be65449b7ef49baccc82eec3`, Production
+`https://permitext-sync-3wkca40x7-randycodexs-projects-b72fc111.vercel.app`
+(`dpl_5rp8vnZ9yZ6XBRWbFHofaD7jQqo9`), release `e60ca415fe8b`. At
+`2026-09-06T14:03:10.518Z`, Codex verified both origins returned the exact source,
+healthy storage and six matching web assets. Health, universal-link and approved
+policy checks passed. Build 62's signed archive from the same source passed
+configuration, signature, dependency and packaged privacy checks. Upload
+succeeded at `2026-09-06T14:10:03.283Z`; Apple processing is complete and build
+`1fc6a88c-1f12-494f-b9a1-7fe197349184` is available to Internal Testers with one
+tester. The owner subsequently installed build 62. Its Account footer, usual
+Lifetime Pro/98-turn/Synced state and saved-data continuity were independently
+verified. The [build-62 retained handoff check](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md)
+passed current web Note navigation, lower native Note review and both actual
+Report exports, with every PDF page inspected and existing Research/Note/history
+integrity verified. The owner confirmed the Chrome Production PDF download;
+the in-app browser's download action produced no result and remains unaccepted.
+Temporary Pro is independently revoked and both browser test sessions are signed
+out. At the owner's request, the phone retains the Free, Synced test session for
+continued audit work; repeated main-account restoration is no longer required.
+Final candidate binding stays open.
+No additional Research turn or public App Store submission is included.
+
+Preceding publication: the [September 6 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
 tracks owner-approved PR #57, merge commit
 `4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e`, release `4ed4b5b9f4eb`,
 Production `https://permitext-sync-orugmme7o-randycodexs-projects-b72fc111.vercel.app`
@@ -47,10 +71,9 @@ text after verification, a silent Note-reference failure, and Report
 edition/citation/formatting defects. See the confirmation record for retained
 artifacts, physical checks, cleanup and their limits. Final candidate binding
 and owner release approval remain open.
-Subsequent [local handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
-address the three captured defects and record completed owner-session
-restoration. Their local verification does not change the Production or
-TestFlight identity above.
+The subsequent handoff repairs above address these captured defects and record
+completed owner-session restoration. Their local checks and Production
+publication do not establish physical acceptance of the new native candidate.
 Build 61's bounded physical table-pan result is retained in the
 [Reader acceptance record](./PERMITEXT_READER_ACCEPTANCE_REPAIRS_2026-09-05.md).
 
@@ -119,10 +142,19 @@ The controlled monetary and entitlement lifecycle does not need another paid Bet
 ## Production authentication and account lifecycle
 
 Gate ID: `production-auth-account-lifecycle`
-Status: **OPEN — persisted-account continuity retained through physical build 59 and current web; fresh/remaining providers and full populated deletion matrix remain open**
+Status: **OPEN — email registration/sign-in and bounded populated deletion passed; remaining providers, link/stale-client edges and final-release binding remain open**
 Release-bound: **yes**
 
-Latest September 5 correction: operator access and the designated Free-account
+Current reconciliation: [the September 5 execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md)
+records repaired fresh email registration, existing-account email sign-in on web
+and phone, and build-60 populated deletion. Independent exports, all five exact
+private-file checks, Clerk directory absence and second-client signed-out reload
+passed. Build 62 retained ordinary account/data continuity, and its scoped test
+grant is revoked. The phone intentionally remains signed into the Free test
+account during continuing audit work. The [original-audit checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md)
+maps remaining link/stale-client coverage without reopening these passed cases.
+
+Earlier September 5 correction: operator access and the designated Free-account
 export passed after the owner replaced the administrator credential. The owner
 then completed the deletion action; backend and attributable browser content
 were absent, but Clerk identity removal required fresh verification and did not
@@ -139,18 +171,18 @@ populated private-file and second-client acceptance remain open.
 
 Earlier September 5 snapshot (superseded by the correction above): build 58 is processed and internally available, with its installation, displayed build identity and existing native account/plan/sync/Saved/Project-container continuity physically verified. Current web continuity and account-operation repairs are recorded in the [repair publication record](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#build-58-upload-after-apple-sign-in-recovery). Fresh email registration is blocked by the unchanged hosted-provider configuration. The designated Free test account has four saved entries, one synthetic note and an empty collection, but its complete operator export, representative Project/Research/private-file coverage, reviewed deletion, provider cleanup and recreation remain open. The current Production operator credential is still required. These observations do not satisfy the fresh sign-in fields below.
 
-- Fresh-account email-code sign-in:
+- Fresh-account email-code sign-in: passed on Production after enabling required email; the same new account subsequently signed into the physical client. See the September 5 execution.
 - Fresh-account Apple sign-in:
 - Fresh-account Google sign-in:
 - Fresh-account Microsoft sign-in:
-- Existing-account email-code sign-in retained the correct Permitext account/data:
+- Existing-account email-code sign-in retained the correct Permitext account/data: passed on web and phone for the designated existing test account, with retained Projects/Notes/Research and Synced status in later build-62 checks.
 - Existing-account Apple sign-in retained the correct Permitext account/data: historical build-51 owner observations and build-52 Mirroring observations retain the signed-in account, Lifetime Pro, Synced, saved content and Project containers. These are persisted-session checks, not fresh Apple sign-in. Build 51 additionally retained an explicitly selected Project in Research. Representative saved Project-item coverage was not established.
 - Existing-account Google sign-in retained the correct Permitext account/data:
 - Existing-account Microsoft sign-in retained the correct Permitext account/data:
-- Dedicated disposable-account pre-deletion export and aggregate baseline captured safely: partial prior exercise retained; not a complete representative export.
-- Customer-interface deletion reported every applicable billing, data, private-asset, device, and Clerk stage accurately: not fully passed in the prior exercise.
-- Deleted session failed, private asset disappeared, and recreated identity returned an empty Free account: empty-account recreation and tested server categories passed; private assets and complete Clerk/device cleanup were not fully exercised.
-- Disposable account and test content cleanup completed under separate authorization: prior Permitext test-account cleanup is retained; external Clerk deletion was not proven.
+- Dedicated disposable-account pre-deletion export and aggregate baseline captured safely: passed for the approved populated synthetic account: one Project, one Note, one image, two Report versions/four PDFs, zero Research usage or paid entitlements. Other ownership/Research categories retain their separate coverage boundary.
+- Customer-interface deletion reported every applicable billing, data, private-asset, device, and Clerk stage accurately: passed for that build-60 no-recurring-billing account, including disclosed retention of unknown-owner historical cache files. Paid billing and shared ownership are separate cases.
+- Deleted session failed, private asset disappeared, and recreated identity returned an empty Free account: account/session/records and all five exact private files were absent after populated deletion and browser reload; Clerk identity absence passed. Recreation was observed in the earlier partial cleanup exercise, not after this final populated deletion.
+- Disposable account and test content cleanup completed under separate authorization: the distinct empty web and populated native targets were separately approved and removed, including independent Clerk-directory checks. The current designated test account is intentionally retained and is not a deletion target.
 - Evidence: [build 51](./PERMITEXT_BETA1_BUILD51_PHYSICAL_IPHONE_ACCEPTANCE_2026-09-03.md), [build 52](./PERMITEXT_RESEARCH_RECOVERY_RELEASE_2026-09-03.md#september-3-physical-iphone-continuity-check), and [partial Production deletion](./PERMITEXT_BETA1_PRODUCTION_ACCOUNT_DELETION_2026-09-02.md).
 
 Follow [the detailed account export/deletion checklist](./BETA1_BILLING_IDENTITY_RUNBOOK.md#production-account-exportdeletion-acceptance). Never use the owner's primary, administrator, Lifetime Pro, or real customer account. Consolidating historical evidence does not authorize another destructive exercise.
@@ -259,12 +291,19 @@ Do not mark this gate complete until the selected release passes the enabled web
 ## Production web, TestFlight, and physical iPhone
 
 Gate ID: `production-web-testflight-iphone`
-Status: **OPEN — Report repair verified on Production and physical TestFlight build 60; final device acceptance remains incomplete**
+Status: **OPEN — build-62 Note/Report acceptance and earlier bounded recovery/table checks passed; remaining device/context coverage and final candidate selection remain open**
 Release-bound: **yes**
 
 ### Current candidate and latest verified clients
 
-- Latest repair source: `ae40953603cf9308a64d6da5657c27cf9175d99b`, Production deployment `dpl_8oTbEHtNFGLHTXftsvV7MPvM1zQx`, with both origins, six assets each, and PostgreSQL health verified. The final public-release candidate remains unselected.
+- Latest verified product source: `e60ca415fe8b7b60be65449b7ef49baccc82eec3`, Production deployment `dpl_5rp8vnZ9yZ6XBRWbFHofaD7jQqo9`, physical Permitext 1.0 (62). The source/archive/upload/Apple-processing binding is in the [September 6 repair publication](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md#approved-publication).
+- [Build-62 acceptance](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md) passed current web Note navigation, lower native Note fields, both actual Report PDFs with all nine pages inspected, and immutable record integrity. Chrome Production PDF download is owner-confirmed. The in-app browser download remains unaccepted.
+- Temporary Pro is revoked; the phone shows Free Active/Billing None/Synced and intentionally retains the test identity at the owner's request. Both browser test sessions were signed out before that preference change.
+- The final public-release candidate remains unselected. The [original 17-finding checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md) assigns the remaining client/context, recovery, accessibility/performance and release work. Existing passed checks below retain their original build scope.
+
+### Earlier build-60 observations retained with their original limits
+
+- Then-verified repair source: `ae40953603cf9308a64d6da5657c27cf9175d99b`, Production deployment `dpl_8oTbEHtNFGLHTXftsvV7MPvM1zQx`, with both origins, six assets each, and PostgreSQL health verified.
 - Build 60 archived from that source; executable SHA-256 `b6af915ada081303619352c299cecaac78e91ff4e754c3a519e844869e2b928e`. Upload succeeded at `2026-09-05T20:38:47.421Z`; Apple processing and the existing Internal Testers group with one invite were verified at 20:48 UTC.
 - The owner installed 1.0 (60); physical TestFlight displayed Open at approximately `2026-09-05T20:59Z`. The disposable account and synthetic Project recovered. The actual iOS PDF saved successfully and visibly preserved the qualified Project facts, reconciled Report edits and professional-use notice.
 - Final temporary-grant revocation was independently confirmed at `2026-09-05T21:02:53.869Z`, with synthetic records retained and zero Research usage. The phone showed an explicit requires-Pro Notebook message and Free Active/Billing None/Synced. Broader physical offline, unsent-draft, account-lifecycle and professional Research acceptance remain open.
@@ -323,4 +362,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: review the locally verified [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md), then bind their approved publication to deployed web and physical-candidate acceptance. The repairs cover application-injected outside-authority text, Note-reference navigation, and Report edition/citation/formatting without another provider call. PR #57 remains the published source; these new repairs are not yet Production or TestFlight evidence. Owner account restoration is complete. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed.
+- Next technical step: after the owner returns with the phone, install internally available build 62 and bind the [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md) to physical-candidate and hosted handoff acceptance. PR #58 is verified on Production; build 62 shares that source. Owner account restoration is complete. Web/native populated-account deletion and the bounded build-61 table repair retain their separate evidence. All three recorded ramp-turn approvals are consumed.

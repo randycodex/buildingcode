@@ -43,6 +43,7 @@ private struct AccountDeletionStage: Identifiable {
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.purchase) private var purchase
     @Environment(\.permitextClerk) private var clerk
@@ -211,6 +212,15 @@ struct SettingsView: View {
             .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Close Account", systemImage: "xmark") {
+                        dismiss()
+                    }
+                    .labelStyle(.iconOnly)
+                    .accessibilityIdentifier("account-close")
+                }
+            }
             .tint(Color.appChrome)
             .task(id: initialSection) {
                 guard let initialSection, !didScrollToInitialSection else { return }

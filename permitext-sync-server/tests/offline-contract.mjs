@@ -99,8 +99,8 @@ assert.equal(
 );
 assert.equal(
   offlineFeatureMetadata.librarySchemaVersion,
-  2,
-  "Offline packages do not advertise the legal-source metadata schema."
+  3,
+  "Offline packages must identify complete paged bodies and the historical catalog."
 );
 assert(
   html.includes(offlineFeatureMetadata.shellAssetVersion) &&

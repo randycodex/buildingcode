@@ -5,6 +5,22 @@ that source revision, and starting repairs on a new branch. This document tracks
 the audit findings; it does not approve public release or claim that all findings
 are repaired. No paid Research evaluation is authorized by this work.
 
+**Current action list:** the [original 17-finding closeout checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md)
+reconciles the historical ledgers below with build-62 acceptance. Use its mapped
+remaining batches for execution. Passed Note/Report exports, email registration,
+populated deletion, physical text-draft recovery and table panning are retained;
+older pending statements below describe their earlier checkpoints.
+
+Latest bounded acceptance: the [September 6 build-62 handoff record](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md)
+confirms physical installation/owner continuity, repaired web Note navigation,
+lower native Note fields and corrected web/native PDFs for the retained synthetic
+Report. Prior Research, Notes and Report history remain unchanged. The owner
+confirmed the Chrome Production PDF downloaded; the in-app browser download
+action does nothing and remains unaccepted. Temporary Pro is independently
+revoked and browser test sessions are signed out. The phone retains the Free,
+Synced test session at the owner's request for continued audit work. This updates
+the original audit findings without closing the broader release gates.
+
 ## Baseline and branch
 
 - Baseline `main` and `origin/main`: `176cca6f2e2d01db6495f29192f805ef7daddfbe`.
@@ -451,8 +467,8 @@ deployed-environment acceptance requirements.
 | ID | Finding | Implementation and local evidence | Remaining acceptance |
 | --- | --- | --- | --- |
 | P0-1 | Historical citations can open a different provision or edition. | First-batch canonical identity and offline compatibility repairs are complete. Citation contracts pass. Production saved-citation/reload and physical build-60 paths reopen 2014 Slope and 2022 Gates with their correct editions; see the September 5 execution record. | Complete offline citation and broader source/assistive-technology acceptance; no fresh paid Research acceptance is claimed. |
-| P0-2 | Research moved between Projects retains prior active facts/history. | Implemented Project/context revision boundaries, fresh active history/facts after move or unassign, and rejection of generation started under the old context. Historical answers remain immutable. Context, concurrent HTTP, and real local PostgreSQL move/completion races pass. | Complete final cross-platform Project → Research → Report acceptance and deployed-environment verification. |
-| P0-3 | Account transitions fail to isolate private state and async results. | Implemented owner/session/generation guards, per-account and guest workspace storage, conservative legacy quarantine, native account-scoped state, and guarded mutation/timer/error/finally paths. Deferred actual-function tests include A → B → A, stale 401, SDK callbacks, and captured-owner deletion cleanup. Linking checkpoints local work and fences same-tab editing; confirmed source work has an export-only recovery path. Build 60's approved populated-account deletion passed independent account/file/provider checks and signed-out web reload. | Complete remaining account-switch/link tests and review the explicit legacy recovery limits below. Cross-tab merging is not a transaction and source work is not automatically replayed. |
+| P0-2 | Research moved between Projects retains prior active facts/history. | Implemented Project/context revision boundaries, fresh active history/facts after move or unassign, and rejection of generation started under the old context. Historical answers remain immutable. Context, concurrent HTTP, and real local PostgreSQL move/completion races pass. The September 6 joined local A → B → Note/Report → unassign check also passes with distinct qualified facts and unchanged issued records. | Complete actual web/phone reassignment and deployed context recovery in closeout batch B1; the retained build-62 PDF cycle is already complete. |
+| P0-3 | Account transitions fail to isolate private state and async results. | Implemented owner/session/generation guards, per-account and guest workspace storage, conservative legacy quarantine, native account-scoped state, and guarded mutation/timer/error/finally paths. Actual-function tests cover delayed A → B → A responses, stale 401, SDK callbacks, and captured-owner deletion cleanup. Linking checkpoints local work and fences same-tab editing; confirmed source work has an export-only recovery path. Build 60's approved populated-account deletion passed independent account/file/provider checks and signed-out web reload. | Complete remaining account-switch/link tests and review the explicit legacy recovery limits below. Cross-tab merging is not a transaction and source work is not automatically replayed. |
 | P0-4 | Offline cleanup deletes unsynchronized Notebook drafts/images. | Public code cleanup preserves private stores. Draft metadata, pending-save journals, conditional acknowledgement, conflict review and deletion tombstones are implemented. Storage contracts and browser 503 → 403 → reopen/export recovery pass. Physical build 60 preserves an unsent draft through controlled connection failure and app-switcher termination, with independent server-absence evidence and successful reviewed reconnect. | Exercise device storage pressure, OS background eviction, image upload/reconnect and deletion failure recovery. The physical test retained the Wi-Fi radio for Mirroring; it is not full radio-off acceptance. Retained unattributed legacy bytes are not claimed deleted. |
 | P0-5 | Retired Workboard writers do not enforce read-only compatibility. | First-batch authenticated 410 responses and per-record mixed-sync rejection are complete. Historical reads, previews, and immutable Report sources pass imported-fixture HTTP regressions. | Verify final deployment/candidate compatibility; no live PostgreSQL write test or production exploit was performed. |
 | P0-6 | Concurrent Notebook/Research writes lose changes despite success. | Atomic expected-version/context checks and retry receipts are implemented. Real local PostgreSQL passed 34 Serializable batches, rollback and charge-once replay. Actual authenticated browser tabs preserve competing drafts through reload. On Production, build 60's stale unsent Note save is rejected after a web edit; native review and explicit reconciliation produce version 3 without silently replacing version 2. | Complete deployed Research completion/context races and remaining stale-writer lifecycle cases. The physical Notebook check verifies that bounded live path; local PostgreSQL results do not alone establish cloud behavior. |
@@ -466,25 +482,34 @@ production customer incidents.
 
 | ID | Finding | Implementation and local evidence | Remaining acceptance |
 | --- | --- | --- | --- |
-| P1-1 | Fact normalization loses negation, partial scope, and assumptions. | Shared qualification/projection helpers preserve original wording and qualifiers; only unambiguous assertions become established facts. Partial sprinklers, negated status, embedded hypotheticals, legacy inflated facts, and follow-ups pass focused tests. | Review meaning preservation in the final candidate's Project → Research → Report workflow. Extraction tests do not establish generated-answer quality. Retain the accepted Beta evaluation scope below; this finding does not require a new paid cohort. Any selected new provider-backed confirmation needs its own exact scope and authorization. |
+| P1-1 | Fact normalization loses negation, partial scope, and assumptions. | Shared qualification/projection helpers preserve original wording and qualifiers; only unambiguous assertions become established facts. Partial sprinklers, negated status, embedded hypotheticals, legacy inflated facts, and follow-ups pass focused tests. Build-62 web/native Reports and the new local moved-Project handoff preserve qualifications. | Complete actual moved-Project context/meaning acceptance in closeout batch B1. Extraction tests do not establish generated-answer quality. Retain the accepted Beta evaluation scope below; this finding does not require a new paid cohort. Any selected new provider-backed confirmation needs its own exact scope and authorization. |
 | P1-2 | Streaming errors discard recovery information. | JSON/stream responses share a safe error envelope. Web recovery preserves conflict/source/prerequisite details, offers current-state review, and rejects obsolete account responses. Recovery contracts pass. | Verify current-source review and retry with representative final-candidate workflows and provider failures; no new paid run is included. |
 | P1-3 | Private cache deletion/revocation lifecycle is incomplete. | Implemented owner-scoped native/web cleanup, persistent deletion tombstones, and authorization/deletion-sensitive cache fallback. Authored device work has a separate recovery route when access is unavailable. Native/web contracts and build-60 populated-account deletion passed; independent checks confirm all five private files absent and no resurrection after web reload. | Complete stale independent-writer tests on actual devices and explicit treatment of unattributed legacy bytes. Native cleanup discloses retaining unknown-owner historical cache files. |
 | P1-4 | Final release acceptance remains incomplete for the repaired candidate. | Retain the accepted Research/no-cost economics scope, the owner's six-case Zoning Beta sequencing decision, passed controlled Stripe and Apple Sandbox/TestFlight lifecycles, passed support/restore exercises, and accepted bounded daily monitoring. These are historical evidence with their original limits; source fixes do not establish final candidate acceptance. | Bind the exact candidate to Production and TestFlight, verify supported client/authentication/account-deletion and privacy workflows, reconcile remaining non-charge billing evidence, complete the distinct spend-notification/hard-stop acceptance, and obtain final owner go/no-go. No new paid cohort or automatic repetition of passed payment/monitoring decisions is required. |
 
 ## Release acceptance reconciliation
 
-The [September 6 local handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
+The [September 6 handoff repairs](./PERMITEXT_RESEARCH_HANDOFF_REPAIRS_2026-09-06.md)
 address the captured outside-authority reinsertion, hidden Note-linked answer
-panel, and Report presentation defects. The owner's usual phone account is
-restored. Publication and deployed/physical acceptance of these subsequent
-repairs remain distinct from PR #57's completed routing confirmation.
+panel, and Report presentation defects. PR #58 is verified on Production at
+`e60ca415fe8b7b60be65449b7ef49baccc82eec3`; build 62 shares that source and its
+verified archive uploaded successfully. Apple processing is complete and build
+62 is available to the existing Internal Testers group with one tester. Its
+physical installation, retained Note fields, repaired web Note navigation and
+actual web/native Report PDFs passed the [build-62 check](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md).
+Chrome download is owner-confirmed; the in-app browser download remains a
+documented limitation. Temporary Pro is revoked and the phone retains its Free
+test session at the owner's request. The new local Project A → B → Note/Report
+handoff also passed with zero provider calls. The current closeout checklist
+separates the remaining live context move from the completed PDF cycle.
 
-The newer [PR #57 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
+The preceding [PR #57 confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md)
 verified Production `4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e` and completed
 one approved turn with 2014-only citations and no web lookup. P0-1's bounded
-routing repair is verified. P0-2/P1-1/P2-2 acceptance remains open: unrelated
-authority text survived verification, the Note's answer reference did not open,
-and the exported Report has edition, citation-label and formatting defects.
+routing repair is verified. At that earlier checkpoint, P0-2/P1-1/P2-2 acceptance
+was blocked by unrelated authority text, the hidden Note-linked answer, and
+Report edition/citation/formatting defects. PR #58 and the build-62 check above
+supersede those defect-pending statements within their stated limits.
 Saved handoff artifacts and native source reopening provide separate evidence;
 a completed Research operation does not close these defects. The record retains
 exact no-provider reproduction inputs, accounting and cleanup status.
@@ -566,7 +591,7 @@ until the exact candidate and remaining evidence satisfy its requirements.
 | ID | Finding | Implementation and local evidence | Remaining acceptance |
 | --- | --- | --- | --- |
 | P2-1 | Collapsed Project facts remain focusable/exposed. | Hidden controls are removed from focus/accessibility exposure. Actual authenticated Production keyboard checks reach Occupancy when expanded; after collapse the inputs leave the accessibility snapshot and the next Tab reaches Saved Evidence. | Complete assistive-technology and remaining supported-layout acceptance. |
-| P2-2 | Report omits structured Project facts used by Research. | Shared qualified projection feeds Report sources and immutable manifests. PR #52 fixes stale visible Note snapshots and native PDF Project-facts rendering. Production promotion/export, a native two-page PDF regression, and the actual build-60 physical export passed with qualified facts preserved. | The reproduced PDF omission is verified repaired. Remaining full professional Research handoff acceptance stays open. |
+| P2-2 | Report omits structured Project facts used by Research. | Shared qualified projection feeds Report sources and immutable manifests. PR #52 fixes stale visible Note snapshots and native PDF Project-facts rendering. Production promotion/export, the actual build-60 export and all pages of the build-62 web/native PDFs passed with qualified facts preserved. Current web Note navigation and Chrome download also passed. | The reproduced omission and retained Note/Report/PDF cycle are complete. The distinct moved-Project scenario is tracked under P0-2/B1; final release binding is P1-4/B5. |
 | P2-3 | Native Notebook initial-load errors appear empty/read-only. | Loading/error/permission/device-recovery states and retry behavior are implemented. Web 503/403 recovery and build-60 revoked-access presentation pass. Physical connection failure plus termination preserves a separately listed unsent draft; Retry after reconnect restores access, and the original save enters explicit conflict review against the newer server Note. | Complete image upload/reconnect, storage-pressure and broader recovery cases. The controlled failed-transport test does not establish every offline condition. |
 | P2-4 | Reader chrome inconsistently identifies edition. | Native/web edition labels and citation identity repairs are implemented. Production and physical saved-citation paths show correct 2014/2022 labels. A later web code-switch race is repaired with immediate text clearing and navigation-generation guards; actual-function delay/race/retry tests and rendered local failure/recovery pass. Production `d6986c572924` is verified with matching assets; the actual browser clears old text during an edition change and loads the correct new edition. See the Reader repair record below. | Complete broader source, scroll-position and assistive-technology coverage. |
 | P2-5 | Tablet toolbars collide and phone-web scope is unclear. | Root checked 320/375/390/430/768/1024/1280/1440 widths with no observed overlap, and 44-pixel tablet targets. The owner confirmed build 60 cannot pan Fuel Gas Table 504.2(1). The single-viewport repair passes Simulator gestures with and without search highlighting, plus historical figure/table compatibility checks. Build 61 from `d6986c572924` is installed through TestFlight and independently identified in the native footer. The owner physically swiped the table in both directions and explicitly confirmed that its columns move. | The reported physical table-pan failure is verified repaired. Complete broader supported-layout and VoiceOver acceptance; the physical check does not cover every table or search-highlight state. |

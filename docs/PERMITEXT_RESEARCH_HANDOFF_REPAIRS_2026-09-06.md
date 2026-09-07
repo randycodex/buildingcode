@@ -1,16 +1,21 @@
 # Research handoff repairs — September 6, 2026
 
-Status: locally verified; publication pending. Production remains
-PR #57 (`4ed4b5b9f4eba77683af8aedb4f38fc3e0b4421e`); the phone remains on the
-previous build-61 candidate. This continues the three defects captured in the
+Status: Production publication verified; build 62 physically installed. Production
+serves PR #58 (`e60ca415fe8b7b60be65449b7ef49baccc82eec3`). The
+[build-62 acceptance record](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md)
+confirms current web Note navigation, retained native Note fields and web/native
+Report presentation. The owner confirmed the Chrome Production PDF download;
+the in-app browser download remains unaccepted. Temporary Pro is revoked and
+the phone intentionally retains the Free test session at the owner's request.
+This continues the three defects captured in the
 [approved confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md),
-within the original production-readiness audit. No paid Research call, live
-content or entitlement change, Production publication or TestFlight upload is part of this
-repair step.
+within the original production-readiness audit. The local repair phase used no
+paid Research call or live content/entitlement change. The owner subsequently
+approved Production publication and the next TestFlight upload for PR #58.
 
-## Restored owner session
+## Restored owner session before publication
 
-The owner signed back into the usual account. The physical Account screen
+At that preceding checkpoint, the owner signed back into the usual account. The physical Account screen
 showed Lifetime Pro Active, 98 included turns and Synced. Existing Projects and
 the saved Building Code section were visible. Codex dismissed the Account sheet.
 The designated test account remains retained; its previous grant revocation and
@@ -100,14 +105,61 @@ production account identifiers and raw exports are excluded from this record.
 
 ## Remaining acceptance
 
-Review the exact finished change before Production publication and a new native
-candidate. After publication, reopen the existing test answer/Note and export a
-new Report revision on the deployed web client and physical candidate. The old
+The owner returned with build 62 installed. The linked acceptance record tracks
+the retained Note, repaired web answer navigation and new web/native Report
+exports, owner-confirmed Chrome download and completed grant cleanup. The owner
+asked to retain the test account during the ongoing audit; repeated usual-account
+restoration is no longer a checkpoint requirement. The in-app browser download
+limitation and broader acceptance gates retain their separate status. The old
 saved answer's unsupported limitation must not be silently rewritten; a corrected
 answer requires its own authorized generation or an explicit reviewed correction
 workflow. The original question's existing paid approval is consumed.
 
-The lower native Note fields, hosted browser download behavior, broader Project
-reassignment with different facts, final release binding and the other open
-original audit gates retain their separate acceptance status. These repairs do
-not authorize App Store submission or public paid Beta.
+The lower native Note fields and Chrome download passed the linked build-62
+check. The [current original-audit checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md)
+tracks broader Project reassignment with different facts, the in-app browser
+limitation, final release binding and the other open original audit gates.
+These repairs do not authorize App Store submission or public paid Beta.
+
+## Approved publication
+
+The owner approved PR #58 at exact head
+`19b0e9c31a071f4122a5e168fd6b47dca0c8934b` for Production and the next TestFlight
+candidate. Both reported PR checks passed. The PR merged at
+`2026-09-06T14:00:24Z` as `e60ca415fe8b7b60be65449b7ef49baccc82eec3`; its product
+trees match the approved head.
+
+Production deployment `dpl_5rp8vnZ9yZ6XBRWbFHofaD7jQqo9` is READY at
+`https://permitext-sync-3wkca40x7-randycodexs-projects-b72fc111.vercel.app`.
+Codex verified both canonical origins at `2026-09-06T14:03:10.518Z`: release
+`e60ca415fe8b`, the exact source and healthy PostgreSQL/normalized-v4 storage.
+Six web assets per origin matched the source bytes. Production health,
+universal-link configuration and approved-policy publication checks passed.
+The first deployment-specific runtime sample has nine successful requests,
+including three health requests, and no errors. It contains no Research samples
+and does not establish sustained operating or full hosted handoff acceptance.
+
+The signed 1.0 (62) archive was built from that same merged source, with native
+runtime tree `7a750a95decd6b47acaf0cdc959ef81cc64641ac` and the build number
+supplied as an Xcode build setting. Strict deep signature verification, live
+backend/Clerk configuration and all three pinned dependency revisions passed.
+Its signed entitlements and packaged privacy semantic union match build 61:
+13 collected-data categories, three required-reason API groups and no tracking.
+This is a packaged comparison, not provider-policy or public-release approval.
+
+Archive: `/private/tmp/permitext-1.0-62-e60ca415f.xcarchive`.
+Executable SHA-256:
+`f30608b112f42bf3b9f9603405ddd9386f966ec05381b915bdfbe4caebace624`.
+Xcode reported Upload succeeded at `2026-09-06T14:10:03.283Z`, followed by
+EXPORT SUCCEEDED and exit 0. At `2026-09-06T14:19:11.568Z`, Codex confirmed that
+App Store Connect completed processing and lists
+build `1fc6a88c-1f12-494f-b9a1-7fe197349184` as Ready to Submit with the existing
+Internal Testers group and one tester. No external group or public submission
+was added. The owner has temporarily taken the physical phone; installation and
+device checks will wait for its return. No owner session was changed during
+publication.
+
+Private publication evidence:
+`/private/tmp/permitext-handoff-publication-20260906/`, including
+`publication-evidence.json`, `served-production.json`, `policy-publication.json`,
+`early-runtime-sample.md` and the native archive/upload receipts.

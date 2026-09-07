@@ -61,4 +61,72 @@ function harness() {
   assert.equal(t.content.children[0],"No exact match in this chapter");
 }
 assert.match(source.slice(source.indexOf("async function renderSectionContent("),source.indexOf("async function renderSectionContent(")+220),/readerSearchToken/);
-console.log("Reader find recovery passed: empty-query preservation, stale-response suppression, visible fetch failure and zero-result recovery.");
+
+// A saved citation fetch failure must resolve to visible recovery, remove only
+// its abandoned detail pane, and retain the exact citation for another attempt.
+const savedStart = source.indexOf("async function openSavedItemInReader(");
+const savedEnd = source.indexOf("\nasync function startFocusedResearchFromSavedItem(", savedStart);
+const removeStart = source.indexOf("function removeSectionDetail(");
+const removeEnd = source.indexOf("\nfunction closeSavedItemDetailsForPane(", removeStart);
+assert.ok(savedStart > 0 && savedEnd > savedStart && removeStart > 0 && removeEnd > removeStart);
+function savedHarness({ online = false } = {}) {
+  const details = {}, anchors = {}, requests = [], notices = [], opened = [];
+  const state = { readers: [], utilityInstances: [{id:"unrelated",key:"search"}], paneWeights: {}, paneOrder: [] };
+  let generation = 1, nextID = 0, saves = 0;
+  const context = vm.createContext({
+    state, navigator: { onLine: online },
+    captureAccountRequest: () => generation,
+    isCurrentAccountRequest: value => value === generation,
+    closeSavedItemDetailsForPane() {}, closeLinkedReaderForSearch() {},
+    sectionDetailsBySearch: () => details, sectionDetailAnchorsBySearch: () => anchors,
+    paneIDForSectionDetail: id => `detail:${id}`,
+    newUtilityInstance: key => ({id:`attempt-${++nextID}`,key}),
+    openSectionDetail(id, item, options) {
+      details[id] = item; anchors[id] = options.anchorPaneID;
+      state.paneWeights[`detail:${id}`] = 400; state.paneOrder.push(`detail:${id}`);
+      const request = deferred(); requests.push({ ...request, item, options }); return request.promise;
+    },
+    saveWorkspaceState() { saves += 1; },
+    showWebNotice: async (title, message) => { notices.push({title,message}); },
+    paneIDForReader: reader => reader.id,
+    normalizeAnnotationBlockID: value => value || "",
+    openOrUpdateLinkedReaderForSearch: async (id, detail) => { opened.push(detail); return {id:`reader:${id}`}; },
+    transitionWorkspace: async () => {}, revealReaderSourceTarget() {}, scrollPaneIntoView() {}
+  });
+  vm.runInContext(source.slice(removeStart,removeEnd)+"\n"+source.slice(savedStart,savedEnd)+"\nglobalThis.openSaved = openSavedItemInReader;",context);
+  return {state,details,anchors,requests,notices,opened,run:item=>context.openSaved(item,"saved"),switchAccount:()=>{generation+=1;},get saves(){return saves;}};
+}
+const historicalSaved = { sectionID:"2014-1010.2", sectionNumber:"1010.2", title:"Slope", codeVersion:"2014", chapterID:"2014-chapter-10" };
+{
+  const t=savedHarness(), pending=t.run(historicalSaved);
+  t.requests[0].reject(new Error("Failed to fetch")); await pending;
+  assert.equal(t.notices[0].title,"Saved section unavailable");
+  assert.match(t.notices[0].message,/Connect to the internet/);
+  assert.match(t.notices[0].message,/download the code library in Account/);
+  assert.equal(t.opened.length,0);
+  assert.equal(Object.keys(t.details).length,0); assert.equal(Object.keys(t.anchors).length,0);
+  assert.equal(Object.keys(t.state.paneWeights).length,0); assert.equal(t.state.paneOrder.length,0);
+  assert.equal(t.state.utilityInstances.length,1); assert.equal(t.state.utilityInstances[0].id,"unrelated");
+  const retry=t.run(historicalSaved); t.requests[1].resolve(); await retry;
+  assert.equal(t.opened[0].sectionID,historicalSaved.sectionID);
+  assert.equal(t.opened[0].codeVersion,"2014"); assert.equal(t.opened[0].title,"Slope");
+  assert.equal(t.requests[1].options.anchorPaneID,"saved");
+}
+{
+  const t=savedHarness({online:true}), pending=t.run(historicalSaved);
+  t.requests[0].reject(new Error("503")); await pending;
+  assert.match(t.notices[0].message,/saved item has not been removed/);
+}
+for(const outcome of ["resolve","reject"]) {
+  const t=savedHarness(), pending=t.run(historicalSaved);
+  t.switchAccount(); t.requests[0][outcome](new Error("Old account result")); await pending;
+  assert.equal(t.notices.length,0); assert.equal(t.opened.length,0); assert.equal(t.saves,0);
+  assert.ok(t.details["attempt-1"],"late results cannot clean up the next account's state");
+}
+{
+  const t=savedHarness(), pending=t.run(historicalSaved);
+  delete t.details["attempt-1"];
+  t.requests[0].reject(new Error("Closed citation request")); await pending;
+  assert.equal(t.notices.length,0); assert.equal(t.saves,0);
+}
+console.log("Reader recovery passed: find preservation/retry, visible saved-citation failure, exact-source reopening, and stale-account suppression.");

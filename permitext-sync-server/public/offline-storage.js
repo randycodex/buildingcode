@@ -6,7 +6,7 @@ import {
 
 const databaseName = "permitext-offline";
 const databaseVersion = 5;
-const offlineLibrarySchemaVersion = 2;
+const offlineLibrarySchemaVersion = 3;
 const metadataStoreName = "metadata";
 const chaptersStoreName = "chapters";
 const sectionsStoreName = "sections";
@@ -16,8 +16,8 @@ const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const deletedAccountsStoreName = "deleted-accounts";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v787";
-const shellAssetVersion = "20260906-research-handoff-v48";
+const shellCacheName = "permitext-pro-shell-v789";
+const shellAssetVersion = "20260906-offline-install-recovery-v50";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -26,16 +26,16 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260901-2014-code-assets-v15",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260906-research-handoff-v48",
+  "/web/styles.css?v=20260906-offline-install-recovery-v50",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260906-research-handoff-v48",
+  "/web/app.js?v=20260906-offline-install-recovery-v50",
   "/web/settings-copy.js?v=20260830-stripe-tax-copy-v4",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260826-research-request-recovery-v121",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260906-research-handoff-v48",
-  "/web/research-intent-state.js?v=20260906-research-handoff-v48",
+  "/web/offline-storage.js?v=20260906-offline-install-recovery-v50",
+  "/web/research-intent-state.js?v=20260906-offline-install-recovery-v50",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260811-research-columns-v3",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",
@@ -655,22 +655,104 @@ async function activateInstall(record) {
   }
 }
 
-async function fetchJSON(path, signal) {
-  const response = await fetch(path, { cache: "no-store", signal });
-  if (!response.ok) throw new Error(`Offline download failed: ${response.status}`);
-  return response.json();
+const offlineChapterBodyLimit = 25;
+const offlineRequestTimeoutMilliseconds = 30_000;
+
+function requireOfflineDownloadActive(signal) {
+  if (signal?.aborted) throw signal.reason || new Error("Offline download canceled.");
 }
 
-async function mapWithConcurrency(items, concurrency, worker) {
+async function readOfflineResponse(path, signal, read) {
+  requireOfflineDownloadActive(signal);
+  const controller = new AbortController();
+  const abort = () => controller.abort(signal.reason);
+  signal?.addEventListener("abort", abort, { once: true });
+  const timeout = setTimeout(() => controller.abort(new Error(
+    "Offline download timed out. Check your connection and try the download again."
+  )), offlineRequestTimeoutMilliseconds);
+  try {
+    const response = await fetch(path, { cache: "no-store", signal: controller.signal });
+    if (!response.ok) throw new Error(`Offline download failed: ${response.status}. Try the download again.`);
+    const result = await read(response);
+    requireOfflineDownloadActive(controller.signal);
+    return result;
+  } catch (error) {
+    requireOfflineDownloadActive(controller.signal);
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+    signal?.removeEventListener("abort", abort);
+  }
+}
+
+async function fetchJSON(path, signal) {
+  return readOfflineResponse(path, signal, (response) => response.json());
+}
+
+async function mapWithConcurrency(items, concurrency, worker, signal) {
+  requireOfflineDownloadActive(signal);
+  const controller = new AbortController();
+  const abort = () => controller.abort(signal.reason);
+  signal?.addEventListener("abort", abort, { once: true });
   let nextIndex = 0;
-  const runners = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
-    while (nextIndex < items.length) {
-      const index = nextIndex;
-      nextIndex += 1;
-      await worker(items[index], index);
+  try {
+    const runners = Array.from({ length: Math.min(concurrency, items.length) }, async () => {
+      try {
+        while (nextIndex < items.length) {
+          requireOfflineDownloadActive(controller.signal);
+          const index = nextIndex++;
+          await worker(items[index], index, controller.signal);
+        }
+      } catch (error) {
+        controller.abort(error);
+      }
+    });
+    // Finish/abort every in-flight worker before cleanup or UI failure. Otherwise
+    // surviving workers can recreate deleted rows and overwrite the error with progress.
+    await Promise.all(runners);
+    requireOfflineDownloadActive(controller.signal);
+  } finally {
+    signal?.removeEventListener("abort", abort);
+  }
+}
+
+async function downloadOfflineChapter(summary, signal, onProgress) {
+  let chapter = null;
+  let downloadedBytes = 0;
+  let start = 0;
+  do {
+    requireOfflineDownloadActive(signal);
+    const payload = await fetchJSON(
+      `/code/chapters/${encodeURIComponent(summary.id)}?include=body&bodyStart=${start}&bodyLimit=${offlineChapterBodyLimit}`,
+      signal
+    );
+    const page = payload.chapter;
+    const sections = page?.sections;
+    const range = page?.bodyRange;
+    if (String(page?.id) !== String(summary.id) || !Array.isArray(sections) ||
+        range?.start !== start || range?.total !== sections.length ||
+        range?.end !== Math.min(start + offlineChapterBodyLimit, sections.length) ||
+        (start > 0 && range.end <= start)) {
+      throw new Error("An offline chapter download was incomplete. Try the download again.");
     }
-  });
-  await Promise.all(runners);
+    if (chapter && (page.codePrefix !== chapter.codePrefix ||
+        page.codeVersion !== chapter.codeVersion || sections.length !== chapter.sections.length ||
+        sections.some((section, index) => String(section.id) !== String(chapter.sections[index].id)))) {
+      throw new Error("A code chapter changed during download. Try the download again.");
+    }
+    chapter ||= { ...page, sections: [...sections] };
+    for (let index = range.start; index < range.end; index += 1) {
+      if (!Array.isArray(sections[index]?.blocks)) {
+        throw new Error("An offline section download was incomplete. Try the download again.");
+      }
+      chapter.sections[index] = sections[index];
+    }
+    downloadedBytes += JSON.stringify(payload).length;
+    start = range.end;
+    onProgress?.({ completed: start, total: chapter.sections.length });
+  } while (start < chapter.sections.length);
+  chapter.bodyRange = { start: 0, end: start, total: start, complete: true };
+  return { chapter, downloadedBytes };
 }
 
 function normalizedOfflineAssetName(value) {
@@ -717,13 +799,19 @@ async function cacheOfflineAssets(assetNames, options = {}) {
     phase: "Downloading figures",
     unit: "figures"
   });
-  await mapWithConcurrency(assetNames, 4, async (name) => {
+  await mapWithConcurrency(assetNames, 4, async (name, _index, signal) => {
     const url = offlineAssetURL(name);
-    const response = await fetch(url, { cache: "no-store", signal: options.signal });
-    if (!response.ok) throw new Error(`Offline figure download failed: ${response.status}`);
-    const size = response.clone().arrayBuffer().then((buffer) => buffer.byteLength);
-    await cache.put(url, response);
-    downloadedBytes += await size;
+    downloadedBytes += await readOfflineResponse(url, signal, async (response) => {
+      const bytes = await response.arrayBuffer();
+      requireOfflineDownloadActive(signal);
+      const headers = new Headers(response.headers);
+      // arrayBuffer() has already decoded HTTP compression.
+      headers.delete("content-encoding");
+      headers.delete("content-length");
+      await cache.put(url, new Response(bytes, { headers }));
+      return bytes.byteLength;
+    });
+    requireOfflineDownloadActive(signal);
     completed += 1;
     options.onProgress?.({
       completed,
@@ -732,7 +820,7 @@ async function cacheOfflineAssets(assetNames, options = {}) {
       phase: "Downloading figures",
       unit: "figures"
     });
-  });
+  }, options.signal);
   return downloadedBytes;
 }
 
@@ -763,7 +851,14 @@ export async function downloadOfflineLibrary(options = {}) {
       fetchJSON("/code/chapters", options.signal),
       fetchJSON("/code/libraries", options.signal)
     ]);
-    const chapters = indexPayload.chapters || [];
+    // The default index excludes historical Construction, even though the
+    // library catalog advertises it. Include its separately addressed edition.
+    const historicalIndex = (librariesPayload.libraries || []).some((library) =>
+      library.syncCodeVersion === historicalConstructionSyncCodeVersion
+    ) ? await fetchJSON(`/code/chapters?version=${encodeURIComponent(historicalConstructionSyncCodeVersion)}`, options.signal)
+      : { chapters: [] };
+    const chapters = [...new Map([...(indexPayload.chapters || []), ...(historicalIndex.chapters || [])]
+      .map((chapter) => [String(chapter.id), chapter])).values()];
     if (!chapters.length) throw new Error("No code chapters were available for offline download.");
     options.onProgress?.({
       completed: 0,
@@ -772,12 +867,23 @@ export async function downloadOfflineLibrary(options = {}) {
       phase: "Downloading codes",
       unit: "chapters"
     });
-    await mapWithConcurrency(chapters, 4, async (summary) => {
-      const payload = await fetchJSON(
-        `/code/chapters/${encodeURIComponent(summary.id)}?include=body`,
-        options.signal
-      );
-      const chapter = { ...summary, ...payload.chapter };
+    let sectionCount = 0;
+    const chapterFractions = new Map();
+    const reportChapterProgress = (detail = "") => options.onProgress?.({
+      completed,
+      total: chapters.length,
+      percent: Math.round([...chapterFractions.values()].reduce((sum, value) => sum + value, 0) / chapters.length * 100),
+      phase: "Downloading codes",
+      unit: "chapters",
+      detail
+    });
+    await mapWithConcurrency(chapters, 4, async (summary, _index, signal) => {
+      const result = await downloadOfflineChapter(summary, signal, (page) => {
+        requireOfflineDownloadActive(signal);
+        chapterFractions.set(summary.id, page.total ? page.completed / page.total : 1);
+        reportChapterProgress(`${summary.codePrefix} ${summary.chapterNumber || ""}: ${page.completed} of ${page.total} sections`);
+      });
+      const chapter = { ...summary, ...result.chapter };
       if (!chapter?.id) throw new Error(`Chapter ${summary.id} did not return offline content.`);
       const versions = new Set((chapter.sections || []).map((section) =>
         offlineSectionCodeVersion({ ...section, codePrefix: chapter.codePrefix }, chapter, librariesPayload)
@@ -789,22 +895,19 @@ export async function downloadOfflineLibrary(options = {}) {
       }
       chapter.codeVersion = [...versions][0] || chapter.codeVersion || "";
       offlineAssetNamesForChapter(chapter).forEach((name) => referencedAssetNames.add(name));
-      downloadedBytes += JSON.stringify(payload).length;
+      downloadedBytes += result.downloadedBytes;
+      requireOfflineDownloadActive(signal);
       await writeDownloadedChapter(installID, chapter);
+      requireOfflineDownloadActive(signal);
+      sectionCount += chapter.sections.length;
       completed += 1;
-      options.onProgress?.({
-        completed,
-        total: chapters.length,
-        percent: Math.round((completed / chapters.length) * 100),
-        phase: "Downloading codes",
-        unit: "chapters"
-      });
-    });
+      reportChapterProgress();
+    }, options.signal);
     downloadedBytes += await cacheOfflineAssets([...referencedAssetNames].sort(), {
       onProgress: options.onProgress,
       signal: options.signal
     });
-    const sectionCount = chapters.reduce((count, chapter) => count + Number(chapter.sectionCount || 0), 0);
+    requireOfflineDownloadActive(options.signal);
     await activateInstall({
       installID,
       librarySchemaVersion: offlineLibrarySchemaVersion,
@@ -1258,7 +1361,7 @@ export const offlineFeatureMetadata = {
   assetCacheName: offlineAssetCacheName,
   assetVersion: offlineAssetVersion,
   librarySchemaVersion: offlineLibrarySchemaVersion,
-  estimatedDownload: "about 70 MB",
+  estimatedDownload: "several hundred MB",
   shellAssetVersion,
   shellCacheName
 };
