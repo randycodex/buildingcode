@@ -400,7 +400,9 @@ chapter-1 Reader was clamped into its initial body window. The
 now preserves both visible passages within one pixel in the actual complete
 local Chrome app, including nearby-section loading. Keyboard chapter-tree
 navigation, focus return and native-select exclusion also passed. Publication
-and hosted scroll acceptance remain pending; this is not VoiceOver evidence.
+and hosted scroll acceptance subsequently passed through PR #62: the two
+Production Reader passages stayed within half a pixel after a real pane rebuild
+on v55. This is not VoiceOver evidence.
 VoiceOver on the affected Reader/table/Project/Search controls and
 supported-layout scope remain open. Reuse the build-61 physical table-pan result
 unless its runtime path changes; keep further device work bounded.
@@ -414,8 +416,10 @@ cache lifecycle check passes. See the [shell cache repair](./PERMITEXT_WEB_SHELL
 The combined Reader/cache candidate passes local check/smoke and Chrome cache
 lifecycle checks. Its READY preview at application head `eb001c9d1` confirms
 actual v55 loading, revalidated HTML and unversioned resources, and cached
-immutable versioned assets. Publication and hosted Reader acceptance remain
-pending; the broader header matrix retains its local/compiled-config boundary.
+immutable versioned assets. Approved PR #62 then published as `5f1afb414fdd`.
+Canonical Production health/source checks and all ten public HTTP header paths
+passed; the retained session loaded v55 and passed the actual Reader rebuild
+check. Private-route exclusions remain compiled-config evidence.
 The stale trace is diagnostic only; representative startup timing remains open.
 Earlier retained-tab reload claims establish visible behavior, not the deployed
 script version unless that version was independently inspected in the DOM.
@@ -470,8 +474,10 @@ and integrated retained-byte account-link recovery checks now pass in real Chrom
 storage, with the local/synthetic boundaries recorded above. B3 reproduced a
 separate Reader scroll reset; its local repair and actual full-app Chrome
 acceptance pass in the [repair record](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md).
-Finish the reviewable candidate and approved publication/hosted check, then
-continue B3's remaining accessibility/layout scope and B4/B5; preserve the separate
+Approved PR #62 published the Reader and shell-cache repairs as `5f1afb414fdd`;
+Production health, matching source, ten public HTTP header paths and retained
+v55 session/Reader acceptance passed. Continue B3's remaining
+accessibility/layout scope and B4/B5; preserve the separate
 server-side race and live provider-link/consent scope.
 The native Account close button is merged source awaiting a
 separately selected iOS build; it is not part of installed build 62.
