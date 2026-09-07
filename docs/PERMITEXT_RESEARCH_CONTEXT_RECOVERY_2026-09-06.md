@@ -177,14 +177,18 @@ allowance checks. It is not yet published; see
 [rate-limit repair](./PERMITEXT_RATE_LIMIT_DEADLOCK_REPAIR_2026-09-06.md).
 
 The account menu also displayed “Not downloaded on this device” after the v51
-upgrade. The earlier v50 installed/offline result remains passed. No cause has
-been established for the later absence; do not label it storage eviction or an
-upgrade regression without additional evidence.
+upgrade. Source inspection shows that entitlement reconciliation calls
+`disableOfflineFeature()` when Pro is absent, intentionally removing public
+downloads while preserving private drafts. The preceding test ended Free/Synced
+after revocation, so the later absence is consistent with that cleanup. It is
+not evidence of an upgrade or eviction defect, and does not require repeating
+the previously passed installation/offline pair.
 
 ## Next bounded step
 
 Prepare the locally verified Research and rate-limit repairs for publication
-review, then continue B2 controlled failed-cleanup recovery. Keep a
+review. B2 controlled failed-cleanup recovery subsequently passed in real Chrome
+storage; continue its remaining account-link boundary. Keep a
 server-side overlapping move/completion transaction race separate from the live
 Saved-selection test. Reuse the completed move/summary/return, Note/Report/PDF,
 image-recovery and device checks. B3–B5 retain their documented remaining scope.

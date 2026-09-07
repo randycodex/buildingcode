@@ -58,7 +58,7 @@ each remaining check one home so it is not repeated for several findings.
 | P0-1 | Historical citations open the wrong provision/edition. | **Verified online symptom; native offline pair owner-confirmed.** Production and physical build 60 reopened 2014 Slope and 2022 Gates correctly; build 61 opened both saved 2014 Research citations. The owner confirmed build-62 offline Slope/Gates checks, within the B3 evidence limits below. Source/edition routing contracts pass. [Execution](./PERMITEXT_AUDIT_ACCEPTANCE_EXECUTION_2026-09-05.md#saved-citations-and-keyboard-access), [Research confirmation](./PERMITEXT_RESEARCH_HANDOFF_CONFIRMATION_2026-09-06.md). | B3: focused assistive-technology coverage remains. Hosted web install/reopening and failure recovery passed on Production `6ccc2d4a8`. |
 | P0-2 | Moving Research retains the prior Project's active facts/history. | **Live A → B summary → A verified.** Production reset active context, captured B's qualified facts in a provider-free summary, and preserved both immutable answers and all original Notes/Reports. Physical build 62 showed B's synced summary and correct address. Local context/version, PostgreSQL races and the joined Note/Report flow also pass. | B1: controlled final-client context-change/stale-completion recovery. The successful move and summary do not need repeating. |
 | P0-3 | Account transitions leak private state or late async results. | **Partial live acceptance.** The repaired web sign-out, scoped account switches and build-60 populated deletion passed. Local delayed-callback, A → B → A, stale-401 and account-link recovery contracts pass. | B2: stale independent client during switch/revocation and the remaining link-recovery path. Retain the documented legacy/quarantine boundaries. |
-| P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Text and offline-image live paths verified.** Physical build 60 retained an unsent text draft through failed transport/termination and reconciled it after a web edit. The September 6 image survived offline close/reopen, reconnect/reload, server persistence and physical build-62 display. | B2: controlled failed-cleanup recovery. The image exercise did not interrupt a transfer mid-byte. B4: storage-pressure/OS-eviction coverage or an explicit recorded scope decision. |
+| P0-4 | Offline cleanup deletes unsent Notebook drafts/images. | **Text/image live paths and controlled web cleanup failure verified.** Physical build 60 retained an unsent text draft through failed transport/termination and reconciled it after a web edit. The September 6 image survived offline reopening, server persistence and physical build-62 display. B2's real Chrome IndexedDB/CacheStorage fault tests preserve drafts, exact pending saves and image bytes after restart/retry. | The image exercise did not interrupt a transfer mid-byte. B4: storage-pressure/OS-eviction coverage or an explicit recorded scope decision. |
 | P0-5 | Retired Workboard writers remain writable. | **Local HTTP repair verified.** Authenticated 410 responses, mixed-sync rejection and historical read/Report compatibility pass imported fixtures. Publication records bind the shipped repair. | B5: final candidate compatibility binding. The absence of a destructive Production write exercise is not a new authorization to attempt one. |
 | P0-6 | Concurrent Notebook/Research writes report success while losing changes. | **Notebook live path verified; Research races verified locally.** Physical stale-save rejection and reviewed version-3 reconciliation passed against Production. Local PostgreSQL tests cover atomic move/completion, rollback and replay accounting. | B1: deployed context/completion conflict evidence. B2: stale-writer lifecycle edges. The independent-device Notebook conflict already passed. |
 | P1-1 | Normalization loses negation, partial coverage and assumptions. | **Saved-workflow qualification verified.** Local qualification/projection tests plus actual build-60/62 Reports preserve qualifiers. The live moved-Project summary preserves B's partial coverage and assumptions; physical build 62 displays its matching question/address history card. | Retain the recorded native history-card limit and previously accepted Beta Research limits. Context-failure recovery is tracked once under B1; a new paid quality cohort is not part of closeout. |
@@ -241,8 +241,8 @@ was performed.
 1. **Completed September 6 within the offline-queue scope above.** The synthetic
    image/document survived offline reopening and reconnect/reload, then displayed
    on the independent physical client. Do not repeat this successful path.
-2. **Pro-revocation stale-editor path completed above.** Controlled cleanup
-   failure and account-transition/link-recovery boundaries remain separate;
+2. **Pro-revocation stale-editor and controlled public-cleanup failure paths
+   completed.** Account-transition/link-recovery boundaries remain separate;
    preserving drafts for the same signed-in owner does not certify account
    deletion or purging another identity's private cache.
 3. Complete or explicitly disposition the supported account-link recovery path,
@@ -252,6 +252,26 @@ was performed.
 The text-only unsent-draft/termination/conflict exercise and both completed account
 deletions remain passed. Reuse the test account; batch access changes and phone
 input instead of restoring the main account between cases.
+
+#### Controlled cleanup failure — September 6 late checkpoint
+
+Chrome 152 ran the current `offline-storage.js` on a dedicated loopback origin
+with synthetic accounts and independent iframe clients. One test aborted the
+actual IndexedDB public-cleanup transaction while clearing `sections`; another
+made CacheStorage deletion reject after public database cleanup. Both calls to
+`disableOfflineFeature()` reported failure. A fresh client then reopened the
+exact unsent draft, unchanged pending-save journal/revision and original image
+bytes. A subsequent successful cleanup retry also preserved them.
+
+All 9 browser durability checks passed at `2026-09-07T02:39:21.182Z`, including
+the two new failure cases. The temporary-origin database/caches were removed,
+the fixture tab closed and its server stopped. Evidence:
+`/private/tmp/permitext-b1-live-20260906/b2-failed-cleanup-browser.txt` and `.png`.
+This closes the named controlled browser cleanup-failure check with real browser
+storage and the shipped cleanup implementation. It is not OS storage pressure,
+eviction, a new native test, a provider/account merge or a Production deletion.
+No product repair, grant or phone session was needed. Account-link recovery
+acceptance remains open under item 3 above.
 
 ### B3 — One focused client/device session
 
@@ -377,7 +397,8 @@ follow-up is repaired and verified locally, awaiting publication review. A
 Production rate-limit PostgreSQL deadlock also caused one export 503. It was
 reproduced and repaired in real local PostgreSQL; the exact concurrent allowance
 and locked-row cleanup checks pass. The [rate-limit repair](./PERMITEXT_RATE_LIMIT_DEADLOCK_REPAIR_2026-09-06.md)
-also awaits publication review. Continue with B2 failed-cleanup recovery, then
+also awaits publication review. B2's controlled cleanup-failure check now passes
+in real Chrome storage; continue with the remaining account-link boundary, then
 the remaining B3 edges and B4/B5; preserve the separate server-side race scope.
 The native Account close button is merged source awaiting a
 separately selected iOS build; it is not part of installed build 62.

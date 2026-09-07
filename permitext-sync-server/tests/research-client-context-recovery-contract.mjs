@@ -20,7 +20,7 @@ const conversation = (id, project, revision = 1, contextRevision = 0) => ({
 function harness() {
   const a = conversation("conversation-a", "project-a");
   const b = conversation("conversation-b", "project-b");
-  const requests = [], opens = [], writes = [], removed = [], refreshes = [];
+  const requests = [], opens = [], writes = [], removed = [], refreshes = [], consumerRefreshes = [];
   const input = { disabled: true, value: "" }, sendButton = { disabled: true };
   const controls = { ".research-question-input": input, ".research-send-button": sendButton,
     ".research-composer-status": { textContent: "" } };
@@ -48,7 +48,10 @@ function harness() {
     removeResearchRequestRecovery: (_, value) => removed.push(value),
     researchFailureMessage: error => error.message,
     postResearchWithProgress(body) { const request = { body, ...deferred() }; requests.push(request); return request.promise; },
-    async refreshProjectSourceConsumers() { if (refreshBarrier) await refreshBarrier.promise; },
+    async refreshProjectSourceConsumers(ids, options) {
+      consumerRefreshes.push({ ids: Array.from(ids), refreshNotebookFoundation: options.refreshNotebookFoundation });
+      if (refreshBarrier) await refreshBarrier.promise;
+    },
     async refreshResearchConversationList() {},
     async transitionWorkspace(mode, options) { refreshes.push({ mode, ids: Array.from(options.refreshPaneIDs) }); },
     async openResearchConversation(id) {
@@ -65,7 +68,7 @@ function harness() {
   const progress = { id: "request-a", conversationID: a.id, question: "Synthetic saved Project summary", status: "active",
     stages: new Map([["preparing_question", "active"]]), controller: new AbortController() };
   context.activeResearchProgress.set(a.id, progress);
-  return { context, a, b, progress, requests, opens, writes, removed, refreshes, input, sendButton,
+  return { context, a, b, progress, requests, opens, writes, removed, refreshes, consumerRefreshes, input, sendButton,
     start: (supplemental = false) => context.runResearchProgressSession(progress, context.recoveredResearchProgressCallbacks(a.id, { supplemental })),
     select(value, { workspace = "workspace-a" } = {}) {
       context.activeWorkspaceID = workspace; context.projectID = value.primaryProjectID;
@@ -93,7 +96,11 @@ for (const outcome of ["success", "failure"]) {
   assert.deepEqual(t.opens, [], "Completion refresh must not navigate or fetch by reopening A");
   assert.equal(t.context.projectID, "project-b");
   assert.equal(t.context.state.researchConversationID, t.a.id);
-  if (outcome === "success") assert.equal(t.context.activeResearchConversation.messages[0].answer, "Saved summary for A");
+  if (outcome === "success") {
+    assert.equal(t.context.activeResearchConversation.messages[0].answer, "Saved summary for A");
+    assert.deepEqual(t.consumerRefreshes, [{ ids: ["project-a"], refreshNotebookFoundation: true }],
+      "Completion must update the answer's Notebook/Report Project even while Saved selects B");
+  }
   else assert.equal(t.removed.length, 0, "Failure keeps the recoverable question");
 }
 
