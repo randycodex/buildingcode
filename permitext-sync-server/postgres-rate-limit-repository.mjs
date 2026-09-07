@@ -57,17 +57,6 @@ export function createPostgresRateLimitRepository(sql) {
       const resetAt = new Date(observedAt.getTime() + windowMs);
       const bucketKey = rateLimitBucketKey(scope, principal);
       const rows = await sql`
-        WITH expired AS (
-          DELETE FROM permitext_rate_limit_buckets
-          WHERE bucket_key IN (
-            SELECT bucket_key
-            FROM permitext_rate_limit_buckets
-            WHERE reset_at <= ${observedAt}
-              AND bucket_key <> ${bucketKey}
-            ORDER BY reset_at ASC
-            LIMIT 32
-          )
-        )
         INSERT INTO permitext_rate_limit_buckets (
           bucket_key,
           scope,
@@ -98,6 +87,27 @@ export function createPostgresRateLimitRepository(sql) {
           request_count,
           (extract(epoch FROM reset_at) * 1000)::bigint AS reset_at_ms
       `;
+      // The increment must commit before maintenance acquires any other bucket
+      // locks. Combining both writes lets two expired buckets deadlock as each
+      // request deletes the other's bucket and then upserts its own.
+      try {
+        await sql`
+          WITH expired AS (
+            SELECT bucket_key FROM permitext_rate_limit_buckets
+            WHERE reset_at <= ${observedAt} AND bucket_key <> ${bucketKey}
+            ORDER BY reset_at ASC, bucket_key ASC
+            LIMIT 32
+            FOR UPDATE SKIP LOCKED
+          )
+          DELETE FROM permitext_rate_limit_buckets AS buckets
+          USING expired
+          WHERE buckets.bucket_key = expired.bucket_key
+        `;
+      } catch (error) {
+        // Cleanup is best effort; the authoritative count above already committed.
+        // Counter failures still reject the request. Do not log private bucket IDs.
+        console.warn("Rate-limit bucket cleanup failed.", { code: String(error?.code || "UNKNOWN") });
+      }
       const count = Number(rows[0]?.request_count || 0);
       const returnedResetAt = Number(rows[0]?.reset_at_ms || resetAt.getTime());
       return {

@@ -7,6 +7,15 @@ if (location.search === "?client") {
   document.querySelector("main").remove();
   await import("/client.js");
 } else button.addEventListener("click", run);
+if (location.search !== "?client") document.querySelector("#cleanup").addEventListener("click", async () => {
+  demoClient?.close();
+  await new Promise((resolve, reject) => {
+    const request = indexedDB.deleteDatabase("permitext-offline");
+    request.onsuccess = resolve; request.onerror = () => reject(request.error);
+  });
+  for (const name of await caches.keys()) if (name.startsWith("permitext-pro-")) await caches.delete(name);
+  status.textContent = "Synthetic fixture database and public caches removed.";
+});
 
 async function client() {
   const frame = document.createElement("iframe");
@@ -125,6 +134,31 @@ async function run() {
       const image = snapshot.images.find((item) => item.localURL === record.localURL);
       assert(image && await image.blob.text() === "synthetic image bytes", "Queued image bytes missing after restart");
     });
+    for (const kind of ["database", "cache"]) {
+      await check(`Failed ${kind} cleanup preserves the exact pending save and image after restart and retry`, async () => {
+        const cardID = `failed-cleanup-${kind}`;
+        const image = await a.call("stageNotebookImage", { accountUserID: owner, projectID, cardID,
+          assetID: crypto.randomUUID(), blob: new Blob([`synthetic unsent image ${kind}`], { type: "image/png" }), name: "pending.png" });
+        const original = await a.call("saveNotebookDraft", draft(cardID, `Unsent ${kind} cleanup draft`, {
+          document: { text: `Unsent ${kind} cleanup draft`, imageURL: image.localURL }
+        }));
+        await a.call("beginNotebookDraftSave", owner, projectID, cardID, original.revision);
+        const checkpoint = await a.call("loadNotebookDraft", owner, projectID, cardID);
+        assert(checkpoint.pendingSave, "A pending-save journal is required for this check");
+        const failure = await b.call("fixtureFailedPublicCleanup", kind);
+        assert(failure.injected && failure.rejected && failure.message, "Cleanup did not report the injected failure");
+        const fresh = await client(); clients.push(fresh);
+        async function verify() {
+          const current = await fresh.call("loadNotebookDraft", owner, projectID, cardID);
+          assert(JSON.stringify(current) === JSON.stringify(checkpoint), "Draft or exact pending save changed during failed cleanup");
+          const retained = await fresh.call("notebookImageRecord", image.localURL, owner);
+          assert(retained && await retained.blob.text() === `synthetic unsent image ${kind}`, "Unsent image bytes were lost");
+        }
+        await verify();
+        await b.call("disableOfflineFeature");
+        await verify();
+      });
+    }
     await check("Deletion persists across client restart and rejects stale writes without touching another account", async () => {
       await b.call("saveNotebookDraft", draft("other-card", "Other account", { accountUserID: other }));
       await a.call("deleteOfflineAccountData", owner);

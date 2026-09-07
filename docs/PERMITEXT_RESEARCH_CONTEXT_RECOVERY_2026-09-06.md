@@ -10,8 +10,9 @@ with actual `conversation-a`, expected `conversation-b`.
 The local repair and focused contracts pass. A real Chrome fixture verified the
 application's response handlers, recovery storage and review/retry controls with
 synthetic transport and Project transitions. This is not authenticated hosted
-acceptance, a live PostgreSQL race, or native-device acceptance. Production
-remains at `6ccc2d4a8cc2d605b13ee6d46dbd4e1a0070883a`; this pass did not publish.
+acceptance, a live PostgreSQL race, or native-device acceptance. The initial
+repair pass did not publish. The owner subsequently approved publication; the
+deployed source and hosted loading evidence are recorded below.
 
 ## Repair
 
@@ -84,10 +85,110 @@ DOM receipts and inspected screenshots are in
 storage was cleaned, its tab closed and loopback server stopped. Actual account
 sessions, grants, retained content and the physical phone were not touched.
 
+## Approved publication and hosted verification
+
+The owner approved publishing repair `08d1cb5d7acf5f8ef4d7e35914f733565bfab54b`.
+Both PR checks passed and [PR #60](https://github.com/randycodex/buildingcode/pull/60)
+merged at `2026-09-07T01:54:35Z` (September 6 in New York) as
+`2e4f7db2dd80828d5746e51143f81d46a28c5f09`. The merged product source matches the
+approved head. No unrelated untracked files were included.
+
+Vercel Production deployment `dpl_4jSAihqQqT4Vgh3XyUqEgQGL9uP9` reached READY at
+`2026-09-07T01:57:19.735Z`. Both `https://permitext.com` and
+`https://permitext-sync.vercel.app` report the exact merge SHA and healthy
+PostgreSQL/normalized-v4 storage. Six source assets per origin match the approved
+files by SHA-256, including the app, offline installer and service worker.
+`npm run verify:production` passed. Existing build gates were not bypassed.
+
+The retained Chrome session reloaded the deployed `v51` app and displayed
+`Release: 2e4f7db2dd80`, Free and Synced. The three saved sections and three
+synthetic Project rows remained visible. The previously disclosed unknown-owner
+legacy-workspace notice remained; no site data was cleared. This verifies hosted
+loading and session continuity, not a new independent content export or a
+deliberately overlapping cloud Research/context-change request. No grant,
+Research request, purchase, account change or phone interaction was needed.
+
+The deployment-specific 5xx scan from `01:57:19Z` to `01:58:18.991Z` returned no
+rows. This is an early bounded observation, not sustained monitoring. Private
+receipts include `publication-result.json`, `served-production.json` and the
+hosted reload DOM/screenshot in the same evidence directory. The task's browser
+tab remains available with the test account signed in.
+
+## Live delayed completion and follow-up repair
+
+On September 6 (UTC September 7, 02:07–02:17), the exact designated synthetic
+account was independently verified and temporarily granted Pro. In Chrome on
+Production `2e4f7db2d`, one existing-conversation request asked:
+“Summarize the saved Project structured facts and address.” DevTools applied
+30,000 ms latency to the owned test tab. While `/research/conversations/message`
+was visibly pending, Saved switched from Project A to B; conversation A stayed
+open. The request returned HTTP 200 in 30.03 seconds.
+
+**Selection preservation passed; visible completion failed.** Saved remained on
+B, but A showed “Research complete” without rendering the new answer and kept
+its composer disabled. Closing DevTools did not release it. This is a real
+client navigation/completion test, not a server-side move/completion transaction
+race: the conversation itself remained assigned to A throughout.
+
+Independent exports confirmed revision 7 → 8, context revision unchanged at 4,
+and messages 4 → 6. One deterministic `project_context` answer/operation was added:
+`charged: false`, zero provider requests and zero tokens. All 12 foundation
+artifacts, the usage records and both original answers remained unchanged.
+The emulated 30.03 seconds is not a server-performance measurement; the recorded
+operation duration was 748 ms.
+
+The follow-up source repair distinguishes Saved selection from an open Research
+pane. Success and failure refresh only the existing conversation pane through
+the utility renderer, without reopening/navigating. Rebuilding the composer
+also replaces input handlers which captured a pending request's disabled state.
+Account/workspace checks, closed primary/supplemental pane checks and conversation
+context/revision rejection remain in force. Asset version is
+`20260906-research-pane-completion-v52`; shell constants agree at
+`permitext-pro-shell-v791`. This follow-up is locally verified, **not published**.
+
+The new regression failed against v51 before the patch. Nine focused contracts
+pass: Research client recovery, web recovery, Reader navigation races, web
+account mutation isolation, Research context persistence, source/edition integrity,
+build output, offline compatibility and offline installer recovery. JavaScript
+syntax and `git diff --check` pass. The expanded Chrome fixture extracts the
+actual composer code, including input/submit handlers, as well as the response
+handlers. Its Project panes, answer display and transport remain synthetic.
+Chrome verified the A-pane/B-selection success, an editable follow-up enabling
+Send, failure with recovery retained, review and same-request-ID retry, and the
+separate draft surviving successful retry. No provider was called by the fixture.
+
+Private receipts, native accessibility snapshots and the inspected local-browser
+screenshot are in `/private/tmp/permitext-b1-live-20260906/`. Temporary Pro was
+revoked and independently confirmed absent at `2026-09-07T02:16:46.550Z`.
+DevTools and the owned delayed test tab were closed, ending that tab's network
+emulation. The inactive custom delay profile may remain in Chrome settings.
+No account sign-out/restoration was performed; the phone was not used. The local
+fixture's storage was cleaned, its tab closed and its server stopped.
+
+### Separate observations retained for follow-up
+
+At `02:06:34Z`, the first `/admin/accounts/export` returned 503. Vercel reported
+`Rate-limit enforcement failed`, PostgreSQL `deadlock detected`, request
+`iad1::ngpfn-1788746794063-2329f14dafd3`, on this release. A later export and health
+check succeeded. The earlier one-minute clean log scan does not close this
+concurrency defect. The actual SQL subsequently reproduced `40P01` locally and
+the separated increment/cleanup repair passed real PostgreSQL concurrency and
+allowance checks. It is not yet published; see
+[rate-limit repair](./PERMITEXT_RATE_LIMIT_DEADLOCK_REPAIR_2026-09-06.md).
+
+The account menu also displayed “Not downloaded on this device” after the v51
+upgrade. Source inspection shows that entitlement reconciliation calls
+`disableOfflineFeature()` when Pro is absent, intentionally removing public
+downloads while preserving private drafts. The preceding test ended Free/Synced
+after revocation, so the later absence is consistent with that cleanup. It is
+not evidence of an upgrade or eviction defect, and does not require repeating
+the previously passed installation/offline pair.
+
 ## Next bounded step
 
-Review and publish this web candidate, then bind the deployed source/assets and
-record the hosted acceptance that is still missing. Keep synthetic handler
-evidence distinct from a real cloud completion race. B1's successful live
-move/summary/return and the completed Note/Report/PDF cycle do not need repeating.
-The remaining B2/B3 edges and B4/B5 retain their existing scope.
+Prepare the locally verified Research and rate-limit repairs for publication
+review. B2 controlled failed-cleanup recovery subsequently passed in real Chrome
+storage; continue its remaining account-link boundary. Keep a
+server-side overlapping move/completion transaction race separate from the live
+Saved-selection test. Reuse the completed move/summary/return, Note/Report/PDF,
+image-recovery and device checks. B3–B5 retain their documented remaining scope.

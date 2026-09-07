@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260906-research-context-recovery-v51";
+} from "./offline-storage.js?v=20260906-research-pane-completion-v52";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260906-research-context-recovery-v51";
+} from "./research-intent-state.js?v=20260906-research-pane-completion-v52";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -18724,11 +18724,13 @@ function captureResearchProgressView(conversationID) {
 }
 
 function researchProgressViewIsCurrent(view) {
+  // Saved Project selection is independent of an already-open Research pane.
+  // Conversation revisions below guard an actual move to another Project.
   if (!view || !isCurrentAccountRequest(view.requestIdentity) ||
-      view.workspaceID !== activeWorkspaceID || view.projectID !== activeProjectIDForCodeQuestions()) return false;
+      view.workspaceID !== activeWorkspaceID) return false;
   return view.supplemental
     ? supplementalResearchConversationIDs.includes(view.conversationID) && supplementalResearchConversations.has(view.conversationID)
-    : state.researchConversationID === view.conversationID;
+    : researchConversationPaneIsOpen() && state.researchConversationID === view.conversationID;
 }
 
 function researchProgressConversationConflict(view, incoming) {
@@ -18819,7 +18821,7 @@ async function runResearchProgressSession(
       clearInterval(progress.timer);
       persistResearchProgressSession(progress);
       refreshResearchProgressCard(progress);
-      if (researchProgressViewIsCurrent(view)) onFailure?.(error, { cancelled, view });
+      if (researchProgressViewIsCurrent(view)) await onFailure?.(error, { cancelled, view });
     }
   };
   const callbacks = { onSuccess, onFailure, onRetry };
@@ -18854,19 +18856,17 @@ function recoveredResearchProgressCallbacks(conversationID, { supplemental = fal
       if (!researchProgressViewIsCurrent(view) || researchProgressConversationConflict(view, result.conversation)) return;
       await refreshResearchConversationList();
       if (!researchProgressViewIsCurrent(view) || researchProgressConversationConflict(view, result.conversation)) return;
-      if (supplemental) await openSupplementalResearchConversation(conversationID);
-      else await openResearchConversation(conversationID, { refreshList: true });
+      await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForResearchConversation(conversationID)] });
     },
-    onFailure: (error, { view = captureResearchProgressView(conversationID) } = {}) => {
+    onFailure: async (error, { view = captureResearchProgressView(conversationID) } = {}) => {
       if (!researchProgressViewIsCurrent(view)) return;
       if (error.payload?.conversation && !researchProgressConversationConflict(view, error.payload.conversation)) {
         if (supplemental) supplementalResearchConversations.set(conversationID, error.payload.conversation);
         else activeResearchConversation = error.payload.conversation;
       }
-      const controls = composerControls();
-      if (controls.status) controls.status.textContent = "";
-      if (controls.input) controls.input.disabled = false;
-      if (controls.sendButton) controls.sendButton.disabled = controls.input?.value.trim().length < 3;
+      // Rebuild the composer too: a pane restored during an active request has
+      // input handlers which captured that request's disabled state.
+      await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForResearchConversation(conversationID)] });
     }
   };
 }
