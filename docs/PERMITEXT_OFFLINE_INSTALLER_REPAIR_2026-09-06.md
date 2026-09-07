@@ -2,8 +2,10 @@
 
 September 6, 2026 (New York). Continuation of B3 in the
 [original production audit closeout](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md).
-Base commit: `4f4e874fe`. This is local repair/verification evidence, not a new
-Production deployment, authenticated hosted acceptance or TestFlight build.
+Base commit: `4f4e874fe`. The repair was approved and published through PR #59
+as Production commit `6ccc2d4a8cc2d605b13ee6d46dbd4e1a0070883a`. The local
+verification below retains its original scope; publication and hosted evidence
+are recorded separately below. No new TestFlight build was created.
 
 ## Reproduced cause
 
@@ -96,10 +98,71 @@ Both isolated browser test origins were cleaned, their tabs closed and the
 loopback servers stopped. Captured public inputs and test receipts remain in
 the private evidence directory; the user's Production session was untouched.
 
-## Remaining step
+## Approved publication
 
-Publish the reviewed web candidate with approval, then verify one hosted
-installation and the saved-citation recovery flow. Reuse the existing test
-account and prior native passes. Other B1/B2/B3 boundaries and B4/B5 remain as
+The owner approved pushing and deploying the reviewed web candidate. Branch head
+`a36f5fe19a85bd22a2f8577821c4342cd7d88686` passed both PR checks and was merged
+through [PR #59](https://github.com/randycodex/buildingcode/pull/59) at
+`2026-09-07T01:05:59Z` (September 6 in New York). The merge's product trees match
+the approved head. The unrelated untracked workspace files were preserved.
+
+Production deployment `dpl_4QmhXSsY7kVtKLEvzGKS83sgSSc7` reached READY at
+`2026-09-07T01:08:18.218Z`. Both `https://permitext.com` and
+`https://permitext-sync.vercel.app` reported the exact merge SHA, healthy
+PostgreSQL/normalized-v4 storage, and six matching source assets per origin.
+The Production health contract passed. Existing content, configuration and
+Notebook dependency gates ran in the Vercel build without bypasses.
+
+On the hosted Free test session without an installed library, DevTools Offline
+and the app's Offline indicator were observed. Opening saved 2014 Slope showed
+the new "Saved section unavailable" dialog with connection/download recovery
+instructions; the saved item remained. The dialog was visually inspected and
+dismissed. The test tab was closed to end its offline simulation, and a fresh
+tab returned Synced. The approved temporary Pro grant was reactivated at
+`2026-09-07T01:11:39.117Z` for the hosted installation.
+
+Private receipts include `served-offline-production.json`,
+`hosted-saved-citation-recovery.txt` and `.png`. The native Account X is now in
+the shared source but remains unbuilt for TestFlight; phone build 62 is unchanged.
+
+## Hosted acceptance and cleanup
+
+The live Chrome session completed **Download for Offline Use** with
+**578 chapters available offline**. The download began at
+`2026-09-07T01:12:02.039Z`; completion was observed by `01:14:03.227Z`.
+That is one periodically observed hosted run, not a p50/p90 benchmark. The
+installed status survived a page reload.
+
+With DevTools **Offline** selected and the app displaying **Offline**, Saved
+reopened **1010.2 Slope** in the **Building Code (2014)** Reader, then
+**1010.2 Gates** in the **Building Code (2022)** Reader. Their full target text,
+chapter and edition labels were captured in DOM/accessibility evidence. Saved
+detail screenshots were visually inspected; they do not separately show both
+Reader edition headers. This verifies the hosted browser path with emulated
+transport failure, not a new physical radio-off test or a browser-wide
+storage-pressure test.
+
+DevTools was restored to **No throttling** and closed. The retained test session
+returned **Synced**. Temporary Pro was revoked and independently confirmed
+absent at `2026-09-07T01:17:15.716Z`; a fresh client load showed **Free** and the
+same test identity. A before/after export comparison confirmed unchanged
+foundation artifacts, Research answers, operations and usage. No private cache
+was cleared, no new paid Research or purchase occurred, and the test account
+remains signed in. The public offline library was retained.
+
+The deployment-specific early 5xx log sample returned no rows. This is a bounded
+observation, not sustained monitoring. Additional private receipts:
+
+- `offline-publication-receipt.json`, `hosted-install-timing.json`
+- `hosted-offline-installed.txt` and `.png`
+- `hosted-offline-2014.txt` and `.png`, `hosted-offline-2022.txt` and `.png`
+- `hosted-network-restored.txt`, `hosted-final-cleanup.txt`
+- `hosted-retained-comparison.json`
+
+## Remaining original-audit work
+
+The web installer, installed-library citation pair and failure-recovery flow
+are passed within the scopes above. Reuse these results and the prior native
+passes. Other B1/B2/B3 boundaries and B4/B5 remain as
 recorded; this repair does not close VoiceOver, storage pressure, operations or
 release approval.
