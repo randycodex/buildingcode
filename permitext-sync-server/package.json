@@ -200,8 +200,8 @@
   },
   "devDependencies": {
     "@vercel/routing-utils": "6.5.0",
-    "@vitejs/plugin-react": "^6.0.3",
+    "@vitejs/plugin-react": "^6.1.1",
     "parse5": "^8.0.0",
-    "vite": "^8.1.5"
+    "vite": "^8.2.2"
   }
 }
