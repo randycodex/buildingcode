@@ -13,8 +13,14 @@ description are now saved in Apple. The Production notification URL is saved;
 actual Production signed-notification delivery remains separate. U.S.-only
 availability is verified. Mac and Vision Pro availability were disabled to
 match the source's existing iPhone-only support settings. The App Privacy
-questionnaire, content rights, age rating, reviewer access and final submission
-are not complete. The owner-provided App Review contact details are now saved
+questionnaire is now published with 13 linked types, two Analytics purposes and
+no tracking, matching the live September 7 privacy revision; see the
+[publication receipt](../../../docs/PERMITEXT_PRIVACY_DISCLOSURE_PUBLICATION_2026-09-07.md).
+Content rights, age rating, complete reviewer access and final submission remain
+open. Password-based web access passed, but secure Apple credential persistence,
+Pro access and native verification remain pending; see the
+[reviewer-access checkpoint](../../../docs/PERMITEXT_REVIEWER_ACCESS_2026-09-07.md).
+The owner-provided App Review contact details were previously saved
 and verified after reload; the phone number is retained only in Apple, outside
 the repository. Remaining VoiceOver testing is deferred by the owner's
 September 7 instruction. Screenshots are also deferred until the owner finishes
@@ -71,13 +77,13 @@ Build/upload and app availability were rechecked September 3. Agreement, bank, t
 
 ## App Privacy questionnaire working answers
 
-These answers are derived from the app privacy manifest and the published privacy policy. They must be checked against App Store Connect's current wording before being submitted.
+These answers are derived from the app privacy manifest and the published privacy policy. They were checked against Apple's live wording, published and retained after reload on September 7. The dated source-audit paragraph below describes the earlier preparation state.
 
 September 3 source audit corrected Search History, Performance Data, and Other Diagnostic Data. The owner subsequently approved applying the provider disclosure proposal to the local release package: Device ID, Coarse Location, and Analytics purposes for User ID and Product Interaction are now also reflected in the manifest included in uploaded build 56. See the [source-to-declaration evidence](../../../docs/PERMITEXT_PRIVACY_DATA_FLOW_AUDIT_2026-09-03.md) and [approved local scope](../../../docs/PERMITEXT_PRIVACY_PROVIDER_DISCLOSURE_PROPOSAL_2026-09-03.md). Semantic aggregation of all privacy manifests physically present in the signed build-56 archive verified 13 collected categories, three required-reason API groups, and no tracking. This is not an Apple Organizer PDF or a provider-policy attestation, and the App Store questionnaire has not been published. The strict live audit also verified the exact previously approved policy artifacts; remaining provider-disclosure wording review and final client consent acceptance remain separate.
 
 ### Tracking
 
-Provider disclosure classifications below are approved for local preparation and synchronized with the app-owned manifest. Do not submit this checklist as a completed questionnaire until the remaining publication and final-candidate checks pass.
+Provider disclosure classifications below are synchronized with the app-owned manifest and the September 7 published Apple answers. Final-candidate alignment remains a separate submission check.
 
 - Data used to track the user: `No`
 - Tracking domains: none
@@ -161,16 +167,16 @@ Provider disclosure classifications below are approved for local preparation and
 
 ## App Review access
 
-Review-access plan (requires approval and verification before submission):
+Review-access plan (authorized preparation; complete verification still required):
 
 - Explain that reading and search work without an account.
 - Provide a dedicated synthetic reviewer-access plan for account-based features. Do not assume that asking Apple to create an account replaces verified reviewer access. See Apple's [review guidelines](https://developer.apple.com/app-store/review/guidelines/), Before You Submit and 2.1.
-- Verify the actual passwordless or identity-provider route without sharing the owner's credentials or introducing an authentication bypass. A demo mode is a separate product/security decision, not an automatic addition.
+- Standard password web sign-in passed for the designated test account; final credential handoff and native/Pro acceptance remain open. See the September 7 reviewer-access checkpoint above. No hidden demo mode was added.
 - Resolve the subscription/backend-feature mismatch in the current Production-targeted candidate: Sandbox purchases bind locally and do not grant Production backend Pro. The draft metadata now states this boundary. Corrected instructions alone do not establish reviewer access; verify the complete route before submission.
-- The live sign-in-required checkbox is currently checked; it was not changed during the audit. Review notes and credentials are currently blank.
+- The live sign-in-required checkbox remains checked. Automated credential edits did not persist; final review notes are still incomplete. Verify owner-entered credentials after the pending handoff before claiming this section complete.
 - Review contact name: Higinio Jimenez Manzano
 - Review contact email: `permitext@gmail.com`
-- Review contact phone: required from the owner before submission
+- Review contact phone: already supplied and previously saved privately in Apple; never retain it in the repository. Current reload did not expose populated phone/email input values, so recheck their persistence with the reviewer credential handoff rather than request the same details again.
 
 ## Version 1.0 items still required in App Store Connect
 

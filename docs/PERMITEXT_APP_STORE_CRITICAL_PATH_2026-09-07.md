@@ -28,11 +28,16 @@ repeated without a relevant change or failure.
 
 ## Remaining submission work
 
-Current desktop work: close the already-identified provider privacy-disclosure
-gap with a versioned policy revision. See the [revision receipt](./PERMITEXT_PRIVACY_DISCLOSURE_PUBLICATION_2026-09-07.md).
-App Store Connect's in-app browser session requires sign-in as of this resume;
-live questionnaire/reviewer fields cannot yet be reverified. No phone access
-or verification code was requested.
+Desktop work completed: the versioned provider privacy revision is live and
+Apple's matching App Privacy responses are published. Production source is
+`7b36fa180fbf6f26e6e2a516c10d2c58144d8943`. See the
+[publication receipt](./PERMITEXT_PRIVACY_DISCLOSURE_PUBLICATION_2026-09-07.md).
+The owner restored App Store Connect access. A standard password login passed
+for the designated test account on web, but Apple credential persistence failed
+and an owner password handoff remains pending. Full Pro access and the native
+route remain unverified. See the [reviewer-access checkpoint](./PERMITEXT_REVIEWER_ACCESS_2026-09-07.md),
+including the global pre-release password/Device Trust settings. The phone was
+not used; no new paid operation or Pro grant was performed.
 
 1. **Resolve the native purchase preflight blocker.** Build 63 repeatedly stops
    at the expired Sandbox transaction queue before Apple's confirmation sheet.
@@ -49,8 +54,8 @@ or verification code was requested.
    establish native acceptance. Use the final offered login paths and a stable
    review account/demo route; supply App Review notes and credentials through
    App Store Connect. Reuse existing account-deletion evidence.
-3. **Complete required App Store Connect material.** Reconcile privacy answers
-   against actual data/SDK behavior, age/content-rights declarations, subscription
+3. **Complete required App Store Connect material.** Privacy answers are now
+   published; retain final-build alignment. Finish age/content-rights declarations, subscription
    material, reviewer notes/access, and any outstanding Apple agreements/tax/bank
    requirements actually needed by this app. Do not invent business/legal facts.
    Previously supplied reviewer contact details stay out of source control.

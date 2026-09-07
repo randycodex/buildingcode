@@ -1,6 +1,7 @@
 # Provider privacy disclosure publication — September 7, 2026
 
-Status: local candidate; publication and live version checks pending.
+Status: published to Production; Apple App Privacy responses also published and
+retained after reload. This is not an app submission or public app release.
 
 ## Why this is in the App Store and web scope
 
@@ -35,11 +36,40 @@ and its historical consent records remain valid evidence for their own version.
 - These sources were rechecked September 7. The pinned native SDK/source
   evidence remains in the [provider proposal](./PERMITEXT_PRIVACY_PROVIDER_DISCLOSURE_PROPOSAL_2026-09-03.md).
 - Apple's [App Privacy guidance](https://developer.apple.com/app-store/app-privacy-details/)
-  includes third-party partners in collection disclosures. The questionnaire
-  itself remains unsubmitted; this policy publication does not complete it.
+  includes third-party partners in collection disclosures. The matching Apple
+  questionnaire was subsequently completed as recorded below.
 
 ## Validation and rollout
 
-Local privacy and authentication/consent tests, rendered preview, exact public
-policy bytes and active server version will be recorded here when completed.
-The phone checkout and native policy-submission observation remain pending.
+- `npm run test:privacy`, `npm run test:auth` and `npm run check`: passed.
+- Hosted preview `dpl_AKzWAZe1fBTgXhQDCbmKgcupN4Nm`: READY. Authenticated
+  Vercel retrieval returned HTTP 200 HTML; privacy and CSS bytes matched the
+  candidate, and the retrieved page passed rendered inspection.
+- [PR #66](https://github.com/randycodex/buildingcode/pull/66) merged at
+  `2026-09-07T21:24:33Z`. Production source:
+  `7b36fa180fbf6f26e6e2a516c10d2c58144d8943`; deployment
+  `dpl_GsrdeGDbVxqxrKSyx1K73Te6SL6k`: READY.
+- Production `PERMITEXT_PRIVACY_VERSION` is `privacy-2026-09-07`.
+  `/policies/current` returned policy set `ce4159c4e89f8007121f7025` with
+  unchanged Terms and subscription/refund versions.
+- `npm run verify:production`: passed. Strict live policy audit at
+  `2026-09-07T21:28:22.467Z`: publication ready, all three exact public policy
+  hashes matched, direct HTTP 200 HTML responses.
+- No paid Research, purchase, native code change or new physical acceptance.
+  Phone checkout and native policy submission remain pending.
+
+## Apple App Privacy receipt
+
+App `6774385434` → Distribution → App Privacy was completed and published
+September 7. A reload displayed the publisher receipt and all completed answers:
+
+- 13 collected types, each linked to identity and used for App Functionality:
+  Name, Email Address, Physical Address, Coarse Location, Photos or Videos,
+  Other User Content, Search History, User ID, Device ID, Purchase History,
+  Product Interaction, Performance Data and Other Diagnostic Data.
+- Analytics only for User ID and Product Interaction.
+- No use for tracking; no tracking section in the product-page preview.
+- Privacy URL remains `https://permitext.com/privacy`.
+
+The app remains 1.0 Prepare for Submission. No Add for Review action, build
+selection, screenshot upload or release was performed.

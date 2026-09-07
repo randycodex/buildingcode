@@ -68,7 +68,7 @@ Reading and search can be reviewed without an account:
 
 Account-based workspace, sync, and Pro features also require review. A dedicated synthetic reviewer identity and independently tested access instructions must be supplied before submission. The app supports Apple, Google, Microsoft, and passwordless email through its sign-in UI. Do not substitute an instruction to create an account for the verified access plan, disclose the owner's credentials, or add a hidden authentication/entitlement bypass.
 
-Internal preparation only: reviewer identity/access method and Pro access are **not yet provisioned or verified**. Resolve these with owner approval, then replace this preparation note with complete review instructions. Reviewers must be able to inspect the enabled features without needing a live response from the owner to obtain each verification code.
+Internal preparation only, updated September 7: standard password-based web sign-in passed for the designated synthetic test identity. The owner's shorter replacement did not meet the existing password minimum; replacement and secure Apple credential persistence are pending an owner handoff. Native login and full backend Pro access remain unverified, and the account remains Free. See the [reviewer-access checkpoint](../../../docs/PERMITEXT_REVIEWER_ACCESS_2026-09-07.md). Replace this preparation note with complete, observed instructions before submission. Reviewers must be able to inspect the enabled features without needing a live response from the owner to obtain each verification code.
 
 Subscription review flow to verify before submission:
 

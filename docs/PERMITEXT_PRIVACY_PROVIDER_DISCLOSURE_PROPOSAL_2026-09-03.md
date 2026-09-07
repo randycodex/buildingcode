@@ -1,5 +1,11 @@
 # Provider privacy disclosures — owner-review proposal
 
+September 7 update: subsequent standing authorization for necessary App Store
+and web work covered the versioned public policy revision and matching Apple
+App Privacy publication. Both are now complete; see the
+[publication receipt](./PERMITEXT_PRIVACY_DISCLOSURE_PUBLICATION_2026-09-07.md).
+The original approval scope and historical evidence below are retained.
+
 Status: **Owner approved applying these disclosures to the local release package** with the reply “i do,” acknowledged at approximately `2026-09-04T01:02Z` (September 3 EDT). The local privacy manifest and checklist now include the approved categories/purposes. No app behavior, approved public policy, provider configuration, Apple field, or UI/UX changes are authorized by that approval. Reviewed proposal base: `85cf031563c65368c46ea70dc29bb28216c961e7`; proposal commit: `e3025da17a60a3175a0ce96c0b18dd92faa03a05`.
 
 ## Approved local answers
