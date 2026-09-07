@@ -184,7 +184,9 @@ each remaining check one home so it is not repeated for several findings.
    all existing foundation artifacts, usage and original answers were retained.
    The follow-up v52 repair refreshes the existing pane without navigating and
    passes local contracts plus Chrome with the actual composer handlers. It is
-   not yet published. This changed Saved selection, not the conversation's
+   now published through approved PR #61 as `aed302627`, with exact served-source
+   binding, Production health and hosted session loading verified. The live test
+   changed Saved selection, not the conversation's
    server-side Project assignment. See the linked repair record for evidence.
 
 Stop after the named transitions have evidence or a concrete reproducible defect.
@@ -393,11 +395,14 @@ verified in local contracts and a Chrome fixture. PR #60 published the repair
 as `2e4f7db2d`; Production health, matching assets on both origins, and the
 retained Chrome session's reload passed. The next live delayed completion found
 the still-visible A composer stranded after selecting Saved Project B. The v52
-follow-up is repaired and verified locally, awaiting publication review. A
+follow-up is repaired and verified locally, and published through approved
+PR #61 as `aed302627`. A
 Production rate-limit PostgreSQL deadlock also caused one export 503. It was
 reproduced and repaired in real local PostgreSQL; the exact concurrent allowance
 and locked-row cleanup checks pass. The [rate-limit repair](./PERMITEXT_RATE_LIMIT_DEADLOCK_REPAIR_2026-09-06.md)
-also awaits publication review. B2's controlled cleanup-failure check now passes
+was published in the same PR. Production health, matching source on both origins,
+the read-only account export and hosted Free/Synced session passed; the initial
+two-minute log scan found no 5xx or rate-limit errors. B2's controlled cleanup-failure check now passes
 in real Chrome storage; continue with the remaining account-link boundary, then
 the remaining B3 edges and B4/B5; preserve the separate server-side race scope.
 The native Account close button is merged source awaiting a
