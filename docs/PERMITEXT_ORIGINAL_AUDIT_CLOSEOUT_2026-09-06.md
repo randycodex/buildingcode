@@ -1,22 +1,25 @@
 # Original production audit — current closeout checklist
 
-Updated September 6, 2026. This is the current action list for the **original
+Updated September 7, 2026. This is the current action list for the **original
 17 findings** in the [production-readiness backlog](./PERMITEXT_PRODUCTION_READINESS_BACKLOG_2026-09-04.md).
 It reconciles completed evidence with remaining acceptance. It adds no feature,
 paid evaluation cohort, release approval or new audit scope.
 
 ## Evidence baseline and working rules
 
-- Latest verified web source: `aed30262742d1888f94555997c4140cbdcaa7b71`,
-  Production deployment `dpl_BmE1MmRPw1rVGTG5Gmfx9GvZHL6s`, published with
-  owner approval through PR #61. Both canonical origins and six assets per
-  origin were verified against the source. See the [publication evidence](./PERMITEXT_RESEARCH_CONTEXT_RECOVERY_2026-09-06.md#approved-follow-up-publication).
+- Latest verified web source: `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
+  Production deployment `dpl_CJenPVvz6HfNHV5N7RkNkVq9gU15`, published with
+  owner approval through PR #62. Production source, ten public cache-header
+  paths and the retained v55 session/Reader check passed. See the
+  [Reader repair and publication record](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md).
   Physical build 62 remains based on `e60ca415fe8b7b60be65449b7ef49baccc82eec3`
   with its original [acceptance scope](./PERMITEXT_BUILD62_HANDOFF_ACCEPTANCE_2026-09-06.md).
 - Reconciliation started at branch commit `7001a3b1d`. The owner-requested
-  Account close control is commit `33f5cd41d`, now merged but not built for
-  TestFlight. The saved-citation recovery and offline-installer repairs are
-  deployed on the web. No new native build was made in this publication.
+  Account close control is commit `33f5cd41d`, now merged and verified by a
+  focused simulator UI test from both welcome and Saved, including dismissal
+  after scrolling. Xcode Cloud archive 264 succeeded on the current source;
+  TestFlight still listed build 62 on September 7. Build 63 delivery is in
+  progress. A successful archive alone is not a TestFlight or phone pass.
 - The 17 IDs comprise 16 repair findings and the P1-4 release-acceptance umbrella.
   A repaired symptom, broader client coverage and public-release approval are
   separate statuses. The table below does not count a local pass as a physical
@@ -493,3 +496,38 @@ documents and local checks to reconcile the remaining work without another
 phone session or main-account restoration. This is sequencing within the
 original audit, not authorization for paid Research, agent delegation, a new
 deployment, provider configuration changes or public release.
+
+## September 7 execution checkpoint
+
+The owner subsequently authorized continuing the six closeout steps and routine
+recommended actions without repeated approval requests, using the designated
+test account and retaining its sessions. Earlier batch-specific restrictions
+above describe their historical authorizations. Verification codes and facts
+only the owner can supply still require input; unobserved release criteria
+cannot be marked passed by authorization alone.
+
+- **B3 Account X:** the requested native glass control is already in the merged
+  source. The new welcome/Saved/scroll/dismiss UI regression passes; both
+  screenshots were inspected. Physical inventory still reports build 62.
+  A signed, verified build 63 is being uploaded. Follow the
+  [build 63 delivery record](./PERMITEXT_BUILD63_ACCOUNT_CLOSE_2026-09-07.md).
+- **B4 startup measurement:** ten valid Production v55 traces now complete the
+  representative desktop measurement: five warm-cache and five disabled-cache
+  reloads, with individually inspected workspace filmstrip frames. Median LCP
+  is 2.084 seconds warm and 1.990 seconds with network cache disabled. See the
+  [conditions, individual samples and limitations](./PERMITEXT_WEB_STARTUP_MEASUREMENT_2026-09-07.md).
+  OS pressure/eviction and interrupted-transfer coverage remain open.
+- **B2 recovery file:** a new isolated synthetic run reached recovery after a
+  lost receipt, but did not produce an independently observed completed file.
+  The previous exact-byte fixture evidence remains valid; no new download pass
+  is claimed. The temporary fixture's browser database/local/session storage
+  and server-side file storage were removed afterward.
+- The Production test-account baseline remains Free, with retained content and
+  no temporary grant. No new Research request, paid turn, provider link, account
+  merge or deletion was performed in this checkpoint.
+
+Remaining six-step scope is unchanged: B1 deliberate server-side move/completion
+overlap; B2 live provider/consent and recovery file receipt; B3 selected-build
+phone/accessibility/layout checks; B4 storage failure coverage; B5 operational
+and release evidence; then exact candidate binding and final go/no-go. The
+actual Certificate of Authority effective date is awaiting the owner's answer.

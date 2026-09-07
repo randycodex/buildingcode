@@ -1,6 +1,6 @@
 # Permitext Beta 1 spend-control acceptance record
 
-Status: **Prepared; not executed**
+Status: **September 7 read-only preflight verified; delivery and pause drills remain open**
 
 This record is for the remaining delivered spend-notification and hard-stop gate. Preparing it does not authorize a provider setting change, deliberate metered-usage increase, Production pause, budget change, purchase, deployment, or service interruption.
 
@@ -109,3 +109,36 @@ Do not force this result by spending or lowering the configured amount. Capture 
 - Evidence reviewed by and timestamp:
 
 The master-plan hard-stop gate remains open unless the owner accepts the exact results recorded here. No-cost preparation, a read-only dashboard check, or a manual isolated pause must not be mislabeled as automatic Spend Management proof.
+
+## September 7, 2026 preflight receipt
+
+The owner authorized continuing the six closeout steps and recommended routine
+actions without repeated approval requests. This inspection changed no provider
+setting, budget, project, notification preference or payment method.
+
+- Team `team_9EJNb6mc4ZUQ5bhRcRhmoBRR`; authenticated owner account; Pro active.
+- Dashboard cycle: August 28–September 28, 2026.
+- Included Credit displays `$7.60 / $20.00`. The separate On-Demand Budget
+  control also displays `$7.60 / $20 (38%)`; these overlapping dashboard labels
+  are retained as displayed, not added together or asserted to be a separate
+  invoiced on-demand charge.
+- The expanded Spend Amount field is `$20`; budget enabled and Pause
+  Production Deployments checked. The webhook field is empty. Save remained
+  disabled; the panel was dismissed with Cancel.
+- Global Web and Email notifications are enabled, SMS is off. The Spend
+  Management row has Email and Web checked and SMS unchecked. Push is shown
+  disabled by the UI.
+- Six existing team projects were inventoried. The existing isolated
+  `permitext-restore-acceptance` has a successful protected Preview
+  `dpl_D8NYCyGxfLVjVpBDi666HZ79udXg`, but its Production target
+  `dpl_ABQ5BDfwWJVPW4PqsPg79tTLLBL4` is ERROR. It is therefore not yet a usable
+  before/after Production health baseline for the proposed pause drill.
+- The returned project JSON omitted pause-state fields; omission was not treated
+  as proof that every project is running.
+
+Private API receipts: `/private/tmp/permitext-spend-preflight-team-20260907.json`
+and `/private/tmp/permitext-vercel-projects-before-pause-20260907.json`, stored
+with owner-only permissions. Raw billing/account details are not committed.
+Dashboard and notification controls were independently read through Chrome.
+No threshold delivery, manual pause/resume or automatic threshold trigger is
+claimed by this receipt. Results A, B and C remain unexecuted.
