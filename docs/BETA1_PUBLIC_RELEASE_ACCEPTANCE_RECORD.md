@@ -33,13 +33,16 @@ Gate ID: `production-deployment`
 Status: **CURRENT WEBSITE/BACKEND PUBLICATION VERIFIED — final selected-release machine binding remains open**
 Release-bound: **yes**
 
-Latest website/backend publication: [PR #63](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md#publication-and-retained-hosted-pdf)
-is verified on Production source `4048aa28e65b67ff8eecd9dc95ab76f861f7d680`,
-deployment `dpl_BJBGHbmKsFYJ5a5DGkoP2QJJ5ZA3`, completed at
-`2026-09-07T17:57:10.647Z`. The acknowledgment's Account navigation label,
-live asset hashes, unchanged policy configuration and retained hosted PDF passed.
-Web runtime remains v55. The installed native build remains 63 at the preceding
-source; no new physical installation or final shared candidate is claimed.
+Latest website/backend publication: [PR #64](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md#publication-and-live-returning-sign-in)
+is verified on Production source `02d320725c5df2f0c7df83026e0af445d62c1e5e`,
+deployment `dpl_8ezS6HFV55ifNeXDkj5MKiyMuhs5`, with public health verified at
+`2026-09-07T19:52:15.989835Z`. The account metadata repair passed real PostgreSQL,
+check/auth/smoke and hosted preview; an actual returning Microsoft sign-in retained
+its exact new consent record and saved collection. Previous PR #63's acknowledgment
+label and retained hosted PDF pass retain their original source/scope.
+Web runtime remains v55. The installed native build remains 63 at
+`5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`; no new physical installation or final
+shared candidate is claimed.
 
 Preceding website/backend publication: the [approved PR #62 repairs](./PERMITEXT_READER_SCROLL_CONTINUITY_2026-09-06.md)
 are verified on Production source `5f1afb414fdd51e74c59a28c7e279d3ef10b74d9`,
@@ -217,13 +220,13 @@ Follow [the detailed account export/deletion checklist](./BETA1_BILLING_IDENTITY
 ## Exact policy publication
 
 Gate ID: `exact-policy-publication`
-Status: **OPEN — publication and bounded web recording pass; web sign-in durability failed; iOS consent and final binding remain open**
+Status: **OPEN — publication, bounded web recording and repaired web sign-in durability pass; iOS consent and final binding remain open**
 Release-bound: **yes**
 
 - Strict live publication audit returned `publicationReady: true` for Terms, Privacy, and Subscription/Refund policy: yes at `2026-09-03T10:33:44.038Z`. The September 5 exact-source repair publication also passed the strict live audit; see the [current publication evidence](./PERMITEXT_READINESS_REPAIRS_PUBLICATION_2026-09-04.md#whole-section-saved-visibility-publication).
 - Live document SHA-256 hashes equal the approved manifest: yes for all three canonical routes; the audit emitted hashes only, not policy bodies or customer data.
 - Production version identifiers equal the approved current versions: yes — the protected exact-candidate build reported approved policy versions ready.
-- Web purchase consent displays and records those exact versions: bounded pass on Production `5f1afb414fdd`, September 7. The unchecked gate, canonical document links, one server-dated acceptance and same-policy retry passed with independent account exports; hosted Checkout was opened and left unpaid. A later real Google sign-in on `4048aa28e65b` removed the stored acceptance. The PostgreSQL sign-in repair and real database regression now pass locally; publication and live durability retest remain open. The Stripe description and retained acknowledgment passes remain valid. [Recording evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md), [sign-in durability failure](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
+- Web purchase consent displays and records those exact versions: bounded pass on Production `5f1afb414fdd`, September 7. The unchecked gate, canonical document links, one server-dated acceptance and same-policy retry passed with independent account exports; hosted Checkout was opened and left unpaid. A later real Google sign-in on `4048aa28e65b` removed the stored acceptance. The PostgreSQL repair is now published through PR #64 on `02d320725c5d`; the real Microsoft returning-sign-in/export retest retained one exact acceptance with its ID, versions and timestamp unchanged. The historical lost Gmail acceptance was not backfilled. The Stripe description and retained acknowledgment passes remain valid. [Recording evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md), [sign-in repair and live durability retest](./PERMITEXT_SIGN_IN_POLICY_PERSISTENCE_2026-09-07.md).
 - iOS purchase consent displays and records those exact versions: partial. The physical policy switch gates Subscribe, but expired Sandbox transactions stop the flow before policy recording or Apple's purchase sheet. The exact-tester history reset, visually verified Sandbox sign-in and clean app relaunch did not resolve it. The prior web acceptance is not an iOS pass. Further work must isolate the tester queue or collect device-level diagnostics rather than repeat the same sequence. [Evidence](./PERMITEXT_IOS_POLICY_CONSENT_2026-09-07.md).
 - Retainable post-purchase acknowledgment matches the selected release: current Production `4048aa28e65b` passed on September 7. The Settings label was corrected to Account through PR #63; canonical hosted HTML/script hashes matched, and Chrome's actual saved one-page PDF passed content, policy-link and rendered-page checks. No new purchase was made. Final shared-source/build selection remains open. [Evidence](./PERMITEXT_WEB_POLICY_CONSENT_2026-09-07.md#publication-and-retained-hosted-pdf).
 - Canonical URLs are direct HTTPS 200 responses without redirect or fallback bytes: yes for `/terms`, `/privacy`, and `/refunds`.
@@ -391,4 +394,4 @@ A **GO** decision authorizes only the specifically recorded release action. It d
 - Machine activation audit: **RED / not ready**
 - Public paid Beta authorized: **no**
 - Production and TestFlight repair publication was explicitly authorized in the active work session; this does not authorize public App Store submission or public paid Beta.
-- Next technical step: publish the locally verified PostgreSQL sign-in metadata repair and verify consent survives real returning sign-in. Personal-Microsoft web fresh/returning sign-in now passes after the credential repair; publisher verification and other provider/client/linking cases remain open. Continue B1's server-side context/completion overlap, B4's device/OS/browser storage boundaries and broader hosted/native transfers, and B5 operations/reviewer/declaration evidence. B1's controlled hosted overlap is awaiting usable credentials; a Vercel Production download returned protected placeholders. The real-browser recovery file, actual local Chrome/HTTP interrupted transfers, and native-cache APFS exhaustion/retry have bounded passes; do not repeat them as substitutes for remaining conditions. Build 63 is installed and its Account X passed; do not repeat the build-62 handoff or completed deletion/table checks. Screenshots wait for the owner's UI work, VoiceOver is deferred, and final candidate selection/go-no-go remain open. All three recorded ramp-turn approvals are consumed. Follow the [current closeout checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md).
+- Next technical step: configure the Microsoft app publisher domain and inspect verification prerequisites, then continue the remaining provider/client/linking and iOS consent checks. The PostgreSQL metadata repair is published; real web consent durability now passes. Personal-Microsoft web fresh/returning sign-in now passes after the credential repair; publisher verification and other provider/client/linking cases remain open. Continue B1's server-side context/completion overlap, B4's device/OS/browser storage boundaries and broader hosted/native transfers, and B5 operations/reviewer/declaration evidence. B1's controlled hosted overlap is awaiting usable credentials; a Vercel Production download returned protected placeholders. The real-browser recovery file, actual local Chrome/HTTP interrupted transfers, and native-cache APFS exhaustion/retry have bounded passes; do not repeat them as substitutes for remaining conditions. Build 63 is installed and its Account X passed; do not repeat the build-62 handoff or completed deletion/table checks. Screenshots wait for the owner's UI work, VoiceOver is deferred, and final candidate selection/go-no-go remain open. All three recorded ramp-turn approvals are consumed. Follow the [current closeout checklist](./PERMITEXT_ORIGINAL_AUDIT_CLOSEOUT_2026-09-06.md).
