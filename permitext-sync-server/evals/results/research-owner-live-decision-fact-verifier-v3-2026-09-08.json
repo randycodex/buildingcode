@@ -1,0 +1,441 @@
+{
+  "schema": "permitext-decision-fact-verifier-diagnostic-v3",
+  "sourceCommit": "dcd32ed105d30bd1480271120175911831268734",
+  "authorization": "Owner authorized repeated Research testing within approximately $8 total. This package uses at most $0.15 of the remaining $0.172285 conservative allowance for four production-verifier checks of the exact delivered laundry answer, its fact correction, a broken point binding and an invented standpipe exception. The instruction explicitly separates supported application from unsupported inference.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    }
+  ],
+  "previousConservativeSpendUSD": 7.827715,
+  "authorizationUSD": 8,
+  "maximumCumulativeSpendUSD": 0.15,
+  "maximumTurnSpendUSD": 0.15,
+  "maximumChecks": 4,
+  "maximumProviderRequests": 8,
+  "scope": "Production verifier only; no answering-model generation, new user Research delivery, web search, paid benchmark scoring, manual retry, deployment or professional approval. Native provider-client retries remain bounded by the same conservative ledger.",
+  "originalFullHTTPTurnAttempts": 66,
+  "originalProviderCalls": 152,
+  "originalVerifierOnlyChecks": 13,
+  "pricingSource": "Versioned local standard-price fixture in tests/research-request-envelope-preflight.mjs; not a provider invoice or account balance.",
+  "preflightSHA256": "c4615a66e3508fba14b35cde54c3ba8618b146d218f57c444cd701d1f083090a",
+  "status": "completed",
+  "startedAt": "2026-09-08T09:38:40.241Z",
+  "results": [
+    {
+      "id": "PC-04-delivered-decision-facts",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": false,
+      "expectedIssueTypes": [
+        "unnecessary_qualification"
+      ],
+      "acceptableSubstantiveIssueTypes": null,
+      "expectedRepairApplied": true,
+      "expectedMissingFactIndices": [
+        0,
+        1
+      ],
+      "purpose": "Actual delivered answer with all source bindings preserved; only unnecessary missing facts should fail.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-delivered-decision-facts",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006705,
+          "estimatedTokenCostUSD": 0.002927
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The answer correctly concludes that the floor drain cannot be omitted. The listed missing facts about floor area, configuration, drain locations, outlet diameter, and lint-strainer details are not needed to decide whether a floor drain is required; they are optional downstream design/compliance inputs. Their inclusion weakens the otherwise established result."
+          }
+        ],
+        "unnecessaryMissingFactIndices": [
+          0,
+          1
+        ]
+      },
+      "expectationMatched": true,
+      "actualIssueTypes": [
+        "unnecessary_qualification"
+      ],
+      "actualMissingFactIndices": [
+        0,
+        1
+      ],
+      "repairApplied": true,
+      "durationMilliseconds": 7840
+    },
+    {
+      "id": "PC-04-delivered-facts-corrected",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": true,
+      "expectedIssueTypes": [],
+      "acceptableSubstantiveIssueTypes": null,
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Identical delivered answer after the limited missing-fact correction; full verification must pass.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-delivered-facts-corrected",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.00613,
+          "estimatedTokenCostUSD": 0.002009
+        }
+      ],
+      "verification": {
+        "pass": true,
+        "issues": []
+      },
+      "expectationMatched": true,
+      "actualIssueTypes": [],
+      "actualMissingFactIndices": [],
+      "repairApplied": false,
+      "durationMilliseconds": 4046
+    },
+    {
+      "id": "PC-04-missing-point-binding",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": false,
+      "expectedIssueTypes": [
+        "incorrect_citation"
+      ],
+      "acceptableSubstantiveIssueTypes": null,
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Negative control: PC 412.4 remains elsewhere in the answer but is deliberately removed from the lint-strainer point.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-missing-point-binding",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006468,
+          "estimatedTokenCostUSD": 0.00224
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "incorrect_citation",
+            "detail": "The supported point titled “Required drain outlet size and lint strainer” cites only PC 412.3 (source research-permitext_discovered-id:11967-2), whose bound passage establishes the 3-inch minimum but does not mention lint strainers. The lint-strainer claim must be bound to and cited with PC 412.4 (source research-permitext_discovered-id:11968-1), rather than relying on support elsewhere in the answer."
+          }
+        ]
+      },
+      "expectationMatched": true,
+      "actualIssueTypes": [
+        "incorrect_citation"
+      ],
+      "actualMissingFactIndices": [],
+      "repairApplied": false,
+      "durationMilliseconds": 5022
+    },
+    {
+      "id": "PC-04-invented-standpipe-exception",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": false,
+      "expectedIssueTypes": [],
+      "acceptableSubstantiveIssueTypes": [
+        "misstated_provision",
+        "overstated_compliance",
+        "unsupported_requirement",
+        "incorrect_citation"
+      ],
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Adversarial control: falsely treat the stipulated standpipes as an exception to PC 412.4's applicable mandatory floor-drain rule.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-invented-standpipe-exception",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006466,
+          "estimatedTokenCostUSD": 0.002263
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "misstated_provision",
+            "detail": "PC 412.4 requires rooms containing automatic clothes washers in the central washing facilities of multiple-family dwellings to have floor drains that readily drain the entire floor area. It provides no exception for washers having trapped standpipes, so the answer incorrectly says the standpipes permit omission and substitute for the floor drains."
+          },
+          {
+            "type": "incorrect_citation",
+            "detail": "The supported point claiming that PC 412.4 permits omission is bound only to PC 412.4, whose text imposes—not waives—the floor-drain requirement."
+          },
+          {
+            "type": "overstated_compliance",
+            "detail": "The answer incorrectly concludes that omitting the floor drains is permissible and says the 3-inch outlet and lint-strainer requirements apply only to voluntarily provided drains. Under PC 412.4, those are mandatory characteristics of the required floor drains."
+          }
+        ]
+      },
+      "expectationMatched": true,
+      "actualIssueTypes": [
+        "incorrect_citation",
+        "misstated_provision",
+        "overstated_compliance"
+      ],
+      "actualMissingFactIndices": [],
+      "repairApplied": false,
+      "durationMilliseconds": 6403
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "PC-04-delivered-decision-facts",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 55762,
+      "startedAt": "2026-09-08T09:38:40.243Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11574,
+        "input_tokens_details": {
+          "cache_write_tokens": 11571,
+          "cached_tokens": 0
+        },
+        "output_tokens": 510,
+        "output_tokens_details": {
+          "reasoning_tokens": 404
+        },
+        "total_tokens": 12084
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_05bfab3df4074cb3016a9fd7a6bd3887d2a6b565b52e66ccd7",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"unnecessary_qualification\",\"detail\":\"The answer correctly concludes that the floor drain cannot be omitted. The listed missing facts about floor area, configuration, drain locations, outlet diameter, and lint-strainer details are not needed to decide whether a floor drain is required; they are optional downstream design/compliance inputs. Their inclusion weakens the otherwise established result.\"}],\"unnecessaryMissingFactIndices\":[0,1]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 7835
+    },
+    {
+      "caseID": "PC-04-delivered-facts-corrected",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 55420,
+      "startedAt": "2026-09-08T09:38:48.083Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11517,
+        "input_tokens_details": {
+          "cache_write_tokens": 8503,
+          "cached_tokens": 3011
+        },
+        "output_tokens": 206,
+        "output_tokens_details": {
+          "reasoning_tokens": 177
+        },
+        "total_tokens": 11723
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_07a9705dc08874f9016a9fd7abc00c87d2a7a71fc1741ffd20",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 4043
+    },
+    {
+      "caseID": "PC-04-missing-point-binding",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 55266,
+      "startedAt": "2026-09-08T09:38:52.129Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11474,
+        "input_tokens_details": {
+          "cache_write_tokens": 8460,
+          "cached_tokens": 3011
+        },
+        "output_tokens": 406,
+        "output_tokens_details": {
+          "reasoning_tokens": 272
+        },
+        "total_tokens": 11880
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_09418db32797be90016a9fd7afcb4887d2bb49dc7de6e7fdd7",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"incorrect_citation\",\"detail\":\"The supported point titled “Required drain outlet size and lint strainer” cites only PC 412.3 (source research-permitext_discovered-id:11967-2), whose bound passage establishes the 3-inch minimum but does not mention lint strainers. The lint-strainer claim must be bound to and cited with PC 412.4 (source research-permitext_discovered-id:11968-1), rather than relying on support elsewhere in the answer.\"}],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 5017
+    },
+    {
+      "caseID": "PC-04-invented-standpipe-exception",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 54324,
+      "startedAt": "2026-09-08T09:38:57.156Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11290,
+        "input_tokens_details": {
+          "cache_write_tokens": 8276,
+          "cached_tokens": 3011
+        },
+        "output_tokens": 456,
+        "output_tokens_details": {
+          "reasoning_tokens": 251
+        },
+        "total_tokens": 11746
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0076ba9825e6f9f1016a9fd7b5066c87d2967b853148c5dbfb",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"misstated_provision\",\"detail\":\"PC 412.4 requires rooms containing automatic clothes washers in the central washing facilities of multiple-family dwellings to have floor drains that readily drain the entire floor area. It provides no exception for washers having trapped standpipes, so the answer incorrectly says the standpipes permit omission and substitute for the floor drains.\"},{\"type\":\"incorrect_citation\",\"detail\":\"The supported point claiming that PC 412.4 permits omission is bound only to PC 412.4, whose text imposes—not waives—the floor-drain requirement.\"},{\"type\":\"overstated_compliance\",\"detail\":\"The answer incorrectly concludes that omitting the floor drains is permissible and says the 3-inch outlet and lint-strainer requirements apply only to voluntarily provided drains. Under PC 412.4, those are mandatory characteristics of the required floor drains.\"}],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 6396
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 0.15,
+    "reservedUSD": 0.009439,
+    "actualUSD": 0.009439,
+    "requestCount": 4,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 7.853484,
+  "completedAt": "2026-09-08T09:39:03.557Z"
+}

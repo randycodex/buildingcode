@@ -1,0 +1,156 @@
+{
+  "schema": "permitext-decision-fact-verifier-diagnostic-v3",
+  "sourceCommit": "dcd32ed105d30bd1480271120175911831268734",
+  "authorization": "Owner authorized repeated Research testing within approximately $8 total. This package uses at most $0.15 of the remaining $0.172285 conservative allowance for four production-verifier checks of the exact delivered laundry answer, its fact correction, a broken point binding and an invented standpipe exception. The instruction explicitly separates supported application from unsupported inference.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    }
+  ],
+  "previousConservativeSpendUSD": 7.827715,
+  "authorizationUSD": 8,
+  "maximumCumulativeSpendUSD": 0.15,
+  "maximumTurnSpendUSD": 0.15,
+  "maximumChecks": 4,
+  "maximumProviderRequests": 8,
+  "scope": "Production verifier only; no answering-model generation, new user Research delivery, web search, paid benchmark scoring, manual retry, deployment or professional approval. Native provider-client retries remain bounded by the same conservative ledger.",
+  "originalFullHTTPTurnAttempts": 66,
+  "originalProviderCalls": 152,
+  "originalVerifierOnlyChecks": 13,
+  "pricingSource": "Versioned local standard-price fixture in tests/research-request-envelope-preflight.mjs; not a provider invoice or account balance.",
+  "fixtureSourceSHA256": "60cd6853622ca861c736dd8619beea470d0e2c18ee22c37611c0a6dd64f78666",
+  "appSHA256": "0a3d2a7fa5ee93afd958d40c083e08f1b0e0e3ecac636d4b0f2168231e8cfd3f",
+  "entries": [
+    {
+      "id": "PC-04-delivered-decision-facts",
+      "expectedPass": false,
+      "expectedIssueTypes": [
+        "unnecessary_qualification"
+      ],
+      "acceptableSubstantiveIssueTypes": null,
+      "expectedRepairApplied": true,
+      "expectedMissingFactIndices": [
+        0,
+        1
+      ],
+      "purpose": "Actual delivered answer with all source bindings preserved; only unnecessary missing facts should fail.",
+      "requestBodySHA256": "6282441c2d8f8379342efc8560fd7c09e18d1fd119f3530bc1a9baf435a5d42c",
+      "requestBytes": 55762,
+      "maximumRequestUSD": 0.035593
+    },
+    {
+      "id": "PC-04-delivered-facts-corrected",
+      "expectedPass": true,
+      "expectedIssueTypes": [],
+      "acceptableSubstantiveIssueTypes": null,
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Identical delivered answer after the limited missing-fact correction; full verification must pass.",
+      "requestBodySHA256": "226c9ebc1299623a3335910a4593cd96b3c5cbc61ef01201a487226f03226a4b",
+      "requestBytes": 55420,
+      "maximumRequestUSD": 0.035422
+    },
+    {
+      "id": "PC-04-missing-point-binding",
+      "expectedPass": false,
+      "expectedIssueTypes": [
+        "incorrect_citation"
+      ],
+      "acceptableSubstantiveIssueTypes": null,
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Negative control: PC 412.4 remains elsewhere in the answer but is deliberately removed from the lint-strainer point.",
+      "requestBodySHA256": "9f94a3e6e1c4e405495d6f0c786e863c41db21c70ac14a03e1c72832c915018b",
+      "requestBytes": 55266,
+      "maximumRequestUSD": 0.035345
+    },
+    {
+      "id": "PC-04-invented-standpipe-exception",
+      "expectedPass": false,
+      "expectedIssueTypes": [],
+      "acceptableSubstantiveIssueTypes": [
+        "misstated_provision",
+        "overstated_compliance",
+        "unsupported_requirement",
+        "incorrect_citation"
+      ],
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Adversarial control: falsely treat the stipulated standpipes as an exception to PC 412.4's applicable mandatory floor-drain rule.",
+      "requestBodySHA256": "8195f5e4461ebf9be09eec09cdaa2d6ac1f5eb52dcc6cc79e42caa179e457626",
+      "requestBytes": 54324,
+      "maximumRequestUSD": 0.034874
+    }
+  ],
+  "networkAttempts": 0,
+  "providerCalls": 0
+}

@@ -1,4 +1,5 @@
-// Recorded drafts and usage, synthetic verifier verdicts; no paid model calls.
+// Recorded drafts, live verifier verdicts and usage; synthetic final-rejection
+// controls prove that a proposed correction cannot approve itself. No paid calls.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { randomUUID } from "node:crypto";
@@ -6,6 +7,8 @@ import { readFile, mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 const recorded = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-compact-confirmation-2026-09-08.json", import.meta.url)));
+const laundryVerification = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json", import.meta.url)));
+const panVerification = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json", import.meta.url)));
 const scratch = await mkdtemp(join(tmpdir(), "permitext-decision-fact-http-"));
 for (const name of Object.keys(process.env)) if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$)/.test(name)) delete process.env[name];
 Object.assign(process.env, {
@@ -41,7 +44,12 @@ globalThis.fetch = async (url, options) => {
     assert.equal(phase, "permitext_research_verification");
     assert(phases.length === 2 || phases.length === 3);
     const proposed = JSON.parse(body.input.split("PROPOSED ANSWER JSON\n")[1]);
-    call = recorded.providerCalls.find((item) => item.caseID === active.id && item.phase === phase);
+    const verificationRun = active.id === "PC-04" ? laundryVerification : panVerification;
+    const verificationCaseID = active.id === "PC-04"
+      ? (phases.length === 2 ? "PC-04-delivered-decision-facts" : "PC-04-delivered-facts-corrected")
+      : (phases.length === 2 ? "PC-10-recorded" : "PC-10-decision-facts-only");
+    call = verificationRun.providerCalls.find((item) => item.caseID === verificationCaseID && item.phase === phase);
+    const recordedVerdict = verificationRun.results.find((item) => item.id === verificationCaseID).verification;
     let verdict;
     if (phases.length === 2) {
       firstProposed = proposed;
@@ -49,20 +57,22 @@ globalThis.fetch = async (url, options) => {
       for (const key of ["answerText", "supportedPoints", "citations"]) {
         assert.deepEqual(proposed[key], active.answer[key], `The verifier must receive the delivered ${key}, including source repairs.`);
       }
-      verdict = { pass: false, issues: [{ type: "unnecessary_qualification", detail: "Recorded decision is already established; the listed design inputs cannot change it." }],
-        unnecessaryMissingFactIndices: proposed.missingFacts.map((_, index) => index) };
+      verdict = recordedVerdict;
+      assert.equal(verdict.pass, false);
+      assert.deepEqual(verdict.unnecessaryMissingFactIndices, proposed.missingFacts.map((_, index) => index));
     } else {
       secondProposed = proposed;
       assert.deepEqual(secondProposed, { ...firstProposed, missingFacts: [] },
         "The final verifier must see every original field unchanged except the explicitly reviewed missingFacts entries.");
-      verdict = accept ? { pass: true, issues: [], unnecessaryMissingFactIndices: [] } : {
+      assert.equal(recordedVerdict.pass, true);
+      verdict = accept ? recordedVerdict : {
         pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final rejection: removing facts never approves an answer by itself." }], unnecessaryMissingFactIndices: []
       };
     }
-    output = [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(verdict) }] }];
+    output = phases.length === 2 || accept ? call.output
+      : [{ type: "message", content: [{ type: "output_text", text: JSON.stringify(verdict) }] }];
   }
-  // Preserve the recorded token usage rather than making the spend test cheap
-  // with a tiny fake usage count. Verdicts remain synthetic.
+  // Preserve actual recorded token usage, including each live verifier phase.
   return Response.json({ model: body.model, status: "completed", usage: call.usage, output });
 };
 let server;
@@ -119,4 +129,4 @@ try {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
   await rm(scratch, { recursive: true, force: true });
 }
-console.log("Decision-fact HTTP replays passed: four flows, preserved answer/citations, final accept/reject gates, no full rewrite, recorded usage under the unchanged $0.50 turn cap.");
+console.log("Decision-fact HTTP replays passed: four flows, recorded live acceptance verdicts, preserved answer/citations, synthetic final rejection blocks saving/charging, no full rewrite, recorded usage under the unchanged $0.50 turn cap.");
