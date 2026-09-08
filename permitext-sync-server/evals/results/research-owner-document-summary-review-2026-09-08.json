@@ -1,0 +1,74 @@
+{
+  "schema": "permitext-official-document-summary-review-v1",
+  "reviewedAt": "2026-09-08T04:52:08.898Z",
+  "sourceCommit": "0b3ec0ea04696b64ea595e662ed497bb75a49b49",
+  "liveResultSHA256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af",
+  "method": "Manual comparison of actual generated answers against the independently refreshed official PDFs and reconciled owner cases; no reference answer supplied to Research and no paid judge.",
+  "professionalApproval": false,
+  "releaseApproval": false,
+  "findings": [
+    {
+      "id": "DOBNOW-019",
+      "answerSHA256": "32ab0e5ee9736ec67ac771a5e159a1f795531df6507d45f6481298b9beaab282",
+      "durationMilliseconds": 7767,
+      "words": 83,
+      "delivery": "completed",
+      "mainConclusion": "supported",
+      "materialCompleteness": "supported",
+      "authorityBoundary": "official supporting guidance, noncontrolling",
+      "presentation": "Direct and complete; short enough for this workflow.",
+      "sources": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf",
+          "contentHash": "06c223de1b461d95b55c1caa95f581198ce2e79a43286483a16f2c83731af3ab",
+          "pages": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-018",
+      "answerSHA256": "6681abd897d05253aa013f9b510fc677f70e5d2a71d43b2bb78578803970905d",
+      "durationMilliseconds": 11305,
+      "words": 166,
+      "delivery": "completed",
+      "mainConclusion": "supported",
+      "materialCompleteness": "supported",
+      "authorityBoundary": "official supporting guidance, noncontrolling",
+      "presentation": "Correct conditions; repeats scenario and adds a redundant authority paragraph before the server label.",
+      "sources": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+          "pages": [
+            12
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+          "pages": [
+            13
+          ]
+        }
+      ]
+    }
+  ],
+  "spend": {
+    "batchTokenTelemetryUSD": 0.012018,
+    "batchEstimatedCacheWritePremiumUSD": 0.00157095,
+    "batchUsageEstimateUSD": 0.013588949999999999,
+    "cumulativeUsageEstimateUSD": 1.5236363600000002,
+    "cumulativeConservativeBoundUSD": 3.050704,
+    "pendingRequests": 0,
+    "totalEffortTurns": 27,
+    "totalEffortProviderRequests": 54,
+    "limitation": "Usage-derived estimate, not an invoice or account balance."
+  },
+  "remaining": [
+    "Wetlands summary can remove repeated scenario and redundant authority prose.",
+    "CC-04 source truncation must be repaired before another fixture follow-up test.",
+    "Broader generated-answer coverage and useful missing-zoning-fact replies remain open."
+  ]
+}

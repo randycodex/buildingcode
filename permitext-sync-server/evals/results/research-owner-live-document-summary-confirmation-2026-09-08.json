@@ -1,0 +1,1900 @@
+{
+  "schema": "permitext-owner-document-summary-confirmation-20260908-v1",
+  "authorization": "Owner: approximately $8 available for API testing; test as many times as needed. This package is limited to two official PDF summary turns after no-cost source-integrity and persistence checks; one attempt per case.",
+  "previousConservativeSpendUSD": 3.02638,
+  "priorScopeResultSHA256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956",
+  "priorQualityResultSHA256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323",
+  "priorFarResultSHA256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab",
+  "priorConfirmationResultSHA256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a",
+  "priorZeroCallResultSHA256": "cd2bd778d4e881912697c0280b33952bb905f010a9bbb2c816024da42c816b17",
+  "priorZeroCallResult": "research-owner-live-source-confirmation-2026-09-08.json",
+  "priorZeroCallExplanation": "First turn rejected before dispatch; zero provider calls and costs. The stale evaluation reservation was bookkeeping, not incurred spend.",
+  "sourceCommit": "0b3ec0ea04696b64ea595e662ed497bb75a49b49",
+  "keySHA256": "c8949b70372b5165fcf4561863b27414284da621602e6b70ca508f99da69a14b",
+  "execution": "Isolated local HTTP Research conversations with live OpenAI responses; automatic evidence discovery; no reference answers supplied to the answering model.",
+  "maximumCumulativeSpendUSD": 1.8,
+  "maximumTurnSpendUSD": 0.85,
+  "maximumTurns": 2,
+  "absoluteTurnSumCeilingUSD": 1.7,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra model routing; general answers medium reasoning, official summaries low reasoning; standard service tier",
+  "zoning": "Local diagnostic eligibility only; no public gate or deployment changes",
+  "cases": [
+    {
+      "id": "DOBNOW-019",
+      "conversation": "bpp",
+      "question": "A new Builders Pavement Plan application is initiated after August 17, 2026.\n\nWhere must it be filed, which review type applies, and what authorization step appears?"
+    },
+    {
+      "id": "DOBNOW-018",
+      "conversation": "wetlands",
+      "question": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area.\n\nWhat documents and conditional responses are required under the August 2026 workflow?"
+    }
+  ],
+  "startedAt": "2026-09-08T04:49:59.520Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "DOBNOW-019",
+      "question": "A new Builders Pavement Plan application is initiated after August 17, 2026.\n\nWhere must it be filed, which review type applies, and what authorization step appears?",
+      "status": "completed",
+      "startedAt": "2026-09-08T04:49:59.643Z",
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260908-document-summary-v1",
+        "evidenceVersion": "20260908-table-context-integrity-v25:official-documents",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-prior-code-technical-scope-v5",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T04:49:59.710Z"
+        },
+        "answerText": "It must be filed in DOB NOW: Build, using the Builders Pavement Plan work type and Standard Plan Review. The Authorization to DOT (BPP5) tab appears on the job filing and must be completed so DOT may issue a construction permit for the BPP work. This guidance applies to all new BPP applications beginning August 17, 2026; new filings can no longer be submitted in BIS. [Builders Pavement Plan service notice, p. 1](https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf#page=1)\n\nOfficial supporting guidance — noncontrolling and not an enacted-code conclusion.",
+        "conclusion": "It must be filed in DOB NOW: Build, using the Builders Pavement Plan work type and Standard Plan Review. The Authorization to DOT (BPP5) tab appears on the job filing and must be completed so DOT may issue a construction permit for the BPP work. This guidance applies to all new BPP applications beginning August 17, 2026; new filings can no longer be submitted in BIS. [Builders Pavement Plan service notice, p. 1](https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf#page=1)",
+        "supportedPoints": [],
+        "explanation": "Official supporting guidance — noncontrolling and not an enacted-code conclusion.",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This answer summarizes retrieved official supporting guidance; it does not establish an enacted-code conclusion.",
+          "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [
+          {
+            "sourceID": "dob-bpp-service-notice",
+            "claimID": "official-passage-a9351e29772b35eadd43945a",
+            "claim": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf#page=1) — Ahmed Tigani, Commissioner nyc.gov/buildings August 6, 2 0 2 6 SERVICE NOTICE Builders Pavement Plan Filings to Launch in DOB NOW: Build Beginning August 17, 2026, all new Builder's Pavement Plan (BPP) applications must be submitted in DOB NOW: Build. BPP filings can no longer be submitted in the Buildings Information System (BIS). To submit a BPP filing in DOB NOW: Build, login at nyc.gov/dobnow, Builders Pavement Plan is a new Work Type. BPP must be filed as Review Type Standard Plan Review. Authorization to the Department of Transportation (DOT) The Authorization to DOT (BPP5) tab will appear on the job filing and must be completed to authorize DOT to issue a construction permit for the BPP work. Once the BPP filing is approved, all stakeholders will receive an email notification indicating that the Plans/Sketch and Authorization to DOT documents are available for download in DOB NOW. These documents can be viewed and printed from within the job filing or the Public Portal. Waiver of Legal Grade Fee If a Waiver of Legal Grade Fee applies to the job filing, the $345 fee will display in Job Filing Highlights and on the Pay Now button. Email notification will be sent to all stakeholders with instructions to process the payment and resubmit the job filing. BPP Jobs Filed in BIS Before Launch Depending on the Job Status and the date of the Last Action in BIS, BPP jobs filed in BIS before the launch may proceed in BIS or will have the Job Status changed to Administratively Closed and a new BPP job will have to be filed in DOB NOW to proceed. Review the following chart for details: Last Action Date in BIS BIS Job Status as of August 14, 2026 BIS Status after August 14, 2026 To Proceed with Filing After August 14, 2024 Application Processed – Completed (D) Plan Exam - In Process (H) Plan Exam – Disapproved (J) Plan Exam – Approved (P) Permit Issued - Partial Job (Q) Permit Issued - Entire Job/Work (R) Signed-Off (X) No change Continue in BIS After August 14, 2024 Pre-Filing (A) Application Processed - Part-No Payment (B) Application Processed - Payment Only (C) Administratively Closed File a new job in DOB NOW: Build"
+          }
+        ],
+        "supportingSources": [
+          {
+            "id": "dob-bpp-service-notice",
+            "title": "Builders Pavement Plan service notice",
+            "url": "https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf",
+            "publisher": "NYC Department of Buildings",
+            "catalogReviewedOn": "2026-09-08",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "controlling": false,
+            "attributedClaims": [
+              {
+                "id": "official-passage-a9351e29772b35eadd43945a",
+                "text": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf#page=1) — Ahmed Tigani, Commissioner nyc.gov/buildings August 6, 2 0 2 6 SERVICE NOTICE Builders Pavement Plan Filings to Launch in DOB NOW: Build Beginning August 17, 2026, all new Builder's Pavement Plan (BPP) applications must be submitted in DOB NOW: Build. BPP filings can no longer be submitted in the Buildings Information System (BIS). To submit a BPP filing in DOB NOW: Build, login at nyc.gov/dobnow, Builders Pavement Plan is a new Work Type. BPP must be filed as Review Type Standard Plan Review. Authorization to the Department of Transportation (DOT) The Authorization to DOT (BPP5) tab will appear on the job filing and must be completed to authorize DOT to issue a construction permit for the BPP work. Once the BPP filing is approved, all stakeholders will receive an email notification indicating that the Plans/Sketch and Authorization to DOT documents are available for download in DOB NOW. These documents can be viewed and printed from within the job filing or the Public Portal. Waiver of Legal Grade Fee If a Waiver of Legal Grade Fee applies to the job filing, the $345 fee will display in Job Filing Highlights and on the Pay Now button. Email notification will be sent to all stakeholders with instructions to process the payment and resubmit the job filing. BPP Jobs Filed in BIS Before Launch Depending on the Job Status and the date of the Last Action in BIS, BPP jobs filed in BIS before the launch may proceed in BIS or will have the Job Status changed to Administratively Closed and a new BPP job will have to be filed in DOB NOW to proceed. Review the following chart for details: Last Action Date in BIS BIS Job Status as of August 14, 2026 BIS Status after August 14, 2026 To Proceed with Filing After August 14, 2024 Application Processed – Completed (D) Plan Exam - In Process (H) Plan Exam – Disapproved (J) Plan Exam – Approved (P) Permit Issued - Partial Job (Q) Permit Issued - Entire Job/Work (R) Signed-Off (X) No change Continue in BIS After August 14, 2024 Pre-Filing (A) Application Processed - Part-No Payment (B) Application Processed - Payment Only (C) Administratively Closed File a new job in DOB NOW: Build",
+                "verbatimText": "Ahmed Tigani, Commissioner nyc.gov/buildings\nAugust 6 , 2 0 2 6\nSERVICE NOTICE\nBuilders Pavement Plan Filings to Launch in DOB NOW: Build\nBeginning August 17, 2026, all new Builder's Pavement Plan (BPP) applications\nmust be submitted in DOB NOW: Build . BPP filings can no longer be submitted\nin the Buildings Information System (BIS).\nTo submit a BPP filing in DOB NOW: Build, login at nyc.gov/dobnow , Builders Pavement Plan is a new\nWork Type. BPP must be filed as Review Type Standard Plan Review .\nAuthorization to the Department of Transportation (DOT)\nThe Authorization to DOT (BPP5) tab will appear on the job filing and must be completed to authorize DOT\nto issue a construction permit for the BPP work. Once the BPP filing is approved, all stakeholders will\nreceive an email notification indicating that the Plans/Sketch and Authorization to DOT documents are\navailable for download in DOB NOW. These documents can be viewed and printed from within the job filing\nor the Public Portal.\nWaiver of Legal Grade Fee\nIf a Waiver of Legal Grade Fee applies to the job filing, the $345 fee will display in Job Filing Highlights\nand on the Pay Now button. Email notification will be sent to all stakeholders with instructions to process the\npayment and resubmit the job filing.\nBPP Jobs Filed in BIS Before Launch\nDepending on the Job Status and the date of the Last Action in BIS, BPP jobs filed in BIS before the\nlaunch may proceed in BIS or will have the Job Status changed to Administratively Closed and a new BPP\njob will have to be filed in DOB NOW to proceed. Review the following chart for details:\nLast Action\nDate in BIS\nBIS Job Status as of\nAugust 14, 2026\nBIS Status after\nAugust 14, 2026\nTo Proceed with\nFiling\nAfter\nAugust 14, 2024\nApplication Processed – Completed (D)\nPlan Exam - In Process (H)\nPlan Exam – Disapproved (J)\nPlan Exam – Approved (P)\nPermit Issued - Partial Job (Q)\nPermit Issued - Entire Job/Work (R)\nSigned-Off (X)\nNo change Continue in BIS\nAfter\nAugust 14, 2024\nPre-Filing (A)\nApplication Processed - Part-No Payment (B)\nApplication Processed - Payment Only (C)\nAdministratively\nClosed\nFile a new job in\nDOB NOW: Build",
+                "heading": "PDF page 1",
+                "intro": "",
+                "contentHash": "06c223de1b461d95b55c1caa95f581198ce2e79a43286483a16f2c83731af3ab",
+                "pageNumber": 1,
+                "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf#page=1"
+              }
+            ],
+            "sourceContentHash": "06c223de1b461d95b55c1caa95f581198ce2e79a43286483a16f2c83731af3ab",
+            "sourceValidation": "official_pdf",
+            "pageCount": 2,
+            "textlessPages": [],
+            "extractionLimitations": [
+              "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+            ],
+            "claim": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf#page=1) — Ahmed Tigani, Commissioner nyc.gov/buildings August 6, 2 0 2 6 SERVICE NOTICE Builders Pavement Plan Filings to Launch in DOB NOW: Build Beginning August 17, 2026, all new Builder's Pavement Plan (BPP) applications must be submitted in DOB NOW: Build. BPP filings can no longer be submitted in the Buildings Information System (BIS). To submit a BPP filing in DOB NOW: Build, login at nyc.gov/dobnow, Builders Pavement Plan is a new Work Type. BPP must be filed as Review Type Standard Plan Review. Authorization to the Department of Transportation (DOT) The Authorization to DOT (BPP5) tab will appear on the job filing and must be completed to authorize DOT to issue a construction permit for the BPP work. Once the BPP filing is approved, all stakeholders will receive an email notification indicating that the Plans/Sketch and Authorization to DOT documents are available for download in DOB NOW. These documents can be viewed and printed from within the job filing or the Public Portal. Waiver of Legal Grade Fee If a Waiver of Legal Grade Fee applies to the job filing, the $345 fee will display in Job Filing Highlights and on the Pay Now button. Email notification will be sent to all stakeholders with instructions to process the payment and resubmit the job filing. BPP Jobs Filed in BIS Before Launch Depending on the Job Status and the date of the Last Action in BIS, BPP jobs filed in BIS before the launch may proceed in BIS or will have the Job Status changed to Administratively Closed and a new BPP job will have to be filed in DOB NOW to proceed. Review the following chart for details: Last Action Date in BIS BIS Job Status as of August 14, 2026 BIS Status after August 14, 2026 To Proceed with Filing After August 14, 2024 Application Processed – Completed (D) Plan Exam - In Process (H) Plan Exam – Disapproved (J) Plan Exam – Approved (P) Permit Issued - Partial Job (Q) Permit Issued - Entire Job/Work (R) Signed-Off (X) No change Continue in BIS After August 14, 2024 Pre-Filing (A) Application Processed - Part-No Payment (B) Application Processed - Payment Only (C) Administratively Closed File a new job in DOB NOW: Build"
+          }
+        ],
+        "citations": [],
+        "officialGuidanceSummary": {
+          "version": "20260908-document-summary-v1",
+          "answerSHA256": "28c8ccb9a7907eb17e4387fb826015e7185ff7f27040fa600596d3feba8190c6",
+          "verificationInputSHA256": "49c04d68721755155e1ad8b47e3f7753e5ee7bea1a62e6ccdbf2cb053ab634ce",
+          "verification": {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        },
+        "evidenceSectionIDs": [
+          "9054",
+          "9213",
+          "10174",
+          "9618",
+          "9170",
+          "10366",
+          "5110",
+          "9452",
+          "11811",
+          "4323",
+          "10176",
+          "9620",
+          "9577",
+          "9588"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:9054-1",
+          "research-permitext_discovered-id:9213-2",
+          "research-permitext_discovered-id:10174-3",
+          "research-permitext_discovered-id:9618-4",
+          "research-permitext_discovered-id:9170-5",
+          "research-permitext_discovered-id:10366-6",
+          "research-permitext_discovered-id:5110-7",
+          "research-permitext_discovered-id:9452-8",
+          "research-permitext_discovered-id:11811-9",
+          "research-permitext_discovered-id:4323-10",
+          "research-permitext_cross_reference-id:10176-1",
+          "research-permitext_cross_reference-id:9620-3",
+          "research-permitext_cross_reference-id:9577-4",
+          "research-permitext_cross_reference-id:9588-5"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 14,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 0,
+          "governingCitationCount": 0,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 14,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 10,
+          "crossReferenceCount": 4,
+          "supportingWebSourceCount": 1,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 0,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 0
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [],
+          "generalRules": [],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [],
+          "supportedPointEvidenceSourceIDs": [],
+          "citedEvidenceSourceIDs": [],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9054-1",
+            "research-permitext_discovered-id:9213-2",
+            "research-permitext_discovered-id:10174-3",
+            "research-permitext_discovered-id:9618-4",
+            "research-permitext_discovered-id:9170-5",
+            "research-permitext_discovered-id:10366-6",
+            "research-permitext_discovered-id:5110-7",
+            "research-permitext_discovered-id:9452-8",
+            "research-permitext_discovered-id:11811-9",
+            "research-permitext_discovered-id:4323-10",
+            "research-permitext_cross_reference-id:10176-1",
+            "research-permitext_cross_reference-id:9620-3",
+            "research-permitext_cross_reference-id:9577-4",
+            "research-permitext_cross_reference-id:9588-5"
+          ],
+          "claims": []
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [],
+          "claims": []
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260902-generated-typography-v25",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:9054-1",
+            "research-permitext_discovered-id:9213-2",
+            "research-permitext_discovered-id:10174-3",
+            "research-permitext_discovered-id:9618-4",
+            "research-permitext_discovered-id:9170-5",
+            "research-permitext_discovered-id:10366-6",
+            "research-permitext_discovered-id:5110-7",
+            "research-permitext_discovered-id:9452-8",
+            "research-permitext_discovered-id:11811-9",
+            "research-permitext_discovered-id:4323-10",
+            "research-permitext_cross_reference-id:10176-1",
+            "research-permitext_cross_reference-id:9620-3",
+            "research-permitext_cross_reference-id:9577-4",
+            "research-permitext_cross_reference-id:9588-5"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 0,
+            "citedProvisionCount": 0,
+            "governingCitationCount": 0,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 14,
+            "reviewedOnlyProvisionCount": 14,
+            "assembledSourceCount": 14,
+            "assembledProvisionCount": 14
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:9054-1",
+              "sectionID": "9054",
+              "reference": "AC 28-108.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-108.2 § 28-108.2 Pavement plan required. Construction documents shall include a pavement plan processed and approved under guidelines established by the department. The pavement plan shall include documentation sufficient to show compliance with the New York city building code, the New York city zoning resolution, and the standards prescribed by the New York city department of transportation pursuant to sections 19-113 and 19-115 of the administrative code. Exception: No pavement plan shall be required with respect to an alteration application for a building where the applicant certifies that there is a sidewalk in existence in front of or abutting such building, including but not limited to the intersection quadrants for corner properties, complying with the specifications of the New York city department of transportation, and that the nature of such alteration work will neither remove such existing sidewalk nor cause damage to such existing sidewalk such that the damage could not be corrected as minor repairs prior to issuance of the certificate of occupancy. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9213-2",
+              "sectionID": "9213",
+              "reference": "AC 28-118.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-118.7 § 28-118.7 Pavement plan. No certificate of occupancy shall be issued for any building or open lot requiring a pavement plan pursuant to article 108 unless and until an inspection has been made to show that all work necessary for compliance with the pavement plan has been completed."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10174-3",
+              "sectionID": "10174",
+              "reference": "AC 28-507.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-507.2 § 28-507.2 Eligibility. This article applies to private dwellings and multiple dwellings. The department shall establish a temporary residence program in accordance with this article. To participate in such program, an owner of an eligible basement or cellar residence shall apply for authorization for temporary residence pursuant to section 28-507.4 on or before April 20, 2029. An application for temporary residence may not be made where the eligible basement or cellar residence is located within the 10-year rainfall flood risk area or the coastal flood risk area as described in section 24-809 , except as otherwise allowed pursuant to the New York city zoning resolution. (L.L. 2024/126, 12/18/2024, eff. 6/16/2025)"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9618-4",
+              "sectionID": "9618",
+              "reference": "AC 28-308.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-308.5 § 28-308.5 Content of energy efficiency report. Except as otherwise provided in section 28-308.7, the energy efficiency report shall include, in a format prescribed by the department, (i) the energy audit report or documentation substantiating that an exception as set forth in section 28-308.2 applies to such building, and (ii) the retro-commissioning report or documentation substantiating that an exception as set forth in section 28-308.3 applies to such building. Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/087 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9170-5",
+              "sectionID": "9170",
+              "reference": "AC 28-116.2.6.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-116.2.6.4 § 28-116.2.6.4 Electrical final inspection. Final inspections for electrical work for which a permit is required shall be performed in accordance with the New York city electrical code. ( L.L. 2026/042, 1/17/2026, eff. 1/17/2026)"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10366-6",
+              "sectionID": "10366",
+              "reference": "MC 307.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "307.3 307.3 Exceptions. This section applies to permanently installed equipment. Window units and through-the-wall air-conditioning units are exempt from the requirements of this section. Section MC 308: Clearance Reduction"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:5110-7",
+              "sectionID": "5110",
+              "reference": "BC 2405.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "2405.1 2405.1 Scope. This section applies to the installation of glass and other transparent, translucent or opaque glazing material installed at a slope more than 15 degrees (0.26 rad) from the vertical plane, including glazing materials in skylights, roofs and sloped walls."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9452-8",
+              "sectionID": "9452",
+              "reference": "AC 28-216.8.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-216.8.2 § 28-216.8.2 Owner application to perform work. The owner of such unsafe building, structure, or premises, or any party interested therein, if such person applies to the commissioner immediately upon the issuing of such precept, shall be allowed to perform the requirements of such precept at his or her own cost and expense, if the performance shall be done immediately and in accordance with the requirements of such precept and other applicable laws and rules and such other requirements as the commissioner shall impose."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11811-9",
+              "sectionID": "11811",
+              "reference": "PC 201.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "201.4 201.4 Terms not defined. Where terms are not defined through the methods authorized by this section, such terms shall have ordinarily accepted meanings such as the context implies. Section PC 202: General Definitions ACCEPTED ENGINEERING PRACTICE. That which conforms to accepted principles, tests or standards of nationally recognized technical or scientific authorities. ACCESS (TO). That which enables a device, fixture, appliance or equipment to be reached by ready access or by a means that first requires the removal or movement of a panel, door or similar obstruction (see \"Ready access (to)\"). ACCESS COVER. A removable plate, usually secured by bolts or screws, to permit access to a pipe or pipe fitting for the purposes of inspection, repair or cleaning. ADAPTER FITTING. An approved connecting device that suitably and properly joins or adjusts pipes and fittings that do not otherwise fit together . AIR BREAK (Drainage System). A piping arrangement in which a drain from a fixture, appliance or device discharges indirectly into another fixture, receptacle or interceptor at a point below the flood level rim and above the trap seal. AIR GAP (Drainage System). The unobstructed vertical distance through the free atmosphere between the outlet of the waste pipe and the flood level rim of the receptacle into which the waste pipe is discharging. AIR GAP (Water Distribution System). The unobstructed vertical distance through the free atmosphere between the lowest opening from any pipe or faucet supplying water to a tank, plumbing fixture or other device and the flood level rim of the receptacle. ALTERNATIVE ENGINEERED DESIGN. A plumbing system that performs in accordance with the intent of this code and provides an equivalent level of performance for the protection of public health, safety and welfare. The system design is not specifically regulated by this code. ANCHORS. See \"Supports.\" ANTISIPHON. A term applied to valves or mechanical devices that eliminate siphonage. AREA DRAIN. A receptacle designed to collect surface or storm water from an open area. ASPIRATOR. A fitting or device supplied with water or other fluid under positive pressure that passes through an integral orifice or constriction, causing a vacuum. Aspirators are also referred to as suction apparatus, and are similar in operation to an ejector. BACKFLOW. The undesirable reversal of flow of water or mixtures of water and other liquids, gases or other substances into the distribution pipes of the potable supply of water from any source or sources or the undesirable reversal of flow from the intended direction of flow in the drainage system due to a system stoppage, system overload or a higher pressure on the drainage pipe side of the house trap. Backpressure, low head. A pressure less than or equal to 4.33 psi (29.88 kPa) or the pressure exerted by a 10-foot (3048 mm) column of water. Backsiphonage. The backflow of potentially contaminated water into the potable water system as a result of the pressure in the potable water system falling below atmospheric pressure of the plumbing fixtures, pools, tanks or vats connected to the potable water distribution piping. Drainage. A reversal of flow in the drainage system. Water supply system. The flow of water or other liquids, mixtures or substances into the distribution pipes of a potable water supply from any source except the intended source. BACKFLOW CONNECTION. Any arrangement whereby backflow is possible. BACKFLOW PREVENTER. A backflow prevention assembly, a backflow prevention device or other means or method to prevent backflow into the potable water supply. BACKWATER VALVE. A device or valve installed in the building drain, sewer or any branch line where such drain or branch is subject to backflow, and which prevents drainage or waste from backing up into a lower level or fixtures and causing a flooding condition. BALL COCK. See \"Fill Valve.\" BASE FLOOD ELEVATION. Refer to Section G201.2 of Appendix G of the New York City Building Code . BATHROOM GROUP. A group of fixtures consisting of a water closet, lavatory, bathtub or shower, including or excluding a bidet, an emergency floor drain or both. Such fixtures are located together in the same room. BEDPAN STEAMER OR BOILER. A fixture utilized for scalding bedpans or urinals by direct application of steam or boiling water. BEDPAN WASHER AND STERILIZER. A fixture designed to wash bedpans and to flush the contents into the sanitary drainage system. Included are fixtures of this type that provide for disinfecting utensils by scalding with steam or hot water. BEDPAN WASHER HOSE. A device supplied with hot and cold water and located adjacent to a water closet or clinical sink to be utilized for cleansing bedpans. BRANCH. Any part of the piping system that extends to fixtures on two or less consecutive floors except a riser, main or stack. BRANCH INTERVAL. A vertical measurement of distance, 8 feet (2438 mm) or more in developed length, between the connections of horizontal branches to a drainage stack. Measurements are taken down the stack from the highest horizontal branch connection. BRANCH VENT. A vent connecting one or more individual vents with a vent stack or stack vent. BUILDING DRAIN. That part of the lowest piping of a drainage system that receives the discharge from soil, waste and other drainage pipes inside and that extends to the exterior face of the exterior building wall, or the outlet of the most downstream trap, private manhole, catch basin, detention tank, or similar fixture or equipment, and conveys the drainage directly to the building sewer or, in the absence of building sewer, to an approved place of disposal. Combined. A building drain that conveys both sewage and storm water or other drainage. Sanitary. A building drain that conveys sewage only. Storm. A building drain that conveys storm water or other drainage, but not sewage. BUILDING SEWER. See Sewer, Building sewer. BUILDING SUBDRAIN. That portion of a drainage system that does not drain by gravity into the building sewer. BUILDING TRAP. A device or fitting, without joints within the water seal, installed in the building drain to prevent circulation of air between the drainage system of the building and the building sewer. CIRCUIT VENT. A vent that connects to a horizontal drainage branch and vents two traps to a maximum of eight traps or trapped fixtures connected into a battery. CISTERN. A covered tank for storing rainwater to be utilized for purposes other than in the potable water supply. CLEANOUT. An access opening in the drainage system utilized for the removal of obstructions. Types of cleanouts include a removable plug or cap, and a removable fixture or fixture trap. CLEAR WATER WASTE. Drips from equipment, coil condensate, steam condensate, single pass refrigeration discharge, RPZ discharge, and similar matter. COMBINATION FIXTURE. A fixture combining one sink and laundry tray or a two- or three-compartment sink or laundry tray in one unit. COMBINATION WASTE AND VENT SYSTEM. A specially designed system of waste piping embodying the horizontal wet venting of one or more lavatories, drinking fountains or floor drains by means of a common waste and vent pipe adequately sized to provide free movement of air above the flow line of the drain. COMBINED BUILDING DRAIN. See \"Building drain, combined.\" COMBINED SEWER. See \"Sewer, combined sewer.\" COMMON VENT. A vent connecting at the junction of two fixture drains or to a fixture branch and serving as a vent for both fixtures. CONCEALED FOULING SURFACE. Any surface of a plumbing fixture that is not readily visible and is not scoured or cleansed with each fixture operation. CONDUCTOR. A pipe inside the building that conveys storm water from the roof to a storm or combined building drain. CONTAMINATION. An impairment of the quality of the potable water that creates an actual hazard to the public health through poisoning or the spread of disease by sewage, industrial fluids or waste. CONVEYANCE PIPE. See \"Water Pipe, conveyance.\" COVERED DEVELOPMENT PROJECT. See Section 28-104.11.1 of the Administrative Code. CRITICAL LEVEL (C-L). An elevation (height) reference point that determines the minimum height at which a backflow preventer or vacuum breaker is installed above the flood level rim of the fixture or receptor served by the device. The critical level is the elevation level below which there is a potential for backflow to occur. If the critical level marking is not indicated on the device, the bottom of the device shall constitute the critical level. CROSS CONNECTION. Any physical connection or arrangement between two otherwise separate piping systems, one of which contains potable water and the other either water of unknown or questionable safety or steam, gas or chemical, whereby there exists the possibility for flow from one system to the other, with the direction of flow depending on the pressure differential between the two systems (see \"Backflow\"). CURED-IN-PLACE PIPE (CIPP). A piping repair method utilizing a resin-impregnated, flexible tube inverted into existing conduit by use of a hydrostatic head or air pressure, or by a process that sprays epoxy directly onto the walls of the rehabilitated pipe. DEAD END. A branch leading from a soil, waste or vent pipe; a building drain; or a building sewer, and terminating at a developed length of 2 feet (610 mm) or more by means of a plug, cap or other closed fitting. DEMAND RECIRCULATION WATER SYSTEM. A water distribution system where one or more pumps prime the service hot water piping with heated water upon a demand for hot water. DESIGN FLOOD ELEVATION. Refer to Section G201.2 of Appendix G of the New York City Building Code. DETENTION SYSTEM. A system that slows and temporarily holds rainwater or storm water runoff so that it can be released into the public sewer system at a controlled rate. DEVELOPED LENGTH. The length of a pipeline measured along the centerline of the pipe and fittings. DISCHARGE PIPE. A pipe that conveys the discharge from plumbing fixtures or appliances. DRAIN. Any pipe that carries waste water or water-borne wastes in a building drainage system. DRAINAGE FITTING. The type of fitting or fittings utilized in the drainage system. DRAINAGE FIXTURE UNIT (dfu). A measure of the probable discharge into the drainage system by various types of plumbing fixtures. The drainage fixture-unit value for a particular fixture depends on its volume rate of drainage discharge, on the time duration of a single drainage operation and on the average time between successive operations. DRAINAGE SYSTEM. Piping within a public or private premise that conveys sewage, rainwater or other liquid waste to a point of disposal. A drainage system does not include the mains of a public sewer system or a private or public sewage treatment or disposal plant. Gravity. A drainage system that drains by gravity into the building sewer. Sanitary. A drainage system that carries sewage or similar matter. Storm. A drainage system that carries only stormwater, potable clear water waste, and groundwater. DRINKING FOUNTAIN. A plumbing fixture that is connected to the potable water distribution system and drains to an approved point of disposal. The fixture allows the user to obtain a drink directly from a stream of flowing water without the use of any accessories. DRYWELL. A covered pit constructed so as to permit liquid contents to seep into the ground. DUAL FLUSH WATER CLOSET. A water closet that enables the user to select a high flush for solid waste or a reduced volume, low flush for liquid waste. EFFECTIVE OPENING. The minimum cross-sectional area at the point of water supply discharge, measured or expressed in terms of the diameter of a circle or, if the opening is not circular, the diameter of a circle of equivalent cross-sectional area. For faucets and similar fittings, the effective opening shall be measured at the smallest orifice in the fitting bo"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:4323-10",
+              "sectionID": "4323",
+              "reference": "BC 1901.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1901.3 1901.3 Anchoring to concrete. Anchoring to concrete shall be in accordance with ACI 318 as amended in Section 1908 , and applies to cast-in (headed bolts, headed studs and hooked J- or L-bolts), post-installed expansion (torque-controlled and displacement-controlled), undercut and adhesive anchors."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10176-1",
+              "sectionID": "10176",
+              "reference": "AC 28-507.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-507.4 § 28-507.4 Authorization for temporary residence. The department may issue an authorization for temporary residence for the use of an eligible basement or cellar residence in the program area as an apartment prior to the issuance of a certificate of occupancy or temporary certificate of occupancy in accordance with this section. The owner of an eligible basement or cellar residence may submit an application for an authorization for temporary residence to the department in a form and manner determined by the department. An application for an authorization for temporary residence may not be used as the basis for an enforcement action for illegal occupancy of such residence, provided that nothing in this article shall be construed to prevent the issuance of a vacate order for an imminently hazardous or otherwise unsafe condition. (L.L. 2024/126, 12/18/2024, eff. 6/16/2025)"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9620-3",
+              "sectionID": "9620",
+              "reference": "AC 28-308.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-308.7 § 28-308.7 Rules. The department shall promulgate such rules as are necessary to carry out the provisions of this article in a timely manner, which may include separate fees for filing and review of applications and reports filed pursuant to this article. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/087 and L.L. 2021/126 . Article 309: Benchmarking Energy and Water Use and Disclosure of Energy Efficiency Scores and Grades (Am. L.L. 2018/033, 1/8/2018, eff. 1/8/2018). Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2018/033 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9577-4",
+              "sectionID": "9577",
+              "reference": "AC 28-308.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-308.2 § 28-308.2 Energy audits required. The owner shall ensure that an energy audit is performed on the base building systems of a covered building prior to filing an energy efficiency report as required by this article. Except as otherwise provided in section 28-308.7, an energy audit shall be performed by or under the supervision of an energy auditor and shall be performed in accordance with rules promulgated by the department. The audit process shall cover the base building systems and shall identify at a minimum: 1. All reasonable measures, including capital improvements, that would, if implemented, reduce energy use and/or the cost of operating the building; 2. For each measure, the associated annual energy savings, the cost to implement, and the simple payback, calculated by a method determined by the department; 3. The building's benchmarking output consistent with the United States Environmental Protection Administration (EPA) Portfolio Manager tool or as otherwise established by the department; 4. A break-down of energy usage by system and predicted energy savings by system after implementation of the proposed measures; and 5. A general assessment of how the major energy consuming equipment and systems used within tenant spaces impact the energy consumption of the base building systems based on a representative sample of spaces. Exceptions: 1. No energy audit is required if the building complies with one of the following as certified by a registered design professional: 1.1. The covered building has received an EPA Energy Star label for at least two of the three years preceding the filing of the building's energy efficiency report. 1.2. There is no EPA Energy Star rating for the building type and a registered design professional submits documentation, as specified in the rules of the department, that the building's energy performance is 25 or more points better than the performance of an average building of its type over a two-year period within the three-year period prior to the filing of an energy efficiency report consistent with the methodology of the Leadership in Energy and Environmental Design (LEED) 2009 rating system for Existing Buildings published by the United States Green Building Council (USGBC) or other rating system or methodology for existing buildings, as determined by the department. 1.3. The covered building has received certification under the LEED 2009 rating system for Existing Buildings published by the USGBC or other rating system for existing buildings, as determined by the department, within four years prior to the filing of the building's energy efficiency report. 2. An energy audit shall not be required for the first energy efficiency report of a simple building that is in compliance with six out of seven of the following items as certified by a registered design professional: 2.1. Individual heating controls. (i) Each dwelling unit in the building has one or more thermostatic controls controlling all the heating units within the dwelling unit and any heated space not within a dwelling unit has one or more thermostatic controls controlling all the heating units within the space, or (ii) the building has a central heating system controlled by an energy management system or a building management system that incorporates temperature sensors located in at least 10 percent of the dwelling units and 10 percent of the heated spaces, except that the total number of sensors required within the building shall not be less than 10 nor more than 30. 2.2. Common area and exterior lighting. Common area (lighting outside of tenant spaces) and exterior lighting, at a minimum, are in compliance with the provisions of the New York city energy conservation code as in effect for new systems installed on or after July 1, 2010. 2.3. Low flow faucets and shower heads. All faucets and showerheads within the building, at a minimum, meet the standards of table 604.4 of the New York city plumbing code as in effect for new systems installed on or after July 1, 2010. 2.4. Pipe insulation. All exposed pipes that are used to convey heat or hot water are insulated, at a minimum, in accordance with the standards of the New York city energy conservation code as in effect for new systems installed on or after July 1, 2010. 2.5. Domestic hot water. All domestic hot water tanks that do not have built-in insulation are insulated with a minimum insulation value of R-8. 2.6. Washing machines. All common area clothes washing machines are front loading. 2.7. Cool roof. The roof complies with section 1504.8 of the New York city building code as in effect for new buildings constructed on or after July 1, 2010. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/087 and L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9588-5",
+              "sectionID": "9588",
+              "reference": "AC 28-308.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-308.3 § 28-308.3 Retro-commissioning required. The owner shall ensure that retro-commissioning is performed on the base building systems of a covered building prior to filing an energy efficiency report as required by this article. Except as otherwise provided in section 28-308.7, retro-commissioning shall be performed by or under the supervision of a retro-commissioning agent in accordance with rules promulgated by the department. Such rules, at a minimum, shall ensure that sufficient analysis, corrections and testing have been done so that the base building systems meet the following criteria demonstrating efficient operation: 1. Operating protocols, calibration, and sequencing: 1.1. HVAC temperature and humidity set points and setbacks are appropriate and operating schedules reflect major space occupancy patterns and the current facility requirements. 1.2. HVAC sensors are properly calibrated. 1.3. HVAC controls are functioning and control sequences are appropriate for the current facility requirements. 1.4. Loads are distributed equally across equipment when appropriate (i.e. fans, boilers, pumps, etc. that run in parallel). 1.5. Ventilation rates are appropriate for the current facility requirements. 1.6. System automatic reset functions are functioning appropriately, if applicable. 1.7. Adjustments have been made to compensate for oversized or undersized equipment so that it is functioning as efficiently as possible. 1.8. Simultaneous heating and cooling does not occur unless intended. 1.9. HVAC system economizer controls are properly functioning, if applicable. 1.10. The HVAC distribution systems, both air and water side, are balanced. 1.11. Light levels are appropriate to the task. 1.12. Lighting sensors and controls are functioning properly according to occupancy, schedule, and/or available daylight, where applicable. 1.13. Domestic hot water systems have been checked to ensure proper temperature settings. 1.14. Water pumps are functioning as designed. 1.15. System water leaks have been identified and repaired. 2. Cleaning and repair: 2.1. HVAC equipment (vents, ducts, coils, valves, soot bin, etc.) is clean. 2.2. Filters are clean and protocols are in place to replace, as appropriate. 2.3. Light fixtures are clean. 2.4. Motors, fans, and pumps, including components such as belts, pulleys, and bearings, are in good operating condition. 2.5. Steam traps have been replaced as required to maintain efficient operation, if applicable. 2.6. Manual overrides on existing equipment have been remediated. 2.7. Boilers have been tuned for optimal efficiency, if applicable. 2.8. Exposed hot and chilled water and steam pipes three (3) inches or greater in diameter with associated control valves are insulated in accordance with the standards of the New York city energy conservation code as in effect for new systems installed on or after July 1, 2010. 2.9. In all easily accessible locations, sealants and weather stripping are installed where appropriate and are in good condition. 3. Training and documentation: 3.1. Permits for all HVAC, electrical and plumbing equipment are in order. 3.2. Critical operations and maintenance staff have received appropriate training, which may include labor/management training, on all major equipment and systems and general energy conservation techniques. 3.3. Operational and maintenance record keeping procedures (log books, computer maintenance records, etc.) have been implemented. 3.4. The following documentation is on site and accessible to the operators: the operations and maintenance manuals, if such manuals are still available from the manufacturer, the maintenance contracts, and the most recent retro-commissioning report. Exception: No retro-commissioning is required if the covered building has received certification under the LEED 2009 rating system for Existing Buildings published by the USGBC or other rating system for existing buildings, as determined by the department, within two years prior to the filing of the building's energy efficiency report and earned the LEED point for Existing Building Commissioning investigation and analysis and the LEED point for Existing Building Commissioning implementation. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/087 and L.L. 2021/126 ."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260831-zoning-canonical-source-output-table-legend-v17",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-table-context-integrity-v25",
+          "retrievalQuery": "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 27151,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 4,
+            "topicDependencyCount": 0,
+            "characterCount": 27151,
+            "resolverFailureCount": 9,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 9,
+              "text": "9 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-descendant-coverage-scope-v26",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T04:49:59.710Z"
+          },
+          "webSupportRequested": true,
+          "webSupportReasons": [
+            "dob_workflow_requested"
+          ],
+          "allowOfficialGuidanceOnly": true,
+          "officialWorkflow": {
+            "version": "20260908-dob-procedural-sources-v1",
+            "topic": "builders_pavement",
+            "retrievalMethod": "official_workflow_catalog"
+          },
+          "webSupportSearched": true,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "official_supporting_guidance",
+        "authorityLabel": "Official supporting guidance — noncontrolling",
+        "sourceAsOf": "2026-09-08T04:49:59.710Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "outside_library_support",
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "durationMilliseconds": 7767,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "6462f6ba-63ac-473b-b4af-8716959e9f7d",
+          "createdAt": "2026-09-08T04:49:59.658Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 3450,
+          "cachedInputTokens": 0,
+          "outputTokens": 226,
+          "totalTokens": 3676,
+          "estimatedCostUSD": 0.005431,
+          "actualProviderCostUSD": 0.005431,
+          "conservativeProviderCostUSD": 0.011697,
+          "durationMilliseconds": 7722,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": true,
+          "webSupportSearched": true,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-018",
+      "question": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area.\n\nWhat documents and conditional responses are required under the August 2026 workflow?",
+      "status": "completed",
+      "startedAt": "2026-09-08T04:50:07.989Z",
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260908-document-summary-v1",
+        "evidenceVersion": "20260908-table-context-integrity-v25:official-documents",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-prior-code-technical-scope-v5",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T04:50:08.004Z"
+        },
+        "answerText": "For an initial New Building–General Construction filing on a DOB NOW property flagged as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area, the August 2026 workflow adds two required-document items to the filing: a DEC Jurisdictional Determination and a DEC Permit. This filing type is among the listed scope of filings subject to the new pre-approval document requirements. [DOB NOW: Build release notes, p. 12](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=12) [DOB NOW: Build release notes, p. 13](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=13)\n\nSubmit the DEC Jurisdictional Determination in every case. If the determination says a DEC Permit is required, submit that permit before DOB approval. If it says a DEC Permit is not required, submit a waiver request for the DEC Permit required-document item instead. The release notes describe this as a DOB NOW filing workflow and pre-approval documentation requirement; they do not themselves determine wetland jurisdiction, establish legal compliance, or grant permit approval. [DOB NOW: Build release notes, p. 13](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=13)\n\nOfficial supporting guidance — noncontrolling and not an enacted-code conclusion.",
+        "conclusion": "For an initial New Building–General Construction filing on a DOB NOW property flagged as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area, the August 2026 workflow adds two required-document items to the filing: a DEC Jurisdictional Determination and a DEC Permit. This filing type is among the listed scope of filings subject to the new pre-approval document requirements. [DOB NOW: Build release notes, p. 12](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=12) [DOB NOW: Build release notes, p. 13](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=13)",
+        "supportedPoints": [],
+        "explanation": "Submit the DEC Jurisdictional Determination in every case. If the determination says a DEC Permit is required, submit that permit before DOB approval. If it says a DEC Permit is not required, submit a waiver request for the DEC Permit required-document item instead. The release notes describe this as a DOB NOW filing workflow and pre-approval documentation requirement; they do not themselves determine wetland jurisdiction, establish legal compliance, or grant permit approval. [DOB NOW: Build release notes, p. 13](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=13)\n\nOfficial supporting guidance — noncontrolling and not an enacted-code conclusion.",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This answer summarizes retrieved official supporting guidance; it does not establish an enacted-code conclusion.",
+          "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [
+          {
+            "sourceID": "dob-build-release-notes",
+            "claimID": "official-passage-8a7766c7027d1fb71340e371",
+            "claim": "[PDF page 12](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=12) — August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas Filings in DOB NOW: Build for specific Job Types and Work Types on properties that are flagged as Tidal Wetlands (TW), Freshwater Wetlands (FW), and/or Coastal Erosion Hazard Areas (CEHA) will have new required documents prior to approval. Job Types and Work Types • New Building (NB): Initial (I1), General Construction (GC) Work Type • New Building with Existing Elements to Remain (NBEE), and Alteration - CO (Alt - CO) or Alteration (Alt) with Horizontal Enlargement. • Earthwork (EA) and Foundation (FO) Work Types Buildings identified by the NYS Department of Environmental Conservation (DEC) as being in an area that may be affected by Tidal Wetlands, Freshwater Wetlands and/or Coastal Erosion Hazard Area will have a flag on the DOB NOW Property Profile."
+          },
+          {
+            "sourceID": "dob-build-release-notes",
+            "claimID": "official-passage-bd1acc9d874e42c204e38873",
+            "claim": "[PDF page 13](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=13) — August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas (cont’d) Required Documents Filings that meet the criteria will have two required documents added to the filing: DEC Jurisdictional Determination and DEC Permit. All applicants will be required to submit the DEC Jurisdictional Determination. If that document indicates that a DEC Permit is required, it must be submitted prior to approval. If the determination indicates that a DEC Permit is not required, a waiver request for the DEC Permit required document should be submitted. See the August 2026 Service Notice for more information."
+          }
+        ],
+        "supportingSources": [
+          {
+            "id": "dob-build-release-notes",
+            "title": "DOB NOW: Build release notes",
+            "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+            "publisher": "NYC Department of Buildings",
+            "catalogReviewedOn": "2026-09-08",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "controlling": false,
+            "attributedClaims": [
+              {
+                "id": "official-passage-8a7766c7027d1fb71340e371",
+                "text": "[PDF page 12](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=12) — August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas Filings in DOB NOW: Build for specific Job Types and Work Types on properties that are flagged as Tidal Wetlands (TW), Freshwater Wetlands (FW), and/or Coastal Erosion Hazard Areas (CEHA) will have new required documents prior to approval. Job Types and Work Types • New Building (NB): Initial (I1), General Construction (GC) Work Type • New Building with Existing Elements to Remain (NBEE), and Alteration - CO (Alt - CO) or Alteration (Alt) with Horizontal Enlargement. • Earthwork (EA) and Foundation (FO) Work Types Buildings identified by the NYS Department of Environmental Conservation (DEC) as being in an area that may be affected by Tidal Wetlands, Freshwater Wetlands and/or Coastal Erosion Hazard Area will have a flag on the DOB NOW Property Profile.",
+                "verbatimText": "August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas\nFilings in DOB NOW: Build for specific Job Types and Work Types on properties that are flagged as Tidal Wetlands (TW),\nFreshwater Wetlands (FW), and/or Coastal Erosion Hazard Areas (CEHA) will have new required documents prior to\napproval.\nJob Types and Work Types\n• New Building (NB): Initial (I1), General Construction (GC) Work Type\n• New Building with Existing Elements to Remain (NBEE), and Alteration - CO (Alt - CO) or Alteration (Alt) with Horizontal\nEnlargement.\n• Earthwork (EA) and Foundation (FO) Work Types\nBuildings identified by the NYS Department of\nEnvironmental Conservation (DEC) as being in an\narea that may be affected by Tidal Wetlands,\nFreshwater Wetlands and/or Coastal Erosion\nHazard Area will have a flag on the DOB NOW\nProperty Profile.",
+                "heading": "PDF page 12",
+                "intro": "",
+                "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+                "pageNumber": 12,
+                "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=12"
+              }
+            ],
+            "sourceContentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+            "sourceValidation": "official_pdf",
+            "pageCount": 159,
+            "textlessPages": [],
+            "extractionLimitations": [
+              "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+            ],
+            "claim": "[PDF page 12](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=12) — August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas Filings in DOB NOW: Build for specific Job Types and Work Types on properties that are flagged as Tidal Wetlands (TW), Freshwater Wetlands (FW), and/or Coastal Erosion Hazard Areas (CEHA) will have new required documents prior to approval. Job Types and Work Types • New Building (NB): Initial (I1), General Construction (GC) Work Type • New Building with Existing Elements to Remain (NBEE), and Alteration - CO (Alt - CO) or Alteration (Alt) with Horizontal Enlargement. • Earthwork (EA) and Foundation (FO) Work Types Buildings identified by the NYS Department of Environmental Conservation (DEC) as being in an area that may be affected by Tidal Wetlands, Freshwater Wetlands and/or Coastal Erosion Hazard Area will have a flag on the DOB NOW Property Profile."
+          },
+          {
+            "id": "dob-build-release-notes",
+            "title": "DOB NOW: Build release notes",
+            "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+            "publisher": "NYC Department of Buildings",
+            "catalogReviewedOn": "2026-09-08",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "controlling": false,
+            "attributedClaims": [
+              {
+                "id": "official-passage-bd1acc9d874e42c204e38873",
+                "text": "[PDF page 13](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=13) — August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas (cont’d) Required Documents Filings that meet the criteria will have two required documents added to the filing: DEC Jurisdictional Determination and DEC Permit. All applicants will be required to submit the DEC Jurisdictional Determination. If that document indicates that a DEC Permit is required, it must be submitted prior to approval. If the determination indicates that a DEC Permit is not required, a waiver request for the DEC Permit required document should be submitted. See the August 2026 Service Notice for more information.",
+                "verbatimText": "August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas (cont’d)\nRequired Documents\nFilings that meet the criteria will have two required documents added to the filing: DEC Jurisdictional Determination and\nDEC Permit . All applicants will be required to submit the DEC Jurisdictional Determination. If that document indicates that\na DEC Permit is required, it must be submitted prior to approval. If the determination indicates that a DEC Permit is not\nrequired, a waiver request for the DEC Permit required document should be submitted.\nSee the August 2026 Service Notice for more information.",
+                "heading": "PDF page 13",
+                "intro": "",
+                "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+                "pageNumber": 13,
+                "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=13"
+              }
+            ],
+            "sourceContentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+            "sourceValidation": "official_pdf",
+            "pageCount": 159,
+            "textlessPages": [],
+            "extractionLimitations": [
+              "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+            ],
+            "claim": "[PDF page 13](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=13) — August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas (cont’d) Required Documents Filings that meet the criteria will have two required documents added to the filing: DEC Jurisdictional Determination and DEC Permit. All applicants will be required to submit the DEC Jurisdictional Determination. If that document indicates that a DEC Permit is required, it must be submitted prior to approval. If the determination indicates that a DEC Permit is not required, a waiver request for the DEC Permit required document should be submitted. See the August 2026 Service Notice for more information."
+          }
+        ],
+        "citations": [],
+        "officialGuidanceSummary": {
+          "version": "20260908-document-summary-v1",
+          "answerSHA256": "adeae8025000ee9827c0cefa988fbf95cf28a2510653174c2ec9c17e6c0a2533",
+          "verificationInputSHA256": "7d921d9845b95d0999b84e8a291f7b78dafa86a488ab90bc9eaeb08775a3d35d",
+          "verification": {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        },
+        "evidenceSectionIDs": [
+          "8965",
+          "8967",
+          "7900",
+          "7046",
+          "11867",
+          "7135",
+          "8968",
+          "1794",
+          "3432",
+          "7086",
+          "113",
+          "8964",
+          "7899",
+          "11866",
+          "7054",
+          "8786",
+          "7000"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:8965-1",
+          "research-permitext_discovered-id:8967-2",
+          "research-permitext_discovered-id:7900-3",
+          "research-permitext_discovered-id:7046-4",
+          "research-permitext_discovered-id:11867-5",
+          "research-permitext_discovered-id:7135-6",
+          "research-permitext_discovered-id:8968-7",
+          "research-permitext_discovered-id:1794-8",
+          "research-permitext_discovered-id:3432-9",
+          "research-permitext_discovered-id:7086-10",
+          "research-permitext_discovered-id:113-13",
+          "research-permitext_cross_reference-id:8964-4",
+          "research-permitext_cross_reference-id:7899-6",
+          "research-permitext_cross_reference-id:11866-8",
+          "research-permitext_cross_reference-id:7054-10",
+          "research-permitext_cross_reference-id:8786-21",
+          "research-permitext_cross_reference-id:7000-24"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 17,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 0,
+          "governingCitationCount": 0,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 17,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 11,
+          "crossReferenceCount": 6,
+          "supportingWebSourceCount": 1,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 0,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 0
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [],
+          "generalRules": [],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area. What documents and conditional responses are required under the August 2026 workflow?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area. What documents and conditional responses are required under the August 2026 workflow?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [],
+          "supportedPointEvidenceSourceIDs": [],
+          "citedEvidenceSourceIDs": [],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8965-1",
+            "research-permitext_discovered-id:8967-2",
+            "research-permitext_discovered-id:7900-3",
+            "research-permitext_discovered-id:7046-4",
+            "research-permitext_discovered-id:11867-5",
+            "research-permitext_discovered-id:7135-6",
+            "research-permitext_discovered-id:8968-7",
+            "research-permitext_discovered-id:1794-8",
+            "research-permitext_discovered-id:3432-9",
+            "research-permitext_discovered-id:7086-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:8964-4",
+            "research-permitext_cross_reference-id:7899-6",
+            "research-permitext_cross_reference-id:11866-8",
+            "research-permitext_cross_reference-id:7054-10",
+            "research-permitext_cross_reference-id:8786-21",
+            "research-permitext_cross_reference-id:7000-24"
+          ],
+          "claims": []
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [],
+          "claims": []
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260902-generated-typography-v25",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:8965-1",
+            "research-permitext_discovered-id:8967-2",
+            "research-permitext_discovered-id:7900-3",
+            "research-permitext_discovered-id:7046-4",
+            "research-permitext_discovered-id:11867-5",
+            "research-permitext_discovered-id:7135-6",
+            "research-permitext_discovered-id:8968-7",
+            "research-permitext_discovered-id:1794-8",
+            "research-permitext_discovered-id:3432-9",
+            "research-permitext_discovered-id:7086-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:8964-4",
+            "research-permitext_cross_reference-id:7899-6",
+            "research-permitext_cross_reference-id:11866-8",
+            "research-permitext_cross_reference-id:7054-10",
+            "research-permitext_cross_reference-id:8786-21",
+            "research-permitext_cross_reference-id:7000-24"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 0,
+            "citedProvisionCount": 0,
+            "governingCitationCount": 0,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 17,
+            "reviewedOnlyProvisionCount": 17,
+            "assembledSourceCount": 17,
+            "assembledProvisionCount": 17
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:8965-1",
+              "sectionID": "8965",
+              "reference": "AC 28-104.9.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.9.1 § 28-104.9.1 Definitions. As used in section 28-104.9 the following terms shall have the following meanings: COASTAL EROSION HAZARD AREAS. Areas of land as identified on the final map issued by the New York state department of environmental conservation in accordance with section 34-0104 of the New York state environmental conservation law; COASTAL SPECIAL FLOOD HAZARD AREAS. Areas of land as identified on the flood insurance rate maps referenced in New York city building code section G402 of appendix G pursuant to article 36 of the New York state environmental conservation law. COASTAL ZONES AND WATER-SENSITIVE INLAND ZONES. Areas of land comprising tidal wetlands, freshwater wetlands, coastal erosion hazard areas, coastal special flood hazard areas or rivervine and other inland special flood hazard areas. FRESHWATER WETLANDS. Areas of land as identified on the final map issued by the New York state department of environmental conservation in accordance with section 24-0301 of the New York state environmental conservation law, as well as any adjacent areas as such term is defined in section 662.1 of title 6 of the New York code of rules and regulations. RIVERVINE AND OTHER INLAND SPECIAL FLOOD HAZARD AREAS. Areas of land, including floodways, as identified on the flood insurance rate maps referenced in section G402 of the New York city building code pursuant to article 36 of the New York state environmental conservation law. STRUCTURE. Any object constructed, installed or placed in, on or under land or water, including, but not limited to, a building, permanent shed, deck, in-ground or aboveground swimming pool, garage, mobile home, paving, road, public utility service distribution, transmission and collection system, storage tank, pier, dock, wharf, groin, jetty, seawall, revetment, bulkhead or breakwater. TIDAL WETLANDS. Areas of land as identified on the tidal wetland inventory issued by the New York state department of environmental conservation in accordance with section 25-0201 of the New York state environmental conservation law, as well as any adjacent areas as such term is defined in section 661.4 of title 6 of the New York code of rules and regulations; (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022; Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/021 , L.L. 2021/126 , and L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8967-2",
+              "sectionID": "8967",
+              "reference": "AC 28-104.9.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.9.3 § 28-104.9.3 Coordination with department of environmental conservation and other agencies. The commissioner shall not approve construction documents for construction of a new structure, the horizontal enlargement of a structure or to excavate or fill any land, within a tidal wetland, a tidal wetland adjacent area, freshwater wetland, freshwater wetland adjacent area, or coastal erosion hazard area, without documentation satisfactory to the commissioner that the New York state department of environmental conservation, and such other governmental agencies as are applicable, have issued any applicable permits or other approvals for such construction, excavation or fill. Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/021 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7900-3",
+              "sectionID": "7900",
+              "reference": "BC U202.3.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "U202.3.1 U202.3.1 Identification of flood hazard areas. Where an ADU is permitted in accordance with Section U202.3, the construction documents for the ADU shall include a statement to certify that the premises are not located in any one of the following flood hazard areas: 1. Special flood hazard area, in accordance with Section G201 . 1.1. Coastal A-zone. 1.2. Coastal high-hazard area. 1.3. A-zone. 2. 10-year rainfall flood risk area. 3. Coastal flood risk area. Each such statement shall be accompanied with the applicable flood area map."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7046-4",
+              "sectionID": "7046",
+              "reference": "BC G303.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "G303.2 G303.2 Coastal high-hazard areas and coastal A-Zones. In coastal high-hazard areas and coastal A-Zones: 1. New buildings, not including substantial improvements, shall only be authorized landward of the reach of mean high tide. 2. The use of fill for structural support of buildings is prohibited."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11867-5",
+              "sectionID": "11867",
+              "reference": "PC 309.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "309.3 309.3 Coastal high-hazard areas and coastal A zones. Structures located in coastal high-hazard areas and coastal A zones shall meet the requirements of Section 309.2. The plumbing systems, pipes and fixtures shall not be mounted on or penetrate through walls intended to break away under flood loads. Section PC 310: Washroom and Toilet Room Requirements"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7135-6",
+              "sectionID": "7135",
+              "reference": "BC G308.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "G308.7 G308.7 Nonstructural concrete slabs in coastal high-hazard areas and coastal A-Zones. In coastal high-hazard areas and coastal A-Zones, nonstructural concrete slabs used as parking pads, enclosure floors, landings, decks, walkways, patios and similar nonstructural uses are permitted beneath or adjacent to buildings and structures provided that the concrete slabs shall be constructed in accordance with ASCE 24, Section 9.3."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8968-7",
+              "sectionID": "8968",
+              "reference": "AC 28-104.9.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.9.4 § 28-104.9.4 Compliance with special flood hazard area requirements mandated within special flood hazard areas. Within coastal special flood hazard areas and special flood hazard areas, the commissioner shall not approve construction documents for construction or alteration of buildings or structures, including alterations pursuant to section 28-101.4.3 of this code, or for any other activity regulated by section G201 of appendix G of the New York city building code, unless the application complies with the requirements of appendix G of the New York city building code. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022; Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/021 , L.L. 2021/126 , and L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:1794-8",
+              "sectionID": "1794",
+              "reference": "BC 907.2.12.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "907.2.12.2 907.2.12.2 System response. The following minimum system actuations and responses shall be required upon approval by the department and the Fire Department. The activation of two or more smoke detectors, a single smoke detector equipped with an alarm verification feature, the automatic sprinkler system or other approved fire detection device shall automatically do all of the following: 1. Cause illumination of the means of egress with light of not less than 1 footcandle (11 lux) at the walking surface level. 2. Stop any conflicting or confusing sounds and visual distractions. 3. Activate an approved directional exit marking that will become apparent in an emergency."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:3432-9",
+              "sectionID": "3432",
+              "reference": "BC 1603.1.8",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1603.1.8 1603.1.8 Flood hazard areas. Construction documents for buildings and other structures located in flood hazard areas shall comply with provisions of Section G104.2.1."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7086-10",
+              "sectionID": "7086",
+              "reference": "BC G304.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "G304.2 G304.2 Coastal high-hazard area construction standards. In addition to the requirements of ASCE 24, the following standards shall apply to post-FIRM construction, horizontal enlargements and substantial improvements located within coastal high-hazard area. 1. Foundation. The lowest floor shall be elevated on adequately anchored pilings or columns and securely anchored to such piles or columns to prevent flotation, collapse and lateral movement resulting from wind and flood loads acting simultaneously on all building components, and other load requirements of Chapter 16 and this appendix. 2. Lowest horizontal member. The lowest portion of the lowest horizontal structural member of the lowest floor (excluding the pilings or columns) shall be at or above the design flood elevation specified in ASCE 24, Table 4-1. 3. Below the lowest horizontal member. Spaces below the lowest horizontal member shall be either: 3.1. Free of obstructions; or 3.2. Enclosed with breakaway walls providing unconditioned space useable solely for parking of vehicles, building access, storage or crawl space. Such breakaway walls shall: 3.2.1. Be of an open lattice type construction only; 3.2.2. Meet the load requirements of Section 5.3.3 of ASCE 7; and 3.2.3. Meet the additional requirements of ASCE 24. 4. Materials. Only flood-damage-resistant materials and finishes shall be utilized below the design flood elevation specified in ASCE 24, Table 5-1; 5. Utilities and equipment. Utilities and attendant equipment shall be located at or above the design flood elevation specified in ASCE 24, Table 7-1, or shall be constructed so as to both resist the wave action and prevent water from entering or accumulating within the components during conditions of flooding in accordance with ASCE 24; 5.1. Additional requirements. The structure shall comply with Items 5.1 through 5.4 of Section G304.1.1. 6. Prohibitions. The following shall be prohibited in coastal high-hazard areas: 6.1. Development, including land disturbing activities, seaward of the reach of mean high tide; 6.2. Use of fill for structural support of buildings; and 6.3. Man-made alterations of sand dunes that would increase potential damage to buildings. 7. Certifications. Applications shall contain applicable certifications in accordance with Section G104.2.3; and 8. Special inspections. Special inspections shall be as required by Section G107 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-13",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ALARM VERIFICATION FEATURE. A feature of automatic fire detection and alarm systems to reduce unwanted alarms wherein smoke detectors report alarm conditions for a minimum period of time, or confirm alarm conditions within a given time period, after being automatically reset, in order to be accepted as a valid alarm-initiation signal. AUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is heated to its thermal rating or above, allowing water to discharge over a specified area. DESIGN FLOOD ELEVATION . The applicable elevation specified in ASCE 24 , Tables 2 - 1 , 4 - 1 , 5 - 1 , 6 - 1 , or 7 - 1 , depending on the flood design class designated in ASCE 24 , Table 1 - 1 . FLOOD HAZARD AREA. The following two areas: 1. The area within a flood plain subject to a 1-percent or greater chance of flooding in any year. Also defined as the \"special flood hazard area\". 2. Where buildings are classified as Flood Design Class 4, the area within a flood plain delineated as shaded X-Zones. OTHER STRUCTURES . Structures , other than buildings , for which loads are specified in Chapter 16 . SAND DUNES. Naturally occurring accumulations of sand in ridges or mounds landward of a beach. SMOKE DETECTOR . A listed device that senses visible or invisible particles of combustion or smoke . SPECIAL FLOOD HAZARD AREA . Land in the floodplain subject to a 1 % or greater chance of flooding in any given year ; area delineated on the Flood Insurance Rate Map as Zone A , AE , A1 - 30 , A99 , AR , AO , AH , V , VO , VE , or V1 - 30 . Such areas include A - Zones , Coastal A - Zones , and V - Zones ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8964-4",
+              "sectionID": "8964",
+              "reference": "AC 28-104.9",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.9 § 28-104.9 Coastal zones and water-sensitive inland zones. Construction documents shall comply with sections 28-104.9.1 through 28-104.9.6 relating to work in coastal zones and water-sensitive inland zones. Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/021 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:7899-6",
+              "sectionID": "7899",
+              "reference": "BC U202.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "U202.3 U202.3 Prohibited locations. An ADU shall not be permitted in a basement or cellar of a building in the following locations, except as otherwise provided pursuant to the New York City Zoning Resolution: 1. Within the special flood hazard area in accordance with Appendix G . 2. Within the 10-year rainfall flood risk area. 3. Within the coastal flood risk area."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:11866-8",
+              "sectionID": "11866",
+              "reference": "PC 309.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "309.2 309.2 Flood hazard. For structures located in flood hazard areas, the following systems and equipment shall be located and installed as required by Appendix G of the New York City Building Code : 1. Water service pipes. 2. Pump seals in individual water supply systems where the pump is located below the design flood elevation. 3. Covers on potable water wells shall be sealed, except where the top of the casing well or pipe sleeve is elevated to not less than 1 foot (305 mm) above the design flood elevation. 4. Sanitary drainage piping. 5. Storm drainage piping. 6. Manhole covers shall be sealed, except where elevated to or above the design flood elevation. 7. Other plumbing fixtures, faucets, fixture fittings, piping systems and equipment. 8. Water heaters. 9. Vents and vent systems. Exception: In accordance with Appendix G of the New York City Building Code , the above systems are permitted to be located below the design flood elevation provided that the systems are designed and installed to prevent water from entering or accumulating within their components and the systems are constructed to resist hydrostatic and hydrodynamic loads and stresses, including the effects of buoyancy, during the occurrence of flooding to the design flood elevation."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:7054-10",
+              "sectionID": "7054",
+              "reference": "BC G304.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "G304.1.1 G304.1.1 Residential. For buildings or structures that are residential (for flood zone purposes), all post-FIRM new buildings, horizontal enlargements and substantial improvements shall comply with the applicable requirements of this appendix and ASCE 24, and shall be elevated as follows: 1. Lowest floor. The lowest floor, including the basement (for flood zone purposes), shall be elevated to or above the design flood elevation specified in ASCE 24, Table 2-1; 2. Enclosures below the design flood elevation. Enclosed spaces below the design flood elevation specified in ASCE 24, Table 2-1, shall be useable solely for parking of vehicles, building access, storage, or crawlspace, and shall be wet floodproofed in accordance with ASCE 24. Breakaway walls are not required in A-Zones; 2.1. A restrictive declaration noting the above restriction shall be filed with the City Register or County Clerk, and the City Register File Number (CRFN) shall be identified in the permit application and on the certificate of occupancy. 3. Under-floor spaces. The finished ground level of an under-floor space, such as a crawl space, shall be equal to or higher than the outside finished ground level on at least one side; 4. Materials. Only flood-damage-resistant materials and finishes shall be utilized below the design flood elevation specified in ASCE 24, Table 5-1; 5. Utilities and equipment. Utilities and attendant equipment shall be located at or above the design flood elevation specified in ASCE 24, Table 7-1, or with the exception of the items below, shall be constructed so as to prevent water from entering or accumulating within the components during conditions of flooding in accordance with ASCE 24. 5.1 Fire protection systems and equipment. The following fire protection systems and equipment shall be located at or above the design flood elevation specified in ASCE 24, Table 7-1, except that where the system or equipment or portion thereof serves only spaces located below such design flood elevation, the system or equipment or portion thereof may be located at or above such design flood elevation: 5.1.1. Sprinkler control valves that are not outside stem and yoke valves; 5.1.2. Fire standpipe control valves that are not outside stem and yoke valves; 5.1.3. Sprinkler booster pumps and fire pumps; 5.1.4. Dry pipe valve-related electrically operated alarm appurtenances; 5.1.5. Alarm control panels for water and non-water fire extinguishing systems; 5.1.6. Alarm control panels for sprinkler systems, pre-action sprinkler systems, deluge sprinkler systems, and combined dry pipe and pre-action sprinkler systems; 5.1.7. Electrically operated waterflow detection devices serving sprinkler systems and 5.1.8. Air compressors serving sprinkler systems and pre-action sprinkler systems. 5.2 Fire alarm systems and components. Where a zoning indicator panel is provided at the main building entrance in accordance with Section 907.6.3.1 of this code and such panel is located at or below 5 feet (1524 mm) above the design flood elevation specified in ASCE 24, Table 7-1, at least one secondary zoning indicator panel complying with the following requirements shall be provided: 5.2.1. The secondary zoning indicator panel, associated controls, power supplies and means of transferring control shall be provided at least 5 feet (1524 mm) above the design flood elevation specified in ASCE 24, Table 7-1, in a location accessible to responding Fire Department personnel and approved by the department and the Fire Department and 5.2.2. Where the secondary zoning indicator panel or associated controls are only operable upon transfer of control from another zoning indicator panel, such transfer shall be by a means that is approved by the Fire Department. 5.3 Fuel-oil piping systems. The following requirements shall apply to fuel-oil piping systems, as defined by Section 202 of the New York City Mechanical Code : 5.3.1. Fill piping that does not terminate in a watertight terminal approved by the department shall terminate at least 3 feet (914 mm) above the design flood elevation specified in ASCE 24, Table 7-1 and 5.3.2. Normal vent piping and emergency vent piping shall terminate at least 3 feet (914 mm) above the design flood elevation specified in ASCE 24, Table 7-1. 5.4 Plumbing systems and components. The structure shall comply with the following requirements: 5.4.1. Relief vents and fresh air intakes. Relief vents and fresh air intakes serving building traps in accordance with Section 1002.6 of the New York City Plumbing Code shall be carried above grade and shall terminate in a screened outlet that is located outside of the building and at or above the design flood elevation specified in ASCE 24, Table 7-1 and 5.4.2. Reduced pressure zone backflow preventers. 5.4.2.1. Primary reduced pressure principle backflow preventers complying with the requirements of the Department of Environmental Protection shall be located at or above the design flood elevation specified in ASCE 24, Table 7.1. 5.4.2.2. Secondary reduced pressure principle backflow preventers complying with Section 608.13.2 of the New York City Plumbing Code and backflow preventers with intermediate atmospheric vents complying with Section 608.13.3 of the New York City Plumbing Code shall be located at or above the design flood elevation specified in ASCE 24, Table 7-1. 5.4.3. Relief vents for gas service, equipment, and appliance pressure regulators. Relief vents for gas service, equipment, and appliance pressure regulators complying with the New York City Fuel Gas Code shall be located at or above the design flood elevation specified in ASCE 24, Table 7.1. 6. Certifications. Applications shall contain applicable certifications in accordance with Section G104.5; and 7. Special inspections. Special inspections shall be as required by Section G107 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8786-21",
+              "sectionID": "8786",
+              "reference": "AC 28-101.4.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.3 § 28-101.4.3 Optional use of the 1968 building code for work on prior code buildings. Exceptions: 1. Fuel gas, plumbing, electrical, and mechanical work. The installation of and work on all appliances, equipment and systems regulated by the New York city fuel gas code, the New York city plumbing code, the New York city electrical code, and the New York city mechanical code shall be governed by applicable provisions of those codes relating to new and existing installations. 2. Fire protection systems. Alterations of buildings and changes of use or occupancy shall be governed by chapter 9 of the New York city building code, subject to special provisions for prior code buildings as set forth therein. 3. Elevators, conveyors and amusement rides. The installation of and work on elevators, conveyors, and amusement rides shall be governed by chapter 30 and appendix K of the New York city building code and the rules of the department, subject to special provisions for prior code buildings as set forth therein. 4. Safety during construction operations. Safety of public and property during construction operations including demolition shall be governed by chapter 33 of the New York city building code. 5. Accessibility. Alterations, including minor alterations, of buildings and changes of use or occupancy, shall be governed by chapter 11 of the New York city building code, subject to special provisions for prior code buildings as set forth therein. 6. Encroachments into the public right of way. Encroachments onto the public right of way shall be governed by chapter 32 of the New York city building code. 7. Administration and enforcement. Except as otherwise limited by the commissioner, administration and enforcement of the 1968 building code shall be in accordance with this code, including but not limited to approval of construction documents, issuance of permits and certificates of occupancy, tests and inspections, penalties and enforcement. 8. Special inspections. Controlled inspections and semi-controlled inspections as referenced in the 1968 building code shall be deemed to be special inspections and shall be governed by the provisions of this code relating to special inspections. 9. Materials. Materials regulated in their use by the 1968 building code shall be subject to applicable provisions of this code. 10. Security grilles. The installation and replacement of security grilles shall comply with section 1010.1.4.4 of the New York city building code. 11. Energy efficiency. All work related to energy efficiency shall be regulated by the New York city energy conservation code. 12. Roof recovering and replacements. 12.1 Installation and materials. Work involving the recovering or replacing of an existing roof covering shall be governed by sections 1511.1 through 1511.7 of the New York city building code; 12.2 Cool roofs. Work involving the recovering or replacing of an existing roof covering shall comply with section 1504.9 of the New York city building code unless the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46 m 2 ). 12.3 Green roofs. Notwithstanding the applicant's election to use the 1968 building code or prior code, work involving green roof systems and container gardens shall be permitted to be performed pursuant to Chapter 15 of the New York city building code. 12.4 Sustainable roofs. Work involving the replacing of an entire existing roof deck or roof assembly shall comply with section 1512.2 of the New York city building code. 13. Handrails. Where the alteration of a building includes the addition or replacement of an entire stair enclosure including the stairs, handrails shall comply with section 1011.11 and section 1014 of the New York city building code. Where the alteration of a building includes the addition or replacement of ramps, handrails shall comply with section 1012.8 and section 1014 of such code. 14. Guards. Where the alteration or repair of a building involves the addition or replacement of guards, such guards shall comply with sections 1015 and 1607.8 of the New York city building code. 15. Flood hazard areas. Within flood hazard areas in accordance with section 28-104.9.4 , all work for any activity regulated by Appendix G of the New York city building code shall be governed by such appendix. 16. Structural. The use of load resistance factor design (LRFD), calculation of live loads, and applicability of seismic and wind loads shall be governed by special provisions for prior code buildings as set forth in section 1601.2 of the New York city building code. 17. Emergency and standby power systems. The installation of and work on emergency and standby power systems shall comply with section 2702.1 of the New York city building code. 18. Parking garages and open parking lots. Parking garages and open parking lots shall comply with section 406.4.10 or 406.9.8 of the New York city building code, as applicable. 19. Mold protection. Alterations shall comply with sections 2506 and 2509 of the New York city building code relating to areas subject to moisture or water damage. 20. Where the alteration of a building includes the replacement of all exterior glazing, such alteration shall comply with section 1403.8 of the New York city building code. (Am. L.L. 2019/094, 5/19/2019, eff. 11/15/2019; Am. L.L. 2020/015, 1/10/2020, eff. 1/10/2021; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022; Am. L.L. 2024/055, 4/6/2024, eff. 12/21/2025; Am. L.L. 2024/128, 12/21/2024, eff. 12/21/2025) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2011/021 , L.L. 2013/130 , L.L. 2014/013 , L.L. 2020/015 , L.L. 2021/126 , L.L. 2024/055 , and L.L. 2024/128 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:7000-24",
+              "sectionID": "7000",
+              "reference": "BC G104.2.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "G104.2.1 G104.2.1 Flood zone compliance plans. The permit application shall include flood zone compliance plans. Such plans shall include plans and drawings, shall be sealed by a registered design professional and shall include a site plan and the following information and any other data as may be required by the department: 1. Flood design class assigned according to ASCE 24; 2. A delineation of the flood hazard areas, including identification of the base flood elevation(s), design flood elevations and stillwater flood depth; 3. If applicable, the location of the regulatory floodway; 4. For all proposed structures, spot ground elevations at building corners and in 20-foot (6096 mm) or smaller intervals along the foundation footprint, or 1-foot (305 mm) contour elevations throughout the building site; 5. Proposed locations of water supply, sanitary sewer, and utilities; 6. Drainage patterns and facilities; 7. Foundation design details, including but not limited to: 7.1. Proposed elevation of the lowest floor including basement (for flood zone purposes) of all structures; 7.2. For crawl spaces and enclosed parking, storage and building access that are wet floodproofed below the design flood elevation, location and total net area of foundation openings in accordance with ASCE 24; 7.3. For dry floodproofed spaces in buildings or structures that are nonresidential (for flood zone purposes), the proposed elevation to which the enclosure will be dry floodproofed in accordance with ASCE 24; 7.4. Any proposed fill and excavation details ; and 7.5. In coastal high-hazard areas and coastal A-zones, the proposed elevation of the bottom of the lowest horizontal structural member of the lowest floor; and 8. For structures in coastal high-hazard areas or coastal A-zones, and for dry-floodproofed structures: flood loading and parameters including average velocity of water (V), debris impact load (F i ), scour depths, and wave loads (F t or F D ). Exception: Applications for subdivisions shall comply with Section G302 ."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260831-zoning-canonical-source-output-table-legend-v17",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-table-context-integrity-v25",
+          "retrievalQuery": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area. What documents and conditional responses are required under the August 2026 workflow?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area. What documents and conditional responses are required under the August 2026 workflow?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area. What documents and conditional responses are required under the August 2026 workflow?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area. What documents and conditional responses are required under the August 2026 workflow?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": true,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 26207,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 6,
+            "topicDependencyCount": 0,
+            "characterCount": 26207,
+            "resolverFailureCount": 13,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 13,
+              "text": "13 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "referenced-table-review-required",
+              "text": "At least one candidate refers to a table whose complete structured values are not in the proposed passage. That candidate cannot be prepared until the table itself can be reviewed as evidence."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-descendant-coverage-scope-v26",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T04:50:08.004Z"
+          },
+          "webSupportRequested": true,
+          "webSupportReasons": [
+            "dob_workflow_requested"
+          ],
+          "allowOfficialGuidanceOnly": true,
+          "officialWorkflow": {
+            "version": "20260908-dob-procedural-sources-v1",
+            "topic": "wetland_documents",
+            "retrievalMethod": "official_workflow_catalog"
+          },
+          "webSupportSearched": true,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "official_supporting_guidance",
+        "authorityLabel": "Official supporting guidance — noncontrolling",
+        "sourceAsOf": "2026-09-08T04:50:08.004Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "outside_library_support",
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "durationMilliseconds": 11305,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "7031fcfe-9a47-4ee6-aa20-2b0dd74e4ca8",
+          "createdAt": "2026-09-08T04:50:08.003Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 2979,
+          "cachedInputTokens": 0,
+          "outputTokens": 437,
+          "totalTokens": 3416,
+          "estimatedCostUSD": 0.006587,
+          "actualProviderCostUSD": 0.006587,
+          "conservativeProviderCostUSD": 0.012627,
+          "durationMilliseconds": 11255,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": true,
+          "webSupportSearched": true,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ]
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "DOBNOW-019",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_official_guidance_summary",
+      "requestBytes": 7301,
+      "maxOutputTokens": 2200,
+      "startedAt": "2026-09-08T04:50:01.751Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 3530,
+      "usage": {
+        "input_tokens": 1589,
+        "input_tokens_details": {
+          "cache_write_tokens": 1586,
+          "cached_tokens": 0
+        },
+        "output_tokens": 149,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1738
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_04fff5c3cf28609b016a9f93fbf09c87d2865104db42a440d3",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"paragraphs\":[{\"text\":\"It must be filed in DOB NOW: Build, using the Builders Pavement Plan work type and Standard Plan Review. The Authorization to DOT (BPP5) tab appears on the job filing and must be completed so DOT may issue a construction permit for the BPP work. This guidance applies to all new BPP applications beginning August 17, 2026; new filings can no longer be submitted in BIS.\",\"sourceUses\":[{\"sourceID\":\"dob-bpp-service-notice\",\"claimID\":\"official-passage-a9351e29772b35eadd43945a\"}]}],\"missingFacts\":[],\"evidenceLimitations\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "DOBNOW-019",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_official_guidance_verification",
+      "requestBytes": 8407,
+      "maxOutputTokens": 1800,
+      "startedAt": "2026-09-08T04:50:05.294Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 2023,
+      "usage": {
+        "input_tokens": 1861,
+        "input_tokens_details": {
+          "cache_write_tokens": 1858,
+          "cached_tokens": 0
+        },
+        "output_tokens": 77,
+        "output_tokens_details": {
+          "reasoning_tokens": 53
+        },
+        "total_tokens": 1938
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_062a517c05bdfd6c016a9f93ff1de887d2aa44dee7ff77c1e9",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "DOBNOW-018",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_official_guidance_summary",
+      "requestBytes": 5821,
+      "maxOutputTokens": 2200,
+      "startedAt": "2026-09-08T04:50:09.281Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 7814,
+      "usage": {
+        "input_tokens": 1195,
+        "input_tokens_details": {
+          "cache_write_tokens": 1192,
+          "cached_tokens": 0
+        },
+        "output_tokens": 307,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 1502
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0a7b7fc76f41bb4a016a9f9402b97887d2b2fcb59020d09df6",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"paragraphs\":[{\"text\":\"For an initial New Building–General Construction filing on a DOB NOW property flagged as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area, the August 2026 workflow adds two required-document items to the filing: a DEC Jurisdictional Determination and a DEC Permit. This filing type is among the listed scope of filings subject to the new pre-approval document requirements.\",\"sourceUses\":[{\"sourceID\":\"dob-build-release-notes\",\"claimID\":\"official-passage-8a7766c7027d1fb71340e371\"},{\"sourceID\":\"dob-build-release-notes\",\"claimID\":\"official-passage-bd1acc9d874e42c204e38873\"}]},{\"text\":\"Submit the DEC Jurisdictional Determination in every case. If the determination says a DEC Permit is required, submit that permit before DOB approval. If it says a DEC Permit is not required, submit a waiver request for the DEC Permit required-document item instead. The release notes describe this as a DOB NOW filing workflow and pre-approval documentation requirement; they do not themselves determine wetland jurisdiction, establish legal compliance, or grant permit approval.\",\"sourceUses\":[{\"sourceID\":\"dob-build-release-notes\",\"claimID\":\"official-passage-bd1acc9d874e42c204e38873\"}]}],\"missingFacts\":[],\"evidenceLimitations\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "DOBNOW-018",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_official_guidance_verification",
+      "requestBytes": 8478,
+      "maxOutputTokens": 1800,
+      "startedAt": "2026-09-08T04:50:17.108Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 2084,
+      "usage": {
+        "input_tokens": 1784,
+        "input_tokens_details": {
+          "cache_write_tokens": 1781,
+          "cached_tokens": 0
+        },
+        "output_tokens": 130,
+        "output_tokens_details": {
+          "reasoning_tokens": 106
+        },
+        "total_tokens": 1914
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_07c4580bbee0a95b016a9f940b01dc87d285661daf455cc739",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 1.8,
+    "reservedUSD": 0.012018,
+    "actualUSD": 0.012018,
+    "requestCount": 4,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 3.050704,
+  "completedAt": "2026-09-08T04:50:19.656Z"
+}

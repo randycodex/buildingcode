@@ -21,3 +21,18 @@ Focused no-network contracts passed for paragraph/source pairing, original-passa
 The five earlier packages have zero pending provider requests and a cumulative conservative bound of $3.026380. Two turn caps of $0.85 add at most $1.70, for a combined ceiling of $4.726380 within the owner's $8 authorization. An aggregate $1.80 package guard also applies. The runner defaults to a no-network preflight and exclusively creates a permanent result file before any paid dispatch, preventing accidental replay. No separate paid judge or manual retry is included.
 
 The full `npm run check` (including the Research chat suite) and `npm run smoke` passed before dispatch. Live results will be recorded after execution. No deployment is authorized by this package.
+
+## Live results at `0b3ec0ea0`
+
+Both questions delivered on the first attempt with one Terra summary and one Luna verification each. There were no search-model calls, repairs or pending provider requests. Manual comparison with the refreshed PDFs supports both main answers and their material conditions.
+
+| Case | End-to-end time | Words | Review |
+| --- | ---: | ---: | --- |
+| DOBNOW-019, new BPP filing | 7.767 s | 83 | Correct filing system, work type, review type, effective date and BPP5/DOT authorization distinction; cites notice page 1. |
+| DOBNOW-018, wetlands documents | 11.305 s | 166 | Correct determination plus conditional permit/waiver workflow; cites release-note pages 12–13. Repeats some scenario and authority context. |
+
+The BPP response decreased from the earlier 523-word whole-page rendering to 83 words. The two new timings are individual observations, not a controlled general speed claim. The wetlands answer can be shorter without losing its conditions; this remains a presentation note.
+
+This batch's token telemetry is $0.012018. Adding the estimated cache-write premium of $0.00157095 gives **$0.01358895**. Across six paid packages, the cumulative usage estimate is **$1.52363636**, the conservative bound is **$3.050704**, and pending provider requests are **zero** (27 turns, 54 provider requests). These are estimates derived from usage records, not an invoice or account balance.
+
+The immutable live result is `permitext-sync-server/evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json`; the separate manual review is `research-owner-document-summary-review-2026-09-08.json` in the same folder. The review records answer hashes and fetched PDF hashes. No deployment occurred. Broader answer coverage, missing-zoning-fact responses and the CC-04 source-tail defect remain open.
