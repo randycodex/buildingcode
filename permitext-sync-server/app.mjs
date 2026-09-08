@@ -9793,7 +9793,7 @@ export function validateResearchInterpretation(value, evidence, supportingSource
     // other writing systems while preserving Latin letters, numbers, units,
     // punctuation, symbols, and ordinary Unicode formatting.
     .replace(/(?:(?!\p{Script=Latin})\p{Letter})+/gu, " ")
-    .replace(/[【】：「」『』。“”]+(?=\s*[A-Za-z0-9])/g, " ")
+    .replace(/[【】：「」『』。]+(?=\s*[A-Za-z0-9])/g, " ")
     .replace(/[^\S\r\n]+/g, " ")
     .replace(/ *\n */g, "\n")
     .replace(/\s+([,.;:!?])/g, "$1")
@@ -10502,6 +10502,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement, or says unsupplied law requires verification or could change the result without enacted support.",
       "Require each mandatory passage in supported points and citations. Check substantive coverage of every proviso, exception, definition or limit that can change or explain the requested result under the stated facts; a source ID alone is insufficient.",
       "For a calculation or substitution question, accept an explicitly stipulated required quantity or applicability as the premise unless supplied facts or evidence contradict it. Do not demand exemptions that would replace that premise, product-standard lists unrelated to the requested comparison, or alternatives not proposed. Preserve conditions governing the proposed substitution and any unresolved exception that could change its result. If the question asks whether the premise itself is correct, verify it instead.",
+      "Check material conditions for a proposed substitution or alternative in answerText itself; their appearance only in supporting points, assumptions or evidence limitations does not make the main answer complete. Do not require unknown subgroup quantities when a stated combined total already establishes the same threshold result for every possible subgroup.",
       "For a selected-provision compliance question, fail with weakest_supported_conclusion when the answer does not clearly distinguish what the selected text establishes from material quantities, rates, capacities, locations, assemblies, approvals, or other compliance inputs it cannot establish.",
       "Fail with missed_material_conclusion when the answer replaces material unresolved inputs with a generic phrase such as full design, additional evidence, other requirements, or applicable approvals. Require the answer to name distinct approved-record bases, quantities, rates, capacities, dimensions, locations, system-design inputs, and expressly implicated technical or agency conditions only when they can change or authorize the requested conclusion.",
       "Do not fail merely because the answer omits an unrelated permit, agency, or record. The completeness review is limited to inputs material to the question, a relied-on existing legal condition, a supplied provision, or an express cross-reference in the authorized evidence.",

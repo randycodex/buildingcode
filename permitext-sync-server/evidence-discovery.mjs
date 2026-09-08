@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 
-export const evidenceDiscoveryVersion = "20260908-descendant-coverage-scope-v26";
+export const evidenceDiscoveryVersion = "20260908-stipulated-fixture-scope-v27";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -72,8 +72,25 @@ const conceptExpansions = [
   }
 ];
 
+const separateToiletFacilitiesCue = /\bseparate\s+(?:male\s+and\s+female|men(?:'s)?\s+and\s+women(?:'s)?|(?:toilet\s+)?facilities\s+for\s+(?:each|both)\s+sex)|\bsex[- ]separat\w*\s+(?:toilet\s+)?facilities\b/i;
+
+function stipulatedSeparateFacilitiesQuestion(question) {
+  const statedLoad = /\b(?:total\s+)?occupant\s+load\s+(?:(?:of|is|equals)\s+)?\d+\b/i.test(question);
+  const statedFixtureSufficiency = /\b(?:required\s+)?fixture\s+count\s+(?:can\s+be\s+satisfied|(?:is|has\s+been)\s+(?:already\s+)?(?:satisfied|met))\b/i.test(question);
+  const calculationRequest = /\b(?:calculate|recalculate|determine|verify|check|reassess)\b[^.!?]*\b(?:occupant\s+load|fixture\s+count|fixtures?)\b|\b(?:how\s+many|what\s+(?:is|are))\b[^.!?]*\b(?:occupant\s+load|fixture\s+count|fixtures?)\b|\b(?:occupant\s+load|fixture\s+count)\b[^.!?]*\b(?:correct|valid|adequate|sufficient)\b/i.test(question);
+  return separateToiletFacilitiesCue.test(question) && statedLoad && statedFixtureSufficiency && !calculationRequest;
+}
+
 const topicRoutes = [
   ...researchTechnicalTopicRoutes,
+  {
+    pattern: separateToiletFacilitiesCue,
+    label: "separate-sex toilet facilities and employee/public arrangements",
+    targets: [
+      { codePrefix: "PC", sectionPrefix: "403.2", descendantClaimCoverage: false },
+      { codePrefix: "PC", sectionPrefix: "403.3", descendantClaimCoverage: false }
+    ]
+  },
   {
     pattern: /\bducts?\b.*\bfire[- ]barriers?\b|\bfire[- ]barriers?\b.*\b(?:ducts?|dampers?)\b/i,
     label: "duct penetrations of fire barriers and damper exceptions",
@@ -336,6 +353,7 @@ const topicRoutes = [
   {
     pattern: /\b(?:plumbing\s+)?fixture\s+(?:counts?|requirements?|ratios?|calculations?)|fractional\s+fixture|\b(?:how\s+many|minimum\s+(?:number|count))\b[\s\S]*\b(?:plumbing\s+)?fixtures?\b|\bplumbing\s+fixtures?\b[\s\S]*\b(?:count|calculat|number|occupanc)/i,
     label: "plumbing-fixture classification and calculation provisions",
+    calculationScope: true,
     targets: [
       { codePrefix: "PC", sectionPrefix: "403.1", includeDescendants: true },
       { codePrefix: "BC", sectionPrefix: "303.1.3" }
@@ -353,6 +371,7 @@ const topicRoutes = [
   {
     pattern: /\boccupant\s+load|movable\s+seats?|fixed\s+seats?|nonsimultaneous|load\s+factor/i,
     label: "occupant-load calculation provisions",
+    calculationScope: true,
     targets: [
       { codePrefix: "BC", sectionPrefix: "1004.1", includeDescendants: true },
       { codePrefix: "BC", sectionPrefix: "1004.3" }
@@ -704,6 +723,7 @@ const topicRoutes = [
   {
     pattern: /\bmixed[- ]use\b.*\b(?:fixtures?|water\s+closets?|lavator(?:y|ies)|required\s+number)\b|\b(?:restaurant|retail|office)\b.*\b(?:fixtures?|water\s+closets?|lavator(?:y|ies))\b.*\b(?:calculat|number|required)|\b(?:water\s+closets?|lavator(?:y|ies))\b.*\b(?:restaurant|retail|office|mixed[- ]use)\b/i,
     label: "mixed-use plumbing-fixture calculation provisions",
+    calculationScope: true,
     targets: [
       { codePrefix: "PC", sectionPrefix: "403.1" },
       { codePrefix: "PC", sectionPrefix: "403.1.1" },
@@ -1467,7 +1487,10 @@ export async function discoverRelevantEvidence({
       String(section.sectionNumber || "") === reference.sectionNumber
     ).forEach((section) => exactReferenceIDs.add(comparableSectionID(section.id)));
   }
-  for (const route of topicRoutes.filter(({ pattern }) => pattern.test(normalizedQuestion))) {
+  const separateFacilitiesWithStipulatedCounts = stipulatedSeparateFacilitiesQuestion(normalizedQuestion);
+  for (const route of topicRoutes.filter(({ pattern, calculationScope }) =>
+    pattern.test(normalizedQuestion) && !(calculationScope && separateFacilitiesWithStipulatedCounts)
+  )) {
     for (const target of route.targets) {
       for (const section of sections) {
         const sectionNumber = String(section.sectionNumber || "");

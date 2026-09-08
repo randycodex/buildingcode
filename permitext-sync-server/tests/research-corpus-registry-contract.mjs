@@ -172,6 +172,28 @@ assert.deepEqual(zoningProjectDefault.selected, []);
 assert.deepEqual(zoningProjectDefault.unavailable.map((corpus) => corpus.id), ["nyc-zoning-resolution"]);
 assert.equal(zoningProjectDefault.unavailable[0].routeReason, "Project configured code basis");
 
+const enabledZoningRegistry = createResearchCorpusRegistry({ zoningResearchEligibility: true });
+for (const question of [
+  "On a 40-foot-wide zoning lot, a ventilation air intake is proposed six feet from an interior side lot line. Does that satisfy the ordinary Mechanical Code intake-location rule?",
+  "Under MC 401.4, does an intake eight feet from the lot line on a 35-foot zoning lot satisfy the intake rule?"
+]) {
+  assert.deepEqual(routeResearchCorpora({ question, registry: enabledZoningRegistry })
+    .selected.map((corpus) => corpus.id), ["nyc-2022-construction-codes"],
+  "A technical intake separation question must not acquire Zoning conclusions through the contextual term zoning lot.");
+}
+for (const question of [
+  "What is a zoning lot?",
+  "Under MC 401.4, where can the intake go? Also explain the Zoning Resolution definition of zoning lot.",
+  "Under MC 401.4, where can the intake go on this zoning lot? Is the office use permitted in C6-4?",
+  "What does zoning lot mean in MC 401.4?",
+  "Compare the Mechanical Code air intake rule with ZR 12-10.",
+  "Explain MC 401.4 and the zoning lot formation rules."
+]) {
+  assert(routeResearchCorpora({ question, registry: enabledZoningRegistry }).selected
+    .some((corpus) => corpus.id === "nyc-zoning-resolution"),
+  `An independent Zoning question still requires the Zoning corpus: ${question}`);
+}
+
 const zoningEnabled = routeResearchCorpora({
   question: "What does ZR 12-01 control?",
   registry: createResearchCorpusRegistry({ zoningResearchEligibility: true })

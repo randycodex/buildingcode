@@ -68,6 +68,15 @@ assert.doesNotMatch(whitespaceAnswer.supportedPoints[0].explanation, / {2,}/);
 assert.doesNotMatch(whitespaceAnswer.evidenceLimitations[0], / {2,}/);
 assert.doesNotMatch(whitespaceAnswer.citations[0].relevance, / {2,}/);
 
+const quotedText = '**“Yes, with the stated conditions.”** The term “café” remains readable.';
+const quotedAnswer = validateResearchInterpretation({
+  ...whitespaceAnswer, answerText: quotedText,
+  supportedPoints: whitespaceAnswer.supportedPoints.map((point) => ({ ...point, explanation: quotedText }))
+}, evidence);
+assert.equal(quotedAnswer.answerText, quotedText,
+  "English curly quotes must survive sanitization without introducing whitespace inside Markdown emphasis.");
+assert.equal(quotedAnswer.supportedPoints[0].explanation, quotedText);
+
 const exceptionAttributionAnswer = validateResearchInterpretation({
   conclusion: "The referenced sprinkler standard must be confirmed.",
   supportedPoints: [{

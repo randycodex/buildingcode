@@ -1,4 +1,4 @@
-export const researchAnswerPresentationVersion = "20260908-stipulated-premise-v8";
+export const researchAnswerPresentationVersion = "20260908-visible-material-conditions-v9";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
@@ -121,10 +121,10 @@ function contractFor(mode, preferredStructure, requiredElements) {
       "Never fill gaps in the question from an expected answer, an example scenario, or an unstated assumption.",
       "Place each material code citation next to the claim it supports.",
       "Separate governing enacted requirements from outside guidance or unsupplied standards.",
-      "Preserve material applicability conditions, exceptions, and unresolved facts.",
+      "Keep material applicability, substitution conditions, exceptions and unresolved facts in answerText; expandable supporting details alone are insufficient.",
       "Establish each alternative rule's applicability independently; an unresolved condition does not establish another path. Preserve the stated subject, such as a building or nonaccessory tenant space, without generalizing to any room.",
       "Keep the opening, calculation and closing consistent. State a failed applicable limit directly; a scope note must not imply compliance. Broader compliance remains unevaluated.",
-      "For calculations or substitutions, use explicitly stipulated required quantities and applicability unless contradicted. Include secondary rules only when they can change or explain that result; do not reopen its premise with unrelated exemptions or product-standard lists. Verify the premise when that is what the question asks.",
+      "Use stipulated quantities and applicability unless contradicted; verify them when asked. Include secondary rules only when material to the result, retaining conditions for the proposed substitution.",
       "Once a supplied fact establishes a definite failure, additional design details needed to develop a compliant replacement are not missing facts needed to answer whether the stated proposal complies. Preserve any exception or unresolved applicability fact that could change that failure.",
       "Use headings, tables, lists, calculations and follow-ups only when useful. State each material point once; avoid repeating prose in a table or checklist or restating the conclusion."
     ])

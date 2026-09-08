@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20260908-prior-code-technical-scope-v5";
+export const researchCorpusRegistryVersion = "20260908-intake-lot-context-v6";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -20,6 +20,18 @@ const historicalBuildingCue = /\b1968\s+(?:NYC\s+)?Building\s+Code\b|\bBC68\b/i;
 const historical2014FollowUpCue = /\b(?:the\s+)?2014(?:\s+(?:edition|code))?\b/i;
 const current2022FollowUpCue = /\b(?:the\s+)?2022(?:\s+(?:edition|code))?\b/i;
 const appendixPCrossEditionCue = /\b(?:BC\s*[- ]?)?Appendix\s+P\b/i;
+
+function zoningRequestedByQuestion(context) {
+  // MC 401.4 itself uses "zoning lot" to describe intake separation. That
+  // contextual noun does not request a Zoning conclusion. Keep independent
+  // ZR citations, district/use/bulk cues and questions about the lot itself.
+  const technicalIntakeRule = /\bMC\s*(?:§\s*)?401\.4\b/i.test(context) ||
+    (/\bmechanical\s+code\b/i.test(context) && /\b(?:air\s+intakes?|intake[- ]location)\b/i.test(context));
+  const lotRuleQuestion = /\b(?:defin\w*|mean\w*|form\w*|merg\w*|subdiv\w*|establish\w*)\b[^.!?]*\bzoning\s+lots?\b|\bzoning\s+lots?\b[^.!?]*\b(?:defin\w*|mean\w*|form\w*|merg\w*|subdiv\w*)\b|\bzoning\s+lots?\s+(?:rules?|regulations?)\b/i.test(context);
+  return zoningCue.test(technicalIntakeRule && !lotRuleQuestion
+    ? context.replace(/\bzoning\s+lots?\b/gi, "lot")
+    : context);
+}
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -196,7 +208,7 @@ export function routeResearchCorpora({
   const constructionRequested = (constructionCue.test(context) || shorthand2022Requested) &&
     (!futureRequested && !historical2014Requested && !historicalRequested || explicitCurrentConstructionCue);
   const fireRequested = fireCue.test(context);
-  const zoningRequested = !buildingCodeOnlyScope && (zoningCue.test(context) || projectZoningRequested);
+  const zoningRequested = !buildingCodeOnlyScope && (zoningRequestedByQuestion(context) || projectZoningRequested);
   const requestedIDs = new Map();
   if (constructionRequested) requestedIDs.set("nyc-2022-construction-codes", "construction-code cue");
   if (priorCodeTechnicalApplicability) {

@@ -60,6 +60,31 @@ try {
   assert.match(fixtureRoot.text, /building or nonaccessory tenant space[\s\S]*fewer than 75[\s\S]*Assembly occupancies/i);
   assert(fixtureAssembly.sources.some((source) => source.codePrefix === "PC" && source.sectionNumber === "403.1.1"));
   assert(fixtureAssembly.sources.some((source) => source.codePrefix === "BC" && source.sectionNumber === "303.1.3"));
+
+  const facilityQuestion = "A small café has a total occupant load of 28 people, including employees and customers. The required fixture count can be satisfied with one single-user toilet room. Must separate male and female toilet facilities still be provided?";
+  const irrelevantCalculationReferences = ["BC 1004.1", "BC 1004.3", "BC 303.1.3", "PC 403.1.2"];
+  const assemble = (question) => assembledResearchEvidenceForTurn({ question,
+    messages: [], pinnedEvidence: [], projectFacts: [] });
+  const requiredReferences = (assembled) => assembled.sources
+    .filter((source) => source.evidencePriority?.claimCoverageRequired)
+    .map((source) => `${source.codePrefix} ${source.sectionNumber}`);
+  for (const question of [facilityQuestion,
+    "The occupant load is 24 and the required fixture count is already met. Are separate facilities for each sex required?"
+  ]) {
+    const assembled = await assemble(question);
+    const required = requiredReferences(assembled);
+    for (const reference of ["PC 403.2", "PC 403.3"]) assert(required.includes(reference), reference);
+    for (const reference of irrelevantCalculationReferences) assert(!required.includes(reference),
+      `Stipulated counts must not force collateral calculations into the separate-facilities answer: ${reference}`);
+    const separateFacilities = assembled.sources.find((source) => source.codePrefix === "PC" && source.sectionNumber === "403.2");
+    assert(separateFacilities.canonicalContextComplete);
+    assert.match(separateFacilities.text, /combined employee and public[\s\S]*30 or fewer/i);
+  }
+  const explicitLoad = await assemble(`${facilityQuestion} Explain BC 1004.1.`);
+  assert(requiredReferences(explicitLoad).includes("BC 1004.1"), "An explicitly requested calculation source remains mandatory.");
+  const verifyCounts = await assemble(`${facilityQuestion} Verify the occupant load and fixture count.`);
+  assert(requiredReferences(verifyCounts).includes("BC 1004.1"), "A request to verify the premise retains the calculation route.");
+  assert(requiredReferences(verifyCounts).includes("PC 403.1"));
   assert.equal(networkAttempts, 0);
 } finally {
   globalThis.fetch = savedFetch;
