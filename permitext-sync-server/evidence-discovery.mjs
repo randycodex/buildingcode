@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
+import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 
-export const evidenceDiscoveryVersion = "20260908-passage-local-retrieval-v23";
+export const evidenceDiscoveryVersion = "20260908-technical-source-routes-v24";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -72,6 +73,7 @@ const conceptExpansions = [
 ];
 
 const topicRoutes = [
+  ...researchTechnicalTopicRoutes,
   {
     pattern: /\bducts?\b.*\bfire[- ]barriers?\b|\bfire[- ]barriers?\b.*\b(?:ducts?|dampers?)\b/i,
     label: "duct penetrations of fire barriers and damper exceptions",
