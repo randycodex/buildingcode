@@ -1,0 +1,105 @@
+{
+  "schema": "permitext-owner-answer-quality-manual-review-v1",
+  "liveResultSHA256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323",
+  "sourceCommit": "eec44b5292cb710ad20d8534d28c3b828bb7acac",
+  "deliverySummary": "6/6 delivered with two provider requests each and no repair; delivery and internal verification are not independent quality grades.",
+  "professionalApproval": false,
+  "goalComplete": false,
+  "results": [
+    {
+      "id": "FGC-02",
+      "delivery": "completed",
+      "review": "main-conclusion-supported; presentation-needs-revision",
+      "finding": "The general prohibition and direct-vent exception conditions are correct. The mandatory descendant coverage introduces sleeping-room installer and CO-detector rules that do not answer the bathroom question. The final paragraph repeats conditions.",
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-197419",
+      "sourceCheckedOn": "2026-09-08",
+      "answerSHA256": "ed61b0c3f5f32a63d5f3f46a14cbc6c9fd6b0cff69f214c534043cb254f27589",
+      "answerWords": 256,
+      "durationMilliseconds": 19431,
+      "providerCalls": 2,
+      "pendingProviderRequests": 0
+    },
+    {
+      "id": "MC-01",
+      "delivery": "completed",
+      "review": "main-conclusion-supported; presentation-needs-revision",
+      "finding": "Correctly rejects windows alone for an air-conditioned office. Adds airflow-rate calculation inputs and other system-design detail beyond the yes/no ventilation question.",
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-193181",
+      "sourceCheckedOn": "2026-09-08",
+      "answerSHA256": "96b7c4b044b5f701021baf67732a9cf11c0edb377b91476f4142808fde307a35",
+      "answerWords": 152,
+      "durationMilliseconds": 14396,
+      "providerCalls": 2,
+      "pendingProviderRequests": 0
+    },
+    {
+      "id": "GAP-11",
+      "delivery": "completed",
+      "review": "main-conclusion-supported; presentation-needs-revision",
+      "finding": "Correctly says a satisfactory inspection does not approve a violation. The final corrective-measure and enforcement discussion is unnecessary for this narrow question.",
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-156868",
+      "sourceCheckedOn": "2026-09-08",
+      "answerSHA256": "8454950be0220888fb0ffbf932a59f27cb39eaa655f6e7a15c24512d41bac7e9",
+      "answerWords": 111,
+      "durationMilliseconds": 9264,
+      "providerCalls": 2,
+      "pendingProviderRequests": 0
+    },
+    {
+      "id": "PC-12",
+      "delivery": "completed",
+      "review": "supported-answer; minor-repetition",
+      "finding": "Correctly applies the downstream no-reduction rule and identifies the specific water-closet connection exception. Repeats the result, but remains within scope.",
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-162530",
+      "sourceCheckedOn": "2026-09-08",
+      "answerSHA256": "691ee056cefd12ee7e024af7dae197de6a45f6378985f304cac6a184564d4177",
+      "answerWords": 119,
+      "durationMilliseconds": 8966,
+      "providerCalls": 2,
+      "pendingProviderRequests": 0
+    },
+    {
+      "id": "ZR-08",
+      "delivery": "completed",
+      "review": "supported-calculation; prior-wording-defect-resolved",
+      "finding": "Correct 4.2 versus 4.00 FAR, 40,000-square-foot limit and 2,000-square-foot excess; identifies the separate 5.01 category. No closing implication of compliance. The request to establish the final code-defined floor-area total could better respect the supplied calculation premise.",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-3/23-22",
+      "sourceCheckedOn": "2026-09-08",
+      "answerSHA256": "96286c09ffed3daee4dd28402f30dc9699318ecd72a86676013331bd621bbe96",
+      "answerWords": 138,
+      "durationMilliseconds": 13223,
+      "providerCalls": 2,
+      "pendingProviderRequests": 0
+    },
+    {
+      "id": "CC-03",
+      "delivery": "completed",
+      "review": "calculation-supported; applicability-needs-revision",
+      "finding": "Correct 900/15=60 and useful alternate-purpose caveat. Retrieves and discusses both classification rules, but the opening generalizes Group B to any sub-75 assembly room. BC 303.1.2 specifically covers a building or nonaccessory tenant space; the answer does not establish that alternative scope for the described room. Retain the conditional accessory path instead of treating every nonaccessory room as a tenant space.",
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-165884",
+      "sourceCheckedOn": "2026-09-08",
+      "answerSHA256": "8649258ae51ba7217a89db20006f18a46fca38d5a0e7d8c4dfce541abd4f4f10",
+      "answerWords": 204,
+      "durationMilliseconds": 27106,
+      "providerCalls": 2,
+      "pendingProviderRequests": 0
+    }
+  ],
+  "spend": {
+    "providerTokenTelemetryUSD": 0.257655,
+    "estimatedCacheWritePremiumUSD": 0.04798935,
+    "usageBasedEstimateUSD": 0.30564435,
+    "conservativeBoundUSD": 0.583028,
+    "cumulativeConservativeBoundUSD": 2.832511,
+    "cumulativeUsageBasedEstimateUSD": 1.40656461,
+    "pendingRequests": 0,
+    "pricingSource": "https://developers.openai.com/api/docs/pricing",
+    "pricingCheckedOn": "2026-09-08",
+    "limitation": "Usage-based estimate including cache-write premium, not an invoice or account balance; no web-search calls in this run."
+  },
+  "latency": {
+    "p50NearestRankMilliseconds": 13223,
+    "p90NearestRankMilliseconds": 27106,
+    "limitation": "Six selected local end-to-end live turns, one each; no population-level or controlled before-after speed claim."
+  }
+}
