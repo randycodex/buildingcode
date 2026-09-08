@@ -367,6 +367,33 @@ const officialGuidanceAnswer = immutableResearchAnswer({
 });
 assert.deepEqual(officialGuidanceAnswer.citations, []);
 assert.deepEqual(officialGuidanceAnswer.passageToCitationMapping, []);
+const pdfGuidanceInput = structuredClone(officialGuidanceInputAnswer);
+const pdfExtractionLimitation = "PDF text extraction does not independently verify diagrams or complex table geometry.";
+Object.assign(pdfGuidanceInput.supportingSources[0], {
+  url: "https://www.nyc.gov/assets/buildings/pdf/synthetic-guidance.pdf",
+  sourceValidation: "official_pdf",
+  sourceContentHash: "a".repeat(64),
+  extractionLimitations: [pdfExtractionLimitation]
+});
+pdfGuidanceInput.evidenceLimitations.push(pdfExtractionLimitation);
+const persistPDFGuidance = (answer) => immutableResearchAnswer({
+  id: "answer-official-pdf-guidance", owner,
+  conversationID: "conversation-official-pdf-guidance",
+  question: "What does the official PDF say?", evidence: [], answer, citations: [],
+  model: "permitext-test", researchSystemVersion: "official-pdf-v1", createdAt
+});
+assert.deepEqual(persistPDFGuidance(pdfGuidanceInput).answer.evidenceLimitations,
+  [officialGuidanceBoundary, pdfExtractionLimitation]);
+for (const mutate of [
+  (answer) => answer.evidenceLimitations.pop(),
+  (answer) => answer.evidenceLimitations.push("Unsupported additional guidance."),
+  (answer) => { answer.supportingSources[0].sourceValidation = "official_html"; }
+]) {
+  const tampered = structuredClone(pdfGuidanceInput);
+  mutate(tampered);
+  assert.throws(() => persistPDFGuidance(tampered), /require evidence/,
+    "PDF caveats must match the validated source exactly; the citation-free boundary stays strict.");
+}
 const duplicateClaimGuidanceInput = structuredClone(officialGuidanceInputAnswer);
 duplicateClaimGuidanceInput.supportingSourceUses.push({
   sourceID: "web-source-boiler-duplicate",

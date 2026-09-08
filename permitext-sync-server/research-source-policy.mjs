@@ -5,6 +5,16 @@ export const researchOfficialGuidanceAuthorityStatement =
 export const researchOfficialGuidanceEnactedBoundary =
   "The assembled enacted evidence did not establish the requested rule; Permitext is reporting only the exact official supporting guidance attributed below.";
 
+export function canonicalResearchOfficialGuidanceLimitations(sources = []) {
+  return [...new Set([
+    researchOfficialGuidanceEnactedBoundary,
+    ...sources.flatMap((source) => source?.sourceValidation === "official_pdf" &&
+      Array.isArray(source.extractionLimitations)
+      ? source.extractionLimitations.filter((value) => typeof value === "string" && value.trim())
+      : [])
+  ])];
+}
+
 export function canonicalResearchOfficialGuidanceNarrative(values = []) {
   const claims = Array.from(new Set(
     (Array.isArray(values) ? values : [])

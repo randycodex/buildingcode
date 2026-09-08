@@ -6,10 +6,10 @@ import {
   researchEntitlementMode
 } from "./entitlement-contract.mjs";
 import {
+  canonicalResearchOfficialGuidanceLimitations,
   canonicalResearchOfficialGuidanceNarrative,
   classifyResearchWebSource,
   researchOfficialGuidanceAuthorityStatement,
-  researchOfficialGuidanceEnactedBoundary,
   researchSourcePolicyConfiguration
 } from "./research-source-policy.mjs";
 
@@ -676,6 +676,7 @@ export function immutableResearchAnswer({
     ["projectContext", "conversation", "other"].every((key) =>
       Array.isArray(answer.factUsage[key]) && answer.factUsage[key].length === 0
     );
+  const canonicalGuidanceLimitations = canonicalResearchOfficialGuidanceLimitations(supportingSources);
   const officialSupportingGuidanceAnswer =
     answer?.authorityStatus === "official_supporting_guidance" &&
     answer?.authorityLabel === "Official supporting guidance — noncontrolling" &&
@@ -693,8 +694,8 @@ export function immutableResearchAnswer({
     Array.isArray(answer?.followUpQuestions) && answer.followUpQuestions.length === 0 &&
     Array.isArray(answer?.additionalEvidenceNeeded) && answer.additionalEvidenceNeeded.length === 0 &&
     Array.isArray(answer?.evidenceLimitations) &&
-    answer.evidenceLimitations.length === 1 &&
-    answer.evidenceLimitations[0] === researchOfficialGuidanceEnactedBoundary &&
+    answer.evidenceLimitations.length === canonicalGuidanceLimitations.length &&
+    answer.evidenceLimitations.every((value, index) => value === canonicalGuidanceLimitations[index]) &&
     canonicalGuidanceSources &&
     emptyStructuredGuidanceAnalysis &&
     emptyGuidanceFactUsage;

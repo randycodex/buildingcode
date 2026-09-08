@@ -260,6 +260,7 @@ import {
   researchEvidenceStrategyForTurn
 } from "./research-evidence-assembly.mjs";
 import {
+  canonicalResearchOfficialGuidanceLimitations,
   canonicalResearchOfficialGuidanceNarrative,
   normalizeResearchWebSources,
   researchSourcePolicyVersion,
@@ -9939,10 +9940,7 @@ export function finalizeResearchGuidanceOnlyInterpretation(
     assumptions: [],
     missingFacts: [],
     followUpQuestions: [],
-    evidenceLimitations: [...new Set([
-      narrative.enactedBoundary,
-      ...supportingSources.flatMap((source) => source.extractionLimitations || [])
-    ])],
+    evidenceLimitations: canonicalResearchOfficialGuidanceLimitations(supportingSources),
     additionalEvidenceNeeded: [],
     supportingSources
   };
@@ -9979,10 +9977,7 @@ export function researchOfficialGuidanceOnlyInterpretation(webSupport = {}) {
     assumptions: [],
     missingFacts: [],
     followUpQuestions: [],
-    evidenceLimitations: [...new Set([
-      narrative.enactedBoundary,
-      ...bindings.flatMap((binding) => binding.source.extractionLimitations || [])
-    ])],
+    evidenceLimitations: canonicalResearchOfficialGuidanceLimitations(bindings.map((binding) => binding.source)),
     additionalEvidenceNeeded: [],
     supportingSourceUses: bindings.map((binding) => ({
       sourceID: binding.sourceID,
@@ -19497,7 +19492,7 @@ async function handleResearchConversationMessage(request, response) {
         webAttribution.pass &&
         result.interpretation.supportingSources?.length > 0 &&
         result.interpretation.supportingSources.every((source) =>
-          source?.sourceValidation === "official_html" &&
+          ["official_html", "official_pdf"].includes(source?.sourceValidation) &&
           source?.sourceContentHash &&
           source?.claim
         );
@@ -19506,10 +19501,10 @@ async function handleResearchConversationMessage(request, response) {
         issues: sourceFaithfulPass
           ? []
           : combinedResearchAnswerRevisionIssues({ webAttribution }),
-        model: "permitext-deterministic-official-html-attribution"
+        model: "permitext-deterministic-official-document-attribution"
       }];
       if (!sourceFaithfulPass) {
-        const error = new Error("The official guidance answer was not bound to the retrieved official HTML.");
+        const error = new Error("The official guidance answer was not bound to the retrieved official document.");
         error.code = "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE";
         error.verificationAttempts = verificationAttempts;
         throw error;
