@@ -39,8 +39,10 @@ export const researchRequestEnvelopeEnvironment = Object.freeze({
   PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "openai-standard-2026-09-03"
 });
 
-export async function buildResearchRequestEnvelopeBuilders(environment = researchRequestEnvelopeEnvironment) {
-  const source = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
+export async function buildResearchRequestEnvelopeBuilders(environment = researchRequestEnvelopeEnvironment, { sourceText } = {}) {
+  // A retained source revision may be supplied only to compare offline requests.
+  // Both paths end before dispatch and share the current, separately checked helpers.
+  const source = sourceText ?? await readFile(new URL("../app.mjs", import.meta.url), "utf8");
   const start = source.indexOf("async function openAIResearchInterpretation(");
   const end = source.indexOf("  const { payload } = await requestResearchProvider({", start);
   assert(start >= 0 && end > start, "The production answer-request builder must remain identifiable.");

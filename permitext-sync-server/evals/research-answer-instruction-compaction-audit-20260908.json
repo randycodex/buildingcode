@@ -1,0 +1,250 @@
+{
+  "schema": "permitext-answer-instruction-compaction-audit-v1",
+  "baselineCommit": "2ede75371",
+  "baselineAppSHA256": "2362ee5e6a5169c16b137bab0ce6a02040a600ffbdf9b35bc2fa51151ddebe0c",
+  "scope": "Main interpretation generator only. Raw question/evidence input, schema, routing, output ceilings, final semantic verifier and official-guidance-summary generator are unchanged. This is a policy-preservation review, not semantic/live acceptance.",
+  "changes": [
+    {
+      "action": "consolidate",
+      "before": "Treat user-provided Project facts and established active-topic conversation facts as factual context for this discussion, never as code authority or cited evidence.",
+      "after": "Use current-question and established active-topic Project/conversation facts as factual context, never as cited code authority. Treat unsupplied occupancy, construction type, location, existing conditions, height and occupant load as unknown.",
+      "preservation": "Preserves factual context versus code authority and explicit treatment of unsupplied project attributes."
+    },
+    {
+      "action": "consolidate",
+      "before": "Treat facts explicitly stated in the current question as established premises for the scoped answer. Do not list them in missingFacts or ask the user to reconfirm them. If professional reliance requires later document verification, distinguish that verification from whether the fact is already established for this discussion.",
+      "after": "Accept facts supplied in the current question or established by the user earlier in the active topic as premises. Do not list them as missing or request reconfirmation. Distinguish later professional document verification from whether a fact is established for this discussion.",
+      "preservation": "Combines the current-turn and earlier-turn premises rules without changing the separate representation and hypothetical rules."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "Do not ask the user to reconfirm an established active-topic fact merely because it was supplied in an earlier turn. Do not list such a fact in missingFacts. If final professional reliance requires independent verification, distinguish that later verification from whether the fact is already established in this conversation.",
+      "after": null,
+      "preservation": "Covered by the consolidated current/prior user-premise rule; professional document verification remains distinct."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "When Project facts explicitly list multiple unknowns that can affect the requested conclusion, name each material unresolved item separately in missingFacts. Do not collapse distinct approvals, records, capacity or dimension inputs, and technical inputs into a generic phrase.",
+      "after": null,
+      "preservation": "The consolidated material-completeness rule below requires each distinct material unknown separately."
+    },
+    {
+      "action": "consolidate",
+      "before": "Before finalizing, perform a material-completeness review of the requested conclusion. Separately identify any unresolved approved-record basis (for example a current certificate of occupancy, partial certificate, approved plans, approved loads, or prior approval), any material quantity, rate, capacity, dimension, location, or system-design input, and any cited or expressly implicated technical or agency requirement that the supplied evidence does not establish. Include only items that can change or authorize the requested conclusion; do not add a generic checklist of unrelated permits, agencies, or systems.",
+      "after": "Before finalizing, identify separately each unresolved input that can change or authorize the result: the approved-record basis (current or partial certificate of occupancy, approved plans or loads, prior approval); quantities, rates, capacities, dimensions, locations and system design; and cited or expressly implicated technical, agency or approval conditions. Name material details such as detector quantities, airflow, filing status, electrical or emergency-power provisions, testing, monitoring and Fire Department conditions. Put material unknown facts in missingFacts; do not collapse them into full design, additional evidence, other requirements or applicable approvals. Do not add unrelated checklists or claim that an unsupplied authority imposes a requirement.",
+      "preservation": "Combines two completeness lists and the separate-missing-facts rule; preserves all named record, technical and agency categories, relevance limits and the outside-authority boundary."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "Do not hide distinct missing inputs inside a phrase such as full design, additional evidence, other requirements, or applicable approvals. When they are material, name the unresolved inputs—for example detector quantity, airflow rate, system capacity, existing approved occupancy records, filing or approval status, or a referenced electrical, emergency-power, testing, monitoring, or Fire Department condition—without claiming that an unsupplied authority imposes a requirement.",
+      "after": null,
+      "preservation": "All listed categories and the prohibition on generic missing-input labels are retained in the preceding completeness rule."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "Put every material source-specific web-guidance statement only in supportingSourceUses by selecting the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair. Never write a new claim for that pair. In answerText, identify it as noncontrolling guidance and keep it distinct from the enacted rule.",
+      "after": null,
+      "preservation": "Exact immutable WEB_SOURCE_ID/WEB_CLAIM_ID selection and visible noncontrolling labeling are consolidated into the supportingSourceUses rule at the end."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "Use the shortest answer that fully and reliably resolves the question from the available evidence. Structure must follow the reasoning: a simple answer may be one paragraph; rule-and-application reasoning may use more; multiple provisions, exceptions, applicability paths, competing interpretations, or evidence gaps may use additional paragraphs or a short hyphen-led breakdown.",
+      "after": null,
+      "preservation": "The unchanged presentation contract specifies direct answers, requirements, comparisons, useful structure and no repetition; the material-qualification override and complete answerText requirement remain."
+    },
+    {
+      "action": "consolidate",
+      "before": "When the evidence supports a practical calculation, design implication, correction to an earlier answer, or safer drawing note, give it after the governing rule and label it clearly; do not introduce outside requirements. If the user asks for a short paragraph or quick explanation, answer in one compact paragraph unless a material qualification makes a second paragraph necessary.",
+      "after": "Place a supported calculation, design implication, correction or drawing note after the governing rule and label it. Do not introduce outside requirements. Honor an expressly short request unless a material qualification requires more room.",
+      "preservation": "Preserves practical applications, their position and labels, the evidence boundary and the express-short-request qualification."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "Lead with the strongest supported conclusion. State a conditional conclusion immediately when a material condition remains. When the evidence is insufficient, identify exactly what cannot be determined.",
+      "after": null,
+      "preservation": "The unchanged presentation contract requires the supported/conditional result or the specific reason it cannot be determined first, including material opening conditions."
+    },
+    {
+      "action": "consolidate",
+      "before": "Include only what is needed to explain the conclusion, controlling rule, application to stated facts, material conditions or exceptions, and material uncertainty or missing evidence. Never omit a material qualification, applicability issue, conflicting provision, or evidence limitation merely to keep the answer short. Never expand a complete short answer for visual consistency or completeness theater.",
+      "after": "Never omit a material qualification, applicability issue, conflicting provision or evidence limitation for brevity. Do not lengthen a complete answer for visual consistency.",
+      "preservation": "The unchanged presentation contract already specifies rule, citation, application, material exceptions/uncertainty, useful structure and no repeated prose; retains explicit conflict and brevity safeguards."
+    },
+    {
+      "action": "consolidate",
+      "before": "In answerText, separate natural paragraphs with a blank line. Use a short hyphen-led breakdown only when it makes multiple material paths or issues clearer. Do not add headings or a list when ordinary prose is clearer.",
+      "after": "Separate natural paragraphs in answerText with a blank line. Use headings or lists only when they make the reasoning clearer.",
+      "preservation": "Retains blank-line rendering and selective structure; parallel-path and table choices remain in the unchanged presentation contract and adjacent formatting rule."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "Use answerText to apply the supported rules to the question and user-provided Project facts. Do not merely repeat the structured supportedPoints.",
+      "after": null,
+      "preservation": "The unchanged presentation contract explicitly requires application to supplied facts or calculation and says to state material points once. answerText remains the complete visible narrative."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
+      "after": null,
+      "preservation": "Unsupplied project attributes are covered by the consolidated factual-context rule, which also preserves established Project and conversation facts."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "Facts stated by the user may support the answer. Restate a material fact when it helps explain the result, but do not make the answer conditional merely because that fact came from an earlier user turn.",
+      "after": null,
+      "preservation": "Covered by the consolidated current/prior user-premise rule, including the prohibition on reconfirmation merely because a fact came from an earlier turn."
+    },
+    {
+      "action": "consolidate",
+      "before": "When a category, table row, shared-facility condition, or calculation input is needed but not established, name that missing item specifically rather than asking only for generic project information.",
+      "after": "When a needed category, table row, shared-facility condition or calculation input is unresolved, name it specifically. Select use categories from the actual use; explain what the supplied evidence establishes instead of merely saying a table or category must be checked.",
+      "preservation": "Combines the two missing-category instructions; preserves actual-use selection and the requirement to provide the strongest supported result."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "Do not merely say that a table or category must be checked. Identify the project-specific use category that must be selected from actual use and explain what the assembled evidence already establishes.",
+      "after": null,
+      "preservation": "Covered by the preceding consolidated category/calculation-input rule."
+    },
+    {
+      "action": "remove-covered-repeat",
+      "before": "For plumbing-fixture questions, when a final count could depend on facilities serving more than one space, ask whether existing or shared facilities are proposed to serve the space and identify any missing provisions governing that sharing. Do not assume those facilities qualify.",
+      "after": null,
+      "preservation": "The retained scoped sharing rule requires the arrangement and missing sharing authority to be identified; the general completeness rule covers unresolved inputs."
+    },
+    {
+      "action": "consolidate",
+      "before": "Return supportingSourceUses only by selecting an exact WEB_SOURCE_ID and WEB_CLAIM_ID pair from SOURCE-SPECIFIC ATTRIBUTED CLAIMS. Keep it empty when no web source materially improves the answer. If WEB SUPPORT LIMITATION is present, repeat that limitation visibly in evidenceLimitations and do not infer the unavailable document's contents.",
+      "after": "For every material web-guidance statement, select only the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair from SOURCE-SPECIFIC ATTRIBUTED CLAIMS in supportingSourceUses; never write a new claim for that pair. In answerText label it noncontrolling and separate it from enacted rules. Leave supportingSourceUses empty when no web source materially improves the answer. Show any WEB SUPPORT LIMITATION in evidenceLimitations; never infer the unavailable document's contents.",
+      "preservation": "Consolidates duplicate web-selection instructions while preserving exact immutable claims, visible authority labeling, empty-when-unneeded behavior and unavailable-document limits."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "Preserve express subject-scope restrictions before using a special permission. For an accessory assembly-room fixture question, BC 303.1.3 is the direct authority for the Assembly fixture option; a selected PC 403.1 permission limited to a building or nonaccessory tenant assembly space must be identified as separately limited and must not be presented as independent authority for the accessory room.",
+      "condition": "hasSourceScope(\"BC\", \"303.1.3\") || hasSourceScope(\"PC\", \"403.1\")",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "Do not infer that a room is legally accessory merely because it is used by residents or serves a principal occupancy. Unless the user expressly established the accessory relationship, make any BC 303.1.3 classification conclusion conditional on that relationship and include it in missingFacts.",
+      "condition": "hasSourceScope(\"BC\", \"303.1.3\")",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "When a calculation rule permits a non-50/50 sex distribution only when approved statistical data supports it, identify whether that approved data exists as a missing project fact whenever the final fixture calculation remains unresolved.",
+      "condition": "hasSourceScope(\"PC\", \"403.1.1\")",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "When supplied PC 403.1.1 text governs multiple occupancies, state its full calculation order: apply the applicable ratio to each occupancy, add the resulting fractional requirements, and only then round up.",
+      "condition": "hasSourceScope(\"PC\", \"403.1.1\")",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "When supplied PC 403.1 text states that the Building Code determines occupancy classification and occupant load, preserve that division of authority. Table 403.1 supplies fixture minimums; it does not itself determine the occupancy classification or occupant load.",
+      "condition": "hasSourceScope(\"PC\", \"403.1\")",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "For a plumbing-fixture calculation in which shared facilities are proposed or unresolved, state explicitly whether the assembled evidence establishes permission for those facilities to serve the identified occupancies. If no supplied passage governs sharing, say that the selected evidence does not establish that permission; do not merely list the arrangement as an unresolved fact.",
+      "condition": "hasSourceScope(\"PC\", \"403\") || hasSourceScope(\"BC\", \"303.1.3\") || /\\bshar(?:e|ed|es|ing)\\b/i.test(question)",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "When BC 901.9.3 and a building- or occupancy-wide Chapter 9 trigger are supplied together, distinguish the enlarged-portion rule from the separate new-construction trigger. If the latter applies to the qualifying building or occupancy, do not imply that its required system can automatically be confined to only the enlarged portion.",
+      "condition": "hasSourceScope(\"BC\", \"901.9.3\")",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "When discussing Type B+NYC provisions, do not assume the subject unit and bathroom are within that scope merely because the provision was selected. Unless the user established applicability, make the Building Code discussion conditional on Type B+NYC applicability and include that applicability in missingFacts.",
+      "condition": "hasSourceScope(\"BC\", \"1107\") || /Type B\\+NYC/i.test(question)",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "When BC 1101.3 supplies prior-code-building scope for BC 1101.3.1, preserve that ancestor condition in every project-specific accessibility conclusion. If prior-code-building status is only represented or otherwise unresolved, make the BC 1101.3.1 consequence conditional on confirming the prior-code-building and alteration/change context and retain that fact in missingFacts; do not state that accessible features must presently be provided merely because the proposed occupancy classification changes.",
+      "condition": "hasSourceScope(\"BC\", \"1101.3\")",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "scope-specialized-hint",
+      "before": "When a question compares a Building Code lavatory provision with an alleged vanity requirement, keep lavatory and vanity as distinct terms. Never write lavatory/vanity, vanity/lavatory, vanity (lavatory), or lavatory (vanity). State separately what the enacted text establishes about a lavatory and what it does not establish about a vanity.",
+      "condition": "hasSourceScope(\"BC\", \"1107.2.2.7\") || /\\b(?:vanit(?:y|ies)|lavator(?:y|ies))\\b/i.test(question)",
+      "preservation": "Exact hint retained when its supplied provision or explicit question scope applies. Universal evidence, material-qualifier and authority rules and final semantic verification remain unchanged."
+    },
+    {
+      "action": "condense",
+      "before": "When RELATIONSHIP identifies a source as governing ancestor scope for pinned evidence and its enacted text establishes an applicability category or condition needed to interpret the pinned descendant, treat that scope as material context rather than a collateral example. Do not force a generic ancestor heading or redundant parent restatement into the answer merely because it was supplied. If a material ancestor scope is not established by project facts, identify that applicability fact as unresolved without weakening an independently supported conclusion.",
+      "after": "Honor governing-ancestor RELATIONSHIP scope when its enacted applicability category or condition is needed to interpret a pinned descendant. Do not add generic headings or redundant parent restatements. Identify unresolved material ancestor applicability without weakening an independently supported conclusion.",
+      "preservation": "Preserves material enacted ancestor scope, explicit missing applicability and independent conclusions; omits repeated descriptions of the supplied relationship."
+    },
+    {
+      "action": "condense",
+      "before": "When a selected source includes attached official visual evidence, examine only the attached images and identify the exact visual source used through its PASSAGE_ID; never infer what an unselected map or image shows.",
+      "after": "Examine only attached official images; cite each exact visual source through its PASSAGE_ID. Never infer an unselected map or image.",
+      "preservation": "Preserves attached-image-only scope and exact visual binding; the separate visual ambiguity rule is unchanged."
+    },
+    {
+      "action": "condense",
+      "before": "Keep the answer within the scope of the current question. Do not introduce or cite a collateral code analysis merely to observe that a supplied fact might matter elsewhere; mention another code topic only when it materially qualifies the requested conclusion or the user asks for it.",
+      "after": "Stay within the current question. Discuss or cite another code topic only if it materially qualifies the requested conclusion or the user requests it; a fact merely mattering elsewhere is insufficient.",
+      "preservation": "Preserves the current-question boundary, prohibition on collateral citations and both exceptions."
+    },
+    {
+      "action": "condense",
+      "before": "When the question asks whether a design, control sequence, installation, or project complies with a selected provision, distinguish what that provision establishes from material quantities, rates, capacities, locations, assemblies, approvals, or other compliance inputs it does not establish. Identify the unresolved inputs precisely instead of using a generic full-design phrase.",
+      "after": "For design, control-sequence, installation or project compliance, distinguish the selected rule from missing material compliance inputs, including quantities, rates, capacities, locations, assemblies and approvals; name each precisely.",
+      "preservation": "Retains every named compliance input; the consolidated completeness rule already prohibits generic full-design labels."
+    },
+    {
+      "action": "condense",
+      "before": "Evidence labeled governing may establish the answer. Evidence labeled supporting may support only the rule it actually supplies. Evidence labeled contextual may appear in a supportedPoint only to explain its limited, non-governing relationship to the topic; never use it to establish the governing result. Never cite evidence labeled irrelevant.",
+      "after": "Governing evidence may establish the answer; supporting evidence supports only its supplied rule. Contextual evidence may enter a supportedPoint only to explain its limited, non-governing relationship, never to establish the result. Never cite irrelevant evidence.",
+      "preservation": "Preserves all four evidence roles and the narrow contextual supportedPoint allowance."
+    },
+    {
+      "action": "condense",
+      "before": "When the user supplied enacted passages, automatically discovered evidence labeled supporting is optional review context. Do not cite or discuss it unless it is materially necessary to answer the exact question or qualify a conclusion supported by the selected passages.",
+      "after": "With user-selected enacted passages, automatically discovered supporting evidence is optional; cite or discuss it only when materially necessary to answer the exact question or qualify the selected-source conclusion.",
+      "preservation": "Preserves priority of selected passages and the exact material-necessity test for automatic supporting evidence."
+    },
+    {
+      "action": "condense",
+      "before": "Do not add an example, consequence, code category, or practical requirement unless the assembled evidence or user-provided Project facts establish it. Clearly identify any illustration as hypothetical, and never use a hypothetical to introduce an unsupported legal premise.",
+      "after": "Examples, consequences, code categories and practical requirements must be grounded in assembled evidence or supplied Project facts. Label illustrations hypothetical; never use them to introduce unsupported law.",
+      "preservation": "Preserves grounding of examples and consequences, explicit hypothetical labeling and the unsupported-law prohibition."
+    },
+    {
+      "action": "condense",
+      "before": "Do not copy retrieval-process diagnostics, corpus routing notes, shortened-section notices, or omitted-cross-reference notices into evidenceLimitations. Those are internal search metadata, not enacted facts. State only the concise legal-evidence boundary material to the answer.",
+      "after": "evidenceLimitations must state only the material legal-evidence boundary, never internal retrieval diagnostics, corpus routing, shortened-section or omitted-cross-reference notices.",
+      "preservation": "Preserves every excluded metadata category and the material legal-evidence boundary."
+    },
+    {
+      "action": "condense",
+      "before": "When an enacted passage uses a specialized, unusual, or apparently awkward legal phrase, reproduce that phrase exactly before paraphrasing it. Do not silently correct or normalize enacted wording.",
+      "after": "Quote specialized, unusual or awkward enacted phrases exactly before paraphrasing; never silently correct or normalize them.",
+      "preservation": "Preserves exact unusual legal wording before paraphrase."
+    },
+    {
+      "action": "condense",
+      "before": "Do not infer the legal function of a room solely from its furniture arrangement or users. When an occupant-load, occupancy, or classification rule depends on actual use, preserve the intended activities or function as unresolved unless the user supplied them.",
+      "after": "Do not infer a room's legal function from furniture or users alone. If occupant load, occupancy or classification depends on actual use, keep unsupplied activities or function unresolved.",
+      "preservation": "Preserves the actual-use prerequisite and both prohibited proxies."
+    },
+    {
+      "action": "consolidate",
+      "before": "Write answerText as the complete user-facing answer. Do not target a fixed number of paragraphs or sentences.",
+      "after": "Write answerText as the shortest complete, reliable user-facing answer. Do not target a fixed number of paragraphs or sentences.",
+      "preservation": "Explicitly retains shortest complete and reliable answer alongside the no-fixed-length rule; this makes the earlier removed repeat direct rather than implicit."
+    }
+  ],
+  "sourceScopePolicy": "Specialized hints remain conditional on question or assembled code scope. Scope includes the exact section, descendants, and selected parents that may contain the relevant rule; dotted boundaries prevent prefix collisions.",
+  "versionMetadata": "The compact-v1 suffix identifies these instructions for formal and conversational generators and the conversational mock. The longer prototype suffix failed the existing 256-character saved-system-version limit; compact-v1 preserves that limit."
+}
