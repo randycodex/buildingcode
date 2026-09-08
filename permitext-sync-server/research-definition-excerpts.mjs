@@ -1,4 +1,4 @@
-export const researchDefinitionExcerptVersion = "20260811-canonical-definition-excerpt-v1";
+export const researchDefinitionExcerptVersion = "20260908-zoning-far-definition-v2";
 
 export const researchDefinitionExcerptLimits = Object.freeze({
   minimumSectionCharacters: 20_000,
@@ -260,8 +260,13 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     !isDefinitionSection(section, canonicalText)
   ) return null;
 
-  const normalizedQuery = terms(query).join(" ");
-  const queryTerms = new Set(terms(query));
+  // Match the enacted definition's full label when a zoning question uses
+  // its ordinary abbreviation. This adds a retrieval term, never a code rule.
+  const definitionQuery = String(section?.codePrefix || "").toUpperCase() === "ZR"
+    ? String(query || "").replace(/\bFAR\b/gi, "FAR floor area ratio")
+    : query;
+  const normalizedQuery = terms(definitionQuery).join(" ");
+  const queryTerms = new Set(terms(definitionQuery));
   if (!queryTerms.size) return null;
   const maximumDefinitions = positiveBound(
     options.maximumDefinitions,

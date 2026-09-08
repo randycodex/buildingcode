@@ -272,8 +272,11 @@ function immutableStructuredEvidenceSource(source, passageText) {
   if (!/^[a-f0-9]{64}$/.test(contentHash)) {
     throw new Error("Invalid structured evidence content hash.");
   }
+  const text = source.richSourceText === undefined
+    ? passageText
+    : requiredText(source.richSourceText, "structured evidence text", 20_000);
   const expectedHash = createHash("sha256")
-    .update(JSON.stringify({ reference, text: passageText, grids }))
+    .update(JSON.stringify({ reference, text, grids }))
     .digest("hex");
   if (contentHash !== expectedHash) {
     throw new Error("Structured evidence content no longer matches its integrity hash.");
@@ -282,6 +285,7 @@ function immutableStructuredEvidenceSource(source, passageText) {
     id: requiredText(source.richSourceID, "structured evidence source ID", 256),
     kind: requiredText(source.richSourceKind, "structured evidence kind", 64),
     reference,
+    text,
     contentHash,
     rowCount,
     grids

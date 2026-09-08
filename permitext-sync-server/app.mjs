@@ -11516,6 +11516,12 @@ async function resolveResearchAssemblySection(request, catalog) {
   if (!evidence) return null;
   return {
     ...evidence,
+    // Definition labels in the official zoning HTML are lowercase headings.
+    // Preserve that structure for selecting complete entries; flattened text
+    // cannot distinguish those labels from mentions inside other definitions.
+    ...(/\bdefinitions?\b/i.test(evidence.title) ? {
+      body: await researchBodyForCatalogSection({ ...evidence, id: evidence.sectionID })
+    } : {}),
     crossReferences: researchAssemblyCrossReferences(evidence, catalog)
   };
 }
@@ -18978,6 +18984,14 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
+    // Validate the exact evidence that will be persisted before spending on
+    // drafting or verification. Keep table text distinct from section context.
+    const evidenceSnapshots = assembledEvidence.map((source) => immutableEvidenceSnapshot({
+      source,
+      approvedAt: new Date().toISOString(),
+      evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
+      sourceLibraryVersion: source.codeVersion || conversation.codeVersion
+    }));
     progressResponse.progress("checking_citation_support", "active");
     const requiredClaims = requiredResearchClaimsFromEvidence(assembledEvidence);
     const materialityClaims = requiredClaims.map((claim) => ({
@@ -20128,12 +20142,6 @@ async function handleResearchConversationMessage(request, response) {
         disclaimer
       }
     };
-    const evidenceSnapshots = assembledEvidence.map((source) => immutableEvidenceSnapshot({
-      source,
-      approvedAt: now,
-      evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
-      sourceLibraryVersion: source.codeVersion || conversation.codeVersion
-    }));
     const answerRecord = {
       ...immutableResearchAnswer({
         id: assistantMessage.id,

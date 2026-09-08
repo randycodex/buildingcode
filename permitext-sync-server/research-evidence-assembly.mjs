@@ -10,7 +10,7 @@ import {
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260908-targeted-definition-reserve-v24";
+export const researchEvidenceAssemblyVersion = "20260908-table-context-integrity-v25";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -438,6 +438,9 @@ function attachStructuredTable(record, value, characterAllowance) {
     richSourceReference: compactText(table.reference),
     richSourceCanonicalReference: compactText(table.canonicalReference || table.reference),
     richSourceContentHash: compactText(table.contentHash),
+    // The table hash binds its own text and grid. The passage may additionally
+    // preserve the section's scope and footnotes, which have their own hash.
+    richSourceText: tableText,
     richSourceRowCount: Number(table.rowCount),
     richSourceGrids: structuredClone(table.grids)
   };
