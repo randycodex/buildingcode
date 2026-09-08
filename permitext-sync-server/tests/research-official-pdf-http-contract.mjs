@@ -36,7 +36,16 @@ Object.assign(process.env, {
   PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "offline-test"
 });
 const sourceURL = "https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf";
-let question = `According to the official service notice at ${sourceURL}, which review type applies to a new Builders Pavement Plan filing?`;
+const releaseURL = "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf";
+const releaseDocument = new PDFDocument();
+const releaseChunks = [];
+const releaseComplete = new Promise((resolve) => { releaseDocument.on("data", (chunk) => releaseChunks.push(chunk)); releaseDocument.on("end", () => resolve(Buffer.concat(releaseChunks))); });
+releaseDocument.text("Synthetic regression source: August 2026 Wetlands documents. An initial NB-GC filing flagged as wetlands requires a DEC Jurisdictional Determination.");
+releaseDocument.addPage().text("Wetlands documents continued. If the determination requires a DEC Permit, submit it before approval. Otherwise submit a waiver request for the DEC Permit document.");
+releaseDocument.addPage().text("Unrelated required documents for NB-GC filing applications flagged in the DOB NOW Property Profile as Mandatory Inclusionary Housing. August 2026 workflow documents and conditional responses.");
+releaseDocument.end();
+const releaseBytes = await releaseComplete;
+let question = `According to the official service notice at ${sourceURL}, which review type applies to the new application?`;
 let payload;
 let bytes;
 if (replayPath) {
@@ -69,6 +78,7 @@ globalThis.fetch = async (url, options) => {
     documentDoubles += 1;
     return new Response(corruptDocument ? Buffer.from("invalid pdf") : bytes, { headers: { "content-type": "application/pdf" } });
   }
+  if (String(url) === releaseURL) return new Response(releaseBytes, { headers: { "content-type": "application/pdf" } });
   throw new Error(`Unexpected external request in offline contract: ${String(url)}`);
 };
 let server;
@@ -98,17 +108,36 @@ try {
   assert.equal(answer.supportingSources[0].controlling, false);
   assert.equal(answer.supportingSources[0].attributedClaims[0].pageNumber, 1);
   assert.equal(answer.supportingSources[0].sourceContentHash.length, 64);
-  assert.equal(providerDoubles, 1, "No additional drafting or verification provider call is needed for canonical excerpts.");
+  assert.equal(providerDoubles, replayPath ? 0 : 1, "Known workflow documents bypass search; generic PDF requests require only the search call.");
   if (replayPath) {
     assert.match(answer.answerText, /BPP5/);
     assert.match(answer.answerText, /August 17, 2026/);
-    console.log(`Saved live response replay passed: ${answer.answerText.split(/\s+/).length} words; canonical PDF page retained.`);
+    console.log(`Saved official document replay passed: ${answer.answerText.split(/\s+/).length} words; canonical PDF page retained without provider calls.`);
   }
+  const beforeWorkflow = providerDoubles;
+  question = "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?";
+  const workflowResponse = await ask();
+  assert.equal(workflowResponse.status, 200, JSON.stringify(workflowResponse.body));
+  const workflowAnswer = workflowResponse.body.conversation.messages.at(-1).answer;
+  assert.match(workflowAnswer.answerText, /Standard Plan Review/);
+  assert.equal(workflowAnswer.retrieval.officialWorkflow.retrievalMethod, "official_workflow_catalog");
+  assert.equal(providerDoubles, beforeWorkflow, "An ordinary BPP workflow question must fetch the official PDF without a provider call.");
+  question = "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area. What documents and conditional responses are required under the August 2026 workflow?";
+  const wetlandResponse = await ask();
+  assert.equal(wetlandResponse.status, 200, JSON.stringify(wetlandResponse.body));
+  const wetlandAnswer = wetlandResponse.body.conversation.messages.at(-1).answer;
+  assert.match(wetlandAnswer.answerText, /DEC Jurisdictional Determination/);
+  assert.match(wetlandAnswer.answerText, /waiver request/);
+  assert.doesNotMatch(wetlandAnswer.answerText, /Mandatory Inclusionary Housing/);
+  assert.deepEqual(wetlandAnswer.supportingSources.flatMap((source) => source.attributedClaims.map((claim) => claim.pageNumber)), [1, 2]);
+  assert.equal(providerDoubles, beforeWorkflow, "The wetlands workflow also bypasses provider calls.");
+  // Keep the generic PDF failure check independent of catalog fallback.
+  question = `According to the official service notice at ${sourceURL}, which review type applies to the new application?`;
   corruptDocument = true;
   const rejected = await ask();
   assert.equal(rejected.status, 502);
   assert.equal(rejected.body.code, "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE");
-  assert.equal(documentDoubles, 2);
+  assert.equal(documentDoubles, 3);
   console.log("Official PDF HTTP completion and invalid-document rejection passed; zero external/provider calls.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

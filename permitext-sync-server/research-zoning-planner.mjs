@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const zoningResearchPlannerVersion = "20260901-question-compiler-v2";
+export const zoningResearchPlannerVersion = "20260908-question-compiler-v3";
 
 export const zoningResearchCompilerVersion = "20260901-answer-obligations-v21";
 export const zoningResearchRepairVersion = "20260901-source-bounded-patch-v2";
@@ -155,6 +155,12 @@ function questionPath(question) {
   if (propertyOrMap) return zoningResearchPaths.propertyMapApplicability;
   if (effectiveOrHistory) return zoningResearchPaths.effectiveDateHistory;
   if (table) return zoningResearchPaths.structuredTableSymbol;
+  // A numerical application can cite the FAR definition as one of its sources.
+  // Keep that application on the arithmetic path; section numbers alone do not
+  // turn a definition question into a calculation.
+  if (calculation && /\d[\d,]*(?:\.\d+)?(?:[- ]square-foot|\s+square feet|\s+sq\.?\s*ft\.?)/i.test(value)) {
+    return zoningResearchPaths.calculationScenario;
+  }
   if (definition) return zoningResearchPaths.definitionCrossReference;
   if (calculation) return zoningResearchPaths.calculationScenario;
   return zoningResearchPaths.directRule;

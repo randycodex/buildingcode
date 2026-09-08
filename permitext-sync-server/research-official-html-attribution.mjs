@@ -171,6 +171,7 @@ function queryTokens(value) {
 
 export function selectResearchOfficialHTMLPassages(passages, query, options = {}) {
   const tokens = queryTokens(query);
+  const requiredTerms = new Set((options.requiredPassageTerms || []).map((term) => normalizedText(term).toLowerCase()));
   const maximum = Math.max(1, Number(options.maximum || maximumSelectedPassages));
   return (Array.isArray(passages) ? passages : [])
     .map((passage) => {
@@ -184,7 +185,9 @@ export function selectResearchOfficialHTMLPassages(passages, query, options = {}
         score: sharedTokens.length ? sharedTokens.length * 10 + phraseBoost + (passage?.kind === "list_item" ? 2 : 0) : 0
       };
     })
-    .filter(({ score }) => score > 0)
+    .filter(({ passage, score }) => score > 0 && (!requiredTerms.size ||
+      [...queryTokens(passage?.kind === "pdf_page" ? passage.text : passage.claim)]
+        .some((token) => requiredTerms.has(token))))
     .sort((left, right) => right.score - left.score || left.passage.index - right.passage.index)
     .slice(0, maximum)
     .sort((left, right) => left.passage.index - right.passage.index)
@@ -344,7 +347,7 @@ export async function bindResearchWebSupportToOfficialDocuments(webSupport, opti
       const selected = selectResearchOfficialHTMLPassages(
         fetched.passages,
         `${options.question || ""} ${providerContext}`,
-        fetched.format === "pdf" ? { maximum: 3 } : {}
+        { ...(fetched.format === "pdf" ? { maximum: 3 } : {}), requiredPassageTerms: options.requiredPassageTerms }
       );
       if (!selected.length) {
         validationFailures.push({ url: source.url, code: "RESEARCH_OFFICIAL_SOURCE_NO_RELEVANT_PASSAGE" });

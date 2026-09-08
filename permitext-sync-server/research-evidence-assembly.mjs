@@ -10,7 +10,7 @@ import {
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260903-topic-dependency-coverage-v22";
+export const researchEvidenceAssemblyVersion = "20260908-zoning-table-context-v23";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -364,7 +364,7 @@ async function canonicalSection(resolveSection, value, origin) {
 
 function comparableTableReference(value, fallbackCodePrefix = "") {
   const normalized = compactText(value).toUpperCase();
-  const match = normalized.match(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?TABLE\s+([A-Z]?\d+(?:\.[0-9A-Z-]+)*)/i);
+  const match = normalized.match(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?TABLE\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Z-]+)*)/i);
   if (!match) return "";
   const codePrefix = String(match[1] || fallbackCodePrefix || "").toUpperCase();
   return codePrefix ? `${codePrefix}:TABLE:${match[2].toUpperCase()}` : `TABLE:${match[2].toUpperCase()}`;
@@ -372,7 +372,7 @@ function comparableTableReference(value, fallbackCodePrefix = "") {
 
 function tableReferences(value, fallbackCodePrefix = "") {
   const references = new Set();
-  for (const match of compactText(value).matchAll(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?Table\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi)) {
+  for (const match of compactText(value).matchAll(/\b(?:(AC|BC|EBC|FC|FGC|MC|PC|ZR)\s+)?Table\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi)) {
     const identity = comparableTableReference(match[0], match[1] || fallbackCodePrefix);
     if (identity) references.add(identity);
   }
@@ -386,20 +386,29 @@ function applicableStructuredTable(value) {
       compactText(source.id) && compactText(source.contentHash) &&
       Number(source.rowCount) > 0 && Array.isArray(source.grids) && source.grids.length > 0
   );
+  const ownTableReference = comparableTableReference(
+    `${value?.codePrefix || ""} Table ${value?.sectionNumber || ""}`,
+    value?.codePrefix
+  );
   const exact = completeTables.find((source) => {
     if (String(source?.kind || "").toLowerCase() !== "table") return false;
     const identity = comparableTableReference(source.reference, value?.codePrefix);
     return identity && references.has(identity);
   });
-  if (exact) return exact;
+  if (exact) return value?.codePrefix === "ZR" && completeTables.length === 1 &&
+      comparableTableReference(exact.reference, "ZR") === ownTableReference
+    ? { ...exact, preserveSectionContext: true } : exact;
 
   // Some prepared legacy sections preserve a complete grid but label its rich
   // source only as "Official table." Infer the identity only when the section
   // itself is the referenced table and contains exactly one complete grid.
-  const ownTableReference = comparableTableReference(
-    `${value?.codePrefix || ""} Table ${value?.sectionNumber || ""}`,
-    value?.codePrefix
-  );
+  // Zoning tables can be introduced as "the following table". Require a
+  // unique grid explicitly identified as this section's table; never infer
+  // identity merely from a shared chapter number or nearby table.
+  if (value?.codePrefix === "ZR" && completeTables.length === 1 && ownTableReference &&
+      comparableTableReference(completeTables[0].reference, "ZR") === ownTableReference) {
+    return { ...completeTables[0], preserveSectionContext: true };
+  }
   if (
     completeTables.length === 1 &&
     ownTableReference &&
@@ -418,10 +427,11 @@ function attachStructuredTable(record, value, characterAllowance) {
   const table = applicableStructuredTable(value);
   const tableText = String(table?.text || "").trim();
   if (!table || !tableText || tableText.length > characterAllowance) return record;
+  if (table.preserveSectionContext && !record.canonicalContextComplete) return record;
   return {
     ...record,
-    text: tableText,
-    canonicalContextComplete: false,
+    text: table.preserveSectionContext ? record.text : tableText,
+    canonicalContextComplete: table.preserveSectionContext ? record.canonicalContextComplete : false,
     truncated: false,
     richSourceID: compactText(table.id),
     richSourceKind: "table",

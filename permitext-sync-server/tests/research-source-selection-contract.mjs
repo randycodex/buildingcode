@@ -1,0 +1,62 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { researchWebSupportTrigger } from "../research-source-policy.mjs";
+import { researchDOBWorkflowRoute } from "../research-dob-workflow-routing.mjs";
+import { assembleResearchEvidence } from "../research-evidence-assembly.mjs";
+import { planZoningResearchQuestion, zoningResearchDeterministicContext, evaluateZoningEvidenceReadiness } from "../research-zoning-planner.mjs";
+
+const pilot = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-pilot-2026-09-07.json", import.meta.url)));
+for (const [id, topic] of [["DOBNOW-019", "builders_pavement"], ["DOBNOW-018", "wetland_documents"]]) {
+  const question = pilot.cases.find((item) => item.id === id).question;
+  const route = researchWebSupportTrigger({ question }, {});
+  assert.equal(route.useWeb, true);
+  assert.equal(route.workflow.topic, topic);
+  assert.equal(route.workflow.directDocumentRetrieval, true);
+  assert(route.workflow.sources.every((source) => source.url.startsWith("https://www.nyc.gov/assets/buildings/pdf/")));
+  assert.equal(researchWebSupportTrigger({ question: `Do not use the internet. ${question}` }, {}).useWeb, false);
+}
+assert.equal(researchWebSupportTrigger({ question: "Using only AC 28-105.4, explain the DOB filing exemption." }, {}).useWeb, false);
+assert.equal(researchDOBWorkflowRoute("For a new BPP filing, use https://www.nyc.gov/assets/buildings/pdf/different.pdf.").directDocumentRetrieval, false);
+assert.equal(researchDOBWorkflowRoute("For my DOB NOW application, does the proposed stair comply with BC 1007.1.1?").guidanceOnly, false);
+assert.equal(researchWebSupportTrigger({ question: "What authorization step appears?", retrievalQuery: "A new Builders Pavement Plan application. What authorization step appears?" }, {}).workflow.topic, "builders_pavement");
+assert.equal(researchWebSupportTrigger({ question: "What does PC 403.1 require?", retrievalQuery: "What does PC 403.1 require?" }, {}).workflow, undefined);
+const intake = JSON.parse(await readFile(new URL("../evals/research-owner-code-candidates.json", import.meta.url)));
+assert.equal(intake.cases.length, 60);
+assert.equal(new Set(intake.cases.map((item) => item.id)).size, 60);
+assert(intake.cases.every((item) => item.reviewStatus === "candidate-unverified"));
+for (const item of intake.cases) {
+  assert.notEqual(researchDOBWorkflowRoute(item.question)?.guidanceOnly, true,
+    `${item.id} is a technical or legal question, not a guidance-only portal workflow.`);
+}
+
+// Exercise the application's actual corpus routing, discovery and canonical
+// assembly. No supplied answer key, source IDs or table grids enter retrieval.
+process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA = "1";
+process.env.PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS = "1";
+const { assembledResearchEvidenceForTurn } = await import("../app.mjs");
+const question = pilot.cases.find((item) => item.id === "ZR-08").question;
+const plan = planZoningResearchQuestion({ question });
+assert.equal(plan.path, "calculation_scenario");
+assert.equal(planZoningResearchQuestion({ question: "What is the FAR definition in Section 12-10?" }).path, "definition_cross_reference");
+const assembled = await assembledResearchEvidenceForTurn({ question, messages: [], pinnedEvidence: [], projectFacts: [], zoningPlan: plan });
+const table = assembled.sources.find((source) => source.sectionNumber === "23-22");
+assert(table?.richSourceGrids?.length);
+assert.equal(table.canonicalContextComplete, true);
+assert.match(table.text, /standard residences/);
+assert.match(table.text, /within 100 feet of a wide street/);
+const context = zoningResearchDeterministicContext({ question, evidence: assembled.sources, plan });
+assert.equal(evaluateZoningEvidenceReadiness({ question, evidence: assembled.sources, plan, deterministicContext: context }).pass, true);
+assert(context.answerObligations.find((item) => item.id === "table_standard_floor_area_ceiling").values.includes("40,000"));
+assert.equal(context.arithmetic.calculations.find((item) => item.id === "proposed_floor_area_far").result, 4.2);
+const withoutGrid = assembled.sources.map(({ richSourceGrids, ...source }) => source);
+const missingContext = zoningResearchDeterministicContext({ question, evidence: withoutGrid, plan });
+assert.equal(evaluateZoningEvidenceReadiness({ question, evidence: withoutGrid, plan, deterministicContext: missingContext }).pass, false);
+
+// A neighboring table with the same chapter prefix must never satisfy the row.
+const neighboring = await assembleResearchEvidence({
+  question: "Use Table 23-22.",
+  discover: async () => ({ candidates: [{ sectionID: "mismatch", codePrefix: "ZR", sectionNumber: "23-22" }] }),
+  resolveSection: async () => ({ codePrefix: "ZR", sectionNumber: "23-22", text: "See Table 23-22.", richSources: [{ id: "wrong-grid", kind: "table", reference: "ZR Table 23-23", text: "Wrong table", contentHash: "a".repeat(64), rowCount: 1, grids: [{ rows: [{ cells: [{ text: "wrong" }] }] }] }] })
+});
+assert.equal(neighboring.sources[0].richSourceGrids, undefined);
+console.log("Research source-selection contracts passed: ordinary DOB workflows, 60 technical-question boundaries, actual FAR retrieval and missing-grid rejection; no paid calls.");

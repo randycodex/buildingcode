@@ -1,4 +1,6 @@
-export const researchSourcePolicyVersion = "20260908-supporting-web-v15";
+import { researchDOBWorkflowRoute } from "./research-dob-workflow-routing.mjs";
+
+export const researchSourcePolicyVersion = "20260908-supporting-web-v16";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -201,12 +203,18 @@ export function researchWebSupportTrigger(input = {}, environment = process.env)
 
   const question = normalizedText(input.question || input.query);
   const reasons = [];
+  const explicitNoWeb = /\b(?:do not|don't|without)\s+(?:use|using|search|searching|consult|consulting|browse|browsing)\s+(?:the\s+)?(?:web|internet|online|external)\b/i.test(question);
+  const onlyNamedSources = /\b(?:using|use|from|based on)\s+only\s+(?:the\s+)?(?:(?:AC|BC|PC|ZR|MC|FGC)\b|(?:selected|supplied|enacted)\s+(?:code\s+)?(?:text|sources?|passages?))/i.test(question);
   const selectedEvidenceBoundaryOnly =
-    (selectedEvidenceBoundaryPattern.test(question) || namedProvisionBoundaryPattern.test(question) ||
+    explicitNoWeb || ((onlyNamedSources || selectedEvidenceBoundaryPattern.test(question) || namedProvisionBoundaryPattern.test(question) ||
       selectedPassageSummaryPattern.test(question)) &&
     input.guidanceRequested !== true &&
-    !explicitExternalLookupPattern.test(question);
+    !explicitExternalLookupPattern.test(question));
   if (selectedEvidenceBoundaryOnly) reasons.push("selected_evidence_boundary");
+  const workflow = !selectedEvidenceBoundaryOnly
+    ? researchDOBWorkflowRoute(input.retrievalQuery || question)
+    : null;
+  if (workflow) reasons.push("dob_workflow_requested");
   if (
     !selectedEvidenceBoundaryOnly && (
       input.guidanceRequested === true ||
@@ -239,10 +247,11 @@ export function researchWebSupportTrigger(input = {}, environment = process.env)
   const uniqueReasons = [...new Set(reasons)];
   return {
     useWeb: uniqueReasons.some((reason) =>
-      ["official_guidance_requested", "outside_library_support_needed"].includes(reason)
+      ["official_guidance_requested", "outside_library_support_needed", "dob_workflow_requested"].includes(reason)
     ),
     reasons: uniqueReasons,
-    configuration
+    configuration,
+    ...(workflow ? { workflow } : {})
   };
 }
 

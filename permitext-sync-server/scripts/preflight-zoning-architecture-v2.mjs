@@ -29,6 +29,8 @@ import {
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const architectureV21 = process.argv.includes("--architecture-v21");
+const sourceSelection = process.argv.includes("--source-selection");
+if (sourceSelection && !architectureV21) throw new Error("Source-selection replay requires the V2.1 regression suite.");
 const paidEnvironmentNames = [
   "OPENAI_API_KEY",
   "AZURE_OPENAI_API_KEY",
@@ -63,7 +65,9 @@ const resultPath = join(
   root,
   "evals",
   "results",
-  architectureV21
+  sourceSelection
+    ? "zoning-source-selection-no-cost-preflight-2026-09-08.json"
+    : architectureV21
     ? "zoning-architecture-v21-no-cost-preflight.json"
     : "zoning-architecture-v2-no-cost-preflight.json"
 );
@@ -533,7 +537,7 @@ async function buildResult() {
     artifact: architectureV21
       ? "Permitext Zoning Research Architecture V2.1 no-cost preflight"
       : "Permitext Zoning Research Architecture V2 no-cost preflight",
-    artifactDate: "2026-09-01",
+    artifactDate: sourceSelection ? "2026-09-08" : "2026-09-01",
     plannerVersion: zoningResearchPlannerVersion,
     compilerVersion: zoningResearchCompilerVersion,
     cohort: {

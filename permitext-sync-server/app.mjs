@@ -11520,7 +11520,7 @@ async function resolveResearchAssemblySection(request, catalog) {
   };
 }
 
-async function assembledResearchEvidenceForTurn({
+export async function assembledResearchEvidenceForTurn({
   question,
   messages,
   pinnedEvidence,
@@ -19110,13 +19110,15 @@ async function handleResearchConversationMessage(request, response) {
       ? { useWeb: false, reasons: [] }
       : researchWebSupportTrigger({
           question,
+          retrievalQuery: evidencePackage.retrievalQuery,
           outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(
             evidencePackage.discovery
           )
         });
     const webSupportRequested = webSupportPolicyDecision.useWeb;
     const allowOfficialGuidanceOnly =
-      webSupportPolicyDecision.reasons.includes("official_guidance_requested");
+      webSupportPolicyDecision.reasons.includes("official_guidance_requested") ||
+      webSupportPolicyDecision.workflow?.guidanceOnly === true;
     const modelRouting = routeResearchAnswerModel({
       question,
       evidence: assembledEvidence,
@@ -19208,18 +19210,40 @@ async function handleResearchConversationMessage(request, response) {
           });
           return runEvidenceAnalysis(accurateModel);
         });
+    const retrieveWebSupport = async () => {
+      const workflow = webSupportPolicyDecision.workflow;
+      if (workflow?.directDocumentRetrieval) {
+        const direct = await bindResearchWebSupportToOfficialDocuments({
+          ...emptyWebSupport,
+          sources: workflow.sources.map((source) => ({
+            ...source, authorityClass: "official_guidance", role: "supporting", controlling: false
+          })),
+          searched: true,
+          retrievalMethod: "official_workflow_catalog",
+          candidateOfficialURLs: workflow.sources.map((source) => source.url)
+        }, {
+          question: evidencePackage.retrievalQuery || question,
+          requiredPassageTerms: workflow.passageTerms,
+          officialDomains: researchSourcePolicyConfiguration().officialDomains,
+          signal: progressResponse.signal
+        });
+        if (direct.sources.length) return direct;
+      }
+      return openAIResearchWebSupport(question, context.userID, {
+        retrievalQuery: workflow ? evidencePackage.retrievalQuery || question : question,
+        model: modelRouting.configuration.webSupportModel,
+        requireAttributableSources: allowOfficialGuidanceOnly,
+        candidateOfficialURLs: [
+          ...(workflow?.sources || []).map((source) => source.url),
+          ...(evidencePackage.discovery?.outsideCurrentLibrary || []).map((source) => source?.sourceURL)
+        ].filter(Boolean),
+        signal: progressResponse.signal
+      });
+    };
     const webSupportPromise = mockWebSupport
       ? Promise.resolve(mockWebSupport)
       : !mockMode && webSupportRequested
-      ? openAIResearchWebSupport(question, context.userID, {
-          retrievalQuery: question,
-          model: modelRouting.configuration.webSupportModel,
-          requireAttributableSources: allowOfficialGuidanceOnly,
-          candidateOfficialURLs: (evidencePackage.discovery?.outsideCurrentLibrary || [])
-            .map((source) => source?.sourceURL)
-            .filter(Boolean),
-          signal: progressResponse.signal
-        })
+      ? retrieveWebSupport()
       : Promise.resolve(emptyWebSupport);
     // Web guidance and enacted-evidence organization are independent. Running
     // them together shortens the turn without removing either quality gate.
@@ -19228,7 +19252,8 @@ async function handleResearchConversationMessage(request, response) {
       evidenceAnalysisPromise
     ]);
     researchOperation.webSupportSearched = webSupport.searched === true;
-    if (!mockMode && allowOfficialGuidanceOnly && webSupport.sources.length > 0) {
+    if (!mockMode && allowOfficialGuidanceOnly && webSupport.sources.length > 0 &&
+        webSupport.retrievalMethod !== "official_workflow_catalog") {
       webSupport = await bindResearchWebSupportToOfficialDocuments(webSupport, {
         question,
         officialDomains: researchSourcePolicyConfiguration().officialDomains,
@@ -20058,6 +20083,11 @@ async function handleResearchConversationMessage(request, response) {
           webSupportRequested,
           webSupportReasons: webSupportPolicyDecision.reasons,
           allowOfficialGuidanceOnly,
+          ...(webSupportPolicyDecision.workflow ? { officialWorkflow: {
+            version: webSupportPolicyDecision.workflow.version,
+            topic: webSupportPolicyDecision.workflow.topic,
+            retrievalMethod: webSupport.retrievalMethod || "official_web_search"
+          } } : {}),
           webSupportSearched: Boolean(webSupport.searched),
           webQuery: webSupport.sanitizedQuery || null,
           webLimitation: webSupport.limitation || null

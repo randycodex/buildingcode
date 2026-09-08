@@ -1539,10 +1539,14 @@ export async function discoverRelevantEvidence({
       Array.from(String(passage.text || "").matchAll(/\bTable\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi))
         .map((match) => `Table ${match[1]}`)
     ));
+    const ownZoningTables = String(section.codePrefix).toUpperCase() === "ZR"
+      ? richSources.filter((source) => source.kind === "table" &&
+          comparableTableReference(source.reference) === comparableTableReference(`ZR Table ${section.sectionNumber}`))
+      : [];
     const applicableRichSources = richSources.filter((source) =>
       passageTableReferences.some((reference) =>
         comparableTableReference(source.reference) === comparableTableReference(reference)
-      )
+      ) || (ownZoningTables.length === 1 && source === ownZoningTables[0])
     );
     const displayBlock = candidateDisplayBlock(body, passage);
     const finalScore = entry.score +
