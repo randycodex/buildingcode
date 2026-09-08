@@ -1,0 +1,617 @@
+{
+  "schema": "permitext-decision-fact-verifier-diagnostic-v1",
+  "sourceCommit": "1472f20de8696c7a783077b6683a154ebbab8776",
+  "authorization": "Owner authorized repeated Research testing within approximately $8 total. This package uses at most $0.24 of the remaining $0.250157 conservative allowance for seven production-verifier checks, including contrasting applicability and requested-design controls.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    }
+  ],
+  "previousConservativeSpendUSD": 7.749843,
+  "authorizationUSD": 8,
+  "maximumCumulativeSpendUSD": 0.24,
+  "maximumTurnSpendUSD": 0.24,
+  "maximumChecks": 7,
+  "maximumProviderRequests": 14,
+  "scope": "Production verifier only; no answering-model generation, new user Research delivery, web search, paid benchmark scoring, manual retry, deployment or professional approval. Native provider-client retries remain bounded by the same conservative ledger.",
+  "originalFullHTTPTurnAttempts": 66,
+  "originalProviderCalls": 139,
+  "pricingSource": "Versioned local standard-price fixture in tests/research-request-envelope-preflight.mjs; not a provider invoice or account balance.",
+  "preflightSHA256": "4203ad39bd8b23de0ee6e82d6881c15faafc727e94c76230d7a5195dc805a1af",
+  "status": "completed",
+  "startedAt": "2026-09-08T09:11:22.542Z",
+  "results": [
+    {
+      "id": "PC-04-recorded",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": false,
+      "expectedIssue": "unnecessary_qualification",
+      "expectedMissingFactIndices": [
+        0,
+        1
+      ],
+      "purpose": "Correct direct result with downstream design inputs incorrectly listed as missing facts.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-recorded",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006377,
+          "estimatedTokenCostUSD": 0.002769
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "incorrect_citation",
+            "detail": "The supported point titled “Required drain outlet size and lint strainer” cites only PC 412.3, which establishes the 3-inch outlet size but not the lint-strainer requirement. The lint-strainer statement must also cite PC 412.4."
+          },
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The missing-facts entries about floor area, configuration, elevations, drain locations, outlet diameter, and lint-strainer details are not needed to answer whether the floor drain is optional. The supplied facts and PC 412.4 establish that omitting the floor drain is not compliant; those items are optional downstream design or verification details."
+          }
+        ],
+        "unnecessaryMissingFactIndices": [
+          0,
+          1
+        ]
+      },
+      "expectationMatched": true,
+      "durationMilliseconds": 7831
+    },
+    {
+      "id": "PC-04-decision-facts-only",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": true,
+      "expectedIssue": null,
+      "expectedMissingFactIndices": [],
+      "purpose": "Same narrative, rules, qualifications and citations; only non-decision missing facts removed.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-decision-facts-only",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.00582,
+          "estimatedTokenCostUSD": 0.001898
+        }
+      ],
+      "verification": {
+        "pass": true,
+        "issues": []
+      },
+      "expectationMatched": true,
+      "durationMilliseconds": 2946
+    },
+    {
+      "id": "PC-10-recorded",
+      "sourceCaseID": "PC-10",
+      "scope": "verifier-only",
+      "expectedPass": false,
+      "expectedIssue": "unnecessary_qualification",
+      "expectedMissingFactIndices": [
+        0
+      ],
+      "purpose": "Correct direct result with downstream design inputs incorrectly listed as missing facts.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-10-recorded",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.004299,
+          "estimatedTokenCostUSD": 0.001334
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The answer correctly concludes that the pan is required, but it lists replacement-status, prior-pan-drain, and leak-detector facts in missingFacts even though those facts can affect only the optional exception to the pan-drain requirement, not whether PC 504.7 requires the pan on the stated facts."
+          }
+        ],
+        "unnecessaryMissingFactIndices": [
+          0
+        ]
+      },
+      "expectationMatched": true,
+      "durationMilliseconds": 4288
+    },
+    {
+      "id": "PC-10-decision-facts-only",
+      "sourceCaseID": "PC-10",
+      "scope": "verifier-only",
+      "expectedPass": true,
+      "expectedIssue": null,
+      "expectedMissingFactIndices": [],
+      "purpose": "Same narrative, rules, qualifications and citations; only non-decision missing facts removed.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-10-decision-facts-only",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.004492,
+          "estimatedTokenCostUSD": 0.001471
+        }
+      ],
+      "verification": {
+        "pass": true,
+        "issues": []
+      },
+      "expectationMatched": true,
+      "durationMilliseconds": 6485
+    },
+    {
+      "id": "PC-04-unresolved-applicability",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": true,
+      "expectedIssue": null,
+      "expectedMissingFactIndices": [],
+      "purpose": "Counterfactual control: genuinely unresolved facility applicability remains in missingFacts.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-unresolved-applicability",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006238,
+          "estimatedTokenCostUSD": 0.002195
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "misstated_provision",
+            "detail": "The supported point says, “For the central washing facility rule, the drains also must be provided with lint strainers,” which incorrectly suggests that lint strainers apply only to central washing facilities. PC 412.4 requires lint strainers for the floor drains in both listed categories: public coin-operated laundries and central washing facilities of multiple-family dwellings."
+          }
+        ]
+      },
+      "expectationMatched": false,
+      "durationMilliseconds": 5499
+    },
+    {
+      "id": "PC-04-mixed-material-entry",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": false,
+      "expectedIssue": "unnecessary_qualification",
+      "expectedMissingFactIndices": [],
+      "purpose": "An entry mixes necessary applicability with optional design details. Report the defect but do not authorize deletion of the material entry.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-mixed-material-entry",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006329,
+          "estimatedTokenCostUSD": 0.002254
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "misstated_provision",
+            "detail": "The answer says lint strainers apply additionally to the central washing facility rule, which implies they may not apply to public coin-operated laundries. PC 412.4 states that the drains required in both listed facility categories must have outlets of at least 3 inches and be provided with lint strainers."
+          },
+          {
+            "type": "unsupported_requirement",
+            "detail": "The missing-facts entry adds proposed drain locations, floor elevations, and outlet specifications as information to supply for a compliant layout. Those design details are not needed to answer whether PC 412.4 requires a floor drain and are not established as requirements by the supplied evidence."
+          },
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The answer correctly identifies the facility category as the material unresolved fact, but it unnecessarily treats downstream layout-design details as needed information for the requested decision."
+          }
+        ]
+      },
+      "expectationMatched": true,
+      "durationMilliseconds": 5887
+    },
+    {
+      "id": "PC-04-requested-design",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": true,
+      "expectedIssue": null,
+      "expectedMissingFactIndices": [],
+      "purpose": "Counterfactual control: the same design unknowns are relevant when the question explicitly requests that design.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-requested-design",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006346,
+          "estimatedTokenCostUSD": 0.002261
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "unsupported_requirement",
+            "detail": "The supported point adds an uncited statement about “trapped standpipes for washer discharge.” That issue is not necessary to answer the requested missing-design-details question and is not supported by the cited PC 412.4 passage."
+          },
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The missing-facts list treats proposed drain locations and proposed outlet/lint-strainer details as facts needed to determine the requested result. Drain locations are a design output, and the code already establishes the minimum 3-inch outlet and lint-strainer requirements; these items may be optional design or verification context rather than prerequisites for determining the governing result."
+          }
+        ],
+        "unnecessaryMissingFactIndices": [
+          0,
+          1
+        ]
+      },
+      "expectationMatched": false,
+      "durationMilliseconds": 6893
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "PC-04-recorded",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 53782,
+      "startedAt": "2026-09-08T09:11:22.544Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11116,
+        "input_tokens_details": {
+          "cache_write_tokens": 11113,
+          "cached_tokens": 0
+        },
+        "output_tokens": 455,
+        "output_tokens_details": {
+          "reasoning_tokens": 285
+        },
+        "total_tokens": 11571
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_04dc2fad635e817a016a9fd140876087d2817b68cde2a531b6",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"incorrect_citation\",\"detail\":\"The supported point titled “Required drain outlet size and lint strainer” cites only PC 412.3, which establishes the 3-inch outlet size but not the lint-strainer requirement. The lint-strainer statement must also cite PC 412.4.\"},{\"type\":\"unnecessary_qualification\",\"detail\":\"The missing-facts entries about floor area, configuration, elevations, drain locations, outlet diameter, and lint-strainer details are not needed to answer whether the floor drain is optional. The supplied facts and PC 412.4 establish that omitting the floor drain is not compliant; those items are optional downstream design or verification details.\"}],\"unnecessaryMissingFactIndices\":[0,1]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 7826
+    },
+    {
+      "caseID": "PC-04-decision-facts-only",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 53440,
+      "startedAt": "2026-09-08T09:11:30.376Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11059,
+        "input_tokens_details": {
+          "cache_write_tokens": 8241,
+          "cached_tokens": 2815
+        },
+        "output_tokens": 161,
+        "output_tokens_details": {
+          "reasoning_tokens": 132
+        },
+        "total_tokens": 11220
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_021d599510cd7665016a9fd144d17487d2a0e1f6ea162ace7f",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 2942
+    },
+    {
+      "caseID": "PC-10-recorded",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 37620,
+      "startedAt": "2026-09-08T09:11:33.322Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 7682,
+        "input_tokens_details": {
+          "cache_write_tokens": 4864,
+          "cached_tokens": 2815
+        },
+        "output_tokens": 254,
+        "output_tokens_details": {
+          "reasoning_tokens": 152
+        },
+        "total_tokens": 7936
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0c28008ffcf25578016a9fd1486b5487d2bb38e6793cfae511",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"unnecessary_qualification\",\"detail\":\"The answer correctly concludes that the pan is required, but it lists replacement-status, prior-pan-drain, and leak-detector facts in missingFacts even though those facts can affect only the optional exception to the pan-drain requirement, not whether PC 504.7 requires the pan on the stated facts.\"}],\"unnecessaryMissingFactIndices\":[0]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 4284
+    },
+    {
+      "caseID": "PC-10-decision-facts-only",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 37341,
+      "startedAt": "2026-09-08T09:11:37.614Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 7630,
+        "input_tokens_details": {
+          "cache_write_tokens": 4812,
+          "cached_tokens": 2815
+        },
+        "output_tokens": 376,
+        "output_tokens_details": {
+          "reasoning_tokens": 347
+        },
+        "total_tokens": 8006
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_04f8125863a0e859016a9fd14fb5b087d2926dd82814157866",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 6480
+    },
+    {
+      "caseID": "PC-04-unresolved-applicability",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 52804,
+      "startedAt": "2026-09-08T09:11:44.099Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10919,
+        "input_tokens_details": {
+          "cache_write_tokens": 8101,
+          "cached_tokens": 2815
+        },
+        "output_tokens": 432,
+        "output_tokens_details": {
+          "reasoning_tokens": 320
+        },
+        "total_tokens": 11351
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_00e9e5c0c5a64898016a9fd154369c87d290674b9cdec102d6",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"misstated_provision\",\"detail\":\"The supported point says, “For the central washing facility rule, the drains also must be provided with lint strainers,” which incorrectly suggests that lint strainers apply only to central washing facilities. PC 412.4 requires lint strainers for the floor drains in both listed categories: public coin-operated laundries and central washing facilities of multiple-family dwellings.\"}],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 5493
+    },
+    {
+      "caseID": "PC-04-mixed-material-entry",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 52920,
+      "startedAt": "2026-09-08T09:11:49.601Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10937,
+        "input_tokens_details": {
+          "cache_write_tokens": 8119,
+          "cached_tokens": 2815
+        },
+        "output_tokens": 478,
+        "output_tokens_details": {
+          "reasoning_tokens": 276
+        },
+        "total_tokens": 11415
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_057fb8ac34d14783016a9fd159975487d292ae2f4ae9a2c21f",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"misstated_provision\",\"detail\":\"The answer says lint strainers apply additionally to the central washing facility rule, which implies they may not apply to public coin-operated laundries. PC 412.4 states that the drains required in both listed facility categories must have outlets of at least 3 inches and be provided with lint strainers.\"},{\"type\":\"unsupported_requirement\",\"detail\":\"The missing-facts entry adds proposed drain locations, floor elevations, and outlet specifications as information to supply for a compliant layout. Those design details are not needed to answer whether PC 412.4 requires a floor drain and are not established as requirements by the supplied evidence.\"},{\"type\":\"unnecessary_qualification\",\"detail\":\"The answer correctly identifies the facility category as the material unresolved fact, but it unnecessarily treats downstream layout-design details as needed information for the requested decision.\"}],\"unnecessaryMissingFactIndices\":[] }"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 5879
+    },
+    {
+      "caseID": "PC-04-requested-design",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 53184,
+      "startedAt": "2026-09-08T09:11:55.490Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10970,
+        "input_tokens_details": {
+          "cache_write_tokens": 8152,
+          "cached_tokens": 2815
+        },
+        "output_tokens": 478,
+        "output_tokens_details": {
+          "reasoning_tokens": 314
+        },
+        "total_tokens": 11448
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_012a6b589471a9e9016a9fd16078fc87d2965a216bd60c660c",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"unsupported_requirement\",\"detail\":\"The supported point adds an uncited statement about “trapped standpipes for washer discharge.” That issue is not necessary to answer the requested missing-design-details question and is not supported by the cited PC 412.4 passage.\"},{\"type\":\"unnecessary_qualification\",\"detail\":\"The missing-facts list treats proposed drain locations and proposed outlet/lint-strainer details as facts needed to determine the requested result. Drain locations are a design output, and the code already establishes the minimum 3-inch outlet and lint-strainer requirements; these items may be optional design or verification context rather than prerequisites for determining the governing result.\"}],\"unnecessaryMissingFactIndices\":[0,1]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 6885
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 0.24,
+    "reservedUSD": 0.014182,
+    "actualUSD": 0.014182,
+    "requestCount": 7,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 7.789744,
+  "completedAt": "2026-09-08T09:12:02.381Z"
+}

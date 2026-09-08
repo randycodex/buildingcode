@@ -46,6 +46,9 @@ globalThis.fetch = async (url, options) => {
     if (phases.length === 2) {
       firstProposed = proposed;
       assert.deepEqual(proposed.missingFacts, active.answer.missingFacts);
+      for (const key of ["answerText", "supportedPoints", "citations"]) {
+        assert.deepEqual(proposed[key], active.answer[key], `The verifier must receive the delivered ${key}, including source repairs.`);
+      }
       verdict = { pass: false, issues: [{ type: "unnecessary_qualification", detail: "Recorded decision is already established; the listed design inputs cannot change it." }],
         unnecessaryMissingFactIndices: proposed.missingFacts.map((_, index) => index) };
     } else {

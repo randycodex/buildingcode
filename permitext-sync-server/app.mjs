@@ -10482,6 +10482,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
   };
   const evidenceText = evidence.map((source) => [
     `PASSAGE_ID: ${source.sourceID}`,
+    `SECTION_ID: ${source.sectionID}`,
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
     `EVIDENCE_ROLE: ${source.evidencePriority?.evidenceRole || "supporting"}`,
     `TOPIC_ROUTE_RELATIONSHIP: ${source.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
@@ -10492,6 +10493,18 @@ export async function openAIResearchVerification(question, evidence, interpretat
       : "",
     `TEXT: ${source.text}`
   ].join("\n")).join("\n\n---\n\n");
+  // Structural lookup only. The verifier must still read the exact bound text;
+  // neither a primary section nor a citation elsewhere proves this point.
+  const evidenceByID = new Map(evidence.map((source) => [source.sourceID, source]));
+  const pointBindings = (interpretation.supportedPoints || []).map((point, pointIndex) => ({
+    pointIndex,
+    primarySectionID: point.sectionID,
+    boundPassages: (point.sourceIDs || []).map((sourceID) => {
+      const source = evidenceByID.get(sourceID);
+      return source ? { sourceID, sectionID: source.sectionID, section: `${source.codePrefix} ${source.sectionNumber}` }
+        : { sourceID, unresolved: true };
+    })
+  }));
   const requestBody = {
     model: configuration.model,
     store: false,
@@ -10500,6 +10513,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
+      "For each supported point, evaluate every passage in its sourceIDs array. Its sectionID identifies the primary section, not the exclusive source. The supported-point binding lookup resolves these IDs but does not establish substantive support. Fail with incorrect_citation if a claim lacks support in that point's bound passages, even when a supporting passage appears elsewhere in the answer's citations or supplied evidence. Never infer a missing binding from a shared topic or section number.",
       zoningResearchSafetyInstruction(evidence),
       "Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs.",
       "Presentation must fit the question: accept a concise direct paragraph for a simple or expressly short request, a compact checklist for parallel requirements, and a Markdown table only for a real side-by-side comparison. Fail with missed_material_conclusion if formatting hides the governing result or material qualification. Fail with unsupported_requirement if a bold statement, practical note, calculation, drawing note, or human-readable inline code reference is not supported by the supplied enacted evidence and structured citation map.",
@@ -10577,6 +10591,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
         ? `STRUCTURED UNRESOLVED PROJECT FACTS\n${options.structuredEvidenceAnalysis.unresolvedProjectFacts.join("\n")}`
         : "",
       `AUTHORIZED ENACTED EVIDENCE\n${evidenceText}`,
+      `SUPPORTED-POINT BINDING LOOKUP — STRUCTURAL METADATA ONLY\n${JSON.stringify(pointBindings)}`,
       `LEXICAL WEB OVERLAPS FOR SOURCE COMPARISON — HEURISTIC, NOT AN ATTRIBUTION FINDING\n${JSON.stringify(evaluateResearchWebAttribution({
         question, answer: interpretation, evidence, webSupport: options.webSupport,
         deferLexicalOverlapToVerifier: true
