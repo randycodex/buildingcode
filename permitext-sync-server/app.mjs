@@ -236,6 +236,7 @@ import {
   researchEconomicsReport
 } from "./research-economics.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
+import { researchDecisionFactRepair } from "./research-decision-fact-repair.mjs";
 import {
   researchEvidenceForBoundedCitationLookup,
   researchEvidenceSupportsBoundedCitationFastPath,
@@ -325,7 +326,8 @@ import {
 } from "./research-answer-quality.mjs";
 import {
   applyResearchOutsideAuthorityStartingPoints,
-  researchAnswerPresentationContract
+  researchAnswerPresentationContract,
+  researchDecisionFactInstruction
 } from "./research-answer-presentation.mjs";
 import {
   applyResearchProjectFactCoverage,
@@ -10135,10 +10137,10 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   const configuration = conversational
     ? {
         ...baseConfiguration,
-        promptVersion: `${baseConfiguration.promptVersion}:compact-v1:conversational-v4`,
+        promptVersion: `${baseConfiguration.promptVersion}:compact-v2:conversational-v4`,
         evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
       }
-    : { ...baseConfiguration, promptVersion: `${baseConfiguration.promptVersion}:compact-v1` };
+    : { ...baseConfiguration, promptVersion: `${baseConfiguration.promptVersion}:compact-v2` };
   const model = configuration.model;
   const passageEvidence = evidence.map((section) => ({
     ...section,
@@ -10429,7 +10431,16 @@ const researchVerificationSchema = {
   required: ["pass", "issues"]
 };
 
-function validateResearchVerification(value) {
+const researchDecisionFactVerificationSchema = {
+  ...researchVerificationSchema,
+  properties: {
+    ...researchVerificationSchema.properties,
+    unnecessaryMissingFactIndices: { type: "array", maxItems: 12, items: { type: "integer", minimum: 0 } }
+  },
+  required: [...researchVerificationSchema.required, "unnecessaryMissingFactIndices"]
+};
+
+function validateResearchVerification(value, missingFactCount = 0) {
   if (!value || typeof value !== "object" || typeof value.pass !== "boolean" || !Array.isArray(value.issues)) {
     const error = new Error("The Research verifier returned an invalid result.");
     error.code = "INVALID_RESEARCH_VERIFICATION";
@@ -10439,20 +10450,26 @@ function validateResearchVerification(value) {
     type: String(issue?.type || "").trim(),
     detail: String(issue?.detail || "").replace(/\s+/g, " ").trim().slice(0, 1_500)
   }));
+  // Older stored responses and test doubles omit the new field. Only explicit,
+  // valid indices in a failed response can authorize a candidate fact edit.
+  const indices = value.unnecessaryMissingFactIndices === undefined ? [] : value.unnecessaryMissingFactIndices;
   if (
     issues.length > 12 ||
     issues.some((issue) => !researchVerificationIssueTypes.has(issue.type) || !issue.detail) ||
     (value.pass && issues.length) ||
-    (!value.pass && !issues.length)
+    (!value.pass && !issues.length) ||
+    !Array.isArray(indices) || indices.length > 12 || new Set(indices).size !== indices.length ||
+    indices.some((index) => !Number.isSafeInteger(index) || index < 0 || index >= missingFactCount) ||
+    (indices.length > 0 && (value.pass || !issues.some((issue) => issue.type === "unnecessary_qualification")))
   ) {
     const error = new Error("The Research verifier returned inconsistent issues.");
     error.code = "INVALID_RESEARCH_VERIFICATION";
     throw error;
   }
-  return { pass: value.pass, issues };
+  return { pass: value.pass, issues, ...(indices.length ? { unnecessaryMissingFactIndices: indices } : {}) };
 }
 
-async function openAIResearchVerification(question, evidence, interpretation, userID, options = {}) {
+export async function openAIResearchVerification(question, evidence, interpretation, userID, options = {}) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     const error = new Error("Research AI is not configured.");
@@ -10503,10 +10520,13 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not validate a sibling table row, exception, or rule that is absent from that selected text merely because it belongs to the same section.",
       "A source whose RELATIONSHIP identifies it as governing ancestor scope for pinned evidence is material only when its enacted text establishes an applicability category or condition needed to interpret the pinned descendant. Do not classify such material scope as collateral merely because the ancestor is broader, but do not require or cite a generic ancestor heading or redundant parent restatement merely because it was supplied. Preserve any genuinely unresolved applicability fact without weakening an independently supported conclusion.",
       "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
+      researchDecisionFactInstruction,
+      "Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields.",
+      "When rejecting an answer solely for unnecessary missingFacts entries, return their zero-based array indices in unnecessaryMissingFactIndices. Select an entry only when its entire content is unnecessary for the requested decision; never select an entry containing a material applicability or exception fact. Return an empty index array for other failures or a passing answer. These indices propose a limited edit; the edited answer must still pass a new full verification.",
       "Fail with repeated_established_fact when the answer asks the user to establish or reconfirm a fact already supplied for the active topic. Independent professional verification of documents or measurements is different and may still be identified when material.",
       "When the user has established that a building is fully sprinklered, treat installed throughout as established factual context. The answer may request documentation of compliance with a named installation standard when material, but must not return fully sprinklered or installed throughout as a missing fact or follow-up question.",
       "For a numeric limit or table comparison, fail with weakest_supported_conclusion when the stated value satisfies a stricter directly applicable supplied limit but the answer makes compliance conditional on qualifying for a more generous allowance.",
-      "For every numeric comparison, check the opening result, arithmetic and closing scope statement together. Fail with overstated_compliance if any sentence says or implies that a failed applicable limit is satisfied, even if the opening correctly says No. A statement limiting the review to one requirement must preserve whether that requirement passed or failed. Do not demand additional design details needed only to develop a compliant replacement once the stated proposal definitively fails; retain exceptions and unresolved applicability facts that could change that result.",
+      "For every numeric comparison, check the opening result, arithmetic and closing scope statement together. Fail with overstated_compliance if any sentence says or implies that a failed applicable limit is satisfied, even if the opening correctly says No. A statement limiting the review to one requirement must preserve whether that requirement passed or failed.",
       "Fail with misstated_provision when enacted text applies 10 percent to the overall total seating and standing spaces but the answer applies 10 percent to each dining-surface type. The separate per-type condition is a minimum of one accessible space, not a separate 10-percent calculation.",
       "Fail with misstated_provision when the answer changes a cumulative enacted condition into an alternative or an enacted alternative into a cumulative condition. In particular, A and B must not be restated as A or B.",
       "Fail with overstated_compliance when the answer treats alternative applicability paths as exhaustive without evidence: an unresolved accessory relationship does not establish that a room is a nonaccessory tenant space, and a rule expressly limited to a building or nonaccessory tenant space must not be generalized to every room. Each path needs its own supplied factual basis or an explicit condition.",
@@ -10588,7 +10608,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
         type: "json_schema",
         name: "permitext_research_verification",
         strict: true,
-        schema: researchVerificationSchema
+        schema: researchDecisionFactVerificationSchema
       }
     }
   };
@@ -10616,7 +10636,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
     throw invalid;
   }
   return {
-    result: validateResearchVerification(value),
+    result: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0),
     model: payload.model || configuration.model,
     usage: researchUsageFromProviderPayload(payload, configuration.model)
   };
@@ -19450,7 +19470,7 @@ async function handleResearchConversationMessage(request, response) {
           model: "permitext-mock",
           configuration: {
             ...researchModelConfiguration(),
-            promptVersion: `${researchModelConfiguration().promptVersion}:compact-v1:conversational-v4`,
+            promptVersion: `${researchModelConfiguration().promptVersion}:compact-v2:conversational-v4`,
             evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
           },
           usage: combinedResearchUsage()
@@ -19529,6 +19549,23 @@ async function handleResearchConversationMessage(request, response) {
     let evidenceBoundaryFallback = false;
     let verifierUsage = combinedResearchUsage();
     let answerGenerationUsage = result.usage;
+    let answerRegenerated = false;
+    let decisionFactRepairApplied = false;
+    const applyDecisionFactCandidate = () => {
+      const previous = result;
+      const repaired = researchDecisionFactRepair(result.interpretation, verificationAttempts.at(-1));
+      if (!repaired.applied) return false;
+      result = { ...result, interpretation: repaired.answer };
+      // Preserve material user-declared unknowns and the ordinary source repairs.
+      result = preserveDeclaredProjectFactUncertainty(result);
+      result = applyDeterministicAnswerRepairs(result);
+      if (JSON.stringify(result.interpretation.missingFacts) === JSON.stringify(previous.interpretation.missingFacts)) {
+        result = previous;
+        return false;
+      }
+      decisionFactRepairApplied = true;
+      return true;
+    };
     let zoningRepairApplied = false;
     const zoningRepairPacketHashes = [];
     let requiredClaimCoverage = evaluateResearchRequiredClaimCoverage({
@@ -19762,6 +19799,7 @@ async function handleResearchConversationMessage(request, response) {
           throw error;
         }
         repairAttempted = true;
+        if (applyDecisionFactCandidate()) return;
         const repaired = await openAIResearchZoningRepair(
           question,
           assembledEvidence,
@@ -19889,7 +19927,7 @@ async function handleResearchConversationMessage(request, response) {
       }
     } else {
       for (let attempt = 0; attempt < maximumResearchVerificationAttempts; attempt += 1) {
-        if (attempt > 0) {
+        if (attempt > 0 && !applyDecisionFactCandidate()) {
           if (result.requestedModel !== accurateModel) {
             answerEscalated = true;
             modelEscalationStages.push({
@@ -19905,6 +19943,7 @@ async function handleResearchConversationMessage(request, response) {
             });
           }
           const previousInterpretation = result.interpretation;
+          answerRegenerated = true;
           const revised = await openAIResearchInterpretationWithStructuredRetry(question, assembledEvidence, context.userID, {
             ...interpretationOptions,
             model: accurateModel,
@@ -20218,7 +20257,8 @@ async function handleResearchConversationMessage(request, response) {
           pass: !evidenceBoundaryFallback,
           ...(evidenceBoundaryFallback ? { reason: "NO_GOVERNING_EVIDENCE" } : {}),
           attempts: verificationAttempts.length,
-          regenerated: !zoningPlan && verificationAttempts.length > 1,
+          regenerated: answerRegenerated,
+          ...(decisionFactRepairApplied ? { decisionFactRepairApplied: true } : {}),
           sourceBoundedRepairApplied: zoningRepairApplied,
           history: verificationAttempts
         },

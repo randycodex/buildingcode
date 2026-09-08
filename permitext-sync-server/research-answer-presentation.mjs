@@ -1,4 +1,8 @@
-export const researchAnswerPresentationVersion = "20260908-condition-subject-v10";
+export const researchAnswerPresentationVersion = "20260908-decision-facts-v11";
+
+// Shared by generation and verification, independent of numeric comparisons.
+export const researchDecisionFactInstruction =
+  "For every question, put a fact in missingFacts or followUpQuestions only if it can change or determine the requested result. Once the supplied evidence and facts establish that result, details needed solely to design a compliant replacement or apply an optional downstream exception are not missing facts for that decision. This applies to both Yes and No answers and to non-numeric questions. Such details may be labeled as optional design context without making the answer depend on them. Retain unresolved applicability or exception facts that could change the result, and design or calculation inputs when the user requests that design or calculation.";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
@@ -125,7 +129,7 @@ function contractFor(mode, preferredStructure, requiredElements) {
       "Establish each alternative rule's applicability independently; an unresolved condition does not establish another path. Preserve the stated subject, such as a building or nonaccessory tenant space, without generalizing to any room.",
       "Keep the opening, calculation and closing consistent. State a failed applicable limit directly; a scope note must not imply compliance. Broader compliance remains unevaluated.",
       "Use stipulated quantities and applicability unless contradicted; verify them when asked. Include secondary rules only when material to the result, retaining conditions for the proposed substitution.",
-      "Once a supplied fact establishes a definite failure, additional design details needed to develop a compliant replacement are not missing facts needed to answer whether the stated proposal complies. Preserve any exception or unresolved applicability fact that could change that failure.",
+      researchDecisionFactInstruction,
       "Use headings, tables, lists, calculations and follow-ups only when useful. State each material point once; avoid repeating prose in a table or checklist or restating the conclusion."
     ])
   });
