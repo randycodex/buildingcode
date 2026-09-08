@@ -82,7 +82,7 @@ function stipulatedSeparateFacilitiesQuestion(question) {
   return separateToiletFacilitiesCue.test(question) && statedLoad && statedFixtureSufficiency && !calculationRequest;
 }
 
-function stipulatedFountainSubstitutionQuestion(question) {
+export function stipulatedFountainSubstitutionQuestion(question) {
   // A declared required count is the premise of a substitution comparison.
   // Questions about whether that count is required still need applicability
   // and fixture-table evidence. Exact citations remain independently selected.

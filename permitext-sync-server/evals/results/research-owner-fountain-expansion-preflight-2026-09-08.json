@@ -1,0 +1,1129 @@
+{
+  "schema": "permitext-owner-fountain-expansion-preflight-v1",
+  "sourceCommit": "d2622128ed7e8c63478ed88fa24b9a4c1cd484f1",
+  "cases": [
+    {
+      "id": "PC-03",
+      "conversation": "PC-03",
+      "question": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?"
+    },
+    {
+      "id": "FGC-08",
+      "conversation": "FGC-08",
+      "question": "Can an ordinary shutoff valve be used as the sole bulkhead between a gas-filled portion of a piping system and an adjacent portion being pressure tested?"
+    },
+    {
+      "id": "FGC-09",
+      "conversation": "FGC-09",
+      "question": "A short run of gas piping is strapped to a nearby domestic-water pipe because there is no convenient structural support above. Is that acceptable if the water pipe is strong enough?"
+    },
+    {
+      "id": "FGC-10",
+      "conversation": "FGC-10",
+      "question": "A gas appliance has a manual shutoff valve in the same room, eight feet from the appliance. There is no special manifold arrangement. Does the valve satisfy the ordinary appliance shutoff requirement?"
+    },
+    {
+      "id": "FGC-13",
+      "conversation": "FGC-13",
+      "question": "A contractor proposes a listed flexible gas connector between the branch piping and a gas-fired water heater. The connector is less than six feet long and is in the same room. Is it permitted?"
+    },
+    {
+      "id": "MC-08",
+      "conversation": "MC-08",
+      "question": "A bathroom exhaust fan in a top-floor apartment discharges into a ventilated attic instead of directly outdoors. Is that acceptable because the attic itself has roof vents?"
+    },
+    {
+      "id": "PC-04",
+      "conversation": "PC-04",
+      "question": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?"
+    },
+    {
+      "id": "PC-10",
+      "conversation": "PC-10",
+      "question": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?"
+    },
+    {
+      "id": "PC-11",
+      "conversation": "PC-11",
+      "question": "A new 3-inch horizontal sanitary drainage pipe is designed at a slope of 1/16 inch per foot. Is that enough?"
+    },
+    {
+      "id": "PC-13",
+      "conversation": "PC-13",
+      "question": "A designer places two traps in series on a sink waste line to provide “extra protection” against sewer gas. Is double trapping permitted?"
+    }
+  ],
+  "results": [
+    {
+      "id": "PC-03",
+      "references": [
+        "PC 410.3"
+      ],
+      "completeReferences": [
+        "PC 410.1",
+        "PC 410.3"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "PC 410.3",
+          "sourceID": "research-permitext_discovered-id:11961-1",
+          "canonicalContextComplete": true,
+          "characters": 624,
+          "textSHA256": "9fa051b9d75d686adb059536a46e1db1b7d8109b3889a4ad0686cfa4177e6aa4"
+        },
+        {
+          "reference": "PC 410.1",
+          "sourceID": "research-permitext_discovered-id:11959-2",
+          "canonicalContextComplete": true,
+          "characters": 533,
+          "textSHA256": "ca049e498cbb5f49608bc0e58a55bc148965f7df8f693254c73fdc186f6fe8f9"
+        },
+        {
+          "reference": "BC 1109.5",
+          "sourceID": "research-permitext_discovered-id:2825-3",
+          "canonicalContextComplete": true,
+          "characters": 221,
+          "textSHA256": "b63aaf5ec1a4b30feaf2151795be8efdb511aeb07ec8b573e9be4aafe9566abc"
+        },
+        {
+          "reference": "PC 410.4",
+          "sourceID": "research-permitext_discovered-id:11962-4",
+          "canonicalContextComplete": true,
+          "characters": 245,
+          "textSHA256": "17be97e006487e4343e67f5646f05eeedef225369f6b8d6998735efd19877313"
+        },
+        {
+          "reference": "PC 403.5",
+          "sourceID": "research-permitext_discovered-id:11925-5",
+          "canonicalContextComplete": true,
+          "characters": 507,
+          "textSHA256": "8caaa657cfc37c74fe2c0b0773d9e5af640f8b545d6c5c166eefcc17d230b247"
+        },
+        {
+          "reference": "BC 1109.5.2",
+          "sourceID": "research-permitext_discovered-id:2827-6",
+          "canonicalContextComplete": true,
+          "characters": 975,
+          "textSHA256": "6afe5bf127f7fe6b79e8250cc4d7f0f33ffc9bbf600e17669aea24851c6e01ba"
+        },
+        {
+          "reference": "BC 1109.5.1",
+          "sourceID": "research-permitext_discovered-id:2826-7",
+          "canonicalContextComplete": true,
+          "characters": 807,
+          "textSHA256": "d658f77d3d31a26de02158c526e42bd24583818bd565843b5213b2b166bda126"
+        },
+        {
+          "reference": "PC 410.2",
+          "sourceID": "research-permitext_discovered-id:11960-8",
+          "canonicalContextComplete": true,
+          "characters": 108,
+          "textSHA256": "1020e7263661dee51088ba20b641323276b41420c1b61fa45da2b765d5ca0f1d"
+        },
+        {
+          "reference": "BC 1106.8",
+          "sourceID": "research-permitext_discovered-id:2691-9",
+          "canonicalContextComplete": true,
+          "characters": 292,
+          "textSHA256": "82750531ca5ccfb5ac2cd5a77579570d2314121f86979b66f64657c0d6f6496a"
+        },
+        {
+          "reference": "PC 409.3",
+          "sourceID": "research-permitext_discovered-id:11958-10",
+          "canonicalContextComplete": true,
+          "characters": 142,
+          "textSHA256": "b1473597dd9327cbde6da2660a25246e2ca8bd4a28ff91987fae39723dd75689"
+        },
+        {
+          "reference": "BC 202",
+          "sourceID": "research-permitext_discovered-id:113-13",
+          "canonicalContextComplete": false,
+          "characters": 1468,
+          "textSHA256": "e38ba01b2b52eb0964a39f7a7bc8accaa5f152fd0823b90a588c78a8ba6d90c9"
+        },
+        {
+          "reference": "PC 403.1",
+          "sourceID": "research-permitext_cross_reference-id:11909-1",
+          "canonicalContextComplete": false,
+          "characters": 7516,
+          "textSHA256": "014eb2db257542117dfe8cf87c7b1aa7167a5a643a6222c8e6bda1b81341cb0e"
+        },
+        {
+          "reference": "BC 1106.8.1",
+          "sourceID": "research-permitext_cross_reference-id:2692-4",
+          "canonicalContextComplete": true,
+          "characters": 635,
+          "textSHA256": "264121e5482784d4f3ad72500e99224cfbaa6010b10a4e3d743447ee072f057b"
+        },
+        {
+          "reference": "BC 1106.8.5",
+          "sourceID": "research-permitext_cross_reference-id:2696-5",
+          "canonicalContextComplete": true,
+          "characters": 254,
+          "textSHA256": "f7fac673eea5eb28c03d6a82f25021c6a76c73b83b27a96b2248a4e6e90042f0"
+        },
+        {
+          "reference": "BC 1106.8.2",
+          "sourceID": "research-permitext_cross_reference-id:2693-7",
+          "canonicalContextComplete": true,
+          "characters": 269,
+          "textSHA256": "8040c94ea535dd5abfceb2411cba7b082b77dddc0d74802dcab465f002bb5c1b"
+        },
+        {
+          "reference": "BC 1106.8.3",
+          "sourceID": "research-permitext_cross_reference-id:2694-8",
+          "canonicalContextComplete": true,
+          "characters": 415,
+          "textSHA256": "4b0e45a8feb86e3ec9bd14610d47213aaafbf98a3d44da69ceba3a595f5c806c"
+        },
+        {
+          "reference": "BC 1106.8.4",
+          "sourceID": "research-permitext_cross_reference-id:2695-9",
+          "canonicalContextComplete": true,
+          "characters": 153,
+          "textSHA256": "2c07d12af5d43a98662bd7f1e5001f8811aa6cf14921054e9b74ca60af33bc77"
+        }
+      ],
+      "requiredReferences": [
+        "PC 410.3",
+        "PC 410.1"
+      ],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    },
+    {
+      "id": "FGC-08",
+      "references": [
+        "FGC 406.1.4"
+      ],
+      "completeReferences": [
+        "FGC 406.1.4"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "FGC 404.20",
+          "sourceID": "research-permitext_discovered-id:8260-1",
+          "canonicalContextComplete": true,
+          "characters": 212,
+          "textSHA256": "3cec10f8cfa58bf5562a33f1c6beea970127bd79888b08ec8fe615de72787619"
+        },
+        {
+          "reference": "FGC 406.1",
+          "sourceID": "research-permitext_discovered-id:8269-2",
+          "canonicalContextComplete": true,
+          "characters": 250,
+          "textSHA256": "e32dc9fc92f1bd873bda6393b4936e5bb70f2b86de3fb0667200748b464c9aec"
+        },
+        {
+          "reference": "FGC 406.1.4",
+          "sourceID": "research-permitext_discovered-id:8274-3",
+          "canonicalContextComplete": true,
+          "characters": 705,
+          "textSHA256": "1fe77710ec7dfa1795baa21dc147089683142de93b592ba5d250bb491477f6c5"
+        },
+        {
+          "reference": "BC 908.3.2",
+          "sourceID": "research-permitext_discovered-id:1869-4",
+          "canonicalContextComplete": true,
+          "characters": 553,
+          "textSHA256": "8eb8320f85e96d8b33cde6eb82095eb766fad0fadbe653f780aa4e9e88f95889"
+        },
+        {
+          "reference": "BC 918.8.3",
+          "sourceID": "research-permitext_discovered-id:2113-5",
+          "canonicalContextComplete": true,
+          "characters": 578,
+          "textSHA256": "0999f5008033ac1b5d773ee1fe70afe7934d2219c9905f615bbad29b9fe9d32a"
+        },
+        {
+          "reference": "BC 415.11.7.2.2",
+          "sourceID": "research-permitext_discovered-id:713-6",
+          "canonicalContextComplete": true,
+          "characters": 1463,
+          "textSHA256": "237173411b5479b8bbf4fa991d7e43bd272971d94f1fe557d895dc54a4d59731"
+        },
+        {
+          "reference": "FGC 101.2.2",
+          "sourceID": "research-permitext_discovered-id:7946-7",
+          "canonicalContextComplete": true,
+          "characters": 472,
+          "textSHA256": "c93167adea715c9c41e829da2b7353770c88b1ad83cd83fb3a10ea5e3c677c4a"
+        },
+        {
+          "reference": "FGC 409.6",
+          "sourceID": "research-permitext_discovered-id:8338-8",
+          "canonicalContextComplete": true,
+          "characters": 559,
+          "textSHA256": "51e105f9dbcdd3876bcd826b349881cee3141f4d6ff43eb5f74512c36b0b8cc6"
+        },
+        {
+          "reference": "FGC 409.3",
+          "sourceID": "research-permitext_discovered-id:8330-9",
+          "canonicalContextComplete": true,
+          "characters": 211,
+          "textSHA256": "3156be4911f5a3fc4900e6f5b1512397f8d04f1cb1ba2cfdea1ac844aed82cd4"
+        },
+        {
+          "reference": "FGC 406.6.2.1.1",
+          "sourceID": "research-permitext_discovered-id:8301-10",
+          "canonicalContextComplete": true,
+          "characters": 694,
+          "textSHA256": "36fc1423225716e67ac96c4e252e919c18cf526a964b394af84c316fab3e1524"
+        },
+        {
+          "reference": "BC 202",
+          "sourceID": "research-permitext_discovered-id:113-13",
+          "canonicalContextComplete": false,
+          "characters": 2435,
+          "textSHA256": "46f653a717b1900496b69543ebee36f19efbe89c17e42728b0aab7559742c859"
+        },
+        {
+          "reference": "FGC 406.4",
+          "sourceID": "research-permitext_cross_reference-id:8284-1",
+          "canonicalContextComplete": true,
+          "characters": 783,
+          "textSHA256": "bc48bfa81f065cccdd6c3f4ee36f734de84485bc5671880697116c25e0835c52"
+        }
+      ],
+      "requiredReferences": [
+        "FGC 404.20",
+        "FGC 406.1",
+        "FGC 406.1.4"
+      ],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    },
+    {
+      "id": "FGC-09",
+      "references": [
+        "FGC 407.2"
+      ],
+      "completeReferences": [
+        "FGC 407.2"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "FGC 407.2",
+          "sourceID": "research-permitext_discovered-id:8320-1",
+          "canonicalContextComplete": true,
+          "characters": 889,
+          "textSHA256": "3fc465b49271cee0ae7cda4c8f6007bd19d6ff62bac5cb95840a42eeca42e0ea"
+        }
+      ],
+      "requiredReferences": [
+        "FGC 407.2"
+      ],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    },
+    {
+      "id": "FGC-10",
+      "references": [
+        "FGC 409.5",
+        "FGC 409.5.1"
+      ],
+      "completeReferences": [
+        "FGC 409.5",
+        "FGC 409.5.1"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "FGC 409.5.1",
+          "sourceID": "research-permitext_discovered-id:8336-1",
+          "canonicalContextComplete": true,
+          "characters": 841,
+          "textSHA256": "465086d8be3c1d88bdcd33a3829f680c6cdf8ce4e83be8b09c6654f2001e3c9d"
+        },
+        {
+          "reference": "FGC 409.5",
+          "sourceID": "research-permitext_discovered-id:8335-2",
+          "canonicalContextComplete": true,
+          "characters": 137,
+          "textSHA256": "f325772d12f25e4d917f7a4a4d5f44610f1601313b4cb4005e1de74acc27d73a"
+        },
+        {
+          "reference": "FGC 409.5.2",
+          "sourceID": "research-permitext_discovered-id:8337-3",
+          "canonicalContextComplete": true,
+          "characters": 559,
+          "textSHA256": "da654122cc20140c7433970d2ede9d3ef6807d64fc76c1adae4e40ed8a0ea105"
+        },
+        {
+          "reference": "FGC 406.6.2.1.1",
+          "sourceID": "research-permitext_discovered-id:8301-4",
+          "canonicalContextComplete": true,
+          "characters": 694,
+          "textSHA256": "36fc1423225716e67ac96c4e252e919c18cf526a964b394af84c316fab3e1524"
+        },
+        {
+          "reference": "FGC 409.6",
+          "sourceID": "research-permitext_discovered-id:8338-5",
+          "canonicalContextComplete": true,
+          "characters": 559,
+          "textSHA256": "51e105f9dbcdd3876bcd826b349881cee3141f4d6ff43eb5f74512c36b0b8cc6"
+        },
+        {
+          "reference": "BC 415.11.7.2.2",
+          "sourceID": "research-permitext_discovered-id:713-6",
+          "canonicalContextComplete": true,
+          "characters": 1463,
+          "textSHA256": "237173411b5479b8bbf4fa991d7e43bd272971d94f1fe557d895dc54a4d59731"
+        },
+        {
+          "reference": "FGC 409.9",
+          "sourceID": "research-permitext_discovered-id:8341-7",
+          "canonicalContextComplete": true,
+          "characters": 227,
+          "textSHA256": "a22808b4ae6cddb34cc0a6610dd360a4274a28d049e78cc4870038412fec89ed"
+        },
+        {
+          "reference": "FGC 409.1.1",
+          "sourceID": "research-permitext_discovered-id:8326-8",
+          "canonicalContextComplete": true,
+          "characters": 661,
+          "textSHA256": "ba70fbf7a1a94eb576014c86da83aac8b127d1eada6bbba40535db5d11365480"
+        },
+        {
+          "reference": "FGC 409.3",
+          "sourceID": "research-permitext_discovered-id:8330-9",
+          "canonicalContextComplete": true,
+          "characters": 211,
+          "textSHA256": "3156be4911f5a3fc4900e6f5b1512397f8d04f1cb1ba2cfdea1ac844aed82cd4"
+        },
+        {
+          "reference": "MC 909.5",
+          "sourceID": "research-permitext_discovered-id:11102-10",
+          "canonicalContextComplete": true,
+          "characters": 98,
+          "textSHA256": "26502b09fc30948858af82b4454a2bb67df2d38558060ca5531207668e37b119"
+        },
+        {
+          "reference": "BC 202",
+          "sourceID": "research-permitext_discovered-id:113-13",
+          "canonicalContextComplete": false,
+          "characters": 2462,
+          "textSHA256": "edff357ebf3805aeaa5f966bd9f675ea33866a91e7fa2551e3be9fa77854e216"
+        }
+      ],
+      "requiredReferences": [],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    },
+    {
+      "id": "FGC-13",
+      "references": [
+        "FGC 411.1"
+      ],
+      "completeReferences": [
+        "FGC 411.1"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "AC 28-101.5",
+          "sourceID": "research-permitext_discovered-id:8796-1",
+          "canonicalContextComplete": false,
+          "characters": 410,
+          "textSHA256": "8d596315a0b18fefa83b6fbf405b09ea07e16468fbc2ffcf830c6551ca8730a2"
+        },
+        {
+          "reference": "FGC 411.1",
+          "sourceID": "research-permitext_discovered-id:8348-2",
+          "canonicalContextComplete": true,
+          "characters": 1534,
+          "textSHA256": "1f7f5602c8ceb44018ee6f13b3ef2fc3f235cb27fbbb4b2d3d2729f612999e76"
+        },
+        {
+          "reference": "FGC 303.3.1",
+          "sourceID": "research-permitext_discovered-id:8064-3",
+          "canonicalContextComplete": true,
+          "characters": 309,
+          "textSHA256": "32f74d23fa35b0f4f2999c1c40c48baead04ac73a96095fe4e274b9281a3774a"
+        },
+        {
+          "reference": "FGC 303.3.1.4",
+          "sourceID": "research-permitext_discovered-id:8068-4",
+          "canonicalContextComplete": true,
+          "characters": 579,
+          "textSHA256": "ee5525997dc9c934fd23bc5daf6abee2915d157eb9dda843a174bc04fa78701d"
+        },
+        {
+          "reference": "PC 502.3",
+          "sourceID": "research-permitext_discovered-id:12075-5",
+          "canonicalContextComplete": true,
+          "characters": 908,
+          "textSHA256": "3b3374c4bd9544c16cbfa375305a33c1e2f55b465952b82273f5ae0c81ce53bb"
+        },
+        {
+          "reference": "PC 101.2",
+          "sourceID": "research-permitext_discovered-id:11730-6",
+          "canonicalContextComplete": true,
+          "characters": 657,
+          "textSHA256": "a3536d7c2b32982ad0f57b50bed890db6fb12c75c74ecb43b4a343768cc6bbfc"
+        },
+        {
+          "reference": "FGC 411.3",
+          "sourceID": "research-permitext_discovered-id:8360-7",
+          "canonicalContextComplete": true,
+          "characters": 410,
+          "textSHA256": "929de9f5300dc3a450acc96b334f18d6df2d761ece76883a3bf19a3dfa5815ec"
+        },
+        {
+          "reference": "PC 502.1",
+          "sourceID": "research-permitext_discovered-id:12072-8",
+          "canonicalContextComplete": true,
+          "characters": 966,
+          "textSHA256": "68240681ebc09ca643c5ad695eaf009b2e822797cd8af859d922ca5fb2c4af11"
+        },
+        {
+          "reference": "FGC 624.1.1",
+          "sourceID": "research-permitext_discovered-id:8738-9",
+          "canonicalContextComplete": true,
+          "characters": 672,
+          "textSHA256": "1aeef211180e792645a989cadf856d0849f880aadc722c5d999a8aa2f1c99a76"
+        },
+        {
+          "reference": "PC 607.5",
+          "sourceID": "research-permitext_discovered-id:12219-10",
+          "canonicalContextComplete": true,
+          "characters": 765,
+          "textSHA256": "01502fb1ad8c12a5c45a07ebb6480a6564e99b51dcf16676cb3787d09d846701"
+        },
+        {
+          "reference": "AC 28-101.4.2",
+          "sourceID": "research-permitext_cross_reference-id:8785-1",
+          "canonicalContextComplete": true,
+          "characters": 1906,
+          "textSHA256": "f513a682529cf8d399a6be9a6a55ab949d50c61381e615fe288fa99e6b812365"
+        },
+        {
+          "reference": "FGC 411.1.1",
+          "sourceID": "research-permitext_cross_reference-id:8349-3",
+          "canonicalContextComplete": true,
+          "characters": 633,
+          "textSHA256": "e809e1d89be2ccca9ae6c9f88af97cb5118d2f0ad0ca61f36319c1478b5d11dc"
+        },
+        {
+          "reference": "FGC 303.3.1.1",
+          "sourceID": "research-permitext_cross_reference-id:8065-5",
+          "canonicalContextComplete": true,
+          "characters": 576,
+          "textSHA256": "3814093e02031444619ef50a12bf76a6f80a14be6b5a82bf771043620e8176c3"
+        },
+        {
+          "reference": "FGC 303.3.1.7",
+          "sourceID": "research-permitext_cross_reference-id:8071-6",
+          "canonicalContextComplete": true,
+          "characters": 1021,
+          "textSHA256": "975da5dca09f25dbb4fe2d2d16c36fb2c190a6f2632fcde54aa73e21d89ab273"
+        },
+        {
+          "reference": "FGC 303.3.1.2",
+          "sourceID": "research-permitext_cross_reference-id:8066-8",
+          "canonicalContextComplete": true,
+          "characters": 414,
+          "textSHA256": "6bcc23c9cd9c55f657b8b26d2989ff9960e5c8d7453590fdf43099aea5492440"
+        },
+        {
+          "reference": "FGC 303.3.1.3",
+          "sourceID": "research-permitext_cross_reference-id:8067-9",
+          "canonicalContextComplete": true,
+          "characters": 524,
+          "textSHA256": "0a07a621c0f5aa701eac9533c69945df036dcdadadd388c73bb5ffa6f6583616"
+        }
+      ],
+      "requiredReferences": [],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    },
+    {
+      "id": "MC-08",
+      "references": [
+        "MC 501.3"
+      ],
+      "completeReferences": [
+        "MC 501.3"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "MC 501.3",
+          "sourceID": "research-permitext_discovered-id:10454-1",
+          "canonicalContextComplete": true,
+          "characters": 881,
+          "textSHA256": "6a322c67309670b0c7352c4f4ea7f653444bfc10533cb0293c5e403be6f4ddf6"
+        },
+        {
+          "reference": "MC 801.25",
+          "sourceID": "research-permitext_discovered-id:10994-2",
+          "canonicalContextComplete": true,
+          "characters": 259,
+          "textSHA256": "8b57b137e3acde4830044a7875d0e10e9331afec7633c392df84ba2a31a24f05"
+        },
+        {
+          "reference": "MC 506.5.2",
+          "sourceID": "research-permitext_discovered-id:10651-3",
+          "canonicalContextComplete": true,
+          "characters": 376,
+          "textSHA256": "f15b2abca38b07b264f27a5d60bad16f9335c5391a58f192493db5f9a98d632b"
+        },
+        {
+          "reference": "MC 511.1.3",
+          "sourceID": "research-permitext_discovered-id:10728-4",
+          "canonicalContextComplete": true,
+          "characters": 569,
+          "textSHA256": "5a1f928a346134d22aeaaef4f1af46f5f157d77dfb3709cb5d5e32d38dea11cc"
+        },
+        {
+          "reference": "MC 701.4",
+          "sourceID": "research-permitext_discovered-id:10909-5",
+          "canonicalContextComplete": true,
+          "characters": 200,
+          "textSHA256": "50ccf7fcec4cbe1cdcf641a31979680031cdaeac7a337f01c6c9a01d16768e0e"
+        },
+        {
+          "reference": "MC 1105.6.1",
+          "sourceID": "research-permitext_discovered-id:11263-6",
+          "canonicalContextComplete": true,
+          "characters": 325,
+          "textSHA256": "c8012af68eae9cd7644efe1b3d588eccc384894014d89ef3796e39ed4737892a"
+        },
+        {
+          "reference": "MC 501.3.1",
+          "sourceID": "research-permitext_discovered-id:10455-7",
+          "canonicalContextComplete": true,
+          "characters": 4337,
+          "textSHA256": "f1bd570e6f129c27516537cf3e7fbb498f635afb4cc7d850d1d9b180be22b2dd"
+        },
+        {
+          "reference": "MC 401.4",
+          "sourceID": "research-permitext_discovered-id:10406-8",
+          "canonicalContextComplete": true,
+          "characters": 2486,
+          "textSHA256": "942a172101a43b2670a92a4d8e044462bac5f75ad881aa6d9a2e2d91c3af0be2"
+        },
+        {
+          "reference": "MC 506.5.1.2",
+          "sourceID": "research-permitext_discovered-id:10650-9",
+          "canonicalContextComplete": true,
+          "characters": 403,
+          "textSHA256": "b81c767639074aae863c674a1c917574272cfc1eeeda6554b5d43d21d94fa24c"
+        },
+        {
+          "reference": "MC 502.12",
+          "sourceID": "research-permitext_discovered-id:10565-10",
+          "canonicalContextComplete": true,
+          "characters": 553,
+          "textSHA256": "c27c38c7d078244d700f31f760b38f038008fdbc293f70c17d84d787f288e5e9"
+        },
+        {
+          "reference": "MC 504.4",
+          "sourceID": "research-permitext_cross_reference-id:10587-5",
+          "canonicalContextComplete": true,
+          "characters": 600,
+          "textSHA256": "bee39bf26a0ab248bb9667989364dd04bffb27666b2dc6958eb421a2f92d10f5"
+        },
+        {
+          "reference": "MC 506.3.13",
+          "sourceID": "research-permitext_cross_reference-id:10639-6",
+          "canonicalContextComplete": true,
+          "characters": 186,
+          "textSHA256": "8900117d56f282bd80600efca018b0f8763585e9b03f2925d7d31c5c27b26dac"
+        },
+        {
+          "reference": "MC 506.4",
+          "sourceID": "research-permitext_cross_reference-id:10643-7",
+          "canonicalContextComplete": true,
+          "characters": 145,
+          "textSHA256": "b8c8958166c7d259ee2ecc11a3df6a285511fc0b60f283552939e3c5186716b6"
+        },
+        {
+          "reference": "MC 506.5",
+          "sourceID": "research-permitext_cross_reference-id:10647-8",
+          "canonicalContextComplete": true,
+          "characters": 211,
+          "textSHA256": "8d5681ac2fdceb750d6bd9a9b949d6e3f3ac30cfb7dfa88f64d277f4f647be9e"
+        },
+        {
+          "reference": "MC 512.4",
+          "sourceID": "research-permitext_cross_reference-id:10737-10",
+          "canonicalContextComplete": true,
+          "characters": 229,
+          "textSHA256": "5b612eec1c9723e77b753814afa5225e2780ccd4ef8a1957545c615b2684dc75"
+        },
+        {
+          "reference": "MC 1105.7",
+          "sourceID": "research-permitext_cross_reference-id:11268-12",
+          "canonicalContextComplete": true,
+          "characters": 399,
+          "textSHA256": "c936f64765798eef0f9b42c67f6b1dc0f79b56a7797d8d0fd66b29362742d251"
+        }
+      ],
+      "requiredReferences": [],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    },
+    {
+      "id": "PC-04",
+      "references": [
+        "PC 412.3",
+        "PC 412.4"
+      ],
+      "completeReferences": [
+        "PC 412.3",
+        "PC 412.4"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "PC 412.4",
+          "sourceID": "research-permitext_discovered-id:11968-1",
+          "canonicalContextComplete": true,
+          "characters": 451,
+          "textSHA256": "8db3e2df2cbe950392425169e576e57d0321b4eda9d95f8019a1457d7997c204"
+        },
+        {
+          "reference": "PC 412.3",
+          "sourceID": "research-permitext_discovered-id:11967-2",
+          "canonicalContextComplete": true,
+          "characters": 116,
+          "textSHA256": "1017b9ff55efd7896ea9afc1f499c0f78e631a6f8315f3bc7a1f9a7c6bac6025"
+        },
+        {
+          "reference": "PC 1003.6",
+          "sourceID": "research-permitext_discovered-id:12636-3",
+          "canonicalContextComplete": true,
+          "characters": 680,
+          "textSHA256": "ca2bde9d9dbb841aa289a575c7e2300b07eac29b1846a2d0e0a9a948333b7148"
+        },
+        {
+          "reference": "PC 406.2",
+          "sourceID": "research-permitext_discovered-id:11948-4",
+          "canonicalContextComplete": true,
+          "characters": 624,
+          "textSHA256": "96e8f28e6f21cf0fae0580ed3e8d6e847a7c5d1e1d3c12f0a3a741d53274e688"
+        },
+        {
+          "reference": "PC 709.1",
+          "sourceID": "research-permitext_discovered-id:12415-5",
+          "canonicalContextComplete": false,
+          "characters": 2323,
+          "textSHA256": "1d2b302138012b6fd98582e52004892123841b80d31d6a8e81d3de7e388dae01"
+        },
+        {
+          "reference": "PC 405.9",
+          "sourceID": "research-permitext_discovered-id:11946-6",
+          "canonicalContextComplete": true,
+          "characters": 309,
+          "textSHA256": "7a72c1a2adb7a62eb61357c367391dbfa47e9498b49793ea81e53e8a80fbaf73"
+        },
+        {
+          "reference": "PC 713.9",
+          "sourceID": "research-permitext_discovered-id:12451-7",
+          "canonicalContextComplete": true,
+          "characters": 328,
+          "textSHA256": "f3f27008f64c48a2b202e86a37b0ceacb6909855acf669f13b49908ad628ca68"
+        },
+        {
+          "reference": "BC E105.2.2",
+          "sourceID": "research-permitext_discovered-id:6898-8",
+          "canonicalContextComplete": true,
+          "characters": 354,
+          "textSHA256": "8ab2a2860283b76fab306368d7a1c3b645d773ded9b3dd54e808a660e0fb2925"
+        },
+        {
+          "reference": "PC 201.4",
+          "sourceID": "research-permitext_discovered-id:11811-9",
+          "canonicalContextComplete": false,
+          "characters": 12000,
+          "textSHA256": "410ee87c9c6c056b623274035dff132064daa6705580fc508852133319dad6c8"
+        },
+        {
+          "reference": "MC 504.10",
+          "sourceID": "research-permitext_discovered-id:10602-10",
+          "canonicalContextComplete": true,
+          "characters": 2327,
+          "textSHA256": "3e6af427cccc9b7d5bdcc5650901a62c5600fb4a7bd2eb4c964b18ec7deeb0d8"
+        },
+        {
+          "reference": "BC 202",
+          "sourceID": "research-permitext_discovered-id:113-13",
+          "canonicalContextComplete": false,
+          "characters": 1243,
+          "textSHA256": "d5af19948973127bbbef8041de53bd2e76ca7b89a0966292cbe4b243af49f58c"
+        },
+        {
+          "reference": "PC 709.2",
+          "sourceID": "research-permitext_cross_reference-id:12416-2",
+          "canonicalContextComplete": true,
+          "characters": 509,
+          "textSHA256": "df60bcdbf59559c2c3b128778cad70791c763fbc39544e46cf17d1290bd64d73"
+        },
+        {
+          "reference": "PC 709.4.1",
+          "sourceID": "research-permitext_cross_reference-id:12419-4",
+          "canonicalContextComplete": true,
+          "characters": 335,
+          "textSHA256": "04ec01ff142ea5cceb230f8d74703f13464a1cffb35dcc3106ce3b604cbb1e58"
+        },
+        {
+          "reference": "PC 709.4",
+          "sourceID": "research-permitext_cross_reference-id:12418-5",
+          "canonicalContextComplete": true,
+          "characters": 379,
+          "textSHA256": "dd15438c14360ce68a7f2c9058ba25bc4d56805f77351a4cc058bb8fd6fd7c43"
+        },
+        {
+          "reference": "MC 503.2",
+          "sourceID": "research-permitext_cross_reference-id:10580-17",
+          "canonicalContextComplete": true,
+          "characters": 684,
+          "textSHA256": "a87e265e674bc0428294ed125442b74b34f275777ce4e68172e46770b94c1382"
+        }
+      ],
+      "requiredReferences": [
+        "PC 412.4",
+        "PC 412.3"
+      ],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    },
+    {
+      "id": "PC-10",
+      "references": [
+        "PC 504.7"
+      ],
+      "completeReferences": [
+        "PC 504.7"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "PC 504.7",
+          "sourceID": "research-permitext_discovered-id:12087-1",
+          "canonicalContextComplete": true,
+          "characters": 347,
+          "textSHA256": "234c15278bf9dfaf0f7f4310d95bd37c6a534929c1a574ee76f19acb3be37132"
+        },
+        {
+          "reference": "PC 504.7.1",
+          "sourceID": "research-permitext_discovered-id:12088-2",
+          "canonicalContextComplete": true,
+          "characters": 575,
+          "textSHA256": "de9fdac79764092e06f002157b61ffa347ec13b988c83c7b42165f7985cf0e4f"
+        },
+        {
+          "reference": "PC 314.2.3.2",
+          "sourceID": "research-permitext_discovered-id:11897-3",
+          "canonicalContextComplete": true,
+          "characters": 408,
+          "textSHA256": "ce76db5ca4d9b4914500ba6b00f6342b0ef0d69d38a404101a15c04cbcd0e8a4"
+        },
+        {
+          "reference": "PC 501.3",
+          "sourceID": "research-permitext_discovered-id:12065-4",
+          "canonicalContextComplete": true,
+          "characters": 292,
+          "textSHA256": "5e185eb01c70ae83b26d0c718752b0e791933587e3586a9bc6634dbbac15ccc1"
+        },
+        {
+          "reference": "PC 314.2.3",
+          "sourceID": "research-permitext_discovered-id:11895-5",
+          "canonicalContextComplete": true,
+          "characters": 2740,
+          "textSHA256": "799f1656af1d4f4cac919b303ea73cd98195c61607d7b0cf008728bdb560d39f"
+        },
+        {
+          "reference": "FGC 307.5",
+          "sourceID": "research-permitext_discovered-id:8142-6",
+          "canonicalContextComplete": true,
+          "characters": 714,
+          "textSHA256": "89ccdc53c09f89ce796a50a03b9d504808d939d6ee9885707b18402034d06bbe"
+        },
+        {
+          "reference": "MC 307.2.3.2",
+          "sourceID": "research-permitext_discovered-id:10362-7",
+          "canonicalContextComplete": true,
+          "characters": 394,
+          "textSHA256": "11fc9ab7b11435fad87113cc7bce84ba7a4e511420cf6f3c9c7b510d18eeeb4e"
+        },
+        {
+          "reference": "PC 802.3",
+          "sourceID": "research-permitext_discovered-id:12487-8",
+          "canonicalContextComplete": true,
+          "characters": 417,
+          "textSHA256": "802bef22257e218b261ff5d083036963fe710cfb9aa6c6c503aef011b793ad0b"
+        },
+        {
+          "reference": "PC 314.2.3.1",
+          "sourceID": "research-permitext_discovered-id:11896-9",
+          "canonicalContextComplete": true,
+          "characters": 431,
+          "textSHA256": "7677a153bab0488b7a3a624ed4435fce04d40cfe83dbafcf12b13e0a7e0080be"
+        },
+        {
+          "reference": "MC 1305.9.4",
+          "sourceID": "research-permitext_discovered-id:11587-10",
+          "canonicalContextComplete": true,
+          "characters": 746,
+          "textSHA256": "59bd09b8b583a36729bbf130b9c3291f88e6acbb7108ef8d1367192d5c496546"
+        },
+        {
+          "reference": "PC 605.4",
+          "sourceID": "research-permitext_cross_reference-id:12136-1",
+          "canonicalContextComplete": true,
+          "characters": 535,
+          "textSHA256": "084b5d6df519900ee598ed7f4b700817f046fd57836207799a5ca1cb00d4384b"
+        },
+        {
+          "reference": "PC 314.2.1",
+          "sourceID": "research-permitext_cross_reference-id:11893-2",
+          "canonicalContextComplete": true,
+          "characters": 426,
+          "textSHA256": "30eff7a0116dcf901f17fb83f22c154f083d594dceedf4e437d8fbf8101f85f1"
+        }
+      ],
+      "requiredReferences": [],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    },
+    {
+      "id": "PC-11",
+      "references": [
+        "PC 704.1"
+      ],
+      "completeReferences": [
+        "PC 704.1"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "PC 704.1",
+          "sourceID": "research-permitext_discovered-id:12334-1",
+          "canonicalContextComplete": true,
+          "characters": 421,
+          "textSHA256": "eda770b051d9b4e8e4baa6d32c42417cb0ad2f9f4556d67154573b496276aafe"
+        },
+        {
+          "reference": "PC 714.3.2",
+          "sourceID": "research-permitext_discovered-id:12467-2",
+          "canonicalContextComplete": true,
+          "characters": 187,
+          "textSHA256": "4303d0abdec5d957263c262bdfa8ffe7b8ef1ed49c5b84788ae0de8cd5f93ef2"
+        },
+        {
+          "reference": "PC 710.1",
+          "sourceID": "research-permitext_discovered-id:12420-3",
+          "canonicalContextComplete": false,
+          "characters": 928,
+          "textSHA256": "cf4e5de4d2e28226731684f30b845e97df924c3a517678b5c5e4961518463386"
+        },
+        {
+          "reference": "PC 702.2",
+          "sourceID": "research-permitext_discovered-id:12319-4",
+          "canonicalContextComplete": true,
+          "characters": 806,
+          "textSHA256": "0a6f701faec80688c7da7113b27bd75be48960d3000be8d44e0c35f4da5ce6bc"
+        },
+        {
+          "reference": "PC 1106.6",
+          "sourceID": "research-permitext_discovered-id:12688-5",
+          "canonicalContextComplete": false,
+          "characters": 708,
+          "textSHA256": "f058589a12c42ac97f00e962fa85e740e2ae1095b57ff771484247c1713fe184"
+        },
+        {
+          "reference": "PC 1303.5.1",
+          "sourceID": "research-permitext_discovered-id:12821-6",
+          "canonicalContextComplete": true,
+          "characters": 452,
+          "textSHA256": "8d9b47288bfd49c1e9f237a6e31059fa9d0a43dbb07a8a32c9c468d439889eb5"
+        },
+        {
+          "reference": "PC 914.3",
+          "sourceID": "research-permitext_discovered-id:12582-7",
+          "canonicalContextComplete": true,
+          "characters": 330,
+          "textSHA256": "13b943f38bc16c424a0ebe84f89485ffa313c23bd339aa08717f72cf963ed873"
+        },
+        {
+          "reference": "PC 702.1",
+          "sourceID": "research-permitext_discovered-id:12318-8",
+          "canonicalContextComplete": false,
+          "characters": 1063,
+          "textSHA256": "ecf810e4b033a2d4ec90b5046f234bc05fa7ef919acd7ab0c1615148f7e36c7b"
+        },
+        {
+          "reference": "PC 909.1",
+          "sourceID": "research-permitext_discovered-id:12565-9",
+          "canonicalContextComplete": true,
+          "characters": 668,
+          "textSHA256": "0956bf30d34c02303808357abe06e8359b0b4aeeb3e8153011c81b7dee23a2b5"
+        },
+        {
+          "reference": "PC 1104.3",
+          "sourceID": "research-permitext_discovered-id:12677-10",
+          "canonicalContextComplete": true,
+          "characters": 645,
+          "textSHA256": "1eeb25ee0a1c4edffa3da37100975bb1c7eaca4b4bf8e6c0cc164a25da346186"
+        }
+      ],
+      "requiredReferences": [],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    },
+    {
+      "id": "PC-13",
+      "references": [
+        "PC 1002.1"
+      ],
+      "completeReferences": [
+        "PC 1002.1"
+      ],
+      "missingReferences": [],
+      "sources": [
+        {
+          "reference": "PC 1002.1",
+          "sourceID": "research-permitext_discovered-id:12605-1",
+          "canonicalContextComplete": true,
+          "characters": 2044,
+          "textSHA256": "cc82edcb3daecc3d98e74eebee0a88fe971c852f0af807a8feadc9408b60fc81"
+        },
+        {
+          "reference": "PC 1002.3",
+          "sourceID": "research-permitext_discovered-id:12607-2",
+          "canonicalContextComplete": true,
+          "characters": 559,
+          "textSHA256": "63483ee9a60f9d564c1e8e233326cb1ff3c64adf46e909f46f61e923976025eb"
+        },
+        {
+          "reference": "PC 201.4",
+          "sourceID": "research-permitext_discovered-id:11811-3",
+          "canonicalContextComplete": false,
+          "characters": 5674,
+          "textSHA256": "24ce510bfa46655e933dbb4ca7c66ad76ab5f347d4d6d1afe0f8411e2b2fed1d"
+        },
+        {
+          "reference": "PC 1002.6",
+          "sourceID": "research-permitext_discovered-id:12614-4",
+          "canonicalContextComplete": true,
+          "characters": 828,
+          "textSHA256": "2010273c2d18df7c0019b3361f17cd1d1e3ce7faef1052a1a87a5ef0618843db"
+        },
+        {
+          "reference": "PC 1302.3",
+          "sourceID": "research-permitext_discovered-id:12778-5",
+          "canonicalContextComplete": true,
+          "characters": 155,
+          "textSHA256": "677cc056c2b15fd0c7e8bdfe071e8d590b7e0b3ace17f83d06296af1f3dfc015"
+        },
+        {
+          "reference": "PC 803.3.4.2.1",
+          "sourceID": "research-permitext_discovered-id:12503-6",
+          "canonicalContextComplete": true,
+          "characters": 318,
+          "textSHA256": "911d9bde5f8887acc4de2bf5f2e7bf6e246c84bd03a582634fc6a084ef6df4a1"
+        },
+        {
+          "reference": "PC 1103.1",
+          "sourceID": "research-permitext_discovered-id:12671-7",
+          "canonicalContextComplete": true,
+          "characters": 483,
+          "textSHA256": "20cec168824652df0faf9a4a2a8a69334b97df8716567cc16db0bd9656890f61"
+        },
+        {
+          "reference": "BC 1205.3.5",
+          "sourceID": "research-permitext_discovered-id:3001-8",
+          "canonicalContextComplete": true,
+          "characters": 109,
+          "textSHA256": "dc313b435bdbebffce51a8d4fbf67f2f23fe1624575f8f25559d0f429aa57a76"
+        },
+        {
+          "reference": "PC 703.7",
+          "sourceID": "research-permitext_discovered-id:12331-9",
+          "canonicalContextComplete": true,
+          "characters": 131,
+          "textSHA256": "f9f32fe58b157c36b9121fc892bd68a6275a61123403e90b2fd5da547429b654"
+        },
+        {
+          "reference": "BC 1029.19",
+          "sourceID": "research-permitext_discovered-id:2594-10",
+          "canonicalContextComplete": true,
+          "characters": 290,
+          "textSHA256": "1e4624841de1ce316a3a34bf53368a38af5058c0d413499d5c1c30ab5390bf7c"
+        },
+        {
+          "reference": "BC 202",
+          "sourceID": "research-permitext_discovered-id:113-13",
+          "canonicalContextComplete": false,
+          "characters": 1374,
+          "textSHA256": "0c402a91e2723a28ae92c0e7d0a5e99ce39552d1aab9b67c134d5bd03241142f"
+        },
+        {
+          "reference": "PC 803.3.4.2.2",
+          "sourceID": "research-permitext_cross_reference-id:12504-1",
+          "canonicalContextComplete": true,
+          "characters": 519,
+          "textSHA256": "d71df8f58e46481a21b8c6bfeba801fdf68c41b79d534149532e8d6e47ccd16a"
+        },
+        {
+          "reference": "PC 802.3.3",
+          "sourceID": "research-permitext_cross_reference-id:12490-3",
+          "canonicalContextComplete": true,
+          "characters": 282,
+          "textSHA256": "2197ba1e6e2aeef7dc2521304031b13ba5cb3d482608f80787203ad0f368a5c2"
+        },
+        {
+          "reference": "PC 803.2",
+          "sourceID": "research-permitext_cross_reference-id:12492-4",
+          "canonicalContextComplete": true,
+          "characters": 902,
+          "textSHA256": "de35b10ca636b4ce9e35927caa1b241d4680bcb0af50a5e39d994b20d3e9d277"
+        },
+        {
+          "reference": "PC 703.7.1",
+          "sourceID": "research-permitext_cross_reference-id:12332-12",
+          "canonicalContextComplete": true,
+          "characters": 1093,
+          "textSHA256": "03d536d9dd8ce6a8f5dbb394ebfe64c8d45df919a1286cc7e0edbf20ba58e24c"
+        },
+        {
+          "reference": "PC 1002.4",
+          "sourceID": "research-permitext_cross_reference-id:12608-14",
+          "canonicalContextComplete": true,
+          "characters": 202,
+          "textSHA256": "0b9a6b3150185fc874a3f4aa561538c9e10c7379dc73ea9ca5bd54e686d24576"
+        }
+      ],
+      "requiredReferences": [],
+      "selectedCorpora": [
+        "nyc-2022-construction-codes"
+      ],
+      "useWeb": false
+    }
+  ],
+  "networkAttempts": 0,
+  "providerCalls": 0
+}

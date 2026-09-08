@@ -1,7 +1,8 @@
 import { researchRequestedAreaConversions } from "./research-answer-presentation.mjs";
+import { applyResearchPlumbingSourceRepairs } from "./research-plumbing-source-repairs.mjs";
 
 export const researchAnswerQualityVersion =
-  "20260902-generated-typography-v25";
+  "20260908-plumbing-source-repairs-v26";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -570,6 +571,7 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
  */
 export function applyResearchDeterministicAnswerRepairs(answer, evidence = [], { question = "" } = {}) {
   if (!answer || typeof answer !== "object") return answer;
+  answer = applyResearchPlumbingSourceRepairs(answer, evidence, { question });
   const diningSourceIDs = (Array.isArray(evidence) ? evidence : [])
     .filter((source) =>
       compactText(source?.codePrefix).toUpperCase() === "BC" &&
