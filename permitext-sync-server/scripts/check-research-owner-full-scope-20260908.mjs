@@ -10,6 +10,7 @@ import { assembledResearchEvidenceForTurn, researchCorpusPlanForTurn } from "../
 import { zoningSectionSummary } from "../zoning-content.mjs";
 import { resolveResearchConversationFacts, researchConversationFactPromptContext } from "../research-conversation-facts.mjs";
 import { planZoningResearchQuestion, zoningResearchDeterministicContext, evaluateZoningEvidenceReadiness } from "../research-zoning-planner.mjs";
+import { planZoningConditionalExplanation, isZoningConditionalExplanation } from "../research-zoning-conditional-explanation.mjs";
 import { researchDiscoveryNeedsAutomaticWebSupport, researchWebSupportTrigger } from "../research-source-policy.mjs";
 
 assert(!process.argv.includes("--run-live"), "This diagnostic cannot dispatch provider requests.");
@@ -65,6 +66,7 @@ for (const testCase of cases) {
   const zoningPlan = zoningTurn ? planZoningResearchQuestion({ ...input, conversationFactContext }) : null;
   const deterministicContext = zoningPlan ? zoningResearchDeterministicContext({ ...input, evidence: assembled.sources, plan: zoningPlan, conversationFactContext }) : null;
   const readiness = zoningPlan ? evaluateZoningEvidenceReadiness({ question: input.question, evidence: assembled.sources, plan: zoningPlan, deterministicContext }) : null;
+  const responsePlan = planZoningConditionalExplanation({ plan: zoningPlan, evidence: assembled.sources, evidenceReadiness: readiness, evidenceSelection: assembled.zoningSelection });
   const exactSelections = input.pinnedEvidence.filter((source) => source.selectedText).map((pin) => {
     const resolved = assembled.sources.find((source) => source.sourceID === pin.sourceID);
     return { sectionID: pin.sectionID, sourceID: pin.sourceID, exact: compact(resolved?.text) === compact(pin.selectedText),
@@ -88,7 +90,12 @@ for (const testCase of cases) {
       selection: assembled.zoningSelection ? {
         pass: assembled.zoningSelection.pass, rejected: assembled.zoningSelection.rejected,
         gateFailures: assembled.zoningSelection.gateFailures, usage: assembled.zoningSelection.usage
-      } : null, readiness } : null,
+      } : null, readiness,
+      responseScope: isZoningConditionalExplanation(responsePlan) ? {
+        disposition: responsePlan.disposition, determinationStatus: responsePlan.conditionalExplanation.determinationStatus,
+        prerequisitePlanHash: responsePlan.conditionalExplanation.prerequisitePlanHash,
+        version: responsePlan.conditionalExplanation.version, maximumProviderCalls: responsePlan.callPolicy.maximumProviderCalls
+      } : null } : null,
     webSupportRequested: web.useWeb, webSupportReasons: web.reasons,
     durationMilliseconds: Math.round(performance.now() - started) });
 }
@@ -101,14 +108,16 @@ const summary = { cases: results.length, providerCalls: 0, networkAttempts, cons
   changedSelectedPassages: results.flatMap((item) => item.exactSelections.filter((pin) => !pin.exact).map((pin) => ({ id: item.id, sectionID: pin.sectionID }))),
   missingReferences: results.filter((item) => item.missingExactReferences.length).map(({ id, missingExactReferences }) => ({ id, missingExactReferences })),
   noSources: results.filter((item) => !item.sources.length).map((item) => item.id),
+  conditionalExplanationEligible: results.filter((item) => item.zoning?.responseScope).map((item) => item.id),
   zoningNotReady: results.filter((item) => item.zoning && (item.zoning.disposition !== "ready" || !item.zoning.selection?.pass || !item.zoning.readiness?.pass)).map((item) => ({ id: item.id, disposition: item.zoning.disposition, selectionPass: item.zoning.selection?.pass, readiness: item.zoning.readiness })) };
 const report = { schema: "permitext-owner-authored-source-diagnostic-v1", checkedAt: new Date().toISOString(),
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
-  scope: "All 110 authored question/scenario inputs, Project facts and selected passages/section IDs through production corpus planning and evidence assembly. Zoning planning/selection/readiness functions run with local diagnostic eligibility. Web triggering is inspected, but no document is fetched. No answer generation, semantic grading, saved answer, full HTTP dispatch, latency benchmark, public eligibility or professional approval is claimed. Exact reference presence does not prove source or answer completeness.",
+  scope: "All 110 authored question/scenario inputs, Project facts and selected passages/section IDs through production corpus planning and evidence assembly. Zoning planning/selection/readiness and conditional response eligibility run with local diagnostic eligibility. Original property prerequisites remain recorded separately; conditional eligibility does not resolve the determination. Web triggering is inspected separately, but no document is fetched. No answer generation, semantic grading, saved answer, full HTTP dispatch, latency benchmark, public eligibility or professional approval is claimed. Exact reference presence does not prove source or answer completeness.",
   sourceHashes: { ...Object.fromEntries(await Promise.all([
       "app.mjs", "research-zoning-planner.mjs", "research-zoning-safety.mjs",
       "research-dob-workflow-routing.mjs", "research-source-policy.mjs",
       "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs",
+      "research-zoning-conditional-explanation.mjs", "research-model-routing.mjs",
       "evals/research-owner-scope-input.mjs", "scripts/check-research-owner-full-scope-20260908.mjs"
     ].map(async (file) => [file, hash(await readFile(new URL(file, root)))]))),
     "evals/research-reconciled-answer-key.json": hash(keyBytes), "evals/results/research-owner-code-source-review-2026-09-08.json": hash(reviewBytes) }, ledgerHashes, summary, results };

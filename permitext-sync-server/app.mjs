@@ -280,6 +280,7 @@ import {
 } from "./research-official-guidance-summary.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import { refreshZoningContextEvidence } from "./research-zoning-context-excerpts.mjs";
+import { isZoningConditionalExplanation, planZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
 import {
   createResearchCorpusRegistry,
   researchCorpusByPrefix,
@@ -10290,6 +10291,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     signal: options.signal,
     timeoutMilliseconds: 45_000,
     failureMessage: "The Research interpretation request failed.",
+    maximumAttempts: isZoningConditionalExplanation(options.zoningPlan) ? 1 : 2,
     reserveEvaluationSpend: reserveResearchEvaluationSpend,
     reserveProviderSpend: reserveResearchProviderSpend,
     settleProviderSpend: settleResearchProviderSpend
@@ -10635,6 +10637,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     signal: options.signal,
     timeoutMilliseconds: 45_000,
     failureMessage: "The Research verifier request failed.",
+    maximumAttempts: isZoningConditionalExplanation(options.zoningPlan) ? 1 : 2,
     failureCode: "RESEARCH_VERIFIER_ERROR",
     reserveEvaluationSpend: reserveResearchEvaluationSpend,
     reserveProviderSpend: reserveResearchProviderSpend,
@@ -19018,7 +19021,7 @@ async function handleResearchConversationMessage(request, response) {
       topicContext
     });
     const conversationFactContext = researchConversationFactPromptContext(conversationFactState);
-    const zoningPlan = zoningTurn
+    let zoningPlan = zoningTurn
       ? planZoningResearchQuestion({
           question,
           projectFacts: combinedProjectFacts,
@@ -19072,6 +19075,22 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     if (zoningPlan && zoningPlan.disposition !== zoningResearchDispositions.ready) {
+      const prerequisiteContext = zoningResearchDeterministicContext({
+        question, evidence: assembledEvidence, plan: zoningPlan,
+        projectFacts: combinedProjectFacts, conversationFactContext
+      });
+      zoningPlan = planZoningConditionalExplanation({
+        plan: zoningPlan,
+        evidence: assembledEvidence,
+        evidenceSelection: evidencePackage.zoningSelection,
+        evidenceReadiness: evaluateZoningEvidenceReadiness({
+          question, evidence: assembledEvidence, plan: zoningPlan,
+          deterministicContext: prerequisiteContext
+        })
+      });
+    }
+    const conditionalZoningExplanation = isZoningConditionalExplanation(zoningPlan);
+    if (zoningPlan && zoningPlan.disposition !== zoningResearchDispositions.ready && !conditionalZoningExplanation) {
       const boundary = zoningResearchBoundaryResponse({ plan: zoningPlan });
       researchOperation.failureCode = "RESEARCH_ZONING_PREREQUISITES_REQUIRED";
       progressResponse.json(422, {
@@ -19268,7 +19287,7 @@ async function handleResearchConversationMessage(request, response) {
         };
       }
     }
-    const webSupportPolicyDecision = boundedCitationLookup
+    const webSupportPolicyDecision = boundedCitationLookup || conditionalZoningExplanation
       ? { useWeb: false, reasons: [] }
       : researchWebSupportTrigger({
           question,
@@ -19326,7 +19345,7 @@ async function handleResearchConversationMessage(request, response) {
       ? mockResearchWebSupportFixture(question)
       : null;
     let evidenceAnalysisEscalated = false;
-    const useModelEvidenceAnalysis =
+    const useModelEvidenceAnalysis = !conditionalZoningExplanation &&
       String(process.env.PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS || "").trim() === "1";
     const evidenceAnalysisPromise = mockMode
       ? Promise.resolve({
@@ -19459,7 +19478,7 @@ async function handleResearchConversationMessage(request, response) {
       evidence: assembledEvidence
     });
     const requestInterpretation = (model, options) =>
-      model === accurateModel
+      model === accurateModel && !conditionalZoningExplanation
         ? openAIResearchInterpretationWithStructuredRetry(
             question,
             assembledEvidence,
@@ -19503,6 +19522,7 @@ async function handleResearchConversationMessage(request, response) {
         })
       : await requestInterpretation(modelRouting.model, interpretationOptions).catch(async (error) => {
           if (
+            conditionalZoningExplanation ||
             modelRouting.tier !== "fast" ||
             modelRouting.model === accurateModel ||
             ["RESEARCH_CANCELLED", "AbortError", "RESEARCH_SPEND_CAP", "RESEARCH_EVAL_SPEND_CAP"].includes(error?.code || error?.name)
@@ -19626,6 +19646,9 @@ async function handleResearchConversationMessage(request, response) {
       webSupport
     });
     const applyEvidenceBoundaryFallback = () => {
+      // This scope promises a verified rule explanation. A rejected draft must
+      // remain unsaved/uncharged, not become a generic successful boundary.
+      if (conditionalZoningExplanation) return false;
       // Once Permitext has attributable official guidance for an explicit
       // guidance request, it must never replace that sourced material with a
       // charged generic enacted-evidence fallback. Revision may repair the

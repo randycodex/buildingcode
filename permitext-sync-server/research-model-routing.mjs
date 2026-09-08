@@ -1,4 +1,5 @@
 import { extractResearchCodeReferences } from "./research-conversation-topic.mjs";
+import { isZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
 
 export const researchModelRoutingVersion = "20260901-luna-terra-hybrid-zoning-compiler-v6";
 
@@ -136,7 +137,7 @@ export function routeResearchAnswerModel({
   const isBoundedCitationLookup = boundedCitationLookup === null
     ? researchQuestionIsBoundedCitationLookup(question)
     : Boolean(boundedCitationLookup);
-  if (zoningPlan?.disposition === "ready") {
+  if (zoningPlan?.disposition === "ready" || isZoningConditionalExplanation(zoningPlan)) {
     const accurate = zoningPlan?.callPolicy?.initialTier === "accurate";
     return {
       model: accurate ? configuration.accurateModel : configuration.fastModel,

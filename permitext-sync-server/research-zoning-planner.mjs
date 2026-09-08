@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { isAppendixJSourceBoundaryQuestion } from "./research-zoning-safety.mjs";
+import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zoningConditionalExplanationPrompt } from "./research-zoning-conditional-explanation.mjs";
 
 export const zoningResearchPlannerVersion = "20260908-source-boundary-scope-v4";
 
@@ -1382,6 +1383,7 @@ export function zoningResearchPromptContext(plan, deterministicContext) {
     `QUESTION_PATH: ${plan.path}`,
     `PLAN_HASH: ${plan.planHash}`,
     `DISPOSITION: ${plan.disposition}`,
+    zoningConditionalExplanationPrompt(plan),
     `DETERMINISTIC_CONTEXT: ${JSON.stringify(deterministicContext || {})}`,
     deterministicContext?.answerObligations?.length
       ? `MANDATORY_ANSWER_OBLIGATIONS: ${JSON.stringify(deterministicContext.answerObligations)}`
@@ -1729,15 +1731,18 @@ export function evaluateZoningDeterministicControls({
     text: compactText([point?.heading, point?.explanation].filter(Boolean).join(" ")),
     sourceIDs: new Set((Array.isArray(point?.sourceIDs) ? point.sourceIDs : []).map(String))
   }));
-  const issues = [];
+  const issues = zoningConditionalExplanationIssues({ plan, answer });
   if (
-    plan?.disposition !== zoningResearchDispositions.ready &&
+    plan?.disposition !== zoningResearchDispositions.ready && !isZoningConditionalExplanation(plan) &&
     Number(providerRequestCount) > 0
   ) {
     issues.push({
       code: "MODEL_CALLED_WITH_MISSING_PREREQUISITES",
       detail: "A Zoning model request was attempted before required facts were established."
     });
+  }
+  if (isZoningConditionalExplanation(plan) && Number(providerRequestCount) > plan.callPolicy.maximumProviderCalls) {
+    issues.push({ code: "CONDITIONAL_PROVIDER_CALL_LIMIT_EXCEEDED", detail: "A conditional explanation permits only one draft and one verification request." });
   }
   if (plan?.deterministicControls?.effectiveDateEventBinding) {
     for (const date of deterministicContext?.dates || []) {
