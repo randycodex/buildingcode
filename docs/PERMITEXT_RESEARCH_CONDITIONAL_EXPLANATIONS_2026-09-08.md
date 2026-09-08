@@ -20,6 +20,8 @@ The mapped-location checker now recognizes an unresolved “cannot determine whe
 - The existing Zoning architecture preflight passed without changing its retained artifact: 16 accepted retained answers keep their outcomes and five known failed answers remain rejected.
 - The 110-case source comparison preserves every authored input hash, source record and exact selected passage from the preceding storage-context diagnostic. Only ZR-06, ZR-07 and ZR-13 become eligible for the separate conditional response scope; their property determinations remain unresolved. This inspection makes zero network/provider calls and does not upgrade live campaign coverage.
 
+Implementation commit: `f17ef8cee`. The [committed-source 110-case diagnostic](../permitext-sync-server/evals/results/research-owner-conditional-response-source-diagnostic-2026-09-08.json) records that exact commit, current source hashes and the 19 unchanged paid-ledger hashes. All hashes were checked after the run. Earlier source diagnostics and paid results remain preserved.
+
 The governing source wording used to inspect the test doubles was checked against [ZR 42-192](https://zr.planning.nyc.gov/article-iv/chapter-2/42-192), [ZR 23-343](https://zr.planning.nyc.gov/article-ii/chapter-3/23-343) and [Chapter 1, including ZR 11-14](https://zr.planning.nyc.gov/article-i/chapter-1). This does not constitute professional approval of the reference keys.
 
 ## Remaining work found during this pass
