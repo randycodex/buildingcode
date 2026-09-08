@@ -36,9 +36,16 @@ for (const [suffix, turns, calls] of previousPackages) {
   assert.equal(run.providerCalls.length, calls);
   const operations = run.results.flatMap((item) => item.operations || []);
   assert.equal(operations.length, turns);
-  assert(operations.every((op) => op.pendingProviderRequestCount === 0 && Number.isFinite(op.conservativeProviderCostUSD) &&
-    (["completed", "failed"].includes(op.status) ||
-      (op.status === "rejected" && op.providerRequestCount === 0 && op.conservativeProviderCostUSD === 0))));
+  // The original pilot records null cost for two pre-dispatch rejections.
+  // Accept that historical representation only with independent zero-call
+  // evidence; missing cost on any dispatched operation remains a hard stop.
+  for (const entry of run.results) for (const op of entry.operations || []) {
+    assert.equal(op.pendingProviderRequestCount, 0);
+    const rejectedBeforeDispatch = suffix === "pilot-2026-09-07" && op.status === "rejected" &&
+      op.providerRequestCount === 0 && !run.providerCalls.some((call) => call.caseID === entry.id) &&
+      (op.conservativeProviderCostUSD === null || op.conservativeProviderCostUSD === 0);
+    assert(rejectedBeforeDispatch || (["completed", "failed"].includes(op.status) && Number.isFinite(op.conservativeProviderCostUSD)));
+  }
   previousConservativeSpendUSD += operations.reduce((sum, op) => sum + op.conservativeProviderCostUSD, 0);
   previousResultHashes.push({ file, sha256: createHash("sha256").update(bytes).digest("hex") });
 }
