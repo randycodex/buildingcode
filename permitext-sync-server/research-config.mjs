@@ -469,8 +469,23 @@ export function reserveResearchEvaluationSpend(requestBody, environment = proces
   };
   return {
     ...reservation,
+    cancelBeforeDispatch: () => cancelResearchEvaluationSpendBeforeDispatch(reservation),
     settle: (providerPayload) => settleResearchEvaluationSpend(reservation, providerPayload, environment)
   };
+}
+
+// Only the provider client's reservation stage may use this release. Once
+// dispatch starts, missing usage or an uncertain response retains its allowance.
+export function cancelResearchEvaluationSpendBeforeDispatch(reservation) {
+  if (!reservation?.active || reservation.configurationKey !== evaluationSpendReservation.configurationKey) return researchEvaluationSpendStatus();
+  const maximumRequestUSD = evaluationSpendReservation.pendingReservations.get(reservation.reservationID);
+  if (maximumRequestUSD === undefined) return researchEvaluationSpendStatus();
+  evaluationSpendReservation.pendingReservations.delete(reservation.reservationID);
+  evaluationSpendReservation.reservedUSD = Number(Math.max(
+    evaluationSpendReservation.actualUSD,
+    evaluationSpendReservation.reservedUSD - maximumRequestUSD
+  ).toFixed(6));
+  return researchEvaluationSpendStatus();
 }
 
 export function settleResearchEvaluationSpend(reservation, providerPayload, environment = process.env) {

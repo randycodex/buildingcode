@@ -214,6 +214,9 @@ async function performResearchProviderRequest({
       evaluationSpendReservation = reserveEvaluationSpend(requestBody);
       providerSpendReservation = reserveProviderSpend(requestBody);
     } catch (error) {
+      // Both limits must accept the request before any fetch can start. If the
+      // second limit rejects it, release only the unsent evaluation reservation.
+      evaluationSpendReservation?.cancelBeforeDispatch?.();
       if (completedProviderAttempts > 0) {
         throw attachProviderAccounting(
           error,

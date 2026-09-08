@@ -1,0 +1,132 @@
+{
+  "schema": "permitext-owner-live-source-confirmation-20260908-v1",
+  "authorization": "Owner: approximately $8 available for API testing; test as many times as needed. This package is limited to eight turns, one attempt each.",
+  "previousConservativeSpendUSD": 1.065597,
+  "ownerCandidateSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "sourceCommit": "894ba7035d086a3115ba4731243eff7968c447b8",
+  "keySHA256": "c8949b70372b5165fcf4561863b27414284da621602e6b70ca508f99da69a14b",
+  "execution": "Isolated local HTTP Research conversations with live OpenAI responses; automatic evidence discovery; no reference answers supplied to the answering model.",
+  "maximumCumulativeSpendUSD": 5,
+  "maximumTurnSpendUSD": 0.6,
+  "maximumTurns": 8,
+  "absoluteTurnSumCeilingUSD": 4.8,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing, medium reasoning, standard service tier",
+  "zoning": "Local diagnostic eligibility only; no public gate or deployment changes",
+  "cases": [
+    {
+      "id": "FGC-03",
+      "conversation": "FGC-03",
+      "question": "A mechanical room contains gas appliances with a combined input of 400,000 Btu/h. The room is large enough to satisfy an indoor-air volume calculation. Can the designer rely entirely on indoor combustion air?"
+    },
+    {
+      "id": "FGC-04",
+      "conversation": "FGC-04",
+      "question": "A contractor proposes a union in a concealed gas-piping location above a permanent gypsum ceiling so the piping can be assembled more easily. Is that fitting permitted to remain concealed?"
+    },
+    {
+      "id": "MC-06",
+      "conversation": "MC-06",
+      "question": "An uninhabited crawl space is not naturally ventilated. The designer proposes mechanical exhaust at 0.01 cfm per square foot that activates only when relative humidity reaches 70 percent. Is that enough?"
+    },
+    {
+      "id": "MC-15",
+      "conversation": "MC-15",
+      "question": "A commercial kitchen has a mechanical makeup-air fan sized to offset the hood exhaust, but kitchen staff must switch the makeup-air fan on separately. Is that acceptable?"
+    },
+    {
+      "id": "GAP-05",
+      "conversation": "GAP-05",
+      "question": "A permit application covers work in an occupied residential building containing 20 dwelling units. The application does not state how many units are occupied at filing or how many will remain occupied during the work. Is that omission acceptable?"
+    },
+    {
+      "id": "PC-05",
+      "conversation": "PC-05",
+      "question": "A restaurant kitchen proposes a commercial food-waste disposer connected to the sanitary system. The disposer is a listed product, but no DEP approval has been obtained. Is the listing enough?"
+    },
+    {
+      "id": "PC-15",
+      "conversation": "PC-15",
+      "question": "Basement plumbing fixtures are located at an elevation where they are subject to backflow from the public sewer, but the sanitary design provides no backwater valve. Is that acceptable?"
+    },
+    {
+      "id": "ZR-08",
+      "conversation": "far",
+      "question": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?"
+    }
+  ],
+  "startedAt": "2026-09-08T03:16:23.267Z",
+  "status": "stopped",
+  "results": [
+    {
+      "id": "FGC-03",
+      "question": "A mechanical room contains gas appliances with a combined input of 400,000 Btu/h. The room is large enough to satisfy an indoor-air volume calculation. Can the designer rely entirely on indoor combustion air?",
+      "status": "failed",
+      "startedAt": "2026-09-08T03:16:23.417Z",
+      "error": {
+        "message": "Research is temporarily unavailable. Your question is still here.",
+        "httpStatus": 503,
+        "error": "Research is temporarily unavailable. Your question is still here.",
+        "code": "RESEARCH_SPEND_CAP",
+        "status": 503
+      },
+      "durationMilliseconds": 1300,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "6cd61a54-cb5f-4de3-b06e-32d21aa2b841",
+          "createdAt": "2026-09-08T03:16:23.430Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 0,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 1264,
+          "failureCode": "RESEARCH_SPEND_CAP",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    }
+  ],
+  "providerCalls": [],
+  "spend": {
+    "active": true,
+    "capUSD": 5,
+    "reservedUSD": 0.255903,
+    "actualUSD": 0,
+    "requestCount": 1,
+    "pendingRequestCount": 1
+  },
+  "stopReason": "Spending guard stopped this pilot; remaining cases skipped.",
+  "completedAt": "2026-09-08T03:16:25.283Z"
+}

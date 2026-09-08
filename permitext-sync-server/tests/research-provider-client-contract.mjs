@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { requestResearchProvider } from "../research-provider-client.mjs";
 import {
   beginResearchSpendReservation, endResearchSpendReservation,
-  reserveResearchProviderSpend, settleResearchProviderSpend
+  reserveResearchProviderSpend, settleResearchProviderSpend,
+  reserveResearchEvaluationSpend, researchEvaluationSpendStatus
 } from "../research-config.mjs";
 
 function providerResponse(status, body, headers = {}) {
@@ -274,6 +275,83 @@ for (const name of ["TimeoutError", "AbortError"]) {
       return true;
     }
   );
+}
+
+const evaluationEnvironment = {
+  PERMITEXT_RESEARCH_EVAL_MAX_USD: "1",
+  PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "2",
+  PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: "0.2",
+  PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "12",
+  PERMITEXT_RESEARCH_PRICING_VERSION: "evaluation-before-dispatch-contract"
+};
+const boundedRequest = { model: "test-model", input: "test", max_output_tokens: 100 };
+
+{
+  const outstanding = reserveResearchEvaluationSpend(boundedRequest, evaluationEnvironment);
+  let rejectedReservation;
+  let calls = 0;
+  const spendLimit = Object.assign(new Error("Turn limit reached"), { code: "RESEARCH_SPEND_CAP" });
+  await assert.rejects(requestResearchProvider(requestOptions({
+    requestBody: boundedRequest,
+    reserveEvaluationSpend: (body) => {
+      rejectedReservation = reserveResearchEvaluationSpend(body, evaluationEnvironment);
+      return rejectedReservation;
+    },
+    reserveProviderSpend: () => { throw spendLimit; },
+    fetchImpl: async () => { calls += 1; throw new Error("Must not dispatch"); }
+  })), (error) => error === spendLimit);
+  assert.equal(calls, 0);
+  assert.equal(researchEvaluationSpendStatus().reservedUSD, outstanding.maximumRequestUSD);
+  assert.equal(researchEvaluationSpendStatus().pendingRequestCount, 1);
+  assert.equal(researchEvaluationSpendStatus().actualUSD, 0);
+  // Releasing the rejected request twice cannot cancel another reservation.
+  rejectedReservation.cancelBeforeDispatch();
+  assert.equal(researchEvaluationSpendStatus().reservedUSD, outstanding.maximumRequestUSD);
+  outstanding.cancelBeforeDispatch();
+  assert.equal(researchEvaluationSpendStatus().pendingRequestCount, 0);
+  assert.equal(researchEvaluationSpendStatus().reservedUSD, 0);
+}
+
+{
+  const environment = { ...evaluationEnvironment, PERMITEXT_RESEARCH_PRICING_VERSION: "evaluation-uncertain-retry-contract" };
+  const reservations = [];
+  let calls = 0;
+  const spendLimit = Object.assign(new Error("Retry limit reached"), { code: "RESEARCH_SPEND_CAP" });
+  await assert.rejects(requestResearchProvider(requestOptions({
+    requestBody: boundedRequest,
+    reserveEvaluationSpend: (body) => {
+      const reservation = reserveResearchEvaluationSpend(body, environment);
+      reservations.push(reservation);
+      return reservation;
+    },
+    reserveProviderSpend: () => {
+      if (calls) throw spendLimit;
+      return { active: true, maximumRequestUSD: 0.05 };
+    },
+    fetchImpl: async () => { calls += 1; return providerResponse(503, { error: { code: "service_unavailable" } }); }
+  })), (error) => {
+    assert.equal(error, spendLimit);
+    assert.equal(error.providerAttempts, 1);
+    assert.equal(error.providerUsage.permitext_unreconciled_cost_usd, 0.05);
+    return true;
+  });
+  assert.equal(calls, 1);
+  assert.equal(reservations.length, 2);
+  assert.equal(researchEvaluationSpendStatus().pendingRequestCount, 1);
+  assert.equal(researchEvaluationSpendStatus().reservedUSD, reservations[0].maximumRequestUSD,
+    "Only the unsent retry may be released; the dispatched request with unknown usage stays reserved.");
+}
+
+for (const name of ["TimeoutError", "AbortError"]) {
+  const environment = { ...evaluationEnvironment, PERMITEXT_RESEARCH_PRICING_VERSION: `evaluation-${name}-contract` };
+  let reservation;
+  await assert.rejects(requestResearchProvider(requestOptions({
+    requestBody: boundedRequest,
+    reserveEvaluationSpend: (body) => { reservation = reserveResearchEvaluationSpend(body, environment); return reservation; },
+    fetchImpl: async () => { throw new DOMException("Dispatched request interrupted", name); }
+  })), { name });
+  assert.equal(researchEvaluationSpendStatus().pendingRequestCount, 1);
+  assert.equal(researchEvaluationSpendStatus().reservedUSD, reservation.maximumRequestUSD);
 }
 
 console.log("Research provider client contract passed.");
