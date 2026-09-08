@@ -19,11 +19,11 @@ globalThis.fetch = async () => { networkAttempts++; throw new Error("Network for
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1", PERMITEXT_RUN_PAID_RESEARCH_EVALS: "0" });
 const root = new URL("../", import.meta.url);
 const hash = (text) => createHash("sha256").update(text).digest("hex");
-const terminalFile = "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json";
+const terminalFile = "evals/results/research-owner-live-zoning-expansion-2026-09-08.json";
 const terminalBytes = await readFile(new URL(terminalFile, root));
 const terminal = JSON.parse(terminalBytes);
 const ledgerHashes = [...terminal.previousResultHashes, { file: terminalFile, sha256: hash(terminalBytes) }];
-assert.equal(ledgerHashes.length, 21);
+assert.equal(ledgerHashes.length, 22);
 const attempted = new Set();
 let conservativeUSD = 0;
 for (const entry of ledgerHashes) {
@@ -42,7 +42,7 @@ for (const entry of ledgerHashes) {
   }
 }
 conservativeUSD = Number(conservativeUSD.toFixed(6));
-assert.equal(conservativeUSD, 7.876233);
+assert.equal(conservativeUSD, 7.887898);
 const keyBytes = await readFile(new URL("evals/research-reconciled-answer-key.json", root));
 const original = JSON.parse(keyBytes);
 await validateReconciledAnswerKey(original);
@@ -114,7 +114,7 @@ const report = { schema: "permitext-owner-authored-source-diagnostic-v1", checke
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
   scope: "All 110 authored question/scenario inputs, Project facts and selected passages/section IDs through production corpus planning and evidence assembly. Zoning planning/selection/readiness and conditional response eligibility run with local diagnostic eligibility. Original property prerequisites remain recorded separately; conditional eligibility does not resolve the determination. Web triggering is inspected separately, but no document is fetched. No answer generation, semantic grading, saved answer, full HTTP dispatch, latency benchmark, public eligibility or professional approval is claimed. Exact reference presence does not prove source or answer completeness.",
   sourceHashes: { ...Object.fromEntries(await Promise.all([
-      "app.mjs", "research-zoning-planner.mjs", "research-zoning-safety.mjs", "research-corpus-registry.mjs",
+      "app.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-safety.mjs", "research-corpus-registry.mjs",
       "research-dob-workflow-routing.mjs", "research-source-policy.mjs",
       "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs",
       "research-topic-dependencies.mjs", "project-foundation-contract.mjs",

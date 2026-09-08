@@ -139,12 +139,21 @@ const expectedSemanticFailureIDs = retained.results
   .sort();
 assert.deepEqual(
   deliveredReplay.filter((item) => !item.pass).map((item) => item.id).sort(),
-  [...expectedSemanticFailureIDs, "zr-rules-of-construction"].sort(),
-  "Preserve the other accepted answers, reject the five known failures, and expose the newly enforced construction principle without changing the historical grading."
+  [...expectedSemanticFailureIDs, "zr-rules-of-construction", "zr-new-divided-zoning-lot"].sort(),
+  "Preserve the other accepted answers, reject the five known failures, and expose the construction and date-application gaps without changing historical grading."
 );
-assert.equal(deliveredReplay.filter((item) => item.pass).length, 15);
+assert.equal(deliveredReplay.filter((item) => item.pass).length, 14);
 assert.deepEqual(deliveredReplay.find((item) => item.id === "zr-rules-of-construction").issues.map((issue) => issue.obligationID),
   ["construction_particular_controls_general"]);
+const temporalGap = deliveredReplay.find((item) => item.id === "zr-new-divided-zoning-lot");
+assert(temporalGap.issues.every((issue) => issue.code === "TEMPORAL_APPLICATION_NOT_ESTABLISHED" && issue.obligationID === "divided_lot_effective_date_application"));
+assert.deepEqual(temporalGap.issues.map((issue) => issue.field).sort(), ["answerText", "explanation"]);
+const temporalResult = retained.results.find((item) => item.testCase.id === temporalGap.id);
+const temporalCorrection = structuredClone(temporalResult.answer);
+for (const field of ["answerText", "explanation"]) temporalCorrection[field] = temporalCorrection[field].replace(
+  "On the supplied evidence, the stated 2026 assembly therefore does not qualify for the Section 77-11 majority-district use-regulation option.",
+  "The formation year alone does not establish whether the lot existed on an applicable amendment date; that condition needs confirmation before applying either existence-date branch here.");
+assert((await controlsFor(temporalResult, temporalCorrection)).controls.pass, "Correcting the unsupported temporal inference restores acceptance while retaining the original rule and other qualifications.");
 assert.equal(deliveredReplay.find((item) => item.id === "zr-residential-building-spacing").pass, true,
   "Preserve the qualified spacing explanation and main-text calculation.");
 
@@ -457,6 +466,7 @@ console.log(JSON.stringify({
   retainedAcceptedAnswersPreserved: deliveredReplay.filter((item) => item.pass).length,
   retainedSemanticFailuresRejected: deliveredReplay.filter((item) => !item.pass && expectedSemanticFailureIDs.includes(item.id)).length,
   newlyDetectedRequiredCoverageGaps: ["zr-rules-of-construction"],
+  newlyDetectedTemporalApplicationGaps: ["zr-new-divided-zoning-lot"],
   focusedAdversarialSuitePassed: true,
   ownerApprovedRubricsModified: false,
   paidModelCalls: 0

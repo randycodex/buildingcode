@@ -325,8 +325,9 @@ async function replayRetainedAnswers(retained) {
   return {
     deliveredCount: answers.length,
     preservedFullScoreIDs: answers.filter((item) => item.pass).map((item) => item.id),
-    rejectedKnownJudgeFailureIDs: answers.filter((item) => !item.pass && !(architectureV21 && item.id === "zr-rules-of-construction")).map((item) => item.id),
+    rejectedKnownJudgeFailureIDs: answers.filter((item) => !item.pass && !(architectureV21 && ["zr-rules-of-construction", "zr-new-divided-zoning-lot"].includes(item.id))).map((item) => item.id),
     ...(architectureV21 ? { rejectedRequiredCoverageIDs: answers.filter((item) => !item.pass && item.id === "zr-rules-of-construction").map((item) => item.id) } : {}),
+    ...(architectureV21 ? { rejectedTemporalApplicationIDs: answers.filter((item) => !item.pass && item.id === "zr-new-divided-zoning-lot").map((item) => item.id) } : {}),
     answers
   };
 }
@@ -525,7 +526,10 @@ async function buildResult() {
     productionAdverseCostAtMostSixPerHundred:
       readyCases.length > 0 && (adverseUSD / readyCases.length) * 100 <= 6,
     ...(architectureV21 ? {
-      fifteenAcceptedRetainedAnswersPreserved: answerReplay.preservedFullScoreIDs.length === 15,
+      fourteenAcceptedRetainedAnswersPreserved: answerReplay.preservedFullScoreIDs.length === 14,
+      unsupportedTemporalApplicationExposed: JSON.stringify(answerReplay.rejectedTemporalApplicationIDs) === JSON.stringify(["zr-new-divided-zoning-lot"]) &&
+        answerReplay.answers.find((item) => item.id === "zr-new-divided-zoning-lot").issues.every((issue) =>
+          issue.obligationID === "divided_lot_effective_date_application" && issue.code === "TEMPORAL_APPLICATION_NOT_ESTABLISHED"),
       missingConstructionPrincipleExposed: JSON.stringify(answerReplay.rejectedRequiredCoverageIDs) === JSON.stringify(["zr-rules-of-construction"]) &&
         answerReplay.answers.find((item) => item.id === "zr-rules-of-construction").issues.every((issue) =>
           issue.obligationID === "construction_particular_controls_general"),

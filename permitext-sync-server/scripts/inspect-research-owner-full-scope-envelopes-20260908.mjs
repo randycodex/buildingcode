@@ -26,11 +26,11 @@ globalThis.fetch = async () => { networkAttempts++; throw new Error("Network for
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1", PERMITEXT_RUN_PAID_RESEARCH_EVALS: "0" });
 const root = new URL("../", import.meta.url);
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const terminalFile = "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json";
+const terminalFile = "evals/results/research-owner-live-zoning-expansion-2026-09-08.json";
 const terminalBytes = await readFile(new URL(terminalFile, root));
 const terminal = JSON.parse(terminalBytes);
 const ledgerHashes = [...terminal.previousResultHashes, { file: terminalFile, sha256: hash(terminalBytes) }];
-assert.equal(ledgerHashes.length, 21);
+assert.equal(ledgerHashes.length, 22);
 let conservativeUSD = 0;
 const attempted = new Set();
 for (const entry of ledgerHashes) {
@@ -49,7 +49,7 @@ for (const entry of ledgerHashes) {
   }
 }
 conservativeUSD = Number(conservativeUSD.toFixed(6));
-assert.equal(conservativeUSD, 7.876233);
+assert.equal(conservativeUSD, 7.887898);
 const remainingAuthorizationUSD = Number((8 - conservativeUSD).toFixed(6));
 const key = JSON.parse(await readFile(new URL("evals/research-reconciled-answer-key.json", root)));
 await validateReconciledAnswerKey(key);
@@ -138,7 +138,7 @@ assert.equal(networkAttempts, 0);
 assert.equal(researchEvaluationSpendStatus().pendingRequestCount, 0);
 assert.equal(researchEvaluationSpendStatus().reservedUSD, 0);
 const sourceFiles = ["app.mjs", "research-config.mjs", "research-model-routing.mjs", "research-corpus-registry.mjs", "research-code-basis.mjs",
-  "research-source-policy.mjs", "research-evidence-assembly.mjs", "research-zoning-planner.mjs", "research-zoning-conditional-explanation.mjs",
+  "research-source-policy.mjs", "research-evidence-assembly.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-conditional-explanation.mjs",
   "research-required-claim-coverage.mjs", "research-conversation-facts.mjs", "evals/research-owner-scope-input.mjs",
   "evals/research-reconciled-answer-key.json", "evals/results/research-owner-code-source-review-2026-09-08.json",
   "tests/research-request-envelope-preflight.mjs", "scripts/inspect-research-owner-full-scope-envelopes-20260908.mjs"];

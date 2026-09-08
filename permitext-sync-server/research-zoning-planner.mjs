@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
 import { isAppendixJSourceBoundaryQuestion } from "./research-zoning-safety.mjs";
 import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zoningConditionalExplanationPrompt } from "./research-zoning-conditional-explanation.mjs";
+import { zoningTemporalApplicationObligations, zoningTemporalApplicationIssues } from "./research-zoning-temporal-application.mjs";
 
 export const zoningResearchPlannerVersion = "20260908-historical-source-intent-v5";
 
-export const zoningResearchCompilerVersion = "20260908-direct-rule-obligations-v22";
+export const zoningResearchCompilerVersion = "20260908-temporal-application-v23";
 export const zoningResearchRepairVersion = "20260901-source-bounded-patch-v2";
 
 export const zoningResearchPaths = Object.freeze({
@@ -1466,7 +1467,11 @@ export function zoningResearchDeterministicContext({
     plan,
     arithmetic,
     facts: resolvedFactText({ question, projectFacts, conversationFactContext })
-  }).concat(tableLegendObligations(question, evidence));
+  }).concat(tableLegendObligations(question, evidence), zoningTemporalApplicationObligations({
+    question, evidence, facts: resolvedFactText({ question, projectFacts, conversationFactContext }),
+    uncertainty: [question, ...(Array.isArray(projectFacts) ? projectFacts : []),
+      ...(Array.isArray(conversationFactContext?.unknown) ? conversationFactContext.unknown : []).map((fact) => `Unresolved: ${fact}`)]
+  }));
   const context = {
     schemaVersion: 2,
     compilerVersion: zoningResearchCompilerVersion,
@@ -1898,6 +1903,7 @@ export function evaluateZoningDeterministicControls({
       : answerObligation?.coverageScope === "answer"
         ? primaryText
         : text;
+    issues.push(...zoningTemporalApplicationIssues({ obligation: answerObligation, answer }));
     const covered = obligationCoveredByText(answerObligation, scopeText);
     if (!covered) {
       issues.push({
