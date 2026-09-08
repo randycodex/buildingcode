@@ -8,9 +8,10 @@ import {
   researchQuestionReturnsToOriginalTopic
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
+import { targetedZoningContextExcerpt } from "./research-zoning-context-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260908-complete-governing-passages-v26";
+export const researchEvidenceAssemblyVersion = "20260908-pinned-source-blocks-v27";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -661,10 +662,12 @@ function sourceRecord(value, {
     text,
     canonicalContextResolved: Boolean(canonicalResolved),
     canonicalContextComplete: Boolean(
-      canonicalResolved && !targetedDefinition && text.length === rawText.length
+      canonicalResolved && !targetedDefinition && !value.questionSpecificPassage &&
+      !value.targetedZoningContext && text.length === rawText.length
     ),
-    truncated: targetedDefinition ? false : text.length < rawText.length,
-    targetedDefinition: targetedDefinition ? structuredClone(targetedDefinition) : null
+    truncated: targetedDefinition ? false : Boolean(value.questionSpecificPassage) || text.length < rawText.length,
+    targetedDefinition: targetedDefinition ? structuredClone(targetedDefinition) : null,
+    ...(value.targetedZoningContext ? { targetedZoningContext: structuredClone(value.targetedZoningContext) } : {})
   }, value, Math.max(0, characterAllowance));
 }
 
@@ -687,6 +690,7 @@ export async function assembleResearchEvidence({
   projectFacts = [],
   pinnedEvidence = [],
   topicContext = null,
+  questionPlan = null,
   strategy = null,
   discover,
   resolveSection,
@@ -813,15 +817,41 @@ export async function assembleResearchEvidence({
     } catch {
       resolverFailureCount += 1;
     }
-    resolvedPins.push({ index, pinned, value, resolved });
+    const contextExcerpt = resolved && !pinned.richSourceID &&
+      !compactText(pinned.userSelectedText || pinned.selectedText || pinned.text)
+      ? targetedZoningContextExcerpt(value, { question: query.question, plan: questionPlan }) : null;
+    resolvedPins.push({ index, pinned, value, resolved, contextExcerpt });
+  }
+
+  // Reserve complete selected source excerpts before sharing the remaining
+  // budget. A fair-share prefix must not cut a closing condition in half.
+  const excerptReservation = resolvedPins.reduce((sum, entry) => sum + (entry.contextExcerpt?.text.length || 0), 0);
+  if (excerptReservation) {
+    for (const entry of resolvedPins) {
+      entry.atomicSelectedLength = entry.contextExcerpt ? 0 :
+        compactText(entry.pinned.userSelectedText || entry.pinned.selectedText || entry.pinned.text).length;
+    }
+  }
+  const reservationFor = (entry) => entry.contextExcerpt?.text.length || entry.atomicSelectedLength || 0;
+  const atomicReservation = resolvedPins.reduce((sum, entry) => sum + reservationFor(entry), 0);
+  const ordinaryPinCount = resolvedPins.filter((entry) => !reservationFor(entry)).length;
+  if (atomicReservation + ordinaryPinCount > limits.maximumCharacters ||
+      resolvedPins.some((entry) => reservationFor(entry) > limits.maximumCharactersPerSource)) {
+    for (const entry of resolvedPins) { entry.contextExcerpt = null; entry.atomicSelectedLength = 0; }
   }
 
   for (const [position, entry] of resolvedPins.entries()) {
     const remainingCharacters = Math.max(0, limits.maximumCharacters - characterCount);
-    const remainingPins = resolvedPins.length - position;
-    const fairPinnedShare = remainingPins ? Math.floor(remainingCharacters / remainingPins) : 0;
-    const allowance = Math.min(limits.maximumCharactersPerSource, fairPinnedShare);
-    let targeted = !entry.pinned.richSourceID &&
+    const remainingEntries = resolvedPins.slice(position);
+    const reservedCharacters = remainingEntries.reduce((sum, item) => sum + reservationFor(item), 0);
+    const remainingOrdinaryPins = remainingEntries.filter((item) => !reservationFor(item)).length;
+    const fairPinnedShare = remainingOrdinaryPins
+      ? Math.floor(Math.max(0, remainingCharacters - reservedCharacters) / remainingOrdinaryPins) : 0;
+    const allowance = Math.min(limits.maximumCharactersPerSource,
+      reservationFor(entry) || fairPinnedShare, remainingCharacters);
+    let targeted = entry.contextExcerpt
+      ? { value: { ...entry.value, text: entry.contextExcerpt.text, targetedZoningContext: entry.contextExcerpt.metadata }, excerpt: null }
+      : !entry.pinned.richSourceID &&
       allowance > 0 &&
       targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
@@ -830,7 +860,7 @@ export async function assembleResearchEvidence({
           allowance
         )
       : { value: entry.value, excerpt: null };
-    if (!targeted.excerpt && !entry.pinned.richSourceID && allowance > 0) {
+    if (!targeted.excerpt && !entry.contextExcerpt && !entry.pinned.richSourceID && allowance > 0) {
       targeted = {
         ...targeted,
         value: questionSpecificBlockValue(targeted.value, query.retrievalQuery, allowance)
@@ -1308,6 +1338,10 @@ export async function assembleResearchEvidence({
       count: targetedDefinitionCount,
       text: "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
     });
+  }
+  for (const source of sources.filter((item) => item.targetedZoningContext)) {
+    limitations.push({ kind: "targeted-zoning-context-excerpt", sourceID: source.sourceID,
+      text: source.targetedZoningContext.limitation });
   }
   if (crossReferenceQueue.length > crossReferenceCount) {
     limitations.push({

@@ -279,6 +279,7 @@ import {
   researchOfficialGuidanceSummaryProof
 } from "./research-official-guidance-summary.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
+import { refreshZoningContextEvidence } from "./research-zoning-context-excerpts.mjs";
 import {
   createResearchCorpusRegistry,
   researchCorpusByPrefix,
@@ -11711,6 +11712,7 @@ export async function assembledResearchEvidenceForTurn({
     pinnedEvidence,
     strategy,
     topicContext,
+    questionPlan: zoningPlan,
     onStage,
     limits: assemblyLimits,
     discover: ({ question: retrievalQuestion, limit, retrievalContext }) => discoverRelevantEvidence({
@@ -18998,7 +19000,7 @@ async function handleResearchConversationMessage(request, response) {
       corpusPlan
     );
     progressResponse.progress("preparing_question", "completed");
-    const evidencePackage = await assembledResearchEvidenceForTurn({
+    const assembleForZoningPlan = (questionPlan) => assembledResearchEvidenceForTurn({
       question,
       messages: activeMessages,
       pinnedEvidence,
@@ -19006,9 +19008,10 @@ async function handleResearchConversationMessage(request, response) {
       projectFacts: combinedProjectFacts,
       topicContext,
       corpusPlan,
-      zoningPlan: initialZoningPlan,
+      zoningPlan: questionPlan,
       onStage: progressResponse.progress
     });
+    let evidencePackage = await assembleForZoningPlan(initialZoningPlan);
     const conversationFactState = resolveResearchConversationFacts({
       question,
       topicDecision: evidencePackage.topicDecision,
@@ -19022,6 +19025,8 @@ async function handleResearchConversationMessage(request, response) {
           conversationFactContext
         })
       : null;
+    // Conversation facts may resolve prerequisites after initial planning.
+    evidencePackage = await refreshZoningContextEvidence(evidencePackage, zoningPlan, assembleForZoningPlan);
     const validUserFacts = Array.from(new Set([
       ...combinedProjectFacts,
       ...conversationFactContext.established,

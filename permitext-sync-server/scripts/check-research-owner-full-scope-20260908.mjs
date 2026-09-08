@@ -75,7 +75,8 @@ for (const testCase of cases) {
   const sources = assembled.sources.map((source) => ({ sourceID: source.sourceID, sectionID: source.sectionID,
     reference: `${source.codePrefix} ${source.sectionNumber}`, origin: source.origin, role: source.evidencePriority?.evidenceRole,
     characters: source.text.length, textSHA256: hash(source.text), canonicalContextComplete: source.canonicalContextComplete,
-    truncated: source.truncated, structuredTable: !!source.richSourceGrids, targetedDefinition: !!source.targetedDefinition }));
+    truncated: source.truncated, structuredTable: !!source.richSourceGrids, targetedDefinition: !!source.targetedDefinition,
+    ...(source.targetedZoningContext ? { targetedZoningContext: source.targetedZoningContext } : {}) }));
   const web = researchWebSupportTrigger({ question: input.question, retrievalQuery: assembled.retrievalQuery,
     outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(assembled.discovery) }, { PERMITEXT_RESEARCH_WEB_SUPPORT: "1" });
   results.push({ id: item.id, family: item.id.split("-")[0], previouslyProviderAttempted: attempted.has(item.id),
@@ -107,6 +108,7 @@ const report = { schema: "permitext-owner-authored-source-diagnostic-v1", checke
   sourceHashes: { ...Object.fromEntries(await Promise.all([
       "app.mjs", "research-zoning-planner.mjs", "research-zoning-safety.mjs",
       "research-dob-workflow-routing.mjs", "research-source-policy.mjs",
+      "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs",
       "evals/research-owner-scope-input.mjs", "scripts/check-research-owner-full-scope-20260908.mjs"
     ].map(async (file) => [file, hash(await readFile(new URL(file, root)))]))),
     "evals/research-reconciled-answer-key.json": hash(keyBytes), "evals/results/research-owner-code-source-review-2026-09-08.json": hash(reviewBytes) }, ledgerHashes, summary, results };
