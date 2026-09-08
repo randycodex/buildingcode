@@ -1,0 +1,80 @@
+{
+  "schema": "permitext-technical-expansion-source-preflight-v1",
+  "sourceCommit": "d8d88001a89c1e8ca275d1c9bd17dc4f7145492b",
+  "createdAt": "2026-09-08T05:17:36.680Z",
+  "networkCalls": 0,
+  "providerCalls": 0,
+  "limitation": "Source completeness is not an answer-quality grade.",
+  "cases": [
+    {
+      "id": "MC-05",
+      "sourceCount": 14,
+      "characters": 8512,
+      "requiredSources": [
+        {
+          "reference": "MC 405.2",
+          "present": true,
+          "complete": true,
+          "characters": 317,
+          "hash": "b3122446568147cff1f0c0b4021dc1d791af18d552ca4d8eecb2115940a0af6c"
+        }
+      ]
+    },
+    {
+      "id": "GAP-04",
+      "sourceCount": 17,
+      "characters": 21166,
+      "requiredSources": [
+        {
+          "reference": "AC 28-105.4",
+          "present": true,
+          "complete": true,
+          "characters": 2136,
+          "hash": "c7b01c4801aac47aad7536857c20640f7f4db8f2a308af3fe42d89d6480cef40"
+        }
+      ]
+    },
+    {
+      "id": "PC-03",
+      "sourceCount": 17,
+      "characters": 16670,
+      "requiredSources": [
+        {
+          "reference": "PC 410.3",
+          "present": true,
+          "complete": true,
+          "characters": 624,
+          "hash": "9fa051b9d75d686adb059536a46e1db1b7d8109b3889a4ad0686cfa4177e6aa4"
+        }
+      ]
+    },
+    {
+      "id": "PC-08",
+      "sourceCount": 15,
+      "characters": 12651,
+      "requiredSources": [
+        {
+          "reference": "PC 419.2",
+          "present": true,
+          "complete": true,
+          "characters": 165,
+          "hash": "224b8197c9a903c5967c5c921b337bc7efc98743888c57dbba711bdb98eb7875"
+        }
+      ]
+    },
+    {
+      "id": "MC-10",
+      "sourceCount": 17,
+      "characters": 18349,
+      "requiredSources": [
+        {
+          "reference": "MC 501.3.1",
+          "present": true,
+          "complete": true,
+          "characters": 4337,
+          "hash": "f1bd570e6f129c27516537cf3e7fbb498f635afb4cc7d850d1d9b180be22b2dd"
+        }
+      ]
+    }
+  ]
+}
