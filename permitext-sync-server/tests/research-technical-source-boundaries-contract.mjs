@@ -51,6 +51,15 @@ try {
       "The complete applicable exception must survive scope changes.");
     assert.equal(child.evidencePriority.claimCoverageRequired, room === "sleeping room");
   }
+  const fixtureAssembly = await assembledResearchEvidenceForTurn({
+    question: "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+    messages: [], pinnedEvidence: [], projectFacts: []
+  });
+  const fixtureRoot = fixtureAssembly.sources.find((source) => source.codePrefix === "PC" && source.sectionNumber === "403.1");
+  assert(fixtureRoot?.canonicalContextComplete, "The controlling fixture section must include its qualifications after the long table.");
+  assert.match(fixtureRoot.text, /building or nonaccessory tenant space[\s\S]*fewer than 75[\s\S]*Assembly occupancies/i);
+  assert(fixtureAssembly.sources.some((source) => source.codePrefix === "PC" && source.sectionNumber === "403.1.1"));
+  assert(fixtureAssembly.sources.some((source) => source.codePrefix === "BC" && source.sectionNumber === "303.1.3"));
   assert.equal(networkAttempts, 0);
 } finally {
   globalThis.fetch = savedFetch;

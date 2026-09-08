@@ -789,4 +789,36 @@ assert.throws(
   /requires a text question/
 );
 
+const longGoverningText = "Table entry. ".repeat(45) + "Only a nonaccessory tenant space qualifies.";
+async function governingCompletion({ governing = true, perSource = 900, selectedOnly = false, extraLength = 20 } = {}) {
+  const entries = [
+    { sectionID: "long-root", codePrefix: "PC", sectionNumber: "901.1", title: "Test provision",
+      text: longGoverningText, selectedText: "Selected opening.",
+      signals: { exactTopicRouteTarget: governing, topicRoutes: governing ? ["test governing source"] : [], useSelectedPassageOnly: selectedOnly } },
+    ...["902.1", "903.1"].map((sectionNumber) => ({ sectionID: sectionNumber, codePrefix: "PC", sectionNumber,
+      title: "Other candidate", text: "x".repeat(extraLength), signals: {} }))
+  ];
+  let reads = 0;
+  const result = await assembleResearchEvidence({
+    question: "Which rule applies?", discover: async () => ({ candidates: entries }),
+    resolveSection: async (descriptor) => { reads += 1; return entries.find((entry) => entry.sectionID === descriptor.sectionID); },
+    limits: { maximumCandidates: 3, maximumDiscovered: 3, maximumCharacters: 1_000, maximumCharactersPerSource: perSource }
+  });
+  assert.equal(reads, 3, "Completion must use already resolved canonical text without another fetch.");
+  assert(result.sources.reduce((total, source) => total + source.text.length, 0) <= 1_000);
+  return result.sources.find((source) => source.sectionID === "long-root");
+}
+const completedGoverning = await governingCompletion();
+assert.equal(completedGoverning.text, longGoverningText);
+assert.equal(completedGoverning.canonicalContextComplete, true);
+assert.equal(completedGoverning.truncated, false);
+assert.equal((await governingCompletion({ governing: false })).truncated, true,
+  "Incidental candidates must not consume the unused budget for governing provisions.");
+assert.equal((await governingCompletion({ perSource: 300 })).truncated, true,
+  "The per-source ceiling still applies.");
+assert.equal((await governingCompletion({ extraLength: 330 })).truncated, true,
+  "Other candidates must not be displaced to force a governing section to fit.");
+assert.equal((await governingCompletion({ selectedOnly: true })).text, "Selected opening.",
+  "An explicitly selected discovery passage must remain bounded to its selection.");
+
 console.log("Permitext Research evidence assembly contract passed.");

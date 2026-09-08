@@ -10,7 +10,7 @@ import {
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260908-table-context-integrity-v25";
+export const researchEvidenceAssemblyVersion = "20260908-complete-governing-passages-v26";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -789,6 +789,7 @@ export async function assembleResearchEvidence({
   await onStage?.("reviewing_provisions", "active");
   const sources = [];
   const canonicalForExpansion = [];
+  const incompleteGoverningPassages = [];
   const includedSectionIdentities = new Set();
   const limitations = [];
   let characterCount = 0;
@@ -996,6 +997,10 @@ export async function assembleResearchEvidence({
     }
     if (!record.text) break;
     sources.push(record);
+    if (record.truncated && candidate.evidencePriority?.claimCoverageRequired === true &&
+        !useSelectedPassageOnly && !targeted.excerpt && !query.relevanceComparison) {
+      incompleteGoverningPassages.push({ record, value: resolved });
+    }
     if (targeted.excerpt) targetedDefinitionCount += 1;
     canonicalForExpansion.push({
       ...(useSelectedPassageOnly || query.relevanceComparison
@@ -1247,6 +1252,26 @@ export async function assembleResearchEvidence({
     crossReferenceCount += 1;
   }
   await onStage?.("following_cross_references", "completed");
+
+  // Initial fair shares protect room for other candidates and dependencies.
+  // Once those are assembled, reclaim unused space for complete governing
+  // passages. A long table must not hide a qualification below it merely
+  // because the other candidates turned out to be short.
+  for (const { record, value } of incompleteGoverningPassages) {
+    if (!record.truncated) continue;
+    const completeText = canonicalText(value);
+    const additionalCharacters = completeText.length - record.text.length;
+    if (additionalCharacters <= 0 || completeText.length > limits.maximumCharactersPerSource ||
+        characterCount + additionalCharacters > supplementalCharacterCeiling) continue;
+    const withTable = attachStructuredTable({
+      ...record, text: completeText, canonicalContextComplete: true, truncated: false
+    }, value, completeText.length);
+    Object.assign(record, withTable, {
+      text: completeText, canonicalContextComplete: true, truncated: false,
+      completionReason: "unused_evidence_budget_for_governing_passage"
+    });
+    characterCount += additionalCharacters;
+  }
 
   // Generic expansion may recover a dependency that the topic-specific count
   // limit omitted. Report final coverage, not an intermediate false absence.

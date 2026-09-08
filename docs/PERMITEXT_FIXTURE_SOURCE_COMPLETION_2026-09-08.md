@@ -1,0 +1,13 @@
+# Fixture source completion — September 8, 2026
+
+The earlier CC-04 answer omitted the distinct scope of the fewer-than-75 fixture permission in PC 403.1. A no-network replay located the cause: the 4,800-character initial source allocation stopped inside the long fixture table, before its footnotes. The qualification is present in the canonical source and the [official publisher's PC 403.1, footnote j](https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-161441), refreshed September 8. The accessory-room permission is separately stated in [BC 303.1.3](https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-165886).
+
+Evidence assembly now waits until initial candidates and cross-references are included, then uses any remaining character budget to complete truncated governing passages from their already resolved canonical text. It does not increase the aggregate or per-source limit, drop another candidate, fetch another source, or expand an explicitly selected passage. A section that still cannot fit remains marked incomplete. Any table binding is retained alongside the complete section text rather than replacing its scope and qualifications.
+
+The actual CC-04 source assembly now includes the complete PC 403.1 qualification and retains BC 303.1.3 and PC 403.1.1. Contracts verify unused-budget recovery, aggregate and per-source bounds, incidental-source exclusion, explicit-selection preservation and no extra resolver calls. The full Research chat suite passed. The 60-question source diagnostic remains 59/60 exact-reference coverage with no empty source packages or network calls; mean evidence size changed from 15,448 to 15,537 characters. The unchanged MC 403 grouping-reference miss remains documented, not relabeled as a pass. The 20-case draft retrieval benchmark and distinct-route contract also passed.
+
+## Bounded live confirmation
+
+The separate `run-research-owner-fixture-confirmation-20260908.mjs` package asks CC-03 and then CC-04 in the same isolated local Research conversation, once each, with actual provider responses and no supplied reference answers. This tests the source repair and retention of the established room facts. It does not assume an internal verification pass proves answer quality.
+
+Prior settled conservative spend across six packages is $3.050704, with zero pending requests. Two $0.85 turn caps add an absolute $1.70 ceiling, or $4.750704 including all prior packages, within the owner's $8 authorization. The package also enforces a $1.80 aggregate guard, a no-network default preflight and a permanent result file that prevents accidental replay. No separate paid judge, manual retry or deployment is included. Existing model routing is retained.
