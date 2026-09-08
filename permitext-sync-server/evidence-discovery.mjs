@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 
-export const evidenceDiscoveryVersion = "20260908-assembly-classification-scope-v25";
+export const evidenceDiscoveryVersion = "20260908-descendant-coverage-scope-v26";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -1491,6 +1491,7 @@ export async function discoverRelevantEvidence({
           score: 0,
           labels: new Set(),
           exactTarget: false,
+          descendantClaimCoverage: false,
           useSelectedPassageOnly: false,
           selectedExcerptPatterns: []
         };
@@ -1498,6 +1499,7 @@ export async function discoverRelevantEvidence({
         routeMatch.labels.add(route.label);
         if (sectionNumber === target.sectionPrefix) {
           routeMatch.exactTarget = true;
+          routeMatch.descendantClaimCoverage ||= target.descendantClaimCoverage !== false;
           routeMatch.useSelectedPassageOnly ||= target.useSelectedPassageOnly === true;
           if (Array.isArray(target.selectedExcerptPatterns)) {
             routeMatch.selectedExcerptPatterns.push(...target.selectedExcerptPatterns);
@@ -1595,6 +1597,7 @@ export async function discoverRelevantEvidence({
       exactReference,
       contextualReference,
       exactTopicRouteTarget: Boolean(routeMatch?.exactTarget),
+      descendantClaimCoverage: routeMatch?.descendantClaimCoverage !== false,
       useSelectedPassageOnly: routeMatch?.useSelectedPassageOnly === true,
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
@@ -1724,6 +1727,7 @@ export async function discoverRelevantEvidence({
         matchedTerms: item.matchedTerms.slice(0, 12),
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
+        descendantClaimCoverage: item.descendantClaimCoverage,
         useSelectedPassageOnly: item.useSelectedPassageOnly,
         exactReference: item.exactReference,
         contextualReference: item.contextualReference,

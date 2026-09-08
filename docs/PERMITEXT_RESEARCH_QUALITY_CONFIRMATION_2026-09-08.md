@@ -38,3 +38,13 @@ For these six selected turns, nearest-rank p50 is 13.223 seconds and p90 is 27.1
 Usage telemetry is $0.257655 plus an estimated $0.04798935 cache-write premium: **$0.30564435** for this batch. Including earlier runs, the usage-based estimate is **$1.40656461** and the conservative bound is **$2.832511**, with zero pending requests. These are telemetry-derived estimates, not an invoice or account balance.
 
 The exact answers and provider telemetry are retained in `research-owner-live-quality-confirmation-2026-09-08.json`; independent review is in `research-owner-quality-confirmation-review-2026-09-08.json`, both under `permitext-sync-server/evals/results`. The review preserves answer hashes and official source links. The overall quality goal remains open; internal verifier passes did not catch every issue above.
+
+## Follow-up scope repair
+
+The non-sleeping-room appliance-location route now declares that the parent provision is mandatory but discovered descendants require an applicability review. Its complete exceptions remain in the evidence. Sleeping-room questions retain broader descendant coverage. A directly requested, pinned or explicitly routed child still creates its own coverage obligation, and overlapping broader routes preserve theirs. This corrects a required-claim rule that previously forced sleeping-room installer and detector text into a bathroom answer.
+
+The answer and verifier instructions also require an independent factual basis for each alternative applicability path. An unresolved accessory relationship must not be treated as proof of nonaccessory-tenant-space status.
+
+The full Research suite, main check, smoke and both existing retrieval benchmarks passed after this repair. The 60-case diagnostic remains 59/60 with the same MC 403 grouping miss and 15,448 mean evidence characters. A full-assembly regression proves that both room questions retain the relevant source text while their mandatory coverage differs. Priority tests retain direct-reference, pinned-source and overlapping-route obligations.
+
+The follow-up live runner is limited to FGC-02 and CC-03 once each, with no separate judge. Prior settled conservative spend is $2.832511; two $0.85 turn caps give a combined ceiling of $4.532511 including earlier runs. An additional aggregate $1.80 guard remains active. Default execution is a no-network preflight; the permanent output file prevents accidental replay.

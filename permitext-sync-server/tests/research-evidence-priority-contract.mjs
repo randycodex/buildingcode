@@ -210,4 +210,27 @@ for (const discoveredContext of alignedPinnedScope.slice(1)) {
   );
 }
 
+const narrowRoot = candidate("303.3", "General rule and complete exceptions.", {
+  exactTopicRouteTarget: true, descendantClaimCoverage: false
+});
+const optionalChild = candidate("303.3.1", "Different room category and its conditions.");
+const scoped = prioritizeResearchEvidence([narrowRoot, optionalChild]);
+assert.equal(scoped[0].evidencePriority.claimCoverageRequired, true);
+assert.equal(scoped[1].evidencePriority.evidenceRole, "supporting");
+assert.equal(scoped[1].evidencePriority.claimCoverageRequired, false);
+assert.equal(scoped[1].selectedText, optionalChild.selectedText, "Optional review must retain the source intact.");
+for (const override of [
+  { ...optionalChild, origin: "user_pinned" },
+  { ...optionalChild, signals: { exactReference: true } },
+  { ...optionalChild, signals: { exactTopicRouteTarget: true } }
+]) {
+  const child = prioritizeResearchEvidence([narrowRoot, override]).find((item) => item.sectionNumber === "303.3.1");
+  assert.equal(child.evidencePriority.claimCoverageRequired, true, "A directly requested or routed child retains its own obligation.");
+}
+const overlapping = prioritizeResearchEvidence([narrowRoot, optionalChild], {
+  controllingRoots: [{ codePrefix: "BC", sectionNumber: "303.3" }]
+});
+assert.equal(overlapping.find((item) => item.sectionNumber === "303.3.1").evidencePriority.claimCoverageRequired, true,
+  "A broader overlapping controlling route cannot lose its descendants through deduplication.");
+
 console.log("Permitext deterministic Research evidence priority contract passed.");

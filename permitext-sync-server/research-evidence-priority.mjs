@@ -1,4 +1,4 @@
-export const researchEvidencePriorityVersion = "20260827-pinned-scope-v4";
+export const researchEvidencePriorityVersion = "20260908-explicit-descendant-scope-v5";
 
 export const researchEvidenceFunctions = Object.freeze({
   controllingRule: "controlling_rule",
@@ -17,7 +17,8 @@ function normalizedText(value) {
 function descriptor(value = {}) {
   return {
     codePrefix: normalizedText(value.codePrefix).toUpperCase(),
-    sectionNumber: normalizedText(value.sectionNumber)
+    sectionNumber: normalizedText(value.sectionNumber),
+    descendantClaimCoverage: (value.signals?.descendantClaimCoverage ?? value.descendantClaimCoverage) !== false
   };
 }
 
@@ -34,7 +35,12 @@ function uniqueDescriptors(values) {
   for (const value of Array.isArray(values) ? values : []) {
     const item = descriptor(value);
     const identity = descriptorIdentity(item);
-    if (!identity || seen.has(identity)) continue;
+    if (!identity) continue;
+    if (seen.has(identity)) {
+      // An overlapping broader route retains its coverage obligation.
+      if (item.descendantClaimCoverage) result.find((entry) => descriptorIdentity(entry) === identity).descendantClaimCoverage = true;
+      continue;
+    }
     seen.add(identity);
     result.push(item);
   }
@@ -191,8 +197,13 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
   // topic route is reviewed context, not a mandatory conclusion or citation.
   // Keeping that distinction here prevents the required-claim gate from
   // demanding the same passage that the answer-quality gate must reject.
+  // A narrowly routed parent can remain mandatory without treating every
+  // retrieved descendant as applicable. Keep those descendants available for
+  // review; direct user references, pins and explicit child routes still win.
+  const controllingHierarchy = controllingRoot &&
+    (controllingRoot.depth === 0 || controllingRoot.descendantClaimCoverage);
   const controlling =
-    (pinned || exactReference || (!pinnedScopeActive && Boolean(controllingRoot))) &&
+    (pinned || exactReference || (!pinnedScopeActive && Boolean(controllingHierarchy))) &&
     topicRouteRelationship !== "collateral";
   const claimCoverageRequired = controlling && !crossReference;
   const roles = [];
@@ -233,6 +244,7 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
     topicRouteRelationship,
     pinnedScopeActive,
     hierarchyDepth: rootDepth,
+    descendantClaimCoverage: controllingRoot?.descendantClaimCoverage ?? true,
     claimCoverageRequired,
     claimCoverageReason: claimCoverageRequired
       ? pinned
@@ -248,7 +260,9 @@ export function researchEvidencePriorityMetadata(value, options = {}) {
       ...(exactReference ? ["exact code reference in the question"] : []),
       ...(rootDepth === 0 ? ["controlling routed section"] : []),
       ...(rootDepth !== null && rootDepth > 0
-        ? [`material descendant of ${controllingRoot.codePrefix} ${controllingRoot.sectionNumber}`]
+        ? [controllingRoot.descendantClaimCoverage
+            ? `material descendant of ${controllingRoot.codePrefix} ${controllingRoot.sectionNumber}`
+            : `retrieved descendant of ${controllingRoot.codePrefix} ${controllingRoot.sectionNumber}; applicability requires review`]
         : []),
       ...(exception ? ["exception or permitted reduction"] : []),
       ...(calculationTable ? ["calculation or table provision"] : []),

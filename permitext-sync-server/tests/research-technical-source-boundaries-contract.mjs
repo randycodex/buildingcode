@@ -31,4 +31,30 @@ for (const probe of probes) {
   const restricted = await discover(probe.question, catalog.slice(1));
   assert.equal(restricted.candidates.length, 0, "An unavailable current source must not be synthesized or substituted from another edition.");
 }
-console.log("Permitext technical source boundaries passed: paraphrases, adjacent topics, editions and restricted catalogs; no paid calls.");
+const savedFetch = globalThis.fetch;
+const savedDiscovery = process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA;
+let networkAttempts = 0;
+try {
+  process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA = "1";
+  globalThis.fetch = async () => { networkAttempts += 1; throw new Error("External calls forbidden in this source-scope regression."); };
+  const { assembledResearchEvidenceForTurn } = await import("../app.mjs");
+  for (const room of ["bathroom", "sleeping room"]) {
+    const assembled = await assembledResearchEvidenceForTurn({
+      question: `Is a gas-fired appliance categorically prohibited in every ${room}?`,
+      messages: [], pinnedEvidence: [], projectFacts: []
+    });
+    const root = assembled.sources.find((source) => source.codePrefix === "FGC" && source.sectionNumber === "303.3");
+    const child = assembled.sources.find((source) => source.codePrefix === "FGC" && source.sectionNumber === "303.3.1");
+    assert(root && child, "Both source scopes remain available in the actual assembled package.");
+    assert.equal(root.evidencePriority.claimCoverageRequired, true);
+    assert.match(root.text, /direct-vent[\s\S]*all combustion air[\s\S]*listing[\s\S]*manufacturer/i,
+      "The complete applicable exception must survive scope changes.");
+    assert.equal(child.evidencePriority.claimCoverageRequired, room === "sleeping room");
+  }
+  assert.equal(networkAttempts, 0);
+} finally {
+  globalThis.fetch = savedFetch;
+  if (savedDiscovery === undefined) delete process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA;
+  else process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA = savedDiscovery;
+}
+console.log("Permitext technical source boundaries passed: paraphrases, adjacent topics, editions, restricted catalogs and full bathroom/sleeping-room assembly; no paid calls.");

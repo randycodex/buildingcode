@@ -1,14 +1,16 @@
 // Reviewed source locations for recurring technical and administrative topics.
 // These routes supply enacted evidence, never answers, thresholds or Project
 // facts. The corpus router still owns edition eligibility and selected scope.
-const route = (pattern, label, codePrefix, sections) => ({
+const route = (pattern, label, codePrefix, sections, options = {}) => ({
   pattern, label,
-  targets: sections.map((sectionPrefix) => ({ codePrefix, sectionPrefix, codeEdition: "2022" }))
+  targets: sections.map((sectionPrefix) => ({ codePrefix, sectionPrefix, codeEdition: "2022", ...options }))
 });
 
 export const researchTechnicalTopicRoutes = [
-  route(/^(?=[\s\S]*\b(?:gas[- ]fired|gas\s+appliances?|fuel[- ]gas)\b)(?=[\s\S]*\b(?:bathrooms?|bedrooms?|sleeping\s+rooms?|toilet\s+rooms?|storage\s+closets?|surgical\s+rooms?)\b)/i,
-    "fuel-gas appliance location restrictions and exceptions", "FGC", ["303.3"]),
+  route(/^(?=[\s\S]*\b(?:gas[- ]fired|gas\s+appliances?|fuel[- ]gas)\b)(?=[\s\S]*\b(?:bathrooms?|toilet\s+rooms?|storage\s+closets?|surgical\s+rooms?)\b)/i,
+    "fuel-gas appliance location restrictions and exceptions", "FGC", ["303.3"], { descendantClaimCoverage: false }),
+  route(/^(?=[\s\S]*\b(?:gas[- ]fired|gas\s+appliances?|fuel[- ]gas)\b)(?=[\s\S]*\b(?:bedrooms?|sleeping\s+rooms?)\b)/i,
+    "fuel-gas appliance sleeping-room restrictions and exceptions", "FGC", ["303.3"]),
   route(/^(?=[\s\S]*\bgas\b)(?=[\s\S]*\bpip(?:e|es|ing)\b)(?=[\s\S]*\b(?:tests?|testing|tested|inspect\w*|acceptance|commission\w*|service|operat\w*)\b)/i,
     "fuel-gas piping inspection and testing before service", "FGC", ["404.20", "406.1"]),
   route(/^(?=[\s\S]*\bgas\b)(?=[\s\S]*\bpip(?:e|es|ing)\b)(?=[\s\S]*\b(?:support\w*|strapp?\w*|hang(?:er|ers|ing)?|brackets?|anchor\w*)\b)/i,
