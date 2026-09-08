@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { isAppendixJSourceBoundaryQuestion } from "./research-zoning-safety.mjs";
 import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zoningConditionalExplanationPrompt } from "./research-zoning-conditional-explanation.mjs";
 
-export const zoningResearchPlannerVersion = "20260908-source-boundary-scope-v4";
+export const zoningResearchPlannerVersion = "20260908-historical-source-intent-v5";
 
 export const zoningResearchCompilerVersion = "20260901-answer-obligations-v21";
 export const zoningResearchRepairVersion = "20260901-source-bounded-patch-v2";
@@ -144,10 +144,44 @@ function resolvedFactText({ question, projectFacts = [], conversationFactContext
     .join(" "));
 }
 
+const historicalCalendarDate = String.raw`(?:(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\.?\s+(?:\d{1,2}(?:st|nd|rd|th)?(?:,)?\s+)?(?:18|19|20)\d{2}|\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+(?:18|19|20)\d{2}|(?:18|19|20)\d{2}(?:-\d{1,2}-\d{1,2})?|\d{1,2}/\d{1,2}/(?:18|19|20)?\d{2})`;
+const historicalTemporalClause = new RegExp(String.raw`\b(?:on|in|during|as[- ]of|before|after|by|from)\s+(?:the\s+)?${historicalCalendarDate}\b`, "i");
+const historicalRuleVerbDate = new RegExp(String.raw`^(?:require|allow|permit|prohibit|provide|say|read)\s+(?:on|in|as[- ]of|before|after)\s+${historicalCalendarDate}\b`, "i");
+const historicalRuleVersion = /\b(?:18|19|20)\d{2}\s+(?:version|edition|Zoning Resolution|ZR)\b|\b(?:old|prior|previous|pre-amendment|pre[- ](?:18|19|20)\d{2})\s+(?:zoning\s+)?(?:text|rules?|requirements?|provisions?)\b|\b(?:before|prior to)\s+(?:the\s+)?(?:City of Yes|amendment)\b/i;
+
+function asksForHistoricalSubstantiveText(question) {
+  const value = compactText(question);
+  // A question about what current source metadata can establish is answerable
+  // as a source explanation. A second request for the actual old rule keeps
+  // its historical-source prerequisite, even after a source-boundary clause.
+  const singleSourceQuestion = (value.match(/\?/g) || []).length <= 1 &&
+    !/[?;]\s*\S|\b(?:and|also|then)\s+(?:what|which|how|reconstruct|determine|quote|list|give|show)\b/i.test(value);
+  const sourceBoundaryOnly = singleSourceQuestion &&
+    /^(?:can|could|does|do|is|are|why\s+(?:can't|cannot|doesn't|does not))\b/i.test(value) &&
+    /\b(?:current|selected|supplied)\b[^?;]{0,90}\b(?:metadata|amendment[- ]history|text|provisions?)\b/i.test(value) &&
+    /\b(?:reconstruct|establish|determine|identify|show|enough|sufficient)\b/i.test(value);
+  const sourceResearchMethodOnly = singleSourceQuestion &&
+    /^(?:where|how)\s+(?:can|could|do|does|should|would)\s+(?:I|we|you|one|a professional)\b/i.test(value) &&
+    /\b(?:retrieve|find|locate|research|verify|check)\b/i.test(value);
+  if (sourceBoundaryOnly || sourceResearchMethodOnly) return false;
+  if (/\b(?:reconstruct|determine|retrieve|quote|show|summarize)\s+(?:the\s+)?(?:zoning\s+)?(?:text|rules?|requirements?|provisions?)\s+in\s+(?:force|effect)\b/i.test(value)) return true;
+  if (/\b(?:reconstruct|retrieve|quote|summarize|explain|identify|list)\s+(?:the\s+)?(?:old|prior|previous|historical|pre-amendment)\s+(?:zoning\s+)?(?:text|rules?|requirements?|provisions?)\b/i.test(value)) return true;
+  if (!historicalTemporalClause.test(value) && !historicalRuleVersion.test(value)) return false;
+  if (!/\b(?:ZR|Zoning Resolution|Sections?\s+\d{1,3}-\d{2,4}|rules?|requirements?|provisions?|law|require|allow|permit|prohibit|provide|say|read|permitted|allowed|prohibited|minimum|maximum|FAR)\b/i.test(value)) return false;
+  // Bind the date to the requested rule's verb. A project fact such as
+  // "issued the permit on December 4" is not a dated substantive-law request.
+  const presentRuleQuestions = [...value.matchAll(/\b(?:what|which)\s+(?:does|do)\b[^?;]{0,180}?\b(require|allow|permit|prohibit|provide|say|read)\b([^?;]*)/gi)];
+  return /\b(?:what|which|how)\s+(?:did|was|were)\b/i.test(value) ||
+    /\b(?:what|which)\s+(?:(?!(?:does|do|is|are|will|would|can|could)\b)\S+\s+){0,8}(?:applied|was|were|required|permitted|allowed)\b/i.test(value) ||
+    /(?:^|[?;,]\s*)(?:did|was|were)\b[^?;]{0,160}\b(?:require|allow|permit|prohibit|provide|say|apply|read|required|allowed|permitted|prohibited|applicable)\b/i.test(value) ||
+    presentRuleQuestions.some(([, verb, rest]) => historicalRuleVerbDate.test(`${verb}${rest}`)) ||
+    /\b(?:text|rules?|requirements?|provisions?|law)\s+(?:in\s+(?:force|effect)|applicable)\b/i.test(value);
+}
+
 function questionPath(question) {
   const value = compactText(question);
   const propertyOrMap = /\b(?:address|BBL|mapped zoning district|mapped district|Appendix [A-Z].*(?:map|location)|map and location|specific property|broker says .*subway|unverified transit zone|MIH.*(?:established|historical zoning lot|tax lots? were combined))\b/i.test(value);
-  const effectiveOrHistory = /\b(?:amendment history|historical|text in force|effective date|transition|continuation|grandfather|vested|certificate of occupancy|issued (?:before|after)|filed .*\b(?:before|after|on)\b|existed on|December \d|November \d|City of Yes)\b/i.test(value);
+  const effectiveOrHistory = asksForHistoricalSubstantiveText(value) || /\b(?:amendment history|historical|text in force|effective date|transition|continuation|grandfather|vested|certificate of occupancy|issued (?:before|after)|filed .*\b(?:before|after|on)\b|existed on|December \d|November \d|City of Yes)\b/i.test(value);
   const table = /\b(?:selected table|height-and-setback table|table symbols?|table footnotes?|legend|blank cell|asterisk|dagger)\b/i.test(value) &&
     !/\bconflict between\b/i.test(value);
   const definition = /\b(?:definition|defined|what (?:is|constitutes)|tax lots?.*one zoning lot|treated as one zoning lot|below-grade.*(?:floor area|base plane)|straddles two zoning districts|Section 77-11)\b/i.test(value);
@@ -209,16 +243,19 @@ function factRequirements(path, facts, question) {
       });
     }
   }
+  // The authorized Zoning corpus contains current consolidated text, not a
+  // dated substantive archive. An archive mentioned in a question or Project
+  // fact is not resolved source evidence, whether claimed present or absent.
+  // Retain this requirement for mixed parcel/history requests as well.
+  if (asksForHistoricalSubstantiveText(question)) {
+    requirements.push({
+      id: "dated_substantive_text",
+      label: "dated enacted or official archived substantive text",
+      present: false,
+      reason: "Amendment metadata, current transition text and a statement that an archive exists do not supply the dated substantive rule."
+    });
+  }
   if (path === zoningResearchPaths.effectiveDateHistory) {
-    if (/\b(?:determine|reconstruct) (?:the )?(?:text|rules?) in force|what (?:did|was) .* (?:require|allow) on\b/i.test(question) &&
-        !/\b(?:official archived|dated enacted)\b/i.test(facts)) {
-      requirements.push({
-        id: "dated_substantive_text",
-        label: "dated enacted or official archived substantive text",
-        present: false,
-        reason: "Amendment metadata and transition text do not reconstruct the prior substantive rule."
-      });
-    }
     if (/\bhistorical shallow[- ]lot condition is unknown\b/i.test(question)) {
       requirements.push({
         id: "historical_lot_condition",
@@ -295,7 +332,7 @@ export function planZoningResearchQuestion({
       exactPassageBinding: true,
       stableSourceHashes: true,
       tableGridAndLegend: path === zoningResearchPaths.structuredTableSymbol,
-      effectiveDateEventBinding: path === zoningResearchPaths.effectiveDateHistory,
+      effectiveDateEventBinding: path === zoningResearchPaths.effectiveDateHistory || asksForHistoricalSubstantiveText(normalizedQuestion),
       arithmeticLedger: path === zoningResearchPaths.calculationScenario,
       propertyAndMapPrerequisites: path === zoningResearchPaths.propertyMapApplicability
     },
@@ -316,6 +353,7 @@ export function planZoningResearchQuestion({
     },
     questionSignals: {
       sourceBoundaryExplanationOnly: appendixJSourceExplanationOnly(normalizedQuestion),
+      historicalSubstantiveTextRequested: asksForHistoricalSubstantiveText(normalizedQuestion),
       explicitMissingFact: explicitMissingPattern.test(normalizedQuestion),
       propertyIdentifierPresent: propertyIdentifierPattern.test(facts),
       mappedStatusPresent: concreteMappedStatusPattern.test(facts)

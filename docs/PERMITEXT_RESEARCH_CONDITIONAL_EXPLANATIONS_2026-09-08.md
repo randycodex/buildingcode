@@ -26,7 +26,7 @@ The governing source wording used to inspect the test doubles was checked agains
 
 ## Remaining work found during this pass
 
-Follow-up: the [storage source coverage pass](PERMITEXT_RESEARCH_STORAGE_SOURCE_COVERAGE_2026-09-08.md) addresses the full Reader-selection truncation and unpinned storage dependencies below. It preserves these original findings and describes the tested scope. Historical routing remains open.
+Follow-up: the [storage source coverage pass](PERMITEXT_RESEARCH_STORAGE_SOURCE_COVERAGE_2026-09-08.md) addresses the full Reader-selection truncation and unpinned storage dependencies below. The subsequent [historical source readiness pass](PERMITEXT_RESEARCH_HISTORICAL_SOURCE_READINESS_2026-09-08.md) addresses the routing and archive-availability checks in item 3. These links preserve the original findings below and describe the tested scope; historical archive ingestion remains absent.
 
 1. A full, long Reader selection of ZR 42-192 is still shortened by the existing per-source/fair-share limits, losing closing conditions. The successful HTTP fixture uses exact, individually selected canonical spans within those limits. It does not prove that the long-selection case is fixed.
 2. Unpinned self-storage chat retrieval returned Appendix J, ZR 42-192, ZR 12-10 and ZR 42-19. It did not supply ZR 42-193, and the storage source omitted the closing existing-facility documentation text. Conditional response eligibility alone does not establish completeness; generation and verification still have to reject unsupported claims. Automatic retrieval needs the same material-condition coverage as the selected-source case.

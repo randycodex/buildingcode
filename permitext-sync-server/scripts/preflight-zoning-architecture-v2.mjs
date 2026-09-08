@@ -63,17 +63,22 @@ const retainedResultPath = join(
     : "2026-09-01T14-35-20-650Z-90f42d5b-b758-4df4-98af-933350f036e7.json"
 );
 const regressionFixturePath = join(root, "evals", "zoning-architecture-v21-regression-fixtures.json");
+const snapshotArgument = process.argv.indexOf("--snapshot");
+const snapshotName = snapshotArgument === -1 ? null : process.argv[snapshotArgument + 1];
+if (snapshotArgument !== -1 && !/^[a-z0-9][a-z0-9._-]*\.json$/i.test(snapshotName || "")) {
+  throw new Error("--snapshot requires a JSON basename within evals/results.");
+}
 const resultPath = join(
   root,
   "evals",
   "results",
-  sourceBoundary
+  snapshotName || (sourceBoundary
     ? "zoning-source-boundary-no-cost-preflight-2026-09-08.json"
     : sourceSelection
     ? "zoning-source-selection-no-cost-preflight-2026-09-08.json"
     : architectureV21
     ? "zoning-architecture-v21-no-cost-preflight.json"
-    : "zoning-architecture-v2-no-cost-preflight.json"
+    : "zoning-architecture-v2-no-cost-preflight.json")
 );
 const hybridEnvironment = {
   PERMITEXT_RESEARCH_ROUTING_MODE: "hybrid",
@@ -626,7 +631,9 @@ const mode = process.argv.includes("--write") ? "write" : "check";
 const result = await buildResult();
 const output = stableJSON(result);
 if (mode === "write") {
-  await writeFile(resultPath, output, "utf8");
+  // Named comparison snapshots preserve prior retained evidence. Re-running
+  // their creation must not silently overwrite an earlier source revision.
+  await writeFile(resultPath, output, { encoding: "utf8", flag: snapshotName ? "wx" : "w" });
   console.log(`Wrote ${resultPath}`);
 } else {
   const retained = await readFile(resultPath, "utf8");

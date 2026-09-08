@@ -88,6 +88,7 @@ try {
   const auth = { accountUserID: account.appUserID };
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const seen = new Set();
+  let currentRuleConversationID;
   for (const scenario of [["ZR-06", "reader"], ["ZR-06", "chat"], ["ZR-07", "reader"], ["ZR-13", "reader"]]) {
     [activeID, surface] = scenario;
     const input = await ownerResearchScopeInput(key.cases.find((item) => item.id === activeID), { original: true, zoningSummary: zoningSectionSummary });
@@ -109,6 +110,7 @@ try {
       if (doubleError) throw doubleError;
       if (mode === "accept") {
         assert.equal(response.status, 200, `${activeID}: ${JSON.stringify(response.body)}`);
+        if (activeID === "ZR-13") currentRuleConversationID = conversationID;
         const message = response.body.conversation.messages.findLast((item) => item.role === "assistant");
         assert.equal(message.answer.answerText, proposed.answerText);
         const { plan } = message.answer.zoningArchitecture;
@@ -155,18 +157,44 @@ try {
       if (mode === "provider_error") assert(operation.conservativeProviderCostUSD > 0);
     }
   }
+  const historicalQuestions = [
+    "Reconstruct the text in force under the NYC Zoning Resolution on January 1, 2020.",
+    "What did ZR Section 23-343 require on January 1, 2020? Reconstruct the rules in force.",
+    "Using current Zoning transition text, what did the rules require in 2020?",
+    "Reconstruct the text in force under the NYC Zoning Resolution on January 1, 2020 without official archived substantive text.",
+    "Official archived substantive text is available. What did ZR Section 23-343 require in 2020?",
+    "Can current amendment-history metadata reconstruct the text in force? What did ZR Section 23-343 require in 2020?",
+    "For this specific property with an unknown mapped district, what did ZR Section 23-343 require in 2020?"
+  ];
+  for (const question of historicalQuestions) {
+    phases = [];
+    doubleError = null;
+    const created = await request("/research/conversations/create", { auth }, token);
+    const boundary = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question, requestID: randomUUID() }, token);
+    if (doubleError) throw doubleError;
+    assert.equal(boundary.status, 422, `${question}: ${JSON.stringify(boundary.body)}`);
+    assert.equal(boundary.body.code, "RESEARCH_ZONING_PREREQUISITES_REQUIRED");
+    assert.equal(boundary.body.charged, false);
+    assert(boundary.body.zoningPlan.missingFacts.some((fact) => fact.id === "dated_substantive_text"));
+    assert.deepEqual(phases, [], "Missing historical law must still stop before provider dispatch.");
+    const reopened = await request("/research/conversations/get", { auth, conversationID: created.body.conversation.id }, token);
+    assert.equal(reopened.body.conversation.messages.filter((item) => item.role === "assistant").length, 0);
+  }
+  // A dated follow-up must not reuse the preceding current-rule answer or its
+  // Reader selection as though it were the substantive text for the past date.
+  assert(currentRuleConversationID);
   phases = [];
   doubleError = null;
-  const created = await request("/research/conversations/create", { auth }, token);
-  const question = "Reconstruct the text in force under the NYC Zoning Resolution on January 1, 2020.";
-  const boundary = await request("/research/conversations/message", { auth, conversationID: created.body.conversation.id, question, requestID: randomUUID() }, token);
+  const followUp = await request("/research/conversations/message", { auth, conversationID: currentRuleConversationID,
+    question: "What did it require on January 1, 2020?", requestID: randomUUID() }, token);
   if (doubleError) throw doubleError;
-  assert.equal(boundary.status, 422, JSON.stringify(boundary.body));
-  assert.equal(boundary.body.code, "RESEARCH_ZONING_PREREQUISITES_REQUIRED");
-  assert.equal(boundary.body.charged, false);
-  assert(boundary.body.zoningPlan.missingFacts.some((fact) => fact.id === "dated_substantive_text"));
-  assert.deepEqual(phases, [], "Missing historical law must still stop before provider dispatch.");
-  console.log("Conditional HTTP contract passed: 21 offline flows including full Reader sections and unpinned storage chat; cited answers and excerpt provenance persist, failures stay unsaved and uncharged, maximum two provider doubles, missing historical law blocks dispatch, zero external calls.");
+  assert.equal(followUp.status, 422, JSON.stringify(followUp.body));
+  assert(followUp.body.zoningPlan.missingFacts.some((fact) => fact.id === "dated_substantive_text"));
+  assert.equal(followUp.body.charged, false);
+  assert.deepEqual(phases, []);
+  const priorAnswer = await request("/research/conversations/get", { auth, conversationID: currentRuleConversationID }, token);
+  assert.equal(priorAnswer.body.conversation.messages.filter((item) => item.role === "assistant").length, 1);
+  console.log(`Conditional HTTP contract passed: ${21 + historicalQuestions.length} offline flows including full Reader sections and unpinned storage chat; cited answers and excerpt provenance persist, failures stay unsaved and uncharged, maximum two provider doubles, eight historical source boundaries including a follow-up block dispatch, zero external calls.`);
 } finally {
   globalThis.fetch = nativeFetch;
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

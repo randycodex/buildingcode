@@ -114,7 +114,7 @@ const report = { schema: "permitext-owner-authored-source-diagnostic-v1", checke
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
   scope: "All 110 authored question/scenario inputs, Project facts and selected passages/section IDs through production corpus planning and evidence assembly. Zoning planning/selection/readiness and conditional response eligibility run with local diagnostic eligibility. Original property prerequisites remain recorded separately; conditional eligibility does not resolve the determination. Web triggering is inspected separately, but no document is fetched. No answer generation, semantic grading, saved answer, full HTTP dispatch, latency benchmark, public eligibility or professional approval is claimed. Exact reference presence does not prove source or answer completeness.",
   sourceHashes: { ...Object.fromEntries(await Promise.all([
-      "app.mjs", "research-zoning-planner.mjs", "research-zoning-safety.mjs",
+      "app.mjs", "research-zoning-planner.mjs", "research-zoning-safety.mjs", "research-corpus-registry.mjs",
       "research-dob-workflow-routing.mjs", "research-source-policy.mjs",
       "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs",
       "research-topic-dependencies.mjs", "project-foundation-contract.mjs",
