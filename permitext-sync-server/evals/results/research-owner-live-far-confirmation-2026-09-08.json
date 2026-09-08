@@ -1,0 +1,2193 @@
+{
+  "schema": "permitext-owner-far-repair-confirmation-20260908-v1",
+  "authorization": "Owner: approximately $8 available for API testing; test as many times as needed. This package is limited to one FAR turn after verified local repairs, one attempt.",
+  "previousConservativeSpendUSD": 2.162891,
+  "priorConfirmationResultSHA256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a",
+  "priorZeroCallResultSHA256": "cd2bd778d4e881912697c0280b33952bb905f010a9bbb2c816024da42c816b17",
+  "priorZeroCallResult": "research-owner-live-source-confirmation-2026-09-08.json",
+  "priorZeroCallExplanation": "First turn rejected before dispatch; zero provider calls and costs. The stale evaluation reservation was bookkeeping, not incurred spend.",
+  "ownerCandidateSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "sourceCommit": "47bf44eaa99e5356c8aee016de03143c77e0a5c1",
+  "keySHA256": "c8949b70372b5165fcf4561863b27414284da621602e6b70ca508f99da69a14b",
+  "execution": "Isolated local HTTP Research conversations with live OpenAI responses; automatic evidence discovery; no reference answers supplied to the answering model.",
+  "maximumCumulativeSpendUSD": 1,
+  "maximumTurnSpendUSD": 0.85,
+  "maximumTurns": 1,
+  "absoluteTurnSumCeilingUSD": 0.85,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing, medium reasoning, standard service tier",
+  "zoning": "Local diagnostic eligibility only; no public gate or deployment changes",
+  "cases": [
+    {
+      "id": "ZR-08",
+      "conversation": "far",
+      "question": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?"
+    }
+  ],
+  "startedAt": "2026-09-08T03:43:08.345Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "ZR-08",
+      "question": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
+      "status": "completed",
+      "startedAt": "2026-09-08T03:43:08.476Z",
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:conversational-v4",
+        "evidenceVersion": "20260908-table-context-integrity-v25:structured-v1",
+        "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-prior-code-technical-scope-v5",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "zoning cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: NYC Zoning Resolution",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T03:43:08.542Z"
+        },
+        "answerText": "**No.** On the stated R7A zoning lot containing standard residences, 42,000 square feet produces an FAR of **4.2** (42,000 ÷ 10,000). The R7A standard-residences entry is **4.00**, which permits **40,000 square feet** on a 10,000-square-foot zoning lot (10,000 × 4.00). The proposal therefore exceeds that basic maximum by 2,000 square feet. (ZR §§ 12-10, 23-22)\n\nZR 23-22 separately lists **5.01** for R7A zoning lots containing qualifying affordable housing or qualifying senior housing, but that is a different table category and does not apply to the stated standard-residence scenario. This calculation establishes only compliance with the basic ZR 23-22 standard-residential FAR maximum; it does not establish overall zoning compliance or entitlement, which may depend on other applicable provisions not supplied here, including any location-specific or other modifying controls.",
+        "conclusion": "**No.** On the stated R7A zoning lot containing standard residences, 42,000 square feet produces an FAR of **4.2** (42,000 ÷ 10,000). The R7A standard-residences entry is **4.00**, which permits **40,000 square feet** on a 10,000-square-foot zoning lot (10,000 × 4.00). The proposal therefore exceeds that basic maximum by 2,000 square feet. (ZR §§ 12-10, 23-22)",
+        "supportedPoints": [
+          {
+            "heading": "FAR calculation",
+            "explanation": "ZR 12-10 defines floor area ratio as total floor area on a zoning lot divided by that zoning lot’s area. Applying that definition, 42,000 square feet divided by 10,000 square feet equals 4.2 FAR.",
+            "sectionID": "20018523",
+            "sourceIDs": [
+              "research-permitext_discovered-id:20018523-1"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "R7A standard-residence maximum",
+            "explanation": "ZR 23-22 provides a maximum residential FAR of 4.00 for R7A zoning lots containing standard residences. On a 10,000-square-foot zoning lot, the corresponding basic maximum is 40,000 square feet (10,000 × 4.00). Since 42,000 square feet is 4.2 FAR, it exceeds that basic maximum by 2,000 square feet. The same table separately lists 5.01 for qualifying affordable housing or qualifying senior housing.",
+            "sectionID": "20018017",
+            "sourceIDs": [
+              "research-permitext_discovered-id:20018017-2"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "ZR 23-22 separately lists **5.01** for R7A zoning lots containing qualifying affordable housing or qualifying senior housing, but that is a different table category and does not apply to the stated standard-residence scenario. This calculation establishes only compliance with the basic ZR 23-22 standard-residential FAR maximum; it does not establish overall zoning compliance or entitlement, which may depend on other applicable provisions not supplied here, including any location-specific or other modifying controls.",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied enacted evidence establishes the FAR definition and the basic R7A table maximum only; it does not establish all other zoning provisions that could affect overall project compliance or entitlement. No mapped or special-district applicability has been established from the supplied facts."
+        ],
+        "additionalEvidenceNeeded": [
+          "For an overall zoning-compliance conclusion, enacted provisions and verified site-specific applicability information for any potentially modifying zoning controls would be needed."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "20018523",
+            "sectionNumber": "12-10",
+            "title": "DEFINITIONS",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "research-permitext_discovered-id:20018523-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-1",
+                "selectedText": "floor area ratio General Definition Last Amended 2/2/2011 \"Floor area ratio\" is the total floor area on a zoning lot, divided by the lot area of that zoning lot. If two or more buildings are located on the same zoning lot, the floor area ratio is the sum of their floor areas divided by the lot area. (For example, a zoning lot of 10,000 square feet with a building containing 20,000 square feet of floor area has a floor area ratio of 2.0, and a zoning lot of 20,000 square feet with two buildings containing a total of 40,000 square feet of floor area also has a floor area ratio of 2.0)\n\nlot area General Definition Last Amended 2/20/1964 \"Lot area\" is the area of a zoning lot.\n\nlot, zoning General Definition see zoning lot\n\nresidence, or residential General Definition Last Amended 3/22/2016 A \"residence\" is one or more dwelling units or rooming units, including common spaces such as hallways, lobbies, stairways, laundry facilities, recreation areas or storage areas. A residence may, for example, consist of one-family or two-family houses, multiple dwellings, boarding or rooming houses, or apartment hotels. However, residences do not include: (a) such transient accommodations as transient hotels, motels or tourist cabins, or trailer camps; (b) non-profit hospital staff dwellings; or (c) student dormitories, fraternity or sorority student houses, monasteries or convents, long-term care facilities, or other living or sleeping accommodations in community facility buildings or portions of buildings used for community facility uses. \"Residential\" means pertaining to a residence.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Defines FAR and supports the 42,000 ÷ 10,000 = 4.2 calculation."
+          },
+          {
+            "sectionID": "20018017",
+            "sectionNumber": "23-22",
+            "title": "Floor Area Regulations for R6 Through R12 Districts",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "research-permitext_discovered-id:20018017-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:20018017-2",
+                "selectedText": "23-22 Floor Area Regulations for R6 Through R12 Districts R6 R7 R8 R9 R10 R11 R12 In the districts indicated, the maximum residential floor area ratio shall be as set forth in the following table. Separate maximum residential floor area ratios are set forth for zoning lots containing standard residences and zoning lots containing qualifying affordable housing or qualifying senior housing. MAXIMUM FLOOR AREA RATIO FOR R6-R12 DISTRICTS District Standard residences Qualifying affordable housing or qualifying senior housing R6A R61 R6-1 R7B 3.00 3.90 R6 2.20 3.90 R6B 2.00 2.40 R6D R6-2 2.50 3.00 R7A R7-11 R7-21 4.00 5.01 R7-1 R7-2 3.44 5.01 R7D 4.66 5.60 R7X R7-3 5.00 6.00 R8A R8X R8 6.02 7.20 R8 7.201 8.642 R8B 4.00 4.80 R9A R9 7.52 9.02 R9D R9X R9-1 9.00 10.80 R10A R10X R10 10.00 12.00 R11 12.00 15.00 R12 15.00 18.00 1 For zoning lots, or portions thereof, located within 100 feet of a wide street 2 Outside of Mandatory Inclusionary Housing areas, for zoning lots, or portions thereof, located within 100 feet of a wide street, containing UAP developments or qualifying senior housing",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Supplies the R7A standard-residences maximum FAR of 4.00 and the separate 5.01 qualifying-housing category."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "20018523",
+          "20018017",
+          "20020296",
+          "20018414",
+          "20022334",
+          "20020749",
+          "20020547"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:20018523-1",
+          "research-permitext_discovered-id:20018017-2",
+          "research-permitext_discovered-id:20020296-3",
+          "research-permitext_cross_reference-id:20018414-1",
+          "research-permitext_cross_reference-id:20022334-2",
+          "research-permitext_cross_reference-id:20020749-3",
+          "research-permitext_cross_reference-id:20020547-4"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 7,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 2,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 5,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 3,
+          "crossReferenceCount": 4,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 2,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is governing enacted evidence on the aligned topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-1"
+              ]
+            },
+            {
+              "label": "ZR 23-22",
+              "summary": "ZR 23-22 is governing enacted evidence on the aligned topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018017-2"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is governing enacted evidence on the aligned topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-1"
+              ]
+            },
+            {
+              "label": "ZR 23-22",
+              "summary": "ZR 23-22 is governing enacted evidence on the aligned topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018017-2"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is governing enacted evidence on the aligned topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-1"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "ZR 11-00",
+              "summary": "ZR 11-00 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:20018414-1"
+              ]
+            },
+            {
+              "label": "ZR 26-50",
+              "summary": "ZR 26-50 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:20022334-2"
+              ]
+            },
+            {
+              "label": "ZR 117-51",
+              "summary": "ZR 117-51 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:20020749-3"
+              ]
+            },
+            {
+              "label": "ZR 123-20",
+              "summary": "ZR 123-20 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:20020547-4"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "ZR 23-22",
+              "summary": "ZR 23-22 is governing enacted evidence on the aligned topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018017-2"
+              ]
+            },
+            {
+              "label": "ZR 125-21",
+              "summary": "ZR 125-21 is supporting enacted evidence on the unrouted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20020296-3"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018017-2",
+            "research-permitext_discovered-id:20020296-3",
+            "research-permitext_cross_reference-id:20018414-1",
+            "research-permitext_cross_reference-id:20022334-2",
+            "research-permitext_cross_reference-id:20020749-3",
+            "research-permitext_cross_reference-id:20020547-4"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018017-2"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018017-2"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018017-2"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20020296-3",
+            "research-permitext_cross_reference-id:20018414-1",
+            "research-permitext_cross_reference-id:20022334-2",
+            "research-permitext_cross_reference-id:20020749-3",
+            "research-permitext_cross_reference-id:20020547-4"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:20018523-1",
+              "label": "ZR 12-10 — DEFINITIONS",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:20018523-1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:20018017-2",
+              "label": "ZR 23-22 — Floor Area Regulations for R6 Through R12 Districts",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:20018017-2"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018017-2"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:20018523-1",
+              "label": "ZR 12-10 — DEFINITIONS",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:20018523-1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:20018523-1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:20018523-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:20018017-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:20018523-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:20018017-2",
+              "label": "ZR 23-22 — Floor Area Regulations for R6 Through R12 Districts",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:20018017-2"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:20018017-2"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:20018523-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:20018017-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:20018017-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "schemaVersion": 2,
+          "plannerVersion": "20260908-question-compiler-v3",
+          "compilerVersion": "20260901-answer-obligations-v21",
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260902-generated-typography-v25",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018017-2"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:20020296-3",
+            "research-permitext_cross_reference-id:20018414-1",
+            "research-permitext_cross_reference-id:20022334-2",
+            "research-permitext_cross_reference-id:20020749-3",
+            "research-permitext_cross_reference-id:20020547-4"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 2,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 2,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 5,
+            "reviewedOnlyProvisionCount": 5,
+            "assembledSourceCount": 7,
+            "assembledProvisionCount": 7
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:20018523-1",
+              "sectionID": "20018523",
+              "reference": "ZR 12-10",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "aligned",
+              "applicabilityStatus": "continuously-amended",
+              "text": "floor area ratio General Definition Last Amended 2/2/2011 \"Floor area ratio\" is the total floor area on a zoning lot, divided by the lot area of that zoning lot. If two or more buildings are located on the same zoning lot, the floor area ratio is the sum of their floor areas divided by the lot area. (For example, a zoning lot of 10,000 square feet with a building containing 20,000 square feet of floor area has a floor area ratio of 2.0, and a zoning lot of 20,000 square feet with two buildings containing a total of 40,000 square feet of floor area also has a floor area ratio of 2.0) lot area General Definition Last Amended 2/20/1964 \"Lot area\" is the area of a zoning lot. lot, zoning General Definition see zoning lot residence, or residential General Definition Last Amended 3/22/2016 A \"residence\" is one or more dwelling units or rooming units, including common spaces such as hallways, lobbies, stairways, laundry facilities, recreation areas or storage areas. A residence may, for example, consist of one-family or two-family houses, multiple dwellings, boarding or rooming houses, or apartment hotels. However, residences do not include: (a) such transient accommodations as transient hotels, motels or tourist cabins, or trailer camps; (b) non-profit hospital staff dwellings; or (c) student dormitories, fraternity or sorority student houses, monasteries or convents, long-term care facilities, or other living or sleeping accommodations in community facility buildings or portions of buildings used for community facility uses. \"Residential\" means pertaining to a residence."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20018017-2",
+              "sectionID": "20018017",
+              "reference": "ZR 23-22",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "aligned",
+              "applicabilityStatus": "continuously-amended",
+              "text": "23-22 Floor Area Regulations for R6 Through R12 Districts R6 R7 R8 R9 R10 R11 R12 In the districts indicated, the maximum residential floor area ratio shall be as set forth in the following table. Separate maximum residential floor area ratios are set forth for zoning lots containing standard residences and zoning lots containing qualifying affordable housing or qualifying senior housing. MAXIMUM FLOOR AREA RATIO FOR R6-R12 DISTRICTS District Standard residences Qualifying affordable housing or qualifying senior housing R6A R61 R6-1 R7B 3.00 3.90 R6 2.20 3.90 R6B 2.00 2.40 R6D R6-2 2.50 3.00 R7A R7-11 R7-21 4.00 5.01 R7-1 R7-2 3.44 5.01 R7D 4.66 5.60 R7X R7-3 5.00 6.00 R8A R8X R8 6.02 7.20 R8 7.201 8.642 R8B 4.00 4.80 R9A R9 7.52 9.02 R9D R9X R9-1 9.00 10.80 R10A R10X R10 10.00 12.00 R11 12.00 15.00 R12 15.00 18.00 1 For zoning lots, or portions thereof, located within 100 feet of a wide street 2 Outside of Mandatory Inclusionary Housing areas, for zoning lots, or portions thereof, located within 100 feet of a wide street, containing UAP developments or qualifying senior housing"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20020296-3",
+              "sectionID": "20020296",
+              "reference": "ZR 125-21",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrouted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "125-21 East River Subdistrict In the East River Subdistrict, the basic maximum residential floor area ratio for zoning lots containing standard residences shall be as set forth in the following table. On Parcels B, C, and F, the maximum residential floor area ratio for zoning lots containing qualifying affordable housing or qualifying senior housing shall be as set forth in Section 23-22 (Floor Area Regulations for R6 Through R12 Districts) for R10 Districts. For developments or enlargements on qualifying transit improvement sites, a floor area bonus for mass transit station improvements may be granted by the City Planning Commission pursuant to the provisions of Section 66-51 (Additional Floor Area for Mass Transit Station Improvements). No other floor area bonuses shall apply. For the purposes of this paragraph, defined terms additionally include those in Section 66-11 (Definitions). Parcel Maximum Floor Area A 12.0 B 10.0 C 10.5 D 12.0 E 12.0 F 10.0 G 12.0"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:20018414-1",
+              "sectionID": "20018414",
+              "reference": "ZR 11-00",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "11-00 TITLE TITLE"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:20022334-2",
+              "sectionID": "20022334",
+              "reference": "ZR 26-50",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "26-50 SPECIAL SCREENING AND ENCLOSURE PROVISIONS SPECIAL SCREENING AND ENCLOSURE PROVISIONS"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:20020749-3",
+              "sectionID": "20020749",
+              "reference": "ZR 117-51",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "117-51 Queens Plaza Subdistrict Special Use Regulations The use regulations of the underlying districts shall apply, except where modified by the provisions of this Section, inclusive."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:20020547-4",
+              "sectionID": "20020547",
+              "reference": "ZR 123-20",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "123-20 SPECIAL USE REGULATIONS In Special Mixed Use Districts, all uses permitted in the designated Residence District and all uses permitted in the designated M1 District, as set forth in any other provision of this Resolution other than Special Purpose Districts, shall be permitted, except as superseded, modified or supplemented by this Section, inclusive, and Section 123-40 (SIGN REGULATIONS)."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260831-zoning-canonical-source-output-table-legend-v17",
+          "pass": true,
+          "applies": true,
+          "categories": [
+            "citation-boundary",
+            "stable-passage",
+            "table",
+            "arithmetic",
+            "definition",
+            "amendment"
+          ],
+          "zoningSourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018017-2",
+            "research-permitext_discovered-id:20020296-3",
+            "research-permitext_cross_reference-id:20018414-1",
+            "research-permitext_cross_reference-id:20022334-2",
+            "research-permitext_cross_reference-id:20020749-3",
+            "research-permitext_cross_reference-id:20020547-4"
+          ],
+          "issues": []
+        },
+        "zoningArchitecture": {
+          "plannerVersion": "20260908-question-compiler-v3",
+          "plan": {
+            "schemaVersion": 2,
+            "plannerVersion": "20260908-question-compiler-v3",
+            "path": "calculation_scenario",
+            "pathLabel": "calculation and scenario",
+            "disposition": "ready",
+            "requirements": [],
+            "missingFacts": [],
+            "clarification": null,
+            "evidenceLimits": {
+              "maximumCandidates": 8,
+              "maximumDiscovered": 3,
+              "maximumTargetedDefinitions": 1,
+              "maximumCrossReferences": 4,
+              "maximumCharacters": 14000,
+              "maximumSupplementalCharacters": 12000,
+              "maximumCharactersPerSource": 7000
+            },
+            "deterministicControls": {
+              "exactPassageBinding": true,
+              "stableSourceHashes": true,
+              "tableGridAndLegend": false,
+              "effectiveDateEventBinding": false,
+              "arithmeticLedger": true,
+              "propertyAndMapPrerequisites": false
+            },
+            "callPolicy": {
+              "initialTier": "accurate",
+              "initialModelRole": "terra_first_for_complex_path",
+              "subjectiveVerification": true,
+              "verifierTier": "fast",
+              "maximumProviderCalls": 3,
+              "allowFullAnswerRewrite": false,
+              "repairEligible": true,
+              "repairTier": "accurate",
+              "maximumRepairAttempts": 1,
+              "repairMode": "source_bounded_structured_patch",
+              "terraEscalation": "planned_complex_path_or_one_source_bounded_repair"
+            },
+            "questionSignals": {
+              "explicitMissingFact": false,
+              "propertyIdentifierPresent": false,
+              "mappedStatusPresent": false
+            },
+            "planHash": "a583850db2bef27c2de643d9970c1ee7c39946acbde226acd4cf837ba5f3a251"
+          },
+          "deterministicContext": {
+            "schemaVersion": 2,
+            "compilerVersion": "20260901-answer-obligations-v21",
+            "plannerVersion": "20260908-question-compiler-v3",
+            "planHash": "a583850db2bef27c2de643d9970c1ee7c39946acbde226acd4cf837ba5f3a251",
+            "path": "calculation_scenario",
+            "dates": [],
+            "arithmetic": {
+              "measurements": [
+                {
+                  "raw": "10 FAR",
+                  "value": 10,
+                  "unit": "far"
+                },
+                {
+                  "raw": "42,000 square feet",
+                  "value": 42000,
+                  "unit": "square feet"
+                }
+              ],
+              "calculations": [
+                {
+                  "id": "proposed_floor_area_far",
+                  "operation": "division",
+                  "numerator": 42000,
+                  "denominator": 10000,
+                  "result": 4.2,
+                  "resultKind": "far",
+                  "display": "42000 / 10000 = 4.2"
+                }
+              ]
+            },
+            "answerObligations": [
+              {
+                "id": "table_standard_floor_area_ceiling",
+                "kind": "table_calculation",
+                "detail": "Show the R7A standard-residence ceiling: 10000 x 4 = 40000 square feet.",
+                "values": [
+                  "40000",
+                  "40000.00",
+                  "40,000"
+                ],
+                "sourceIDs": [
+                  "research-permitext_discovered-id:20018017-2"
+                ],
+                "requireAllValues": false
+              },
+              {
+                "id": "proposed_floor_area_far",
+                "kind": "arithmetic",
+                "detail": "Show deterministic calculation 42000 / 10000 = 4.2.",
+                "values": [
+                  "4.2",
+                  "4.20"
+                ],
+                "sourceIDs": [
+                  "research-permitext_discovered-id:20018523-1",
+                  "research-permitext_discovered-id:20018017-2",
+                  "research-permitext_discovered-id:20020296-3",
+                  "research-permitext_cross_reference-id:20018414-1",
+                  "research-permitext_cross_reference-id:20022334-2",
+                  "research-permitext_cross_reference-id:20020749-3",
+                  "research-permitext_cross_reference-id:20020547-4"
+                ],
+                "requireAllValues": false
+              }
+            ],
+            "structuredTables": [
+              {
+                "sourceID": "research-permitext_discovered-id:20018017-2",
+                "contentHash": "f1fcc7fb248091b8d4d9fc1ba1bd7cee4e1118c78cc1ceecf45c887332a454c2",
+                "gridHash": "5d1eb462af7b69edfb6807b293230ae4ccb4ca8a7341556ccaae40ef9efe5bce",
+                "gridCount": 1
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20020296-3",
+                "contentHash": "7304918bfb6d739c9afac75be6946e4921b0323b3bca2637dff606d010d6a733",
+                "gridHash": "582e0ec83d506ec1f298f20b4e31f95bb0311a1704472c38c0ccfffb6fb45efe",
+                "gridCount": 1
+              }
+            ],
+            "passages": [
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-1",
+                "sectionID": "20018523",
+                "sectionNumber": "12-10",
+                "textHash": "358d7be02aa3ea526fd6a013df0255516bbc38d4bee631a19d7d24a350eb6fc5",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "aligned"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018017-2",
+                "sectionID": "20018017",
+                "sectionNumber": "23-22",
+                "textHash": "9bb9f0580725525115a846318df0a620ddee7b3b8bd4fa481930e4ab1bff0346",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "aligned"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20020296-3",
+                "sectionID": "20020296",
+                "sectionNumber": "125-21",
+                "textHash": "e110c27c43415dc61eb9d3a1217e42fa2950d519fd5331050c839688c49b2968",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrouted"
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20018414-1",
+                "sectionID": "20018414",
+                "sectionNumber": "11-00",
+                "textHash": "c7145f0d29d394dc4f3c67e9518300b9b0cfe693c47a35481bc6e23f7983bbb2",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20022334-2",
+                "sectionID": "20022334",
+                "sectionNumber": "26-50",
+                "textHash": "ceb7d583eb178041290a95ad9d806027dabae5ebde4ed2ea92146f191d7516ce",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20020749-3",
+                "sectionID": "20020749",
+                "sectionNumber": "117-51",
+                "textHash": "11c79fc19c075dd9350bd7017501c20c3ffb154fdba5c7af3b80494df03c1ad2",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20020547-4",
+                "sectionID": "20020547",
+                "sectionNumber": "123-20",
+                "textHash": "096a305a6ef4ef64501648b1244823f1f2a55046051e25c84ef077dcf0ac04d9",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              }
+            ],
+            "contextHash": "3893b3151c5cb6ced4bbd39479548ee0ae09dfd19d2bc4f557fb483891208c9d"
+          },
+          "evidenceSelection": {
+            "pass": true,
+            "sources": [
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-1",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "The question names ZR 12-10. It falls within the R6 through R12 residential floor-area limits. It matches “only”, “basic”, “section”, “23-22”, “table”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "authorityClass": "enacted",
+                "retrievalReason": "The question names ZR 12-10. It falls within the R6 through R12 residential floor-area limits. It matches “only”, “basic”, “section”, “23-22”, “table”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "retrievalRank": 1,
+                "retrievalScore": 199.005,
+                "retrievalVersion": "20260908-passage-local-retrieval-v23",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260827-pinned-scope-v4",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule",
+                    "definition"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": "ZR 12-10",
+                  "controllingTopicRoutes": [
+                    "r6 through r12 residential floor-area limits"
+                  ],
+                  "topicRoutes": [
+                    "r6 through r12 residential floor-area limits"
+                  ],
+                  "topicRouteRelationship": "aligned",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": 0,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "exact enacted reference requested by the user",
+                  "reasons": [
+                    "exact code reference in the question",
+                    "controlling routed section",
+                    "definition provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T03:43:08.868Z",
+                "sectionID": "20018523",
+                "codePrefix": "ZR",
+                "sectionNumber": "12-10",
+                "title": "DEFINITIONS",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "floor area ratio General Definition Last Amended 2/2/2011 \"Floor area ratio\" is the total floor area on a zoning lot, divided by the lot area of that zoning lot. If two or more buildings are located on the same zoning lot, the floor area ratio is the sum of their floor areas divided by the lot area. (For example, a zoning lot of 10,000 square feet with a building containing 20,000 square feet of floor area has a floor area ratio of 2.0, and a zoning lot of 20,000 square feet with two buildings containing a total of 40,000 square feet of floor area also has a floor area ratio of 2.0)\n\nlot area General Definition Last Amended 2/20/1964 \"Lot area\" is the area of a zoning lot.\n\nlot, zoning General Definition see zoning lot\n\nresidence, or residential General Definition Last Amended 3/22/2016 A \"residence\" is one or more dwelling units or rooming units, including common spaces such as hallways, lobbies, stairways, laundry facilities, recreation areas or storage areas. A residence may, for example, consist of one-family or two-family houses, multiple dwellings, boarding or rooming houses, or apartment hotels. However, residences do not include: (a) such transient accommodations as transient hotels, motels or tourist cabins, or trailer camps; (b) non-profit hospital staff dwellings; or (c) student dormitories, fraternity or sorority student houses, monasteries or convents, long-term care facilities, or other living or sleeping accommodations in community facility buildings or portions of buildings used for community facility uses. \"Residential\" means pertaining to a residence.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": false,
+                "targetedDefinition": {
+                  "schemaVersion": 1,
+                  "version": "20260908-zoning-far-definition-v2",
+                  "sourceMode": "canonical_enacted_definition_entries",
+                  "sectionID": "20018523",
+                  "codePrefix": "ZR",
+                  "sectionNumber": "12-10",
+                  "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                  "jurisdiction": "New York City",
+                  "labels": [
+                    "floor area ratio",
+                    "lot area",
+                    "lot, zoning",
+                    "residence, or residential"
+                  ],
+                  "passages": [
+                    "floor area ratio General Definition Last Amended 2/2/2011 \"Floor area ratio\" is the total floor area on a zoning lot, divided by the lot area of that zoning lot. If two or more buildings are located on the same zoning lot, the floor area ratio is the sum of their floor areas divided by the lot area. (For example, a zoning lot of 10,000 square feet with a building containing 20,000 square feet of floor area has a floor area ratio of 2.0, and a zoning lot of 20,000 square feet with two buildings containing a total of 40,000 square feet of floor area also has a floor area ratio of 2.0)",
+                    "lot area General Definition Last Amended 2/20/1964 \"Lot area\" is the area of a zoning lot.",
+                    "lot, zoning General Definition see zoning lot",
+                    "residence, or residential General Definition Last Amended 3/22/2016 A \"residence\" is one or more dwelling units or rooming units, including common spaces such as hallways, lobbies, stairways, laundry facilities, recreation areas or storage areas. A residence may, for example, consist of one-family or two-family houses, multiple dwellings, boarding or rooming houses, or apartment hotels. However, residences do not include: (a) such transient accommodations as transient hotels, motels or tourist cabins, or trailer camps; (b) non-profit hospital staff dwellings; or (c) student dormitories, fraternity or sorority student houses, monasteries or convents, long-term care facilities, or other living or sleeping accommodations in community facility buildings or portions of buildings used for community facility uses. \"Residential\" means pertaining to a residence."
+                  ],
+                  "canonicalSectionCharacterCount": 268088,
+                  "excerptCharacterCount": 1595,
+                  "canonicalContextComplete": false
+                }
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018017-2",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "The question names ZR 23-22. It falls within the R6 through R12 residential floor-area limits. It matches “23-22”, “table”, “feet”, “residential”, “floor”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "The question names ZR 23-22. It falls within the R6 through R12 residential floor-area limits. It matches “23-22”, “table”, “feet”, “residential”, “floor”.",
+                "retrievalRank": 2,
+                "retrievalScore": 196.919,
+                "retrievalVersion": "20260908-passage-local-retrieval-v23",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260827-pinned-scope-v4",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule",
+                    "calculation_table"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": "ZR 23-22",
+                  "controllingTopicRoutes": [
+                    "r6 through r12 residential floor-area limits"
+                  ],
+                  "topicRoutes": [
+                    "r6 through r12 residential floor-area limits"
+                  ],
+                  "topicRouteRelationship": "aligned",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": 0,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "exact enacted reference requested by the user",
+                  "reasons": [
+                    "exact code reference in the question",
+                    "controlling routed section",
+                    "calculation or table provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T03:43:08.868Z",
+                "sectionID": "20018017",
+                "codePrefix": "ZR",
+                "sectionNumber": "23-22",
+                "title": "Floor Area Regulations for R6 Through R12 Districts",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "23-22 Floor Area Regulations for R6 Through R12 Districts R6 R7 R8 R9 R10 R11 R12 In the districts indicated, the maximum residential floor area ratio shall be as set forth in the following table. Separate maximum residential floor area ratios are set forth for zoning lots containing standard residences and zoning lots containing qualifying affordable housing or qualifying senior housing. MAXIMUM FLOOR AREA RATIO FOR R6-R12 DISTRICTS District Standard residences Qualifying affordable housing or qualifying senior housing R6A R61 R6-1 R7B 3.00 3.90 R6 2.20 3.90 R6B 2.00 2.40 R6D R6-2 2.50 3.00 R7A R7-11 R7-21 4.00 5.01 R7-1 R7-2 3.44 5.01 R7D 4.66 5.60 R7X R7-3 5.00 6.00 R8A R8X R8 6.02 7.20 R8 7.201 8.642 R8B 4.00 4.80 R9A R9 7.52 9.02 R9D R9X R9-1 9.00 10.80 R10A R10X R10 10.00 12.00 R11 12.00 15.00 R12 15.00 18.00 1 For zoning lots, or portions thereof, located within 100 feet of a wide street 2 Outside of Mandatory Inclusionary Housing areas, for zoning lots, or portions thereof, located within 100 feet of a wide street, containing UAP developments or qualifying senior housing",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null,
+                "richSourceID": "zr-18017-table-001",
+                "richSourceKind": "table",
+                "richSourceReference": "ZR Table 23-22",
+                "richSourceCanonicalReference": "ZR Table 23-22",
+                "richSourceContentHash": "f1fcc7fb248091b8d4d9fc1ba1bd7cee4e1118c78cc1ceecf45c887332a454c2",
+                "richSourceText": "MAXIMUM FLOOR AREA RATIO FOR R6-R12 DISTRICTS District Standard residences Qualifying affordable housing or qualifying senior housing R6A R6 1 R6-1 R7B 3.00 3.90 R6 2.20 3.90 R6B 2.00 2.40 R6D R6-2 2.50 3.00 R7A R7-1 1 R7-2 1 4.00 5.01 R7-1 R7-2 3.44 5.01 R7D 4.66 5.60 R7X R7-3 5.00 6.00 R8A R8X R8 6.02 7.20 R8 7.20 1 8.64 2 R8B 4.00 4.80 R9A R9 7.52 9.02 R9D R9X R9-1 9.00 10.80 R10A R10X R10 10.00 12.00 R11 12.00 15.00 R12 15.00 18.00 1 For zoning lots , or portions thereof, located within 100 feet of a wide street 2 Outside of Mandatory Inclusionary Housing areas , for zoning lots , or portions thereof, located within 100 feet of a wide street , containing UAP developments or qualifying senior housing",
+                "richSourceRowCount": 17,
+                "richSourceGrids": [
+                  {
+                    "rows": [
+                      {
+                        "cells": [
+                          {
+                            "text": "District",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "Standard residences",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "Qualifying affordable housing or qualifying senior housing",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R6A R6 1 R6-1 R7B",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "3.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "3.90",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R6",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "2.20",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "3.90",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R6B",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "2.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "2.40",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R6D R6-2",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "2.50",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "3.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R7A R7-1 1 R7-2 1",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "4.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "5.01",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R7-1 R7-2",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "3.44",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "5.01",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R7D",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "4.66",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "5.60",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R7X R7-3",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "5.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "6.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R8A R8X R8",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "6.02",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "7.20",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R8",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "7.20 1",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "8.64 2",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R8B",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "4.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "4.80",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R9A R9",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "7.52",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "9.02",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R9D R9X R9-1",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "9.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "10.80",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R10A R10X R10",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "10.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "12.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R11",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "12.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "15.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "R12",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "15.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "18.00",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20020296-3",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “basic”, “section”, “23-22”, “table”, “definition”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “basic”, “section”, “23-22”, “table”, “definition”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "retrievalRank": 3,
+                "retrievalScore": 49.414,
+                "retrievalVersion": "20260908-passage-local-retrieval-v23",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260827-pinned-scope-v4",
+                  "primaryFunction": "calculation_table",
+                  "functions": [
+                    "calculation_table"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [
+                    "r6 through r12 residential floor-area limits"
+                  ],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrouted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "calculation or table provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T03:43:08.868Z",
+                "sectionID": "20020296",
+                "codePrefix": "ZR",
+                "sectionNumber": "125-21",
+                "title": "East River Subdistrict",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "125-21 East River Subdistrict In the East River Subdistrict, the basic maximum residential floor area ratio for zoning lots containing standard residences shall be as set forth in the following table. On Parcels B, C, and F, the maximum residential floor area ratio for zoning lots containing qualifying affordable housing or qualifying senior housing shall be as set forth in Section 23-22 (Floor Area Regulations for R6 Through R12 Districts) for R10 Districts. For developments or enlargements on qualifying transit improvement sites, a floor area bonus for mass transit station improvements may be granted by the City Planning Commission pursuant to the provisions of Section 66-51 (Additional Floor Area for Mass Transit Station Improvements). No other floor area bonuses shall apply. For the purposes of this paragraph, defined terms additionally include those in Section 66-11 (Definitions). Parcel Maximum Floor Area A 12.0 B 10.0 C 10.5 D 12.0 E 12.0 F 10.0 G 12.0",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null,
+                "richSourceID": "zr-20296-table-001",
+                "richSourceKind": "table",
+                "richSourceReference": "ZR Table 125-21",
+                "richSourceCanonicalReference": "ZR Table 125-21",
+                "richSourceContentHash": "7304918bfb6d739c9afac75be6946e4921b0323b3bca2637dff606d010d6a733",
+                "richSourceText": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> Parcel 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> Maximum Floor Area 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> A 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 12.0 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> B 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 10.0 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> C 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 10.5 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> D 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 12.0 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> E 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 12.0 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> F 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 10.0 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> G 000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 12.0",
+                "richSourceRowCount": 8,
+                "richSourceGrids": [
+                  {
+                    "rows": [
+                      {
+                        "cells": [
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> Parcel",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> Maximum Floor Area",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> A",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 12.0",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> B",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 10.0",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> C",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 10.5",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> D",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 12.0",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> E",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 12.0",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> F",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 10.0",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      },
+                      {
+                        "cells": [
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:107.4pt;border-top-color: 000000;border-bottom-style:solid\"> G",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          },
+                          {
+                            "text": "000000;border-top-width:1pt;border-right-width:1pt;border-left-color: 000000;vertical-align:top;border-right-color: 000000;border-left-width:1pt;border-top-style:solid;border-left-style:solid;border-bottom-width:1pt;width:166.5pt;border-top-color: 000000;border-bottom-style:solid\"> 12.0",
+                            "rowSpan": 1,
+                            "columnSpan": 1
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20018414-1",
+                "origin": "permitext_cross_reference",
+                "sourceType": "enacted_text",
+                "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+                "authorityClass": "enacted",
+                "retrievalReason": "Direct cross-reference to ZR 12-10",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-passage-local-retrieval-v23",
+                "retrievalDepth": 1,
+                "evidencePriority": {
+                  "version": "20260827-pinned-scope-v4",
+                  "primaryFunction": "supporting_cross_reference",
+                  "functions": [
+                    "supporting_cross_reference"
+                  ],
+                  "materialityRank": 7,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "supporting cross-reference"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T03:43:08.868Z",
+                "sectionID": "20018414",
+                "codePrefix": "ZR",
+                "sectionNumber": "11-00",
+                "title": "TITLE",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "11-00 TITLE TITLE",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20022334-2",
+                "origin": "permitext_cross_reference",
+                "sourceType": "enacted_text",
+                "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+                "authorityClass": "enacted",
+                "retrievalReason": "Direct cross-reference to ZR 26-50",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-passage-local-retrieval-v23",
+                "retrievalDepth": 1,
+                "evidencePriority": {
+                  "version": "20260827-pinned-scope-v4",
+                  "primaryFunction": "supporting_cross_reference",
+                  "functions": [
+                    "supporting_cross_reference"
+                  ],
+                  "materialityRank": 7,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "supporting cross-reference"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T03:43:08.868Z",
+                "sectionID": "20022334",
+                "codePrefix": "ZR",
+                "sectionNumber": "26-50",
+                "title": "SPECIAL SCREENING AND ENCLOSURE PROVISIONS",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "26-50 SPECIAL SCREENING AND ENCLOSURE PROVISIONS SPECIAL SCREENING AND ENCLOSURE PROVISIONS",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20020749-3",
+                "origin": "permitext_cross_reference",
+                "sourceType": "enacted_text",
+                "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+                "authorityClass": "enacted",
+                "retrievalReason": "Direct cross-reference to ZR 117-51",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-passage-local-retrieval-v23",
+                "retrievalDepth": 1,
+                "evidencePriority": {
+                  "version": "20260827-pinned-scope-v4",
+                  "primaryFunction": "supporting_cross_reference",
+                  "functions": [
+                    "supporting_cross_reference"
+                  ],
+                  "materialityRank": 7,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "supporting cross-reference"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T03:43:08.868Z",
+                "sectionID": "20020749",
+                "codePrefix": "ZR",
+                "sectionNumber": "117-51",
+                "title": "Queens Plaza Subdistrict Special Use Regulations",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "117-51 Queens Plaza Subdistrict Special Use Regulations The use regulations of the underlying districts shall apply, except where modified by the provisions of this Section, inclusive.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20020547-4",
+                "origin": "permitext_cross_reference",
+                "sourceType": "enacted_text",
+                "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+                "authorityClass": "enacted",
+                "retrievalReason": "Direct cross-reference to ZR 123-20",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-passage-local-retrieval-v23",
+                "retrievalDepth": 1,
+                "evidencePriority": {
+                  "version": "20260827-pinned-scope-v4",
+                  "primaryFunction": "supporting_cross_reference",
+                  "functions": [
+                    "supporting_cross_reference"
+                  ],
+                  "materialityRank": 7,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "supporting cross-reference"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T03:43:08.868Z",
+                "sectionID": "20020547",
+                "codePrefix": "ZR",
+                "sectionNumber": "123-20",
+                "title": "SPECIAL USE REGULATIONS",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "123-20 SPECIAL USE REGULATIONS In Special Mixed Use Districts, all uses permitted in the designated Residence District and all uses permitted in the designated M1 District, as set forth in any other provision of this Resolution other than Special Purpose Districts, shall be permitted, except as superseded, modified or supplemented by this Section, inclusive, and Section 123-40 (SIGN REGULATIONS).",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              }
+            ],
+            "rejected": [],
+            "gateFailures": [],
+            "usage": {
+              "sourceCount": 7,
+              "characterCount": 4351,
+              "pinnedCharacterCount": 0,
+              "maximumCharacters": 14000
+            }
+          },
+          "evidenceReadiness": {
+            "schemaVersion": 1,
+            "pass": true,
+            "disposition": "ready",
+            "issues": [],
+            "requiredEvidence": []
+          },
+          "repairVersion": "20260901-source-bounded-patch-v2",
+          "sourceBoundedRepairApplied": false,
+          "repairPacketHashes": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-table-context-integrity-v25",
+          "retrievalQuery": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "23-22",
+                  "referenceKind": "section",
+                  "reference": "§ 23-22"
+                },
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "12-10",
+                  "referenceKind": "section",
+                  "reference": "§ 12-10"
+                }
+              ]
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "23-22",
+                  "referenceKind": "section",
+                  "reference": "§ 23-22"
+                },
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "12-10",
+                  "referenceKind": "section",
+                  "reference": "§ 12-10"
+                }
+              ]
+            },
+            "nextCurrentTopic": {
+              "text": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "23-22",
+                  "referenceKind": "section",
+                  "reference": "§ 23-22"
+                },
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "12-10",
+                  "referenceKind": "section",
+                  "reference": "§ 12-10"
+                }
+              ]
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 8,
+            "maximumDiscovered": 3,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 4,
+            "maximumCharacters": 14000,
+            "maximumSupplementalCharacters": 12000,
+            "maximumCharactersPerSource": 7000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 14000,
+            "supplementalCharacterCount": 4354,
+            "candidateCount": 8,
+            "discoveredCount": 3,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 4,
+            "topicDependencyCount": 0,
+            "characterCount": 4354,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0,
+            "finalSourceCount": 7,
+            "finalCharacterCount": 4351
+          },
+          "limitations": [
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "visual-source-review-required",
+              "text": "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. Review and explicitly select the applicable visual source before preparing that candidate."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-passage-local-retrieval-v23",
+            "searchedSectionCount": 4068,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codePrefixes": [
+                  "ZR"
+                ],
+                "routeReason": "zoning cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "zoning cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: NYC Zoning Resolution",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T03:43:08.542Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-08T03:43:08.542Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "zoning_compiler_terra_first:calculation_scenario"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": [],
+          "zoningPlannerVersion": "20260908-question-compiler-v3",
+          "maximumProviderCalls": 3,
+          "fullAnswerRewriteAllowed": false,
+          "sourceBoundedRepairApplied": false,
+          "repairVersion": "20260901-source-bounded-patch-v2"
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "durationMilliseconds": 14986,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "3b7d660e-de00-406f-b970-6ea5252767c6",
+          "createdAt": "2026-09-08T03:43:08.488Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 22357,
+          "cachedInputTokens": 7162,
+          "outputTokens": 1213,
+          "totalTokens": 23570,
+          "estimatedCostUSD": 0.029682,
+          "actualProviderCostUSD": 0.029682,
+          "conservativeProviderCostUSD": 0.086592,
+          "durationMilliseconds": 14949,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ]
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "ZR-08",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_code_interpretation",
+      "requestBytes": 59886,
+      "maxOutputTokens": 3000,
+      "startedAt": "2026-09-08T03:43:08.959Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 8878,
+      "usage": {
+        "input_tokens": 13368,
+        "input_tokens_details": {
+          "cache_write_tokens": 8591,
+          "cached_tokens": 4774
+        },
+        "output_tokens": 807,
+        "output_tokens_details": {
+          "reasoning_tokens": 127
+        },
+        "total_tokens": 14175
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_00098f2418908310016a9f844fbb7087d2a0f938ff242a47e9",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** On the stated R7A zoning lot containing standard residences, 42,000 square feet produces an FAR of **4.2** (42,000 ÷ 10,000). The R7A standard-residences entry is **4.00**, which permits **40,000 square feet** on a 10,000-square-foot zoning lot (10,000 × 4.00). The proposal therefore exceeds that basic maximum by 2,000 square feet. (ZR §§ 12-10, 23-22)\\n\\nZR 23-22 separately lists **5.01** for R7A zoning lots containing qualifying affordable housing or qualifying senior housing, but that is a different table category and does not apply to the stated standard-residence scenario. This calculation establishes only compliance with the basic ZR 23-22 standard-residential FAR maximum; it does not establish overall zoning compliance or entitlement, which may depend on other applicable provisions not supplied here, including any location-specific or other modifying controls.\",\"supportedPoints\":[{\"heading\":\"FAR calculation\",\"explanation\":\"ZR 12-10 defines floor area ratio as total floor area on a zoning lot divided by that zoning lot’s area. Applying that definition, 42,000 square feet divided by 10,000 square feet equals 4.2 FAR.\",\"sectionID\":\"20018523\",\"sourceIDs\":[\"research-permitext_discovered-id:20018523-1\"]},{\"heading\":\"R7A standard-residence maximum\",\"explanation\":\"ZR 23-22 provides a maximum residential FAR of 4.00 for R7A zoning lots containing standard residences. On a 10,000-square-foot zoning lot, the corresponding basic maximum is 40,000 square feet (10,000 × 4.00). Since 42,000 square feet is 4.2 FAR, it exceeds that basic maximum by 2,000 square feet. The same table separately lists 5.01 for qualifying affordable housing or qualifying senior housing.\",\"sectionID\":\"20018017\",\"sourceIDs\":[\"research-permitext_discovered-id:20018017-2\"]}],\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"The supplied enacted evidence establishes the FAR definition and the basic R7A table maximum only; it does not establish all other zoning provisions that could affect overall project compliance or entitlement. No mapped or special-district applicability has been established from the supplied facts.\"],\"additionalEvidenceNeeded\":[\"For an overall zoning-compliance conclusion, enacted provisions and verified site-specific applicability information for any potentially modifying zoning controls would be needed.\"],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"20018523\",\"sourceIDs\":[\"research-permitext_discovered-id:20018523-1\"],\"relevance\":\"Defines FAR and supports the 42,000 ÷ 10,000 = 4.2 calculation.\"},{\"sectionID\":\"20018017\",\"sourceIDs\":[\"research-permitext_discovered-id:20018017-2\"],\"relevance\":\"Supplies the R7A standard-residences maximum FAR of 4.00 and the separate 5.01 qualifying-housing category.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "ZR-08",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_research_verification",
+      "requestBytes": 40162,
+      "maxOutputTokens": 4000,
+      "startedAt": "2026-09-08T03:43:18.099Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 5296,
+      "usage": {
+        "input_tokens": 8989,
+        "input_tokens_details": {
+          "cache_write_tokens": 6598,
+          "cached_tokens": 2388
+        },
+        "output_tokens": 406,
+        "output_tokens_details": {
+          "reasoning_tokens": 384
+        },
+        "total_tokens": 9395
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0d82abf1112d2e31016a9f845b37b487d2b0a01c42b7bc1366",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 1,
+    "reservedUSD": 0.029682,
+    "actualUSD": 0.029682,
+    "requestCount": 2,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 2.249483,
+  "completedAt": "2026-09-08T03:43:23.844Z"
+}

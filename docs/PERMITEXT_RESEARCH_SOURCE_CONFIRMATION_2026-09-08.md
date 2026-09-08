@@ -27,7 +27,11 @@ The table's prepared hash binds its own reference, table text and grid. Assembly
 
 The ZR definitions section also lost its HTML heading structure in the application's canonical resolver. That structure is now retained internally when selecting definition entries, and the FAR abbreviation expands to the enacted definition label for zoning retrieval. The complete FAR entry, including multiple buildings on one zoning lot, is supplied instead of the opening alphabetical material.
 
-The saved-provider-response HTTP replay now completes and reopens the historical answer with both hashes intact, the full section footnote and the FAR definition. This replay validates persistence, not the old draft's semantic quality. It makes zero external requests. A separate one-question live confirmation is prepared with a $0.85 maximum; its immutable result will establish the post-repair live outcome.
+The saved-provider-response HTTP replay now completes and reopens the historical answer with both hashes intact, the full section footnote and the FAR definition. This replay validates persistence, not the old draft's semantic quality. It makes zero external requests.
+
+The separate live FAR confirmation at source commit `47bf44eaa` returned an answer in **14.986 seconds**, with two settled provider calls and no repair. It correctly calculates 4.2 FAR, the 40,000-square-foot ceiling and the 2,000-square-foot excess, with the correct definition and table citations. It distinguishes the qualifying-housing column and limits the broader zoning conclusion. However, its closing sentence says the calculation establishes only compliance, an ambiguous phrase that conflicts with the opening No and the stated excess. This remains a wording defect; the retest is not counted as perfect. The original delivery failure remains unchanged in the preceding record.
+
+This final confirmation cost approximately **$0.034307** including cache writes, bringing cumulative usage estimates to **$1.100920** and conservative provider costs to **$2.249483**. No provider requests remain unsettled. See the [live FAR record](../permitext-sync-server/evals/results/research-owner-live-far-confirmation-2026-09-08.json) and [manual FAR review](../permitext-sync-server/evals/results/research-owner-far-confirmation-review-2026-09-08.json). These records establish local backend behavior, not Production or native behavior.
 
 ## Validation and remaining work
 

@@ -1,0 +1,36 @@
+{
+  "schema": "permitext-owner-far-confirmation-review-v1",
+  "reviewedOn": "2026-09-08",
+  "sourceCommit": "47bf44eaa99e5356c8aee016de03143c77e0a5c1",
+  "sourceResult": "research-owner-live-far-confirmation-2026-09-08.json",
+  "sourceResultSHA256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab",
+  "id": "ZR-08",
+  "delivery": "pass",
+  "mainCalculationAndCitationReview": "pass",
+  "presentationReview": "needs-revision",
+  "reviewMethod": "Manual development review; no paid judge and no professional approval.",
+  "reviewNotes": [
+    "Answer now delivered through the real local HTTP conversation endpoint with two settled provider calls and no repair.",
+    "Correct 42,000 / 10,000 = 4.2 FAR, basic standard-residence maximum 4.00, 40,000-square-foot ceiling and 2,000-square-foot excess. Correct references to ZR 12-10 and 23-22.",
+    "Qualifying affordable/senior housing is distinguished from the stated standard-residence scenario. Overall property entitlement is not inferred.",
+    "The sentence stating that this calculation establishes only compliance is ambiguous and conflicts with the opening No and stated excess. The intended boundary should say the comparison determines whether the basic maximum is met, and here it is exceeded. Keep this as a wording defect; do not count the retest as perfect.",
+    "The original failed delivery is retained and not rescored."
+  ],
+  "durationMilliseconds": 14986,
+  "answerWordCount": 127,
+  "providerCalls": 2,
+  "pendingProviderRequests": 0,
+  "tokenEstimateUSD": 0.02968196,
+  "cacheWritePremiumUSD": 0.0046254,
+  "usageBasedEstimateUSD": 0.03430736,
+  "conservativeProviderCostUSD": 0.086592,
+  "cumulativeUsageBasedEstimateUSD": 1.10092026,
+  "cumulativeConservativeProviderCostUSD": 2.249483,
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "primaryReviewSources": [
+    "https://zr.planning.nyc.gov/article-i/chapter-2/12-10",
+    "https://zr.planning.nyc.gov/article-ii/chapter-3/23-22"
+  ],
+  "costLimitation": "Usage estimate includes returned cache-write premium, not an invoice or remaining account balance."
+}
