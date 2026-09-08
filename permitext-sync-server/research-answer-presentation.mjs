@@ -1,4 +1,4 @@
-export const researchAnswerPresentationVersion = "20260908-independent-applicability-v6";
+export const researchAnswerPresentationVersion = "20260908-closed-question-format-v7";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
@@ -9,6 +9,7 @@ const numericCue = /\b(?:maximum|minimum|how (?:much|many|wide|long|high)|square
 const definitionCue = /\b(?:what (?:is|are|does)|define|definition|meaning|appendix)\b/i;
 const editionCheckCue = /\b(?:is|was|were|does|did) (?:this|that|it|the (?:answer|requirement|section))\b[\s\S]*\b(?:19|20)\d{2}\b|\bfrom (?:the )?(?:19|20)\d{2}(?:\s+edition|\s+code)?\b/i;
 const outsideAuthorityCue = /\b(?:Office of Mental Health|OMH|NYCRR|agency|licensing|funding)\b/i;
+const closedQuestionCue = /(?:^|[.!?]\s+)(?:does|do|did|is|are|was|were|can|could|may|must|will|would|should|has|have)\b[^?]*\?\s*$/i;
 
 function normalizedStartingPoint(source) {
   try {
@@ -121,11 +122,11 @@ function contractFor(mode, preferredStructure, requiredElements) {
       "Place each material code citation next to the claim it supports.",
       "Separate governing enacted requirements from outside guidance or unsupplied standards.",
       "Preserve material applicability conditions, exceptions, and unresolved facts.",
-      "Establish the subject and applicability of each alternative rule independently. An unresolved condition for one path does not prove that a different path applies. Preserve specific subjects such as a building or nonaccessory tenant space instead of generalizing them to any room or space.",
-      "Keep the opening result, calculation and closing qualification consistent. If the stated proposal fails the applicable rule, a scope note must not say that the calculation establishes compliance. State the failed requirement directly; broader compliance remains unevaluated.",
+      "Establish each alternative rule's applicability independently; an unresolved condition does not establish another path. Preserve the stated subject, such as a building or nonaccessory tenant space, without generalizing to any room.",
+      "Keep the opening, calculation and closing consistent. State a failed applicable limit directly; a scope note must not imply compliance. Broader compliance remains unevaluated.",
       "Include a secondary rule, alternate category or professional verification item only when it can change or explain the requested result. Do not turn a narrow question into a general project review merely because more provisions were retrieved.",
       "Once a supplied fact establishes a definite failure, additional design details needed to develop a compliant replacement are not missing facts needed to answer whether the stated proposal complies. Preserve any exception or unresolved applicability fact that could change that failure.",
-      "Do not add a heading, table, list, calculation, or follow-up question unless it helps answer this question."
+      "Use headings, tables, lists, calculations and follow-ups only when useful. State each material point once; avoid repeating prose in a table or checklist or restating the conclusion."
     ])
   });
 }
@@ -164,6 +165,15 @@ export function researchAnswerPresentationContract({ question, evidence = [] } =
       "When attributable official supporting claims are supplied, summarize those exact claims and label their authority separately from the enacted Permitext code.",
       "Do not invent ratios, dimensions, or program rules from an unsupplied agency or standard.",
       "Give responsive established requirements first, then request only the program type, controlling source, or project fact that remains missing."
+    ]);
+  }
+
+  if (closedQuestionCue.test(text)) {
+    return contractFor("direct-answer", "one or two concise paragraphs", [
+      "Resolve the stated proposal with Yes, No, or the material condition in the first sentence.",
+      "Follow with the cited rule and its application, including arithmetic when useful.",
+      "Mentioning a requirement or retrieving many sources does not make a yes/no question a request for a requirements table.",
+      "Include only qualifications that can change or explain this result."
     ]);
   }
 

@@ -38,7 +38,23 @@ assert.equal(fixture.schema, "permitext-research-product-examples-v1");
 assert.equal(fixture.paidModelCallsAuthorized, false);
 assert.equal(fixture.cases.length, 7);
 assert.equal(new Set(fixture.cases.map((item) => item.id)).size, fixture.cases.length);
-assert.equal(researchAnswerPresentationVersion, "20260908-independent-applicability-v6");
+assert.equal(researchAnswerPresentationVersion, "20260908-closed-question-format-v7");
+
+const manySources = Array.from({ length: 15 }, (_, i) => ({ sectionID: `source-${i}` }));
+for (const question of [
+  "The only shutdown is the fan disconnect. Does that satisfy the manual-control requirement?",
+  "A room needs four water closets. Can three urinals replace them?",
+  "Is this arrangement permitted under the stated requirements?",
+  "The proposed opening is two feet away. Is the distance sufficient?"
+]) {
+  assert.equal(researchAnswerPresentationContract({ question, evidence: manySources }).mode, "direct-answer", question);
+}
+assert.equal(researchAnswerPresentationContract({
+  question: "What does the code require when designing a ramp?", evidence: manySources
+}).mode, "requirements-table", "Open-ended design questions retain their requirements structure.");
+assert.equal(researchAnswerPresentationContract({
+  question: "Compare the clearance requirements for both configurations.", evidence: manySources
+}).mode, "comparison-table");
 
 const codeSectionNames = new Map(
   (constructionBundle.codeSections || []).map((section) => [section.id, section.name])

@@ -628,6 +628,19 @@ assert.match(researchWebAttributionRevisionIssues(wrongColumnResult)[0].detail, 
 assert.match(researchWebAttributionRevisionIssues(wrongColumnResult)[0].detail, /supportedPoints\[0\]/);
 assert.match(researchWebAttributionRevisionIssues(wrongColumnResult)[0].detail, /WEB_SOURCE_ID=web-bb-2022-013, WEB_CLAIM_ID=bb-2022-013-claim-3/);
 assert.doesNotMatch(wrongColumn.supportedPoints[0].explanation, /bulletin|guidance|\bBB\b/i);
+const deferredWrongColumn = evaluateResearchWebAttribution({
+  answer: wrongColumn, evidence, supportingSources,
+  deferLexicalOverlapToVerifier: true
+});
+assert.equal(deferredWrongColumn.pass, true, "Lexical overlap may proceed only to the caller's required semantic check.");
+assert.equal(deferredWrongColumn.deferredOverlapMatches.length, 1);
+assert.deepEqual(deferredWrongColumn.deferredOverlapMatches[0].bindings, wrongColumnResult.guidanceSupportedPointMatches[0].bindings);
+const explicitlyWebDerived = structuredClone(wrongColumn);
+explicitlyWebDerived.supportedPoints[0].explanation = "DOB guidance requires the additional wall assembly.";
+assert.equal(evaluateResearchWebAttribution({
+  answer: explicitlyWebDerived, evidence, supportingSources,
+  deferLexicalOverlapToVerifier: true
+}).pass, false, "Explicit guidance attribution is a hard failure even when lexical review is deferred.");
 
 // A presentation label alone must not reject an enacted answer twice. This is
 // a synthetic failure-class fixture, not the unavailable failed live draft.

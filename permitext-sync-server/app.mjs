@@ -10469,6 +10469,7 @@ async function openAIResearchVerification(question, evidence, interpretation, us
         ? "Because the user expressly requested official guidance, an official-guidance-only answer may correctly have no supportedPoints or enacted citations when the assembled enacted evidence does not establish a responsive rule, provided the server-rendered answer is visibly noncontrolling and supportingSourceUses contain the exact supplied web source and claim bindings. Do not demand an enacted citation for a guidance-only claim."
         : "Do not accept a guidance-only answer without enacted supportedPoints and citations; the user did not expressly request official guidance.",
       "Fail with wrong_attribution when a bulletin or other web-derived claim appears in supportedPoints, including a paraphrase that omits the words bulletin or guidance, or is tied only to an enacted citation. Such a claim must instead use supportingSourceUses with the exact WEB_SOURCE_ID and WEB_CLAIM_ID pair whose source-specific attributed claim supports it.",
+      "A web page may repeat or paraphrase enacted code. Shared wording alone does not make a claim web-derived. For each lexical overlap flagged below, compare the entire supported point with its cited enacted passages. Accept independently established enacted rules; fail with wrong_attribution for any web-only clause presented as enacted. Do not infer independent support merely from a shared topic, code label, or citation ID.",
       "When the question expressly requests a retrieved named official document, fail with missed_material_conclusion if the answer omits its material source-supported clarification or drops its supportingSourceUse during revision.",
       "Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question.",
       "Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion.",
@@ -10531,6 +10532,10 @@ async function openAIResearchVerification(question, evidence, interpretation, us
         ? `STRUCTURED UNRESOLVED PROJECT FACTS\n${options.structuredEvidenceAnalysis.unresolvedProjectFacts.join("\n")}`
         : "",
       `AUTHORIZED ENACTED EVIDENCE\n${evidenceText}`,
+      `LEXICAL WEB OVERLAPS FOR SOURCE COMPARISON — HEURISTIC, NOT AN ATTRIBUTION FINDING\n${JSON.stringify(evaluateResearchWebAttribution({
+        question, answer: interpretation, evidence, webSupport: options.webSupport,
+        deferLexicalOverlapToVerifier: true
+      }).deferredOverlapMatches)}`,
       options.requiredClaims?.length
         ? `DETERMINISTIC REQUIRED CLAIM CHECKLIST\n${JSON.stringify(options.requiredClaims)}`
         : "",
@@ -19936,7 +19941,10 @@ async function handleResearchConversationMessage(request, response) {
           question,
           answer: result.interpretation,
           evidence: assembledEvidence,
-          webSupport
+          webSupport,
+          // This general-answer branch always verifies each generated draft
+          // below. Lexical overlap cannot establish provenance on its own.
+          deferLexicalOverlapToVerifier: true
         });
         if (
           !requiredClaimCoverage.pass ||

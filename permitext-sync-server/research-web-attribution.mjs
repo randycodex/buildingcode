@@ -116,7 +116,10 @@ export function evaluateResearchWebAttribution({
   answer = {},
   supportingSources = [],
   evidence = [],
-  webSupport = null
+  webSupport = null,
+  // Only a caller that will run source-based semantic verification may defer
+  // a lexical heuristic. Mock and deterministic-only paths remain conservative.
+  deferLexicalOverlapToVerifier = false
 } = {}) {
   const availableSources = Array.isArray(webSupport?.sources)
     ? webSupport.sources
@@ -196,6 +199,12 @@ export function evaluateResearchWebAttribution({
 
   const guidanceSupportedPointMatches = webDerivedSupportedPointMatches(answer, sources, evidence);
   const guidanceSupportedPointIndexes = guidanceSupportedPointMatches.map(({ index }) => index);
+  const deferredOverlapMatches = deferLexicalOverlapToVerifier
+    ? guidanceSupportedPointMatches.filter(({ reason }) => reason === "web_claim_overlap")
+    : [];
+  const blockingGuidanceMatches = guidanceSupportedPointMatches.filter((match) =>
+    !deferredOverlapMatches.includes(match)
+  );
   const guidanceOnly =
     sources.size > 0 &&
     validUsedBindings.length > 0 &&
@@ -227,7 +236,7 @@ export function evaluateResearchWebAttribution({
       !undisclosedGuidanceOnlyNoncontrolling &&
       !undisclosedGuidanceOnlyEnactedBoundary &&
       !guidanceOnlyClaimsControllingAuthority &&
-      guidanceSupportedPointIndexes.length === 0 &&
+      blockingGuidanceMatches.length === 0 &&
       invalidSourceUseBindings.length === 0,
     requiredSourceIDs,
     requiredDocumentReferences,
@@ -245,6 +254,7 @@ export function evaluateResearchWebAttribution({
     guidanceOnlyClaimsControllingAuthority,
     guidanceSupportedPointIndexes,
     guidanceSupportedPointMatches,
+    deferredOverlapMatches,
     invalidSourceUseBindings
   };
 }

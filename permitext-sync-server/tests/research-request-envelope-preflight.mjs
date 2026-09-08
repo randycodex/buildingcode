@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { evaluateResearchWebAttribution } from "../research-web-attribution.mjs";
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import {
@@ -97,7 +98,7 @@ export async function preflightRampRequestEnvelopes(evidence) {
   const schemaStart = source.indexOf("const researchVerificationIssueTypes =");
   const schemaEnd = source.indexOf("function validateResearchVerification(", schemaStart);
   assert(verificationStart >= 0 && verificationEnd > verificationStart && schemaStart >= 0 && schemaEnd > schemaStart);
-  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext };
+  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext, evaluateResearchWebAttribution };
   const buildVerifierRequest = new Function(...Object.keys(verificationDependencies),
     `${source.slice(schemaStart, schemaEnd)} return ${source.slice(verificationStart, verificationEnd).replace(/^async function/, "function")} return requestBody; };`
   )(...Object.values(verificationDependencies));
