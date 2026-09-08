@@ -42,6 +42,7 @@ await withOfflineResearchHTTPHarness("distinct-benchmark-retrieval", async ({ di
     authorityPrefixes: ["BC", "MC", "PC", "FGC", "AC"],
     allConcreteRequiredCitations: true
   });
+  console.log(formatResearchBenchmarkRetrievalReport(report));
 
   assert.equal(report.scope.firstCase, 1);
   assert.equal(report.scope.lastCase, 40);
@@ -92,7 +93,6 @@ await withOfflineResearchHTTPHarness("distinct-benchmark-retrieval", async ({ di
       evidenceHit: item.evidenceHit
     }))
   );
-  console.log(formatResearchBenchmarkRetrievalReport(report));
   assert.deepEqual(misses, []);
   console.log(`Distinct benchmark regression summary: ${JSON.stringify(report.summary)}`);
 });

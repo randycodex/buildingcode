@@ -139,7 +139,7 @@ const assemble = (question, options = {}) => assembleResearchEvidence({
 });
 const assembled = await assemble("what are the requirements for designing a ramp?");
 const assembledBaseline = assembled.sources.filter((source) =>
-  source.origin === "permitext_discovered"
+  source.origin === "permitext_discovered" && !source.targetedDefinition
 );
 assert.equal(assembledBaseline.length, 10, "The model-visible package must retain the complete routed baseline.");
 assert(assembledBaseline.every((source) =>

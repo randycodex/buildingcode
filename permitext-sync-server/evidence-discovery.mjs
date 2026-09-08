@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260902-appendix-p-cross-edition-v22";
+export const evidenceDiscoveryVersion = "20260908-passage-local-retrieval-v23";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -72,6 +72,11 @@ const conceptExpansions = [
 ];
 
 const topicRoutes = [
+  {
+    pattern: /\bducts?\b.*\bfire[- ]barriers?\b|\bfire[- ]barriers?\b.*\b(?:ducts?|dampers?)\b/i,
+    label: "duct penetrations of fire barriers and damper exceptions",
+    targets: [{ codePrefix: "BC", sectionPrefix: "717.5.2" }]
+  },
   {
     pattern: /\b(?:conflict|difference)\b[\s\S]*\b(?:enacted\s+)?text\b[\s\S]*\b(?:caption|illustration|summary\s+table|illustrative\s+table)\b|\b(?:caption|illustration|summary\s+table|illustrative\s+table)\b[\s\S]*\b(?:conflict|difference)\b[\s\S]*\b(?:enacted\s+)?text\b/i,
     label: "Zoning Resolution text-control and construction rules",
@@ -197,12 +202,13 @@ const topicRoutes = [
     ]
   },
   {
-    pattern: /\bexterior\s+wall\b.*\b(?:lot\s+line|fire[- ]separation\s+distance|unprotected\s+(?:window|opening)|fire[- ]resistance\s+rating)\b/i,
+    pattern: /\bexterior[- ]walls?\b.*\b(?:lot\s+line|fire[- ]separation\s+distance|unprotected\s+(?:window|opening)|fire[- ]resistance\s+rating)\b|\b(?:windows?|openings?)\b.*\bexterior[- ]walls?\b.*\b(?:percent(?:age)?|calculat\w*|allowable)\b/i,
     label: "exterior-wall rating and opening-area provisions",
     targets: [
       { codePrefix: "BC", sectionPrefix: "602.1" },
       { codePrefix: "BC", sectionPrefix: "705.8" },
-      { codePrefix: "BC", sectionPrefix: "705.8.1" }
+      { codePrefix: "BC", sectionPrefix: "705.8.1" },
+      { codePrefix: "BC", sectionPrefix: "202" }
     ]
   },
   {
@@ -325,7 +331,7 @@ const topicRoutes = [
     ]
   },
   {
-    pattern: /\bplumbing\s+fixtures?|fixture\s+(?:requirements?|ratios?|calculations?)|fractional\s+fixture/i,
+    pattern: /\b(?:plumbing\s+)?fixture\s+(?:counts?|requirements?|ratios?|calculations?)|fractional\s+fixture|\b(?:how\s+many|minimum\s+(?:number|count))\b[\s\S]*\b(?:plumbing\s+)?fixtures?\b|\bplumbing\s+fixtures?\b[\s\S]*\b(?:count|calculat|number|occupanc)/i,
     label: "plumbing-fixture classification and calculation provisions",
     targets: [
       { codePrefix: "PC", sectionPrefix: "403.1", includeDescendants: true },
@@ -429,7 +435,7 @@ const topicRoutes = [
     ]
   },
   {
-    pattern: /\btype\s+i{1,3}[ab]?\b|\bconstruction\s+type\b.*\b(?:structural\s+frame|exterior\s+walls?|floor|roof)\b/i,
+    pattern: /\btype\s+(?:i{1,3}|iv|v)[ab]\b|\btype\s+(?:i{1,3}|iv|v)\s+(?:construction|buildings?)\b|\bconstruction\s+type\b.*\b(?:structural\s+frame|exterior\s+walls?|floor|roof)\b|\b(?:structural\s+frame|building\s+elements?)\b.*\b(?:fire[- ]resistance|ratings?)\b|\b(?:fire[- ]resistance|ratings?)\b.*\b(?:structural\s+frame|building\s+elements?)\b/i,
     label: "construction-type and building-element ratings",
     targets: [
       { codePrefix: "BC", sectionPrefix: "602.2" },
@@ -685,7 +691,7 @@ const topicRoutes = [
     ]
   },
   {
-    pattern: /\b(?:gas[- ]fired|fuel[- ]burning)\s+appliance\b.*\bcombustion\s+air\b|\bcombustion\s+air\b.*\b(?:gas[- ]fired|mechanical\s+room|appliance)\b/i,
+    pattern: /\b(?:gas[- ]fired|fuel[- ]burning|gas)\s+appliances?\b.*\bcombustion\s+air\b|\bcombustion\s+air\b.*\b(?:gas[- ]fired|mechanical\s+room|appliances?)\b/i,
     label: "fuel-gas appliance combustion-air provisions",
     targets: [
       { codePrefix: "FGC", sectionPrefix: "304.1" },
@@ -870,7 +876,36 @@ function normalizedText(value) {
 }
 
 function rawTokens(value) {
-  return normalizedText(value).match(/[\p{L}\p{N}]+(?:[.-][\p{L}\p{N}]+)*/gu) || [];
+  const values = normalizedText(value).match(/[\p{L}\p{N}]+(?:[.-][\p{L}\p{N}]+)*/gu) || [];
+  return values.flatMap((token) => /^[a-z]+(?:-[a-z]+)+$/.test(token)
+    ? [token, ...token.split("-")]
+    : [token]);
+}
+
+const normalizedIndexCache = new WeakMap();
+function normalizedSearchIndex(index) {
+  if (normalizedIndexCache.has(index)) return normalizedIndexCache.get(index);
+  const normalized = new Map();
+  for (const [token, posting] of index) {
+    for (const term of new Set(rawTokens(token).flatMap((value) => [...singularForms(value)]))) {
+      const ids = normalized.get(term) || new Set();
+      for (const id of posting) ids.add(comparableSectionID(id));
+      normalized.set(term, ids);
+    }
+  }
+  normalizedIndexCache.set(index, normalized);
+  return normalized;
+}
+
+function questionDisciplinePrefixes(question) {
+  // A soft ranking signal, never a corpus exclusion or a substitute for a
+  // section reference. Cross-code requirements can still be selected.
+  const prefixes = new Set();
+  if (/\b(?:fuel[- ]gas|natural[- ]gas|gas[- ]fired|gas\s+(?:piping|pipe|system|appliance|connector|connection))\b/i.test(question)) prefixes.add("FGC");
+  if (/\b(?:ventilat\w*|exhaust|ducts?|air[- ]condition\w*|makeup[- ]air|mechanical\s+(?:code|system)|combustion\s+air)\b/i.test(question)) prefixes.add("MC");
+  if (/\b(?:plumbing|sanitary|drain(?:age|s)?|sewer|trap(?:s|ping)?|lavator\w*|toilet|shower|water[- ]heater|drinking[- ]fountain)\b/i.test(question)) prefixes.add("PC");
+  if (/\b(?:permit|DOB\s+inspection|certificate\s+of\s+occupancy|stop[- ]work\s+order|permit\s+application)\b/i.test(question)) prefixes.add("AC");
+  return prefixes;
 }
 
 function singularForms(token) {
@@ -1303,12 +1338,20 @@ function sourceReviewRequirements(body, passage, richSources) {
 
 function passageScore(text, terms, bigrams) {
   const normalized = normalizedText(text);
-  const tokens = new Set(rawTokens(normalized));
+  const raw = rawTokens(normalized);
+  const tokens = new Map();
+  for (const token of raw) {
+    for (const form of singularForms(token)) tokens.set(form, (tokens.get(form) || 0) + 1);
+  }
   let score = 0;
   let matched = 0;
   for (const [term, weight] of terms) {
-    if (tokens.has(term) || normalized.includes(term)) {
-      score += weight;
+    const frequency = tokens.get(term) || 0;
+    if (frequency) {
+      // Saturate repetition and normalize passage length. A long glossary must
+      // not win merely by mentioning unrelated query words across its entries.
+      const lengthPenalty = 1.2 * (0.25 + 0.75 * raw.length / 100);
+      score += weight * frequency * 2.2 / (frequency + lengthPenalty);
       matched += 1;
     }
   }
@@ -1388,8 +1431,14 @@ export async function discoverRelevantEvidence({
 }) {
   const normalizedQuestion = validateEvidenceDiscoveryQuestion(question);
   const sections = Array.isArray(catalog) ? catalog : [];
-  const index = invertedIndex instanceof Map ? invertedIndex : new Map();
+  const index = normalizedSearchIndex(invertedIndex instanceof Map ? invertedIndex : new Map());
+  const disciplinePrefixes = questionDisciplinePrefixes(normalizedQuestion);
   const terms = queryTermWeights(normalizedQuestion);
+  const passageTerms = new Map(Array.from(terms, ([term, weight]) => {
+    const posting = index.get(term);
+    const count = Number(posting?.size ?? posting?.length ?? 0);
+    return [term, weight * Math.log(1 + (sections.length + 1) / (count + 1))];
+  }));
   const bigrams = queryBigrams(normalizedQuestion);
   const references = codeReferences(normalizedQuestion);
   const relevanceComparison = retrievalContext?.relevanceComparison === true;
@@ -1476,6 +1525,14 @@ export async function discoverRelevantEvidence({
   const preliminary = Array.from(scores, ([id, score]) => ({ id, score }))
     .sort((left, right) => right.score - left.score)
     .slice(0, 160);
+  // Construction dictionaries need a separate opportunity to supply targeted
+  // term definitions even when a broad topic route fills the lexical shortlist.
+  // Their complete text is never admitted automatically by this reservation.
+  const preliminaryIDs = new Set(preliminary.map((entry) => entry.id));
+  for (const section of sections.filter((item) => String(item.sectionNumber) === "202")) {
+    const id = comparableSectionID(section.id);
+    if (!preliminaryIDs.has(id)) preliminary.push({ id, score: scores.get(id) || 0 });
+  }
   const detailed = [];
   for (const entry of preliminary) {
     const section = catalogByID.get(entry.id);
@@ -1493,9 +1550,6 @@ export async function discoverRelevantEvidence({
     const coverage = originalTerms.length
       ? originalMatches.size / new Set(originalTerms).size
       : 0;
-    const titleText = normalizedText(`${section.sectionNumber || ""} ${section.title || ""}`);
-    const titleMatches = originalTerms.filter((term) => titleText.includes(term)).length;
-    const phraseMatches = bigrams.filter((bigram) => normalizedFullText.includes(bigram)).length;
     const exactReference = exactReferenceIDs.has(entry.id);
     const routeMatch = routesByID.get(entry.id);
     const contextualReference = Boolean(
@@ -1508,7 +1562,7 @@ export async function discoverRelevantEvidence({
         ) || comparisonReferenceKeys.has(`*:${String(section.sectionNumber || "")}`)
       )
     );
-    let passage = bestPassage(body, terms, bigrams);
+    let passage = bestPassage(body, passageTerms, bigrams);
     if (!passage) continue;
     if (routeMatch?.useSelectedPassageOnly && routeMatch.selectedExcerptPatterns.length) {
       const selectedExcerpts = routeMatch.selectedExcerptPatterns
@@ -1522,42 +1576,16 @@ export async function discoverRelevantEvidence({
         };
       }
     }
-    const richSources = structuredRichSources(body);
-    const reviewRequirements = sourceReviewRequirements(body, passage, richSources);
-    const visualSources = [];
-    if (typeof resolveVisualSource === "function") {
-      for (const reference of visualSourceReferences(body)) {
-        try {
-          const source = await resolveVisualSource(reference);
-          if (source) visualSources.push(source);
-        } catch {
-          // Missing or unreadable assets remain represented by the blocking source-review requirement.
-        }
-      }
-    }
-    const passageTableReferences = Array.from(new Set(
-      Array.from(String(passage.text || "").matchAll(/\bTable\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi))
-        .map((match) => `Table ${match[1]}`)
-    ));
-    const ownZoningTables = String(section.codePrefix).toUpperCase() === "ZR"
-      ? richSources.filter((source) => source.kind === "table" &&
-          comparableTableReference(source.reference) === comparableTableReference(`ZR Table ${section.sectionNumber}`))
-      : [];
-    const applicableRichSources = richSources.filter((source) =>
-      passageTableReferences.some((reference) =>
-        comparableTableReference(source.reference) === comparableTableReference(reference)
-      ) || (ownZoningTables.length === 1 && source === ownZoningTables[0])
-    );
-    const displayBlock = candidateDisplayBlock(body, passage);
-    const finalScore = entry.score +
-      coverage * 12 +
-      titleMatches * 2.6 +
-      phraseMatches * 1.5 +
-      passage.score * 1.2 +
+    const titleScore = passageScore(`${section.title || ""}`, passageTerms, bigrams).score;
+    const lexicalScore = entry.score * 0.05 +
+      titleScore * 0.8 +
+      passage.score;
+    const finalScore = lexicalScore * (disciplinePrefixes.has(section.codePrefix) ? 1.4 : 1) +
       (routeMatch?.score || 0) +
       (exactReference ? 100 : 0);
     detailed.push({
       section,
+      body,
       passage,
       score: finalScore,
       coverage,
@@ -1567,10 +1595,6 @@ export async function discoverRelevantEvidence({
       useSelectedPassageOnly: routeMatch?.useSelectedPassageOnly === true,
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
-      sourceReviewRequirements: reviewRequirements,
-      richSources: applicableRichSources,
-      visualSources,
-      displayBlock
     });
   }
 
@@ -1592,7 +1616,51 @@ export async function discoverRelevantEvidence({
     evidenceDiscoveryMaximumCandidates
   );
   const topScore = detailed[0]?.score || 1;
-  const candidates = detailed.slice(0, candidateLimit).map((item, index) => {
+  const candidates = [];
+  const selectedCandidates = detailed.slice(0, candidateLimit);
+  const selectedIDs = new Set(selectedCandidates.map((item) => item.section.id));
+  const selectedPrefixCounts = new Map();
+  for (const item of selectedCandidates) {
+    selectedPrefixCounts.set(item.section.codePrefix, (selectedPrefixCounts.get(item.section.codePrefix) || 0) + 1);
+  }
+  const supplementalDefinitions = detailed.filter((item) => !selectedIDs.has(item.section.id) &&
+    selectedPrefixCounts.has(item.section.codePrefix) &&
+    (String(item.section.sectionNumber) === "202" || /\bdefinitions?\b/i.test(item.section.title || "")))
+    .sort((left, right) =>
+      selectedPrefixCounts.get(right.section.codePrefix) - selectedPrefixCounts.get(left.section.codePrefix) ||
+      Number(String(right.section.sectionNumber) === "202") - Number(String(left.section.sectionNumber) === "202") ||
+      right.score - left.score)
+    .slice(0, 2);
+  // Structured tables and image metadata cannot affect lexical ranking. Resolve
+  // them for the chosen candidates, keeping all existing source-review checks.
+  for (const [index, item] of [...selectedCandidates, ...supplementalDefinitions].entries()) {
+    const { body, passage, section } = item;
+    const richSources = structuredRichSources(body);
+    item.sourceReviewRequirements = sourceReviewRequirements(body, passage, richSources);
+    item.visualSources = [];
+    if (typeof resolveVisualSource === "function") {
+      for (const reference of visualSourceReferences(body)) {
+        try {
+          const source = await resolveVisualSource(reference);
+          if (source) item.visualSources.push(source);
+        } catch {
+          // An unavailable image retains its blocking source-review requirement.
+        }
+      }
+    }
+    const passageTableReferences = Array.from(String(passage.text || "").matchAll(
+      /\bTable\s+([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)*)/gi
+    )).map((match) => `Table ${match[1]}`);
+    const ownZoningTables = String(section.codePrefix).toUpperCase() === "ZR"
+      ? richSources.filter((source) => source.kind === "table" &&
+          comparableTableReference(source.reference) === comparableTableReference(`ZR Table ${section.sectionNumber}`))
+      : [];
+    item.richSources = richSources.filter((source) =>
+      passageTableReferences.some((reference) =>
+        comparableTableReference(source.reference) === comparableTableReference(reference)
+      ) || (ownZoningTables.length === 1 && source === ownZoningTables[0])
+    );
+    item.displayBlock = candidateDisplayBlock(body, passage);
     const relativeScore = item.score / topScore;
     const candidateID = `evidence-candidate-${createHash("sha256")
       .update([
@@ -1603,7 +1671,7 @@ export async function discoverRelevantEvidence({
       ].join("\u001f"))
       .digest("hex")
       .slice(0, 24)}`;
-    return {
+    candidates.push({
       id: candidateID,
       candidateState: "candidate",
       rank: index + 1,
@@ -1664,8 +1732,8 @@ export async function discoverRelevantEvidence({
         containsException: /\bexception\b/i.test(item.passage.text),
         containsCrossReference: /\b(section|table|chapter)\s+\d/i.test(item.passage.text)
       }
-    };
-  });
+    });
+  }
 
   const coverageLimitations = [{
     kind: "candidate-review-required",
@@ -1725,7 +1793,8 @@ export async function discoverRelevantEvidence({
     candidateDisplayVersion: evidenceCandidateDisplayVersion,
     question: normalizedQuestion,
     candidateState: "unreviewed",
-    candidates,
+    candidates: candidates.slice(0, candidateLimit),
+    supplementalDefinitionCandidates: candidates.slice(candidateLimit),
     coverageLimitations,
     outsideCurrentLibrary,
     searchedSectionCount: sections.length

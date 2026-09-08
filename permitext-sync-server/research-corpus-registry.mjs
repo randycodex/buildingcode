@@ -1,4 +1,4 @@
-export const researchCorpusRegistryVersion = "20260906-edition-qualified-citations-v4";
+export const researchCorpusRegistryVersion = "20260908-prior-code-technical-scope-v5";
 
 const constructionCodeVersion =
   "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -181,6 +181,9 @@ export function routeResearchCorpora({
   const futureRequested = futureExistingBuildingCue.test(context);
   const historical2014Requested = historical2014ConstructionCue.test(context) || shorthand2014Requested;
   const historicalRequested = historicalBuildingCue.test(context);
+  const priorCodeTechnicalApplicability = historicalRequested &&
+    /\b(?:option(?:al)?|elect(?:ion|ed|ing)?|prior[- ]code|alteration)\b/i.test(context) &&
+    /\b(?:plumbing|fuel[- ]gas|mechanical)\b/i.test(context);
   const appendixPCrossEditionRequested =
     appendixPCrossEditionCue.test(context) && !/\b(?:2014|2022)\b/.test(context);
   const buildingCodeOnlyScope =
@@ -196,6 +199,9 @@ export function routeResearchCorpora({
   const zoningRequested = !buildingCodeOnlyScope && (zoningCue.test(context) || projectZoningRequested);
   const requestedIDs = new Map();
   if (constructionRequested) requestedIDs.set("nyc-2022-construction-codes", "construction-code cue");
+  if (priorCodeTechnicalApplicability) {
+    requestedIDs.set("nyc-2022-construction-codes", "current rules governing the scope of a prior-code election for technical work");
+  }
   if (fireRequested) requestedIDs.set("nyc-2022-fire-code", "Fire Code or FDNY cue");
   if (zoningRequested) {
     requestedIDs.set(

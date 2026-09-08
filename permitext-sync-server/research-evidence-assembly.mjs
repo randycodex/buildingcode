@@ -10,7 +10,7 @@ import {
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260908-zoning-table-context-v23";
+export const researchEvidenceAssemblyVersion = "20260908-targeted-definition-reserve-v24";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1008,7 +1008,17 @@ export async function assembleResearchEvidence({
   // Definitions rank after controlling provisions, so a bounded discovery set can
   // legitimately fill before a giant canonical definition section such as BC 202.
   // Reserve a separate, small budget for query-targeted enacted definition entries.
-  for (const [index, candidate] of candidates.entries()) {
+  const dependencyPlan = !pinnedEvidence.length && appliedStrategy.mode === researchEvidenceStrategies.broad
+    ? researchTopicDependencyPlan({ question: query.retrievalQuery, sources })
+    : null;
+  // A reviewed design plan already reserves its dimensional dependencies. Keep
+  // that package within its established request budget; incidental dictionaries
+  // must not consume the space needed for those complete governing provisions.
+  const definitionCandidates = dependencyPlan ? [] : [...candidates, ...prioritizeResearchEvidence(
+    Array.isArray(discovery?.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [],
+    { limit: limits.maximumTargetedDefinitions, pinnedScopeActive: true }
+  )];
+  for (const [index, candidate] of definitionCandidates.entries()) {
     if (targetedDefinitionCount >= limits.maximumTargetedDefinitions) break;
     if (!isDefinitionCandidate(candidate)) continue;
     const candidateIdentity = sectionIdentity(candidate);
@@ -1024,7 +1034,7 @@ export async function assembleResearchEvidence({
     }
     const identity = sectionIdentity(resolved);
     if (!identity || includedSectionIdentities.has(identity)) continue;
-    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters);
+    const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters, 2_500);
     const targeted = targetedDefinitionValue(
       resolved,
       definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
@@ -1061,9 +1071,6 @@ export async function assembleResearchEvidence({
   // A routed design question needs its dimensional dependencies, not whichever
   // six references happen to appear first after lexical ranking. This separate,
   // reviewed set shares the existing character and provider-spend ceilings.
-  const dependencyPlan = !pinnedEvidence.length && appliedStrategy.mode === researchEvidenceStrategies.broad
-    ? researchTopicDependencyPlan({ question: query.retrievalQuery, sources })
-    : null;
   let topicDependencyCount = 0;
   const missingTopicDependencies = [];
   for (const [index, reference] of (dependencyPlan?.references || []).entries()) {

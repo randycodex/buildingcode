@@ -1,0 +1,56 @@
+{
+  "schema": "permitext-owner-code-variants-v1",
+  "purpose": "Held-out paraphrases and changed-value controls for source retrieval and later answer evaluation. Expected citations are joined by baseCaseID only after retrieval; these are development cases without professional approval.",
+  "cases": [
+    {
+      "id": "FGC-03-single",
+      "baseCaseID": "FGC-03",
+      "question": "One gas-fired appliance is rated at 400,000 Btu/h. The boiler room has ample indoor air volume. May its combustion air come entirely from that room?"
+    },
+    {
+      "id": "FGC-04-elbow",
+      "baseCaseID": "FGC-04",
+      "question": "A threaded elbow in new gas piping will be hidden behind permanent drywall. Is a concealed threaded elbow automatically prohibited?"
+    },
+    {
+      "id": "FGC-06-minimum",
+      "baseCaseID": "FGC-06",
+      "question": "For an ordinary gas piping system operating at 2 psig, is a proposed pressure test of 3 psig below the required minimum pressure? No corridor or other special test condition is involved."
+    },
+    {
+      "id": "MC-03-return",
+      "baseCaseID": "MC-03",
+      "question": "May the ventilation system recirculate return air taken from one apartment into a different apartment?"
+    },
+    {
+      "id": "MC-06-boundary",
+      "baseCaseID": "MC-06",
+      "question": "An uninhabited crawl space has no natural ventilation. Its mechanical exhaust rate is 0.02 cfm per square foot and starts when relative humidity exceeds 60 percent. Are those two values below the Mechanical Code minimums?"
+    },
+    {
+      "id": "MC-11-mesh",
+      "baseCaseID": "MC-11",
+      "question": "May fine metal mesh be fitted over the termination of a clothes dryer exhaust duct to keep pests out?"
+    },
+    {
+      "id": "PC-05-disposal",
+      "baseCaseID": "PC-05",
+      "question": "A listed commercial food-waste disposer would connect to a restaurant sanitary drain. Does the product listing remove the need for Department of Environmental Protection approval?"
+    },
+    {
+      "id": "PC-09-boundary",
+      "baseCaseID": "PC-09",
+      "question": "A pressure-balancing shower valve is adjusted to limit outlet temperature to 120°F. Does that temperature setting exceed the Plumbing Code maximum?"
+    },
+    {
+      "id": "PC-11-boundary",
+      "baseCaseID": "PC-11",
+      "question": "A three-inch horizontal sanitary drainage pipe slopes one eighth of an inch per foot. Is that less than the minimum slope in the Plumbing Code table?"
+    },
+    {
+      "id": "PC-15-backflow",
+      "baseCaseID": "PC-15",
+      "question": "A basement fixture is low enough to be exposed to backflow from the public sewer. Is sewer backflow protection optional for that fixture?"
+    }
+  ]
+}
