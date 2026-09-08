@@ -1,4 +1,4 @@
-export const researchAnswerPresentationVersion = "20260908-direct-rule-application-v4";
+export const researchAnswerPresentationVersion = "20260908-consistent-scoped-conclusions-v5";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
@@ -121,6 +121,9 @@ function contractFor(mode, preferredStructure, requiredElements) {
       "Place each material code citation next to the claim it supports.",
       "Separate governing enacted requirements from outside guidance or unsupplied standards.",
       "Preserve material applicability conditions, exceptions, and unresolved facts.",
+      "Keep the opening result, calculation and closing qualification consistent. If the stated proposal fails the applicable rule, a scope note must not say that the calculation establishes compliance. State the failed requirement directly; broader compliance remains unevaluated.",
+      "Include a secondary rule, alternate category or professional verification item only when it can change or explain the requested result. Do not turn a narrow question into a general project review merely because more provisions were retrieved.",
+      "Once a supplied fact establishes a definite failure, additional design details needed to develop a compliant replacement are not missing facts needed to answer whether the stated proposal complies. Preserve any exception or unresolved applicability fact that could change that failure.",
       "Do not add a heading, table, list, calculation, or follow-up question unless it helps answer this question."
     ])
   });

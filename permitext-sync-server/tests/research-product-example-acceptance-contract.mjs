@@ -38,7 +38,7 @@ assert.equal(fixture.schema, "permitext-research-product-examples-v1");
 assert.equal(fixture.paidModelCallsAuthorized, false);
 assert.equal(fixture.cases.length, 7);
 assert.equal(new Set(fixture.cases.map((item) => item.id)).size, fixture.cases.length);
-assert.equal(researchAnswerPresentationVersion, "20260908-direct-rule-application-v4");
+assert.equal(researchAnswerPresentationVersion, "20260908-consistent-scoped-conclusions-v5");
 
 const codeSectionNames = new Map(
   (constructionBundle.codeSections || []).map((section) => [section.id, section.name])

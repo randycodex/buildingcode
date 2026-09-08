@@ -4,6 +4,7 @@ import { discoverRelevantEvidence } from "../evidence-discovery.mjs";
 // Exercise source selection, not regex membership. Same-number historical
 // entries and adjacent topics must not acquire the current technical route.
 const probes = [
+  { prefix: "BC", section: "303.1.2", question: "Is a small community hall automatically Group A-3?", adjacent: "Which spaces need emergency lighting?" },
   { prefix: "FGC", section: "407.2", question: "May I hang a gas pipe from an adjacent water line?", adjacent: "How much water can this pipe carry?" },
   { prefix: "MC", section: "401.2", question: "We added air conditioning to a studio. Do its windows satisfy ventilation?", adjacent: "How high must the accessible window controls be?" },
   { prefix: "AC", section: "28-105.10", question: "Could an issued permit be revoked for a false statement?", adjacent: "Which permit drawings show the work area?" },

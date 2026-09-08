@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 
-export const evidenceDiscoveryVersion = "20260908-technical-source-routes-v24";
+export const evidenceDiscoveryVersion = "20260908-assembly-classification-scope-v25";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -288,6 +288,7 @@ const topicRoutes = [
     label: "accessory-assembly classification and occupant-load provisions",
     targets: [
       { codePrefix: "BC", sectionPrefix: "302.1" },
+      { codePrefix: "BC", sectionPrefix: "303.1.2", codeEdition: "2022" },
       { codePrefix: "BC", sectionPrefix: "303.1.3" },
       { codePrefix: "BC", sectionPrefix: "303.4" },
       { codePrefix: "BC", sectionPrefix: "1004.1.3" }
