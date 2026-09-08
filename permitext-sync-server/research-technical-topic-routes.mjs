@@ -17,6 +17,8 @@ export const researchTechnicalTopicRoutes = [
     "fuel-gas piping supports and anchors", "FGC", ["407.2"]),
   route(/^(?=[\s\S]*\b(?:air[- ]condition\w*|HVAC)\b)(?=[\s\S]*\b(?:windows?|ventilat\w*)\b)/i,
     "mechanical ventilation of air-conditioned occupiable spaces", "MC", ["401.2", "403.1"]),
+  route(/^(?=[\s\S]*\b(?:air\s+intakes?|intake[- ](?:openings?|location))\b)(?=[\s\S]*\b(?:lot\s+lines?|zoning\s+lots?|separation|setback|distance|feet|foot)\b)/i,
+    "mechanical intake opening location and applicability exceptions", "MC", ["401.4"]),
   route(/\b(?:recirculat\w*\s+(?:the\s+)?air|air\s+recirculat\w*|return[- ]air|transferr?(?:ed|ing)?\s+air|transfer[- ]air|air\s+transfer\w*)\b/i,
     "ventilation air recirculation and transfer-air limits", "MC", ["403.2.1", "403.2.2"]),
   route(/^(?=[\s\S]*\b(?:clothes[- ]dryers?|dryer)\b)(?=[\s\S]*\b(?:exhaust|duct\w*)\b)/i,

@@ -21,16 +21,17 @@ const historical2014FollowUpCue = /\b(?:the\s+)?2014(?:\s+(?:edition|code))?\b/i
 const current2022FollowUpCue = /\b(?:the\s+)?2022(?:\s+(?:edition|code))?\b/i;
 const appendixPCrossEditionCue = /\b(?:BC\s*[- ]?)?Appendix\s+P\b/i;
 
-function zoningRequestedByQuestion(context) {
+export function researchZoningQuestionText(question) {
+  const context = compactText(question);
   // MC 401.4 itself uses "zoning lot" to describe intake separation. That
   // contextual noun does not request a Zoning conclusion. Keep independent
   // ZR citations, district/use/bulk cues and questions about the lot itself.
   const technicalIntakeRule = /\bMC\s*(?:§\s*)?401\.4\b/i.test(context) ||
     (/\bmechanical\s+code\b/i.test(context) && /\b(?:air\s+intakes?|intake[- ]location)\b/i.test(context));
   const lotRuleQuestion = /\b(?:defin\w*|mean\w*|form\w*|merg\w*|subdiv\w*|establish\w*)\b[^.!?]*\bzoning\s+lots?\b|\bzoning\s+lots?\b[^.!?]*\b(?:defin\w*|mean\w*|form\w*|merg\w*|subdiv\w*)\b|\bzoning\s+lots?\s+(?:rules?|regulations?)\b/i.test(context);
-  return zoningCue.test(technicalIntakeRule && !lotRuleQuestion
+  return technicalIntakeRule && !lotRuleQuestion
     ? context.replace(/\bzoning\s+lots?\b/gi, "lot")
-    : context);
+    : context;
 }
 
 function compactText(value) {
@@ -208,7 +209,7 @@ export function routeResearchCorpora({
   const constructionRequested = (constructionCue.test(context) || shorthand2022Requested) &&
     (!futureRequested && !historical2014Requested && !historicalRequested || explicitCurrentConstructionCue);
   const fireRequested = fireCue.test(context);
-  const zoningRequested = !buildingCodeOnlyScope && (zoningRequestedByQuestion(context) || projectZoningRequested);
+  const zoningRequested = !buildingCodeOnlyScope && (zoningCue.test(researchZoningQuestionText(context)) || projectZoningRequested);
   const requestedIDs = new Map();
   if (constructionRequested) requestedIDs.set("nyc-2022-construction-codes", "construction-code cue");
   if (priorCodeTechnicalApplicability) {

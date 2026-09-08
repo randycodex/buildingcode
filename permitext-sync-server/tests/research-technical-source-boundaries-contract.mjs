@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { discoverRelevantEvidence } from "../evidence-discovery.mjs";
+import { researchDiscoveryNeedsAutomaticWebSupport, researchWebSupportTrigger } from "../research-source-policy.mjs";
 
 // Exercise source selection, not regex membership. Same-number historical
 // entries and adjacent topics must not acquire the current technical route.
@@ -38,6 +39,23 @@ try {
   process.env.PERMITEXT_EVIDENCE_DISCOVERY_BETA = "1";
   globalThis.fetch = async () => { networkAttempts += 1; throw new Error("External calls forbidden in this source-scope regression."); };
   const { assembledResearchEvidenceForTurn } = await import("../app.mjs");
+  const intakeQuestion = "On a 40-foot-wide zoning lot, a ventilation air intake is proposed six feet from an interior side lot line. Does that satisfy the ordinary Mechanical Code intake-location rule?";
+  const intake = await assembledResearchEvidenceForTurn({ question: intakeQuestion,
+    messages: [], pinnedEvidence: [], projectFacts: [] });
+  const intakeRule = intake.sources.find((source) => source.codePrefix === "MC" && source.sectionNumber === "401.4");
+  assert(intakeRule?.canonicalContextComplete && intakeRule.evidencePriority?.claimCoverageRequired);
+  assert.match(intakeRule.text, /Group R-3 occupancies are not required to comply/i,
+    "The applicable occupancy exception must remain in the mandatory intake source.");
+  assert(!researchDiscoveryNeedsAutomaticWebSupport(intake.discovery),
+    "Contextual lot terminology must not trigger an automatic Zoning web search after corpus selection.");
+  assert.equal(researchWebSupportTrigger({ question: intakeQuestion,
+    outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(intake.discovery)
+  }, { PERMITEXT_RESEARCH_WEB_SUPPORT: "1" }).useWeb, false);
+  assert.equal(researchWebSupportTrigger({ question: `${intakeQuestion} Also consult official DOB guidance.`
+  }, { PERMITEXT_RESEARCH_WEB_SUPPORT: "1" }).useWeb, true,
+  "An explicit request for official guidance still enables web support.");
+  const mixedIntake = await discover(`${intakeQuestion} Also explain the Zoning Resolution definition of zoning lot.`, []);
+  assert(researchDiscoveryNeedsAutomaticWebSupport(mixedIntake), "An independently requested outside authority remains discoverable.");
   for (const room of ["bathroom", "sleeping room"]) {
     const assembled = await assembledResearchEvidenceForTurn({
       question: `Is a gas-fired appliance categorically prohibited in every ${room}?`,

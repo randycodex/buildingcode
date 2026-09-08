@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
+import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20260908-stipulated-fixture-scope-v27";
+export const evidenceDiscoveryVersion = "20260908-intake-authority-scope-v28";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -836,6 +837,7 @@ const outsideLibrarySignals = [
   },
   {
     pattern: /\bzoning\b|\bZR\s*\d/i,
+    questionText: researchZoningQuestionText,
     label: "NYC Zoning Resolution Research",
     codePrefix: "ZR",
     sourceName: "NYC Zoning Resolution",
@@ -1800,8 +1802,8 @@ export async function discoverRelevantEvidence({
       .filter(Boolean)
   );
   const outsideCurrentLibrary = Array.from(new Map(outsideLibrarySignals
-    .filter(({ pattern, codePrefix }) =>
-      pattern.test(normalizedQuestion) && (!codePrefix || !availablePrefixSet.has(codePrefix))
+    .filter(({ pattern, codePrefix, questionText }) =>
+      pattern.test(questionText ? questionText(normalizedQuestion) : normalizedQuestion) && (!codePrefix || !availablePrefixSet.has(codePrefix))
     )
     .map(({ label, sourceName, sourceURL }) => [label, {
       kind: "outside-current-library",

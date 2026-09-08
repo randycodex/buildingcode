@@ -1,0 +1,402 @@
+{
+  "schema": "permitext-owner-routing-confirmation-20260908-v1",
+  "authorization": "Owner: approximately $8 available for API testing; test as many times as needed. One attempt each for two repaired routing failures and one visible-condition confirmation, capped at $0.80 conservative aggregate with no manual retries.",
+  "previousConservativeSpendUSD": 6.336181,
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "sourceCommit": "521acce779d77a7ce7aa652bf8204476bfc6aa32",
+  "execution": "Isolated local HTTP Research conversations with live OpenAI responses; automatic evidence discovery; no reference answers supplied to the answering model.",
+  "maximumCumulativeSpendUSD": 0.8,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 3,
+  "authorizationUSD": 8,
+  "turnBudgetPolicy": "Cap each complete provider pipeline at the lesser of $0.50 and the remaining settled conservative $0.80 batch budget. Missing or pending accounting stops all further requests.",
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing; general answers medium reasoning; standard service tier",
+  "zoning": "Local diagnostic eligibility only; no public gate or deployment changes",
+  "cases": [
+    {
+      "id": "MC-02",
+      "conversation": "MC-02",
+      "question": "On a 40-foot-wide zoning lot, a ventilation air intake is proposed six feet from an interior side lot line. Does that satisfy the ordinary Mechanical Code intake-location rule?"
+    },
+    {
+      "id": "PC-01",
+      "conversation": "PC-01",
+      "question": "A small café has a total occupant load of 28 people, including employees and customers. The required fixture count can be satisfied with one single-user toilet room. Must separate male and female toilet facilities still be provided?"
+    },
+    {
+      "id": "PC-03",
+      "conversation": "PC-03",
+      "question": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?"
+    }
+  ],
+  "preflightSHA256": "c1fef0fe083c91b29392c144cc56700efd30bd5f23f90dcf6d8f82f61973cadb",
+  "startedAt": "2026-09-08T06:20:14.449Z",
+  "status": "stopped",
+  "results": [
+    {
+      "id": "MC-02",
+      "question": "On a 40-foot-wide zoning lot, a ventilation air intake is proposed six feet from an interior side lot line. Does that satisfy the ordinary Mechanical Code intake-location rule?",
+      "maximumTurnSpendUSD": 0.5,
+      "status": "failed",
+      "startedAt": "2026-09-08T06:20:14.592Z",
+      "error": {
+        "message": "Research is temporarily unavailable. Your question is still here.",
+        "httpStatus": 503,
+        "error": "Research is temporarily unavailable. Your question is still here.",
+        "code": "RESEARCH_SPEND_CAP",
+        "status": 503
+      },
+      "durationMilliseconds": 24898,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "b3082f27-923f-4f02-9d87-bd0506465368",
+          "createdAt": "2026-09-08T06:20:14.606Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 3,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0.039255,
+          "conservativeProviderCostUSD": 0.121497,
+          "durationMilliseconds": 24859,
+          "failureCode": "RESEARCH_SPEND_CAP",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": true,
+          "webSupportSearched": true,
+          "pricingVersion": null
+        }
+      ]
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "MC-02",
+      "model": "gpt-5.6-luna",
+      "phase": "web_support",
+      "requestBytes": 2149,
+      "maxOutputTokens": 1000,
+      "startedAt": "2026-09-08T06:20:16.455Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 10212,
+      "usage": {
+        "input_tokens": 11665,
+        "input_tokens_details": {
+          "cache_write_tokens": 4573,
+          "cached_tokens": 0
+        },
+        "output_tokens": 456,
+        "output_tokens_details": {
+          "reasoning_tokens": 282
+        },
+        "total_tokens": 12121
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "ws_0345321221302217016a9fa9235a6c87d295f87f80369032ab",
+          "type": "web_search_call",
+          "status": "completed",
+          "action": {
+            "type": "open_page",
+            "url": "https://zr.planning.nyc.gov/"
+          }
+        },
+        {
+          "id": "ws_0345321221302217016a9fa92595a087d2a3145a0a60d06ba3",
+          "type": "web_search_call",
+          "status": "completed",
+          "action": {
+            "type": "search",
+            "queries": [
+              "site:nyc.gov mechanical code outdoor air intake opening lot line 10 feet",
+              "site:nyc.gov \"air intake\" \"lot line\" mechanical code"
+            ],
+            "query": "site:nyc.gov mechanical code outdoor air intake opening lot line 10 feet",
+            "sources": [
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/local_laws/ll42of2026.pdf"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/pdf/presentations/bsls22-code_revision_overview.pdf"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/local_laws/intro-875-b.pdf"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter4_VentilationWB.pdf&section=conscode_2022"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/local_laws/int_no_2261-A-2021.pdf"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/local_laws/ll141of2013.pdf"
+              },
+              {
+                "type": "url",
+                "url": "https://legistar.council.nyc.gov/ViewReport.ashx?Extra=WithText&GID=61&GUID=D4C7878D-7974-473E-83FC-6EEFB5EC9C4A&ID=7696069&M=R&N=Master&Title=Legislation+Details+%28With+Text%29"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter5_ExhaustWB.pdf&section=conscode_2022"
+              },
+              {
+                "type": "url",
+                "url": "https://zr.planning.nyc.gov/node/18116"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2014CC_PC_Chapter9_Vents.pdf&section=conscode_2014"
+              },
+              {
+                "type": "url",
+                "url": "https://legistar.council.nyc.gov/LegislationDetail.aspx?GUID=D4C7878D-7974-473E-83FC-6EEFB5EC9C4A&ID=7696069&Options=ID%7CText%7C&Search="
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/industry/project-requirements-design-professional-mechanical.page"
+              },
+              {
+                "type": "url",
+                "url": "https://zr.planning.nyc.gov/article-ii/chapter-3"
+              },
+              {
+                "type": "url",
+                "url": "https://legistar.council.nyc.gov/LegislationDetail.aspx?GUID=F0162598-D155-4B94-BE47-F8C60E94944C&ID=2015578&Options=ID%7CText%7C&Search="
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter7_CombustionAirWB.pdf&section=conscode_2022"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/property-or-business-owner/project-requirements-owner-loft.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.bers.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter7_CombustionAirWB.pdf&section=conscode_2022"
+              },
+              {
+                "type": "url",
+                "url": "https://legistar.council.nyc.gov/LegislationDetail.aspx?GUID=D4C7878D-7974-473E-83FC-6EEFB5EC9C4A&ID=7696069"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter4_VentilationWB.pdf&section=conscode_2022&utm_source=openai"
+              },
+              {
+                "type": "url",
+                "url": "https://zr.planning.nyc.gov/"
+              }
+            ]
+          }
+        },
+        {
+          "id": "msg_0345321221302217016a9fa928e31087d2bf057af6fe34f9ca",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [
+                {
+                  "type": "url_citation",
+                  "end_index": 366,
+                  "start_index": 210,
+                  "title": "2022MC_Chapter4_VentilationWB.pdf",
+                  "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter4_VentilationWB.pdf&section=conscode_2022&utm_source=openai"
+                },
+                {
+                  "type": "url_citation",
+                  "end_index": 714,
+                  "start_index": 558,
+                  "title": "2022MC_Chapter4_VentilationWB.pdf",
+                  "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter4_VentilationWB.pdf&section=conscode_2022&utm_source=openai"
+                },
+                {
+                  "type": "url_citation",
+                  "end_index": 952,
+                  "start_index": 899,
+                  "title": "Homepage | Zoning Resolution",
+                  "url": "https://zr.planning.nyc.gov/"
+                }
+              ],
+              "logprobs": [],
+              "text": "- **No.** NYC Mechanical Code § 401.4(1) requires a ventilation air intake opening to be at least **10 feet from a lot line**; six feet from an interior side lot line is therefore less than the stated minimum. ([nyc.gov](https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter4_VentilationWB.pdf&section=conscode_2022&utm_source=openai))\n- The special rule for lots **less than 20 feet wide** does not apply on the stated **40-foot-wide** zoning lot; that exception instead places the intake at the centerline between lot lines. ([nyc.gov](https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter4_VentilationWB.pdf&section=conscode_2022&utm_source=openai))\n- The supplied Zoning Resolution page identifies the Zoning Resolution as governing land-use and development regulations, but it does not establish the Mechanical Code intake setback. ([zr.planning.nyc.gov](https://zr.planning.nyc.gov/))"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "MC-02",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_code_interpretation",
+      "requestBytes": 65284,
+      "maxOutputTokens": 3000,
+      "startedAt": "2026-09-08T06:20:26.674Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 5913,
+      "usage": {
+        "input_tokens": 14098,
+        "input_tokens_details": {
+          "cache_write_tokens": 14095,
+          "cached_tokens": 0
+        },
+        "output_tokens": 453,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 14551
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_064ae74a024a0c22016a9fa92bec7887d28d50978b75a1bbe3",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** On the stated 40-foot-wide zoning lot, an intake six feet from an interior side lot line does not satisfy the ordinary rule: ventilation air intake openings must be at least **10 feet** from lot lines or buildings on the same lot (MC § 401.4(1)). The special centerline rule applies only to lots **less than 20 feet wide**, so it does not apply here. The proposed location is 4 feet short of the 10-foot minimum.\\n\\nThis conclusion addresses the ordinary lot-line location rule only. The supplied evidence also contains separate intake-location conditions for contaminants, specified high-rise office intakes, Group I occupancies, and flood-hazard areas, but the facts needed to determine their applicability were not supplied.\",\"supportedPoints\":[{\"heading\":\"Ordinary lot-line setback\",\"explanation\":\"Ventilation air intake openings must be located not less than 10 feet from lot lines or buildings on the same lot. A six-foot distance does not meet that minimum.\",\"sectionID\":\"10406\",\"sourceIDs\":[\"research-permitext_discovered-id:10406-1\"]},{\"heading\":\"Narrow-lot centerline rule\",\"explanation\":\"The centerline-between-lot-lines location applies only where the lot measures less than 20 feet in width. The stated 40-foot-wide lot does not meet that condition.\",\"sectionID\":\"10406\",\"sourceIDs\":[\"research-permitext_discovered-id:10406-1\"]}],\"assumptions\":[],\"missingFacts\":[\"Whether the intake is subject to separate MC § 401.4 conditions for contaminant-source separation, qualifying high-rise office occupancies, Group I occupancies, or flood hazard areas.\"],\"followUpQuestions\":[],\"evidenceLimitations\":[\"Permitext limited this answer to the enacted evidence assembled for the current question.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"10406\",\"sourceIDs\":[\"research-permitext_discovered-id:10406-1\"],\"relevance\":\"Establishes the 10-foot lot-line minimum and the exception for lots less than 20 feet wide.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "MC-02",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_research_verification",
+      "requestBytes": 49048,
+      "maxOutputTokens": 4000,
+      "startedAt": "2026-09-08T06:20:32.600Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 6851,
+      "usage": {
+        "input_tokens": 10425,
+        "input_tokens_details": {
+          "cache_write_tokens": 10422,
+          "cached_tokens": 0
+        },
+        "output_tokens": 548,
+        "output_tokens_details": {
+          "reasoning_tokens": 335
+        },
+        "total_tokens": 10973
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_02390d2cc8f9e3b0016a9fa9352d2087d2b4fc53654c2484b9",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"missed_material_conclusion\",\"detail\":\"MC 401.4 expressly provides that Group R-3 occupancies are not required to comply with Section 401.4. Because the occupancy was not supplied, the answer should preserve that applicability condition and identify whether the intake is in Group R-3 as an unresolved fact. Its current statement of the ordinary result is overbroad without that qualification.\"},{\"type\":\"irrelevant_citation\",\"detail\":\"The NYC Zoning Resolution link is collateral to the requested Mechanical Code intake-location question and does not materially qualify the result. Calling it an 'official starting point' adds an unnecessary authority reference.\"},{\"type\":\"unsupported_requirement\",\"detail\":\"The evidence limitation says a controlling program document 'must be retrieved before relying on a program-specific minimum,' but the supplied enacted evidence does not establish that retrieval requirement. The answer can instead state that the supplied evidence does not determine applicability of any separate program-specific provision.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 0.8,
+    "reservedUSD": 0.039255,
+    "actualUSD": 0.039255,
+    "requestCount": 4,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 6.457678,
+  "stopReason": "Spending guard stopped this pilot; remaining cases skipped.",
+  "completedAt": "2026-09-08T06:20:39.956Z"
+}
