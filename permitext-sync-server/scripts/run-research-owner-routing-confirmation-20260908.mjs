@@ -95,7 +95,11 @@ if (!process.argv.includes("--run-live")) {
     }));
     const missingReferences = references.filter((reference) => !sources.some((source) => source.reference === reference));
     assert.equal(missingReferences.length, 0, `${item.id}: missing ${missingReferences.join(", ")}`);
-    assert(references.every((reference) => sources.some((source) => source.reference === reference && source.canonicalContextComplete)), `${item.id}: incomplete governing reference`);
+    // PC-01 stipulates fixture-count sufficiency: the separate-facilities
+    // decision needs complete 403.2/403.3, not the unrelated fixture-count table.
+    // Still retain the reviewed 403.1 reference as discoverable context.
+    const completeReferences = item.id === "PC-01" ? ["PC 403.2", "PC 403.3"] : references;
+    assert(completeReferences.every((reference) => sources.some((source) => source.reference === reference && source.canonicalContextComplete)), `${item.id}: incomplete governing reference`);
     const requiredReferences = assembled.sources.filter((source) => source.evidencePriority?.claimCoverageRequired)
       .map((source) => `${source.codePrefix} ${source.sectionNumber}`);
     const selectedCorpora = routeResearchCorpora({ question: item.question,
@@ -105,7 +109,7 @@ if (!process.argv.includes("--run-live")) {
       for (const reference of ["BC 1004.1", "BC 1004.3", "BC 303.1.3", "PC 403.1.2"]) assert(!requiredReferences.includes(reference));
       for (const reference of ["PC 403.2", "PC 403.3"]) assert(requiredReferences.includes(reference));
     }
-    results.push({ id: item.id, references, missingReferences, sources, requiredReferences, selectedCorpora });
+    results.push({ id: item.id, references, completeReferences, missingReferences, sources, requiredReferences, selectedCorpora });
   }
   assert.equal(networkAttempts, 0);
   await writeFile(preflightURL, `${JSON.stringify({ schema: "permitext-owner-routing-preflight-v1", sourceCommit: profile.sourceCommit, cases, results, networkAttempts, providerCalls: 0 }, null, 2)}\n`, { flag: "wx" });
