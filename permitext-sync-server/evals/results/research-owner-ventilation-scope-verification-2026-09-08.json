@@ -1,0 +1,108 @@
+{
+  "schema": "permitext-owner-ventilation-scope-verification-v1",
+  "checkedAt": "2026-09-08T14:53:23.291Z",
+  "sourceCommit": "e3b8b0e6f08f75e3059c482e3e7a2546e3ee2c88",
+  "scope": "Local Research retrieval, source preservation and serialized initial request comparison. No paid provider dispatch, live model grade, latency benchmark, Project workflow or deployment.",
+  "artifacts": [
+    {
+      "file": "evals/results/research-owner-full-scope-ventilation-2026-09-08.json",
+      "sha256": "196e97ea857d3c3e8fd7ef1da6ae925db566e0b2b4ddc5edc6860b3605897798"
+    },
+    {
+      "file": "evals/results/research-owner-ventilation-envelopes-2026-09-08.json",
+      "sha256": "548625eb4838c337c981f295dcdc3bb8c79c0395355c59b8d6ff1a2d68c5115f"
+    }
+  ],
+  "baselines": [
+    {
+      "file": "evals/results/research-owner-full-scope-temporal-2026-09-08.json",
+      "sha256": "1738d9651dcd5536e6e49307360ae21ffbce20cb282fff49330b615727362e9b"
+    },
+    {
+      "file": "evals/results/research-owner-temporal-envelopes-2026-09-08.json",
+      "sha256": "c47def0afda31e3a2030b02c67e79df096c6f16507df2cbb2b96bde5a2e0d289"
+    }
+  ],
+  "sourceHashEntriesVerifiedAgainstCommit": 34,
+  "priorLedgerHashesVerified": 22,
+  "checks": [
+    {
+      "command": "node tests/research-ventilation-scope-contract.mjs",
+      "exitCode": 0,
+      "logSHA256": "174c7beeac1aa18a41fd514bf0055f826cb3f0ea009c187656e4c1173ded5074",
+      "runtime": "Final implementation and definition-boundary assertions"
+    },
+    {
+      "command": "npm run test:research-chat",
+      "exitCode": 0,
+      "logSHA256": "80992d555c38fd43e121030c0290dd874c4e7053e27273c1b0f375c00b45ecf3",
+      "runtime": "Before final additional-authority exclusion; exclusion covered by final focused contract"
+    },
+    {
+      "command": "npm run test:zoning-architecture-v21",
+      "exitCode": 0,
+      "logSHA256": "af491a781e29c397c39ace816036a740eded04ef6115039c14e3d14221efd590",
+      "runtime": "During this pass; existing temporal snapshot remains valid"
+    }
+  ],
+  "sourceComparison": {
+    "unchangedAuthoredInputs": 110,
+    "unchangedSourcePackets": 109,
+    "changedSourcePackets": [
+      "MC-01"
+    ],
+    "unchangedExactSelectedPassages": 8,
+    "authoredPins": 47,
+    "changedExpectedAnswers": false,
+    "existingMissingReferences": [
+      {
+        "id": "MC-01",
+        "missingExactReferences": [
+          "MC 403"
+        ]
+      }
+    ],
+    "retainedMechanicalPassageHashesUnchanged": true,
+    "targetedDefinitions": {
+      "reference": "BC 202",
+      "beforeCharacters": 1861,
+      "afterCharacters": 2046,
+      "regeneratedFromRetainedSources": true,
+      "habitableExceptionListAndOccupancyVentilationDefinitionsChecked": true
+    }
+  },
+  "ventilation": {
+    "beforeSources": 17,
+    "afterSources": 7,
+    "beforeEvidenceCharacters": 24196,
+    "afterEvidenceCharacters": 16474,
+    "beforeRequestBytes": 100330,
+    "afterRequestBytes": 79317,
+    "model": "gpt-5.6-terra",
+    "maxOutputTokens": 3000,
+    "initialDraftMaximumUSD": 0.455705,
+    "aggregateGuard": "RESEARCH_EVAL_SPEND_CAP",
+    "latencyMeasured": false,
+    "liveAnswerQualityMeasured": false
+  },
+  "spend": {
+    "paidProviderCallsThisPass": 0,
+    "conservativeCampaignUSD": 7.887898,
+    "remainingAuthorizationUSD": 0.112102,
+    "unattemptedDraftsFittingBothGuards": 0,
+    "accountBalanceVerified": false
+  },
+  "coverage": {
+    "ownerCaseCount": 110,
+    "providerAttempted": 45,
+    "notProviderAttempted": 65,
+    "settledPaidPackages": 22
+  },
+  "limitations": [
+    "Only the MC-01 source packet changed within the 110 authored cases; paraphrase tests do not prove arbitrary-question completeness.",
+    "MC 403 remains an unresolved exact grouping reference; operative child sections are present.",
+    "Smaller requests do not establish reduced latency or lower complete-turn cost.",
+    "Further paid testing retains the original spending authorization while a higher-cap request is unanswered.",
+    "Project-workflow testing remains deferred until the owner explicitly asks."
+  ]
+}
