@@ -12,3 +12,11 @@ The original [60-case source-review snapshot](../permitext-sync-server/evals/res
 - Captured sentence SHA-256, UTF-8 without a trailing newline: `ad3def93c1820b00f070ce9731289ebd403cafa7ca771cccfd271501199d1561`
 - Observed source: American Legal, Chapter 8: New York City Mechanical Code, section 508.1, September 2026 consolidation.
 - Scope: the displayed publisher consolidation and this control requirement; the benchmark is not promoted to independent professional approval.
+
+## Complete-body comparison
+
+A subsequent check extends the sentence-level refresh above to the complete substantive section delivered by Research. The [captured source supplement](../permitext-sync-server/evals/results/research-owner-mc15-source-refresh-2026-09-08.json) records the full publisher body, displayed version, URL and hashes. This strengthens the existing refresh; it does not count the historical pending flag as a newly discovered or newly closed issue. The publisher cautions that its site may lag newly adopted legislation or contain temporary errors, so this comparison is not an independent latest-legislation audit.
+
+Run `node scripts/check-research-owner-source-refreshes-20260908.mjs` from `permitext-sync-server` to compare that capture with actual Research assembly. It verifies the unchanged historical review, question and expected answer, then compares the entire MC 508.1 body. Only the duplicated corpus heading and insignificant spacing are normalized. The complete body matches, including its air-balance, intake-location and Energy Code clauses. No production source change is necessary.
+
+The [source comparison](../permitext-sync-server/evals/results/research-owner-mc15-source-comparison-2026-09-08.json) passed with zero network/provider calls; reading the publisher page was a separate web lookup. It adds no generated answer or timing sample and does not resolve the separate presentation note in the earlier live answer. Campaign coverage remains 45/110 numbered cases provider-attempted, with 65 unattempted; conservative usage remains $7.887898 under the original $8 authorization. Project-workflow testing remains paused until the owner asks. No paid provider request or deployment is part of this extension.

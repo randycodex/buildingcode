@@ -1,0 +1,19 @@
+{
+  "sourceCommit": "6157826296bc777fecc7f8f33032adad0a1fb8ad",
+  "refreshSHA256": "c601c8d458b2fe75e8a7d41db80d6e5fdaa7ce4e5a2e698c9cb87f3e834d2eb7",
+  "compared": [
+    {
+      "caseID": "MC-15",
+      "sectionID": "10691",
+      "reference": "MC 508.1",
+      "sourceTextSHA256": "b8ae15a421e722cea2ee548c13a007b79f1e63c05ded621b1ac6801a7fb63e77",
+      "normalizedBodySHA256": "4d0ad97001b525c2565da61d9d7aa280e349c6ad6ab59643b289488053ee84ca",
+      "completeBodyMatch": true
+    }
+  ],
+  "pendingCaseIDs": [],
+  "networkAttempts": 0,
+  "paidProviderCalls": 0,
+  "projectWorkflowTested": false,
+  "liveAnswerQualityMeasured": false
+}

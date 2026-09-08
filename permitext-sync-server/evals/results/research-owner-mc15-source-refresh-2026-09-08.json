@@ -1,0 +1,54 @@
+{
+  "schema": "permitext-owner-source-refresh-v1",
+  "checkedAt": "2026-09-08T14:57:57.702Z",
+  "sourceCommit": "6157826296bc777fecc7f8f33032adad0a1fb8ad",
+  "scope": "Complete-body publisher-consolidation comparison extending the earlier sentence-level MC-15 refresh. The historical pending flag was already resolved in docs/PERMITEXT_MC15_SOURCE_REFRESH_2026-09-08.md; this adds a reproducible comparison with actual Research assembly. The historical review and all expected answers remain unchanged. No new generated answer, whole-answer quality grade, professional approval, Project workflow or speed result.",
+  "historicalReview": {
+    "file": "evals/results/research-owner-code-source-review-2026-09-08.json",
+    "sha256": "5008eac9f2adc2a4de7b98d08567e515055a3ad59ebf243451b010ec697c5f7f",
+    "pendingCount": 1
+  },
+  "refreshes": [
+    {
+      "caseID": "MC-15",
+      "reference": "MC 508.1",
+      "sectionID": "10691",
+      "questionSHA256": "fe58a26644f87ca516f242b82f3dc9fa4c575b2031cd33f9cb3fcfcedfde94f2",
+      "reviewedExpectedAnswerSHA256": "ccc8bda96d9f245a9c5ef2dd663c63e5858e34351c3349d0acb5a2bf79ffc084",
+      "previousSource": {
+        "url": "https://codes.iccsafe.org/content/NYNYCMC2022P1/chapter-5-exhaust-systems",
+        "checkedOn": "2026-09-08",
+        "reportedVersion": "2022 NYC Mechanical Code, July 2022 historical edition; effective November 7, 2022",
+        "capturedPassageSHA256": "ad3def93c1820b00f070ce9731289ebd403cafa7ca771cccfd271501199d1561",
+        "completeSectionCaptured": false,
+        "excerpt": "Mechanical makeup air systems shall be automatically controlled to start and operate simultaneously with the exhaust system.",
+        "captureNote": "Publisher fallback for MC 508.1 after the current American Legal endpoint repeatedly timed out. The code-edition rule was checked; a fresh current-consolidation comparison remains unverified for this provision."
+      },
+      "observedSource": {
+        "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-194028",
+        "title": "508.1 Makeup air.",
+        "reportedVersion": "September 2026 (current)",
+        "jurisdiction": "New York City",
+        "code": "Mechanical Code",
+        "captureMethod": "Complete substantive section body read from the publisher page through the web tool; navigation and publisher disclaimer excluded.",
+        "capturedBody": "Makeup air shall be supplied during the operation of commercial kitchen exhaust systems that are provided for commercial cooking appliances. The amount of makeup air supplied to the building from all sources shall be approximately equal to the amount of exhaust air for all exhaust systems for the building. The makeup air shall not reduce the effectiveness of the exhaust system. Makeup air shall be provided by gravity or mechanical means or both. Mechanical makeup air systems shall be automatically controlled to start and operate simultaneously with the exhaust system. Makeup air intake opening locations shall comply with Section 401.4. Makeup air shall be provided in accordance with the New York City Energy Conservation Code.",
+        "capturedBodySHA256": "4d0ad97001b525c2565da61d9d7aa280e349c6ad6ab59643b289488053ee84ca",
+        "completeSectionBodyCaptured": true,
+        "publisherLimitation": "The publisher cautions that its site may lag newly adopted legislation or contain temporary textual errors. The displayed consolidation was compared; an independent latest-legislation audit is not claimed."
+      },
+      "finding": "The complete published section retains the automatic simultaneous-operation requirement. Its air-balance, intake-location and Energy Code clauses remain present. The manual-switch scenario and the existing expected answer need no change.",
+      "currentConsolidationRefreshPending": false,
+      "expectedAnswerChanged": false,
+      "professionalApproval": false
+    }
+  ],
+  "effectiveReviewCounts": {
+    "total": 60,
+    "retain": 53,
+    "revise": 7,
+    "currentConsolidationRefreshPending": 0,
+    "meaning": "Historical review plus this dated source supplement; zero pending refreshes does not imply professional approval or current-runtime answer acceptance."
+  },
+  "paidProviderCalls": 0,
+  "projectWorkflowTested": false
+}
