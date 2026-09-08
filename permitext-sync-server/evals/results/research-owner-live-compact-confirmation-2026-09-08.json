@@ -1,0 +1,2242 @@
+{
+  "schema": "permitext-owner-compact-confirmation-20260908-v1",
+  "authorization": "Owner: approximately $8 available for API testing; test as many times as needed. One laundry-source repair confirmation and one previously undispatched water-heater-pan question using compact instructions, one attempt each, capped at the remaining $0.402564 conservative aggregate with no manual retries.",
+  "previousConservativeSpendUSD": 7.597436,
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "sourceCommit": "8f2f62f56087aeb15476b15957fc6b29ae1b5ea8",
+  "execution": "Isolated local HTTP Research conversations with live OpenAI responses; automatic evidence discovery; no reference answers supplied to the answering model.",
+  "maximumCumulativeSpendUSD": 0.402564,
+  "maximumTurnSpendUSD": 0.402564,
+  "maximumTurns": 2,
+  "authorizationUSD": 8,
+  "turnBudgetPolicy": "Cap each complete provider pipeline at the lesser of $0.402564 and the remaining settled conservative $0.402564 batch budget. Missing or pending accounting stops all further requests.",
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing; general answers medium reasoning; standard service tier",
+  "zoning": "Local diagnostic eligibility only; no public gate or deployment changes",
+  "cases": [
+    {
+      "id": "PC-04",
+      "conversation": "PC-04",
+      "question": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?"
+    },
+    {
+      "id": "PC-10",
+      "conversation": "PC-10",
+      "question": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?"
+    }
+  ],
+  "instructionComparisonSHA256": "be073f95fccc7ce37a263b4a0b01f13c117d6a4e69e004cd81f99db5a8f43ca2",
+  "preflightSHA256": "d7c2331cb1fb95100173a94d469953bd4a7ed1b4e4607dfd1d303e69b747a0b2",
+  "startedAt": "2026-09-08T08:25:44.739Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "PC-04",
+      "question": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?",
+      "maximumTurnSpendUSD": 0.402564,
+      "status": "completed",
+      "startedAt": "2026-09-08T08:25:44.870Z",
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:compact-v1:conversational-v4",
+        "evidenceVersion": "20260908-complete-governing-passages-v26:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-intake-lot-context-v6",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T08:25:44.940Z"
+        },
+        "answerText": "**No.** For a central washing facility in a multiple-family dwelling, the room containing automatic clothes washers must have floor drains located to readily drain the entire floor area; trapped washer standpipes do not replace that separate requirement (PC § 412.4).\n\nEach required floor drain must have an outlet at least **3 inches (76 mm)** in diameter and must have a lint strainer (PC §§ 412.3, 412.4). The supplied facts place the room within the stated central-washing-facility rule; therefore, omitting the floor drain is not compliant on that basis. The number and placement of drains must be sufficient to readily drain the entire floor area.",
+        "conclusion": "**No.** For a central washing facility in a multiple-family dwelling, the room containing automatic clothes washers must have floor drains located to readily drain the entire floor area; trapped washer standpipes do not replace that separate requirement (PC § 412.4).",
+        "supportedPoints": [
+          {
+            "heading": "Floor drains are mandatory in the common laundry room",
+            "explanation": "In the central washing facilities of multiple-family dwellings, rooms containing automatic clothes washers must be provided with floor drains located to readily drain the entire floor area. The presence of trapped standpipes for washer discharge does not negate this separate floor-drain requirement.",
+            "sectionID": "11968",
+            "sourceIDs": [
+              "research-permitext_discovered-id:11968-1"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Required drain outlet size and lint strainer",
+            "explanation": "Floor drains must have drain outlets not less than 3 inches (76 mm) in diameter. For the central washing facility rule, the drains also must be provided with lint strainers.",
+            "sectionID": "11967",
+            "sourceIDs": [
+              "research-permitext_discovered-id:11967-2",
+              "research-permitext_discovered-id:11968-1"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "Each required floor drain must have an outlet at least **3 inches (76 mm)** in diameter and must have a lint strainer (PC §§ 412.3, 412.4). The supplied facts place the room within the stated central-washing-facility rule; therefore, omitting the floor drain is not compliant on that basis. The number and placement of drains must be sufficient to readily drain the entire floor area.",
+        "assumptions": [],
+        "missingFacts": [
+          "The laundry-room floor area, floor configuration, elevations, and proposed drain locations are needed to determine the number and placement of drains necessary to readily drain the entire floor area.",
+          "The proposed floor-drain outlet diameter and lint-strainer details are needed to verify compliance with the stated drain requirements."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "Permitext limited this answer to the enacted 2022 NYC Construction Codes evidence assembled for the current question. This answer addresses whether a floor drain is required and the expressly supplied drain criteria, not the complete plumbing-system design."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "11968",
+            "sectionNumber": "412.4",
+            "title": "412.4 Public laundries and central washing facilities.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:11968-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:11968-1",
+                "selectedText": "412.4 412.4 Public laundries and central washing facilities. In public coin-operated laundries and in the central washing facilities of multiple-family dwellings, the rooms containing automatic clothes washers shall be provided with floor drains located to readily drain the entire floor area. Such drains shall have an outlet of not less than 3 inches (76 mm) in diameter and be provided with lint strainers. Section PC 413: Food Waste Disposer Units",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the mandatory floor-drain requirement, required coverage of the entire floor area, and lint-strainer requirement for central washing facilities in multiple-family dwellings."
+          },
+          {
+            "sectionID": "11967",
+            "sectionNumber": "412.3",
+            "title": "412.3 Size of floor drains.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:11967-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:11967-2",
+                "selectedText": "412.3 412.3 Size of floor drains. Floor drains shall have a drain outlet not less than 3 inches (76 mm) in diameter.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the minimum 3-inch floor-drain outlet size."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "11968",
+          "11967",
+          "12636",
+          "11948",
+          "12415",
+          "11946",
+          "12451",
+          "6898",
+          "11811",
+          "10602",
+          "113",
+          "12416",
+          "12419",
+          "12418",
+          "10580"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:11968-1",
+          "research-permitext_discovered-id:11967-2",
+          "research-permitext_discovered-id:12636-3",
+          "research-permitext_discovered-id:11948-4",
+          "research-permitext_discovered-id:12415-5",
+          "research-permitext_discovered-id:11946-6",
+          "research-permitext_discovered-id:12451-7",
+          "research-permitext_discovered-id:6898-8",
+          "research-permitext_discovered-id:11811-9",
+          "research-permitext_discovered-id:10602-10",
+          "research-permitext_discovered-id:113-13",
+          "research-permitext_cross_reference-id:12416-2",
+          "research-permitext_cross_reference-id:12419-4",
+          "research-permitext_cross_reference-id:12418-5",
+          "research-permitext_cross_reference-id:10580-17"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 15,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 2,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 13,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 11,
+          "crossReferenceCount": 4,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 2,
+          "requiredClaimCount": 2,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "PC 412.4",
+              "summary": "PC 412.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11968-1"
+              ]
+            },
+            {
+              "label": "PC 412.3",
+              "summary": "PC 412.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11967-2"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "PC 412.4",
+              "summary": "PC 412.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11968-1"
+              ]
+            },
+            {
+              "label": "PC 412.3",
+              "summary": "PC 412.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11967-2"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "PC 1003.6",
+              "summary": "PC 1003.6 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:12636-3"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-13"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "PC 709.2",
+              "summary": "PC 709.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:12416-2"
+              ]
+            },
+            {
+              "label": "PC 709.4.1",
+              "summary": "PC 709.4.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:12419-4"
+              ]
+            },
+            {
+              "label": "PC 709.4",
+              "summary": "PC 709.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:12418-5"
+              ]
+            },
+            {
+              "label": "MC 503.2",
+              "summary": "MC 503.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:10580-17"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "PC 709.1",
+              "summary": "PC 709.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:12415-5"
+              ]
+            },
+            {
+              "label": "PC 709.2",
+              "summary": "PC 709.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:12416-2"
+              ]
+            },
+            {
+              "label": "PC 709.4",
+              "summary": "PC 709.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:12418-5"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:11968-1",
+            "research-permitext_discovered-id:11967-2",
+            "research-permitext_discovered-id:12636-3",
+            "research-permitext_discovered-id:11948-4",
+            "research-permitext_discovered-id:12415-5",
+            "research-permitext_discovered-id:11946-6",
+            "research-permitext_discovered-id:12451-7",
+            "research-permitext_discovered-id:6898-8",
+            "research-permitext_discovered-id:11811-9",
+            "research-permitext_discovered-id:10602-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:12416-2",
+            "research-permitext_cross_reference-id:12419-4",
+            "research-permitext_cross_reference-id:12418-5",
+            "research-permitext_cross_reference-id:10580-17"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:11968-1",
+            "research-permitext_discovered-id:11967-2"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:11968-1",
+            "research-permitext_discovered-id:11967-2"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:11968-1",
+            "research-permitext_discovered-id:11967-2"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:12636-3",
+            "research-permitext_discovered-id:11948-4",
+            "research-permitext_discovered-id:12415-5",
+            "research-permitext_discovered-id:11946-6",
+            "research-permitext_discovered-id:12451-7",
+            "research-permitext_discovered-id:6898-8",
+            "research-permitext_discovered-id:11811-9",
+            "research-permitext_discovered-id:10602-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:12416-2",
+            "research-permitext_cross_reference-id:12419-4",
+            "research-permitext_cross_reference-id:12418-5",
+            "research-permitext_cross_reference-id:10580-17"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:11968-1",
+              "label": "PC 412.4 — 412.4 Public laundries and central washing facilities.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:11968-1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:11967-2",
+              "label": "PC 412.3 — 412.3 Size of floor drains.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:11967-2"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:11968-1",
+            "research-permitext_discovered-id:11967-2"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:11968-1",
+              "label": "PC 412.4 — 412.4 Public laundries and central washing facilities.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:11968-1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:11968-1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:11968-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:11967-2",
+                        "research-permitext_discovered-id:11968-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:11967-2",
+              "label": "PC 412.3 — 412.3 Size of floor drains.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:11967-2"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:11967-2"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:11968-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:11967-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:11967-2",
+                        "research-permitext_discovered-id:11968-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-fixture-permission-scope-v28",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:11968-1",
+            "research-permitext_discovered-id:11967-2"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:12636-3",
+            "research-permitext_discovered-id:11948-4",
+            "research-permitext_discovered-id:12415-5",
+            "research-permitext_discovered-id:11946-6",
+            "research-permitext_discovered-id:12451-7",
+            "research-permitext_discovered-id:6898-8",
+            "research-permitext_discovered-id:11811-9",
+            "research-permitext_discovered-id:10602-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:12416-2",
+            "research-permitext_cross_reference-id:12419-4",
+            "research-permitext_cross_reference-id:12418-5",
+            "research-permitext_cross_reference-id:10580-17"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 2,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 2,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 13,
+            "reviewedOnlyProvisionCount": 13,
+            "assembledSourceCount": 15,
+            "assembledProvisionCount": 15
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:11968-1",
+              "sectionID": "11968",
+              "reference": "PC 412.4",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "412.4 412.4 Public laundries and central washing facilities. In public coin-operated laundries and in the central washing facilities of multiple-family dwellings, the rooms containing automatic clothes washers shall be provided with floor drains located to readily drain the entire floor area. Such drains shall have an outlet of not less than 3 inches (76 mm) in diameter and be provided with lint strainers. Section PC 413: Food Waste Disposer Units"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11967-2",
+              "sectionID": "11967",
+              "reference": "PC 412.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "412.3 412.3 Size of floor drains. Floor drains shall have a drain outlet not less than 3 inches (76 mm) in diameter."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:12636-3",
+              "sectionID": "12636",
+              "reference": "PC 1003.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1003.6 1003.6 Clothes washer discharge interceptor. Clothes washers shall discharge through an interceptor that is provided with a wire basket or similar device, removable for cleaning, that prevents passage into the drainage system of solids 1/2 inch (12.7 mm) or larger in size, string, rags, buttons or other materials detrimental to the public sewage system. Exceptions: 1. Clothes washers in individual dwelling units shall not be required to discharge through an interceptor. 2. A single clothes washer designed for use in individual dwelling units and installed in a location other than an individual dwelling unit shall not be required to discharge through an interceptor."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11948-4",
+              "sectionID": "11948",
+              "reference": "PC 406.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "406.2 406.2 Waste connection. The waste from an automatic clothes washer shall discharge through an air break into a standpipe in accordance with Section 802 or into a laundry sink. The trap and fixture drain for an automatic clothes washer standpipe shall be not less than 2 inches (51 mm) in diameter. The fixture drain for the standpipe serving an automatic clothes washer shall connect to a 3-inch (76 mm) or larger diameter fixture branch, building drain, or stack. Automatic clothes washers that discharge by gravity shall be permitted to drain to a waste receptor or an approved trench drain. Section PC 407: Bathtubs"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:12415-5",
+              "sectionID": "12415",
+              "reference": "PC 709.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Table 709.1 Drainage Fixture Units for Fixtures and Groups Fixture Type Drainage Fixture Unit Value as Load Factors Minimum Size of Trap (inches) Fixture Type Drainage Fixture Unit Value as Load Factors Minimum Size of Trap (inches) Automatic clothes washers, commercial a, g 3 2 Automatic clothes washers, residential g 2 2 Bathroom group as defined in Section 202 f 5 - Bathtub b (with or without overhead shower or whirlpool attachments) 2 1 1/2 Bidet 1 1 1/4 Combination sink and tray 2 1 1/2 Dental lavatory 1 1 1/4 Dental unit or cuspidor 1 1 1/4 Dishwashing machine c , domestic 2 1 1/2 Drinking fountain 1/2 1 1/4 Emergency floor drain 0 2 Floor drains 2 h 3 Floor sinks Note h 2 Hand wash sinks and lavatories (circular or multiple) each faucet 2 1 1/2 Kitchen sink, domestic 2 2 Kitchen sink, domestic with food waste disposer and/or dishwasher 2 2 Laundry tray (1 or 2 compartments) 2 2 Lavatory 1 1 1/4 Multiple (gang) shower (based on the total flow rate through shower heads and body sprays) Flow rate: 5.7 gpm or less 2 2 Greater than 5.7 gpm to 12.3 gpm 3 2 Greater than 12.3 gpm to 25.8 gpm 5 3 Greater than 25.8 gpm to 55.6 gpm 6 4 Shower 2 2 Sink 2 2 Urinal 4 Note d Urinal, 1 gallon per flush or less 2 e Note d Urinal, nonwater supplied 1/2 Note d Water closet, flushometer, tank, public or private 4 e Note d For SI: 1 inch = 25.4 mm, 1 gallon = 3.785 L, gpf = gallon per flushing cycle, gpm = gallon per minute. a. For traps larger than 3 inches, use Table 709.2 . b. A showerhead over a bathtub or whirlpool bathtub attachment does not increase the drainage fixture unit value. c. See Sections 709.2 through 709.4.1 for methods of computing unit value of fixtures not listed in this table or for rating of devices with intermittent flows. d. Trap size shall be consistent with the fixture outlet size. e. For the purpose of computing loads on building drains and sewers, water closets and urinals shall not be rated at a lower drainage fixture unit unless the lower values are confirmed by testing. f. For fixtures added to a bathroom group, add the dfu value of those additional fixtures to the bathroom group fixture count. g. See Section 406.3 for sizing requirements for fixture drain, branch drain and drainage stack for an automatic clothes washer standpipe. h. See Sections 709.4 and 709.4.1."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11946-6",
+              "sectionID": "11946",
+              "reference": "PC 405.9",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "405.9 405.9 Design and installation of plumbing fixtures. Integral fixture fitting mounting surfaces on manufactured plumbing fixtures or plumbing fixtures constructed on site shall meet the design requirements of ASME A112.19.2/CSA B45.1 or ASME A112.19.3/CSA B45.4. Section PC 406: Automatic Clothes Washers"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:12451-7",
+              "sectionID": "12451",
+              "reference": "PC 713.9",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "713.9 713.9 Local vents and stacks for bedpan washers. Bedpan washers shall be vented to open air above the roof by means of one or more local vents. The local vent for a bedpan washer shall be not less than a 2-inch-diameter (51 mm) pipe. A local vent serving a single bedpan washer is permitted to drain to the fixture served."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:6898-8",
+              "sectionID": "6898",
+              "reference": "BC E105.2.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "E105.2.2 E105.2.2 Clothes dryers. Where three or fewer clothes dryers are provided, at least one shall comply with ICC A117.1, including Section 611 (Washing Machines and Clothes Dryers), and shall be accessible. Where more than three clothes dryers are provided, at least two shall comply with ICC A117.1, including Section 611, and shall be accessible."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11811-9",
+              "sectionID": "11811",
+              "reference": "PC 201.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "201.4 201.4 Terms not defined. Where terms are not defined through the methods authorized by this section, such terms shall have ordinarily accepted meanings such as the context implies. Section PC 202: General Definitions ACCEPTED ENGINEERING PRACTICE. That which conforms to accepted principles, tests or standards of nationally recognized technical or scientific authorities. ACCESS (TO). That which enables a device, fixture, appliance or equipment to be reached by ready access or by a means that first requires the removal or movement of a panel, door or similar obstruction (see \"Ready access (to)\"). ACCESS COVER. A removable plate, usually secured by bolts or screws, to permit access to a pipe or pipe fitting for the purposes of inspection, repair or cleaning. ADAPTER FITTING. An approved connecting device that suitably and properly joins or adjusts pipes and fittings that do not otherwise fit together . AIR BREAK (Drainage System). A piping arrangement in which a drain from a fixture, appliance or device discharges indirectly into another fixture, receptacle or interceptor at a point below the flood level rim and above the trap seal. AIR GAP (Drainage System). The unobstructed vertical distance through the free atmosphere between the outlet of the waste pipe and the flood level rim of the receptacle into which the waste pipe is discharging. AIR GAP (Water Distribution System). The unobstructed vertical distance through the free atmosphere between the lowest opening from any pipe or faucet supplying water to a tank, plumbing fixture or other device and the flood level rim of the receptacle. ALTERNATIVE ENGINEERED DESIGN. A plumbing system that performs in accordance with the intent of this code and provides an equivalent level of performance for the protection of public health, safety and welfare. The system design is not specifically regulated by this code. ANCHORS. See \"Supports.\" ANTISIPHON. A term applied to valves or mechanical devices that eliminate siphonage. AREA DRAIN. A receptacle designed to collect surface or storm water from an open area. ASPIRATOR. A fitting or device supplied with water or other fluid under positive pressure that passes through an integral orifice or constriction, causing a vacuum. Aspirators are also referred to as suction apparatus, and are similar in operation to an ejector. BACKFLOW. The undesirable reversal of flow of water or mixtures of water and other liquids, gases or other substances into the distribution pipes of the potable supply of water from any source or sources or the undesirable reversal of flow from the intended direction of flow in the drainage system due to a system stoppage, system overload or a higher pressure on the drainage pipe side of the house trap. Backpressure, low head. A pressure less than or equal to 4.33 psi (29.88 kPa) or the pressure exerted by a 10-foot (3048 mm) column of water. Backsiphonage. The backflow of potentially contaminated water into the potable water system as a result of the pressure in the potable water system falling below atmospheric pressure of the plumbing fixtures, pools, tanks or vats connected to the potable water distribution piping. Drainage. A reversal of flow in the drainage system. Water supply system. The flow of water or other liquids, mixtures or substances into the distribution pipes of a potable water supply from any source except the intended source. BACKFLOW CONNECTION. Any arrangement whereby backflow is possible. BACKFLOW PREVENTER. A backflow prevention assembly, a backflow prevention device or other means or method to prevent backflow into the potable water supply. BACKWATER VALVE. A device or valve installed in the building drain, sewer or any branch line where such drain or branch is subject to backflow, and which prevents drainage or waste from backing up into a lower level or fixtures and causing a flooding condition. BALL COCK. See \"Fill Valve.\" BASE FLOOD ELEVATION. Refer to Section G201.2 of Appendix G of the New York City Building Code . BATHROOM GROUP. A group of fixtures consisting of a water closet, lavatory, bathtub or shower, including or excluding a bidet, an emergency floor drain or both. Such fixtures are located together in the same room. BEDPAN STEAMER OR BOILER. A fixture utilized for scalding bedpans or urinals by direct application of steam or boiling water. BEDPAN WASHER AND STERILIZER. A fixture designed to wash bedpans and to flush the contents into the sanitary drainage system. Included are fixtures of this type that provide for disinfecting utensils by scalding with steam or hot water. BEDPAN WASHER HOSE. A device supplied with hot and cold water and located adjacent to a water closet or clinical sink to be utilized for cleansing bedpans. BRANCH. Any part of the piping system that extends to fixtures on two or less consecutive floors except a riser, main or stack. BRANCH INTERVAL. A vertical measurement of distance, 8 feet (2438 mm) or more in developed length, between the connections of horizontal branches to a drainage stack. Measurements are taken down the stack from the highest horizontal branch connection. BRANCH VENT. A vent connecting one or more individual vents with a vent stack or stack vent. BUILDING DRAIN. That part of the lowest piping of a drainage system that receives the discharge from soil, waste and other drainage pipes inside and that extends to the exterior face of the exterior building wall, or the outlet of the most downstream trap, private manhole, catch basin, detention tank, or similar fixture or equipment, and conveys the drainage directly to the building sewer or, in the absence of building sewer, to an approved place of disposal. Combined. A building drain that conveys both sewage and storm water or other drainage. Sanitary. A building drain that conveys sewage only. Storm. A building drain that conveys storm water or other drainage, but not sewage. BUILDING SEWER. See Sewer, Building sewer. BUILDING SUBDRAIN. That portion of a drainage system that does not drain by gravity into the building sewer. BUILDING TRAP. A device or fitting, without joints within the water seal, installed in the building drain to prevent circulation of air between the drainage system of the building and the building sewer. CIRCUIT VENT. A vent that connects to a horizontal drainage branch and vents two traps to a maximum of eight traps or trapped fixtures connected into a battery. CISTERN. A covered tank for storing rainwater to be utilized for purposes other than in the potable water supply. CLEANOUT. An access opening in the drainage system utilized for the removal of obstructions. Types of cleanouts include a removable plug or cap, and a removable fixture or fixture trap. CLEAR WATER WASTE. Drips from equipment, coil condensate, steam condensate, single pass refrigeration discharge, RPZ discharge, and similar matter. COMBINATION FIXTURE. A fixture combining one sink and laundry tray or a two- or three-compartment sink or laundry tray in one unit. COMBINATION WASTE AND VENT SYSTEM. A specially designed system of waste piping embodying the horizontal wet venting of one or more lavatories, drinking fountains or floor drains by means of a common waste and vent pipe adequately sized to provide free movement of air above the flow line of the drain. COMBINED BUILDING DRAIN. See \"Building drain, combined.\" COMBINED SEWER. See \"Sewer, combined sewer.\" COMMON VENT. A vent connecting at the junction of two fixture drains or to a fixture branch and serving as a vent for both fixtures. CONCEALED FOULING SURFACE. Any surface of a plumbing fixture that is not readily visible and is not scoured or cleansed with each fixture operation. CONDUCTOR. A pipe inside the building that conveys storm water from the roof to a storm or combined building drain. CONTAMINATION. An impairment of the quality of the potable water that creates an actual hazard to the public health through poisoning or the spread of disease by sewage, industrial fluids or waste. CONVEYANCE PIPE. See \"Water Pipe, conveyance.\" COVERED DEVELOPMENT PROJECT. See Section 28-104.11.1 of the Administrative Code. CRITICAL LEVEL (C-L). An elevation (height) reference point that determines the minimum height at which a backflow preventer or vacuum breaker is installed above the flood level rim of the fixture or receptor served by the device. The critical level is the elevation level below which there is a potential for backflow to occur. If the critical level marking is not indicated on the device, the bottom of the device shall constitute the critical level. CROSS CONNECTION. Any physical connection or arrangement between two otherwise separate piping systems, one of which contains potable water and the other either water of unknown or questionable safety or steam, gas or chemical, whereby there exists the possibility for flow from one system to the other, with the direction of flow depending on the pressure differential between the two systems (see \"Backflow\"). CURED-IN-PLACE PIPE (CIPP). A piping repair method utilizing a resin-impregnated, flexible tube inverted into existing conduit by use of a hydrostatic head or air pressure, or by a process that sprays epoxy directly onto the walls of the rehabilitated pipe. DEAD END. A branch leading from a soil, waste or vent pipe; a building drain; or a building sewer, and terminating at a developed length of 2 feet (610 mm) or more by means of a plug, cap or other closed fitting. DEMAND RECIRCULATION WATER SYSTEM. A water distribution system where one or more pumps prime the service hot water piping with heated water upon a demand for hot water. DESIGN FLOOD ELEVATION. Refer to Section G201.2 of Appendix G of the New York City Building Code. DETENTION SYSTEM. A system that slows and temporarily holds rainwater or storm water runoff so that it can be released into the public sewer system at a controlled rate. DEVELOPED LENGTH. The length of a pipeline measured along the centerline of the pipe and fittings. DISCHARGE PIPE. A pipe that conveys the discharge from plumbing fixtures or appliances. DRAIN. Any pipe that carries waste water or water-borne wastes in a building drainage system. DRAINAGE FITTING. The type of fitting or fittings utilized in the drainage system. DRAINAGE FIXTURE UNIT (dfu). A measure of the probable discharge into the drainage system by various types of plumbing fixtures. The drainage fixture-unit value for a particular fixture depends on its volume rate of drainage discharge, on the time duration of a single drainage operation and on the average time between successive operations. DRAINAGE SYSTEM. Piping within a public or private premise that conveys sewage, rainwater or other liquid waste to a point of disposal. A drainage system does not include the mains of a public sewer system or a private or public sewage treatment or disposal plant. Gravity. A drainage system that drains by gravity into the building sewer. Sanitary. A drainage system that carries sewage or similar matter. Storm. A drainage system that carries only stormwater, potable clear water waste, and groundwater. DRINKING FOUNTAIN. A plumbing fixture that is connected to the potable water distribution system and drains to an approved point of disposal. The fixture allows the user to obtain a drink directly from a stream of flowing water without the use of any accessories. DRYWELL. A covered pit constructed so as to permit liquid contents to seep into the ground. DUAL FLUSH WATER CLOSET. A water closet that enables the user to select a high flush for solid waste or a reduced volume, low flush for liquid waste. EFFECTIVE OPENING. The minimum cross-sectional area at the point of water supply discharge, measured or expressed in terms of the diameter of a circle or, if the opening is not circular, the diameter of a circle of equivalent cross-sectional area. For faucets and similar fittings, the effective opening shall be measured at the smallest orifice in the fitting bo"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10602-10",
+              "sectionID": "10602",
+              "reference": "MC 504.10",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "504.10 504.10 Common multistory exhaust systems for clothes dryers. Where a common multistory duct system is designed and installed to convey exhaust from multiple clothes dryers, the construction of the system shall be in accordance with all of the following: 1. The shaft in which the duct is installed shall be constructed and fire-resistance rated as required by the New York City Building Code. 2. Dampers and subducts shall be prohibited in the exhaust duct. 3. Rigid metal ductwork shall be installed within the shaft to convey the exhaust. The ductwork shall be constructed of sheet steel having a minimum thickness of 0.0187 inch (0.4712 mm) (No. 26 gage) and in accordance with SMACNA/ANSI Duct Construction Standards. The common ductwork ducts shall not be connected or installed with sheet metal screws or other fasteners that will obstruct the exhaust flow. 4. Exhaust ducts 20 square inches (129 cm 2 ) or less connected into a common multistory exhaust system shall not require fire dampers when the exhaust fan runs continuously. Exhaust ducts greater than 20 square inches (129 cm 2 ) shall not be connected into a common multistory exhaust system. 5. The exhaust fan motor design shall be in accordance with Section 503.2. 6. The exhaust fan motor shall be located outside of the airstream. 7. The exhaust fan shall run continuously, and shall be connected to a standby power source, where a building standby power source is required per the New York City Building Code. 8. Exhaust fan operation shall be monitored in an approved location and shall initiate an audible or visual signal when the fan is not in operation. 9. Makeup air shall be provided for the exhaust system. 10. A cleanout opening shall be located at the base of the shaft, at all offsets and at all changes of direction to provide access to the duct to allow for cleaning and inspection. The finished opening shall be not less than 12 inches by 12 inches (304.8 mm by 304.8 mm). 11. Screens shall not be installed at the termination. 12. The common multistory duct system shall serve only clothes dryers and shall be independent of other exhaust systems. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 . Section MC 505: Domestic Kitchen Exhaust Equipment"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-13",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ACCESSIBLE. A site, building, facility or portion thereof that complies with Chapter 11 . BACKING. The wall or surface to which the veneer is secured. BASE FLOOD. The flood having a 1-percent chance of being equaled or exceeded in any given year. BASE FLOOD ELEVATION. The elevation of the base flood, including wave height, as specified on FEMA FIRMs 360497 or as determined in accordance with Section G103.3. In areas designated as ZONE AO, the base flood elevation shall be the elevation of the highest existing grade of the building's perimeter plus the depth number (in feet) specified on the flood hazard map. DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling. EQUIPMENT. Tools, machinery, or other implements used to facilitate construction or demolition work. LOAD FACTOR. A factor that accounts for deviations of the actual load from the nominal load; for uncertainties in the analysis that transforms the load into a loud effect, and for the probability that more than one extreme load will occur simultaneously. SITE. A parcel of land bounded by a lot line or a designated portion of a public right-of-way."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:12416-2",
+              "sectionID": "12416",
+              "reference": "PC 709.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "709.2 709.2 Fixtures not listed in Table 709.1. Fixtures not listed in Table 709.1 shall have a drainage fixture unit load based on the outlet size of the fixture in accordance with Table 709.2 . The minimum trap size for unlisted fixtures shall be the size of the drainage outlet but not less than 1 1/4 inches (32 mm). Table 709.2 Drainage Fixture Units for Fixture Drains or Traps Fixture Drain or Trap Size (inches) Drainage Fixture Unit Value 1 1/4 1 1 1/2 2 2 3 2 1/2 4 3 5 4 6 For SI: 1 inch = 25.4 mm."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:12419-4",
+              "sectionID": "12419",
+              "reference": "PC 709.4.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "709.4.1 709.4.1 Clear-water waste receptors. Where waste receptors such as funnel drains, floor sinks and hub drains receive only clear-water waste from display cases, refrigerated display cases, ice bins, coolers and freezers, such receptors shall have a drainage fixture unit value of one-half. Section PC 710: Drainage System Sizing"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:12418-5",
+              "sectionID": "12418",
+              "reference": "PC 709.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "709.4 709.4 Values for indirect waste receptor. The drainage fixture unit load of an indirect waste receptor receiving the discharge of indirectly connected fixtures shall be the sum of the drainage fixture unit values of the fixtures that discharge to the receptor, but not less than the drainage fixture unit value given for the indirect waste receptor in Table 709.1 or 709.2."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10580-17",
+              "sectionID": "10580",
+              "reference": "MC 503.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "503.2 503.2 Fans. Parts of fans in contact with explosive or flammable vapors, fumes or dusts shall be of nonferrous or nonsparking materials, or their casing shall be lined or constructed of such material. Where the size and hardness of materials passing through a fan are capable of producing a spark, both the fan and the casing shall be of nonsparking materials. Where fans are required to be spark resistant, their bearings shall not be within the airstream, and all parts of the fan shall be grounded. Fans in systems-handling materials that are capable of clogging the blades, and fans in buffing or woodworking exhaust systems, shall be of the radial-blade or tube-axial type."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260831-zoning-canonical-source-output-table-legend-v17",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-complete-governing-passages-v26",
+          "retrievalQuery": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": true,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 22662,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 4,
+            "topicDependencyCount": 0,
+            "characterCount": 22662,
+            "resolverFailureCount": 11,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 11,
+              "text": "11 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-intake-lot-context-v6",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-intake-lot-context-v6",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T08:25:44.940Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-09-08T08:25:44.940Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "durationMilliseconds": 14231,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "251e8223-d707-43b3-a408-19f5e0a0982e",
+          "createdAt": "2026-09-08T08:25:44.887Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 26079,
+          "cachedInputTokens": 0,
+          "outputTokens": 775,
+          "totalTokens": 26854,
+          "estimatedCostUSD": 0.039538,
+          "actualProviderCostUSD": 0.039538,
+          "conservativeProviderCostUSD": 0.091845,
+          "durationMilliseconds": 14180,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ]
+    },
+    {
+      "id": "PC-10",
+      "question": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?",
+      "maximumTurnSpendUSD": 0.310719,
+      "status": "completed",
+      "startedAt": "2026-09-08T08:25:59.473Z",
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:compact-v1:conversational-v4",
+        "evidenceVersion": "20260908-complete-governing-passages-v26:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-intake-lot-context-v6",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T08:25:59.488Z"
+        },
+        "answerText": "**Yes—on the stated facts, a pan is required.** A storage tank-type water heater installed where leakage could damage the finished office ceiling and occupied space below must be installed in a pan. The pan must be galvanized steel at least 0.0236 inch (No. 24 gage) thick, or another pan approved for that use (PC § 504.7).\n\nThe pan must be at least 1 1/2 inches deep, sized and shaped to receive all dripping or condensate, and drained indirectly through a pipe at least 3/4 inch in diameter (PC § 504.7.1). The only supplied exception to the pan-drain requirement—not to the pan itself—is for a replacement heater where no pan drain was previously installed and a leak detector is installed within the pan. Whether this is a qualifying replacement installation is not stated.",
+        "conclusion": "**Yes—on the stated facts, a pan is required.** A storage tank-type water heater installed where leakage could damage the finished office ceiling and occupied space below must be installed in a pan. The pan must be galvanized steel at least 0.0236 inch (No. 24 gage) thick, or another pan approved for that use (PC § 504.7).",
+        "supportedPoints": [
+          {
+            "heading": "Pan required where leakage can cause damage",
+            "explanation": "A storage tank-type water heater or hot-water storage tank must be installed in a galvanized steel pan at least 0.0236 inch (No. 24 gage) thick, or another pan approved for the use, when tank leakage will cause damage. The stated potential damage to the finished ceiling and occupied office space meets that condition.",
+            "sectionID": "12087",
+            "sourceIDs": [
+              "research-permitext_discovered-id:12087-1"
+            ],
+            "evidenceRole": "supporting"
+          },
+          {
+            "heading": "Pan dimensions and drainage",
+            "explanation": "The required pan must be at least 1 1/2 inches deep and sufficiently sized and shaped to receive all dripping or condensate. It must drain indirectly through a waste pipe at least 3/4 inch in diameter. The supplied exception removes the drain requirement for a replacement water heater only where a pan drain was not previously installed and a leak detector is installed within the pan.",
+            "sectionID": "12088",
+            "sourceIDs": [
+              "research-permitext_discovered-id:12088-2"
+            ],
+            "evidenceRole": "supporting"
+          }
+        ],
+        "explanation": "The pan must be at least 1 1/2 inches deep, sized and shaped to receive all dripping or condensate, and drained indirectly through a pipe at least 3/4 inch in diameter (PC § 504.7.1). The only supplied exception to the pan-drain requirement—not to the pan itself—is for a replacement heater where no pan drain was previously installed and a leak detector is installed within the pan. Whether this is a qualifying replacement installation is not stated.",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether this is a replacement water heater, whether a pan drain was previously installed, and, if so, whether a leak detector will be installed within the pan. These facts can determine whether the pan drain exception applies, but do not eliminate the stated pan requirement."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "Permitext limited this answer to the enacted 2022 NYC Construction Code evidence assembled for the current question."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "12087",
+            "sectionNumber": "504.7",
+            "title": "504.7 Required pan.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:12087-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:12087-1",
+                "selectedText": "504.7 504.7 Required pan. Where a storage tank-type water heater or a hot water storage tank is installed in a location where water leakage from the tank will cause damage, the tank shall be installed in a galvanized steel pan having a material thickness of not less than 0.0236 inch (0.6010 mm) (No. 24 gage), or other pans approved for such use.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the required pan for a storage tank-type water heater where leakage will cause damage and specifies permissible pan material."
+          },
+          {
+            "sectionID": "12088",
+            "sectionNumber": "504.7.1",
+            "title": "504.7.1 Pan size and drain.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:12088-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:12088-2",
+                "selectedText": "504.7.1 504.7.1 Pan size and drain. The pan shall be not less than 1 1/2 inches (38 mm) in depth and shall be of sufficient size and shape to receive all dripping or condensate from the tank or water heater. The pan shall be drained by an indirect waste pipe having a diameter of not less than 3/4 inch (19 mm). Piping for safety pan drains shall be of those materials listed in Table 605.4 . Exception: A pan drain shall not be required for a replacement water heater where a pan drain was not previously installed, provided that a leak detector is installed within the pan.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes pan depth, collection capacity, indirect drain size, and the limited replacement-water-heater exception to the drain requirement."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "12087",
+          "12088",
+          "11897",
+          "12065",
+          "11895",
+          "8142",
+          "10362",
+          "12487",
+          "11896",
+          "11587",
+          "12136",
+          "11893"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:12087-1",
+          "research-permitext_discovered-id:12088-2",
+          "research-permitext_discovered-id:11897-3",
+          "research-permitext_discovered-id:12065-4",
+          "research-permitext_discovered-id:11895-5",
+          "research-permitext_discovered-id:8142-6",
+          "research-permitext_discovered-id:10362-7",
+          "research-permitext_discovered-id:12487-8",
+          "research-permitext_discovered-id:11896-9",
+          "research-permitext_discovered-id:11587-10",
+          "research-permitext_cross_reference-id:12136-1",
+          "research-permitext_cross_reference-id:11893-2"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 12,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 0,
+          "supportingCitationCount": 2,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 10,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 10,
+          "crossReferenceCount": 2,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 1,
+          "requiredClaimCount": 0,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [],
+          "generalRules": [],
+          "exceptions": [
+            {
+              "label": "PC 504.7.1",
+              "summary": "PC 504.7.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:12088-2"
+              ]
+            },
+            {
+              "label": "PC 314.2.3",
+              "summary": "PC 314.2.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11895-5"
+              ]
+            },
+            {
+              "label": "FGC 307.5",
+              "summary": "FGC 307.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8142-6"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [
+            {
+              "label": "PC 605.4",
+              "summary": "PC 605.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:12136-1"
+              ]
+            },
+            {
+              "label": "PC 314.2.1",
+              "summary": "PC 314.2.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11893-2"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "PC 504.7.1",
+              "summary": "PC 504.7.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:12088-2"
+              ]
+            },
+            {
+              "label": "PC 605.4",
+              "summary": "PC 605.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:12136-1"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:12087-1",
+            "research-permitext_discovered-id:12088-2",
+            "research-permitext_discovered-id:11897-3",
+            "research-permitext_discovered-id:12065-4",
+            "research-permitext_discovered-id:11895-5",
+            "research-permitext_discovered-id:8142-6",
+            "research-permitext_discovered-id:10362-7",
+            "research-permitext_discovered-id:12487-8",
+            "research-permitext_discovered-id:11896-9",
+            "research-permitext_discovered-id:11587-10",
+            "research-permitext_cross_reference-id:12136-1",
+            "research-permitext_cross_reference-id:11893-2"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?",
+          "turnKind": "hypothetical",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:12087-1",
+            "research-permitext_discovered-id:12088-2"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:12087-1",
+            "research-permitext_discovered-id:12088-2"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:12087-1",
+            "research-permitext_discovered-id:12088-2",
+            "research-permitext_discovered-id:11897-3",
+            "research-permitext_discovered-id:12065-4",
+            "research-permitext_discovered-id:11895-5",
+            "research-permitext_discovered-id:8142-6",
+            "research-permitext_discovered-id:10362-7",
+            "research-permitext_discovered-id:12487-8",
+            "research-permitext_discovered-id:11896-9",
+            "research-permitext_discovered-id:11587-10",
+            "research-permitext_cross_reference-id:12136-1",
+            "research-permitext_cross_reference-id:11893-2"
+          ],
+          "claims": []
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:12087-1",
+            "research-permitext_discovered-id:12088-2"
+          ],
+          "claims": []
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-fixture-permission-scope-v28",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:12087-1",
+            "research-permitext_discovered-id:12088-2"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:11897-3",
+            "research-permitext_discovered-id:12065-4",
+            "research-permitext_discovered-id:11895-5",
+            "research-permitext_discovered-id:8142-6",
+            "research-permitext_discovered-id:10362-7",
+            "research-permitext_discovered-id:12487-8",
+            "research-permitext_discovered-id:11896-9",
+            "research-permitext_discovered-id:11587-10",
+            "research-permitext_cross_reference-id:12136-1",
+            "research-permitext_cross_reference-id:11893-2"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 2,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 0,
+            "supportingCitationCount": 2,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 10,
+            "reviewedOnlyProvisionCount": 10,
+            "assembledSourceCount": 12,
+            "assembledProvisionCount": 12
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:12087-1",
+              "sectionID": "12087",
+              "reference": "PC 504.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "504.7 504.7 Required pan. Where a storage tank-type water heater or a hot water storage tank is installed in a location where water leakage from the tank will cause damage, the tank shall be installed in a galvanized steel pan having a material thickness of not less than 0.0236 inch (0.6010 mm) (No. 24 gage), or other pans approved for such use."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:12088-2",
+              "sectionID": "12088",
+              "reference": "PC 504.7.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "504.7.1 504.7.1 Pan size and drain. The pan shall be not less than 1 1/2 inches (38 mm) in depth and shall be of sufficient size and shape to receive all dripping or condensate from the tank or water heater. The pan shall be drained by an indirect waste pipe having a diameter of not less than 3/4 inch (19 mm). Piping for safety pan drains shall be of those materials listed in Table 605.4 . Exception: A pan drain shall not be required for a replacement water heater where a pan drain was not previously installed, provided that a leak detector is installed within the pan."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11897-3",
+              "sectionID": "11897",
+              "reference": "PC 314.2.3.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "314.2.3.2 314.2.3.2 Appliance, equipment and insulation in pans. Where an appliance, equipment or insulation is subject to water damage when auxiliary drain pans fill, that portion of the appliance, equipment and insulation shall be installed above the flood level rim of the pans. Supports located inside of the pans to support the appliance or equipment or insulation shall be water resistant and approved."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:12065-4",
+              "sectionID": "12065",
+              "reference": "PC 501.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "501.3 501.3 Drain valves. Drain valves for emptying shall be installed at the bottom of each tank-type water heater and hot water storage tank. The drain valve inlet shall be not less than 3/4-inch (19 mm) nominal iron pipe size and the outlet shall be provided with male garden hose threads."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11895-5",
+              "sectionID": "11895",
+              "reference": "PC 314.2.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "314.2.3 314.2.3 Auxiliary and secondary drain systems. In addition to the requirements of Section 314.2.1, where damage to any building components could occur as a result of overflow from the equipment primary condensate removal system, one of the following auxiliary protection methods shall be provided for each cooling coil or fuel-fired appliance that produces condensate: 1. An auxiliary drain pan with a separate drain shall be provided under the coils on which condensation will occur. The auxiliary pan drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The pan shall have a depth of not less than 1 1/2 inches (38 mm), shall be not less than 3 inches (76 mm) larger than the unit or the coil dimensions in width and length and shall be constructed of corrosion-resistant material. Metallic pans shall have a thickness of not less than 0.0236-inch (0.6010 mm) (No. 24 gage) for galvanized sheet metal pans, 0.0179 inches (0.4546 mm) (No. 26 gage) for stainless steel pans, or 0.0320 inches (0.8128 mm) (No. 20 gage) for aluminum pans. Nonmetallic pans shall have a thickness of not less than 0.0625-inch (1.6 mm). 2. A separate overflow drain line shall be connected to the drain pan provided with the equipment. Such overflow drain shall discharge to a conspicuous point of disposal to alert occupants in the event of a stoppage of the primary drain. The overflow drain line shall connect to the drain pan at a higher level than the primary drain connection. 3. An auxiliary drain pan without a separate drain line shall be provided under the coils on which condensate will occur. Such pan shall be equipped with a listed water-level detection device that will shut off the equipment served prior to overflow of the pan. The auxiliary drain pan shall be constructed in accordance with Item 1 of this section. 4. A listed water-level detection device shall be provided that will shut off the equipment served in the event that the primary drain is blocked. The device shall be installed in the primary drain line, the overflow drain line or in the equipment-supplied drain pan, located at a point higher than the primary drain line connection and below the overflow rim of such pan. Exceptions: 1. An auxiliary drain protection method shall not be required for fuel-fired appliances that automatically shut down operation in the event of a stoppage in the condensate drainage system. 2. An auxiliary drain protection method shall not be required where a suitably sized and located floor drain is provided. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/051 and L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8142-6",
+              "sectionID": "8142",
+              "reference": "FGC 307.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "307.5 307.5 Auxiliary drain pan. Category II or Category IV condensing appliances shall be provided with an auxiliary drain pan where damage to any building component will occur as a result of stoppage in the condensate drainage system. Such pan shall be installed in accordance with the applicable provisions of Section 307 of the New York City Mechanical Code and provided with a local alarm to indicate the collection of water. Exceptions: 1. An auxiliary drain pan shall not be required for appliances that automatically shut down operation in the event of a stoppage in the condensate drainage system. 2. An auxiliary drain pan shall not be required where a suitably sized and located floor drain is provided."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10362-7",
+              "sectionID": "10362",
+              "reference": "MC 307.2.3.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "307.2.3.2 307.2.3.2 Appliance, equipment or insulation in pans. Where an appliance, equipment or insulation is subject to water damage when auxiliary drain pans fill, that portion of the appliance, equipment or insulation shall be installed above the rim of the pans. Supports located inside of the pans to support the appliance or equipment or insulation shall be water resistant and approved."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:12487-8",
+              "sectionID": "12487",
+              "reference": "PC 802.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "802.3 802.3 Waste receptors. For other than hub drains that receive only clear-water waste and standpipes, a removable strainer or basket shall cover the outlet of waste receptors. Waste receptors shall not be installed in concealed spaces. Waste receptors shall not be installed in plenums, crawl spaces, attics, interstitial spaces above ceilings and below floors. Ready access shall be provided to waste receptors."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11896-9",
+              "sectionID": "11896",
+              "reference": "PC 314.2.3.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "314.2.3.1 314.2.3.1 Water-level monitoring devices. On down-flow units and all other coils that do not have a secondary drain or provisions to install a secondary or auxiliary drain pan, a water-level monitoring device shall be installed inside the primary drain pan. This device shall shut off the equipment served in the event that the primary drain becomes restricted. Devices installed in the drain line shall not be permitted."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11587-10",
+              "sectionID": "11587",
+              "reference": "MC 1305.9.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1305.9.4 1305.9.4 Drain pan at base of shafts with leak detection. A metal drain pan shall be installed at the base of every vertical shaft enclosing the fuel-oil piping. Where the bottom of the shaft is located outside the fuel oil storage tank room, the drain pan shall be connected to and drained into a containment enclosure at the horizontal offset of fuel-oil piping. On the lowest level in the building, the outer containment of horizontal offsets shall be terminated inside the main storage tank room or transfer pump room. A drain pipe shall be provided from the lowest point in the containment enclosure to a minimum 55-gallon (208.2 L) container with a leak detection alarm, arranged so as to sound an alarm and stop the transfer pump."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:12136-1",
+              "sectionID": "12136",
+              "reference": "PC 605.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "605.4 605.4 Water distribution pipe. Water distribution pipe shall conform to NSF 61 and shall conform to one of the standards listed in Table 605.4 . Table 605.4 Water Distribution Pipe Material Standard Brass pipe ASTM B 43 Copper or copper-alloy pipe ASTM B 42; ASTM B 302 Copper or copper-alloy tubing (Type K, L) ASTM B 75; ASTM B 88; ASTM B 251; ASTM B 447 Ductile iron pipe AWWA C151/A21.51; AWWA C115/A21.15 Stainless steel pipe (Type 304/304L) ASTM A 312; ASTM A 778 Stainless steel pipe (Type 316/316L) ASTM A 312; ASTM A 778"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:11893-2",
+              "sectionID": "11893",
+              "reference": "PC 314.2.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "314.2.1 314.2.1 Condensate disposal. Condensate from all cooling coils and evaporators shall be conveyed from the drain pan outlet to an approved place of disposal. Such piping shall maintain a minimum horizontal slope in the direction of discharge of not less than one-eighth unit vertical in 12 units horizontal (1-percent slope). Condensate shall not discharge into a street, alley or other areas so as to cause a nuisance."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260831-zoning-canonical-source-output-table-legend-v17",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-complete-governing-passages-v26",
+          "retrievalQuery": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 8025,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 2,
+            "topicDependencyCount": 0,
+            "characterCount": 8025,
+            "resolverFailureCount": 1,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 1,
+              "text": "1 enacted section was not available from the canonical resolver."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "referenced-table-review-required",
+              "text": "At least one candidate refers to a table whose complete structured values are not in the proposed passage. That candidate cannot be prepared until the table itself can be reviewed as evidence."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-intake-lot-context-v6",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-intake-lot-context-v6",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T08:25:59.488Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-09-08T08:25:59.488Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "durationMilliseconds": 19839,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "dad41565-158c-4e01-a287-5048122d209b",
+          "createdAt": "2026-09-08T08:25:59.488Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 16476,
+          "cachedInputTokens": 2586,
+          "outputTokens": 859,
+          "totalTokens": 17335,
+          "estimatedCostUSD": 0.026884,
+          "actualProviderCostUSD": 0.026884,
+          "conservativeProviderCostUSD": 0.060562,
+          "durationMilliseconds": 19788,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ]
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "PC-04",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_code_interpretation",
+      "requestBytes": 68661,
+      "maxOutputTokens": 3000,
+      "startedAt": "2026-09-08T08:25:46.467Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 8750,
+      "usage": {
+        "input_tokens": 15179,
+        "input_tokens_details": {
+          "cache_write_tokens": 15176,
+          "cached_tokens": 0
+        },
+        "output_tokens": 562,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 15741
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_031322eda82a8980016a9fc68c80f087d2a738c76bce8cee06",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** For a central washing facility in a multiple-family dwelling, the room containing automatic clothes washers must have floor drains located to readily drain the entire floor area; trapped washer standpipes do not replace that separate requirement (PC § 412.4).\\n\\nEach required floor drain must have an outlet at least **3 inches (76 mm)** in diameter and must have a lint strainer (PC §§ 412.3, 412.4). The supplied facts place the room within the stated central-washing-facility rule; therefore, omitting the floor drain is not compliant on that basis. The number and placement of drains must be sufficient to readily drain the entire floor area.\",\"supportedPoints\":[{\"heading\":\"Floor drains are mandatory in the common laundry room\",\"explanation\":\"In the central washing facilities of multiple-family dwellings, rooms containing automatic clothes washers must be provided with floor drains located to readily drain the entire floor area. The presence of trapped standpipes for washer discharge does not negate this separate floor-drain requirement.\",\"sectionID\":\"11968\",\"sourceIDs\":[\"research-permitext_discovered-id:11968-1\"]},{\"heading\":\"Required drain outlet size and lint strainer\",\"explanation\":\"Floor drains must have drain outlets not less than 3 inches (76 mm) in diameter. For the central washing facility rule, the drains also must be provided with lint strainers.\",\"sectionID\":\"11967\",\"sourceIDs\":[\"research-permitext_discovered-id:11967-2\"]}],\"assumptions\":[],\"missingFacts\":[\"The laundry-room floor area, floor configuration, elevations, and proposed drain locations are needed to determine the number and placement of drains necessary to readily drain the entire floor area.\",\"The proposed floor-drain outlet diameter and lint-strainer details are needed to verify compliance with the stated drain requirements.\"],\"followUpQuestions\":[],\"evidenceLimitations\":[\"Permitext limited this answer to the enacted 2022 NYC Construction Codes evidence assembled for the current question. This answer addresses whether a floor drain is required and the expressly supplied drain criteria, not the complete plumbing-system design.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"11968\",\"sourceIDs\":[\"research-permitext_discovered-id:11968-1\"],\"relevance\":\"Establishes the mandatory floor-drain requirement, required coverage of the entire floor area, and lint-strainer requirement for central washing facilities in multiple-family dwellings.\"},{\"sectionID\":\"11967\",\"sourceIDs\":[\"research-permitext_discovered-id:11967-2\"],\"relevance\":\"Establishes the minimum 3-inch floor-drain outlet size.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "PC-04",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_research_verification",
+      "requestBytes": 52489,
+      "maxOutputTokens": 4000,
+      "startedAt": "2026-09-08T08:25:55.246Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 3775,
+      "usage": {
+        "input_tokens": 10900,
+        "input_tokens_details": {
+          "cache_write_tokens": 10897,
+          "cached_tokens": 0
+        },
+        "output_tokens": 213,
+        "output_tokens_details": {
+          "reasoning_tokens": 191
+        },
+        "total_tokens": 11113
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_01679dd8567099ee016a9fc6966a8c87d2b36addb502dacb6c",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "PC-10",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_code_interpretation",
+      "requestBytes": 42551,
+      "maxOutputTokens": 3000,
+      "startedAt": "2026-09-08T08:25:59.844Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 8522,
+      "usage": {
+        "input_tokens": 9023,
+        "input_tokens_details": {
+          "cache_write_tokens": 9020,
+          "cached_tokens": 0
+        },
+        "output_tokens": 628,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 9651
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_068b3e223a157e65016a9fc699178487d29b64261153489156",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**Yes—on the stated facts, a pan is required.** A storage tank-type water heater installed where leakage could damage the finished office ceiling and occupied space below must be installed in a pan. The pan must be galvanized steel at least 0.0236 inch (No. 24 gage) thick, or another pan approved for that use (PC § 504.7).\\n\\nThe pan must be at least 1 1/2 inches deep, sized and shaped to receive all dripping or condensate, and drained indirectly through a pipe at least 3/4 inch in diameter (PC § 504.7.1). The only supplied exception to the pan-drain requirement—not to the pan itself—is for a replacement heater where no pan drain was previously installed and a leak detector is installed within the pan. Whether this is a qualifying replacement installation is not stated.\",\"supportedPoints\":[{\"heading\":\"Pan required where leakage can cause damage\",\"explanation\":\"A storage tank-type water heater or hot-water storage tank must be installed in a galvanized steel pan at least 0.0236 inch (No. 24 gage) thick, or another pan approved for the use, when tank leakage will cause damage. The stated potential damage to the finished ceiling and occupied office space meets that condition.\",\"sectionID\":\"12087\",\"sourceIDs\":[\"research-permitext_discovered-id:12087-1\"]},{\"heading\":\"Pan dimensions and drainage\",\"explanation\":\"The required pan must be at least 1 1/2 inches deep and sufficiently sized and shaped to receive all dripping or condensate. It must drain indirectly through a waste pipe at least 3/4 inch in diameter. The supplied exception removes the drain requirement for a replacement water heater only where a pan drain was not previously installed and a leak detector is installed within the pan.\",\"sectionID\":\"12088\",\"sourceIDs\":[\"research-permitext_discovered-id:12088-2\"]}],\"assumptions\":[],\"missingFacts\":[\"Whether this is a replacement water heater, whether a pan drain was previously installed, and, if so, whether a leak detector will be installed within the pan. These facts can determine whether the pan drain exception applies, but do not eliminate the stated pan requirement.\"],\"followUpQuestions\":[],\"evidenceLimitations\":[\"Permitext limited this answer to the enacted 2022 NYC Construction Code evidence assembled for the current question.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"12087\",\"sourceIDs\":[\"research-permitext_discovered-id:12087-1\"],\"relevance\":\"Establishes the required pan for a storage tank-type water heater where leakage will cause damage and specifies permissible pan material.\"},{\"sectionID\":\"12088\",\"sourceIDs\":[\"research-permitext_discovered-id:12088-2\"],\"relevance\":\"Establishes pan depth, collection capacity, indirect drain size, and the limited replacement-water-heater exception to the drain requirement.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "PC-10",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_research_verification",
+      "requestBytes": 36282,
+      "maxOutputTokens": 4000,
+      "startedAt": "2026-09-08T08:26:08.389Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 10831,
+      "usage": {
+        "input_tokens": 7453,
+        "input_tokens_details": {
+          "cache_write_tokens": 4864,
+          "cached_tokens": 2586
+        },
+        "output_tokens": 231,
+        "output_tokens_details": {
+          "reasoning_tokens": 209
+        },
+        "total_tokens": 7684
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_01983f218b821b43016a9fc6a9ba7887d29827f5340d7942f1",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 0.402564,
+    "reservedUSD": 0.066422,
+    "actualUSD": 0.066422,
+    "requestCount": 4,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 7.749843,
+  "completedAt": "2026-09-08T08:26:19.446Z"
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "permitext-owner-compact-answer-review-v1",
+  "reviewedOn": "2026-09-08",
+  "sourceCommit": "8f2f62f56087aeb15476b15957fc6b29ae1b5ea8",
+  "liveResultSHA256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b",
+  "scope": "Source-based development review of the two delivered answers. Main-conclusion support and delivery are distinct from whole-answer quality, professional approval, and full-cohort acceptance. No additional provider calls or paid judge.",
+  "professionalApproval": false,
+  "cases": [
+    {
+      "id": "PC-04",
+      "delivered": true,
+      "verifierPassed": true,
+      "durationMilliseconds": 14231,
+      "mainConclusion": "supported",
+      "sourceBinding": "The floor-drain rule and lint-strainer supported point bind to PC 412.4. No deterministic source-bound repair or regeneration was needed on this new draft.",
+      "sourceURLs": [
+        "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-161608"
+      ],
+      "remainingQualityGap": "missingFacts still lists floor area, layout/elevations, drain locations, outlet diameter and lint-strainer design details. Those concern developing a compliant replacement, not whether the stated omission is permitted. They should not be treated as missing facts needed for this decision. followUpQuestions is empty.",
+      "wholeAnswerAcceptance": "needs-refinement"
+    },
+    {
+      "id": "PC-10",
+      "delivered": true,
+      "verifierPassed": true,
+      "durationMilliseconds": 19839,
+      "mainConclusion": "supported",
+      "sourceBinding": "The required-pan claim binds to PC 504.7; the optional expanded discussion of dimensions, indirect drainage and the qualified replacement drain exception binds to PC 504.7.1.",
+      "sourceURLs": [
+        "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-161890",
+        "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-161892"
+      ],
+      "remainingQualityGap": "The pan-drain exception cannot remove the stated pan requirement. Treat replacement/drain details as optional design context, not missing facts needed to answer whether a pan is required. The if-so wording in missingFacts is less precise than the correctly qualified visible exception. followUpQuestions is empty.",
+      "wholeAnswerAcceptance": "needs-refinement"
+    }
+  ],
+  "liveCoverageAdditional60": {
+    "providerAttempted": 35,
+    "latestDelivered": 35,
+    "neverProviderAttempted": 25,
+    "meaning": "Delivered is not a whole-answer semantic quality pass. Original 50 remain part of the separate full 110-case objective."
+  },
+  "accounting": {
+    "packages": 16,
+    "caseTurnAttempts": 66,
+    "providerCalls": 139,
+    "pendingProviderRequests": 0,
+    "thisPackageTokenEstimateUSD": 0.066422,
+    "thisPackageCacheWritePremiumUSD": 0.01288605,
+    "thisPackageAdjustedUsageEstimateUSD": 0.07930805,
+    "thisPackageConservativeUSD": 0.152407,
+    "cumulativeAdjustedUsageEstimateUSD": 3.82659295,
+    "historicalWebSearchCalls": 8,
+    "cumulativeConservativeUSD": 7.749843,
+    "remainingConservativeAuthorizationUSD": 0.250157,
+    "note": "Token usage plus cache-write premium and $0.01 per recorded web-search call using local versioned prices. Not an invoice or provider balance; conservative settled ledger controls further authorization."
+  },
+  "nextStep": "Move the verifier rule about replacement-only design unknowns out of the numeric-comparison instruction and apply it explicitly to missingFacts for all decision questions; retain applicability/exception facts that can change the result. Verify with the captured answers and contrasting genuinely unresolved applicability cases before any new bounded paid package. Do not replay the consumed compact-confirmation runner."
+}
