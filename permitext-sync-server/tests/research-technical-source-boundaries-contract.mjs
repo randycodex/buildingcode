@@ -103,6 +103,27 @@ try {
   const verifyCounts = await assemble(`${facilityQuestion} Verify the occupant load and fixture count.`);
   assert(requiredReferences(verifyCounts).includes("BC 1004.1"), "A request to verify the premise retains the calculation route.");
   assert(requiredReferences(verifyCounts).includes("PC 403.1"));
+
+  const fountainQuestion = "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?";
+  for (const question of [fountainQuestion,
+    "An office is required to provide 8 drinking fountains. Can bottle-filling stations replace all eight?"
+  ]) {
+    const assembled = await assemble(question);
+    const required = requiredReferences(assembled);
+    for (const reference of ["PC 410.1", "PC 410.3"]) assert(required.includes(reference), reference);
+    for (const reference of ["PC 403.1", "PC 410.2"]) assert(!required.includes(reference),
+      "A declared fountain count must not require re-proving its table or exemption basis.");
+    const substitution = assembled.sources.find((source) => source.codePrefix === "PC" && source.sectionNumber === "410.3");
+    assert(substitution.canonicalContextComplete);
+    assert.match(substitution.text, /dedicated plumbing fixtures[\s\S]*container at least 10 inches[\s\S]*adjacent to or readily visible/i);
+  }
+  for (const ending of ["Explain PC 410.2.", "Verify the required fountain count.",
+    "Is the building exempt from providing any drinking fountains?"
+  ]) {
+    const assembled = await assemble(`${fountainQuestion} ${ending}`);
+    assert(requiredReferences(assembled).includes("PC 410.2"),
+      `An explicit exemption or premise question retains applicability coverage: ${ending}`);
+  }
   assert.equal(networkAttempts, 0);
 } finally {
   globalThis.fetch = savedFetch;

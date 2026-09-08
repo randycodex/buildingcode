@@ -1,4 +1,4 @@
-export const researchAnswerPresentationVersion = "20260908-visible-material-conditions-v9";
+export const researchAnswerPresentationVersion = "20260908-condition-subject-v10";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
@@ -121,7 +121,7 @@ function contractFor(mode, preferredStructure, requiredElements) {
       "Never fill gaps in the question from an expected answer, an example scenario, or an unstated assumption.",
       "Place each material code citation next to the claim it supports.",
       "Separate governing enacted requirements from outside guidance or unsupplied standards.",
-      "Keep material applicability, substitution conditions, exceptions and unresolved facts in answerText; expandable supporting details alone are insufficient.",
+      "Keep material conditions and unresolved facts in answerText, attached to the correct object; expandable details alone are insufficient.",
       "Establish each alternative rule's applicability independently; an unresolved condition does not establish another path. Preserve the stated subject, such as a building or nonaccessory tenant space, without generalizing to any room.",
       "Keep the opening, calculation and closing consistent. State a failed applicable limit directly; a scope note must not imply compliance. Broader compliance remains unevaluated.",
       "Use stipulated quantities and applicability unless contradicted; verify them when asked. Include secondary rules only when material to the result, retaining conditions for the proposed substitution.",

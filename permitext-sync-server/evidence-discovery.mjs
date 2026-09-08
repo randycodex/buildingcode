@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { researchTechnicalTopicRoutes } from "./research-technical-topic-routes.mjs";
 import { researchZoningQuestionText } from "./research-corpus-registry.mjs";
 
-export const evidenceDiscoveryVersion = "20260908-intake-authority-scope-v28";
+export const evidenceDiscoveryVersion = "20260908-fountain-premise-scope-v29";
 export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
@@ -80,6 +80,16 @@ function stipulatedSeparateFacilitiesQuestion(question) {
   const statedFixtureSufficiency = /\b(?:required\s+)?fixture\s+count\s+(?:can\s+be\s+satisfied|(?:is|has\s+been)\s+(?:already\s+)?(?:satisfied|met))\b/i.test(question);
   const calculationRequest = /\b(?:calculate|recalculate|determine|verify|check|reassess)\b[^.!?]*\b(?:occupant\s+load|fixture\s+count|fixtures?)\b|\b(?:how\s+many|what\s+(?:is|are))\b[^.!?]*\b(?:occupant\s+load|fixture\s+count|fixtures?)\b|\b(?:occupant\s+load|fixture\s+count)\b[^.!?]*\b(?:correct|valid|adequate|sufficient)\b/i.test(question);
   return separateToiletFacilitiesCue.test(question) && statedLoad && statedFixtureSufficiency && !calculationRequest;
+}
+
+function stipulatedFountainSubstitutionQuestion(question) {
+  // A declared required count is the premise of a substitution comparison.
+  // Questions about whether that count is required still need applicability
+  // and fixture-table evidence. Exact citations remain independently selected.
+  const statedRequirement = /\b(?:is|are)\s+required\s+(?:to\s+provide\s+)?(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+drinking[- ]fountains?\b[^?]*[.;]/i.test(question);
+  const substitution = /\b(?:bottle[- ]filling|substitut\w*|replac\w*)\b/i.test(question);
+  const premiseInquiry = /\b(?:calculate|recalculate|determine|verify|check|reassess)\b[^.!?]*\b(?:required\s+(?:count|number)|fountain\s+(?:count|requirement))\b|\b(?:how\s+many)\b[^.!?]*\bfountains?\b[^.!?]*\brequired\b|(?:^|[.!?]\s+)(?:is|are|must|does)\b[^.!?]*\b(?:require\w*|exempt\w*)\b|\b(?:count|requirement)\b[^.!?]*\b(?:correct|valid)\b/i.test(question);
+  return statedRequirement && substitution && !premiseInquiry;
 }
 
 const topicRoutes = [
@@ -743,12 +753,12 @@ const topicRoutes = [
     ]
   },
   {
-    pattern: /\b(?:bottled\s+water|bottle[- ]filling|refrigerator\s+(?:water\s+)?dispenser|water\s+cooler)\b.*\b(?:drinking\s+fountains?|substitut)|\bdrinking\s+fountains?\b.*\b(?:bottled\s+water|dispenser|cooler|substitut)\b/i,
+    pattern: /\b(?:bottled\s+water|bottle[- ]filling|refrigerator\s+(?:water\s+)?dispenser|water\s+cooler)\b.*\b(?:drinking\s+fountains?|substitut)|\bdrinking\s+fountains?\b.*\b(?:bottled\s+water|bottle[- ]filling|dispenser|cooler|substitut|replac\w*)\b/i,
     label: "drinking-fountain and bottle-filling substitution provisions",
     targets: [
-      { codePrefix: "PC", sectionPrefix: "403.1" },
+      { codePrefix: "PC", sectionPrefix: "403.1", fountainApplicability: true },
       { codePrefix: "PC", sectionPrefix: "410.1" },
-      { codePrefix: "PC", sectionPrefix: "410.2" },
+      { codePrefix: "PC", sectionPrefix: "410.2", fountainApplicability: true },
       { codePrefix: "PC", sectionPrefix: "410.3" }
     ]
   },
@@ -1490,10 +1500,12 @@ export async function discoverRelevantEvidence({
     ).forEach((section) => exactReferenceIDs.add(comparableSectionID(section.id)));
   }
   const separateFacilitiesWithStipulatedCounts = stipulatedSeparateFacilitiesQuestion(normalizedQuestion);
+  const fountainSubstitutionWithStipulatedCount = stipulatedFountainSubstitutionQuestion(normalizedQuestion);
   for (const route of topicRoutes.filter(({ pattern, calculationScope }) =>
     pattern.test(normalizedQuestion) && !(calculationScope && separateFacilitiesWithStipulatedCounts)
   )) {
     for (const target of route.targets) {
+      if (target.fountainApplicability && fountainSubstitutionWithStipulatedCount) continue;
       for (const section of sections) {
         const sectionNumber = String(section.sectionNumber || "");
         const codeEdition = sectionCodeEdition(section);
