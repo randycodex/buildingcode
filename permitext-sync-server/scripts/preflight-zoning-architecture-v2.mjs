@@ -30,7 +30,9 @@ import {
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const architectureV21 = process.argv.includes("--architecture-v21");
 const sourceSelection = process.argv.includes("--source-selection");
+const sourceBoundary = process.argv.includes("--source-boundary");
 if (sourceSelection && !architectureV21) throw new Error("Source-selection replay requires the V2.1 regression suite.");
+if (sourceBoundary && !sourceSelection) throw new Error("Source-boundary replay requires the source-selection regression suite.");
 const paidEnvironmentNames = [
   "OPENAI_API_KEY",
   "AZURE_OPENAI_API_KEY",
@@ -65,7 +67,9 @@ const resultPath = join(
   root,
   "evals",
   "results",
-  sourceSelection
+  sourceBoundary
+    ? "zoning-source-boundary-no-cost-preflight-2026-09-08.json"
+    : sourceSelection
     ? "zoning-source-selection-no-cost-preflight-2026-09-08.json"
     : architectureV21
     ? "zoning-architecture-v21-no-cost-preflight.json"

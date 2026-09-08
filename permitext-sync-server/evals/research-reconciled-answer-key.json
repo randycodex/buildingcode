@@ -14,7 +14,7 @@
     "research-cases.json": "da3a0e1061b94d9707abc713d0827a8c1df46b9d8a873e9544b35ac9d90eeefb",
     "zoning-cases.json": "90b9cf4c5c3ea40522103d42a9b8ec052b044cf42be019cae53eed61cfa008a6",
     "review-packets/dob-now-expediter-draft-review.md": "715301e11a99f50ea320402102bb5376e627a41fce0510f7d8705f05929be975",
-    "research-answer-key-amendments.json": "bff14ce88bc63d4e675aca87222c57d13b24f8887d25b280969bcf6b2810594f"
+    "research-answer-key-amendments.json": "4468eaa3f3b6d03dbef1cab2bd47733fe8bb1a4c52db10f52225d12746b89e94"
   },
   "authorization": {
     "paidModelCalls": false,
@@ -33,7 +33,8 @@
     "Current repository review states supersede the compilation's blanket DRAFT labels; approval remains limited to the originally recorded scope. Reconciled prose has not received a new independent professional review.",
     "The repository also contains 30 additional Zoning cases in zoning-cases-expanded-batch-1.json. They are outside this 50-case reconciliation and have not been silently added.",
     "No new model quality score or response-time benchmark is claimed. DOB conflicts need the current official materials and actual filing where applicable.",
-    "CC-04 has an explicit development correction for the optional Assembly calculation. Its original approved source is preserved, and approval of the corrected wording remains pending."
+    "CC-04 has an explicit development correction for the optional Assembly calculation. Its original approved source is preserved, and approval of the corrected wording remains pending.",
+    "CC-01 through CC-03 have development amendments aligning missing-fact expectations with supplied facts and evidence boundaries. Their original source inputs and historical approvals are preserved; the amendments await professional review."
   ],
   "cases": [
     {
@@ -42,10 +43,11 @@
       "intakeQuestion": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
       "question": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
       "scenario": "",
-      "expectedAnswer": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. Confirm the occupancy group, enclosure rating, separating construction, and material before concluding that the exception applies.",
+      "expectedAnswer": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. The question establishes Group R-2 occupancy and the 15-foot door separation. Confirm the enclosure rating, separating-construction rating, and masonry or masonry-equivalent construction before concluding that the exception applies.",
       "answerFormat": "direct-rule-application-qualifications",
       "reconciliationNotes": [
-        "Use the current repository answer and rubric, with the selected evidence and project context restored."
+        "Use the current repository answer and rubric, with the selected evidence and project context restored.",
+        "Development amendment cc01-established-facts-20260908 aligns missing-fact expectations with the supplied question and Project facts. Original source approvals are preserved; this correction awaits professional review."
       ],
       "sourceDataset": "research-cases.json",
       "sourceCaseID": "scissor-stair-two-exits",
@@ -81,15 +83,16 @@
         "Explain the Group R-2 exception for separately counted stairs.",
         "Identify the 2-hour enclosure and separating-construction requirements.",
         "Identify the masonry or masonry-equivalent requirement.",
-        "Identify the minimum 15-foot exit-door separation."
+        "Identify the minimum 15-foot exit-door separation.",
+        "Treat the stated Group R-2 occupancy and 15-foot door separation as supplied facts; retain only the unresolved construction conditions."
       ],
       "forbiddenClaims": [
         "Every scissor stair automatically counts as one exit.",
         "Fifteen feet of door separation automatically makes the stairs compliant.",
-        "Sprinkler protection by itself satisfies the Group R-2 exception."
+        "Sprinkler protection by itself satisfies the Group R-2 exception.",
+        "Require the user to reconfirm Group R-2 occupancy or the stated 15-foot separation without a contradiction."
       ],
       "missingFacts": [
-        "Confirm Group R-2 occupancy.",
         "Confirm the stair-enclosure fire-resistance rating.",
         "Confirm the construction separating the stairs and its fire-resistance rating.",
         "Confirm masonry or an accepted masonry equivalent."
@@ -97,8 +100,9 @@
       "requiredCitations": [
         "BC 1007.1.1"
       ],
-      "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "reconciliationStatus": "development-correction-pending-professional-review",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "developmentAmendmentID": "cc01-established-facts-20260908"
     },
     {
       "id": "CC-02",
@@ -109,7 +113,8 @@
       "expectedAnswer": "BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II construction, does not exceed six stories, and does not exceed 2,000 square feet per story. The stated height and floor area satisfy two of those conditions, but compliance cannot be confirmed until the occupancy classification and construction type are known. This passage only establishes that the single-exit allowance may be available; other applicable egress, fire-protection, travel-distance, and design requirements must be checked under their respective sections without inventing requirements that are not in the selected evidence.",
       "answerFormat": "direct-rule-application-qualifications",
       "reconciliationNotes": [
-        "Use the current repository answer and rubric, with the selected evidence and project context restored."
+        "Use the current repository answer and rubric, with the selected evidence and project context restored.",
+        "Development amendment cc02-established-facts-20260908 aligns missing-fact expectations with the supplied question and Project facts. Original source approvals are preserved; this correction awaits professional review."
       ],
       "sourceDataset": "research-cases.json",
       "sourceCaseID": "single-stair-six-story-r2",
@@ -143,7 +148,8 @@
         "Identify the six-story maximum.",
         "Identify the 2,000-square-foot-per-story maximum.",
         "Recognize that six stories and approximately 1,950 square feet satisfy only the stated height and area conditions.",
-        "Limit the conclusion to potential availability of the single-exit allowance."
+        "Limit the conclusion to potential availability of the single-exit allowance.",
+        "Keep other-scope evidence limitations separate from missing Project facts; the missing facts for Item 7 are occupancy and construction type."
       ],
       "forbiddenClaims": [
         "Every six-story residential building can have one stair.",
@@ -152,14 +158,14 @@
       ],
       "missingFacts": [
         "Confirm the occupancy classification is Group R-2.",
-        "Confirm the construction type is Type I or Type II.",
-        "Check other applicable requirements under evidence supplied for those requirements."
+        "Confirm the construction type is Type I or Type II."
       ],
       "requiredCitations": [
         "BC 1006.3.2"
       ],
-      "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "reconciliationStatus": "development-correction-pending-professional-review",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "developmentAmendmentID": "cc02-established-facts-20260908"
     },
     {
       "id": "CC-03",
@@ -167,10 +173,11 @@
       "intakeQuestion": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
       "question": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
       "scenario": "",
-      "expectedAnswer": "For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. The result depends on the actual net area, furniture arrangement, intended activities, and whether the room is truly accessory to the residential use.",
+      "expectedAnswer": "For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. Confirm whether the room is accessory to the residential occupancy. Other intended functions may require a different occupant-load factor; the stated normal tables-and-chairs arrangement does not establish concentrated seating or standing use.",
       "answerFormat": "direct-rule-application-qualifications",
       "reconciliationNotes": [
-        "Use the current repository answer and rubric, with the selected evidence and project context restored."
+        "Use the current repository answer and rubric, with the selected evidence and project context restored.",
+        "Development amendment cc03-established-facts-20260908 aligns missing-fact expectations with the supplied question and Project facts. Original source approvals are preserved; this correction awaits professional review."
       ],
       "sourceDataset": "research-cases.json",
       "sourceCaseID": "residential-multipurpose-occupancy",
@@ -211,25 +218,26 @@
         "Calculate 900 divided by 15 as an occupant load of 60.",
         "Compare 60 with the fewer-than-75 threshold.",
         "Explain the Group B or served-occupancy classification option when the room is accessory.",
-        "Avoid automatically classifying every residential amenity room as Group R-2."
+        "Avoid automatically classifying every residential amenity room as Group R-2.",
+        "Treat the stated net area and normal furniture arrangement as supplied facts; distinguish other material intended functions from reconfirming those facts."
       ],
       "forbiddenClaims": [
         "Every residential amenity room is automatically Group R-2.",
         "The room is below 75 occupants without performing the calculation.",
-        "The result is unchanged for concentrated seating, standing space, or another function."
+        "The result is unchanged for concentrated seating, standing space, or another function.",
+        "Call the stated 900-net-square-foot area or normal tables-and-chairs arrangement missing without a contradiction."
       ],
       "missingFacts": [
-        "Confirm the actual net area.",
-        "Confirm the furniture arrangement and occupant-load factor.",
-        "Confirm the intended activities.",
-        "Confirm the room is accessory to the residential occupancy."
+        "Confirm whether the room is accessory to the residential occupancy.",
+        "Whether other intended activities require a different function-specific occupant-load factor from the stated normal tables-and-chairs use."
       ],
       "requiredCitations": [
         "BC 303.1.3",
         "BC 1004.1.3"
       ],
-      "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "reconciliationStatus": "development-correction-pending-professional-review",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "developmentAmendmentID": "cc03-established-facts-20260908"
     },
     {
       "id": "CC-04",

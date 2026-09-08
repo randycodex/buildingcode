@@ -24,6 +24,26 @@ assert.equal(originalFixtureCase.status, "approved");
 assert.equal(caseByID("CC-04").sourceCaseStatus, originalFixtureCase.status);
 assert.deepEqual(caseByID("CC-04").selectedEvidence, originalFixtureCase.selectedEvidence);
 assert.deepEqual(caseByID("CC-04").projectContext, originalFixtureCase.projectContext);
+for (const id of ["CC-01", "CC-02", "CC-03"]) {
+  const revised = caseByID(id);
+  const original = originalConstruction.cases.find((item) => item.id === revised.sourceCaseID);
+  assert.equal(revised.reconciliationStatus, "development-correction-pending-professional-review");
+  assert.equal(revised.sourceCaseStatus, original.status);
+  assert.deepEqual(revised.selectedEvidence, original.selectedEvidence);
+  assert.deepEqual(revised.projectContext, original.projectContext);
+  assert.equal(revised.question, original.question);
+  await assert.rejects(() => assertResearchEvaluationReferencesCurrent([original.id]),
+    { code: "RESEARCH_EVALUATION_REFERENCE_AMENDED" });
+}
+assert.doesNotMatch(caseByID("CC-01").missingFacts.join(" "), /Confirm Group R-2/);
+assert.match(caseByID("CC-01").missingFacts.join(" "), /enclosure.*rating/);
+assert.match(caseByID("CC-01").missingFacts.join(" "), /masonry/);
+assert.deepEqual(caseByID("CC-02").missingFacts, [
+  "Confirm the occupancy classification is Group R-2.", "Confirm the construction type is Type I or Type II."
+]);
+assert.doesNotMatch(caseByID("CC-03").missingFacts.join(" "), /Confirm the actual net area|Confirm the furniture arrangement/);
+assert.match(caseByID("CC-03").missingFacts.join(" "), /accessory/);
+assert.match(caseByID("CC-03").expectedAnswer, /occupant load of 60/);
 assert.match(caseByID("CC-05").expectedAnswer, /lavatory and a vanity/);
 assert.match(caseByID("ZR-09").expectedAnswer, /limits.*amount of affordable housing/);
 assert.match(caseByID("ZR-17").question, /11-333/);
@@ -70,7 +90,7 @@ droppedCase.expectedAnswer = originalFixtureCase.expectedConclusion;
 droppedCase.requiredConcepts = originalFixtureCase.requiredConcepts;
 droppedCase.forbiddenClaims = originalFixtureCase.forbiddenClaims;
 await assert.rejects(() => validateReconciledAnswerKey(droppedAmendment), /silently omitted/);
-await assertResearchEvaluationReferencesCurrent(["scissor-stair-two-exits"]);
+await assertResearchEvaluationReferencesCurrent([caseByID("CC-05").sourceCaseID]);
 await assert.rejects(() => assertResearchEvaluationReferencesCurrent([originalFixtureCase.id]),
   { code: "RESEARCH_EVALUATION_REFERENCE_AMENDED" });
 const legacy = spawnSync(process.execPath, ["--input-type=module", "--eval", `

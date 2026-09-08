@@ -51,6 +51,35 @@ assert.deepEqual(missingMap.missingFacts.map((item) => item.id), [
   "official_mapped_status"
 ]);
 
+const sourceBoundaryQuestion = "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?";
+for (const question of [sourceBoundaryQuestion,
+  sourceBoundaryQuestion.replace("establish", "show").replace("site-specific conclusion", "parcel-specific determination")]) {
+  const plan = planZoningResearchQuestion({ question });
+  assert.equal(plan.path, zoningResearchPaths.propertyMapApplicability);
+  assert.equal(plan.disposition, zoningResearchDispositions.ready,
+    "Explaining a source's limits does not require identifying a parcel first.");
+  assert.deepEqual(plan.missingFacts, []);
+  assert.equal(plan.questionSignals.sourceBoundaryExplanationOnly, true);
+  assert.equal(plan.deterministicControls.propertyAndMapPrerequisites, true);
+  assert.equal(plan.callPolicy.subjectiveVerification, true,
+    "A source explanation still requires semantic verification against its citations.");
+  assert.equal(plan.callPolicy.initialTier, missingMap.callPolicy.initialTier);
+}
+for (const question of [
+  `${sourceBoundaryQuestion} Can this specific property be approved?`,
+  sourceBoundaryQuestion.replace("?", ", and can our parcel be approved?"),
+  sourceBoundaryQuestion.replace("?", " for 123 Main Street?"),
+  sourceBoundaryQuestion.replace("?", " for BBL 1000010001?"),
+  sourceBoundaryQuestion.replace("cannot be made", "can be made")
+]) {
+  const plan = planZoningResearchQuestion({ question });
+  assert.equal(plan.questionSignals.sourceBoundaryExplanationOnly, false);
+  assert.equal(plan.disposition, zoningResearchDispositions.deterministicBoundary);
+  assert.equal(plan.callPolicy.maximumProviderCalls, 0);
+  assert.ok(plan.missingFacts.some((item) => item.id === "official_mapped_status"),
+    "A source-boundary clause must not waive a requested parcel determination.");
+}
+
 const generalDefinition = planZoningResearchQuestion({
   question: "Under the selected definition, what is a zoning lot?"
 });

@@ -1,6 +1,6 @@
 // Source locations are discovery hints, never an answer key. Each document is
 // fetched and validated again before its contents may support an answer.
-export const researchDOBWorkflowRoutingVersion = "20260908-dob-procedural-sources-v1";
+export const researchDOBWorkflowRoutingVersion = "20260908-dob-form-question-sources-v2";
 const source = (id, title, filename) => Object.freeze({
   id, title, url: `https://www.nyc.gov/assets/buildings/pdf/${filename}`,
   publisher: "NYC Department of Buildings", catalogReviewedOn: "2026-09-08"
@@ -17,7 +17,9 @@ export function researchDOBWorkflowRoute(question) {
   const dob = /\bDOB\s*NOW\b|\b(?:DOB|Department of Buildings)\b/i.test(text);
   const namedPortal = /\bDOB\s*NOW\b/i.test(text);
   const workflow = /\b(?:fil(?:e|ed|ing|ings)|applications?|job types?|work types?|review types?|documents?|uploads?|submit|submission|attest(?:ation|ations)?|signatures?|form|portal|workflow|tab|screen|field|select|answer (?:yes|no)|check(?:box)?|authorization|waiver|renew(?:al)?|PAA|LOC)\b/i.test(text);
-  if (!(bpp || dob) || !workflow) return null;
+  const formQuestion = namedPortal && /\b(?:questions?|responses?)\b/i.test(text) &&
+    /\b(?:answer(?:ed)?|respond|response|select)\b/i.test(text);
+  if (!(bpp || dob) || !(workflow || formQuestion)) return null;
   const wetlands = /\bwetlands?\b|\bcoastal erosion\b|\bCEHA\b/i.test(text);
   const requiresEnactedAnswer = /\b(?:FAR|floor area ratio|zoning|as[- ]of[- ]right|legal(?:ly)?|compli(?:ance|ant|es)|comply|violat(?:ion|e)|permit[- ]exempt|exempt(?:ion)? from|(?:building|plumbing|mechanical|fuel gas|construction) code|code (?:requirement|compliance)|(?:BC|PC|AC|ZR|MC|FGC)\s*(?:§|Section)?\s*\d)/i.test(text);
   const topic = bpp ? "builders_pavement" : wetlands ? "wetland_documents" : "dob_now_workflow";

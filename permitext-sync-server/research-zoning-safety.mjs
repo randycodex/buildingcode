@@ -560,7 +560,7 @@ function statesSourceLevelMappedAreaRule(value) {
   return facilityRule.test(text) || areaDirectRule.test(text) || areaRelativeRule.test(text);
 }
 
-function isAppendixJSourceBoundaryQuestion(value) {
+export function isAppendixJSourceBoundaryQuestion(value) {
   const text = compactText(value);
   return /\bAppendix\s+J\b/i.test(text) &&
     /\bwhat\b[^?]{0,180}\b(?:establish|show|provide)\b/i.test(text) &&

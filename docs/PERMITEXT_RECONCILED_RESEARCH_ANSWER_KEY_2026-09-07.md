@@ -17,6 +17,7 @@ Put a condition that changes Yes/No in the opening answer. Use adjacent citation
 - The repository also contains 30 additional Zoning cases in zoning-cases-expanded-batch-1.json. They are outside this 50-case reconciliation and have not been silently added.
 - No new model quality score or response-time benchmark is claimed. DOB conflicts need the current official materials and actual filing where applicable.
 - CC-04 has an explicit development correction for the optional Assembly calculation. Its original approved source is preserved, and approval of the corrected wording remains pending.
+- CC-01 through CC-03 have development amendments aligning missing-fact expectations with supplied facts and evidence boundaries. Their original source inputs and historical approvals are preserved; the amendments await professional review.
 - The 24 DOB NOW scenarios are restored. Several Zoning questions are replaced with their revised repository versions; their original intake wording remains visible below.
 - Construction answers retain Plumbing Code scope and vanity/lavatory distinctions. Explicit development corrections below preserve the original source record and carry their own pending-review status. DOB NOW answers retain the subsequent-filing completion distinction, PAA source conflict, site-safety applicability, DEP drainage condition, and distinct Loft Board routes.
 - This work does not authorize paid model calls, change source approval status, enable public Research, or establish professional sign-off. New reconciled prose has no new independent professional approval.
@@ -28,7 +29,7 @@ Intake: `Permitext_Consolidated_Evaluation_Questions_Answer_Key.md`; SHA-256 `40
 - [research-cases.json](../permitext-sync-server/evals/research-cases.json) — SHA-256 `da3a0e1061b94d9707abc713d0827a8c1df46b9d8a873e9544b35ac9d90eeefb`.
 - [zoning-cases.json](../permitext-sync-server/evals/zoning-cases.json) — SHA-256 `90b9cf4c5c3ea40522103d42a9b8ec052b044cf42be019cae53eed61cfa008a6`.
 - [review-packets/dob-now-expediter-draft-review.md](../permitext-sync-server/evals/review-packets/dob-now-expediter-draft-review.md) — SHA-256 `715301e11a99f50ea320402102bb5376e627a41fce0510f7d8705f05929be975`.
-- [research-answer-key-amendments.json](../permitext-sync-server/evals/research-answer-key-amendments.json) — SHA-256 `bff14ce88bc63d4e675aca87222c57d13b24f8887d25b280969bcf6b2810594f`.
+- [research-answer-key-amendments.json](../permitext-sync-server/evals/research-answer-key-amendments.json) — SHA-256 `4468eaa3f3b6d03dbef1cab2bd47733fe8bb1a4c52db10f52225d12746b89e94`.
 
 DOB workflow material remains dated to its review snapshot. Consult current [DOB FAQs](https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page), [NB/Alteration-CO FAQs](https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page), [PAA guidance](https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page), [Application User Guide](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf), [release notes](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf), and [service updates](https://www.nyc.gov/site/buildings/dob/service-updates.page) for live guidance. A source URL is not a claim that all 50 answers were newly verified online.
 
@@ -37,6 +38,8 @@ DOB workflow material remains dated to its review snapshot. Consult current [DOB
 Source basis: 2022 New York City Construction Codes
 
 Source case: `scissor-stair-two-exits`; recorded status: approved; reviewed: 2026-07-23T21:35:54.092Z. Scope: Existing construction-code evaluation approval; no new live result or release approval.
+
+**Development correction:** `cc01-established-facts-20260908`. Status: development-correction-pending-professional-review. The original approval above is historical; it does not approve this corrected wording or rubric.
 
 **Project facts supplied to Research:**
 
@@ -58,7 +61,7 @@ Our Group R-2 building has a scissor stair with the two stair entrance doors loc
 
 **Expected answer:**
 
-The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. Confirm the occupancy group, enclosure rating, separating construction, and material before concluding that the exception applies.
+The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. The question establishes Group R-2 occupancy and the 15-foot door separation. Confirm the enclosure rating, separating-construction rating, and masonry or masonry-equivalent construction before concluding that the exception applies.
 
 **Required concepts:**
 
@@ -68,12 +71,14 @@ The 15-foot separation alone is not enough. Under the general rule, stairs shari
 - Identify the 2-hour enclosure and separating-construction requirements.
 - Identify the masonry or masonry-equivalent requirement.
 - Identify the minimum 15-foot exit-door separation.
+- Treat the stated Group R-2 occupancy and 15-foot door separation as supplied facts; retain only the unresolved construction conditions.
 
 **Forbidden conclusions:**
 
 - Every scissor stair automatically counts as one exit.
 - Fifteen feet of door separation automatically makes the stairs compliant.
 - Sprinkler protection by itself satisfies the Group R-2 exception.
+- Require the user to reconfirm Group R-2 occupancy or the stated 15-foot separation without a contradiction.
 
 **Authority / evidence to verify:**
 
@@ -81,7 +86,6 @@ The 15-foot separation alone is not enough. Under the general rule, stairs shari
 
 **Missing facts:**
 
-- Confirm Group R-2 occupancy.
 - Confirm the stair-enclosure fire-resistance rating.
 - Confirm the construction separating the stairs and its fire-resistance rating.
 - Confirm masonry or an accepted masonry equivalent.
@@ -89,12 +93,15 @@ The 15-foot separation alone is not enough. Under the general rule, stairs shari
 **Reconciliation notes:**
 
 - Use the current repository answer and rubric, with the selected evidence and project context restored.
+- Development amendment cc01-established-facts-20260908 aligns missing-fact expectations with the supplied question and Project facts. Original source approvals are preserved; this correction awaits professional review.
 
 ## CC-02 — Single stair in a six-story residential building
 
 Source basis: 2022 New York City Construction Codes
 
 Source case: `single-stair-six-story-r2`; recorded status: approved; reviewed: 2026-07-22T00:00:00.000Z. Scope: Existing construction-code evaluation approval; no new live result or release approval.
+
+**Development correction:** `cc02-established-facts-20260908`. Status: development-correction-pending-professional-review. The original approval above is historical; it does not approve this corrected wording or rubric.
 
 **Project facts supplied to Research:**
 
@@ -126,6 +133,7 @@ BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II 
 - Identify the 2,000-square-foot-per-story maximum.
 - Recognize that six stories and approximately 1,950 square feet satisfy only the stated height and area conditions.
 - Limit the conclusion to potential availability of the single-exit allowance.
+- Keep other-scope evidence limitations separate from missing Project facts; the missing facts for Item 7 are occupancy and construction type.
 
 **Forbidden conclusions:**
 
@@ -141,17 +149,19 @@ BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II 
 
 - Confirm the occupancy classification is Group R-2.
 - Confirm the construction type is Type I or Type II.
-- Check other applicable requirements under evidence supplied for those requirements.
 
 **Reconciliation notes:**
 
 - Use the current repository answer and rubric, with the selected evidence and project context restored.
+- Development amendment cc02-established-facts-20260908 aligns missing-fact expectations with the supplied question and Project facts. Original source approvals are preserved; this correction awaits professional review.
 
 ## CC-03 — Occupancy classification of a residential multipurpose room
 
 Source basis: 2022 New York City Construction Codes
 
 Source case: `residential-multipurpose-occupancy`; recorded status: approved; reviewed: 2026-07-22T00:00:00.000Z. Scope: Existing construction-code evaluation approval; no new live result or release approval.
+
+**Development correction:** `cc03-established-facts-20260908`. Status: development-correction-pending-professional-review. The original approval above is historical; it does not approve this corrected wording or rubric.
 
 **Project facts supplied to Research:**
 
@@ -170,7 +180,7 @@ A 900-net-square-foot multipurpose room in an apartment building will normally c
 
 **Expected answer:**
 
-For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. The result depends on the actual net area, furniture arrangement, intended activities, and whether the room is truly accessory to the residential use.
+For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. Confirm whether the room is accessory to the residential occupancy. Other intended functions may require a different occupant-load factor; the stated normal tables-and-chairs arrangement does not establish concentrated seating or standing use.
 
 **Required concepts:**
 
@@ -179,12 +189,14 @@ For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.
 - Compare 60 with the fewer-than-75 threshold.
 - Explain the Group B or served-occupancy classification option when the room is accessory.
 - Avoid automatically classifying every residential amenity room as Group R-2.
+- Treat the stated net area and normal furniture arrangement as supplied facts; distinguish other material intended functions from reconfirming those facts.
 
 **Forbidden conclusions:**
 
 - Every residential amenity room is automatically Group R-2.
 - The room is below 75 occupants without performing the calculation.
 - The result is unchanged for concentrated seating, standing space, or another function.
+- Call the stated 900-net-square-foot area or normal tables-and-chairs arrangement missing without a contradiction.
 
 **Authority / evidence to verify:**
 
@@ -193,14 +205,13 @@ For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.
 
 **Missing facts:**
 
-- Confirm the actual net area.
-- Confirm the furniture arrangement and occupant-load factor.
-- Confirm the intended activities.
-- Confirm the room is accessory to the residential occupancy.
+- Confirm whether the room is accessory to the residential occupancy.
+- Whether other intended activities require a different function-specific occupant-load factor from the stated normal tables-and-chairs use.
 
 **Reconciliation notes:**
 
 - Use the current repository answer and rubric, with the selected evidence and project context restored.
+- Development amendment cc03-established-facts-20260908 aligns missing-fact expectations with the supplied question and Project facts. Original source approvals are preserved; this correction awaits professional review.
 
 ## CC-04 — Plumbing fixtures for an accessory assembly space
 

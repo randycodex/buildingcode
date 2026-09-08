@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
+import { isAppendixJSourceBoundaryQuestion } from "./research-zoning-safety.mjs";
 
-export const zoningResearchPlannerVersion = "20260908-question-compiler-v3";
+export const zoningResearchPlannerVersion = "20260908-source-boundary-scope-v4";
 
 export const zoningResearchCompilerVersion = "20260901-answer-obligations-v21";
 export const zoningResearchRepairVersion = "20260901-source-bounded-patch-v2";
@@ -169,7 +170,7 @@ function questionPath(question) {
 function factRequirements(path, facts, question) {
   const requirements = [];
   if (path === zoningResearchPaths.propertyMapApplicability) {
-    const asksSourceBoundary = /\bwhat can .* establish\b|\bwhat .*cannot be made\b|\bwithout identifying\b/i.test(question);
+    const asksSourceBoundary = appendixJSourceExplanationOnly(question);
     const historicMIHLot = /\bMIH\b|Mandatory Inclusionary Housing/i.test(question) &&
       /\b(?:established in|date of establishment|combined in|historical zoning lot|small[- ]development exception)\b/i.test(question);
     const needsMappedDistrict = /\b(?:mapped zoning district|mapped district|transit zone|Appendix [A-Z]|subarea|specific property|self-service storage|close to (?:a|the) subway)\b/i.test(question) ||
@@ -184,7 +185,7 @@ function factRequirements(path, facts, question) {
         reason: "A parcel-specific mapped conclusion needs a usable property identifier."
       });
     }
-    if (needsMappedDistrict && !mappedStatusPresent) {
+    if (needsMappedDistrict && !mappedStatusPresent && !asksSourceBoundary) {
       requirements.push({
         id: "official_mapped_status",
         label: "controlling official map or verified mapped-district status",
@@ -227,6 +228,17 @@ function factRequirements(path, facts, question) {
     }
   }
   return requirements;
+}
+
+function appendixJSourceExplanationOnly(question) {
+  // The existing safety contract permits source-level Appendix J explanation
+  // while rejecting parcel results. Keep real or mixed property requests on
+  // the prerequisite path, even if they also ask about the selected source.
+  return isAppendixJSourceBoundaryQuestion(question) &&
+    /\b(?:cannot|can't)\s+be\s+(?:made|established|determined|drawn)\b/i.test(question) &&
+    (question.match(/\?/g) || []).length <= 1 &&
+    !propertyIdentifierPattern.test(question) &&
+    !/\b(?:this|that|our|my|your|subject|proposed|specific)\s+(?:site|property|parcel|lot|facility)\b/i.test(question);
 }
 
 function dispositionFor(path, requirements, question) {
@@ -302,6 +314,7 @@ export function planZoningResearchQuestion({
         : "provider_failure_or_one_source_bounded_repair"
     },
     questionSignals: {
+      sourceBoundaryExplanationOnly: appendixJSourceExplanationOnly(normalizedQuestion),
       explicitMissingFact: explicitMissingPattern.test(normalizedQuestion),
       propertyIdentifierPresent: propertyIdentifierPattern.test(facts),
       mappedStatusPresent: concreteMappedStatusPattern.test(facts)

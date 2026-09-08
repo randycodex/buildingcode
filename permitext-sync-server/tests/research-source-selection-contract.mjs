@@ -21,6 +21,22 @@ assert.equal(researchDOBWorkflowRoute("For a new BPP filing, use https://www.nyc
 assert.equal(researchDOBWorkflowRoute("For my DOB NOW application, does the proposed stair comply with BC 1007.1.1?").guidanceOnly, false);
 assert.equal(researchWebSupportTrigger({ question: "What authorization step appears?", retrievalQuery: "A new Builders Pavement Plan application. What authorization step appears?" }, {}).workflow.topic, "builders_pavement");
 assert.equal(researchWebSupportTrigger({ question: "What does PC 403.1 require?", retrievalQuery: "What does PC 403.1 require?" }, {}).workflow, undefined);
+const originalCases = JSON.parse(await readFile(new URL("../evals/research-reconciled-answer-key.json", import.meta.url)));
+for (const id of ["DOBNOW-007", "DOBNOW-016"]) {
+  const item = originalCases.cases.find((item) => item.id === id);
+  const question = [item.scenario, item.question].filter(Boolean).join("\n\n");
+  const route = researchWebSupportTrigger({ question }, {});
+  assert.equal(route.useWeb, true, `${id}: an explicit portal form question needs official workflow material.`);
+  assert.equal(route.workflow.guidanceOnly, true);
+  assert.equal(route.workflow.topic, "dob_now_workflow");
+  assert.equal(route.workflow.directDocumentRetrieval, false,
+    "Recognizing a form question does not preselect a page or manufacture an answer.");
+  assert.equal(researchWebSupportTrigger({ question: `Do not use the web. ${question}` }, {}).useWeb, false);
+}
+assert.equal(researchDOBWorkflowRoute("How should the roof question be answered?"), null,
+  "A form question without an identified portal must not be assumed to concern DOB NOW.");
+assert.equal(researchDOBWorkflowRoute("How should the DOB NOW roof question be answered, and does the work comply with BC 1507.1? ").guidanceOnly, false);
+assert.equal(researchWebSupportTrigger({ question: "Using only the selected code text, how should the DOB NOW roof question be answered?" }, {}).useWeb, false);
 const intake = JSON.parse(await readFile(new URL("../evals/research-owner-code-candidates.json", import.meta.url)));
 assert.equal(intake.cases.length, 60);
 assert.equal(new Set(intake.cases.map((item) => item.id)).size, 60);

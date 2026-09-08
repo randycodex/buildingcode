@@ -7826,7 +7826,7 @@ async function currentResearchCorpusRegistry() {
   return cachedResearchCorpusRegistry;
 }
 
-async function researchCorpusPlanForTurn({
+export async function researchCorpusPlanForTurn({
   question,
   messages = [],
   projectCodeVersion = null,

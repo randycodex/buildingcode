@@ -64,6 +64,144 @@
         ]
       },
       "evaluationInputSHA256": "e2545e30a7f393de68db66578469064981a092e927dcdf919e3f7db9e7672c71"
+    },
+    {
+      "id": "cc01-established-facts-20260908",
+      "caseID": "CC-01",
+      "sourceDataset": "research-cases.json",
+      "sourceCaseID": "scissor-stair-two-exits",
+      "sourceCaseSHA256": "5f8756ba294440da87e6718c7dc315c7728336ff96c5b79aa7bd6787cca88e0c",
+      "status": "development-correction-pending-professional-review",
+      "reviewedOn": "2026-09-08",
+      "rationale": "The reference incorrectly requested confirmation of occupancy expressly established by the question and Project facts. Preserve all unresolved conditions of Exception 3 while accepting those supplied facts. No code threshold, question, selection or Project fact changes.",
+      "sourceReferences": [
+        {
+          "reference": "BC 1007.1.1 Exception 3",
+          "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-173125",
+          "checkedOn": "2026-09-08",
+          "basis": "Current publisher text confirms the existing R-2 exception. The question supplies occupancy and door separation; construction ratings and material remain unresolved."
+        }
+      ],
+      "replacement": {
+        "expectedAnswer": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. The question establishes Group R-2 occupancy and the 15-foot door separation. Confirm the enclosure rating, separating-construction rating, and masonry or masonry-equivalent construction before concluding that the exception applies.",
+        "requiredConcepts": [
+          "State that the 15-foot door separation alone is insufficient.",
+          "Explain the general rule that stairs sharing a scissor-stair assembly count as one exit stairway.",
+          "Explain the Group R-2 exception for separately counted stairs.",
+          "Identify the 2-hour enclosure and separating-construction requirements.",
+          "Identify the masonry or masonry-equivalent requirement.",
+          "Identify the minimum 15-foot exit-door separation.",
+          "Treat the stated Group R-2 occupancy and 15-foot door separation as supplied facts; retain only the unresolved construction conditions."
+        ],
+        "forbiddenClaims": [
+          "Every scissor stair automatically counts as one exit.",
+          "Fifteen feet of door separation automatically makes the stairs compliant.",
+          "Sprinkler protection by itself satisfies the Group R-2 exception.",
+          "Require the user to reconfirm Group R-2 occupancy or the stated 15-foot separation without a contradiction."
+        ],
+        "missingFacts": [
+          "Confirm the stair-enclosure fire-resistance rating.",
+          "Confirm the construction separating the stairs and its fire-resistance rating.",
+          "Confirm masonry or an accepted masonry equivalent."
+        ],
+        "reconciliationNotes": [
+          "Use the current repository answer and rubric, with the selected evidence and project context restored.",
+          "Development amendment cc01-established-facts-20260908 aligns missing-fact expectations with the supplied question and Project facts. Original source approvals are preserved; this correction awaits professional review."
+        ]
+      },
+      "evaluationInputSHA256": "f516eb70e786df5b7814093feeadba40e5956d5ea4bb1bb92cfb9411e88ee20f"
+    },
+    {
+      "id": "cc02-established-facts-20260908",
+      "caseID": "CC-02",
+      "sourceDataset": "research-cases.json",
+      "sourceCaseID": "single-stair-six-story-r2",
+      "sourceCaseSHA256": "8b2387c33d232a2ede7d4d666d59edb068a3297d09baa293c47d179ff1ef3f57",
+      "status": "development-correction-pending-professional-review",
+      "reviewedOn": "2026-09-08",
+      "rationale": "A generic instruction to check other requirements is an evidence/scope limitation, not a missing Project fact. Preserve the original answer and its limited conclusion; remove only that misplaced list entry.",
+      "sourceReferences": [
+        {
+          "reference": "BC 1006.3.2 Item 7",
+          "basis": "The unchanged exact selected passage supplies Group R-2, Type I or II, six-story and 2,000-square-foot conditions. This amendment changes only evaluation field categorization, not the source interpretation."
+        }
+      ],
+      "replacement": {
+        "expectedAnswer": "BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II construction, does not exceed six stories, and does not exceed 2,000 square feet per story. The stated height and floor area satisfy two of those conditions, but compliance cannot be confirmed until the occupancy classification and construction type are known. This passage only establishes that the single-exit allowance may be available; other applicable egress, fire-protection, travel-distance, and design requirements must be checked under their respective sections without inventing requirements that are not in the selected evidence.",
+        "requiredConcepts": [
+          "Identify Group R-2 as a condition of Item 7.",
+          "Identify Type I or Type II construction as a condition.",
+          "Identify the six-story maximum.",
+          "Identify the 2,000-square-foot-per-story maximum.",
+          "Recognize that six stories and approximately 1,950 square feet satisfy only the stated height and area conditions.",
+          "Limit the conclusion to potential availability of the single-exit allowance.",
+          "Keep other-scope evidence limitations separate from missing Project facts; the missing facts for Item 7 are occupancy and construction type."
+        ],
+        "forbiddenClaims": [
+          "Every six-story residential building can have one stair.",
+          "The building qualifies without confirming Group R-2 and Type I or Type II construction.",
+          "Assert specific additional requirements that are not supported by selected passages."
+        ],
+        "missingFacts": [
+          "Confirm the occupancy classification is Group R-2.",
+          "Confirm the construction type is Type I or Type II."
+        ],
+        "reconciliationNotes": [
+          "Use the current repository answer and rubric, with the selected evidence and project context restored.",
+          "Development amendment cc02-established-facts-20260908 aligns missing-fact expectations with the supplied question and Project facts. Original source approvals are preserved; this correction awaits professional review."
+        ]
+      },
+      "evaluationInputSHA256": "bdd723490a823e836321b3ab85286531bcc78430c4cf0184ad410d2209f1d3b4"
+    },
+    {
+      "id": "cc03-established-facts-20260908",
+      "caseID": "CC-03",
+      "sourceDataset": "research-cases.json",
+      "sourceCaseID": "residential-multipurpose-occupancy",
+      "sourceCaseSHA256": "76691153bb6291ea107016207d42a96849c7097e25259ec803d6668dd02892f7",
+      "status": "development-correction-pending-professional-review",
+      "reviewedOn": "2026-09-08",
+      "rationale": "The original reference requested reconfirmation of area and furniture arrangement already provided by the question and Project facts. Preserve the selected 15-net calculation and unresolved accessory/use conditions. The publisher table footnote e restricts residential amenity factors to functions not otherwise listed, so no unsupported substitution of the 50-net factor is made.",
+      "sourceReferences": [
+        {
+          "reference": "BC 1004.1.3 and Table 1004.1.3 footnote e",
+          "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-172973",
+          "checkedOn": "2026-09-08",
+          "basis": "The tables-and-chairs assembly factor remains 15 net. The residential amenity fallback is limited to functions not otherwise listed; the selected-row calculation remains unchanged."
+        },
+        {
+          "reference": "BC 303.1.3",
+          "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-165886",
+          "checkedOn": "2026-09-08",
+          "basis": "The accessory relationship remains material to the less-than-75-occupants classification option."
+        }
+      ],
+      "replacement": {
+        "expectedAnswer": "For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. Confirm whether the room is accessory to the residential occupancy. Other intended functions may require a different occupant-load factor; the stated normal tables-and-chairs arrangement does not establish concentrated seating or standing use.",
+        "requiredConcepts": [
+          "Use the 15-net-square-feet-per-occupant factor for unconcentrated tables and chairs.",
+          "Calculate 900 divided by 15 as an occupant load of 60.",
+          "Compare 60 with the fewer-than-75 threshold.",
+          "Explain the Group B or served-occupancy classification option when the room is accessory.",
+          "Avoid automatically classifying every residential amenity room as Group R-2.",
+          "Treat the stated net area and normal furniture arrangement as supplied facts; distinguish other material intended functions from reconfirming those facts."
+        ],
+        "forbiddenClaims": [
+          "Every residential amenity room is automatically Group R-2.",
+          "The room is below 75 occupants without performing the calculation.",
+          "The result is unchanged for concentrated seating, standing space, or another function.",
+          "Call the stated 900-net-square-foot area or normal tables-and-chairs arrangement missing without a contradiction."
+        ],
+        "missingFacts": [
+          "Confirm whether the room is accessory to the residential occupancy.",
+          "Whether other intended activities require a different function-specific occupant-load factor from the stated normal tables-and-chairs use."
+        ],
+        "reconciliationNotes": [
+          "Use the current repository answer and rubric, with the selected evidence and project context restored.",
+          "Development amendment cc03-established-facts-20260908 aligns missing-fact expectations with the supplied question and Project facts. Original source approvals are preserved; this correction awaits professional review."
+        ]
+      },
+      "evaluationInputSHA256": "4c8720ddc0f46cf01121c50cf57c473603e948ed0223de3a15a0ba1989e3dd92"
     }
   ]
 }
