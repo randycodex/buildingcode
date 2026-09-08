@@ -1,0 +1,1417 @@
+{
+  "schema": "permitext-owner-plumbing-repair-confirmation-v2-20260908-v1",
+  "authorization": "Owner: approximately $8 available for API testing; test as many times as needed. Two plumbing source repair confirmations and three previously undispatched plumbing cases, one attempt each, capped at $0.50 conservative aggregate with no manual retries.",
+  "previousConservativeSpendUSD": 7.488284,
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "sourceCommit": "5d1b0e189c5f12ad88f89449103a461c1db36cac",
+  "execution": "Isolated local HTTP Research conversations with live OpenAI responses; automatic evidence discovery; no reference answers supplied to the answering model.",
+  "maximumCumulativeSpendUSD": 0.5,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 5,
+  "authorizationUSD": 8,
+  "turnBudgetPolicy": "Cap each complete provider pipeline at the lesser of $0.50 and the remaining settled conservative $0.50 batch budget. Missing or pending accounting stops all further requests.",
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing; general answers medium reasoning; standard service tier",
+  "zoning": "Local diagnostic eligibility only; no public gate or deployment changes",
+  "cases": [
+    {
+      "id": "PC-03",
+      "conversation": "PC-03",
+      "question": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?"
+    },
+    {
+      "id": "PC-04",
+      "conversation": "PC-04",
+      "question": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?"
+    },
+    {
+      "id": "PC-10",
+      "conversation": "PC-10",
+      "question": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?"
+    },
+    {
+      "id": "PC-11",
+      "conversation": "PC-11",
+      "question": "A new 3-inch horizontal sanitary drainage pipe is designed at a slope of 1/16 inch per foot. Is that enough?"
+    },
+    {
+      "id": "PC-13",
+      "conversation": "PC-13",
+      "question": "A designer places two traps in series on a sink waste line to provide “extra protection” against sewer gas. Is double trapping permitted?"
+    }
+  ],
+  "preflightSHA256": "ab4b9e3a98e8a2ff5f233b393ff5ed045f89612fddfd0afcf50c033687995bf9",
+  "startedAt": "2026-09-08T07:08:13.541Z",
+  "status": "stopped",
+  "results": [
+    {
+      "id": "PC-03",
+      "question": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?",
+      "maximumTurnSpendUSD": 0.5,
+      "status": "completed",
+      "startedAt": "2026-09-08T07:08:13.667Z",
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:conversational-v4",
+        "evidenceVersion": "20260908-complete-governing-passages-v26:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-intake-lot-context-v6",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T07:08:13.729Z"
+        },
+        "answerText": "**No.** Four bottle-filling stations with no drinking fountains are not permitted as the substitution for four required drinking fountains. At most 50 percent may be replaced: for four required fountains, that permits **two** qualifying dedicated bottle-filling fixtures and still requires **two drinking fountains**. Each substituted fixture must be adjacent to or readily visible from a drinking fountain conforming to PC § 410.1. (PC § 410.3)\n\nFurther, drinking fountains required by Table 403.1 must have both a bubbler faucet and a separate container-filling faucet designed for a container at least 10 inches high. (PC § 410.1) Thus, a compliant arrangement could be two such drinking fountains plus two qualifying dedicated bottle-filling fixtures, subject to the specified adjacency/visibility condition. The supplied evidence does not establish the proposed stations’ fixture design or locations.\n\nEach replacement bottle-filling fixture must have a faucet designed to fill a container at least 10 inches (254 mm) high (PC § 410.3).",
+        "conclusion": "**No.** Four bottle-filling stations with no drinking fountains are not permitted as the substitution for four required drinking fountains. At most 50 percent may be replaced: for four required fountains, that permits **two** qualifying dedicated bottle-filling fixtures and still requires **two drinking fountains**. Each substituted fixture must be adjacent to or readily visible from a drinking fountain conforming to PC § 410.1. (PC § 410.3)",
+        "supportedPoints": [
+          {
+            "heading": "Bottle-filling substitution is limited to half",
+            "explanation": "Where drinking fountains are required, no more than 50 percent of the required drinking fountains may be substituted with dedicated plumbing fixtures having faucets designed to fill containers at least 10 inches high. Each substitute must be adjacent to, or readily visible from, a drinking fountain conforming to PC 410.1. Bottled-water dispensers cannot be substituted.",
+            "sectionID": "11961",
+            "sourceIDs": [
+              "research-permitext_discovered-id:11961-1"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Required fountains need drinking and filling faucets",
+            "explanation": "Drinking fountains required by Table 403.1 must be equipped with both a bubbler faucet for drinking and a separate faucet designed to fill a container at least 10 inches high.",
+            "sectionID": "11959",
+            "sourceIDs": [
+              "research-permitext_discovered-id:11959-2"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "Further, drinking fountains required by Table 403.1 must have both a bubbler faucet and a separate container-filling faucet designed for a container at least 10 inches high. (PC § 410.1) Thus, a compliant arrangement could be two such drinking fountains plus two qualifying dedicated bottle-filling fixtures, subject to the specified adjacency/visibility condition. The supplied evidence does not establish the proposed stations’ fixture design or locations.\n\nEach replacement bottle-filling fixture must have a faucet designed to fill a container at least 10 inches (254 mm) high (PC § 410.3).",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This answer is limited to the supplied 2022 NYC Plumbing Code provisions and does not determine whether the proposed bottle-filling stations meet the required faucet-design or adjacency/visibility conditions."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "11961",
+            "sectionNumber": "410.3",
+            "title": "410.3 Required drinking fountains.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:11961-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:11961-1",
+                "selectedText": "410.3 410.3 Required drinking fountains. Where water is served in restaurants, drinking fountains shall not be required. In other occupancies, where drinking fountains are required, up to 50 percent of required drinking fountains conforming to Section 410.1 may be substituted by dedicated plumbing fixtures with faucets designed for filling a container at least 10 inches (254 mm) in height, provided any such dedicated plumbing fixture is adjacent to or readily visible from the location of a drinking fountain conforming to Section 410.1. Bottled water dispensers shall not be substituted for required drinking fountains.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the 50-percent maximum substitution, qualifying-fixture characteristics, adjacency or visibility condition, and prohibition on bottled-water-dispenser substitution."
+          },
+          {
+            "sectionID": "11959",
+            "sectionNumber": "410.1",
+            "title": "410.1 Approval.",
+            "codePrefix": "PC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:11959-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:11959-2",
+                "selectedText": "410.1 410.1 Approval. Drinking fountains shall conform to ASME A112.19.1/CSA B45.2 or ASME A112.19.2/CSA B45.1 and water coolers shall conform to AHRI 1010. Drinking fountains and water coolers shall conform to NSF 61, Section 9 and ICC A117.1. Drinking fountains required by Table 403.1 shall be equipped with both a bubbler faucet for drinking and a separate faucet designed for filling a container at least 10 inches (254 mm) in height. Drinking fountains and water coolers shall comply with the lead requirements of Section 605 .",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the bubbler and separate container-filling faucet requirement for drinking fountains required by Table 403.1."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "11961",
+          "11959",
+          "2825",
+          "11962",
+          "11925",
+          "2827",
+          "2826",
+          "11960",
+          "2691",
+          "11958",
+          "113",
+          "11909",
+          "2692",
+          "2696",
+          "2693",
+          "2694",
+          "2695"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:11961-1",
+          "research-permitext_discovered-id:11959-2",
+          "research-permitext_discovered-id:2825-3",
+          "research-permitext_discovered-id:11962-4",
+          "research-permitext_discovered-id:11925-5",
+          "research-permitext_discovered-id:2827-6",
+          "research-permitext_discovered-id:2826-7",
+          "research-permitext_discovered-id:11960-8",
+          "research-permitext_discovered-id:2691-9",
+          "research-permitext_discovered-id:11958-10",
+          "research-permitext_discovered-id:113-13",
+          "research-permitext_cross_reference-id:11909-1",
+          "research-permitext_cross_reference-id:2692-4",
+          "research-permitext_cross_reference-id:2696-5",
+          "research-permitext_cross_reference-id:2693-7",
+          "research-permitext_cross_reference-id:2694-8",
+          "research-permitext_cross_reference-id:2695-9"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 17,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 2,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 15,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 11,
+          "crossReferenceCount": 6,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 2,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "PC 410.3",
+              "summary": "PC 410.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11961-1"
+              ]
+            },
+            {
+              "label": "PC 410.1",
+              "summary": "PC 410.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11959-2"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "PC 410.3",
+              "summary": "PC 410.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11961-1"
+              ]
+            },
+            {
+              "label": "PC 410.1",
+              "summary": "PC 410.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11959-2"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "BC 1109.5.2",
+              "summary": "BC 1109.5.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2827-6"
+              ]
+            },
+            {
+              "label": "BC 1109.5.1",
+              "summary": "BC 1109.5.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2826-7"
+              ]
+            },
+            {
+              "label": "BC 1106.8",
+              "summary": "BC 1106.8 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2691-9"
+              ]
+            },
+            {
+              "label": "PC 403.1",
+              "summary": "PC 403.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11909-1"
+              ]
+            },
+            {
+              "label": "BC 1106.8.3",
+              "summary": "BC 1106.8.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2694-8"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-13"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "PC 403.1",
+              "summary": "PC 403.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11909-1"
+              ]
+            },
+            {
+              "label": "BC 1106.8.1",
+              "summary": "BC 1106.8.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2692-4"
+              ]
+            },
+            {
+              "label": "BC 1106.8.5",
+              "summary": "BC 1106.8.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2696-5"
+              ]
+            },
+            {
+              "label": "BC 1106.8.2",
+              "summary": "BC 1106.8.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2693-7"
+              ]
+            },
+            {
+              "label": "BC 1106.8.3",
+              "summary": "BC 1106.8.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2694-8"
+              ]
+            },
+            {
+              "label": "BC 1106.8.4",
+              "summary": "BC 1106.8.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2695-9"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "PC 410.1",
+              "summary": "PC 410.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:11959-2"
+              ]
+            },
+            {
+              "label": "PC 403.1",
+              "summary": "PC 403.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11909-1"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:11961-1",
+            "research-permitext_discovered-id:11959-2",
+            "research-permitext_discovered-id:2825-3",
+            "research-permitext_discovered-id:11962-4",
+            "research-permitext_discovered-id:11925-5",
+            "research-permitext_discovered-id:2827-6",
+            "research-permitext_discovered-id:2826-7",
+            "research-permitext_discovered-id:11960-8",
+            "research-permitext_discovered-id:2691-9",
+            "research-permitext_discovered-id:11958-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:11909-1",
+            "research-permitext_cross_reference-id:2692-4",
+            "research-permitext_cross_reference-id:2696-5",
+            "research-permitext_cross_reference-id:2693-7",
+            "research-permitext_cross_reference-id:2694-8",
+            "research-permitext_cross_reference-id:2695-9"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:11961-1",
+            "research-permitext_discovered-id:11959-2"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:11961-1",
+            "research-permitext_discovered-id:11959-2"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:11961-1",
+            "research-permitext_discovered-id:11959-2"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2825-3",
+            "research-permitext_discovered-id:11962-4",
+            "research-permitext_discovered-id:11925-5",
+            "research-permitext_discovered-id:2827-6",
+            "research-permitext_discovered-id:2826-7",
+            "research-permitext_discovered-id:11960-8",
+            "research-permitext_discovered-id:2691-9",
+            "research-permitext_discovered-id:11958-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:11909-1",
+            "research-permitext_cross_reference-id:2692-4",
+            "research-permitext_cross_reference-id:2696-5",
+            "research-permitext_cross_reference-id:2693-7",
+            "research-permitext_cross_reference-id:2694-8",
+            "research-permitext_cross_reference-id:2695-9"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:11961-1",
+              "label": "PC 410.3 — 410.3 Required drinking fountains.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:11961-1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:11959-2",
+              "label": "PC 410.1 — 410.1 Approval.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:11959-2"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:11961-1",
+            "research-permitext_discovered-id:11959-2"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:11961-1",
+              "label": "PC 410.3 — 410.3 Required drinking fountains.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:11961-1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:11961-1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:11961-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:11959-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:11961-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:11959-2",
+              "label": "PC 410.1 — 410.1 Approval.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:11959-2"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:11959-2"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:11961-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:11959-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:11959-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-plumbing-source-repairs-v27",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:11961-1",
+            "research-permitext_discovered-id:11959-2"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:2825-3",
+            "research-permitext_discovered-id:11962-4",
+            "research-permitext_discovered-id:11925-5",
+            "research-permitext_discovered-id:2827-6",
+            "research-permitext_discovered-id:2826-7",
+            "research-permitext_discovered-id:11960-8",
+            "research-permitext_discovered-id:2691-9",
+            "research-permitext_discovered-id:11958-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:11909-1",
+            "research-permitext_cross_reference-id:2692-4",
+            "research-permitext_cross_reference-id:2696-5",
+            "research-permitext_cross_reference-id:2693-7",
+            "research-permitext_cross_reference-id:2694-8",
+            "research-permitext_cross_reference-id:2695-9"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 2,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 2,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 15,
+            "reviewedOnlyProvisionCount": 15,
+            "assembledSourceCount": 17,
+            "assembledProvisionCount": 17
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:11961-1",
+              "sectionID": "11961",
+              "reference": "PC 410.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "410.3 410.3 Required drinking fountains. Where water is served in restaurants, drinking fountains shall not be required. In other occupancies, where drinking fountains are required, up to 50 percent of required drinking fountains conforming to Section 410.1 may be substituted by dedicated plumbing fixtures with faucets designed for filling a container at least 10 inches (254 mm) in height, provided any such dedicated plumbing fixture is adjacent to or readily visible from the location of a drinking fountain conforming to Section 410.1. Bottled water dispensers shall not be substituted for required drinking fountains."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11959-2",
+              "sectionID": "11959",
+              "reference": "PC 410.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "410.1 410.1 Approval. Drinking fountains shall conform to ASME A112.19.1/CSA B45.2 or ASME A112.19.2/CSA B45.1 and water coolers shall conform to AHRI 1010. Drinking fountains and water coolers shall conform to NSF 61, Section 9 and ICC A117.1. Drinking fountains required by Table 403.1 shall be equipped with both a bubbler faucet for drinking and a separate faucet designed for filling a container at least 10 inches (254 mm) in height. Drinking fountains and water coolers shall comply with the lead requirements of Section 605 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2825-3",
+              "sectionID": "2825",
+              "reference": "BC 1109.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1109.5 1109.5 Drinking fountains. Where drinking fountains are provided on an exterior site, on a floor or within a secured area, the drinking fountains shall be provided in accordance with Sections 1109.5.1 and 1109.5.2."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11962-4",
+              "sectionID": "11962",
+              "reference": "PC 410.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "410.4 410.4 Prohibited location. Drinking fountains and plumbing fixtures with faucets permitted to be substituted for required drinking fountains shall not be installed in public restrooms. Section PC 411: Emergency Showers and Eyewash Stations"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11925-5",
+              "sectionID": "11925",
+              "reference": "PC 403.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "403.5 403.5 Drinking fountain location. Drinking fountains shall not be required to be located in individual tenant spaces provided that public drinking fountains are located on each story within a distance of travel of 500 feet (152 m) of the most remote location in the tenant space on such story. Where the tenant space is in a covered or open mall, such distance shall not exceed 300 feet (91 m). Drinking fountains shall be located on an accessible route. Section PC 404: Accessible Plumbing Facilities"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2827-6",
+              "sectionID": "2827",
+              "reference": "BC 1109.5.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1109.5.2 1109.5.2 More than the minimum number. Where more than the minimum number of drinking fountains specified in Section 1109.5.1 is provided, 50 percent of the total number of drinking fountains provided shall comply with the requirements for people who use a wheelchair and 50 percent of the total number of drinking fountains provided shall comply with the requirements for standing persons. Exceptions: 1. Where 50 percent of the drinking fountains yields a fraction, 50 percent shall be permitted to be rounded up or down, provided that the total number of drinking fountains complying with this section equals 100 percent of the drinking fountains. 2. Where drinking fountains are primarily for children's use, drinking fountains for people using wheelchairs shall be permitted to comply with the children's provisions in ICC A117.1 and drinking fountains for standing children shall be permitted to provide the spout at 30 inches (762 mm) minimum above the floor."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2826-7",
+              "sectionID": "2826",
+              "reference": "BC 1109.5.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1109.5.1 1109.5.1 Minimum number. No fewer than two drinking fountains shall be provided. One drinking fountain shall comply with the requirements for people who use a wheelchair and one drinking fountain shall comply with the requirements for standing persons. Exceptions: 1. A single drinking fountain with two separate spouts that complies with the requirements for people who use a wheelchair and standing persons shall be permitted to be substituted for two separate drinking fountains. 2. Where drinking fountains are primarily for children's use, drinking fountains for people using wheelchairs shall be permitted to comply with the children's provisions in ICC A117.1 and drinking fountains for standing children shall be permitted to provide the spout at 30 inches (762 mm) minimum above the floor."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11960-8",
+              "sectionID": "11960",
+              "reference": "PC 410.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "410.2 410.2 Small occupancies. Drinking fountains shall not be required for an occupant load of 15 or fewer."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2691-9",
+              "sectionID": "2691",
+              "reference": "BC 1106.8",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1106.8 1106.8 Electrical vehicle charging stations. Electrical vehicle charging stations shall comply with Sections 1106.8.1 through 1106.8.5. Exception: Electrical vehicle charging stations intended for use by a designated vehicle or driver shall not be required to comply with this section."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:11958-10",
+              "sectionID": "11958",
+              "reference": "PC 409.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "409.3 409.3 Waste connection. The waste connection of a dishwashing machine shall comply with Section 802 . Section PC 410: Drinking Fountains"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-13",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ACCESSIBLE. A site, building, facility or portion thereof that complies with Chapter 11 . ACCESSIBLE ROUTE. A continuous, unobstructed path that complies with Chapter 11 . FACILITY . All or any portion of buildings , structure , site improvements , elements and pedestrian or vehicular routes located on a site . LOADS. Forces or other actions that result from the weight of building materials, occupants and their possessions, environmental effects, differential movement and restrained dimensional changes. Permanent loads are those loads in which variations over time are rare or of small magnitude, such as dead loads. All other loads are variable loads (see also \"Nominal loads\"). OCCUPANT LOAD . The number of persons for which the means of egress of a building or portion thereof is designed . SITE. A parcel of land bounded by a lot line or a designated portion of a public right-of-way. STORY . That portion of a building included between the upper surface of a floor and the upper surface of the floor or roof next above ( also see \" Basement \" and \" Mezzanine \"). It is measured as the vertical distance from top to top of two successive tiers of beams or finished floor surfaces and , for the topmost story , from the top of the floor finish to the top of the ceiling joists or , where there is not a ceiling , to the top of the roof rafters . TRAVEL. The function of the machine moving under its own power from one location to another on a jobsite."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:11909-1",
+              "sectionID": "11909",
+              "reference": "PC 403.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Table 403.1 Minimum Number of Required Plumbing Fixtures a (See Sections 403.1.1 and 403.2) No. Classification Occupancy i Description Water Closets (Urinals: See Section 419.2) Lavatories Bathtubs/ Showers Drinking Fountain (See Section 410 ) e Other Male Female Male Female No. Classification Occupancy i Description Water Closets (Urinals: See Section 419.2) Lavatories Bathtubs/ Showers Drinking Fountain (See Section 410 ) e Other Male Female Male Female 1 Assembly A-1 d Theaters and other buildings for the performing arts and motion pictures 1 per 70 for the first 210 and 1 per 125 for the remainder 1 per 35 for the first 210 and 1 per 65 for the remainder 1 per 200 - 1 per 500 1 service sink A-2 d Nightclubs, bars f , taverns, dance halls and buildings for similar purposes 1 per 75 i 1 per 40 i 1 per 75 - 1 per 500 1 service sink Restaurants g , banquet halls and food courts 1 per 75 1 per 75 1 per 200 - 1 per 500 1 service sink A-3 d Auditoriums without permanent seating, art galleries, exhibition halls, museums, lecture halls, arcades and gymnasiums 1 per 70 for the first 210 and 1 per 125 for the remainder 1 per 35 for the first 210 and 1 per 65 for the remainder 1 per 200 - 1 per 500 1 service sink Passenger terminals and transportation facilities 1 per 500 1 per 500 1 per 750 - 1 per 1,000 1 service sink Places of worship and other religious services 1 per 150 1 per 75 1 per 200 - 1 per 1,000 1 service sink A-4 Coliseums, arenas, skating rinks, pools and tennis courts for indoor sporting events and activities 1 per 75 for the first 1,500 and 1 per 120 for the remainder exceeding 1,500 1 per 40 for the first 1,520 and 1 per 60 for the remainder exceeding 1,520 1 per 200 1 per 150 - 1 per 1,000 1 service sink A-5 Stadiums, amusement parks, bleachers and grandstands for outdoor sporting events and activities 1 per 75 for the first 1,500 and 1 per 120 for the remainder exceeding 1,500 1 per 40 for the first 1,520 and 1 per 60 for the remainder exceeding 1,520 1 per 200 1 per 150 - 1 per 1,000 1 service sink 2 Business B j, n Buildings for the transaction of business, professional services, other services including merchandise, office buildings, banks, light industrial and similar uses No. of persons for each sex 1 - 20 21 - 45 46 - 70 71 - 100 101 - 140 141 - 190 1 fixture for each additional 50 persons No. of fixtures 1 2 3 4 5 6 No. of persons for each sex 1 - 25 26 - 50 51 - 75 76 - 115 116 - 160 1 fixture for each additional 60 persons No. of fixtures 1 2 3 4 5 - 1 per 100 1 service sink m 3 Educational E Educational facilities, including libraries accessory to Group E 1 per 50 1 per 50 - 1 per 100 1 service sink 4 Factory and industrial F-1 and F-2 Structures in which occupants are engaged in work fabricating, assembly or processing of products or materials 1 per 100 1 per 100 (see Section 411) 1 per 400 1 service sink 5 Institutional I-1 k Residential care 1 per 10 1 per 10 1 per 8 1 per 100 1 service sink I-2 Hospitals, ambulatory nursing home care recipient 1 per room c 1 per room c 1 per 15 1 per 100 1 service sink per floor Employees, other than residential care b 1 per 25 1 per 35 - 1 per 100 - Visitors, other than residential care 1 per 75 1 per 100 - 1 per 500 - I-3 Prisons b 1 per cell 1 per cell 1 per 15 1 per 100 1 service sink Reformatories, detention centers, and correctional centers 1 per 15 1 per 15 1 per 15 1 per 100 1 service sink Employees b 1 per 25 1 per 35 - 1 per 100 - I-4 Adult day care and child day care b 1 per 15 1 per 15 1 per 15 1 per 100 1 service sink 6 Mercantile M Retail stores, service stations, shops, salesrooms, markets and shopping centers 1 per 500 1 per 750 - 1 per 1,000 1 service sink 7 Residential R-1 k Hotels, motels, boarding houses (transient) 1 per guestroom 1 per guestroom 1 per guestroom - 1 service sink Dormitories, fraternities, sororities and boarding houses (not transient 1 per 10 1 per 10 1 per 8 1 per 100 1 service sink R-2 k Apartment house 1 per dwelling unit 1 per dwelling unit 1 per dwelling unit - 1 kitchen sink per dwelling; 1 automatic clothes washer connection per 20 dwelling units e R-3 One- and two-family dwellings and lodging houses with five or fewer guestrooms 1 per dwelling unit 1 per dwelling unit 1 per dwelling unit - 1 kitchen sink per dwelling; 1 automatic clothes washer connection per dwelling unit e R-3 k Congregate living facilities with 16 or fewer persons 1 per 10 1 per 10 1 per 8 1 per 100 1 service sink 8 Storage S-1 S-2 Structures for the storage of goods, warehouses, storehouse and freight depots. Low and Moderate Hazard. 1 per 100 1 per 100 See Section 411 1 per 1,000 1 service sink a. The fixtures shown are based on one fixture being the minimum required for the number of persons indicated. Any fraction of the number of persons requires an additional fixture. The number of occupants shall be determined by the New York City Building Code . b. Toilet facilities for employees shall be separate from facilities for incarcerated individuals or care recipients. c. A single-occupant toilet room with one water closet and one lavatory serving not more than two adjacent patient sleeping units shall be permitted where such room is provided with direct access from each patient sleeping unit and with provisions for privacy. d. The occupant load for seasonal outdoor seating and entertainment areas shall be included when determining the minimum number of facilities required. e. The minimum number of required drinking foundations shall comply with Table 403.1 and Chapter 11 of the New York City Building Code. f. For the purposes of this table only, \"Bar\" shall mean a business establishment or a portion of a nonprofit entity devoted primarily to the selling and serving of alcoholic beverages for consumption by the public, guests, patrons, or members on the premises and in which the serving of food is only incidental. g. The total number of occupants for a single establishment comprising of a restaurant with an accessory bar shall be considered as a restaurant for the purposes of determining the minimum number of plumbing fixtures. h. As per the New York City Building Code. i. The requirements for the number of water closets for a total occupancy of 150 persons or fewer shall not apply to bars except that, subject to the requirements of Section 403.2.1, there shall be at least one water closet for men and at least one water closet for women or at least two single-occupant toilet rooms. j. The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies. k. In addition to the requirements of Table 403.1 , residential occupancies I-1, R-1, R-2, and R-3 shall provide fixtures in compliance with the requirements of Section 614 for emergency drinking water access. l. [Reserved.] m. For business and mercantile occupancies with an occupant load of 15 or fewer, service sinks shall not be required. n. Libraries that are not classified as accessory to Group E per Section 304.1 of the New York City Building Code shall comply with fixture counts for Group B occupancies. (Am. L.L. 2016/079, 6/28/2016, eff. 10/26/2016; Am. 2021 N.Y. Laws Ch. 322, 8/2/2021, eff. 8/2/2021) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/051 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2692-4",
+              "sectionID": "2692",
+              "reference": "BC 1106.8.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1106.8.1 1106.8.1 Number of accessible vehicle charging stations. Where provided for common use, at least five percent of the total number of electrical vehicle charging stations per facility, but not less than one for each type of electric vehicle charging station, shall be accessible. Where a multiport electric vehicle charging station can simultaneously charge more than one vehicle, the number of electric vehicle charging stations shall be counted as the number of electric vehicles that can be simultaneously charged. The number of accessible vehicle charging stations are in addition to the required accessible parking spaces."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2696-5",
+              "sectionID": "2696",
+              "reference": "BC 1106.8.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1106.8.5 1106.8.5 Electrical vehicle charging station controls. Electric vehicle charging stations and electric vehicle charging station controls shall comply with Sections 309.2 and 309.3 of ICC A117.1. Section BC 1107: Dwelling Units and Sleeping Units"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2693-7",
+              "sectionID": "2693",
+              "reference": "BC 1106.8.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1106.8.2 1106.8.2 Electric vehicle charging space. At each electrical vehicle charging station required to be accessible, the charging space shall comply with the requirements for a van accessible parking space complying with Sections 502.2 through 502.5 of ICC A117.1."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2694-8",
+              "sectionID": "2694",
+              "reference": "BC 1106.8.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1106.8.3 1106.8.3 Accessible route. At each electric vehicle charging station required to be accessible, the charging station shall be located along an accessible route. An accessible route shall be provided between the charging station and the charging space. Exception: In existing facilities with no accessible route, electrical vehicle charging stations are not required to be located along an accessible route."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2695-9",
+              "sectionID": "2695",
+              "reference": "BC 1106.8.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1106.8.4 1106.8.4 Obstructions. Electric vehicle charging stations shall be designed so accessible routes are not obstructed by cables or other elements."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260831-zoning-canonical-source-output-table-legend-v17",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-complete-governing-passages-v26",
+          "retrievalQuery": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 15164,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 6,
+            "topicDependencyCount": 0,
+            "characterCount": 15164,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-intake-lot-context-v6",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-intake-lot-context-v6",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T07:08:13.729Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-08T07:08:13.729Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "durationMilliseconds": 16904,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "f05ad105-4e10-4fac-afb2-13f49e09cccd",
+          "createdAt": "2026-09-08T07:08:13.679Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 28687,
+          "cachedInputTokens": 21319,
+          "outputTokens": 977,
+          "totalTokens": 29664,
+          "estimatedCostUSD": 0.012494,
+          "actualProviderCostUSD": 0.012494,
+          "conservativeProviderCostUSD": 0.109152,
+          "durationMilliseconds": 16861,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ]
+    },
+    {
+      "id": "PC-04",
+      "question": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?",
+      "maximumTurnSpendUSD": 0.390848,
+      "status": "failed",
+      "startedAt": "2026-09-08T07:08:30.967Z",
+      "error": {
+        "message": "Research is temporarily unavailable. Your question is still here.",
+        "httpStatus": 503,
+        "error": "Research is temporarily unavailable. Your question is still here.",
+        "code": "RESEARCH_SPEND_CAP",
+        "status": 503
+      },
+      "durationMilliseconds": 848,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "a7405ba5-fd7a-4ce6-9ca5-06db8327073b",
+          "createdAt": "2026-09-08T07:08:30.983Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 0,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 812,
+          "failureCode": "RESEARCH_SPEND_CAP",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "PC-03",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_code_interpretation",
+      "requestBytes": 81314,
+      "maxOutputTokens": 3000,
+      "startedAt": "2026-09-08T07:08:15.032Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 7911,
+      "usage": {
+        "input_tokens": 18658,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 18655
+        },
+        "output_tokens": 561,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 19219
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0c5f0eac63ebb0c7016a9fb45ff57c87d28db22d52eb1a3880",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** Four bottle-filling stations with no drinking fountains are not permitted as the substitution for four required drinking fountains. At most 50 percent may be replaced: for four required fountains, that permits **two** qualifying dedicated bottle-filling fixtures and still requires **two drinking fountains**. Each substituted fixture must be adjacent to or readily visible from a drinking fountain conforming to PC § 410.1. (PC § 410.3)\\n\\nFurther, drinking fountains required by Table 403.1 must have both a bubbler faucet and a separate container-filling faucet designed for a container at least 10 inches high. (PC § 410.1) Thus, a compliant arrangement could be two such drinking fountains plus two qualifying dedicated bottle-filling fixtures, subject to the specified adjacency/visibility condition. The supplied evidence does not establish the proposed stations’ fixture design or locations.\",\"supportedPoints\":[{\"heading\":\"Bottle-filling substitution is limited to half\",\"explanation\":\"Where drinking fountains are required, no more than 50 percent of the required drinking fountains may be substituted with dedicated plumbing fixtures having faucets designed to fill containers at least 10 inches high. Each substitute must be adjacent to, or readily visible from, a drinking fountain conforming to PC 410.1. Bottled-water dispensers cannot be substituted.\",\"sectionID\":\"11961\",\"sourceIDs\":[\"research-permitext_discovered-id:11961-1\"]},{\"heading\":\"Required fountains need drinking and filling faucets\",\"explanation\":\"Drinking fountains required by Table 403.1 must be equipped with both a bubbler faucet for drinking and a separate faucet designed to fill a container at least 10 inches high.\",\"sectionID\":\"11959\",\"sourceIDs\":[\"research-permitext_discovered-id:11959-2\"]}],\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"This answer is limited to the supplied 2022 NYC Plumbing Code provisions and does not determine whether the proposed bottle-filling stations meet the required faucet-design or adjacency/visibility conditions.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"11961\",\"sourceIDs\":[\"research-permitext_discovered-id:11961-1\"],\"relevance\":\"Establishes the 50-percent maximum substitution, qualifying-fixture characteristics, adjacency or visibility condition, and prohibition on bottled-water-dispenser substitution.\"},{\"sectionID\":\"11959\",\"sourceIDs\":[\"research-permitext_discovered-id:11959-2\"],\"relevance\":\"Establishes the bubbler and separate container-filling faucet requirement for drinking fountains required by Table 403.1.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "PC-03",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_research_verification",
+      "requestBytes": 47177,
+      "maxOutputTokens": 4000,
+      "startedAt": "2026-09-08T07:08:22.957Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 7531,
+      "usage": {
+        "input_tokens": 10029,
+        "input_tokens_details": {
+          "cache_write_tokens": 7362,
+          "cached_tokens": 2664
+        },
+        "output_tokens": 416,
+        "output_tokens_details": {
+          "reasoning_tokens": 394
+        },
+        "total_tokens": 10445
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0b24f234b406382f016a9fb46e49ac87d2a4ce03e78f1b2fa0",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 0.5,
+    "reservedUSD": 0.012494,
+    "actualUSD": 0.012494,
+    "requestCount": 3,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 7.597436,
+  "stopReason": "Spending guard stopped this pilot; remaining cases skipped.",
+  "completedAt": "2026-09-08T07:08:31.947Z"
+}
