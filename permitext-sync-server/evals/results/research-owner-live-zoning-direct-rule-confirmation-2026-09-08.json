@@ -1,0 +1,2765 @@
+{
+  "schema": "permitext-owner-zoning-direct-rule-confirmation-v1",
+  "sourceCommit": "a74dddd2f14703d7d23ad3b2f919b45608744196",
+  "authorization": "Owner authorized approximately $8 of API tests and repeated testing toward the 110-case answer target. This new package confirms ZR-01 and ZR-14 once each after source/obligation repairs, within the existing remaining authorization; it cannot replay a consumed package.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    }
+  ],
+  "previousConservativeSpendUSD": 7.864152,
+  "authorizationUSD": 8,
+  "maximumCumulativeSpendUSD": 0.135848,
+  "maximumTurnSpendUSD": 0.06,
+  "maximumTurns": 2,
+  "maximumProviderRequests": 6,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual selected-section HTTP Research flow on isolated local accounts and storage. Expected answers are not supplied to drafting or verification. Local diagnostic Zoning eligibility only; no public eligibility, deployment, or phone changes.",
+  "cases": [
+    "ZR-14",
+    "ZR-01"
+  ],
+  "preflightSHA256": "501b85c2464278a2287e55dcdc7b8055b16f263e7d10f1ca98eb9c1a150ba9eb",
+  "sourceHashes": {
+    "app.mjs": "e99e3f025b45158ec707721f58fef75c799a16278f19292d087e8ef6c8cfd534",
+    "research-config.mjs": "0ef7b3b32f7d480a92b5d598a260bdb116b2272bd7a0ed0711387b753f9f0f15",
+    "research-provider-client.mjs": "74a9d566ffdc89ad1540d3b42094c1fdc8ca8626cb3fd67e7ecc04400001d5b1",
+    "research-zoning-planner.mjs": "872ddaf8557e1215a1ed76371f05b9d8f99e3a93b73a804c06b3e363aa7b5e80",
+    "research-zoning-safety.mjs": "d61971dfb9c6295e2ddf38d0298645c0a59f788e2fbf119feb352e5ae33ac744",
+    "research-evidence-assembly.mjs": "9623218d61695721099f60b3977d34ea538eb5a343e1ef4f12721a95eab3f59b",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "15e7dc17bd9ff1fa69938ba13b35686d56ee2cf5178a9350f1f5b5199e0ee97f",
+    "evals/research-reconciled-answer-key.json": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+    "evals/research-owner-http-request-binding.mjs": "eef06bb4d0acf230929cb355f15427d197f7f20c961651feaa8f2003d57dea54",
+    "scripts/run-research-owner-zoning-direct-rule-confirmation-20260908.mjs": "4255c76b8d8e61f9012bbf1d2eb2d5215543e99149b9a218d3ce381c19368d37"
+  },
+  "startedAt": "2026-09-08T13:28:11.585Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "ZR-14",
+      "question": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+      "inputSHA256": "f0bed626422e13a0bf8870cf20d35e9afdb94b6a37d5c986506f61869568f9ff",
+      "readerSelectionsSHA256": "0aab851144893b3dc2d8693a857fb5b02ed8a5b9ba425b2626c6f0c72b49f582",
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.06,
+      "initialRequestSHA256": "728fcabd4710a1bdb669058e12f60081edb3d985fda63e91e4e63fb2733f1e10",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 49862,
+      "durationMilliseconds": 11637,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.030843,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "e040f6f2-1ba5-4a04-b748-d8b9ffb51241",
+          "createdAt": "2026-09-08T13:28:12.339Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-luna",
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 10378,
+          "cachedInputTokens": 0,
+          "outputTokens": 713,
+          "totalTokens": 11091,
+          "estimatedCostUSD": 0.002931,
+          "actualProviderCostUSD": 0.002931,
+          "conservativeProviderCostUSD": 0.006473,
+          "durationMilliseconds": 11604,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-luna",
+        "requestedModel": "gpt-5.6-luna",
+        "promptVersion": "20260827-material-completeness-v31:compact-v2:conversational-v4",
+        "evidenceVersion": "20260908-complete-selected-zoning-v29:structured-v1",
+        "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "zoning cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: NYC Zoning Resolution",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T13:28:12.346Z"
+        },
+        "answerText": "No—not on the stated facts, assuming the 30-foot spacing is measured between the buildings’ closest points and no applicable rear-yard-equivalent exception applies. Because the buildings contain three or more dwelling units, are on the same zoning lot, do not connect at any level, and are below 125 feet, ZR § 23-371 requires 40 feet between their closest points. The proposed spacing is therefore 10 feet short: 40 − 30 = 10 feet. The section’s provisions do not apply to buildings separated by a rear yard equivalent; that exception has not been established here.",
+        "conclusion": "No—not on the stated facts, assuming the 30-foot spacing is measured between the buildings’ closest points and no applicable rear-yard-equivalent exception applies. Because the buildings contain three or more dwelling units, are on the same zoning lot, do not connect at any level, and are below 125 feet, ZR § 23-371 requires 40 feet between their closest points. The proposed spacing is therefore 10 feet short: 40 − 30 = 10 feet. The section’s provisions do not apply to buildings separated by a rear yard equivalent; that exception has not been established here.",
+        "supportedPoints": [
+          {
+            "heading": "Required spacing for the proposed buildings",
+            "explanation": "For two or more buildings on the same zoning lot that are not connected at any level, the minimum distance is 40 feet, measured between the closest points, for portions of buildings lower than 125 feet. The stated 30-foot spacing consequently falls short by 10 feet (40 − 30 = 10 feet).",
+            "sectionID": "20018102",
+            "sourceIDs": [
+              "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Rear-yard-equivalent exception",
+            "explanation": "ZR § 23-371 states that its provisions do not apply to buildings separated from each other by a rear yard equivalent. The supplied facts do not establish that exception.",
+            "sectionID": "20018102",
+            "sourceIDs": [
+              "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "",
+        "assumptions": [
+          "The stated 30-foot separation represents the distance between the buildings’ closest points.",
+          "The stated building heights are measured under the section’s applicable base-plane or curb-level measurement rule."
+        ],
+        "missingFacts": [
+          "Whether the buildings are separated by a rear yard equivalent, which could make the spacing provisions inapplicable.",
+          "Whether the stated 30-foot distance is measured between the buildings’ closest points."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The conclusion is based on the supplied continuously amended NYC Zoning Resolution text through 2026-08-13, principally ZR § 23-371; no mapped district or parcel-specific applicability was supplied or inferred."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "20018102",
+            "sectionNumber": "23-371",
+            "title": "Standard minimum distance between buildings",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba",
+                "selectedText": "R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, as indicated, the minimum distance between the portion of a building containing residences and any other building on the same zoning lot shall be as provided in this Section. For the purpose of this Section, abutting buildings on a single zoning lot may be considered a single building. However, if two or more portions of a building are not connected or not abutting at a particular level, such separated portions shall comply with the applicable provisions of this Section. In applying such provisions, the height of such separated portions shall be measured from the roof of the connecting or abutting portion of such building, as applicable, instead of from the base plane. ExceptionsThe provisions of this Section shall not apply to: buildings that are separated from each other by a rear yard equivalent; or space between a single-family, two-family, or three-family residence and a garage accessory thereto. For single- and two-family residencesFor buildings with two or fewer dwelling units, the required minimum distance between any such residences and any other building with two or fewer dwelling units on the same zoning lot, or a non-residential building on the same zoning lot shall vary according to the height of such buildings. Such minimum distance shall be measured perpendicular to the building wall or window, as applicable. However, for buildings with two or fewer dwelling units, the required minimum distance between any such residences and an ancillary dwelling unit on the same zoning lot shall be 10 feet. For buildings with two or fewer dwelling units, the required minimum distance between any such residences and a building with three or more dwelling units on the same zoning lot shall be subject to the provisions of paragraph (c) of this Section. Maximum Building Height above Base Plane or Curb Level, as Applicable (in feet) 35 or less Between 35 and 50 Over 50 Minimum distance 15 20 30 For buildings that contain three or more dwelling unitsThe minimum distance between a building containing three or more dwelling units and any other building on the zoning lot shall be applied in accordance with the provisions of this Section. Where two or more portions of a building are separated completely from one another at a particular level above grade, such separated portions shall comply with paragraph (c)(1) of this Section. Where there are multiple buildings on a single zoning lot that do not connect at any level, such buildings shall comply with paragraph (c)(2) of this Section. For separated portions of a buildingThe required minimum distance between any separated portion of a building containing dwelling units shall be as follows: where legally required windows face onto a separated portion of a building at or below a height of 75 feet, the minimum dimension between such separated portions shall not be less than 20 feet, and above a height of 75 feet, where permitted, the minimum dimension shall not be less than 30 feet; and where no legally required windows face onto a separated portion of a building at or below a height of 75 feet, the minimum dimension between such separated portions shall not be less than 10 feet, and above a height of 75 feet, where permitted, the minimum dimension shall not be less than 15 feet. Two or more buildings on a single zoning lotThe minimum distance between two or more buildings on the same zoning lot that are not connected at any level shall be 40 feet, as measured between the closest points of such buildings, for portions of buildings lower than 125 feet, as measured from the base plane or curb level, as applicable.Portions of such buildings higher than 125 feet shall be at least 80 feet apart, as measured between the closest points of such buildings. However, such minimum distance need not exceed 40 feet if such portions of buildings above a height of 125 feet do not exceed, in aggregate, a lot coverage of 40 percent or, for lots of less than 20,000 square feet, the percentage set forth in the table below: AGGREGATED LOT COVERAGE OF PORTIONS OF BUILDINGS ON A SMALL ZONING LOT Area of Zoning Lot (in square feet) Maximum Percent of Coverage 10,500 or less 50 10,501 to 11,500 49 11,501 to 12,500 48 12,501 to 13,500 47 13,501 to 14,500 46 14,501 to 15,500 45 15,501 to 16,500 44 16,501 to 17,500 43 17,501 to 18,500 42 18,501 to 19,999 41 In addition, the following rules shall apply to: any portion of a building that qualifies as a building segment may be treated as a separate building for the purposes of determining the minimum distance required between such building segment and another building or building segment; where buildings of different heights face each other, the average of the heights of such buildings shall determine the minimum distance required between them; projections having a maximum height of 25 feet above adjoining grade, a maximum depth of five feet, and an aggregate width not exceeding 25 percent of the building wall from which they project, may penetrate the minimum spacing requirements. However, such projections shall not be permitted in open spaces provided pursuant to paragraph (c)(2) of this Section; and the obstructions permitted in Section 23-311 shall be permitted in such minimum distance.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Governs the 40-foot closest-point spacing requirement for unconnected buildings on the same zoning lot below 125 feet and states the rear-yard-equivalent exception."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "20018102",
+          "20018523",
+          "20018026",
+          "20020555",
+          "20019670"
+        ],
+        "evidenceSourceIDs": [
+          "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba",
+          "research-permitext_discovered-id:20018523-1",
+          "research-permitext_discovered-id:20018026-3",
+          "research-permitext_discovered-id:20020555-4",
+          "research-permitext_discovered-id:20019670-5"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 5,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 4,
+          "userPinnedCount": 1,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 2,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "ZR 23-371",
+              "summary": "ZR 23-371 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "ZR 23-371",
+              "summary": "ZR 23-371 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-1"
+              ]
+            }
+          ],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018026-3",
+            "research-permitext_discovered-id:20020555-4",
+            "research-permitext_discovered-id:20019670-5"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [
+            {
+              "id": "dwelling_unit_count",
+              "key": "dwelling_unit_count",
+              "value": "unknown",
+              "statement": "Qualified user statement; do not infer an unqualified fact: Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart.",
+              "kind": "unknown",
+              "sourceText": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart.",
+              "source": "user",
+              "qualificationVersion": "20260904-qualified-user-facts-v5"
+            }
+          ],
+          "extractedFactKeys": [
+            "dwelling_unit_count"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+              "establishedFacts": [],
+              "unknownFacts": [
+                {
+                  "id": "dwelling_unit_count",
+                  "key": "dwelling_unit_count",
+                  "value": "unknown",
+                  "statement": "Qualified user statement; do not infer an unqualified fact: Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart.",
+                  "kind": "unknown",
+                  "sourceText": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart.",
+                  "source": "user",
+                  "qualificationVersion": "20260904-qualified-user-facts-v5"
+                }
+              ]
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+          ],
+          "citedEvidenceSourceIDs": [
+            "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018026-3",
+            "research-permitext_discovered-id:20020555-4",
+            "research-permitext_discovered-id:20019670-5"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:32fd53d5-dcd8-46cb-a776-68ebfc7bfeba",
+              "label": "ZR 23-371 — Standard minimum distance between buildings",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:32fd53d5-dcd8-46cb-a776-68ebfc7bfeba",
+              "label": "ZR 23-371 — Standard minimum distance between buildings",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "schemaVersion": 2,
+          "plannerVersion": "20260908-historical-source-intent-v5",
+          "compilerVersion": "20260908-direct-rule-obligations-v22",
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-fixture-permission-scope-v28",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018026-3",
+            "research-permitext_discovered-id:20020555-4",
+            "research-permitext_discovered-id:20019670-5"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 4,
+            "reviewedOnlyProvisionCount": 4,
+            "assembledSourceCount": 5,
+            "assembledProvisionCount": 5
+          },
+          "sources": [
+            {
+              "sourceID": "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba",
+              "sectionID": "20018102",
+              "reference": "ZR 23-371",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, as indicated, the minimum distance between the portion of a building containing residences and any other building on the same zoning lot shall be as provided in this Section. For the purpose of this Section, abutting buildings on a single zoning lot may be considered a single building. However, if two or more portions of a building are not connected or not abutting at a particular level, such separated portions shall comply with the applicable provisions of this Section. In applying such provisions, the height of such separated portions shall be measured from the roof of the connecting or abutting portion of such building, as applicable, instead of from the base plane. ExceptionsThe provisions of this Section shall not apply to: buildings that are separated from each other by a rear yard equivalent; or space between a single-family, two-family, or three-family residence and a garage accessory thereto. For single- and two-family residencesFor buildings with two or fewer dwelling units, the required minimum distance between any such residences and any other building with two or fewer dwelling units on the same zoning lot, or a non-residential building on the same zoning lot shall vary according to the height of such buildings. Such minimum distance shall be measured perpendicular to the building wall or window, as applicable. However, for buildings with two or fewer dwelling units, the required minimum distance between any such residences and an ancillary dwelling unit on the same zoning lot shall be 10 feet. For buildings with two or fewer dwelling units, the required minimum distance between any such residences and a building with three or more dwelling units on the same zoning lot shall be subject to the provisions of paragraph (c) of this Section. Maximum Building Height above Base Plane or Curb Level, as Applicable (in feet) 35 or less Between 35 and 50 Over 50 Minimum distance 15 20 30 For buildings that contain three or more dwelling unitsThe minimum distance between a building containing three or more dwelling units and any other building on the zoning lot shall be applied in accordance with the provisions of this Section. Where two or more portions of a building are separated completely from one another at a particular level above grade, such separated portions shall comply with paragraph (c)(1) of this Section. Where there are multiple buildings on a single zoning lot that do not connect at any level, such buildings shall comply with paragraph (c)(2) of this Section. For separated portions of a buildingThe required minimum distance between any separated portion of a building containing dwelling units shall be as follows: where legally required windows face onto a separated portion of a building at or below a height of 75 feet, the minimum dimension between such separated portions shall not be less than 20 feet, and above a height of 75 feet, where permitted, the minimum dimension shall not be less than 30 feet; and where no legally required windows face onto a separated portion of a building at or below a height of 75 feet, the minimum dimension between such separated portions shall not be less than 10 feet, and above a height of 75 feet, where permitted, the minimum dimension shall not be less than 15 feet. Two or more buildings on a single zoning lotThe minimum distance between two or more buildings on the same zoning lot that are not connected at any level shall be 40 feet, as measured between the closest points of such buildings, for portions of buildings lower than 125 feet, as measured from the base plane or curb level, as applicable.Portions of such buildings higher than 125 feet shall be at least 80 feet apart, as measured between the closest points of such buildings. However, such minimum distance need not exceed 40 feet if such portions of buildings above a height of 125 feet do not exceed, in aggregate, a lot coverage of 40 percent or, for lots of less than 20,000 square feet, the percentage set forth in the table below: AGGREGATED LOT COVERAGE OF PORTIONS OF BUILDINGS ON A SMALL ZONING LOT Area of Zoning Lot (in square feet) Maximum Percent of Coverage 10,500 or less 50 10,501 to 11,500 49 11,501 to 12,500 48 12,501 to 13,500 47 13,501 to 14,500 46 14,501 to 15,500 45 15,501 to 16,500 44 16,501 to 17,500 43 17,501 to 18,500 42 18,501 to 19,999 41 In addition, the following rules shall apply to: any portion of a building that qualifies as a building segment may be treated as a separate building for the purposes of determining the minimum distance required between such building segment and another building or building segment; where buildings of different heights face each other, the average of the heights of such buildings shall determine the minimum distance required between them; projections having a maximum height of 25 feet above adjoining grade, a maximum depth of five feet, and an aggregate width not exceeding 25 percent of the building wall from which they project, may penetrate the minimum spacing requirements. However, such projections shall not be permitted in open spaces provided pursuant to paragraph (c)(2) of this Section; and the obstructions permitted in Section 23-311 shall be permitted in such minimum distance."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20018523-1",
+              "sectionID": "20018523",
+              "reference": "ZR 12-10",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "legally required window General Definition Last Amended 2/2/2011 A \"legally required window\" is a window or portion of a window (including a window either in addition to or as a substitute for mechanical ventilation) which is required by any applicable law or statute to provide light or ventilation to a \"living room,\" as defined in the Housing Maintenance Code. lot, zoning General Definition see zoning lot non-residential building General Definition Last Amended 2/2/2011 A “non-residential building” is a building containing no residences. rear yard General Definition see yard, rear rear yard equivalent General Definition see yard equivalent, rear"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20018026-3",
+              "sectionID": "20018026",
+              "reference": "ZR 23-52",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "23-52 Maximum Number of Dwelling Units R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In the districts indicated, for buildings containing multiple dwelling residences, the maximum number of dwelling units permitted shall be determined by dividing the maximum residential floor area permitted on the zoning lot by the applicable dwelling unit factor. The applicable dwelling unit factor shall be as follows: For the following types of multiple dwelling residences, there shall be no applicable dwelling unit factor: developments or enlargements of residences in special density areas; qualifying senior housing; or conversions of any non-residential building, or portion thereof, to resid"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20020555-4",
+              "sectionID": "20020555",
+              "reference": "ZR 123-31",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "123-31 Provisions Regulating Location of Uses in Mixed Use Buildings In Special Mixed Use Districts, in any building or portion of a building occupied by residential uses, commercial or manufacturing uses may be located only on a story below the lowest story occupied by dwelling units, except that this limitation shall not preclude the: extension of a permitted business sign, accessory to such non-residential use, to a maximum height of two feet above the level of a finished floor of the second story, but in no event higher than six inches below the lowest window sill on the second story; location of commercial or manufacturing uses on the same story, or on a story higher"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20019670-5",
+              "sectionID": "20019670",
+              "reference": "ZR 96-104",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "96-104 Dwelling unit regulations Dwelling unit distributionThe density provisions set forth in Section 23-52 (Maximum Number of Dwelling Units) shall apply. In addition, for developments, enlargements, extensions or conversions of an existing building to a residential use, or alterations that create additional dwelling units, at least 20 percent of the dwelling units on the zoning lot shall contain two bedrooms. However, notwithstanding any provision to the contrary contained in this Section, the minimum 20 percent, two-bedroom unit requirement shall not apply to alterations which add a code-complying bathroom, pursuant to Section 27-2063 of the Housing Maintenance Code of"
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260908-zoning-unresolved-predicate-v18",
+          "pass": true,
+          "applies": true,
+          "categories": [
+            "citation-boundary",
+            "stable-passage",
+            "definition",
+            "amendment"
+          ],
+          "zoningSourceIDs": [
+            "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba",
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20018026-3",
+            "research-permitext_discovered-id:20020555-4",
+            "research-permitext_discovered-id:20019670-5"
+          ],
+          "issues": []
+        },
+        "zoningArchitecture": {
+          "plannerVersion": "20260908-historical-source-intent-v5",
+          "plan": {
+            "schemaVersion": 2,
+            "plannerVersion": "20260908-historical-source-intent-v5",
+            "path": "direct_rule",
+            "pathLabel": "direct enacted rule",
+            "disposition": "ready",
+            "requirements": [],
+            "missingFacts": [],
+            "clarification": null,
+            "evidenceLimits": {
+              "maximumCandidates": 6,
+              "maximumDiscovered": 4,
+              "maximumTargetedDefinitions": 1,
+              "maximumCrossReferences": 2,
+              "maximumCharacters": 8000,
+              "maximumSupplementalCharacters": 6000,
+              "maximumCharactersPerSource": 4000
+            },
+            "deterministicControls": {
+              "exactPassageBinding": true,
+              "stableSourceHashes": true,
+              "tableGridAndLegend": false,
+              "effectiveDateEventBinding": false,
+              "arithmeticLedger": false,
+              "propertyAndMapPrerequisites": false
+            },
+            "callPolicy": {
+              "initialTier": "fast",
+              "initialModelRole": "luna_first",
+              "subjectiveVerification": false,
+              "verifierTier": null,
+              "maximumProviderCalls": 1,
+              "allowFullAnswerRewrite": false,
+              "repairEligible": false,
+              "repairTier": null,
+              "maximumRepairAttempts": 0,
+              "repairMode": null,
+              "terraEscalation": "provider_failure_or_one_source_bounded_repair"
+            },
+            "questionSignals": {
+              "sourceBoundaryExplanationOnly": false,
+              "historicalSubstantiveTextRequested": false,
+              "explicitMissingFact": false,
+              "propertyIdentifierPresent": false,
+              "mappedStatusPresent": false
+            },
+            "planHash": "8c50da1720d0170da84449b3cf520fb2674c9cdea4cf3444095ca021b5f249fd"
+          },
+          "deterministicContext": {
+            "schemaVersion": 2,
+            "compilerVersion": "20260908-direct-rule-obligations-v22",
+            "plannerVersion": "20260908-historical-source-intent-v5",
+            "planHash": "8c50da1720d0170da84449b3cf520fb2674c9cdea4cf3444095ca021b5f249fd",
+            "path": "direct_rule",
+            "dates": [],
+            "arithmetic": {
+              "measurements": [],
+              "calculations": []
+            },
+            "answerObligations": [
+              {
+                "id": "separate_buildings_lower_height_spacing",
+                "kind": "tiered_dimension",
+                "detail": "For unconnected buildings below 125 feet, apply 40 feet between closest points.",
+                "values": [
+                  "40",
+                  "40.00"
+                ],
+                "sourceIDs": [
+                  "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+                ],
+                "requireAllValues": false,
+                "valueGroups": [
+                  [
+                    "closest points",
+                    "closest point"
+                  ]
+                ],
+                "coverageScope": "answer",
+                "requireSourceBound": true
+              },
+              {
+                "id": "separate_buildings_rear_yard_equivalent_exception",
+                "kind": "scope_exception",
+                "detail": "Check the rear-yard-equivalent exception; avoid claiming it is the only exception.",
+                "values": [
+                  "rear yard equivalent",
+                  "rear-yard-equivalent"
+                ],
+                "sourceIDs": [
+                  "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+                ],
+                "requireAllValues": false,
+                "coverageScope": "answer",
+                "requireSourceBound": true,
+                "prohibitedPatterns": [
+                  "\\b(?:conclusion|result|answer)\\s+could\\s+differ\\s+only\\s+if\\b"
+                ],
+                "requiredPatterns": [
+                  "\\b(?:exception|exempt|does not apply|do not apply|inapplicable)\\b"
+                ]
+              },
+              {
+                "id": "separate_buildings_spacing_shortfall",
+                "kind": "arithmetic",
+                "detail": "Show the spacing shortfall: 40 - 30 = 10 feet.",
+                "values": [
+                  "10",
+                  "10.00"
+                ],
+                "sourceIDs": [
+                  "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+                ],
+                "requireAllValues": false,
+                "coverageScope": "answer"
+              },
+              {
+                "id": "separate_buildings_requested_height_scope",
+                "kind": "answer_scope",
+                "detail": "Answer the below-125-foot scenario. If mentioning 80-foot upper-height spacing, include its conditional reduction or proviso.",
+                "values": [],
+                "sourceIDs": [
+                  "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba"
+                ],
+                "requireAllValues": false,
+                "coverageScope": "answer",
+                "requireSourceBound": true,
+                "qualifiedClaims": [
+                  {
+                    "claimPattern": "\\b(?:80|80\\.00|eighty)[-\\s]*(?:feet|foot|ft)\\b",
+                    "qualifierPattern": "\\b(?:subject to (?:the )?(?:stated |applicable )?(?:proviso|exception|conditions?|conditional reduction)|provided that|may be reduced|can be reduced|need not exceed|does not apply|do not apply)\\b"
+                  }
+                ]
+              }
+            ],
+            "structuredTables": [],
+            "passages": [
+              {
+                "sourceID": "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba",
+                "sectionID": "20018102",
+                "sectionNumber": "23-371",
+                "textHash": "7e1b57326e5da572c516548d92e438fae96f31240dbb37da7a4fd03920b10d3b",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-1",
+                "sectionID": "20018523",
+                "sectionNumber": "12-10",
+                "textHash": "161b2120f51421979528f785048cb6bd573c8174f6bd3f0bbd3c37eedd6d73d1",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018026-3",
+                "sectionID": "20018026",
+                "sectionNumber": "23-52",
+                "textHash": "db3a04bb7736cec4d4b35d9b947bfadbc898e53209f8a8b650b0e1930c20fb56",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20020555-4",
+                "sectionID": "20020555",
+                "sectionNumber": "123-31",
+                "textHash": "2d2e6cd2e3c71dbf56a18a812ff2bade633c5e0299e0f8ad6f20a2809411cde6",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20019670-5",
+                "sectionID": "20019670",
+                "sectionNumber": "96-104",
+                "textHash": "fae8a9a8184e64a1905748fa32d9eeee3409ec2bef3f09d11f4671759f0681a2",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              }
+            ],
+            "contextHash": "d3d15a65940923153f81531f56ada60c60aca1424433c623bb18f59c3ae48e04"
+          },
+          "evidenceSelection": {
+            "pass": true,
+            "sources": [
+              {
+                "sourceID": "32fd53d5-dcd8-46cb-a776-68ebfc7bfeba",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Pinned by the user",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-complete-selected-zoning-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:28:12.662Z",
+                "sectionID": "20018102",
+                "codePrefix": "ZR",
+                "sectionNumber": "23-371",
+                "title": "Standard minimum distance between buildings",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, as indicated, the minimum distance between the portion of a building containing residences and any other building on the same zoning lot shall be as provided in this Section. For the purpose of this Section, abutting buildings on a single zoning lot may be considered a single building. However, if two or more portions of a building are not connected or not abutting at a particular level, such separated portions shall comply with the applicable provisions of this Section. In applying such provisions, the height of such separated portions shall be measured from the roof of the connecting or abutting portion of such building, as applicable, instead of from the base plane. ExceptionsThe provisions of this Section shall not apply to: buildings that are separated from each other by a rear yard equivalent; or space between a single-family, two-family, or three-family residence and a garage accessory thereto. For single- and two-family residencesFor buildings with two or fewer dwelling units, the required minimum distance between any such residences and any other building with two or fewer dwelling units on the same zoning lot, or a non-residential building on the same zoning lot shall vary according to the height of such buildings. Such minimum distance shall be measured perpendicular to the building wall or window, as applicable. However, for buildings with two or fewer dwelling units, the required minimum distance between any such residences and an ancillary dwelling unit on the same zoning lot shall be 10 feet. For buildings with two or fewer dwelling units, the required minimum distance between any such residences and a building with three or more dwelling units on the same zoning lot shall be subject to the provisions of paragraph (c) of this Section. Maximum Building Height above Base Plane or Curb Level, as Applicable (in feet) 35 or less Between 35 and 50 Over 50 Minimum distance 15 20 30 For buildings that contain three or more dwelling unitsThe minimum distance between a building containing three or more dwelling units and any other building on the zoning lot shall be applied in accordance with the provisions of this Section. Where two or more portions of a building are separated completely from one another at a particular level above grade, such separated portions shall comply with paragraph (c)(1) of this Section. Where there are multiple buildings on a single zoning lot that do not connect at any level, such buildings shall comply with paragraph (c)(2) of this Section. For separated portions of a buildingThe required minimum distance between any separated portion of a building containing dwelling units shall be as follows: where legally required windows face onto a separated portion of a building at or below a height of 75 feet, the minimum dimension between such separated portions shall not be less than 20 feet, and above a height of 75 feet, where permitted, the minimum dimension shall not be less than 30 feet; and where no legally required windows face onto a separated portion of a building at or below a height of 75 feet, the minimum dimension between such separated portions shall not be less than 10 feet, and above a height of 75 feet, where permitted, the minimum dimension shall not be less than 15 feet. Two or more buildings on a single zoning lotThe minimum distance between two or more buildings on the same zoning lot that are not connected at any level shall be 40 feet, as measured between the closest points of such buildings, for portions of buildings lower than 125 feet, as measured from the base plane or curb level, as applicable.Portions of such buildings higher than 125 feet shall be at least 80 feet apart, as measured between the closest points of such buildings. However, such minimum distance need not exceed 40 feet if such portions of buildings above a height of 125 feet do not exceed, in aggregate, a lot coverage of 40 percent or, for lots of less than 20,000 square feet, the percentage set forth in the table below: AGGREGATED LOT COVERAGE OF PORTIONS OF BUILDINGS ON A SMALL ZONING LOT Area of Zoning Lot (in square feet) Maximum Percent of Coverage 10,500 or less 50 10,501 to 11,500 49 11,501 to 12,500 48 12,501 to 13,500 47 13,501 to 14,500 46 14,501 to 15,500 45 15,501 to 16,500 44 16,501 to 17,500 43 17,501 to 18,500 42 18,501 to 19,999 41 In addition, the following rules shall apply to: any portion of a building that qualifies as a building segment may be treated as a separate building for the purposes of determining the minimum distance required between such building segment and another building or building segment; where buildings of different heights face each other, the average of the heights of such buildings shall determine the minimum distance required between them; projections having a maximum height of 25 feet above adjoining grade, a maximum depth of five feet, and an aggregate width not exceeding 25 percent of the building wall from which they project, may penetrate the minimum spacing requirements. However, such projections shall not be permitted in open spaces provided pursuant to paragraph (c)(2) of this Section; and the obstructions permitted in Section 23-311 shall be permitted in such minimum distance.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null,
+                "userSelectedText": "R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, as indicated, the minimum distance between the portion of a building containing residences and any other building on the same zoning lot shall be as provided in this Section. For the purpose of this Section, abutting buildings on a single zoning lot may be considered a single building. However, if two or more portions of a building are not connected or not abutting at a particular level, such separated portions shall comply with the applicable provisions of this Section. In applying such provisions, the height of such separated portions shall be measured from the roof of the connecting or abutting portion of such building, as applicable, instead of from the base plane. ExceptionsThe provisions of this Section shall not apply to: buildings that are separated from each other by a rear yard equivalent; or space between a single-family, two-family, or three-family residence and a garage accessory thereto. For single- and two-family residencesFor buildings with two or fewer dwelling units, the required minimum distance between any such residences and any other building with two or fewer dwelling units on the same zoning lot, or a non-residential building on the same zoning lot shall vary according to the height of such buildings. Such minimum distance shall be measured perpendicular to the building wall or window, as applicable. However, for buildings with two or fewer dwelling units, the required minimum distance between any such residences and an ancillary dwelling unit on the same zoning lot shall be 10 feet. For buildings with two or fewer dwelling units, the required minimum distance between any such residences and a building with three or more dwelling units on the same zoning lot shall be subject to the provisions of paragraph (c) of this Section. Maximum Building Height above Base Plane or Curb Level, as Applicable (in feet) 35 or less Between 35 and 50 Over 50 Minimum distance 15 20 30 For buildings that contain three or more dwelling unitsThe minimum distance between a building containing three or more dwelling units and any other building on the zoning lot shall be applied in accordance with the provisions of this Section. Where two or more portions of a building are separated completely from one another at a particular level above grade, such separated portions shall comply with paragraph (c)(1) of this Section. Where there are multiple buildings on a single zoning lot that do not connect at any level, such buildings shall comply with paragraph (c)(2) of this Section. For separated portions of a buildingThe required minimum distance between any separated portion of a building containing dwelling units shall be as follows: where legally required windows face onto a separated portion of a building at or below a height of 75 feet, the minimum dimension between such separated portions shall not be less than 20 feet, and above a height of 75 feet, where permitted, the minimum dimension shall not be less than 30 feet; and where no legally required windows face onto a separated portion of a building at or below a height of 75 feet, the minimum dimension between such separated portions shall not be less than 10 feet, and above a height of 75 feet, where permitted, the minimum dimension shall not be less than 15 feet. Two or more buildings on a single zoning lotThe minimum distance between two or more buildings on the same zoning lot that are not connected at any level shall be 40 feet, as measured between the closest points of such buildings, for portions of buildings lower than 125 feet, as measured from the base plane or curb level, as applicable.Portions of such buildings higher than 125 feet shall be at least 80 feet apart, as measured between the closest points of such buildings. However, such minimum distance need not exceed 40 feet if such portions of buildings above a height of 125 feet do not exceed, in aggregate, a lot coverage of 40 percent or, for lots of less than 20,000 square feet, the percentage set forth in the table below: AGGREGATED LOT COVERAGE OF PORTIONS OF BUILDINGS ON A SMALL ZONING LOT Area of Zoning Lot (in square feet) Maximum Percent of Coverage 10,500 or less 50 10,501 to 11,500 49 11,501 to 12,500 48 12,501 to 13,500 47 13,501 to 14,500 46 14,501 to 15,500 45 15,501 to 16,500 44 16,501 to 17,500 43 17,501 to 18,500 42 18,501 to 19,999 41 In addition, the following rules shall apply to: any portion of a building that qualifies as a building segment may be treated as a separate building for the purposes of determining the minimum distance required between such building segment and another building or building segment; where buildings of different heights face each other, the average of the heights of such buildings shall determine the minimum distance required between them; projections having a maximum height of 25 feet above adjoining grade, a maximum depth of five feet, and an aggregate width not exceeding 25 percent of the building wall from which they project, may penetrate the minimum spacing requirements. However, such projections shall not be permitted in open spaces provided pursuant to paragraph (c)(2) of this Section; and the obstructions permitted in Section 23-311 shall be permitted in such minimum distance.",
+                "pinnedSelectionExact": true
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-1",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “two”, “separate”, “apartment”, “buildings”, “building”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “two”, “separate”, “apartment”, “buildings”, “building”.",
+                "retrievalRank": 5,
+                "retrievalScore": 35.279,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "definition",
+                  "functions": [
+                    "definition"
+                  ],
+                  "materialityRank": 6,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "definition provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:28:12.662Z",
+                "sectionID": "20018523",
+                "codePrefix": "ZR",
+                "sectionNumber": "12-10",
+                "title": "DEFINITIONS",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "legally required window General Definition Last Amended 2/2/2011 A \"legally required window\" is a window or portion of a window (including a window either in addition to or as a substitute for mechanical ventilation) which is required by any applicable law or statute to provide light or ventilation to a \"living room,\" as defined in the Housing Maintenance Code.\n\nlot, zoning General Definition see zoning lot\n\nnon-residential building General Definition Last Amended 2/2/2011 A “non-residential building” is a building containing no residences.\n\nrear yard General Definition see yard, rear\n\nrear yard equivalent General Definition see yard equivalent, rear",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": false,
+                "targetedDefinition": {
+                  "schemaVersion": 1,
+                  "version": "20260908-zoning-far-definition-v2",
+                  "sourceMode": "canonical_enacted_definition_entries",
+                  "sectionID": "20018523",
+                  "codePrefix": "ZR",
+                  "sectionNumber": "12-10",
+                  "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                  "jurisdiction": "New York City",
+                  "labels": [
+                    "legally required window",
+                    "lot, zoning",
+                    "non-residential building",
+                    "rear yard",
+                    "rear yard equivalent"
+                  ],
+                  "passages": [
+                    "legally required window General Definition Last Amended 2/2/2011 A \"legally required window\" is a window or portion of a window (including a window either in addition to or as a substitute for mechanical ventilation) which is required by any applicable law or statute to provide light or ventilation to a \"living room,\" as defined in the Housing Maintenance Code.",
+                    "lot, zoning General Definition see zoning lot",
+                    "non-residential building General Definition Last Amended 2/2/2011 A “non-residential building” is a building containing no residences.",
+                    "rear yard General Definition see yard, rear",
+                    "rear yard equivalent General Definition see yard equivalent, rear"
+                  ],
+                  "canonicalSectionCharacterCount": 268088,
+                  "excerptCharacterCount": 658,
+                  "canonicalContextComplete": false
+                }
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018026-3",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “buildings”, “building”, “containing”, “three”, “dwelling”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “buildings”, “building”, “containing”, “three”, “dwelling”.",
+                "retrievalRank": 2,
+                "retrievalScore": 42.133,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-08T13:28:12.662Z",
+                "sectionID": "20018026",
+                "codePrefix": "ZR",
+                "sectionNumber": "23-52",
+                "title": "Maximum Number of Dwelling Units",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "23-52 Maximum Number of Dwelling Units R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In the districts indicated, for buildings containing multiple dwelling residences, the maximum number of dwelling units permitted shall be determined by dividing the maximum residential floor area permitted on the zoning lot by the applicable dwelling unit factor. The applicable dwelling unit factor shall be as follows: For the following types of multiple dwelling residences, there shall be no applicable dwelling unit factor: developments or enlargements of residences in special density areas; qualifying senior housing; or conversions of any non-residential building, or portion thereof, to resid",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20020555-4",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “two”, “buildings”, “building”, “containing”, “dwelling”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “two”, “buildings”, “building”, “containing”, “dwelling”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "retrievalRank": 3,
+                "retrievalScore": 37.721,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-08T13:28:12.662Z",
+                "sectionID": "20020555",
+                "codePrefix": "ZR",
+                "sectionNumber": "123-31",
+                "title": "Provisions Regulating Location of Uses in Mixed Use Buildings",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "123-31 Provisions Regulating Location of Uses in Mixed Use Buildings In Special Mixed Use Districts, in any building or portion of a building occupied by residential uses, commercial or manufacturing uses may be located only on a story below the lowest story occupied by dwelling units, except that this limitation shall not preclude the: extension of a permitted business sign, accessory to such non-residential use, to a maximum height of two feet above the level of a finished floor of the second story, but in no event higher than six inches below the lowest window sill on the second story; location of commercial or manufacturing uses on the same story, or on a story higher",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20019670-5",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “two”, “buildings”, “building”, “containing”, “dwelling”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “two”, “buildings”, “building”, “containing”, “dwelling”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "retrievalRank": 4,
+                "retrievalScore": 35.656,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-08T13:28:12.662Z",
+                "sectionID": "20019670",
+                "codePrefix": "ZR",
+                "sectionNumber": "96-104",
+                "title": "Dwelling unit regulations",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "96-104 Dwelling unit regulations Dwelling unit distributionThe density provisions set forth in Section 23-52 (Maximum Number of Dwelling Units) shall apply. In addition, for developments, enlargements, extensions or conversions of an existing building to a residential use, or alterations that create additional dwelling units, at least 20 percent of the dwelling units on the zoning lot shall contain two bedrooms. However, notwithstanding any provision to the contrary contained in this Section, the minimum 20 percent, two-bedroom unit requirement shall not apply to alterations which add a code-complying bathroom, pursuant to Section 27-2063 of the Housing Maintenance Code of",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null
+              }
+            ],
+            "rejected": [],
+            "gateFailures": [],
+            "usage": {
+              "sourceCount": 5,
+              "characterCount": 7996,
+              "pinnedCharacterCount": 5301,
+              "maximumCharacters": 8000
+            }
+          },
+          "evidenceReadiness": {
+            "schemaVersion": 1,
+            "pass": true,
+            "disposition": "ready",
+            "issues": [],
+            "requiredEvidence": []
+          },
+          "repairVersion": "20260901-source-bounded-patch-v2",
+          "sourceBoundedRepairApplied": false,
+          "repairPacketHashes": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-complete-selected-zoning-v29",
+          "retrievalQuery": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "question_not_bounded_to_selected_evidence"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 6,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 2,
+            "maximumCharacters": 8000,
+            "maximumSupplementalCharacters": 6000,
+            "maximumCharactersPerSource": 4000,
+            "maximumCompletePinnedSectionCharacters": 8000
+          },
+          "usage": {
+            "pinnedCount": 1,
+            "pinnedCharacterCount": 5301,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 1,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 8000,
+            "supplementalCharacterCount": 2699,
+            "candidateCount": 6,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 0,
+            "topicDependencyCount": 0,
+            "characterCount": 8000,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0,
+            "finalSourceCount": 5,
+            "finalCharacterCount": 7996
+          },
+          "limitations": [
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "visual-source-review-required",
+              "text": "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. Review and explicitly select the applicable visual source before preparing that candidate."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 4068,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codePrefixes": [
+                  "ZR"
+                ],
+                "routeReason": "zoning cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "zoning cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: NYC Zoning Resolution",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T13:28:12.346Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "permitext-deterministic-zoning-compiler"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-09-08T13:28:12.346Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "fast",
+          "reasons": [
+            "zoning_compiler_luna_first:direct_rule"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-luna",
+          "actualAnswerModel": "gpt-5.6-luna",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": [],
+          "zoningPlannerVersion": "20260908-historical-source-intent-v5",
+          "maximumProviderCalls": 1,
+          "fullAnswerRewriteAllowed": false,
+          "sourceBoundedRepairApplied": false,
+          "repairVersion": "20260901-source-bounded-patch-v2"
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    },
+    {
+      "id": "ZR-01",
+      "question": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+      "inputSHA256": "493cfa89342b223eac2eda1047388956fd667452ddad193abbbce9e1c865fcb0",
+      "readerSelectionsSHA256": "103ba9d7316932631374dd0221649c591135a710d441d998ae00296ce3cdc40c",
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.06,
+      "initialRequestSHA256": "c91fd7f4d848f8c0db4a9dd598f46132944624d15c4af6a57d5e499b065df1c7",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 46471,
+      "durationMilliseconds": 6003,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.029148,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "7a31de14-6d6b-4db4-9401-ff4308a2c399",
+          "createdAt": "2026-09-08T13:28:24.052Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-luna",
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 9775,
+          "cachedInputTokens": 0,
+          "outputTokens": 400,
+          "totalTokens": 10175,
+          "estimatedCostUSD": 0.002435,
+          "actualProviderCostUSD": 0.002435,
+          "conservativeProviderCostUSD": 0.005608,
+          "durationMilliseconds": 5945,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-luna",
+        "requestedModel": "gpt-5.6-luna",
+        "promptVersion": "20260827-material-completeness-v31:compact-v2:conversational-v4",
+        "evidenceVersion": "20260908-complete-selected-zoning-v29:structured-v1",
+        "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "zoning cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: NYC Zoning Resolution",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T13:28:24.054Z"
+        },
+        "answerText": "When there is a difference in meaning or implication, the enacted text controls over any caption, illustration, summary table, or illustrative table. Separately, where a specific provision conflicts with a general one, the more particular provision controls the general provision (ZR § 12-01).",
+        "conclusion": "When there is a difference in meaning or implication, the enacted text controls over any caption, illustration, summary table, or illustrative table. Separately, where a specific provision conflicts with a general one, the more particular provision controls the general provision (ZR § 12-01).",
+        "supportedPoints": [
+          {
+            "heading": "Text and particular provisions control",
+            "explanation": "ZR § 12-01 provides that “the particular shall control the general.” It also provides that, “[i]n case of any difference of meaning or implication between the text of this Resolution and any caption, illustration, summary table or illustrative table, the text shall control.” Thus, the reader resolves the stated conflict by applying the more particular rule and giving controlling effect to the enacted text over the listed caption or illustrative material.",
+            "sectionID": "20018521",
+            "sourceIDs": [
+              "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The answer is based on the supplied NYC Zoning Resolution text through 2026-08-13, identified as continuously amended; no historical-date applicability question was presented."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "20018521",
+            "sectionNumber": "12-01",
+            "title": "Rules Applying to Text of Resolution",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce",
+                "selectedText": "The following rules of construction apply to the text of this Resolution: (a) The particular shall control the general. (b) In case of any difference of meaning or implication between the text of this Resolution and any caption, illustration, summary table or illustrative table, the text shall control. (c) The word \"shall\" is always mandatory and not discretionary. The word \"may\" is permissive. (d) Words used in the present tense shall include the future; and words used in the singular number shall include the plural, and the plural the singular, unless the context clearly indicates the contrary. (e) A \"building\" or \"structure\" includes any part thereof. The terms residential building, commercial building and community facility building shall refer to an entire building used exclusively for such use. (f) The phrase \"used for\" includes \"arranged for\", \"designed for\", \"intended for\", \"maintained for\", \"or occupied for\". (g) The word \"person\" includes an individual, a corporation, a partnership, an incorporated association or any other similar entity. (h) Unless the context clearly indicates the contrary, where a regulation involves two or more items, conditions, provisions, or events connected by the conjunction \"and\", \"or\" or \"either...or\", the conjunction shall be interpreted as follows: (1) \"and\" indicates that all the connected items, conditions, provisions or events shall apply; (2) \"or\" indicates that the connected items, conditions, provisions or events may apply singly or in any combination; and (3) \"either...or\" indicates that the connected items, conditions, provisions or events shall apply singly but not in combination. (i) The word \"includes\" shall not limit a term to the specified examples, but is intended to extend its meaning to all other instances or circumstances of like kind or character. (j) References within a Section or cross-references to a Section numbered with four digits shall include all following Sections with numbers whose first four digits are identical with such Section number but references or cross-references to a Section numbered with five digits shall refer only to such specific five-digit Section. For Sections starting with 101-00, references within a Section or cross-references to a Section numbered with five digits shall include all following Sections with numbers whose first five digits are identical with such Section number but references or cross-references to a Section numbered with six digits shall refer only to such specific six-digit Section.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "ZR § 12-01 directly states both applicable rules of construction: the particular controls the general, and the enacted text controls over a conflicting caption, illustration, summary table, or illustrative table."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "20018521",
+          "20018523",
+          "20021242",
+          "20020965",
+          "20021243"
+        ],
+        "evidenceSourceIDs": [
+          "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce",
+          "research-permitext_discovered-id:20018523-2",
+          "research-permitext_discovered-id:20021242-3",
+          "research-permitext_discovered-id:20020965-4",
+          "research-permitext_discovered-id:20021243-5"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 5,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 4,
+          "userPinnedCount": 1,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "ZR 12-01",
+              "summary": "ZR 12-01 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "ZR 12-01",
+              "summary": "ZR 12-01 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-2"
+              ]
+            }
+          ],
+          "crossReferences": [],
+          "tables": [
+            {
+              "label": "ZR APPENDIX C, Table 1",
+              "summary": "ZR APPENDIX C, Table 1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20021242-3"
+              ]
+            },
+            {
+              "label": "ZR APPENDIX C, Table 2",
+              "summary": "ZR APPENDIX C, Table 2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20021243-5"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [
+            "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:20018523-2",
+            "research-permitext_discovered-id:20021242-3",
+            "research-permitext_discovered-id:20020965-4",
+            "research-permitext_discovered-id:20021243-5"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+          ],
+          "citedEvidenceSourceIDs": [
+            "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20018523-2",
+            "research-permitext_discovered-id:20021242-3",
+            "research-permitext_discovered-id:20020965-4",
+            "research-permitext_discovered-id:20021243-5"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce",
+              "label": "ZR 12-01 — Rules Applying to Text of Resolution",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce",
+              "label": "ZR 12-01 — Rules Applying to Text of Resolution",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "schemaVersion": 2,
+          "plannerVersion": "20260908-historical-source-intent-v5",
+          "compilerVersion": "20260908-direct-rule-obligations-v22",
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-fixture-permission-scope-v28",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:20018523-2",
+            "research-permitext_discovered-id:20021242-3",
+            "research-permitext_discovered-id:20020965-4",
+            "research-permitext_discovered-id:20021243-5"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 4,
+            "reviewedOnlyProvisionCount": 4,
+            "assembledSourceCount": 5,
+            "assembledProvisionCount": 5
+          },
+          "sources": [
+            {
+              "sourceID": "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce",
+              "sectionID": "20018521",
+              "reference": "ZR 12-01",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "The following rules of construction apply to the text of this Resolution: (a) The particular shall control the general. (b) In case of any difference of meaning or implication between the text of this Resolution and any caption, illustration, summary table or illustrative table, the text shall control. (c) The word \"shall\" is always mandatory and not discretionary. The word \"may\" is permissive. (d) Words used in the present tense shall include the future; and words used in the singular number shall include the plural, and the plural the singular, unless the context clearly indicates the contrary. (e) A \"building\" or \"structure\" includes any part thereof. The terms residential building, commercial building and community facility building shall refer to an entire building used exclusively for such use. (f) The phrase \"used for\" includes \"arranged for\", \"designed for\", \"intended for\", \"maintained for\", \"or occupied for\". (g) The word \"person\" includes an individual, a corporation, a partnership, an incorporated association or any other similar entity. (h) Unless the context clearly indicates the contrary, where a regulation involves two or more items, conditions, provisions, or events connected by the conjunction \"and\", \"or\" or \"either...or\", the conjunction shall be interpreted as follows: (1) \"and\" indicates that all the connected items, conditions, provisions or events shall apply; (2) \"or\" indicates that the connected items, conditions, provisions or events may apply singly or in any combination; and (3) \"either...or\" indicates that the connected items, conditions, provisions or events shall apply singly but not in combination. (i) The word \"includes\" shall not limit a term to the specified examples, but is intended to extend its meaning to all other instances or circumstances of like kind or character. (j) References within a Section or cross-references to a Section numbered with four digits shall include all following Sections with numbers whose first four digits are identical with such Section number but references or cross-references to a Section numbered with five digits shall refer only to such specific five-digit Section. For Sections starting with 101-00, references within a Section or cross-references to a Section numbered with five digits shall include all following Sections with numbers whose first five digits are identical with such Section number but references or cross-references to a Section numbered with six digits shall refer only to such specific six-digit Section."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20018523-2",
+              "sectionID": "20018523",
+              "reference": "ZR 12-10",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "building designed for residential use General Definition see designed for residential use building or other structure General Definition Last Amended 12/15/1961 A \"building or other structure\" includes any building or any other structure of any kind. commercial General Definition Last Amended 6/6/2024 A “commercial” use is any use listed in the following use groups, depending on the district type: District Type Use Group Residence Districts N/A Commercial Districts IV, V, VI, VII, VIII, IX, X Manufacturing Districts IV, V, VI, VII, VIII, IX commercial building General Definition Last Amended 6/6/2024 A “commercial building” is a building used only for a commercial use. C1 or C2 Districts mapped within Residence Districts are community facility General Definition Last Amended 6/6/2024 A \"community facility” use is any use listed in the following Use Groups, depending on the district type: District Type Use Group Residence Districts I, III, IV Commercial Districts I, III Manufacturing Districts# I, III community facility building General Definition Last Amended 12/15/1961 A \"community facility building\" is a building used only for a community facility use. residential building General Definition Last Amended 2/2/2011 A \"residential building\" is a building used only for a residential use."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20021242-3",
+              "sectionID": "20021242",
+              "reference": "ZR APPENDIX C, Table 1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "APPENDIX C, Table 1 APPENDIX C, Table 1 — City Environmental Quality Review (CEQR) Environmental Requirements: (E) Designations CITY ENVIRONMENTAL QUALITY REVIEW (CEQR) ENVIRONMENTAL REQUIREMENTS Table 1 – (E) Designations Tax lot changes that may have occurred since the establishment of a particular (E) Designation may not be reflected in this table. If the property in question is located on the same tax block as an (E) designation, review of the related CEQR documentation is recommended. For convenience, for (E) designations applied to a condominium, the condominium billing tax lot number is displayed instead of the individual condominium unit tax lot numbers. Application No. – refers to a ULURP or non-ULURP application (containing six numbers followed by a three- or four-letter suffix) for a zoning text map or text amendment, special permit, authorization, or certification or to a Board of Standards and Appeals application (containing the letters “BZ”) for a special permit or variance. Lot Remediation Date – refers to the date of the duly issued notice from the NYC Office of Environmental Remediation indicating that no investigative/remedial work is required for any current or future development of the lot. * Underground gasoline storage tanks included in category of hazardous materials contamination as of 6/16/94. ** Indicates that a tax lot with multiple deve"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20020965-4",
+              "sectionID": "20020965",
+              "reference": "ZR 104-03",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "104-03 District Plan and Maps The regulations of this Chapter are designed to implement the Special Manhattanville Mixed Use District Plan. The District Plan includes the following maps and illustrative diagrams in Appendix A of this Chapter: Map 1 Special Manhattanville Mixed Use District and Subdistricts Map 2 Subdistrict A Block Plan Map 3 Widened Sidewalk Lines Map 4 Street Wall Types and Locations Map 5 Parcel Designation and Maximum Building Heights Map 6 Ground Floor Use and Frontage Map 7 Mandatory Open Areas The District Plan includes the following table in Appendix B of this Chapter: Base Plane and Building Height Table These maps, diagrams and table are hereby incorporated and made part of this Resolution for the purpose of illustrating requirements or specifying locations where the special regulations and requirements set forth in the text of this Chapter apply."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20021243-5",
+              "sectionID": "20021243",
+              "reference": "ZR APPENDIX C, Table 2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "APPENDIX C, Table 2 APPENDIX C, Table 2 — City Environmental Quality Review (CEQR) Environmental Requirements: Environmental Restrictive Declarations CITY ENVIRONMENTAL QUALITY REVIEW (CEQR) Environmental Requirements Table 2 – Environmental Restrictive Declarations The Environmental Restrictive Declarations (ERD) listed below were recorded in connection with a zoning action against the noted Tax Blocks and Tax Lots, or portion thereof, and are available in the property records on file at the Office of the City Register for Bronx, Kings, New York and Queens counties or at the Richmond County Clerk’s office. They contain environmental requirements with respect to hazardous materials, air quality and/or noise in accordance with Section 11-15 of this Resolution. Tax Lot changes that may have occurred since the recordation of an ERD may not be reflected in this table. If the property in question is located on the same Tax Block as an ERD, review of the related CEQR documentation is recommended. For an ERD recorded against a condominium, the condominium billing tax lot number is displayed instead of the individual condominium unit tax lot numbers. Reference No. – refers to the Environmental Restrictive Declaration identification number used for Table 2 reference purposes only. Application No. – refers to a ULURP or non-ULURP application (containing six numbers followed by a three- or four-letter suffix) for a zoning map or text amendment, special permit, authorization or certification or to a Board of Standards and Appeals application (containing the letters “BZ”) for a special permit or variance. Recording Reference No. – refers to one of the following: Reel No./Page No., City Register File No., or Land Doc No. For ERDs for properties in boroughs other than Staten Island, use the City Register File No. to locate the ERD online in the Automated City Register In"
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260908-zoning-unresolved-predicate-v18",
+          "pass": true,
+          "applies": true,
+          "categories": [
+            "citation-boundary",
+            "stable-passage",
+            "table",
+            "amendment"
+          ],
+          "zoningSourceIDs": [
+            "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce",
+            "research-permitext_discovered-id:20018523-2",
+            "research-permitext_discovered-id:20021242-3",
+            "research-permitext_discovered-id:20020965-4",
+            "research-permitext_discovered-id:20021243-5"
+          ],
+          "issues": []
+        },
+        "zoningArchitecture": {
+          "plannerVersion": "20260908-historical-source-intent-v5",
+          "plan": {
+            "schemaVersion": 2,
+            "plannerVersion": "20260908-historical-source-intent-v5",
+            "path": "direct_rule",
+            "pathLabel": "direct enacted rule",
+            "disposition": "ready",
+            "requirements": [],
+            "missingFacts": [],
+            "clarification": null,
+            "evidenceLimits": {
+              "maximumCandidates": 6,
+              "maximumDiscovered": 4,
+              "maximumTargetedDefinitions": 1,
+              "maximumCrossReferences": 2,
+              "maximumCharacters": 8000,
+              "maximumSupplementalCharacters": 6000,
+              "maximumCharactersPerSource": 4000
+            },
+            "deterministicControls": {
+              "exactPassageBinding": true,
+              "stableSourceHashes": true,
+              "tableGridAndLegend": false,
+              "effectiveDateEventBinding": false,
+              "arithmeticLedger": false,
+              "propertyAndMapPrerequisites": false
+            },
+            "callPolicy": {
+              "initialTier": "fast",
+              "initialModelRole": "luna_first",
+              "subjectiveVerification": false,
+              "verifierTier": null,
+              "maximumProviderCalls": 1,
+              "allowFullAnswerRewrite": false,
+              "repairEligible": false,
+              "repairTier": null,
+              "maximumRepairAttempts": 0,
+              "repairMode": null,
+              "terraEscalation": "provider_failure_or_one_source_bounded_repair"
+            },
+            "questionSignals": {
+              "sourceBoundaryExplanationOnly": false,
+              "historicalSubstantiveTextRequested": false,
+              "explicitMissingFact": false,
+              "propertyIdentifierPresent": false,
+              "mappedStatusPresent": false
+            },
+            "planHash": "8c50da1720d0170da84449b3cf520fb2674c9cdea4cf3444095ca021b5f249fd"
+          },
+          "deterministicContext": {
+            "schemaVersion": 2,
+            "compilerVersion": "20260908-direct-rule-obligations-v22",
+            "plannerVersion": "20260908-historical-source-intent-v5",
+            "planHash": "8c50da1720d0170da84449b3cf520fb2674c9cdea4cf3444095ca021b5f249fd",
+            "path": "direct_rule",
+            "dates": [],
+            "arithmetic": {
+              "measurements": [],
+              "calculations": []
+            },
+            "answerObligations": [
+              {
+                "id": "construction_particular_controls_general",
+                "kind": "rule_priority",
+                "detail": "State the supplied Section 12-01 principle that the particular controls the general, alongside the text-over-illustration rule.",
+                "values": [],
+                "sourceIDs": [
+                  "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+                ],
+                "requireAllValues": false,
+                "coverageScope": "answer",
+                "requireSourceBound": true,
+                "prohibitedPatterns": [
+                  "\\b(?:particular|specific)(?:\\s+(?:rules?|provisions?|requirements?|text))?\\s+(?:does?\\s+not|never|cannot)\\s+(?:control|govern|prevail)\\b"
+                ],
+                "requiredPatterns": [
+                  "\\b(?:the\\s+)?(?:more\\s+)?(?:particular|specific)(?:\\s+(?:rules?|provisions?|requirements?|text))?\\s+(?:(?:shall|must)\\s+)?(?:controls?|governs?|prevails?\\s+over|takes?\\s+precedence\\s+over)\\s+(?:the\\s+)?general\\b"
+                ],
+                "affirmativeRequiredPatterns": true
+              },
+              {
+                "id": "construction_text_controls_illustrations",
+                "kind": "rule_priority",
+                "detail": "Explain that the supplied enacted text controls a conflicting caption, illustration, summary table or illustrative table.",
+                "values": [],
+                "sourceIDs": [
+                  "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce"
+                ],
+                "requireAllValues": false,
+                "valueGroups": [
+                  [
+                    "illustration",
+                    "illustrations"
+                  ],
+                  [
+                    "summary table",
+                    "summary tables",
+                    "illustrative table",
+                    "illustrative tables"
+                  ]
+                ],
+                "coverageScope": "answer",
+                "requireSourceBound": true,
+                "prohibitedPatterns": [
+                  "\\btext\\b[^.;]{0,40}\\b(?:does not|never|cannot)\\s+(?:control|govern|prevail)\\b",
+                  "\\b(?:not|never|cannot)\\s+give controlling effect to\\s+(?:the\\s+)?(?:enacted\\s+)?text\\b"
+                ],
+                "requiredPatterns": [
+                  "\\b(?:text\\b[^.;]{0,80}\\b(?:controls?|governs?|prevails?|takes? precedence)|(?:give|gives|giving)\\s+controlling effect to\\s+(?:the\\s+)?(?:enacted\\s+)?text)\\b"
+                ],
+                "affirmativeRequiredPatterns": true
+              }
+            ],
+            "structuredTables": [],
+            "passages": [
+              {
+                "sourceID": "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce",
+                "sectionID": "20018521",
+                "sectionNumber": "12-01",
+                "textHash": "636df4e3605f52da81e1ac71deff7debb72293ca4bea103f1e4d780e89203583",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-2",
+                "sectionID": "20018523",
+                "sectionNumber": "12-10",
+                "textHash": "2a72bed47acdcee4ae8e328297318f6f6b26bd94f83d2d20cff2ba6dd2f9a354",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20021242-3",
+                "sectionID": "20021242",
+                "sectionNumber": "APPENDIX C, Table 1",
+                "textHash": "75f43e9728877fb9846b06d195c9349ed64e748fab46fcdb63bccc406f334b18",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20020965-4",
+                "sectionID": "20020965",
+                "sectionNumber": "104-03",
+                "textHash": "418b5ce4636936007ae5437b750b9ee6d0d7e51c0e0ccc7ca045e3d67fc03db7",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20021243-5",
+                "sectionID": "20021243",
+                "sectionNumber": "APPENDIX C, Table 2",
+                "textHash": "cab32f6c6a9627a8342cb4cf5a6dcc4af4eb5f0a204b6bf5f46dc9a835eebe3a",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              }
+            ],
+            "contextHash": "ac62c086524508ca31aeec7a4857edf7db34b0a3d3d23c991d8b63863c83c94e"
+          },
+          "evidenceSelection": {
+            "pass": true,
+            "sources": [
+              {
+                "sourceID": "98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Pinned by the user",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-complete-selected-zoning-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:28:24.278Z",
+                "sectionID": "20018521",
+                "codePrefix": "ZR",
+                "sectionNumber": "12-01",
+                "title": "Rules Applying to Text of Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "The following rules of construction apply to the text of this Resolution: (a) The particular shall control the general. (b) In case of any difference of meaning or implication between the text of this Resolution and any caption, illustration, summary table or illustrative table, the text shall control. (c) The word \"shall\" is always mandatory and not discretionary. The word \"may\" is permissive. (d) Words used in the present tense shall include the future; and words used in the singular number shall include the plural, and the plural the singular, unless the context clearly indicates the contrary. (e) A \"building\" or \"structure\" includes any part thereof. The terms residential building, commercial building and community facility building shall refer to an entire building used exclusively for such use. (f) The phrase \"used for\" includes \"arranged for\", \"designed for\", \"intended for\", \"maintained for\", \"or occupied for\". (g) The word \"person\" includes an individual, a corporation, a partnership, an incorporated association or any other similar entity. (h) Unless the context clearly indicates the contrary, where a regulation involves two or more items, conditions, provisions, or events connected by the conjunction \"and\", \"or\" or \"either...or\", the conjunction shall be interpreted as follows: (1) \"and\" indicates that all the connected items, conditions, provisions or events shall apply; (2) \"or\" indicates that the connected items, conditions, provisions or events may apply singly or in any combination; and (3) \"either...or\" indicates that the connected items, conditions, provisions or events shall apply singly but not in combination. (i) The word \"includes\" shall not limit a term to the specified examples, but is intended to extend its meaning to all other instances or circumstances of like kind or character. (j) References within a Section or cross-references to a Section numbered with four digits shall include all following Sections with numbers whose first four digits are identical with such Section number but references or cross-references to a Section numbered with five digits shall refer only to such specific five-digit Section. For Sections starting with 101-00, references within a Section or cross-references to a Section numbered with five digits shall include all following Sections with numbers whose first five digits are identical with such Section number but references or cross-references to a Section numbered with six digits shall refer only to such specific six-digit Section.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null,
+                "userSelectedText": "The following rules of construction apply to the text of this Resolution: (a) The particular shall control the general. (b) In case of any difference of meaning or implication between the text of this Resolution and any caption, illustration, summary table or illustrative table, the text shall control. (c) The word \"shall\" is always mandatory and not discretionary. The word \"may\" is permissive. (d) Words used in the present tense shall include the future; and words used in the singular number shall include the plural, and the plural the singular, unless the context clearly indicates the contrary. (e) A \"building\" or \"structure\" includes any part thereof. The terms residential building, commercial building and community facility building shall refer to an entire building used exclusively for such use. (f) The phrase \"used for\" includes \"arranged for\", \"designed for\", \"intended for\", \"maintained for\", \"or occupied for\". (g) The word \"person\" includes an individual, a corporation, a partnership, an incorporated association or any other similar entity. (h) Unless the context clearly indicates the contrary, where a regulation involves two or more items, conditions, provisions, or events connected by the conjunction \"and\", \"or\" or \"either...or\", the conjunction shall be interpreted as follows: (1) \"and\" indicates that all the connected items, conditions, provisions or events shall apply; (2) \"or\" indicates that the connected items, conditions, provisions or events may apply singly or in any combination; and (3) \"either...or\" indicates that the connected items, conditions, provisions or events shall apply singly but not in combination. (i) The word \"includes\" shall not limit a term to the specified examples, but is intended to extend its meaning to all other instances or circumstances of like kind or character. (j) References within a Section or cross-references to a Section numbered with four digits shall include all following Sections with numbers whose first four digits are identical with such Section number but references or cross-references to a Section numbered with five digits shall refer only to such specific five-digit Section. For Sections starting with 101-00, references within a Section or cross-references to a Section numbered with five digits shall include all following Sections with numbers whose first five digits are identical with such Section number but references or cross-references to a Section numbered with six digits shall refer only to such specific six-digit Section.",
+                "pinnedSelectionExact": true
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-2",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “zoning”, “resolution”, “conflict”, “text”, “illustration”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “zoning”, “resolution”, “conflict”, “text”, “illustration”.",
+                "retrievalRank": 2,
+                "retrievalScore": 12.481,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "definition",
+                  "functions": [
+                    "definition"
+                  ],
+                  "materialityRank": 6,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "definition provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:28:24.278Z",
+                "sectionID": "20018523",
+                "codePrefix": "ZR",
+                "sectionNumber": "12-10",
+                "title": "DEFINITIONS",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "building designed for residential use General Definition see designed for residential use\n\nbuilding or other structure General Definition Last Amended 12/15/1961 A \"building or other structure\" includes any building or any other structure of any kind.\n\ncommercial General Definition Last Amended 6/6/2024 A “commercial” use is any use listed in the following use groups, depending on the district type: District Type Use Group Residence Districts N/A Commercial Districts IV, V, VI, VII, VIII, IX, X Manufacturing Districts IV, V, VI, VII, VIII, IX\n\ncommercial building General Definition Last Amended 6/6/2024 A “commercial building” is a building used only for a commercial use. C1 or C2 Districts mapped within Residence Districts are\n\ncommunity facility General Definition Last Amended 6/6/2024 A \"community facility” use is any use listed in the following Use Groups, depending on the district type: District Type Use Group Residence Districts I, III, IV Commercial Districts I, III Manufacturing Districts# I, III\n\ncommunity facility building General Definition Last Amended 12/15/1961 A \"community facility building\" is a building used only for a community facility use.\n\nresidential building General Definition Last Amended 2/2/2011 A \"residential building\" is a building used only for a residential use.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": false,
+                "targetedDefinition": {
+                  "schemaVersion": 1,
+                  "version": "20260908-zoning-far-definition-v2",
+                  "sourceMode": "canonical_enacted_definition_entries",
+                  "sectionID": "20018523",
+                  "codePrefix": "ZR",
+                  "sectionNumber": "12-10",
+                  "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                  "jurisdiction": "New York City",
+                  "labels": [
+                    "building designed for residential use",
+                    "building or other structure",
+                    "commercial",
+                    "commercial building",
+                    "community facility",
+                    "community facility building",
+                    "residential building"
+                  ],
+                  "passages": [
+                    "building designed for residential use General Definition see designed for residential use",
+                    "building or other structure General Definition Last Amended 12/15/1961 A \"building or other structure\" includes any building or any other structure of any kind.",
+                    "commercial General Definition Last Amended 6/6/2024 A “commercial” use is any use listed in the following use groups, depending on the district type: District Type Use Group Residence Districts N/A Commercial Districts IV, V, VI, VII, VIII, IX, X Manufacturing Districts IV, V, VI, VII, VIII, IX",
+                    "commercial building General Definition Last Amended 6/6/2024 A “commercial building” is a building used only for a commercial use. C1 or C2 Districts mapped within Residence Districts are",
+                    "community facility General Definition Last Amended 6/6/2024 A \"community facility” use is any use listed in the following Use Groups, depending on the district type: District Type Use Group Residence Districts I, III, IV Commercial Districts I, III Manufacturing Districts# I, III",
+                    "community facility building General Definition Last Amended 12/15/1961 A \"community facility building\" is a building used only for a community facility use.",
+                    "residential building General Definition Last Amended 2/2/2011 A \"residential building\" is a building used only for a residential use."
+                  ],
+                  "canonicalSectionCharacterCount": 268088,
+                  "excerptCharacterCount": 1312,
+                  "canonicalContextComplete": false
+                }
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20021242-3",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “zoning”, “text”, “table”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “zoning”, “text”, “table”.",
+                "retrievalRank": 3,
+                "retrievalScore": 12.027,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "calculation_table",
+                  "functions": [
+                    "calculation_table"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "calculation or table provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:28:24.278Z",
+                "sectionID": "20021242",
+                "codePrefix": "ZR",
+                "sectionNumber": "APPENDIX C, Table 1",
+                "title": "APPENDIX C, Table 1 — City Environmental Quality Review (CEQR) Environmental Requirements: (E) Designations",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "APPENDIX C, Table 1 APPENDIX C, Table 1 — City Environmental Quality Review (CEQR) Environmental Requirements: (E) Designations CITY ENVIRONMENTAL QUALITY REVIEW (CEQR) ENVIRONMENTAL REQUIREMENTS Table 1 – (E) Designations Tax lot changes that may have occurred since the establishment of a particular (E) Designation may not be reflected in this table. If the property in question is located on the same tax block as an (E) designation, review of the related CEQR documentation is recommended. For convenience, for (E) designations applied to a condominium, the condominium billing tax lot number is displayed instead of the individual condominium unit tax lot numbers. Application No. – refers to a ULURP or non-ULURP application (containing six numbers followed by a three- or four-letter suffix) for a zoning text map or text amendment, special permit, authorization, or certification or to a Board of Standards and Appeals application (containing the letters “BZ”) for a special permit or variance. Lot Remediation Date – refers to the date of the duly issued notice from the NYC Office of Environmental Remediation indicating that no investigative/remedial work is required for any current or future development of the lot. * Underground gasoline storage tanks included in category of hazardous materials contamination as of 6/16/94. ** Indicates that a tax lot with multiple deve",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20020965-4",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “resolution”, “text”, “table”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “resolution”, “text”, “table”.",
+                "retrievalRank": 4,
+                "retrievalScore": 11.136,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-08T13:28:24.278Z",
+                "sectionID": "20020965",
+                "codePrefix": "ZR",
+                "sectionNumber": "104-03",
+                "title": "District Plan and Maps",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "104-03 District Plan and Maps The regulations of this Chapter are designed to implement the Special Manhattanville Mixed Use District Plan. The District Plan includes the following maps and illustrative diagrams in Appendix A of this Chapter: Map 1 Special Manhattanville Mixed Use District and Subdistricts Map 2 Subdistrict A Block Plan Map 3 Widened Sidewalk Lines Map 4 Street Wall Types and Locations Map 5 Parcel Designation and Maximum Building Heights Map 6 Ground Floor Use and Frontage Map 7 Mandatory Open Areas The District Plan includes the following table in Appendix B of this Chapter: Base Plane and Building Height Table These maps, diagrams and table are hereby incorporated and made part of this Resolution for the purpose of illustrating requirements or specifying locations where the special regulations and requirements set forth in the text of this Chapter apply.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20021243-5",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “zoning”, “resolution”, “text”, “table”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “zoning”, “resolution”, “text”, “table”.",
+                "retrievalRank": 5,
+                "retrievalScore": 10.433,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "calculation_table",
+                  "functions": [
+                    "calculation_table"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "calculation or table provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:28:24.278Z",
+                "sectionID": "20021243",
+                "codePrefix": "ZR",
+                "sectionNumber": "APPENDIX C, Table 2",
+                "title": "APPENDIX C, Table 2 — City Environmental Quality Review (CEQR) Environmental Requirements: Environmental Restrictive Declarations",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "APPENDIX C, Table 2 APPENDIX C, Table 2 — City Environmental Quality Review (CEQR) Environmental Requirements: Environmental Restrictive Declarations CITY ENVIRONMENTAL QUALITY REVIEW (CEQR) Environmental Requirements Table 2 – Environmental Restrictive Declarations The Environmental Restrictive Declarations (ERD) listed below were recorded in connection with a zoning action against the noted Tax Blocks and Tax Lots, or portion thereof, and are available in the property records on file at the Office of the City Register for Bronx, Kings, New York and Queens counties or at the Richmond County Clerk’s office. They contain environmental requirements with respect to hazardous materials, air quality and/or noise in accordance with Section 11-15 of this Resolution. Tax Lot changes that may have occurred since the recordation of an ERD may not be reflected in this table. If the property in question is located on the same Tax Block as an ERD, review of the related CEQR documentation is recommended. For an ERD recorded against a condominium, the condominium billing tax lot number is displayed instead of the individual condominium unit tax lot numbers. Reference No. – refers to the Environmental Restrictive Declaration identification number used for Table 2 reference purposes only. Application No. – refers to a ULURP or non-ULURP application (containing six numbers followed by a three- or four-letter suffix) for a zoning map or text amendment, special permit, authorization or certification or to a Board of Standards and Appeals application (containing the letters “BZ”) for a special permit or variance. Recording Reference No. – refers to one of the following: Reel No./Page No., City Register File No., or Land Doc No. For ERDs for properties in boroughs other than Staten Island, use the City Register File No. to locate the ERD online in the Automated City Register In",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null
+              }
+            ],
+            "rejected": [],
+            "gateFailures": [],
+            "usage": {
+              "sourceCount": 5,
+              "characterCount": 7994,
+              "pinnedCharacterCount": 2528,
+              "maximumCharacters": 8000
+            }
+          },
+          "evidenceReadiness": {
+            "schemaVersion": 1,
+            "pass": true,
+            "disposition": "ready",
+            "issues": [],
+            "requiredEvidence": []
+          },
+          "repairVersion": "20260901-source-bounded-patch-v2",
+          "sourceBoundedRepairApplied": false,
+          "repairPacketHashes": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-complete-selected-zoning-v29",
+          "retrievalQuery": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": true,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "question_not_bounded_to_selected_evidence"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 6,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 2,
+            "maximumCharacters": 8000,
+            "maximumSupplementalCharacters": 6000,
+            "maximumCharactersPerSource": 4000,
+            "maximumCompletePinnedSectionCharacters": 8000
+          },
+          "usage": {
+            "pinnedCount": 1,
+            "pinnedCharacterCount": 2528,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 1,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 8000,
+            "supplementalCharacterCount": 5472,
+            "candidateCount": 6,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 0,
+            "topicDependencyCount": 0,
+            "characterCount": 8000,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0,
+            "finalSourceCount": 5,
+            "finalCharacterCount": 7994
+          },
+          "limitations": [
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "visual-source-review-required",
+              "text": "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. Review and explicitly select the applicable visual source before preparing that candidate."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 4068,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codePrefixes": [
+                  "ZR"
+                ],
+                "routeReason": "zoning cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "zoning cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: NYC Zoning Resolution",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T13:28:24.054Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "permitext-deterministic-zoning-compiler"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-08T13:28:24.054Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "fast",
+          "reasons": [
+            "zoning_compiler_luna_first:direct_rule"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-luna",
+          "actualAnswerModel": "gpt-5.6-luna",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": [],
+          "zoningPlannerVersion": "20260908-historical-source-intent-v5",
+          "maximumProviderCalls": 1,
+          "fullAnswerRewriteAllowed": false,
+          "sourceBoundedRepairApplied": false,
+          "repairVersion": "20260901-source-bounded-patch-v2"
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "ZR-14",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 49862,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "728fcabd4710a1bdb669058e12f60081edb3d985fda63e91e4e63fb2733f1e10",
+      "startedAt": "2026-09-08T13:28:12.748Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10378,
+        "input_tokens_details": {
+          "cache_write_tokens": 10375,
+          "cached_tokens": 0
+        },
+        "output_tokens": 713,
+        "output_tokens_details": {
+          "reasoning_tokens": 160
+        },
+        "total_tokens": 11091
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0b9afe4cecb6a063016aa00d70e6d887d284c0aa33d8b9994e",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"No—not on the stated facts, assuming the 30-foot spacing is measured between the buildings’ closest points and no applicable rear-yard-equivalent exception applies. Because the buildings contain three or more dwelling units, are on the same zoning lot, do not connect at any level, and are below 125 feet, ZR § 23-371 requires 40 feet between their closest points. The proposed spacing is therefore 10 feet short: 40 − 30 = 10 feet. The section’s provisions do not apply to buildings separated by a rear yard equivalent; that exception has not been established here.\",\"supportedPoints\":[{\"heading\":\"Required spacing for the proposed buildings\",\"explanation\":\"For two or more buildings on the same zoning lot that are not connected at any level, the minimum distance is 40 feet, measured between the closest points, for portions of buildings lower than 125 feet. The stated 30-foot spacing consequently falls short by 10 feet (40 − 30 = 10 feet).\",\"sectionID\":\"20018102\",\"sourceIDs\":[\"32fd53d5-dcd8-46cb-a776-68ebfc7bfeba\"]},{\"heading\":\"Rear-yard-equivalent exception\",\"explanation\":\"ZR § 23-371 states that its provisions do not apply to buildings separated from each other by a rear yard equivalent. The supplied facts do not establish that exception.\",\"sectionID\":\"20018102\",\"sourceIDs\":[\"32fd53d5-dcd8-46cb-a776-68ebfc7bfeba\"]}],\"assumptions\":[\"The stated 30-foot separation represents the distance between the buildings’ closest points.\",\"The stated building heights are measured under the section’s applicable base-plane or curb-level measurement rule.\"],\"missingFacts\":[\"Whether the buildings are separated by a rear yard equivalent, which could make the spacing provisions inapplicable.\",\"Whether the stated 30-foot distance is measured between the buildings’ closest points.\"],\"followUpQuestions\":[],\"evidenceLimitations\":[\"The conclusion is based on the supplied continuously amended NYC Zoning Resolution text through 2026-08-13, principally ZR § 23-371; no mapped district or parcel-specific applicability was supplied or inferred.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"20018102\",\"sourceIDs\":[\"32fd53d5-dcd8-46cb-a776-68ebfc7bfeba\"],\"relevance\":\"Governs the 40-foot closest-point spacing requirement for unconnected buildings on the same zoning lot below 125 feet and states the rear-yard-equivalent exception.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 10900
+    },
+    {
+      "caseID": "ZR-01",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 46471,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "c91fd7f4d848f8c0db4a9dd598f46132944624d15c4af6a57d5e499b065df1c7",
+      "startedAt": "2026-09-08T13:28:24.444Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 9775,
+        "input_tokens_details": {
+          "cache_write_tokens": 9772,
+          "cached_tokens": 0
+        },
+        "output_tokens": 400,
+        "output_tokens_details": {
+          "reasoning_tokens": 34
+        },
+        "total_tokens": 10175
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0381f79707895d80016aa00d7a2f0087d28ca9e1cbd50d9204",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"When there is a difference in meaning or implication, the enacted text controls over any caption, illustration, summary table, or illustrative table. Separately, where a specific provision conflicts with a general one, the more particular provision controls the general provision (ZR § 12-01).\",\"supportedPoints\":[{\"heading\":\"Text and particular provisions control\",\"explanation\":\"ZR § 12-01 provides that “the particular shall control the general.” It also provides that, “[i]n case of any difference of meaning or implication between the text of this Resolution and any caption, illustration, summary table or illustrative table, the text shall control.” Thus, the reader resolves the stated conflict by applying the more particular rule and giving controlling effect to the enacted text over the listed caption or illustrative material.\",\"sectionID\":\"20018521\",\"sourceIDs\":[\"98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce\"]}],\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"The answer is based on the supplied NYC Zoning Resolution text through 2026-08-13, identified as continuously amended; no historical-date applicability question was presented.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"20018521\",\"sourceIDs\":[\"98e45877-b8b4-4fa1-bb3c-3a6a2e4143ce\"],\"relevance\":\"ZR § 12-01 directly states both applicable rules of construction: the particular controls the general, and the enacted text controls over a conflicting caption, illustration, summary table, or illustrative table.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 5286
+    }
+  ],
+  "cumulativeConservativeSpendUSD": 7.876233,
+  "spend": {
+    "active": true,
+    "capUSD": 0.135848,
+    "reservedUSD": 0.005366,
+    "actualUSD": 0.005366,
+    "requestCount": 2,
+    "pendingRequestCount": 0
+  },
+  "completedAt": "2026-09-08T13:28:30.084Z"
+}
