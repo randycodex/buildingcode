@@ -1,0 +1,43 @@
+{
+  "schema": "permitext-fixture-confirmation-review-v1",
+  "sourceCommit": "22833c9b9e37a4de916438bbb2f18be17bd44ce1",
+  "reviewedAt": "2026-09-08T05:03:10.051Z",
+  "liveResultSHA256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf",
+  "method": "Manual review of delivered answers and the ordered draft/verifier/revision records against the recovered source and owner key; no paid judge.",
+  "professionalApproval": false,
+  "releaseApproval": false,
+  "findings": [
+    {
+      "id": "CC-03",
+      "answerSHA256": "40966888c7ce6c6c0ba1937b87b5b6860d2f037763b311c4b584f501fb08007d",
+      "status": "completed",
+      "durationMilliseconds": 22170,
+      "words": 236,
+      "review": "Conditional classification and arithmetic are supported; answer remains longer than the reference."
+    },
+    {
+      "id": "CC-04",
+      "answerSHA256": "63bfb2f5fd6a4af9ba8b4188988ceec115d6da1404c5a310712957614a4a691d",
+      "status": "completed",
+      "durationMilliseconds": 45013,
+      "words": 343,
+      "review": "Unresolved. Source-tail recovery succeeded, but the revision changed Not automatically to Yes and was delivered under deterministic post-repair acceptance without a second semantic check. The key also needs a precise distinction between an optional Assembly calculation and a prohibition on the normal Group B calculation; do not treat wording agreement as correctness."
+    }
+  ],
+  "spend": {
+    "batchTokenTelemetryUSD": 0.190086,
+    "batchEstimatedCacheWritePremiumUSD": 0.032888,
+    "batchUsageEstimateUSD": 0.222974,
+    "cumulativeUsageEstimateUSD": 1.74661036,
+    "cumulativeConservativeBoundUSD": 3.492894,
+    "pendingRequests": 0,
+    "totalEffortTurns": 29,
+    "totalEffortProviderRequests": 59,
+    "limitation": "Usage-based estimate, not an invoice or account balance."
+  },
+  "requiredNextSteps": [
+    "Require semantic verification of generated revisions before delivery.",
+    "Reassess CC-04 answer-key permission wording without silently replacing the approved benchmark.",
+    "Reduce irrelevant fixture descendants and repeated context only after preserving material conditions."
+  ]
+}

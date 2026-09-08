@@ -11,3 +11,11 @@ The actual CC-04 source assembly now includes the complete PC 403.1 qualificatio
 The separate `run-research-owner-fixture-confirmation-20260908.mjs` package asks CC-03 and then CC-04 in the same isolated local Research conversation, once each, with actual provider responses and no supplied reference answers. This tests the source repair and retention of the established room facts. It does not assume an internal verification pass proves answer quality.
 
 Prior settled conservative spend across six packages is $3.050704, with zero pending requests. Two $0.85 turn caps add an absolute $1.70 ceiling, or $4.750704 including all prior packages, within the owner's $8 authorization. The package also enforces a $1.80 aggregate guard, a no-network default preflight and a permanent result file that prevents accidental replay. No separate paid judge, manual retry or deployment is included. Existing model routing is retained.
+
+## Live result at `22833c9b9`
+
+Both turns delivered, but **this is not a two-case quality pass**. CC-03 retained its conditional classification and correct calculation in 236 words and 22.170 seconds. CC-04 now receives and discusses the recovered qualification. However, its revised answer changes the opening from “Not automatically” to “Yes” and is delivered after deterministic post-repair acceptance, without another semantic provider review. Its five-call conversation (two for CC-03, three for CC-04) exposes a verification gap. CC-04 took 45.013 seconds and 343 words.
+
+The permission language also needs a careful answer-key review: the cited text permits Assembly calculations; agreement with an expected “Not automatically” must not be achieved by inventing a prohibition on Group B calculations. Preserve this distinction and the original approved benchmark while reviewing the interpretation. The live CC-04 result remains unresolved.
+
+Exact answers and ordered provider outputs are retained in `permitext-sync-server/evals/results/research-owner-live-fixture-confirmation-2026-09-08.json`; the separate review is `research-owner-fixture-confirmation-review-2026-09-08.json` in that folder. All five requests settled, with zero pending requests. The next required repair is semantic review of the generated revision before delivery. No deployment occurred.
