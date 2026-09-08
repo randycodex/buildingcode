@@ -1,0 +1,2048 @@
+{
+  "schema": "permitext-reconciled-answer-key-v1",
+  "reconciledOn": "2026-09-07",
+  "purpose": "Development-only acceptance reference. Wording is illustrative; evidence, facts, qualifiers and source conflicts govern acceptance.",
+  "intake": {
+    "filename": "Permitext_Consolidated_Evaluation_Questions_Answer_Key.md",
+    "sha256": "40ca00c0ac4d3f6b9523694334b8fcdefedcd69e05145bd1630e279f6a0e0950",
+    "caseCount": 50,
+    "zoningSnapshot": "2026-07-16",
+    "dobWorkflowSnapshot": "2026-08-22",
+    "originalPreserved": true
+  },
+  "sourceFileSHA256": {
+    "research-cases.json": "da3a0e1061b94d9707abc713d0827a8c1df46b9d8a873e9544b35ac9d90eeefb",
+    "zoning-cases.json": "90b9cf4c5c3ea40522103d42a9b8ec052b044cf42be019cae53eed61cfa008a6",
+    "review-packets/dob-now-expediter-draft-review.md": "715301e11a99f50ea320402102bb5376e627a41fce0510f7d8705f05929be975"
+  },
+  "authorization": {
+    "paidModelCalls": false,
+    "publicResearchRelease": false,
+    "deployment": false,
+    "newProfessionalApproval": false
+  },
+  "answerSequence": [
+    "Direct answer",
+    "Governing rule with citation",
+    "Application or calculation",
+    "Material exceptions or missing facts"
+  ],
+  "sourceNotes": [
+    "Restore the source scenario, selected evidence and project facts before evaluating an answer. Never infer a scenario from the expected answer.",
+    "Current repository review states supersede the compilation's blanket DRAFT labels; approval remains limited to the originally recorded scope. Reconciled prose has not received a new independent professional review.",
+    "The repository also contains 30 additional Zoning cases in zoning-cases-expanded-batch-1.json. They are outside this 50-case reconciliation and have not been silently added.",
+    "No new model quality score or response-time benchmark is claimed. DOB conflicts need the current official materials and actual filing where applicable."
+  ],
+  "cases": [
+    {
+      "id": "CC-01",
+      "title": "Scissor stair counted as two exits",
+      "intakeQuestion": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+      "question": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+      "scenario": "",
+      "expectedAnswer": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. Confirm the occupancy group, enclosure rating, separating construction, and material before concluding that the exception applies.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Use the current repository answer and rubric, with the selected evidence and project context restored."
+      ],
+      "sourceDataset": "research-cases.json",
+      "sourceCaseID": "scissor-stair-two-exits",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-07-23T21:35:54.092Z",
+      "sourceApprovalScope": "Existing construction-code evaluation approval; no new live result or release approval.",
+      "codeVersion": "2022 New York City Construction Codes",
+      "projectContext": {
+        "occupancy": "Group R-2 stated by the question",
+        "configuration": "Scissor stair with entrance doors 15 feet apart",
+        "unknowns": [
+          "enclosure rating",
+          "separating construction rating",
+          "construction material"
+        ]
+      },
+      "selectedEvidence": [
+        {
+          "sectionID": "2197",
+          "reference": "BC 1007.1.1",
+          "codePrefix": "BC",
+          "sectionNumber": "1007.1.1",
+          "exactPassages": [
+            "Stairs sharing any common wall, floor, ceiling, scissor stair assembly, or other enclosure shall be counted as one exit stairway.",
+            "Exceptions:",
+            "3. Group R-2 occupancies. In Group R-2 occupancies, where stairs are enclosed in walls having at least a 2-hour fire resistance rating and constructed of masonry or masonry equivalent in accordance with department rules: 3.1. The exit doors to such stairs shall be placed a distance apart equal to no less than 15 feet (4572 mm); and 3.2. Such stairs shall be permitted to share common walls, floors, ceilings or scissor stairs assemblies or other enclosures provided that the construction separating the stairs is also of at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules."
+          ]
+        }
+      ],
+      "requiredConcepts": [
+        "State that the 15-foot door separation alone is insufficient.",
+        "Explain the general rule that stairs sharing a scissor-stair assembly count as one exit stairway.",
+        "Explain the Group R-2 exception for separately counted stairs.",
+        "Identify the 2-hour enclosure and separating-construction requirements.",
+        "Identify the masonry or masonry-equivalent requirement.",
+        "Identify the minimum 15-foot exit-door separation."
+      ],
+      "forbiddenClaims": [
+        "Every scissor stair automatically counts as one exit.",
+        "Fifteen feet of door separation automatically makes the stairs compliant.",
+        "Sprinkler protection by itself satisfies the Group R-2 exception."
+      ],
+      "missingFacts": [
+        "Confirm Group R-2 occupancy.",
+        "Confirm the stair-enclosure fire-resistance rating.",
+        "Confirm the construction separating the stairs and its fire-resistance rating.",
+        "Confirm masonry or an accepted masonry equivalent."
+      ],
+      "requiredCitations": [
+        "BC 1007.1.1"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "CC-02",
+      "title": "Single stair in a six-story residential building",
+      "intakeQuestion": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+      "question": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+      "scenario": "",
+      "expectedAnswer": "BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II construction, does not exceed six stories, and does not exceed 2,000 square feet per story. The stated height and floor area satisfy two of those conditions, but compliance cannot be confirmed until the occupancy classification and construction type are known. This passage only establishes that the single-exit allowance may be available; other applicable egress, fire-protection, travel-distance, and design requirements must be checked under their respective sections without inventing requirements that are not in the selected evidence.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Use the current repository answer and rubric, with the selected evidence and project context restored."
+      ],
+      "sourceDataset": "research-cases.json",
+      "sourceCaseID": "single-stair-six-story-r2",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-07-22T00:00:00.000Z",
+      "sourceApprovalScope": "Existing construction-code evaluation approval; no new live result or release approval.",
+      "codeVersion": "2022 New York City Construction Codes",
+      "projectContext": {
+        "stories": 6,
+        "areaPerStorySquareFeet": 1950,
+        "use": "Residential building",
+        "unknowns": [
+          "occupancy classification",
+          "construction type"
+        ]
+      },
+      "selectedEvidence": [
+        {
+          "sectionID": "2185",
+          "reference": "BC 1006.3.2",
+          "codePrefix": "BC",
+          "sectionNumber": "1006.3.2",
+          "exactPassages": [
+            "7. Buildings of Occupancy Group R-2 of construction Type I or II not exceeding six stories and not exceeding 2,000 square feet (185.8 m 2 ) per story."
+          ]
+        }
+      ],
+      "requiredConcepts": [
+        "Identify Group R-2 as a condition of Item 7.",
+        "Identify Type I or Type II construction as a condition.",
+        "Identify the six-story maximum.",
+        "Identify the 2,000-square-foot-per-story maximum.",
+        "Recognize that six stories and approximately 1,950 square feet satisfy only the stated height and area conditions.",
+        "Limit the conclusion to potential availability of the single-exit allowance."
+      ],
+      "forbiddenClaims": [
+        "Every six-story residential building can have one stair.",
+        "The building qualifies without confirming Group R-2 and Type I or Type II construction.",
+        "Assert specific additional requirements that are not supported by selected passages."
+      ],
+      "missingFacts": [
+        "Confirm the occupancy classification is Group R-2.",
+        "Confirm the construction type is Type I or Type II.",
+        "Check other applicable requirements under evidence supplied for those requirements."
+      ],
+      "requiredCitations": [
+        "BC 1006.3.2"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "CC-03",
+      "title": "Occupancy classification of a residential multipurpose room",
+      "intakeQuestion": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+      "question": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+      "scenario": "",
+      "expectedAnswer": "For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. The result depends on the actual net area, furniture arrangement, intended activities, and whether the room is truly accessory to the residential use.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Use the current repository answer and rubric, with the selected evidence and project context restored."
+      ],
+      "sourceDataset": "research-cases.json",
+      "sourceCaseID": "residential-multipurpose-occupancy",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-07-22T00:00:00.000Z",
+      "sourceApprovalScope": "Existing construction-code evaluation approval; no new live result or release approval.",
+      "codeVersion": "2022 New York City Construction Codes",
+      "projectContext": {
+        "buildingUse": "Apartment building",
+        "roomAreaNetSquareFeet": 900,
+        "typicalArrangement": "Tables and chairs",
+        "users": "Residents only"
+      },
+      "selectedEvidence": [
+        {
+          "sectionID": "132",
+          "reference": "BC 303.1.3",
+          "codePrefix": "BC",
+          "sectionNumber": "303.1.3",
+          "exactPassages": [
+            "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+          ]
+        },
+        {
+          "sectionID": "2152",
+          "reference": "BC 1004.1.3",
+          "codePrefix": "BC",
+          "sectionNumber": "1004.1.3",
+          "exactPassages": [
+            "For areas without fixed seating, the occupant load shall be not less than that number determined by dividing the floor area under consideration by the occupant load factor assigned to the function of the space as set forth in Table 1004.1.3.",
+            "Unconcentrated (tables and chairs)",
+            "15 net"
+          ]
+        }
+      ],
+      "requiredConcepts": [
+        "Use the 15-net-square-feet-per-occupant factor for unconcentrated tables and chairs.",
+        "Calculate 900 divided by 15 as an occupant load of 60.",
+        "Compare 60 with the fewer-than-75 threshold.",
+        "Explain the Group B or served-occupancy classification option when the room is accessory.",
+        "Avoid automatically classifying every residential amenity room as Group R-2."
+      ],
+      "forbiddenClaims": [
+        "Every residential amenity room is automatically Group R-2.",
+        "The room is below 75 occupants without performing the calculation.",
+        "The result is unchanged for concentrated seating, standing space, or another function."
+      ],
+      "missingFacts": [
+        "Confirm the actual net area.",
+        "Confirm the furniture arrangement and occupant-load factor.",
+        "Confirm the intended activities.",
+        "Confirm the room is accessory to the residential occupancy."
+      ],
+      "requiredCitations": [
+        "BC 303.1.3",
+        "BC 1004.1.3"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "CC-04",
+      "title": "Plumbing fixtures for an accessory assembly space",
+      "intakeQuestion": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+      "question": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+      "scenario": "",
+      "expectedAnswer": "Not automatically. BC 303.1.3 directly permits the plumbing fixtures for a qualifying accessory assembly room with fewer than 75 occupants to be calculated using the applicable Assembly fixture requirements even when the room is classified as Group B or as part of the occupancy it serves. The selected PC 403.1 passage supplies the general Table 403.1 framework, but its separate fewer-than-75 permission is expressly limited to a building or nonaccessory tenant assembly space and does not independently extend that permission to this accessory room. The appropriate assembly category must first be identified from the room's actual use. PC 403.1.1 supplies the selected calculation mechanics: divide the occupant load equally between the sexes unless approved statistical information supports another distribution, apply the fixture ratios, combine fractions as required for multiple occupancies, and round up. A final fixture count requires the calculated occupant load, applicable assembly use, existing shared facilities, and other relevant project conditions.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Use the current repository answer and rubric, with the selected evidence and project context restored.",
+        "BC 303.1.3 directly supports the accessory-room fixture option. Preserve the separate nonaccessory scope of PC 403.1; do not conflate their subjects."
+      ],
+      "sourceDataset": "research-cases.json",
+      "sourceCaseID": "accessory-assembly-plumbing-fixtures",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-07-22T00:00:00.000Z",
+      "sourceApprovalScope": "Existing construction-code evaluation approval; no new live result or release approval.",
+      "codeVersion": "2022 New York City Construction Codes",
+      "projectContext": {
+        "space": "Residential multipurpose room",
+        "potentialClassification": "Group B under the accessory assembly provision",
+        "unknowns": [
+          "assembly use category",
+          "occupant load",
+          "shared facilities",
+          "sex distribution"
+        ]
+      },
+      "selectedEvidence": [
+        {
+          "sectionID": "132",
+          "reference": "BC 303.1.3",
+          "codePrefix": "BC",
+          "sectionNumber": "303.1.3",
+          "exactPassages": [
+            "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+          ]
+        },
+        {
+          "sectionID": "11909",
+          "reference": "PC 403.1",
+          "codePrefix": "PC",
+          "sectionNumber": "403.1",
+          "exactPassages": [
+            "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code.",
+            "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies."
+          ]
+        },
+        {
+          "sectionID": "11910",
+          "reference": "PC 403.1.1",
+          "codePrefix": "PC",
+          "sectionNumber": "403.1.1",
+          "exactPassages": [
+            "To determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor.",
+            "Exception: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex."
+          ]
+        }
+      ],
+      "requiredConcepts": [
+        "State that Group B classification does not automatically control the fixture calculation.",
+        "Attribute permission to use applicable Assembly fixture requirements for the qualifying accessory assembly room directly to BC 303.1.3.",
+        "Explain that the selected PC 403.1 fewer-than-75 passage applies to a building or nonaccessory tenant assembly space and does not independently extend that permission to the accessory room.",
+        "Use PC 403.1 only for the general Table 403.1, occupant-load, and occupancy-classification framework supported by its selected text.",
+        "Require identification of the appropriate assembly category based on actual use.",
+        "Explain the general equal division between the sexes and the statistical-data exception.",
+        "Explain application of fixture ratios, combination of fractions for multiple occupancies, and rounding up.",
+        "Avoid providing a final fixture count without the required project facts."
+      ],
+      "forbiddenClaims": [
+        "Group B classification always controls the plumbing fixture calculation.",
+        "State that the selected PC 403.1 fewer-than-75 provision independently applies its building or nonaccessory tenant-space rule to this accessory assembly room.",
+        "Residential unit fixtures automatically satisfy the multipurpose-room requirement.",
+        "Provide a final fixture count without the occupant load, assembly use, shared facilities, and project conditions."
+      ],
+      "missingFacts": [
+        "Confirm the calculated occupant load.",
+        "Confirm the applicable assembly use category.",
+        "Confirm existing shared facilities and relevant project conditions.",
+        "Confirm whether approved statistical information supports a different distribution between the sexes."
+      ],
+      "requiredCitations": [
+        "BC 303.1.3",
+        "PC 403.1",
+        "PC 403.1.1"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "CC-05",
+      "title": "Building Code evidence versus an HCR requirement",
+      "intakeQuestion": "Does this section prove that HCR requires a vanity in the bathroom?",
+      "question": "Does this section prove that HCR requires a vanity in the bathroom?",
+      "scenario": "",
+      "expectedAnswer": "No. In its Type B+NYC unit toilet-and-bathing-room context, the selected Building Code subsection establishes the required water-closet clearance when only a forward approach is provided and permits a compliant lavatory at the specified rear-wall location. A lavatory and a vanity must remain distinct: this subsection does not establish an HCR vanity requirement, and its permissive lavatory-location language does not prove that no other Building Code provision requires a lavatory. Confirm whether the unit and bathroom are subject to the Type B+NYC provisions and provide the applicable HCR design standard, program or funding requirement, or official agency guidance before stating what HCR requires.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Use the current repository answer and rubric, with the selected evidence and project context restored.",
+        "Restore the Type B+NYC context, distinguish vanity from lavatory, and avoid implying that no other provision requires a lavatory."
+      ],
+      "sourceDataset": "research-cases.json",
+      "sourceCaseID": "building-code-versus-hcr",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-07-22T00:00:00.000Z",
+      "sourceApprovalScope": "Existing construction-code evaluation approval; no new live result or release approval.",
+      "codeVersion": "2022 New York City Construction Codes",
+      "projectContext": {
+        "questionedAuthority": "New York State Homes and Community Renewal (HCR)",
+        "selectedAuthority": "New York City Building Code only",
+        "unknowns": [
+          "applicable HCR standard",
+          "funding requirements",
+          "agency guidance"
+        ]
+      },
+      "selectedEvidence": [
+        {
+          "sectionID": "2713",
+          "reference": "BC 1107.2.2.7.2.2",
+          "codePrefix": "BC",
+          "sectionNumber": "1107.2.2.7.2.2",
+          "exactPassages": [
+            "Where only a forward approach is provided to the water closet, the clearance shall be 66 inches (1676 mm) minimum, measured perpendicular from the rear wall, and 48 inches (1220 mm) minimum, measured perpendicular from the side wall. A lavatory complying with Section 1107.2.2.5 shall be permitted on the rear wall, 18 inches (457.2 mm) minimum from the water closet centerline."
+          ]
+        }
+      ],
+      "requiredConcepts": [
+        "Answer no.",
+        "Place the subsection in its Building Code Type B+NYC unit toilet-and-bathing-room applicability context.",
+        "Explain that the passage regulates water-closet clearances for a forward approach.",
+        "Explain that the passage permits a compliant lavatory on the rear wall under the stated placement condition.",
+        "Keep a lavatory distinct from a vanity and do not present the terms as interchangeable requirements.",
+        "State that the selected evidence does not establish an HCR vanity requirement.",
+        "Do not imply that no other Building Code provision requires a lavatory merely because this subsection contains permissive location language.",
+        "Request the applicable HCR material before stating what HCR requires."
+      ],
+      "forbiddenClaims": [
+        "A vanity is required by this Building Code passage.",
+        "Treat a vanity and a lavatory as interchangeable requirements.",
+        "State what HCR requires without HCR material in the evidence.",
+        "State or imply that no other Building Code provision requires a lavatory merely because this subsection permits a particular lavatory location."
+      ],
+      "missingFacts": [
+        "Confirm whether the unit and bathroom are subject to the Building Code Type B+NYC provisions applicable to this subsection.",
+        "Provide the applicable HCR design standard, project funding requirement, or agency guidance."
+      ],
+      "requiredCitations": [
+        "BC 1107.2.2.7.2.2"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-01",
+      "title": "Rules of construction",
+      "intakeQuestion": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+      "question": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+      "scenario": "",
+      "expectedAnswer": "ZR 12-01 controls. The particular controls the general, and if there is a difference of meaning or implication between the enacted text and a caption, illustration, summary table, or illustrative table, the **text controls**. An illustration or summary table cannot override conflicting enacted text.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-rules-of-construction",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018521
+      ],
+      "requiredConcepts": [
+        "The particular controls the general.",
+        "The enacted text controls over a caption, illustration, summary table, or illustrative table.",
+        "The answer identifies Section 12-01."
+      ],
+      "forbiddenClaims": [
+        "An illustration overrides the enacted text.",
+        "The answer relies on a section outside the selected evidence."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 12-01 — Rules Applying to Text of Resolution](https://zr.planning.nyc.gov/article-i/chapter-2/12-01)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-02",
+      "title": "Use Group I table",
+      "intakeQuestion": "Using only the selected table, summarize how Use Group I allowances differ across M1, M2, and M3 districts and explain the table symbols.",
+      "question": "Using only the selected table, summarize how Use Group I allowances differ across M1, M2, and M3 districts and explain the table symbols.",
+      "scenario": "",
+      "expectedAnswer": "ZR 42-111 does not give every Use Group I use the same treatment in all Manufacturing Districts. In the selected table: agricultural uses are permitted in M1, M2, and M3 subject to the indicated `P` and `U` notations; cemeteries, golf courses, outdoor racket courts, and public/private parks are permitted in M1 but not in M2 or M3, with outdoor racket courts also carrying `P` in M1; outdoor skating rinks are permitted in all three; and sand, gravel, or clay pits require a special permit in all three. The table symbols are `●` permitted, `♦` permitted with limitations, `○` special permit required, `–` not permitted, `S` size restriction, `P` additional conditions, and `U` open-use allowances. The exact cell and any attached notation must be read together rather than generalized across the district columns.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-use-group-table",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20017276
+      ],
+      "requiredConcepts": [
+        "The answer treats the table as structured evidence.",
+        "The answer distinguishes district columns and symbol meanings.",
+        "The answer does not infer a use allowance from prose that is absent from the selected table."
+      ],
+      "forbiddenClaims": [
+        "Every Use Group I use has the same allowance in every Manufacturing District.",
+        "A symbol is interpreted without support in the selected evidence."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 42-111 — Use Group I – general use allowances](https://zr.planning.nyc.gov/article-iv/chapter-2/42-111)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-03",
+      "title": "Appendix J map boundaries",
+      "intakeQuestion": "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+      "question": "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+      "scenario": "",
+      "expectedAnswer": "Appendix J establishes the mapped boundaries of designated areas within Manufacturing Districts and distinguishes areas in which self-service storage is governed by different treatment. The selected material identifies Subarea 1 as the mapped area associated with the as-of-right provisions of ZR 42-19 and Subarea 2 as the mapped area associated with the CPC special-permit path under ZR 74-192. It cannot establish that a particular tax lot lies in either subarea without the applicable Appendix J map and the parcel's actual location.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-appendix-map-boundaries",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20021237
+      ],
+      "requiredConcepts": [
+        "The answer cites Appendix J.",
+        "The answer distinguishes Subarea 1 and Subarea 2 treatment described in the selected evidence.",
+        "The answer states that a parcel-specific conclusion requires the applicable map and parcel location."
+      ],
+      "forbiddenClaims": [
+        "A particular tax lot is inside a designated area without parcel and map evidence.",
+        "The map image is treated as decorative rather than authoritative selected evidence."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR APPENDIX J — APPENDIX J — Designated Areas Within Manufacturing Districts](https://zr.planning.nyc.gov/appendix-j-designated-areas-within-manufacturing-districts)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-04",
+      "title": "Special-district demolition",
+      "intakeQuestion": "What prerequisites does Section 101-75 state before a demolition permit may be issued in the identified Subdistrict, and what exception does it recognize?",
+      "question": "Within the Atlantic Avenue Subdistrict of the Special Downtown Brooklyn District, what two prerequisites does Section 101-75 state before a demolition permit may be issued, and what unsafe-building exception does it recognize?",
+      "scenario": "",
+      "expectedAnswer": "Within the Atlantic Avenue Subdistrict, ZR 101-75 requires both building-application approval for the new development or enlargement and evidence of a construction-financing commitment from a domestic bank, insurance company, or real estate investment company. Preserve the enacted wording \"letter trust\" when describing the required form. ZR 101-04 establishes the subdistrict scope. The exception covers unsafe buildings whose demolition is required under the cited Administrative Code provision or its successor; this is not a citywide demolition rule.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current.",
+        "Re-reviewed Sections 101-04 and 101-75 against the current official NYC Planning pages; named the Atlantic Avenue Subdistrict in the question and made both prerequisites, the source's exact letter-trust wording, and the narrow unsafe-building exception explicit.",
+        "Use the revised repository question. The exact uploaded question remains separately recorded."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-special-district-demolition",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-30T15:26:45.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20020818,
+        20020889
+      ],
+      "requiredConcepts": [
+        "Section 101-04 establishes that Sections 101-70 through 101-75 apply to the Atlantic Avenue Subdistrict within the Special Downtown Brooklyn District.",
+        "Section 101-75 requires building-application approval for the new development or enlargement.",
+        "Section 101-75 also requires evidence of a construction-financing commitment from a domestic bank, insurance company, or real estate investment company, in the source's stated form of a letter trust.",
+        "The exception is limited to unsafe buildings whose demolition is required under the cited Administrative Code provision or its successor."
+      ],
+      "forbiddenClaims": [
+        "The rule is described as citywide.",
+        "The answer invents a demolition prerequisite not present in the selected evidence."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 101-04 — Subdistricts](https://zr.planning.nyc.gov/article-x/chapter-1/101-04)",
+        "[ZR 101-75 — Special Provisions for Demolition of Buildings](https://zr.planning.nyc.gov/article-x/chapter-1/101-75)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-05",
+      "title": "Amendment history",
+      "intakeQuestion": "What does the imported amendment history show about Section 42-00, and what should a professional verify before relying on a historical version for a particular date?",
+      "question": "What does NYC Planning's official amendment-history metadata currently identify for Section 42-00, and what must a professional still verify before reconstructing the text in force on a particular date?",
+      "scenario": "",
+      "expectedAnswer": "The reviewed amendment-history record for ZR 42-00 identifies December 5, 2024 (N240290ZRY) and two June 6, 2024 events (N240011ZRY and N240010ZRY). That metadata identifies changes; it does not reproduce the text legally in force on every earlier date. Verify each effective date, official CPC report, and authoritative archived text or enactment for the date at issue.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current.",
+        "Rechecked the live NYC Planning amendment-history endpoint; retained the three explicit current events and revised the question and rubric to require official CPC-report and archived-text verification rather than treating metadata as a historical-text reconstruction.",
+        "Use the revised repository question. The exact uploaded question remains separately recorded."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-amendment-history",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-30T15:26:45.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20017271
+      ],
+      "requiredConcepts": [
+        "The answer distinguishes current text from amendment-history metadata.",
+        "The answer identifies the December 5, 2024 N240290ZRY event and the two June 6, 2024 events N240011ZRY and N240010ZRY.",
+        "The answer recommends verifying each effective date, official CPC report, and the authoritative archived text or enactment applicable on the date at issue.",
+        "The answer explains that amendment notes identify changes but do not themselves reproduce every prior version of the section."
+      ],
+      "forbiddenClaims": [
+        "The current text is represented as unchanged since 1961.",
+        "An amendment note is treated as a complete historical reconstruction of prior enacted text."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 42-00 — GENERAL PROVISIONS](https://zr.planning.nyc.gov/article-iv/chapter-2/42-00)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-06",
+      "title": "Missing location facts",
+      "intakeQuestion": "Is a proposed self-storage use permitted as-of-right on a specific property when no address, zoning district, special district, or mapped subarea has been provided?",
+      "question": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+      "scenario": "",
+      "expectedAnswer": "A parcel-specific as-of-right conclusion cannot be made yet. Establish the address, mapped district, special-district status, Appendix J map/subarea, lot area, and any existing-facility facts tied to December 19, 2017. Apply the self-service-storage provisions in ZR 42-191 through 42-193, the Subarea 2 special-permit path in ZR 74-192, and Appendix J together. Subarea 1 treatment, performance standards, and any existing-facility documentation, enlargement, reconstruction, or nonconforming-use path cannot be assumed from an unidentified property.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current.",
+        "Re-reviewed Sections 42-191 through 42-193, 74-192, and Appendix J against the current official pages; added lot-area and December 19, 2017 facility facts, distinguished Subarea 1 conditions from the Subarea 2 special-permit path, and kept the parcel conclusion fail-closed without the governing map.",
+        "Use the revised repository question. The exact uploaded question remains separately recorded."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-missing-location-facts",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-30T15:26:45.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20022472,
+        20022473,
+        20022474,
+        20019206,
+        20021237
+      ],
+      "requiredConcepts": [
+        "The answer declines to make a parcel-specific determination.",
+        "The answer identifies the missing address, mapped zoning district, special-district status, Appendix J map/subarea, lot area, and existing-facility/date facts.",
+        "The answer separates the general Use Group IX table, the Subarea 1 limited-applicability conditions, the additional performance-standard conditions, the Subarea 2 special-permit path, and authoritative Appendix J map applicability.",
+        "The answer explains that a December 19, 2017 facility may follow separate conforming-use documentation, enlargement, reconstruction, or nonconforming-use rules that cannot be assumed from the question."
+      ],
+      "forbiddenClaims": [
+        "The proposed use is approved or prohibited for the unidentified property.",
+        "The answer silently retrieves evidence outside the selected sections."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 42-191 — Use Group IX – general use allowances](https://zr.planning.nyc.gov/article-iv/chapter-2/42-191)",
+        "[ZR 42-192 — Use Group IX – uses permitted with limited applicability](https://zr.planning.nyc.gov/article-iv/chapter-2/42-192)",
+        "[ZR 42-193 — Use Group IX – uses subject to additional conditions](https://zr.planning.nyc.gov/article-iv/chapter-2/42-193)",
+        "[ZR 74-192 — Self-service storage facility in designated areas within Manufacturing Districts](https://zr.planning.nyc.gov/article-vii/chapter-4/74-192)",
+        "[ZR APPENDIX J — APPENDIX J — Designated Areas Within Manufacturing Districts](https://zr.planning.nyc.gov/appendix-j-designated-areas-within-manufacturing-districts)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-07",
+      "title": "Mapped district missing",
+      "intakeQuestion": "A 10,000-square-foot site in the Bronx is proposed for a 40,000-square-foot residential building. What is the maximum permitted residential FAR when the mapped zoning district has not been established?",
+      "question": "A 10,000-square-foot site in the Bronx is proposed for a 40,000-square-foot residential building. What is the maximum permitted residential FAR when the mapped zoning district has not been established?",
+      "scenario": "",
+      "expectedAnswer": "The maximum permitted residential FAR cannot be determined yet. ZR 11-14 incorporates the zoning maps into the Zoning Resolution, so the mapped zoning district is a necessary applicability fact. The property location and any applicable commercial overlay, Special Purpose District, or other mapped condition must be established before selecting the governing FAR rule. A residential proposal does not justify assuming a Residence District.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-mapped-district-missing",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018425
+      ],
+      "requiredConcepts": [
+        "The maximum residential FAR cannot be determined until the mapped zoning district is established.",
+        "Section 11-14 incorporates the zoning maps into the Zoning Resolution and makes the mapped district an applicability fact.",
+        "The answer identifies any applicable overlay, Special Purpose District, or other mapped condition as an additional fact that may affect the governing regulations.",
+        "The answer may use authoritative map evidence if supplied, but otherwise asks for the property location and mapped conditions."
+      ],
+      "forbiddenClaims": [
+        "A Residence District is inferred merely because the proposal is residential.",
+        "Allowable floor area is calculated before the governing mapped district and conditions are established."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 11-14 — Incorporation of Maps](https://zr.planning.nyc.gov/article-i/chapter-1/11-14)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-08",
+      "title": "R7A standard FAR",
+      "intakeQuestion": "A 10,000-square-foot R7A zoning lot will contain standard residences and 42,000 square feet of residential floor area. Does the proposal comply with the basic maximum residential FAR?",
+      "question": "Using only the basic Section 23-22 table and the Section 12-10 FAR definition, does 42,000 square feet of residential floor area on a 10,000-square-foot R7A zoning lot containing standard residences fit the basic maximum, and what broader compliance conclusion remains outside those facts?",
+      "scenario": "",
+      "expectedAnswer": "No. ZR 23-22 sets the R7A maximum residential FAR for standard residences at **4.00**. On a 10,000-square-foot zoning lot, that permits `10,000 × 4.00 = 40,000` square feet of residential zoning floor area. The proposed 42,000 square feet exceeds the basic limit by 2,000 square feet. That calculation is zoning floor area, not a statement that gross building area must equal 40,000 square feet. This establishes only the basic-table arithmetic result, not complete zoning compliance.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current.",
+        "Rechecked the current official Section 23-22 R7A row and Section 12-10 FAR definition; retained the 4.00 calculation and added an explicit boundary against turning a basic-table arithmetic result into complete zoning compliance.",
+        "Use the revised repository question. The exact uploaded question remains separately recorded."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-r7a-standard-far",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-30T15:26:45.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018017,
+        20018523
+      ],
+      "requiredConcepts": [
+        "Section 23-22 sets the R7A maximum residential FAR for standard residences at 4.00.",
+        "A 4.00 FAR applied to the stated 10,000-square-foot zoning lot permits 40,000 square feet of residential floor area.",
+        "The proposed 42,000 square feet exceeds that basic limit by 2,000 square feet.",
+        "The answer distinguishes zoning floor area from an unsupported claim about gross building area.",
+        "The answer limits the conclusion to the basic table and does not claim complete zoning compliance without mapped overlays, special-district rules, deductions, exemptions, or other applicable provisions."
+      ],
+      "forbiddenClaims": [
+        "The 42,000-square-foot proposal complies with the basic 4.00 FAR limit.",
+        "The answer states that the building can contain exactly 40,000 gross square feet."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 23-22 — Floor Area Regulations for R6 Through R12 Districts](https://zr.planning.nyc.gov/article-ii/chapter-3/23-22)",
+        "[ZR 12-10 — DEFINITIONS](https://zr.planning.nyc.gov/article-i/chapter-2/12-10)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-09",
+      "title": "R7A qualifying-affordable-housing FAR",
+      "intakeQuestion": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area, and the project is described as containing qualifying affordable housing. Is the proposed FAR within the R7A limit?",
+      "question": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area and is merely described as containing qualifying affordable housing. What does the Section 23-22 table establish numerically, and what qualification and affordable-floor-area facts are still needed before concluding that the higher FAR is available?",
+      "scenario": "",
+      "expectedAnswer": "The proposed 4.80 FAR is below the 5.01 table ceiling, but the supplied affordable-housing label does not establish that 4.80 FAR is available. ZR 23-22 lists 5.01 FAR for qualifying affordable or senior housing in R7A: 10,000 × 5.01 = 50,100 square feet, compared with the proposed 48,000. The applicable MIH, UAP, or regulatory-agreement path and required amount of affordable floor area must be established under Article II, Chapter 7. For UAP, ZR 27-111 limits the increase over the standard-residence FAR by the amount of affordable housing provided; ZR 27-16 supplies the applicable regulatory-agreement requirements. The table ceiling alone does not establish eligibility for the proposal.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current.",
+        "Re-reviewed current Sections 23-22, 12-10, 27-111, and 27-16; reframed the question so 5.01 is only a numerical ceiling and added the UAP rule that any FAR increase above the standard-residence limit is limited by the amount of affordable housing actually provided.",
+        "Use the revised repository question. The exact uploaded question remains separately recorded."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-r7a-affordable-far-qualification",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-30T15:26:45.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018017,
+        20022699,
+        20022711,
+        20018523
+      ],
+      "requiredConcepts": [
+        "Section 23-22 sets an R7A maximum FAR of 5.01 for qualifying affordable housing or qualifying senior housing.",
+        "A 5.01 FAR applied to 10,000 square feet permits 50,100 square feet, so the stated 48,000 square feet is below that table ceiling.",
+        "Being below the table ceiling does not establish entitlement to the higher FAR; the applicable MIH, UAP, or regulatory-agreement path and its required amount of affordable floor area must be established under Article II, Chapter 7.",
+        "For a UAP path, Section 27-111 limits the increase above the standard-residence FAR to the amount of affordable housing provided, so the project description alone cannot establish that the full proposed 4.80 FAR is available.",
+        "The user's label alone is not treated as proof that the development qualifies for the higher FAR."
+      ],
+      "forbiddenClaims": [
+        "Any project containing affordable units automatically receives 5.01 FAR.",
+        "The answer gives an unconditional compliance conclusion without establishing the qualifying-affordable-housing path."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 23-22 — Floor Area Regulations for R6 Through R12 Districts](https://zr.planning.nyc.gov/article-ii/chapter-3/23-22)",
+        "[ZR 27-111 — General definitions](https://zr.planning.nyc.gov/article-ii/chapter-7/27-111)",
+        "[ZR 27-16 — Requirements for MIH Sites or UAP Sites](https://zr.planning.nyc.gov/article-ii/chapter-7/27-16)",
+        "[ZR 12-10 — DEFINITIONS](https://zr.planning.nyc.gov/article-i/chapter-2/12-10)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-10",
+      "title": "R7A standard height",
+      "intakeQuestion": "Can a standard residential building in an R7A district be 90 feet tall under the basic height-and-setback table?",
+      "question": "Can a standard residential building in an R7A district be 90 feet tall under the basic height-and-setback table?",
+      "scenario": "",
+      "expectedAnswer": "No. Under the basic ZR 23-432 table, the maximum building height for **standard residences in R7A is 85 feet**, so a 90-foot standard-residence building is 5 feet over that basic maximum. The same table allows a higher maximum for qualifying affordable housing or qualifying senior housing, but that cannot be applied to a standard residence. The eligible-site modifications of ZR 23-434 apply to listed districts **without a letter suffix** and therefore do not enlarge the R7A limit.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-r7a-standard-height",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018085,
+        20018087
+      ],
+      "requiredConcepts": [
+        "Section 23-432 limits a standard-residence building in R7A to 85 feet under the basic table.",
+        "The same table allows 115 feet for qualifying affordable housing or qualifying senior housing in R7A.",
+        "A 90-foot standard residential building exceeds the basic maximum by five feet.",
+        "Section 23-434 is not used to enlarge the R7A limit because its eligible-site modifications apply only in listed districts without a letter suffix."
+      ],
+      "forbiddenClaims": [
+        "R7A universally permits a 115-foot building.",
+        "The eligible-site modifications of Section 23-434 are represented as applicable to R7A."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 23-432 — Height and setback requirements](https://zr.planning.nyc.gov/article-ii/chapter-3/23-432)",
+        "[ZR 23-434 — Height and setback modifications for eligible sites](https://zr.planning.nyc.gov/article-ii/chapter-3/23-434)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-11",
+      "title": "R7A lot coverage",
+      "intakeQuestion": "An R7A interior zoning lot contains 10,000 square feet. Can a standard residential development cover 8,500 square feet of the lot under the basic lot-coverage regulation?",
+      "question": "An R7A interior zoning lot contains 10,000 square feet. Can a standard residential development cover 8,500 square feet of the lot under the basic lot-coverage regulation?",
+      "scenario": "",
+      "expectedAnswer": "No under the basic rule. ZR 23-362 sets an 80 percent maximum residential lot coverage for standard interior or through lots in R6 through R12 districts. Eighty percent of 10,000 square feet is 8,000 square feet, so 8,500 square feet exceeds the basic maximum by 500 square feet. ZR 23-363 can modify lot coverage for specified conditions, and yard/open-area rules may impose a more restrictive footprint, so 8,000 square feet is not an unconditional buildable-footprint entitlement.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-r7a-lot-coverage",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20022764,
+        20018020,
+        20018051
+      ],
+      "requiredConcepts": [
+        "Section 23-362 sets the basic maximum residential lot coverage for a standard interior or through lot in R6 through R12 Districts at 80 percent.",
+        "Eighty percent of the stated 10,000-square-foot lot is 8,000 square feet, so 8,500 square feet exceeds the basic maximum.",
+        "Section 23-363 can modify the percentage for specified shallow lots, locations near corners, and short block dimensions.",
+        "The answer does not treat the 8,000-square-foot percentage calculation as an entitlement to that footprint because yard and other open-area rules may be more restrictive."
+      ],
+      "forbiddenClaims": [
+        "The owner has an unconditional right to build an 8,000-square-foot footprint.",
+        "The answer ignores the possible modifications in Section 23-363 or applicable yard requirements."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 23-362 — Maximum lot coverage in R6 through R12 Districts](https://zr.planning.nyc.gov/article-ii/chapter-3/23-362)",
+        "[ZR 23-363 — Special rules for certain interior or through lots](https://zr.planning.nyc.gov/article-ii/chapter-3/23-363)",
+        "[ZR 23-342 — Rear yard requirements](https://zr.planning.nyc.gov/article-ii/chapter-3/23-342)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-12",
+      "title": "Narrow attached-building rear yard",
+      "intakeQuestion": "An attached residential building is proposed on a 35-foot-wide interior zoning lot with a 20-foot rear yard. Is that sufficient under the standard rear-yard rule?",
+      "question": "An attached residential building is proposed on a 35-foot-wide interior zoning lot with a 20-foot rear yard. Is that sufficient under the standard rear-yard rule?",
+      "scenario": "",
+      "expectedAnswer": "No. Under ZR 23-342, an attached or semi-detached residential building on a zoning lot less than 40 feet wide requires a rear yard at least **30 feet** deep under the stated standard rule. The proposed 20-foot yard is 10 feet short. That conclusion is limited to the standard facts and does not eliminate any applicable shallow-lot modification or other exception in ZR 23-34.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-narrow-attached-rear-yard",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018051
+      ],
+      "requiredConcepts": [
+        "Section 23-342 requires a rear yard at least 30 feet deep for an attached or semi-detached building on a zoning lot less than 40 feet wide.",
+        "The proposed 20-foot rear yard is 10 feet short of the standard requirement.",
+        "The conclusion is limited to the stated standard-lot facts and does not erase the shallow-lot modification or other exceptions in Section 23-34."
+      ],
+      "forbiddenClaims": [
+        "A 20-foot rear yard satisfies the standard rule for the stated 35-foot-wide attached-building lot.",
+        "All residential rear yards are described as universally requiring 30 feet."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 23-342 — Rear yard requirements](https://zr.planning.nyc.gov/article-ii/chapter-3/23-342)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-13",
+      "title": "Through-lot historical shallow condition",
+      "intakeQuestion": "A through lot is 150 feet deep and the proposal provides a 20-foot rear yard equivalent. Is that enough when the lot's historical shallow-lot condition is unknown?",
+      "question": "A through lot is 150 feet deep and the proposal provides a 20-foot rear yard equivalent. Is that enough when the lot's historical shallow-lot condition is unknown?",
+      "scenario": "",
+      "expectedAnswer": "The answer cannot be confirmed from the stated depth alone. ZR 23-343 does not make the 20-foot path automatically available merely because the through lot is 150 feet deep. The reduced rear-yard-equivalent treatment identified in the packet depends on the specified shallow-lot condition having existed on December 15, 1961 and not subsequently having been increased or decreased in depth. That historical fact must be verified, along with whether any categorical exception in the section applies.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-through-lot-historic-shallow-condition",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018060
+      ],
+      "requiredConcepts": [
+        "Section 23-343 does not make the 20-foot minimum automatically available merely because the through lot is 150 feet deep.",
+        "The reduced rear-yard-equivalent path requires the shallow-lot condition to have existed on December 15, 1961 and subsequently neither increased nor decreased in depth.",
+        "Historic shallow-lot status is identified as a required missing project fact.",
+        "The answer also recognizes the section's categorical exceptions for specified through lots."
+      ],
+      "forbiddenClaims": [
+        "A 150-foot through lot automatically requires only a 20-foot rear yard equivalent.",
+        "The historical December 15, 1961 condition is assumed without evidence."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 23-343 — Rear yard equivalent requirements](https://zr.planning.nyc.gov/article-ii/chapter-3/23-343)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-14",
+      "title": "Residential building spacing",
+      "intakeQuestion": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+      "question": "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart. Is the spacing sufficient?",
+      "scenario": "",
+      "expectedAnswer": "No under the stated standard rule. ZR 23-371 requires the relevant unconnected building portions below 125 feet to be **40 feet apart**. A 30-foot separation is therefore 10 feet short. The section contains an exception for buildings separated by a rear yard equivalent, so the 40-foot statement should not be turned into a universal rule for every building arrangement on one zoning lot.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-residential-building-spacing",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018102
+      ],
+      "requiredConcepts": [
+        "Section 23-371 requires buildings on the same zoning lot that do not connect at any level to be 40 feet apart for portions below 125 feet.",
+        "The stated 30-foot separation is 10 feet short of that standard requirement.",
+        "The answer recognizes the section's exception for buildings separated by a rear yard equivalent and does not convert the rule into a universal spacing rule."
+      ],
+      "forbiddenClaims": [
+        "The stated 30-foot separation satisfies the 40-foot standard.",
+        "All buildings on one zoning lot are said to require 40 feet of separation in every circumstance."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 23-371 — Standard minimum distance between buildings](https://zr.planning.nyc.gov/article-ii/chapter-3/23-371)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-15",
+      "title": "C3 professional office",
+      "intakeQuestion": "A 1,500-square-foot architectural office is proposed in a C3 district. Is the professional office use permitted as-of-right under the underlying C3 use regulations?",
+      "question": "A 1,500-square-foot architectural office is proposed in a C3 district. Is the professional office use permitted as-of-right under the underlying C3 use regulations?",
+      "scenario": "",
+      "expectedAnswer": "No under the underlying C3 use regulations. ZR 32-17 classifies business and professional offices in Use Group VII, and the office row in ZR 32-171 is marked not permitted in the C3 column. That does not mean an office is impossible in every C3-mapped situation; a separate special-purpose-district provision, authorization, special permit, variance, or other lawful modification could change the result if applicable.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-c3-professional-office",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20017827,
+        20022494
+      ],
+      "requiredConcepts": [
+        "Section 32-17 classifies business and professional offices in Use Group VII.",
+        "The office row in Section 32-171 is marked not permitted in the C3 column.",
+        "The answer states that the use is not permitted as-of-right under the underlying C3 use regulations while preserving separate special-purpose-district, authorization, or variance paths."
+      ],
+      "forbiddenClaims": [
+        "The architectural office is represented as permitted as-of-right in C3.",
+        "The answer claims that professional offices are unlawful in every C3-mapped location under every possible modifying provision."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 32-17 — Use Group VII – Offices and Laboratories](https://zr.planning.nyc.gov/article-iii/chapter-2/32-17)",
+        "[ZR 32-171 — Use Group VII – general use allowances](https://zr.planning.nyc.gov/article-iii/chapter-2/32-171)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-16",
+      "title": "C4-4 residential use",
+      "intakeQuestion": "A C4-4 zoning lot is proposed with retail on the ground floor and apartments above. Is the residential use permitted under the underlying use regulations?",
+      "question": "A C4-4 zoning lot is proposed with retail on the ground floor and apartments above. Is the residential use permitted under the underlying use regulations?",
+      "scenario": "",
+      "expectedAnswer": "Yes under the underlying C4-4 use provisions. ZR 32-121 classifies residential uses in Use Group II and marks the C4 column as permitted subject to additional conditions; ZR 32-123 generally permits residential uses in C4 districts, subject to the identified C4-1 Staten Island limitation. That answers only the use-permission question. It does not establish compliance with mixed-building floor area, height, lot coverage, yards, parking, or other bulk regulations.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-c4-4-residential-use",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20022450,
+        20022452
+      ],
+      "requiredConcepts": [
+        "Section 32-121 places residential uses in Use Group II and marks the C4 column as permitted subject to additional conditions.",
+        "Section 32-123 generally permits residential uses in C4 Districts and states the identified C4-1 Staten Island limitation.",
+        "The answer concludes that residential use is permitted under these underlying C4-4 provisions without claiming complete zoning compliance.",
+        "The answer separates use permission from mixed-building FAR, height, lot coverage, parking, and other bulk analysis."
+      ],
+      "forbiddenClaims": [
+        "Permission for apartments is treated as proof that the entire mixed building complies with zoning.",
+        "Residential R-district bulk controls are applied directly without researching the mixed-building provisions."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 32-121 — Use Group II – general use allowances](https://zr.planning.nyc.gov/article-iii/chapter-2/32-121)",
+        "[ZR 32-123 — Use Group II – uses subject to additional conditions](https://zr.planning.nyc.gov/article-iii/chapter-2/32-123)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-17",
+      "title": "Inner Transit Zone new-unit parking",
+      "intakeQuestion": "An 80-unit residential development in an R7A district is within the Inner Transit Zone, and all dwelling units will be created after December 5, 2024. How many accessory residential parking spaces are required?",
+      "question": "An 80-unit R7A residential development is within the Inner Transit Zone; every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333. How many accessory off-street residential parking spaces does Section 25-211 require for those units?",
+      "scenario": "",
+      "expectedAnswer": "Zero accessory off-street residential parking spaces are required under ZR 25-211 for the stated units. The revised scenario establishes issuance of each temporary certificate of occupancy, or final certificate where no temporary certificate is issued, after December 5, 2024, and excludes the pre-December 5, 2024 continuation path in ZR 11-333. Apply that certificate-based creation test and the Inner Transit Zone provisions of ZR 25-20 and 25-211. This result does not automatically permit removal of existing required parking or apply to existing units.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current.",
+        "Re-reviewed current Sections 11-333, 25-20, and 25-211; replaced the ambiguous word created with the section's temporary/final certificate-of-occupancy test and tied the transition assumption to the actual Section 11-333 filing-and-approval path.",
+        "Use the revised repository question. The exact uploaded question remains separately recorded."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-inner-transit-zone-new-unit-parking",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-30T15:26:45.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018444,
+        20017540,
+        20017541
+      ],
+      "requiredConcepts": [
+        "Section 25-211 requires no accessory off-street parking spaces for dwelling units or rooming units created after December 5, 2024 within the Inner Transit Zone.",
+        "The answer states that zero spaces are required under that provision for the stated new units.",
+        "The answer checks Section 11-333 and relies on the stated absence of the filing and approval facts needed to continue under the pre-December 5, 2024 regulations.",
+        "The answer distinguishes units created after December 5, 2024 from existing units and parking governed by the separate maintenance provisions.",
+        "The answer uses the section's certificate-of-occupancy definition of when a unit is created rather than assuming a colloquial construction date."
+      ],
+      "forbiddenClaims": [
+        "Parking is represented as never required anywhere in the Inner Transit Zone.",
+        "Existing required parking is said to be removable automatically.",
+        "The December 5, 2024 transition and Section 11-333 vesting path are ignored."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 11-333 — Special allowances for building permits issued prior to certain dates](https://zr.planning.nyc.gov/article-i/chapter-1/11-333)",
+        "[ZR 25-20 — REQUIRED ACCESSORY OFF-STREET PARKING SPACES FOR RESIDENCES](https://zr.planning.nyc.gov/article-ii/chapter-5/25-20)",
+        "[ZR 25-211 — General provisions](https://zr.planning.nyc.gov/article-ii/chapter-5/25-211)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-18",
+      "title": "Newly assembled divided zoning lot",
+      "intakeQuestion": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+      "question": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+      "scenario": "",
+      "expectedAnswer": "No. ZR 77-11's majority-district use treatment is limited to qualifying zoning lots that existed on December 15, 1961 or on the date of an applicable subsequent amendment. For a zoning lot assembled in 2026, ZR 77-02 generally requires each portion to be regulated by the district in which that portion is located. ZR 77-22 separately provides an adjusted maximum-FAR calculation for divided zoning lots; that FAR mechanism does not transfer the majority district's use regulations to the entire lot.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-new-divided-zoning-lot",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018891,
+        20018894,
+        20018899
+      ],
+      "requiredConcepts": [
+        "Section 77-11's majority-district use treatment applies only to qualifying zoning lots existing on December 15, 1961 or on the date of an applicable subsequent amendment.",
+        "For the stated lot created in 2026, Section 77-02 generally regulates each portion under the district in which it is located.",
+        "Section 77-22 separately applies an adjusted maximum FAR calculation to divided zoning lots created at any time.",
+        "The answer distinguishes use-regulation treatment from the separate adjusted-FAR mechanism."
+      ],
+      "forbiddenClaims": [
+        "Whichever district contains 51 percent of a newly assembled zoning lot automatically controls the entire lot.",
+        "The Section 77-22 FAR mechanism is represented as transferring the majority district's use regulations to the entire lot."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 77-02 — Zoning Lots not Existing Prior to Effective Date or Amendment of Resolution](https://zr.planning.nyc.gov/article-vii/chapter-7/77-02)",
+        "[ZR 77-11 — Conditions for Application of Use Regulations to Entire Zoning Lot](https://zr.planning.nyc.gov/article-vii/chapter-7/77-11)",
+        "[ZR 77-22 — Floor Area Ratio](https://zr.planning.nyc.gov/article-vii/chapter-7/77-22)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-19",
+      "title": "Zoning-lot contiguity definition",
+      "intakeQuestion": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+      "question": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+      "scenario": "",
+      "expectedAnswer": "No. Common ownership alone does not make the two tax lots one zoning lot under the stated facts. The current ZR 12-10 pathways identified in paragraphs (c) and (d) require two or more lots of record to be contiguous for at least **10 linear feet** within a single block, together with the applicable ownership, party-in-interest, filing, and/or declaration requirements. An eight-foot connection does not satisfy those current pathways. The historical pathways must be considered separately, and a zoning lot may or may not coincide with a tax lot shown on the tax map.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-zoning-lot-contiguity-definition",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018523
+      ],
+      "requiredConcepts": [
+        "No. Common ownership alone does not make the two tax lots one zoning lot under the stated facts.",
+        "The Section 12-10 pathways in paragraphs (c) and (d) require two or more lots of record to be contiguous for at least 10 linear feet within a single block, so an eight-foot connection does not satisfy those pathways.",
+        "The answer separately checks the historical pathways in paragraphs (a) and (b) and does not imply that the 10-linear-foot requirement governs every branch of the definition.",
+        "The answer identifies the additional filing, ownership, party-in-interest, or Declaration requirements that apply under paragraphs (c) and (d), as relevant.",
+        "The answer explains that a zoning lot may or may not coincide with a tax lot shown on the official tax map."
+      ],
+      "forbiddenClaims": [
+        "Common ownership is said to create a zoning-lot merger automatically.",
+        "The 10-linear-foot requirement is said to govern every branch of the zoning-lot definition.",
+        "An eight-foot point of contiguity is said to satisfy the current paragraphs (c) or (d).",
+        "A tax lot and a zoning lot are treated as necessarily identical."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 12-10 — DEFINITIONS](https://zr.planning.nyc.gov/article-i/chapter-2/12-10)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-20",
+      "title": "Cellar floor-area definition",
+      "intakeQuestion": "A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?",
+      "question": "A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?",
+      "scenario": "",
+      "expectedAnswer": "Generally no, on the stated facts and subject to the definition's special measurement rules. Where a base plane determines building height, a space with more than one-half of its floor-to-ceiling height below the base plane is a cellar. ZR 12-10 generally excludes cellar space from zoning floor area unless it is used for dwelling purposes, and the stated storage use is not a dwelling use. The special rules for sloping base planes, the applicable street-wall/through-lot condition, and certain lowered-yard conditions must still be checked before making the classification conclusive. The separate rule that retail cellar space can count for parking, bicycle-parking, and loading calculations does not make ordinary non-dwelling storage zoning floor area for all purposes.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-cellar-floor-area-definition",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018523
+      ],
+      "requiredConcepts": [
+        "No, on the stated facts and subject to the definition's special measurement rules. Where a base plane determines building height, a space with more than one-half its floor-to-ceiling height below that base plane is a cellar.",
+        "The Section 12-10 floor-area definition generally excludes cellar space unless it is used for dwelling purposes, and the stated storage use is not a dwelling use.",
+        "The answer checks the special cellar rules for a sloping base plane, the applicable street wall line level or through lot, and a yard lowered after December 5, 1990 before treating the classification as conclusive.",
+        "The answer notes that cellar space used for retailing is included when calculating accessory off-street parking, bicycle parking, and loading requirements, without converting ordinary non-dwelling storage into zoning floor area."
+      ],
+      "forbiddenClaims": [
+        "All below-grade space is described as exempt from zoning floor area.",
+        "Any amount of space below grade is said to establish a cellar without applying the more-than-one-half-height test.",
+        "The retailing caveat is said to make every cellar count as floor area for all purposes.",
+        "The New York City Building Code is substituted for the Zoning Resolution definitions."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 12-10 — DEFINITIONS](https://zr.planning.nyc.gov/article-i/chapter-2/12-10)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "ZR-21",
+      "title": "Discontinuance of a non-conforming use",
+      "intakeQuestion": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+      "question": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+      "scenario": "",
+      "expectedAnswer": "Generally no. ZR 52-61 states that, after active operation of substantially all non-conforming uses in a building or other structure has been discontinued continuously for two years, the property thereafter must be used only for a conforming use. The owner's intent to resume active operations does not preserve the use under the general rule. Thirty months exceeds two years. Before a project-specific conclusion, check the section's express exceptions, including the governmental-project, vacant-store, transient-hotel, and any other applicable exceptions.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current."
+      ],
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-nonconforming-use-discontinuance",
+      "sourceCaseStatus": "approved",
+      "sourceReviewedAt": "2026-08-17T21:17:41.000Z",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "selectedEvidenceSectionIDs": [
+        20018658
+      ],
+      "requiredConcepts": [
+        "Section 52-61 generally requires the building thereafter to be used only for a conforming use after active operation of substantially all non-conforming uses is discontinued continuously for two years.",
+        "The owner's intent to resume active operations does not preserve the use under the general rule.",
+        "Thirty continuous months exceeds the section's two-year period.",
+        "The answer checks the express governmental-project, vacant-store, transient-hotel, and other stated exceptions before reaching a project-specific conclusion."
+      ],
+      "forbiddenClaims": [
+        "The owner's continuing intent alone is said to preserve the discontinued non-conforming use.",
+        "Every non-conforming use is said to expire after two years regardless of the nature of the discontinuance or the section's express exceptions."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "[ZR 52-61 — General Provisions](https://zr.planning.nyc.gov/article-v/chapter-2/52-61)"
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-001",
+      "title": "Alteration without a CO-triggering change",
+      "intakeQuestion": "How should the five DOB NOW Alteration-routing questions be answered, and what job type results?",
+      "question": "How should the five DOB NOW Alteration-routing questions be answered, and what job type results?",
+      "scenario": "The proposed interior renovation does not require the alteration to meet New Building requirements. It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+      "expectedAnswer": "Answer **No** to all five stated routing conditions. On the facts supplied, the filing remains an **Alteration** rather than an Alteration-CO.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-001",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Evaluate each routing condition separately.",
+        "Connect the resulting job type only to the stated facts.",
+        "State that inconsistent plans, an inaccurate CO, or another unstated scope change could alter the result."
+      ],
+      "forbiddenClaims": [
+        "Every interior renovation is an Alteration.",
+        "An amended CO is never required.",
+        "The expediter may make the underlying occupancy, use, or egress determination without the Applicant of Record."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, PDF page 6, Job Types — Alteration and the five routing questions."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-002",
+      "title": "Existing element retained in reconstruction",
+      "intakeQuestion": "Should the applicant select New Building?",
+      "question": "Should the applicant select New Building?",
+      "scenario": "A reconstruction otherwise resembles a new building, but a portion of the existing foundation will remain in place and become part of the completed building.",
+      "expectedAnswer": "**No.** The guide directs a project retaining an existing building element to **Alteration-CO — New Building with Existing Elements to Remain**, rather than New Building. The corresponding Alteration routing response must reflect that the work is required to meet New Building requirements.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-002",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Treat a retained foundation as an existing building element.",
+        "Distinguish a complete New Building from the DOB NOW “existing elements to remain” route.",
+        "Require the plans and Applicant of Record to confirm the factual premise."
+      ],
+      "forbiddenClaims": [
+        "A mostly new building is always filed as New Building.",
+        "A retained foundation is irrelevant to job-type selection."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, New Building definition and retained-elements instruction, page 7 of the PDF.",
+        "NYC Administrative Code §28-101.4.5 when the evaluation tests the legal basis for retaining existing building elements."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-003",
+      "title": "Subsequent plumbing filing",
+      "intakeQuestion": "Should the plumbing scope receive a new unrelated job number or a subsequent filing under the existing job?",
+      "question": "Should the plumbing scope receive a new unrelated job number or a subsequent filing under the existing job?",
+      "scenario": "An initial GC filing has been created for a project. Plumbing work for the same construction project and property will be filed later, potentially by a different applicant.",
+      "expectedAnswer": "Create the plumbing scope as a **subsequent PL filing under the existing job number**. It may have a different applicant or review type and requires its own approval and permit processing.\n\nDo not give a universal answer about the creation timing or completion document from the public guidance alone. The release history recognizes a subsequent filing created while the initial filing is in pre-filing but not submitted until the initial is submitted; the current general FAQ says initiation and submission occur after the initial is submitted, while another FAQ entry acknowledges a subsequent filing already in pre-filing before the initial is submitted. Check the live form and current DOB direction. Completion also depends on job type: general guidance describes a separate LOC for subsequent filings, while the NB/Alteration-CO FAQ states that subsequent NB and Alteration-CO filings remain Permit Entire and close through the initial filing's CO process.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval.",
+        "Replace the compilation answer with the reviewed correction/qualification, including official-source conflicts where documented."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-003",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Preserve one job number for related construction work on the same property.",
+        "Distinguish the job number from the filing extension.",
+        "State that each filing still requires separate processing and completion.",
+        "Preserve the public-source conflicts about creation timing and completion path.",
+        "Obtain the initial job type before stating whether the subsequent filing closes through an LOC or the initial filing's CO process."
+      ],
+      "forbiddenClaims": [
+        "A different trade or applicant always requires a new job number.",
+        "Approval or sign-off of one filing automatically approves or signs off all subsequent filings.",
+        "Every subsequent filing receives a separate Letter of Completion regardless of job type.",
+        "Public DOB guidance supports one universal creation-timing answer without checking the live filing."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "DOB NOW FAQ, job number and filing-extension explanation.",
+        "Application User Guide, Initial, Subsequent, and PAA filing definitions, pages 6-7 of the PDF.",
+        "DOB NOW: Build Release Notes, May 2023 Subsequent Filings entries.",
+        "New Building and Alteration-CO FAQs, subsequent-filing LOC treatment."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-004",
+      "title": "PAA for an approved-scope change",
+      "intakeQuestion": "What filing action is appropriate, and what limits must be disclosed?",
+      "question": "What filing action is appropriate, and what limits must be disclosed?",
+      "scenario": "The initial filing is approved, and the approved scope and drawings must now be revised. The filing was not submitted for legalization.",
+      "expectedAnswer": "The **Applicant of Record files a Post Approval Amendment**. Only one PAA may be in progress at a time, it must be filed by the same Applicant of Record as the original filing, and a PAA cannot be submitted when the filing includes legalization. Current DOB guidance identifies filing review type, address, Applicant of Record, owner, and building type as locked or requiring another process.\n\nDo not give a deterministic answer about changing **Work on Floors** from the public guidance alone. The current PAA webpage says Work on Floors is not editable, while the current FAQ and DOB release history describe adding or removing floors through a PAA. Check the live PAA and current DOB direction before promising that change.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval.",
+        "Replace the compilation answer with the reviewed correction/qualification, including official-source conflicts where documented."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-004",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Confirm that the original filing is approved.",
+        "Confirm that the requested change is within the PAA route.",
+        "Identify immutable fields before promising that a PAA can accomplish the requested change.",
+        "Disclose the official-source conflict concerning Work on Floors."
+      ],
+      "forbiddenClaims": [
+        "A filing representative can submit the PAA as the Applicant of Record.",
+        "A PAA can change every field on the original filing.",
+        "A legalization filing can always be amended through a PAA.",
+        "Work on Floors is definitely immutable or definitely editable in every current PAA without checking the live filing."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Post Approval Amendment — DOB NOW: Build, current rules and locked fields.",
+        "DOB NOW: Build FAQ, Post Approval Amendments, Work on Floors response.",
+        "DOB NOW: Build release history concerning adding or removing floors through a PAA."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-005",
+      "title": "Small-business response",
+      "intakeQuestion": "Should the DOB NOW small-business question be answered Yes?",
+      "question": "Should the DOB NOW small-business question be answered Yes?",
+      "scenario": "The filing concerns a business that employs 42 people.",
+      "expectedAnswer": "**Yes**, assuming the filing is related to that business. The DOB guide describes a small business for this question as one employing fewer than 100 people. A Yes response permits the business owner to be added as a stakeholder and opens the Small Business section.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-005",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Apply the fewer-than-100 threshold.",
+        "Confirm the filing is actually related to the identified business."
+      ],
+      "forbiddenClaims": [
+        "Small-business status automatically waives all filing fees or civil penalties.",
+        "A company with exactly 100 employees satisfies a “fewer than 100” definition."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, PDF page 7, Additional Questions — Small Business.",
+        "DOB NOW: Build Release Notes, September 2022 Small Business entry."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-006",
+      "title": "MPP enrollment boundary",
+      "intakeQuestion": "Should the filing be identified as an approved MPP project?",
+      "question": "Should the filing be identified as an approved MPP project?",
+      "scenario": "The project is large and expensive but has not been accepted into the Major Projects Development Program.",
+      "expectedAnswer": "**No.** Project scale does not establish MPP status. A Yes response requires evidence that the application relates to a project enrolled in the Major Projects Development Program.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-006",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Require actual MPP enrollment evidence.",
+        "Distinguish project complexity from program status."
+      ],
+      "forbiddenClaims": [
+        "Every large project is an MPP project.",
+        "The Researcher can enroll a project or confer MPP status."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, PDF page 7, Additional Questions — Major Projects Development Program.",
+        "DOB NOW: Build Release Notes, September 2022 MPP entry.",
+        "1 RCNY §101-17 where the evaluation tests program eligibility or procedure."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-007",
+      "title": "Complete roof replacement",
+      "intakeQuestion": "How should the DOB NOW roof question be answered?",
+      "question": "How should the DOB NOW roof question be answered?",
+      "scenario": "A GC alteration removes and replaces the entire existing roof deck or roof assembly.",
+      "expectedAnswer": "Answer **Yes**. The Application User Guide states that this response causes the Local Law 92/94 Sustainable Roof Zone item to populate in Required Documents.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-007",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Distinguish entire roof-deck or roof-assembly replacement from limited repair or recover work.",
+        "Treat the generated document item as a trigger for further compliance review, not proof that the design complies."
+      ],
+      "forbiddenClaims": [
+        "Any roof repair requires a Yes response.",
+        "Selecting Yes establishes Sustainable Roof Zone compliance."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, PW1 roof question and required-document consequence, page 19 of the PDF."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-008",
+      "title": "More than 50 percent of gross floor area",
+      "intakeQuestion": "How should the more-than-50-percent alteration question be answered?",
+      "question": "How should the more-than-50-percent alteration question be answered?",
+      "scenario": "The Applicant of Record's documented calculation shows that the proposed alteration **alters 60 percent of the building's gross floor area**. The building type and Construction Superintendent/site-safety applicability facts are not supplied.",
+      "expectedAnswer": "Answer **Yes** to the more-than-50-percent gross-floor-area question, provided the plans and calculation confirm the stated 60 percent. Do not conclude from that response alone that a Site Safety Plan is legally required in every project. Confirm the building type and current Construction Superintendent/site-safety criteria. DOB's 2022 code-change materials state that qualifying one-, two-, and three-family work may not require a Construction Superintendent and that a Site Safety Plan is required only when the job requires a Construction Superintendent.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval.",
+        "Replace the compilation answer with the reviewed correction/qualification, including official-source conflicts where documented."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-008",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Use gross floor area and the area altered by the proposed scope.",
+        "Confirm the calculation and scope boundary rather than relying on a verbal estimate.",
+        "Separate the portal response or generated item from the final legal site-safety obligation.",
+        "Check the building type and current Construction Superintendent/site-safety criteria."
+      ],
+      "forbiddenClaims": [
+        "The percentage may be based on construction cost.",
+        "A Site Safety Plan is the only possible site-safety obligation.",
+        "Every project answering Yes requires a Site Safety Plan regardless of building type or current exceptions.",
+        "“Affected area,” construction cost, and gross floor area altered are interchangeable measures."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, scope questions and Site Safety Plan trigger, page 23 of the PDF.",
+        "2022 Construction Code Changes in DOB NOW, Site Safety Highlights, including the one-, two-, and three-family Construction Superintendent exception and Site Safety Plan relationship.",
+        "Current Building Code Chapter 33 and Administrative Code Article 110 criteria for any final project-specific conclusion."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-009",
+      "title": "Excavation exactly 12 feet",
+      "intakeQuestion": "Does the work require excavation greater than 12 feet?",
+      "question": "Does the work require excavation greater than 12 feet?",
+      "scenario": "The maximum excavation depth shown on the plans is exactly 12 feet.",
+      "expectedAnswer": "**No**, because exactly 12 feet is not greater than 12 feet. This answer addresses only this DOB NOW threshold and does not determine every excavation, safety, insurance, or adjacent-property requirement.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-009",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Apply the word “greater” precisely.",
+        "Require confirmation of the maximum depth from the plans.",
+        "Preserve other excavation obligations outside this narrow answer."
+      ],
+      "forbiddenClaims": [
+        "Twelve feet satisfies a greater-than-12-feet threshold.",
+        "A No response means no excavation controls or insurance requirements can apply."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, excavation-depth question and PGL consequence, pages 22-23 of the PDF."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-010",
+      "title": "Plumbing impact on sprinkler/standpipe supply",
+      "intakeQuestion": "How should the corresponding plumbing question be answered?",
+      "question": "How should the corresponding plumbing question be answered?",
+      "scenario": "The plumbing work will interrupt or otherwise affect the water supply serving the building's sprinkler or standpipe system.",
+      "expectedAnswer": "Answer **Yes**. The Application User Guide identifies an **FDNY Letter of No Objection** as a required document before approval.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-010",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Confirm an actual impact on the fire-protection water supply.",
+        "State the document timing as prior to approval."
+      ],
+      "forbiddenClaims": [
+        "Any plumbing work triggers the FDNY document.",
+        "The Researcher can determine FDNY acceptance or issue the letter."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, Plumbing question, page 22 of the PDF."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-011",
+      "title": "Standpipe outage longer than 24 hours",
+      "intakeQuestion": "How should the longer-than-24-hours question be answered?",
+      "question": "How should the longer-than-24-hours question be answered?",
+      "scenario": "The scope requires the standpipe service to be out of service for 36 hours.",
+      "expectedAnswer": "Answer **Yes**. The Application User Guide identifies an **FDNY Letter of No Objection** as a required document before approval.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-011",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Compare the planned outage duration with the stated threshold.",
+        "State that separate fire-safety and impairment procedures may apply outside this field."
+      ],
+      "forbiddenClaims": [
+        "A DOB NOW response is authorization to impair the standpipe.",
+        "The Letter of No Objection replaces every operational fire-safety requirement."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, Standpipe question, page 22 of the PDF."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-012",
+      "title": "Stormwater disjunctive thresholds",
+      "intakeQuestion": "Does the stated DOB NOW stormwater condition apply?",
+      "question": "Does the stated DOB NOW stormwater condition apply?",
+      "scenario": "The project will disturb 19,000 square feet of soil and create exactly 5,000 square feet of impervious surface. It is an otherwise applicable NB, Alteration-CO, or Alteration-with-enlargement filing.",
+      "expectedAnswer": "**Yes for the DOB NOW field and generated-document trigger.** Although soil disturbance is below 20,000 square feet, creation of 5,000 square feet or more of impervious surface independently satisfies the stated alternative threshold. The guide identifies a DEP Stormwater Construction Permit before approval and a DEP Stormwater Maintenance Permit or Notice of Termination before sign-off.\n\nDo not treat the numerical response alone as a final legal permit determination. Current DEP guidance also requires that the project can drain to a City-owned sewer system and directs users to current Title 15 Chapter 19.1 exclusions and definitions.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval.",
+        "Replace the compilation answer with the reviewed correction/qualification, including official-source conflicts where documented."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-012",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Treat the two thresholds as alternatives joined by “or.”",
+        "Recognize that exactly 5,000 square feet satisfies “5,000 or more.”",
+        "Confirm whether the separate larger-common-plan question also applies.",
+        "Distinguish the DOB NOW field/document trigger from final DEP permit applicability.",
+        "Confirm City-owned-sewer drainage and current exclusions before making the legal permit conclusion."
+      ],
+      "forbiddenClaims": [
+        "Both thresholds must be met.",
+        "A Yes response proves that DEP has issued the required permit.",
+        "Meeting the numerical DOB NOW threshold alone conclusively establishes legal DEP permit applicability."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, Soil Disturbance questions and consequences, pages 23-24 of the PDF.",
+        "DEP Stormwater Permits, current sewer-drainage condition, numerical thresholds, and Title 15 Chapter 19.1 reference."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-013",
+      "title": "Occupied residential units during construction",
+      "intakeQuestion": "How should the occupied-dwelling-unit question be answered, and what follows?",
+      "question": "How should the occupied-dwelling-unit question be answered, and what follows?",
+      "scenario": "At least one residential unit will be occupied during construction at some point before the permit is signed off by DOB.",
+      "expectedAnswer": "The owner should answer **Yes** to the occupied-dwelling-unit question. The Application User Guide states that a **Tenant Protection Plan is required** when residential units will be occupied at any time before permit sign-off.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-013",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Apply the occupancy condition across the entire period before sign-off, not just the application date.",
+        "Identify this as an owner statement requiring owner review and attestation."
+      ],
+      "forbiddenClaims": [
+        "Temporary vacancy on the filing date permits a No response when units will later be occupied before sign-off.",
+        "The expediter may attest to the owner's occupancy statement."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, Statements & Signatures, Occupied Dwelling Units, page 38 of the PDF."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-014",
+      "title": "Rent-regulated-unit data conflict",
+      "intakeQuestion": "May the filing simply answer No to the rent-regulated-housing question?",
+      "question": "May the filing simply answer No to the rent-regulated-housing question?",
+      "scenario": "The DOB NOW workflow indicates that DHCR data identifies at least one rent-controlled or rent-stabilized unit. The owner believes the building contains none but has not provided supporting documentation.",
+      "expectedAnswer": "**Not without resolving the record conflict.** The Application User Guide states that when at least one rent-regulated unit appears in the referenced data, the owner must answer Yes or provide a document confirming zero regulated units and explaining why the DHCR records are inaccurate.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-014",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Surface the conflict rather than selecting the owner's preferred answer.",
+        "Require owner confirmation and supporting evidence.",
+        "Avoid deciding the legal rent-regulated status from DOB NOW data alone."
+      ],
+      "forbiddenClaims": [
+        "The Researcher can conclusively determine rent regulation from a single dataset.",
+        "The expediter may override DHCR data without documentation."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, Statements & Signatures, Rent Controlled or Rent Stabilized Housing, page 38 of the PDF."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-015",
+      "title": "Condo/co-op board stakeholder",
+      "intakeQuestion": "Is the unit owner's attestation sufficient for the filing to proceed?",
+      "question": "Is the unit owner's attestation sufficient for the filing to proceed?",
+      "scenario": "The Owner Type is Condo Unit Owner.",
+      "expectedAnswer": "**No.** Under the February 2026 DOB NOW update, selecting Condo Unit Owner or Co-op Tenant-Shareholder adds the Condo/Co-op Board as a required stakeholder. The owner and the board representative must both complete their Statements & Signatures attestations before the filing can proceed.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-015",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Apply the rule only to the identified owner types.",
+        "Require an NYC.ID login and attestation by the board representative."
+      ],
+      "forbiddenClaims": [
+        "The unit owner may attest for the board.",
+        "Every condominium filing requires every unit owner to attest."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "DOB NOW: Build Release Notes, February 2026, Condo/Co-op Board stakeholder update."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-016",
+      "title": "Loft Law flag and affected IMD unit",
+      "intakeQuestion": "How should the IMD-impact question be answered, and what approval boundary follows?",
+      "question": "How should the IMD-impact question be answered, and what approval boundary follows?",
+      "scenario": "The DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit.",
+      "expectedAnswer": "Answer **Yes** because the work will take place in or affect an Interim Multiple Dwelling unit. After the job filing is submitted, add a Loft Board request and file for **Loft Board Certification**, including the required **Narrative Statement**. The DOB job filing cannot be approved until the Loft Board Certification has been issued. A Loft Board Letter of No Objection is the distinct route for a No response involving work in a commercial unit that does not affect an IMD unit; it is not the clearance for this scenario.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval.",
+        "Replace the compilation answer with the reviewed correction/qualification, including official-source conflicts where documented."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-016",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Require both the property flag and scope relationship stated in the scenario.",
+        "Distinguish submitting the request from obtaining the Certification.",
+        "Map the Yes and No responses to their distinct Loft Board submission types.",
+        "Include the Narrative Statement in the Yes/Certification path."
+      ],
+      "forbiddenClaims": [
+        "A Loft Law flag alone proves that every proposed scope affects an IMD unit.",
+        "Submission of a request is equivalent to Loft Board clearance.",
+        "A Yes response may be cleared by either an LNO or Certification at the applicant's choice."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Loft Board Requests service notice, effective February 2, 2026.",
+        "DOB NOW: Build Release Notes, February 2026, Loft Board Requests."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-017",
+      "title": "Basement ADU radon/vapor document",
+      "intakeQuestion": "Which DOB NOW responses and document requirement follow?",
+      "question": "Which DOB NOW responses and document requirement follow?",
+      "scenario": "An applicable NB or Alteration-CO GC filing for a newly erected single-family residence includes an Ancillary Dwelling Unit in the basement.",
+      "expectedAnswer": "Answer **Yes** to the ADU question and select **Basement** as the location. Under the August 2026 release, a DOHMH Radon and Vapor Level Certificate is required before Final CO. The release notes state that it may be uploaded before TCO, a waiver request is allowed, and deferral is not allowed.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-017",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Preserve all scenario qualifiers: applicable job type, GC/PW1, newly erected single-family residence, ADU, and basement or cellar location.",
+        "Distinguish optional timing before TCO from required timing before Final CO.",
+        "Distinguish waiver from deferral."
+      ],
+      "forbiddenClaims": [
+        "Every ADU in every location triggers the same certificate.",
+        "The certificate is required before filing based solely on the cited release note.",
+        "A deferral is permitted."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "DOB NOW: Build Release Notes, August 2026, DOHMH Radon and Vapor Level Certificate for ADUs."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-018",
+      "title": "Wetland-area required documents",
+      "intakeQuestion": "What documents and conditional responses are required under the August 2026 workflow?",
+      "question": "What documents and conditional responses are required under the August 2026 workflow?",
+      "scenario": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area.",
+      "expectedAnswer": "For each applicable Yes property flag, the filing must include a **DEC Jurisdictional Determination**, and DOB NOW adds the corresponding DEC Permit document item. If the determination says a DEC Permit is required, submit it before approval. If the determination says a permit is not required, submit a waiver request for the corresponding DEC Permit item.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval.",
+        "Replace the compilation answer with the reviewed correction/qualification, including official-source conflicts where documented."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-018",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Confirm that the job and work types fall within the release-note criteria.",
+        "Treat the property flag as a trigger for agency determination, not as proof that DEC has jurisdiction or that a permit is required.",
+        "Preserve the difference between the determination and the permit.",
+        "Use DEC Permit. Treat the service notice's isolated DEP Permit reference as an apparent typo because the operative table and release notes identify DEC."
+      ],
+      "forbiddenClaims": [
+        "Every flagged property necessarily requires a DEC Permit.",
+        "The DOB NOW flag is itself a DEC jurisdictional determination.",
+        "The document requirement may simply be ignored when DEC says no permit is required."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "DOB NOW: Build Release Notes, August 2026, Required Documents for DOB NOW Job Filings in Wetland Areas.",
+        "DOB Service Updates, effective August 17, 2026.",
+        "Wetland-area Required Documents service notice, including the operative document table."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-019",
+      "title": "New Builders Pavement Plan filing",
+      "intakeQuestion": "Where must it be filed, which review type applies, and what authorization step appears?",
+      "question": "Where must it be filed, which review type applies, and what authorization step appears?",
+      "scenario": "A new Builders Pavement Plan application is initiated after August 17, 2026.",
+      "expectedAnswer": "File it in **DOB NOW: Build** using the **Builders Pavement Plan** work type and **Standard Plan Review**. The BPP5 Authorization to DOT tab must be completed so DOT can issue its construction permit for the BPP work.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-019",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Apply the current effective date.",
+        "State that new BPP filings are no longer initiated in BIS.",
+        "Distinguish DOB's BPP processing from DOT's construction permit."
+      ],
+      "forbiddenClaims": [
+        "Professional Certification is an available BPP review type under the cited release.",
+        "Completing BPP5 means DOT has issued its construction permit."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "DOB NOW: Build Release Notes, August 2026, Builders Pavement Plan filings.",
+        "DOB Service Updates, effective August 17, 2026."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-020",
+      "title": "LPC-calendared property",
+      "intakeQuestion": "Can the Researcher promise immediate DOB approval without LPC processing?",
+      "question": "Can the Researcher promise immediate DOB approval without LPC processing?",
+      "scenario": "The DOB NOW Property Profile identifies the property as LPC-calendared. The proposed filing is an otherwise applicable Alteration initial filing.",
+      "expectedAnswer": "**No.** The August 2026 release notes state that LPC-calendared properties receive an automatic 40-day hold before approval. The applicable LPC Approval/Permit document is required before approval and/or permit depending on when the property was marked calendared. The Researcher must determine the filing review type, filing sequence, scope, exemptions, and timing before stating the exact document deadline.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-020",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Distinguish calendared, designated landmark, and historic-district facts.",
+        "Preserve the 40-day hold and conditional document timing.",
+        "Check exemptions and the live Property Profile."
+      ],
+      "forbiddenClaims": [
+        "Calendared status and designated-landmark status are interchangeable for every purpose.",
+        "Every filing has identical LPC document timing.",
+        "The Researcher can waive the hold or issue LPC approval."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "DOB NOW: Build Release Notes, August 2026, Updated Landmarks Requirements."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-021",
+      "title": "Insufficient facts for code review year",
+      "intakeQuestion": "What is the right Researcher answer?",
+      "question": "What is the right Researcher answer?",
+      "scenario": "The user provides only the property address and asks which Building Code review year to select in DOB NOW.",
+      "expectedAnswer": "**Insufficient information. Do not select a code year.** Request at least the job type, work type, filing and application dates, existing-building and prior-code facts, proposed scope, related or prior filings, and the Applicant of Record's claimed legal basis. The portal options alone do not establish which code may lawfully govern the project.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-021",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Separate the existence of a dropdown option from eligibility to use it.",
+        "Identify the missing facts needed for a supported determination.",
+        "Require applicable current law and transition provisions, not only the user guide."
+      ],
+      "forbiddenClaims": [
+        "The property address determines the code review year.",
+        "The oldest building date automatically selects the oldest code.",
+        "The current portal's default selection is necessarily the legally correct one."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, code-review-year field, page 19 of the PDF.",
+        "Applicable enacted code and transition provisions selected by the reviewer."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-022",
+      "title": "Insufficient facts for Professional Certification",
+      "intakeQuestion": "May the Researcher recommend Professional Certification rather than Standard Plan Examination?",
+      "question": "May the Researcher recommend Professional Certification rather than Standard Plan Examination?",
+      "scenario": "The user provides a brief work description but no property restrictions, filing type, complete scope, agency approvals, or Applicant of Record certification basis.",
+      "expectedAnswer": "**Insufficient information.** The Researcher may explain the two review routes but must not recommend Professional Certification until the job and work types, scope, property restrictions, applicable exclusions, agency approvals, and Applicant of Record's willingness and legal basis to certify full compliance are established.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-022",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "State that Professional Certification relies on an RDP's certification of compliance and remains subject to DOB audit.",
+        "Identify project-specific eligibility facts as missing.",
+        "Keep the ultimate certification with the Applicant of Record.",
+        "Confirm owner consent and the current restriction on changing the selected review route."
+      ],
+      "forbiddenClaims": [
+        "Professional Certification is simply the faster option for any filing.",
+        "An expediter or the Researcher can make the professional certification.",
+        "Professional Certification prevents DOB audit."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, Filing Review Type, page 13 of the PDF.",
+        "Current DOB exclusions and restrictions applicable to the proposed filing."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-023",
+      "title": "Filing representative attestation boundary",
+      "intakeQuestion": "Can the filing representative attest for them and submit the job filing?",
+      "question": "Can the filing representative attest for them and submit the job filing?",
+      "scenario": "A filing representative has completed data entry and uploaded the documents. The applicant and owner have not yet completed their attestations.",
+      "expectedAnswer": "**No.** A filing representative may perform permitted preparation, data-entry, and upload functions but cannot replace the required electronic attestations of the Applicant of Record and owner. The applicant must review, sign, and submit the filing through the required DOB NOW steps; current releases may add other required stakeholder attestations.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-023",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Distinguish preparation access from legal attestation authority.",
+        "Identify the Applicant of Record and owner attestations.",
+        "Check whether another required stakeholder, such as a condo/co-op board representative, must also attest."
+      ],
+      "forbiddenClaims": [
+        "Association with the filing authorizes a person to attest for another stakeholder.",
+        "An expediter's review substitutes for the owner or RDP statement."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Filing through DOB NOW: Build, attestation, preview, and submission steps.",
+        "Application User Guide, Statements & Signatures, page 38 of the PDF."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    },
+    {
+      "id": "DOBNOW-024",
+      "title": "Letter of Completion readiness",
+      "intakeQuestion": "Is the filing ready for an LOC request under the guide's listed prerequisites?",
+      "question": "Is the filing ready for an LOC request under the guide's listed prerequisites?",
+      "scenario": "The filing does not require an initial or amended Certificate of Occupancy. Its status is Permit Entire; final PW3 costs are verified; all required documents are submitted; applicable final technical reports are certified; all permits are inspected and Signed-Off; and all AHV permits are approved.",
+      "expectedAnswer": "**Yes, based on the supplied facts.** The owner or Applicant of Record may request the Letter of Completion from the filing action. The answer must remain conditional on the live filing actually showing every prerequisite and no newer restriction or unresolved item.",
+      "answerFormat": "direct-rule-application-qualifications",
+      "reconciliationNotes": [
+        "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval."
+      ],
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-024",
+      "sourceCaseStatus": "approved-for-answer-key-testing-only",
+      "sourceReviewedAt": "2026-08-22",
+      "sourceApprovalScope": "Terra answer-key testing only",
+      "codeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "requiredConcepts": [
+        "Confirm each listed prerequisite independently.",
+        "Distinguish readiness to request from DOB issuance of the LOC.",
+        "Confirm that a Certificate of Occupancy is not required."
+      ],
+      "forbiddenClaims": [
+        "Meeting the checklist means DOB has already issued the LOC.",
+        "Sign-off of one permit automatically satisfies all permit and filing requirements.",
+        "A filing requiring an initial or amended CO can use an LOC as a substitute."
+      ],
+      "missingFacts": [],
+      "requiredCitations": [
+        "Application User Guide, Letter of Completion prerequisites, page 37 of the PDF."
+      ],
+      "reconciliationStatus": "reconciled-locally; source review scope preserved",
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+    }
+  ]
+}

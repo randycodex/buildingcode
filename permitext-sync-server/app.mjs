@@ -269,7 +269,7 @@ import {
   extractResearchOfficialDocumentReferences,
   researchWebSupportTrigger
 } from "./research-source-policy.mjs";
-import { bindResearchWebSupportToOfficialHTML } from "./research-official-html-attribution.mjs";
+import { bindResearchWebSupportToOfficialDocuments } from "./research-official-html-attribution.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import {
   createResearchCorpusRegistry,
@@ -9923,7 +9923,11 @@ export function finalizeResearchGuidanceOnlyInterpretation(
     );
     return {
       ...source,
-      attributedClaims: [{ id: use.claimID, text: use.claim }],
+      attributedClaims: [{
+        ...source?.attributedClaims?.find((claim) => claim.id === use.claimID),
+        id: use.claimID,
+        text: use.claim
+      }],
       claim: use.claim
     };
   });
@@ -9935,7 +9939,10 @@ export function finalizeResearchGuidanceOnlyInterpretation(
     assumptions: [],
     missingFacts: [],
     followUpQuestions: [],
-    evidenceLimitations: [narrative.enactedBoundary],
+    evidenceLimitations: [...new Set([
+      narrative.enactedBoundary,
+      ...supportingSources.flatMap((source) => source.extractionLimitations || [])
+    ])],
     additionalEvidenceNeeded: [],
     supportingSources
   };
@@ -9972,7 +9979,10 @@ export function researchOfficialGuidanceOnlyInterpretation(webSupport = {}) {
     assumptions: [],
     missingFacts: [],
     followUpQuestions: [],
-    evidenceLimitations: [narrative.enactedBoundary],
+    evidenceLimitations: [...new Set([
+      narrative.enactedBoundary,
+      ...bindings.flatMap((binding) => binding.source.extractionLimitations || [])
+    ])],
     additionalEvidenceNeeded: [],
     supportingSourceUses: bindings.map((binding) => ({
       sourceID: binding.sourceID,
@@ -9981,7 +9991,11 @@ export function researchOfficialGuidanceOnlyInterpretation(webSupport = {}) {
     })),
     supportingSources: bindings.map((binding) => ({
       ...binding.source,
-      attributedClaims: [{ id: binding.claimID, text: binding.text }],
+      attributedClaims: [{
+        ...binding.source.attributedClaims.find((claim) => claim.id === binding.claimID),
+        id: binding.claimID,
+        text: binding.text
+      }],
       claim: binding.text
     })),
     citations: []
@@ -19220,7 +19234,7 @@ async function handleResearchConversationMessage(request, response) {
     ]);
     researchOperation.webSupportSearched = webSupport.searched === true;
     if (!mockMode && allowOfficialGuidanceOnly && webSupport.sources.length > 0) {
-      webSupport = await bindResearchWebSupportToOfficialHTML(webSupport, {
+      webSupport = await bindResearchWebSupportToOfficialDocuments(webSupport, {
         question,
         officialDomains: researchSourcePolicyConfiguration().officialDomains,
         signal: progressResponse.signal

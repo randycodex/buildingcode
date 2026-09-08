@@ -1,7 +1,9 @@
 import { createHash } from "node:crypto";
 import { parse } from "parse5";
+import { researchOfficialPDFPassages } from "./research-official-pdf-attribution.mjs";
 
 const defaultMaximumBytes = 1_500_000;
+const defaultMaximumPDFBytes = 15_000_000;
 const defaultTimeoutMilliseconds = 12_000;
 const maximumRedirects = 3;
 const maximumSelectedPassages = 8;
@@ -172,13 +174,14 @@ export function selectResearchOfficialHTMLPassages(passages, query, options = {}
   const maximum = Math.max(1, Number(options.maximum || maximumSelectedPassages));
   return (Array.isArray(passages) ? passages : [])
     .map((passage) => {
-      const passageTokens = queryTokens(passage?.claim);
+      const searchableText = passage?.kind === "pdf_page" ? passage.text : passage?.claim;
+      const passageTokens = queryTokens(searchableText);
       const sharedTokens = [...tokens].filter((token) => passageTokens.has(token));
       const phraseBoost = [...tokens].reduce((total, token) =>
-        total + (normalizedText(passage?.claim).toLowerCase().includes(token) ? 1 : 0), 0);
+        total + (normalizedText(searchableText).toLowerCase().includes(token) ? 1 : 0), 0);
       return {
         passage,
-        score: sharedTokens.length * 10 + phraseBoost + (passage?.kind === "list_item" ? 2 : 0)
+        score: sharedTokens.length ? sharedTokens.length * 10 + phraseBoost + (passage?.kind === "list_item" ? 2 : 0) : 0
       };
     })
     .filter(({ score }) => score > 0)
@@ -226,34 +229,36 @@ async function responseBodyWithinLimit(response, maximumBytes) {
       throw error;
     }
   }
-  return new TextDecoder("utf-8", { fatal: false }).decode(bytes);
+  return bytes;
 }
 
-export async function fetchResearchOfficialHTMLPassages(sourceURL, options = {}) {
+export async function fetchResearchOfficialDocumentPassages(sourceURL, options = {}) {
   const officialDomains = options.officialDomains || [];
   const fetchImpl = options.fetchImpl || fetch;
-  const maximumBytes = Number(options.maximumBytes || defaultMaximumBytes);
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), Number(
+  const timeout = setTimeout(() => controller.abort(new DOMException("Official source timed out.", "TimeoutError")), Number(
     options.timeoutMilliseconds || defaultTimeoutMilliseconds
   ));
-  const abortFromParent = () => controller.abort();
+  const abortFromParent = () => controller.abort(options.signal.reason);
   options.signal?.addEventListener?.("abort", abortFromParent, { once: true });
   let currentURL = approvedOfficialURL(sourceURL, officialDomains);
   if (!currentURL) {
     clearTimeout(timeout);
+    options.signal?.removeEventListener?.("abort", abortFromParent);
     const error = new Error("The official source URL is outside Permitext's approved domains.");
     error.code = "RESEARCH_OFFICIAL_SOURCE_DISALLOWED";
     throw error;
   }
   try {
+    if (options.signal?.aborted) abortFromParent();
+    controller.signal.throwIfAborted();
     for (let redirect = 0; redirect <= maximumRedirects; redirect += 1) {
       const response = await fetchImpl(currentURL, {
         method: "GET",
         redirect: "manual",
         signal: controller.signal,
         headers: {
-          accept: "text/html,application/xhtml+xml",
+          accept: "text/html,application/xhtml+xml,application/pdf",
           "user-agent": "Mozilla/5.0 (compatible; Permitext/1.0; +https://permitext.com)"
         }
       });
@@ -267,6 +272,7 @@ export async function fetchResearchOfficialHTMLPassages(sourceURL, options = {})
           error.code = "RESEARCH_OFFICIAL_SOURCE_REDIRECT_REJECTED";
           throw error;
         }
+        await response.body?.cancel();
         currentURL = redirectedURL;
         continue;
       }
@@ -276,19 +282,35 @@ export async function fetchResearchOfficialHTMLPassages(sourceURL, options = {})
         throw error;
       }
       const contentType = normalizedText(response.headers?.get?.("content-type")).toLowerCase();
-      if (!contentType.includes("text/html") && !contentType.includes("application/xhtml+xml")) {
-        const error = new Error("The official source was not an HTML document.");
+      const isPDF = contentType.split(";")[0].trim() === "application/pdf";
+      if (!isPDF && !contentType.includes("text/html") && !contentType.includes("application/xhtml+xml")) {
+        const error = new Error("The official source was not a supported HTML or PDF document.");
         error.code = "RESEARCH_OFFICIAL_SOURCE_UNSUPPORTED";
         throw error;
       }
-      const html = await responseBodyWithinLimit(response, maximumBytes);
+      const bytes = await responseBodyWithinLimit(response, Number(options.maximumBytes ??
+        (isPDF ? defaultMaximumPDFBytes : defaultMaximumBytes)));
+      controller.signal.throwIfAborted();
+      if (isPDF) {
+        return {
+          url: currentURL.toString(),
+          format: "pdf",
+          ...await researchOfficialPDFPassages(bytes, currentURL.toString(), {
+            ...options,
+            signal: controller.signal
+          })
+        };
+      }
+      const html = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
       return {
         url: currentURL.toString(),
+        format: "html",
         passages: researchOfficialHTMLPassages(html, currentURL.toString())
       };
     }
   } catch (error) {
-    if (error?.name === "AbortError") {
+    if (options.signal?.aborted) throw options.signal.reason || error;
+    if (controller.signal.aborted || error?.name === "AbortError" || error?.name === "TimeoutError") {
       const timeoutError = new Error("The official source retrieval timed out.");
       timeoutError.code = "RESEARCH_OFFICIAL_SOURCE_TIMEOUT";
       throw timeoutError;
@@ -303,14 +325,15 @@ export async function fetchResearchOfficialHTMLPassages(sourceURL, options = {})
   throw error;
 }
 
-export async function bindResearchWebSupportToOfficialHTML(webSupport, options = {}) {
+export async function bindResearchWebSupportToOfficialDocuments(webSupport, options = {}) {
   const originalSources = Array.isArray(webSupport?.sources) ? webSupport.sources : [];
   const officialDomains = options.officialDomains || [];
   const sources = [];
   const validationFailures = [];
   for (const source of originalSources.slice(0, 3)) {
     try {
-      const fetched = await fetchResearchOfficialHTMLPassages(source.url, {
+      const fetched = await fetchResearchOfficialDocumentPassages(source.url, {
+        ...options,
         officialDomains,
         fetchImpl: options.fetchImpl,
         signal: options.signal,
@@ -320,7 +343,8 @@ export async function bindResearchWebSupportToOfficialHTML(webSupport, options =
       const providerContext = (source.attributedClaims || []).map((claim) => claim?.text).join(" ");
       const selected = selectResearchOfficialHTMLPassages(
         fetched.passages,
-        `${options.question || ""} ${providerContext}`
+        `${options.question || ""} ${providerContext}`,
+        fetched.format === "pdf" ? { maximum: 3 } : {}
       );
       if (!selected.length) {
         validationFailures.push({ url: source.url, code: "RESEARCH_OFFICIAL_SOURCE_NO_RELEVANT_PASSAGE" });
@@ -335,12 +359,24 @@ export async function bindResearchWebSupportToOfficialHTML(webSupport, options =
           verbatimText: passage.text,
           heading: passage.heading,
           intro: passage.intro,
-          contentHash: passage.contentHash
+          contentHash: passage.contentHash,
+          ...(passage.pageNumber ? { pageNumber: passage.pageNumber, sourceURL: passage.sourceURL } : {})
         })),
         sourceContentHash: selected[0].contentHash,
-        sourceValidation: "official_html"
+        sourceValidation: fetched.format === "pdf" ? "official_pdf" : "official_html",
+        ...(fetched.format === "pdf" ? {
+          pageCount: fetched.pageCount,
+          textlessPages: fetched.textlessPages,
+          extractionLimitations: [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified.",
+            ...(fetched.textlessPages.length ? [
+              `No readable text was available on PDF pages ${fetched.textlessPages.join(", ")}.`
+            ] : [])
+          ]
+        } : {})
       });
     } catch (error) {
+      if (options.signal?.aborted) throw options.signal.reason || error;
       validationFailures.push({
         url: source.url,
         code: String(error?.code || error?.name || "RESEARCH_OFFICIAL_SOURCE_UNAVAILABLE")
@@ -351,13 +387,18 @@ export async function bindResearchWebSupportToOfficialHTML(webSupport, options =
     ...webSupport,
     sources,
     sourceValidation: {
-      method: "official_html",
+      method: sources.some((source) => source.sourceValidation === "official_pdf")
+        ? "official_documents" : "official_html",
       attemptedSourceCount: originalSources.slice(0, 3).length,
       validatedSourceCount: sources.length,
       failures: validationFailures
     },
     ...(sources.length === 0 ? {
-      limitation: "Permitext found an approved official page but could not bind the answer to its retrieved HTML; the guidance was not used."
+      limitation: "Permitext could not bind the guidance to readable text from an approved official HTML or PDF source; the guidance was not used."
     } : {})
   };
 }
+
+// Compatibility for existing callers and retained local evidence.
+export const fetchResearchOfficialHTMLPassages = fetchResearchOfficialDocumentPassages;
+export const bindResearchWebSupportToOfficialHTML = bindResearchWebSupportToOfficialDocuments;

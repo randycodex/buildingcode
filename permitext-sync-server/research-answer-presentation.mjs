@@ -1,4 +1,4 @@
-export const researchAnswerPresentationVersion = "20260906-outside-authority-boundary-v3";
+export const researchAnswerPresentationVersion = "20260908-direct-rule-application-v4";
 
 const compactText = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
@@ -105,8 +105,19 @@ function contractFor(mode, preferredStructure, requiredElements) {
     mode,
     preferredStructure,
     directAnswerFirst: true,
+    answerSequence: Object.freeze([
+      "Direct answer",
+      "Governing rule with citation",
+      "Application or calculation",
+      "Material exceptions or missing facts"
+    ]),
     requiredElements: Object.freeze(requiredElements),
     universalRules: Object.freeze([
+      "Lead with the supported result, a conditional result, or the specific reason the result cannot yet be determined.",
+      "Follow with the governing rule and adjacent citation, apply it to the supplied facts or show the calculation, then state only material exceptions or missing facts.",
+      "Keep any condition that changes a Yes or No in the opening answer; do not defer it to a closing disclaimer.",
+      "The answer sequence is a reasoning order, not four mandatory headings; omit steps that do not apply.",
+      "Never fill gaps in the question from an expected answer, an example scenario, or an unstated assumption.",
       "Place each material code citation next to the claim it supports.",
       "Separate governing enacted requirements from outside guidance or unsupplied standards.",
       "Preserve material applicability conditions, exceptions, and unresolved facts.",

@@ -2,6 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run verify:deploy-content && node scripts/verify-production-deploy.mjs && npm run build:clients",
   "outputDirectory": "public",
+  "functions": {
+    "api/index.mjs": {
+      "includeFiles": "{research-official-pdf-worker.mjs,node_modules/pdfjs-dist/legacy/build/*.mjs,node_modules/@napi-rs/canvas*/**}"
+    }
+  },
   "headers": [
     {
       "source": "/",

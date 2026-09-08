@@ -137,7 +137,7 @@ await assert.rejects(
       headers: { "content-type": "application/pdf" }
     })
   }),
-  (error) => error?.code === "RESEARCH_OFFICIAL_SOURCE_UNSUPPORTED"
+  (error) => error?.code === "RESEARCH_OFFICIAL_PDF_INVALID"
 );
 
 await assert.rejects(
