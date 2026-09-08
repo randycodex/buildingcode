@@ -271,6 +271,12 @@ import {
   researchWebSupportTrigger
 } from "./research-source-policy.mjs";
 import { bindResearchWebSupportToOfficialDocuments } from "./research-official-html-attribution.mjs";
+import {
+  researchOfficialGuidanceSummaryVersion,
+  researchOfficialGuidanceSummaryRequest,
+  researchOfficialGuidanceSummaryInterpretation,
+  researchOfficialGuidanceSummaryProof
+} from "./research-official-guidance-summary.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import {
   createResearchCorpusRegistry,
@@ -9918,7 +9924,23 @@ export function finalizeResearchGuidanceOnlyInterpretation(
     interpretation.supportingSources.map((source) => source?.claim)
   );
   if (!narrative.claims.length) return interpretation;
-  const supportingSources = interpretation.supportingSourceUses.map((use) => {
+  const supportingSources = boundResearchGuidanceSupportingSources(interpretation);
+  return {
+    ...interpretation,
+    answerText: narrative.answerText,
+    conclusion: narrative.authorityStatement,
+    explanation: narrative.explanation,
+    assumptions: [],
+    missingFacts: [],
+    followUpQuestions: [],
+    evidenceLimitations: canonicalResearchOfficialGuidanceLimitations(supportingSources),
+    additionalEvidenceNeeded: [],
+    supportingSources
+  };
+}
+
+function boundResearchGuidanceSupportingSources(interpretation) {
+  return interpretation.supportingSourceUses.map((use) => {
     const source = interpretation.supportingSources.find((candidate) =>
       candidate?.id === use.sourceID && candidate?.claim === use.claim
     );
@@ -9932,18 +9954,6 @@ export function finalizeResearchGuidanceOnlyInterpretation(
       claim: use.claim
     };
   });
-  return {
-    ...interpretation,
-    answerText: narrative.answerText,
-    conclusion: narrative.authorityStatement,
-    explanation: narrative.explanation,
-    assumptions: [],
-    missingFacts: [],
-    followUpQuestions: [],
-    evidenceLimitations: canonicalResearchOfficialGuidanceLimitations(supportingSources),
-    additionalEvidenceNeeded: [],
-    supportingSources
-  };
 }
 
 export function researchOfficialGuidanceOnlyInterpretation(webSupport = {}) {
@@ -9997,7 +10007,7 @@ export function researchOfficialGuidanceOnlyInterpretation(webSupport = {}) {
   };
 }
 
-export function researchShouldUseDeterministicOfficialGuidance({
+export function researchShouldUseOfficialGuidanceOnly({
   allowOfficialGuidanceOnly = false,
   webSupport = {}
 } = {}) {
@@ -10005,6 +10015,9 @@ export function researchShouldUseDeterministicOfficialGuidance({
     Array.isArray(webSupport?.sources) &&
     webSupport.sources.length > 0;
 }
+
+// Compatibility for callers that used the former eligibility helper name.
+export const researchShouldUseDeterministicOfficialGuidance = researchShouldUseOfficialGuidanceOnly;
 
 export function researchFollowUpQuestionsForResponse(
   interpretation,
@@ -10039,6 +10052,68 @@ export function researchEvidenceAnalysisForResponse(
     evidenceLimitations: [],
     highValueFollowUpQuestions: []
   };
+}
+
+async function openAIResearchOfficialGuidanceSummary(question, userID, options) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw Object.assign(new Error("Research AI is not configured."), { code: "RESEARCH_NOT_CONFIGURED" });
+  const configuration = {
+    ...researchModelConfiguration(), model: options.model,
+    promptVersion: researchOfficialGuidanceSummaryVersion,
+    evidenceVersion: `${researchEvidenceAssemblyVersion}:official-documents`
+  };
+  let usage = combinedResearchUsage();
+  const call = async (requestBody) => {
+    const { payload } = await requestResearchProvider({
+      apiKey, requestBody, signal: options.signal, timeoutMilliseconds: 45_000,
+      failureMessage: "The official guidance summary request failed.",
+      reserveEvaluationSpend: reserveResearchEvaluationSpend,
+      reserveProviderSpend: reserveResearchProviderSpend,
+      settleProviderSpend: settleResearchProviderSpend
+    });
+    usage = combinedResearchUsage(usage, researchUsageFromProviderPayload(payload, requestBody.model));
+    return { value: JSON.parse(outputTextFromResponse(payload)), model: payload.model || requestBody.model };
+  };
+  const requestOptions = { question, webSupport: options.webSupport, context: options, userID };
+  try {
+    const draft = await call(researchOfficialGuidanceSummaryRequest({ ...requestOptions, model: options.model }));
+    // Validate paragraph bindings before any semantic verifier call. The
+    // immutable full passages remain behind the shorter user-facing prose.
+    const interpretation = validateResearchInterpretation(
+      researchOfficialGuidanceSummaryInterpretation(draft.value, options.webSupport),
+      [], options.webSupport.sources, { allowOfficialGuidanceOnly: true }
+    );
+    interpretation.supportingSources = boundResearchGuidanceSupportingSources(interpretation);
+    const attribution = evaluateResearchWebAttribution({ question, evidence: [], answer: interpretation, webSupport: options.webSupport });
+    if (!attribution.pass) {
+      throw Object.assign(new Error("The summary did not preserve its official source attribution."), {
+        code: "INVALID_RESEARCH_WEB_CITATION"
+      });
+    }
+    const verificationRequest = researchOfficialGuidanceSummaryRequest({
+      ...requestOptions, model: options.verificationModel,
+      verificationSchema: researchVerificationSchema,
+      proposedAnswer: { ...draft.value, answerText: interpretation.answerText }
+    });
+    const checked = await call(verificationRequest);
+    const verification = { ...validateResearchVerification(checked.value), model: checked.model };
+    if (!verification.pass) {
+      throw Object.assign(new Error("The official guidance summary did not pass source verification. Your question is still here."), {
+        code: "RESEARCH_VERIFICATION_FAILED", verificationAttempts: [verification]
+      });
+    }
+    interpretation.officialGuidanceSummary = researchOfficialGuidanceSummaryProof(
+      question, interpretation, verification, verificationRequest.input
+    );
+    return {
+      interpretation, requestedModel: options.model, model: draft.model, configuration, usage,
+      officialGuidanceVerification: verification
+    };
+  } catch (error) {
+    if (!error.code) error.code = "INVALID_RESEARCH_RESPONSE";
+    error.providerUsage = combinedResearchUsage(usage, error.providerUsage);
+    throw error;
+  }
 }
 
 async function openAIResearchInterpretation(question, evidence, userID, options = {}) {
@@ -19307,7 +19382,7 @@ async function handleResearchConversationMessage(request, response) {
       zoningDeterministicContext,
       signal: progressResponse.signal
     };
-    const deterministicOfficialGuidanceOnly = !mockMode && researchShouldUseDeterministicOfficialGuidance({
+    const officialGuidanceOnly = !mockMode && researchShouldUseOfficialGuidanceOnly({
       allowOfficialGuidanceOnly,
       webSupport,
       evidence: assembledEvidence
@@ -19350,18 +19425,11 @@ async function handleResearchConversationMessage(request, response) {
           },
           usage: combinedResearchUsage()
         }
-      : deterministicOfficialGuidanceOnly
-      ? {
-          interpretation: researchOfficialGuidanceOnlyInterpretation(webSupport),
-          requestedModel: modelRouting.model,
-          model: "permitext-deterministic-official-guidance",
-          configuration: {
-            ...researchModelConfiguration(),
-            promptVersion: `${researchModelConfiguration().promptVersion}:official-guidance-v1`,
-            evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
-          },
-          usage: combinedResearchUsage()
-        }
+      : officialGuidanceOnly
+      ? await openAIResearchOfficialGuidanceSummary(question, context.userID, {
+          ...interpretationOptions, model: modelRouting.model,
+          verificationModel: modelRouting.configuration.verificationModel
+        })
       : await requestInterpretation(modelRouting.model, interpretationOptions).catch(async (error) => {
           if (
             modelRouting.tier !== "fast" ||
@@ -19395,7 +19463,7 @@ async function handleResearchConversationMessage(request, response) {
       };
     }
     const preserveDeclaredProjectFactUncertainty = (candidate) =>
-      deterministicOfficialGuidanceOnly
+      officialGuidanceOnly
         ? candidate
         : {
             ...candidate,
@@ -19405,7 +19473,7 @@ async function handleResearchConversationMessage(request, response) {
             )
           };
     const applyDeterministicAnswerRepairs = (candidate) => {
-      const repairedInterpretation = deterministicOfficialGuidanceOnly
+      const repairedInterpretation = officialGuidanceOnly
         ? candidate.interpretation
         : applyZoningResearchDeterministicRepairs(
             applyResearchDeterministicAnswerRepairs(
@@ -19528,9 +19596,9 @@ async function handleResearchConversationMessage(request, response) {
       evidenceBoundaryFallback = true;
       return true;
     };
-    if (deterministicOfficialGuidanceOnly) {
+    if (officialGuidanceOnly) {
       const sourceFaithfulPass =
-        webAttribution.pass &&
+        result.officialGuidanceVerification?.pass === true && webAttribution.pass &&
         result.interpretation.supportingSources?.length > 0 &&
         result.interpretation.supportingSources.every((source) =>
           ["official_html", "official_pdf"].includes(source?.sourceValidation) &&
@@ -19542,7 +19610,7 @@ async function handleResearchConversationMessage(request, response) {
         issues: sourceFaithfulPass
           ? []
           : combinedResearchAnswerRevisionIssues({ webAttribution }),
-        model: "permitext-deterministic-official-document-attribution"
+        model: result.officialGuidanceVerification?.model || "official-document-verification-unavailable"
       }];
       if (!sourceFaithfulPass) {
         const error = new Error("The official guidance answer was not bound to the retrieved official document.");

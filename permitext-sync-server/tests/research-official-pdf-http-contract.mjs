@@ -68,11 +68,44 @@ const nativeFetch = globalThis.fetch;
 let providerDoubles = 0;
 let documentDoubles = 0;
 let corruptDocument = false;
+let rejectSummary = false;
+let summaryDoubles = 0;
+let verificationDoubles = 0;
 globalThis.fetch = async (url, options) => {
   if (String(url) === "https://api.openai.com/v1/responses") {
     providerDoubles += 1;
-    assert(JSON.parse(options.body).tools.some((tool) => tool.type === "web_search"));
-    return Response.json(payload);
+    const body = JSON.parse(options.body);
+    if (body.tools?.some((tool) => tool.type === "web_search")) return Response.json(payload);
+    const input = JSON.parse(body.input);
+    let value;
+    if (body.text.format.name === "permitext_official_guidance_summary") {
+      summaryDoubles += 1;
+      const wetlands = /wetlands/i.test(input.question);
+      const passages = wetlands ? input.passages : input.passages.slice(0, 1);
+      value = {
+        paragraphs: [{
+          text: rejectSummary ? "The filing automatically grants the construction permit."
+            : wetlands
+              ? "Submit the DEC Jurisdictional Determination. If it requires a DEC Permit, submit that permit before approval; otherwise request a waiver for the permit document."
+              : replayPath
+                ? "For new BPP applications beginning August 17, 2026, file in DOB NOW: Build using Standard Plan Review and complete the BPP5 Authorization to DOT."
+                : "Use Standard Plan Review for the new BPP filing. This filing step does not automatically approve the permit.",
+          sourceUses: passages.map((passage) => ({ sourceID: passage.sourceID, claimID: passage.claimID }))
+        }], missingFacts: [], evidenceLimitations: []
+      };
+    } else {
+      assert.equal(body.text.format.name, "permitext_official_guidance_verification");
+      verificationDoubles += 1;
+      assert(input.passages.every((passage) => passage.contentHash?.length === 64));
+      if (rejectSummary) {
+        assert.match(input.proposedAnswer.answerText, /automatically grants/);
+        assert(input.passages.some((passage) => /not automatic permit approval|Once the BPP filing is approved/.test(passage.text)));
+      }
+      value = rejectSummary
+        ? { pass: false, issues: [{ type: "overstated_compliance", detail: "The document does not say filing automatically grants a construction permit." }] }
+        : { pass: true, issues: [] };
+    }
+    return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
   }
   if (String(url) === sourceURL) {
     documentDoubles += 1;
@@ -108,11 +141,20 @@ try {
   assert.equal(answer.supportingSources[0].controlling, false);
   assert.equal(answer.supportingSources[0].attributedClaims[0].pageNumber, 1);
   assert.equal(answer.supportingSources[0].sourceContentHash.length, 64);
-  assert.equal(providerDoubles, replayPath ? 0 : 1, "Known workflow documents bypass search; generic PDF requests require only the search call.");
+  const saved = await request("/research/answers/get", {
+    auth, answerID: response.body.conversation.messages.at(-1).id
+  }, account.backendSessionToken);
+  assert.equal(saved.status, 200);
+  assert.equal(saved.body.answer.immutable, true);
+  assert.equal(saved.body.answer.answer.answerText, answer.answerText);
+  assert.deepEqual(saved.body.answer.answer.officialGuidanceSummary, answer.officialGuidanceSummary);
+  assert.deepEqual(saved.body.answer.answer.supportingSources, answer.supportingSources);
+  assert.equal(providerDoubles, replayPath ? 2 : 3, "Known workflows bypass search; a summary and independent verification are both required.");
   if (replayPath) {
     assert.match(answer.answerText, /BPP5/);
     assert.match(answer.answerText, /August 17, 2026/);
-    console.log(`Saved official document replay passed: ${answer.answerText.split(/\s+/).length} words; canonical PDF page retained without provider calls.`);
+    assert(answer.answerText.split(/\s+/).length < 120);
+    console.log(`Saved official document summary replay passed: ${answer.answerText.split(/\s+/).length} words; complete source page retained behind the summary.`);
   }
   const beforeWorkflow = providerDoubles;
   question = "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?";
@@ -121,24 +163,37 @@ try {
   const workflowAnswer = workflowResponse.body.conversation.messages.at(-1).answer;
   assert.match(workflowAnswer.answerText, /Standard Plan Review/);
   assert.equal(workflowAnswer.retrieval.officialWorkflow.retrievalMethod, "official_workflow_catalog");
-  assert.equal(providerDoubles, beforeWorkflow, "An ordinary BPP workflow question must fetch the official PDF without a provider call.");
+  assert.equal(providerDoubles, beforeWorkflow + 2, "The BPP workflow bypasses search but verifies its summary.");
   question = "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area. What documents and conditional responses are required under the August 2026 workflow?";
   const wetlandResponse = await ask();
   assert.equal(wetlandResponse.status, 200, JSON.stringify(wetlandResponse.body));
   const wetlandAnswer = wetlandResponse.body.conversation.messages.at(-1).answer;
   assert.match(wetlandAnswer.answerText, /DEC Jurisdictional Determination/);
-  assert.match(wetlandAnswer.answerText, /waiver request/);
+  assert.match(wetlandAnswer.answerText, /waiver request|request a waiver/);
   assert.doesNotMatch(wetlandAnswer.answerText, /Mandatory Inclusionary Housing/);
   assert.deepEqual(wetlandAnswer.supportingSources.flatMap((source) => source.attributedClaims.map((claim) => claim.pageNumber)), [1, 2]);
-  assert.equal(providerDoubles, beforeWorkflow, "The wetlands workflow also bypasses provider calls.");
+  assert.equal(providerDoubles, beforeWorkflow + 4, "The wetlands workflow bypasses search but verifies its summary.");
+  assert.equal(summaryDoubles, 3);
+  assert.equal(verificationDoubles, 3);
+  rejectSummary = true;
+  question = "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?";
+  const unsupported = await ask();
+  assert(unsupported.status >= 400);
+  assert.equal(unsupported.body.code, "RESEARCH_VERIFICATION_FAILED");
+  const telemetry = await request("/internal/evaluations/data", { auth }, account.backendSessionToken);
+  const failed = telemetry.body.researchSpend.operationMetrics.find((operation) => operation.failureCode === "RESEARCH_VERIFICATION_FAILED");
+  assert(failed && failed.charged === false && failed.pendingProviderRequestCount === 0,
+    "A rejected summary must not consume the user's turn; dispatched provider usage still settles.");
+  rejectSummary = false;
+  const beforeCorruptDocument = documentDoubles;
   // Keep the generic PDF failure check independent of catalog fallback.
   question = `According to the official service notice at ${sourceURL}, which review type applies to the new application?`;
   corruptDocument = true;
   const rejected = await ask();
   assert.equal(rejected.status, 502);
   assert.equal(rejected.body.code, "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE");
-  assert.equal(documentDoubles, 3);
-  console.log("Official PDF HTTP completion and invalid-document rejection passed; zero external/provider calls.");
+  assert.equal(documentDoubles, beforeCorruptDocument + 1);
+  console.log("Official PDF summary HTTP completion, semantic rejection and invalid-document rejection passed; zero external calls, provider responses mocked.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
   globalThis.fetch = nativeFetch;

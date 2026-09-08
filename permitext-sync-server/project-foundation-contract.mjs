@@ -12,6 +12,7 @@ import {
   researchOfficialGuidanceAuthorityStatement,
   researchSourcePolicyConfiguration
 } from "./research-source-policy.mjs";
+import { hasVerifiedResearchOfficialGuidanceSummary } from "./research-official-guidance-summary.mjs";
 
 export const projectFoundationSchemaVersion = 1;
 export const syncSchemaVersion = 2;
@@ -681,25 +682,27 @@ export function immutableResearchAnswer({
       Array.isArray(answer.factUsage[key]) && answer.factUsage[key].length === 0
     );
   const canonicalGuidanceLimitations = canonicalResearchOfficialGuidanceLimitations(supportingSources);
+  const canonicalGuidancePresentation =
+    answer?.answerText === canonicalGuidanceNarrative.answerText &&
+    answer?.conclusion === researchOfficialGuidanceAuthorityStatement &&
+    answer?.explanation === canonicalGuidanceNarrative.explanation &&
+    Array.isArray(answer?.missingFacts) && answer.missingFacts.length === 0 &&
+    Array.isArray(answer?.evidenceLimitations) &&
+    answer.evidenceLimitations.length === canonicalGuidanceLimitations.length &&
+    answer.evidenceLimitations.every((value, index) => value === canonicalGuidanceLimitations[index]);
   const officialSupportingGuidanceAnswer =
     answer?.authorityStatus === "official_supporting_guidance" &&
     answer?.authorityLabel === "Official supporting guidance — noncontrolling" &&
     answer?.retrieval?.allowOfficialGuidanceOnly === true &&
     answer?.verification?.status === "passed" &&
     answer?.verification?.pass === true &&
-    answer?.answerText === canonicalGuidanceNarrative.answerText &&
-    answer?.conclusion === researchOfficialGuidanceAuthorityStatement &&
-    answer?.explanation === canonicalGuidanceNarrative.explanation &&
+    (canonicalGuidancePresentation || hasVerifiedResearchOfficialGuidanceSummary(question, answer)) &&
     Array.isArray(answer?.supportedPoints) && answer.supportedPoints.length === 0 &&
     Array.isArray(answer?.citations) && answer.citations.length === 0 &&
     researchCitations.length === 0 &&
     Array.isArray(answer?.assumptions) && answer.assumptions.length === 0 &&
-    Array.isArray(answer?.missingFacts) && answer.missingFacts.length === 0 &&
     Array.isArray(answer?.followUpQuestions) && answer.followUpQuestions.length === 0 &&
     Array.isArray(answer?.additionalEvidenceNeeded) && answer.additionalEvidenceNeeded.length === 0 &&
-    Array.isArray(answer?.evidenceLimitations) &&
-    answer.evidenceLimitations.length === canonicalGuidanceLimitations.length &&
-    answer.evidenceLimitations.every((value, index) => value === canonicalGuidanceLimitations[index]) &&
     canonicalGuidanceSources &&
     emptyStructuredGuidanceAnalysis &&
     emptyGuidanceFactUsage;
