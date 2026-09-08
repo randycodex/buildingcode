@@ -48,3 +48,15 @@ The answer and verifier instructions also require an independent factual basis f
 The full Research suite, main check, smoke and both existing retrieval benchmarks passed after this repair. The 60-case diagnostic remains 59/60 with the same MC 403 grouping miss and 15,448 mean evidence characters. A full-assembly regression proves that both room questions retain the relevant source text while their mandatory coverage differs. Priority tests retain direct-reference, pinned-source and overlapping-route obligations.
 
 The follow-up live runner is limited to FGC-02 and CC-03 once each, with no separate judge. Prior settled conservative spend is $2.832511; two $0.85 turn caps give a combined ceiling of $4.532511 including earlier runs. An additional aggregate $1.80 guard remains active. Default execution is a no-network preflight; the permanent output file prevents accidental replay.
+
+## Follow-up live result at `971c1adb3`
+
+Both turns delivered with two successful provider requests each, no repair and no pending requests. FGC-02 retained the general prohibition and exceptions while removing the irrelevant sleeping-room discussion: **256 → 151 words**, **19.431 → 12.613 seconds**. CC-03 now makes the accessory path conditional and explicitly says the supplied facts do not establish a nonaccessory tenant space: **204 → 224 words**, **27.106 → 25.458 seconds**. These single observations do not establish a general speed improvement.
+
+The prior occupancy applicability defect is resolved in this answer. Presentation can still be shorter. The bathroom answer also has a minor precision note: the source refers to a door equipped with an approved self-closing **device**, which is clearer than calling it an approved self-closing door. This is retained in the manual review rather than declaring the whole answer perfect.
+
+This two-turn batch's usage-based estimate is **$0.10348280**, including cache-write premium. Across the five paid packages in this effort, the cumulative estimate is **$1.51004741**, the conservative bound is **$3.026380**, and pending provider requests are **zero**. No deployment occurred.
+
+Immutable evidence: `research-owner-live-scope-confirmation-v2-2026-09-08.json` and `research-owner-scope-confirmation-v2-review-2026-09-08.json` under `permitext-sync-server/evals/results`.
+
+Remaining work includes broader generated-answer coverage, concise official-PDF answers, useful conditional replies when zoning facts are missing, the earlier fixture-follow-up completeness gap, and further elimination of irrelevant or repeated qualifications. The source recall and selected live confirmations above do not complete those requirements.

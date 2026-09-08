@@ -1,0 +1,52 @@
+{
+  "schema": "permitext-owner-answer-scope-manual-review-v2",
+  "liveResultSHA256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956",
+  "sourceCommit": "971c1adb300865ce3e5e952db76b2b385e451524",
+  "professionalApproval": false,
+  "goalComplete": false,
+  "results": [
+    {
+      "id": "FGC-02",
+      "delivery": "completed",
+      "review": "main-rule-supported; irrelevant-descendant-discussion-removed",
+      "finding": "The general prohibition and exceptions remain; the sleeping-room installer and detector discussion is gone. Still repeats verification conditions. Minor precision improvement remains: exception 3 should refer to a door equipped with an approved self-closing device, preserving what the approval modifies.",
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-197419",
+      "sourceCheckedOn": "2026-09-08",
+      "answerSHA256": "08b14f60676f633de3a1be2d8c243a3ff4bd2ea559352584cb801cb927fd2750",
+      "answerWords": 151,
+      "previousAnswerWords": 256,
+      "durationMilliseconds": 12613,
+      "previousDurationMilliseconds": 19431,
+      "providerCalls": 2,
+      "pendingProviderRequests": 0
+    },
+    {
+      "id": "CC-03",
+      "delivery": "completed",
+      "review": "prior-applicability-defect-resolved; presentation-can-shorten",
+      "finding": "The opening now conditions the classification path on assembly use and the accessory relationship. Calculates 900/15=60; separately identifies BC 303.1.2 as limited to buildings or nonaccessory tenant spaces and says the supplied room facts do not establish that alternative. Preserves actual-use and multiple-purpose conditions. Longer than the reference answer, but no longer treats unresolved accessory status as proof of the alternative path.",
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-165884",
+      "sourceCheckedOn": "2026-09-08",
+      "answerSHA256": "c51a21f1a40dd54b9f157c4958fba4001e0ded74f28b9073ddae26ee4d15ab1f",
+      "answerWords": 224,
+      "previousAnswerWords": 204,
+      "durationMilliseconds": 25458,
+      "previousDurationMilliseconds": 27106,
+      "providerCalls": 2,
+      "pendingProviderRequests": 0
+    }
+  ],
+  "spend": {
+    "providerTokenTelemetryUSD": 0.088498,
+    "estimatedCacheWritePremiumUSD": 0.0149848,
+    "usageBasedEstimateUSD": 0.1034828,
+    "conservativeBoundUSD": 0.193869,
+    "cumulativeConservativeBoundUSD": 3.02638,
+    "cumulativeUsageBasedEstimateUSD": 1.51004741,
+    "pendingRequests": 0,
+    "pricingSource": "https://developers.openai.com/api/docs/pricing",
+    "pricingCheckedOn": "2026-09-08",
+    "limitation": "Usage-based estimate including cache-write premium, not an invoice or account balance; no web-search calls in this run."
+  },
+  "latencyLimitation": "Two selected local live turns, one each; observed before/after values are not a controlled latency result."
+}

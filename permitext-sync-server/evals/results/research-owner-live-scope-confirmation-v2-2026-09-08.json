@@ -1,0 +1,2880 @@
+{
+  "schema": "permitext-owner-answer-scope-confirmation-20260908-v2",
+  "authorization": "Owner: approximately $8 available for API testing; test as many times as needed. This package is limited to two turns after verified descendant-scope and applicability repairs, one attempt per case.",
+  "previousConservativeSpendUSD": 2.832511,
+  "priorQualityResultSHA256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323",
+  "priorFarResultSHA256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab",
+  "priorConfirmationResultSHA256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a",
+  "priorZeroCallResultSHA256": "cd2bd778d4e881912697c0280b33952bb905f010a9bbb2c816024da42c816b17",
+  "priorZeroCallResult": "research-owner-live-source-confirmation-2026-09-08.json",
+  "priorZeroCallExplanation": "First turn rejected before dispatch; zero provider calls and costs. The stale evaluation reservation was bookkeeping, not incurred spend.",
+  "ownerCandidateSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "sourceCommit": "971c1adb300865ce3e5e952db76b2b385e451524",
+  "keySHA256": "c8949b70372b5165fcf4561863b27414284da621602e6b70ca508f99da69a14b",
+  "execution": "Isolated local HTTP Research conversations with live OpenAI responses; automatic evidence discovery; no reference answers supplied to the answering model.",
+  "maximumCumulativeSpendUSD": 1.8,
+  "maximumTurnSpendUSD": 0.85,
+  "maximumTurns": 2,
+  "absoluteTurnSumCeilingUSD": 1.7,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing, medium reasoning, standard service tier",
+  "zoning": "Local diagnostic eligibility only; no public gate or deployment changes",
+  "cases": [
+    {
+      "id": "FGC-02",
+      "conversation": "FGC-02",
+      "question": "A designer wants to install a gas-fired appliance in a bathroom. Is a gas appliance categorically prohibited in every bathroom?"
+    },
+    {
+      "id": "CC-03",
+      "conversation": "assembly",
+      "question": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?"
+    }
+  ],
+  "startedAt": "2026-09-08T04:20:40.426Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "FGC-02",
+      "question": "A designer wants to install a gas-fired appliance in a bathroom. Is a gas appliance categorically prohibited in every bathroom?",
+      "status": "completed",
+      "startedAt": "2026-09-08T04:20:40.571Z",
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:conversational-v4",
+        "evidenceVersion": "20260908-table-context-integrity-v25:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-prior-code-technical-scope-v5",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T04:20:40.637Z"
+        },
+        "answerText": "No. A gas appliance is generally prohibited in a bathroom, but FGC § 303.3 provides limited exceptions for rooms not used for sleeping. A bathroom installation can qualify only if it fits one of those exceptions: (1) a direct-vent appliance that takes all combustion air directly from outdoors and is installed per its listing and manufacturer’s instructions; (2) specified vented heaters, fireplaces, and decorative appliances in a room meeting the Section 304.5 volume criteria; or (3) an appliance in an enclosure taking all combustion air from outdoors under Section 304.6, with access through a solid, weather-stripped, approved self-closing door (FGC § 303.3).\n\nAccordingly, the proposed appliance is not permissible merely because it is gas-fired or vented; its appliance type, combustion-air arrangement, listing/instructions, and—depending on the chosen exception—the room-volume or enclosure conditions must establish an applicable exception. The supplied evidence does not establish compliance with the Section 304.5 or 304.6 cross-referenced conditions.",
+        "conclusion": "No. A gas appliance is generally prohibited in a bathroom, but FGC § 303.3 provides limited exceptions for rooms not used for sleeping. A bathroom installation can qualify only if it fits one of those exceptions: (1) a direct-vent appliance that takes all combustion air directly from outdoors and is installed per its listing and manufacturer’s instructions; (2) specified vented heaters, fireplaces, and decorative appliances in a room meeting the Section 304.5 volume criteria; or (3) an appliance in an enclosure taking all combustion air from outdoors under Section 304.6, with access through a solid, weather-stripped, approved self-closing door (FGC § 303.3).",
+        "supportedPoints": [
+          {
+            "heading": "Bathroom-location prohibition and exceptions",
+            "explanation": "Appliances shall not be located in bathrooms. The prohibition has three exceptions, each limited to rooms not used for sleeping: qualifying direct-vent appliances with all combustion air directly from outdoors and installation consistent with listing and manufacturer instructions; specified vented appliances in rooms meeting Section 304.5 volume criteria; and appliances in a qualifying outdoor-combustion-air enclosure with the prescribed solid, weather-stripped, approved self-closing access door.",
+            "sectionID": "8063",
+            "sourceIDs": [
+              "research-permitext_discovered-id:8063-1"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "Accordingly, the proposed appliance is not permissible merely because it is gas-fired or vented; its appliance type, combustion-air arrangement, listing/instructions, and—depending on the chosen exception—the room-volume or enclosure conditions must establish an applicable exception. The supplied evidence does not establish compliance with the Section 304.5 or 304.6 cross-referenced conditions.",
+        "assumptions": [],
+        "missingFacts": [
+          "The proposed appliance type and whether it is a direct-vent appliance obtaining all combustion air directly from outdoors.",
+          "The appliance listing and manufacturer’s installation instructions applicable to the proposed bathroom installation.",
+          "If relying on the specified vented-appliance exception: whether the appliance is one of the listed appliance types and the room-volume information needed to evaluate FGC Section 304.5.",
+          "If relying on the enclosure exception: the enclosure combustion-air arrangement and whether its access door is solid, weather-stripped, and equipped with an approved self-closing device under FGC Section 304.6."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied enacted evidence establishes the bathroom prohibition and the text of FGC § 303.3 exceptions, but does not include the requirements of the cross-referenced FGC §§ 304.5 and 304.6 needed to evaluate those exception paths."
+        ],
+        "additionalEvidenceNeeded": [
+          "The applicable enacted text of FGC §§ 304.5 and 304.6 if the design relies on the room-volume or enclosure exception.",
+          "Product listing documentation and manufacturer installation instructions for the proposed appliance."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "8063",
+            "sectionNumber": "303.3",
+            "title": "303.3 Prohibited locations.",
+            "codePrefix": "FGC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:8063-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:8063-1",
+                "selectedText": "303.3 303.3 Prohibited locations. Appliances shall not be located in sleeping rooms, bathrooms, toilet rooms, storage closets or surgical rooms, or in a space that opens only into such rooms or spaces. Exceptions: 1. In rooms other than those used for sleeping purposes, direct-vent appliances that obtain all combustion air directly from the outdoors and installed in accordance with the conditions of the listing and the manufacturer's instructions. 2. In rooms other than those used for sleeping purposes, vented room heaters, wall furnaces, vented decorative appliances, vented gas fireplaces, vented gas fireplace heaters and decorative appliances for installation in vented solid fuel-burning fireplaces that are installed in rooms that meet the required volume criteria of Section 304.5. 3. In rooms other than those used for sleeping purposes, appliances installed in an enclosure in which all combustion air is taken from the outdoors, in accordance with Section 304.6. Access to such enclosure shall be through a solid weather-stripped door, equipped with an approved self-closing device.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Controlling current-enacted NYC Fuel Gas Code provision prohibiting appliance locations in bathrooms and stating the limited exceptions."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "8063",
+          "8064",
+          "8070",
+          "8074",
+          "10286",
+          "8023",
+          "10957",
+          "8409",
+          "8635",
+          "8743",
+          "8065",
+          "8071",
+          "8066",
+          "8067",
+          "8068",
+          "8069"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:8063-1",
+          "research-permitext_discovered-id:8064-2",
+          "research-permitext_discovered-id:8070-3",
+          "research-permitext_discovered-id:8074-4",
+          "research-permitext_discovered-id:10286-5",
+          "research-permitext_discovered-id:8023-6",
+          "research-permitext_discovered-id:10957-7",
+          "research-permitext_discovered-id:8409-8",
+          "research-permitext_discovered-id:8635-9",
+          "research-permitext_discovered-id:8743-10",
+          "research-permitext_cross_reference-id:8065-1",
+          "research-permitext_cross_reference-id:8071-2",
+          "research-permitext_cross_reference-id:8066-4",
+          "research-permitext_cross_reference-id:8067-5",
+          "research-permitext_cross_reference-id:8068-6",
+          "research-permitext_cross_reference-id:8069-7"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 16,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 15,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 10,
+          "crossReferenceCount": 6,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 4,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "FGC 303.3",
+              "summary": "FGC 303.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8063-1"
+              ]
+            }
+          ],
+          "generalRules": [],
+          "exceptions": [
+            {
+              "label": "FGC 303.3",
+              "summary": "FGC 303.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8063-1"
+              ]
+            },
+            {
+              "label": "FGC 303.5.1",
+              "summary": "FGC 303.5.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8074-4"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [
+            {
+              "label": "FGC 303.3.1.1",
+              "summary": "FGC 303.3.1.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8065-1"
+              ]
+            },
+            {
+              "label": "FGC 303.3.1.7",
+              "summary": "FGC 303.3.1.7 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8071-2"
+              ]
+            },
+            {
+              "label": "FGC 303.3.1.2",
+              "summary": "FGC 303.3.1.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8066-4"
+              ]
+            },
+            {
+              "label": "FGC 303.3.1.3",
+              "summary": "FGC 303.3.1.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8067-5"
+              ]
+            },
+            {
+              "label": "FGC 303.3.1.4",
+              "summary": "FGC 303.3.1.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8068-6"
+              ]
+            },
+            {
+              "label": "FGC 303.3.1.5",
+              "summary": "FGC 303.3.1.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8069-7"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "FGC 303.3.1.7",
+              "summary": "FGC 303.3.1.7 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8071-2"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:8063-1",
+            "research-permitext_discovered-id:8064-2",
+            "research-permitext_discovered-id:8070-3",
+            "research-permitext_discovered-id:8074-4",
+            "research-permitext_discovered-id:10286-5",
+            "research-permitext_discovered-id:8023-6",
+            "research-permitext_discovered-id:10957-7",
+            "research-permitext_discovered-id:8409-8",
+            "research-permitext_discovered-id:8635-9",
+            "research-permitext_discovered-id:8743-10",
+            "research-permitext_cross_reference-id:8065-1",
+            "research-permitext_cross_reference-id:8071-2",
+            "research-permitext_cross_reference-id:8066-4",
+            "research-permitext_cross_reference-id:8067-5",
+            "research-permitext_cross_reference-id:8068-6",
+            "research-permitext_cross_reference-id:8069-7"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "A designer wants to install a gas-fired appliance in a bathroom. Is a gas appliance categorically prohibited in every bathroom?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A designer wants to install a gas-fired appliance in a bathroom. Is a gas appliance categorically prohibited in every bathroom?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8063-1"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8063-1"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8063-1"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8064-2",
+            "research-permitext_discovered-id:8070-3",
+            "research-permitext_discovered-id:8074-4",
+            "research-permitext_discovered-id:10286-5",
+            "research-permitext_discovered-id:8023-6",
+            "research-permitext_discovered-id:10957-7",
+            "research-permitext_discovered-id:8409-8",
+            "research-permitext_discovered-id:8635-9",
+            "research-permitext_discovered-id:8743-10",
+            "research-permitext_cross_reference-id:8065-1",
+            "research-permitext_cross_reference-id:8071-2",
+            "research-permitext_cross_reference-id:8066-4",
+            "research-permitext_cross_reference-id:8067-5",
+            "research-permitext_cross_reference-id:8068-6",
+            "research-permitext_cross_reference-id:8069-7"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:8063-1",
+              "label": "FGC 303.3 — 303.3 Prohibited locations.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:8063-1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8063-1"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:8063-1",
+              "label": "FGC 303.3 — 303.3 Prohibited locations.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:8063-1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:8063-1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:8063-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260902-generated-typography-v25",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:8063-1"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:8064-2",
+            "research-permitext_discovered-id:8070-3",
+            "research-permitext_discovered-id:8074-4",
+            "research-permitext_discovered-id:10286-5",
+            "research-permitext_discovered-id:8023-6",
+            "research-permitext_discovered-id:10957-7",
+            "research-permitext_discovered-id:8409-8",
+            "research-permitext_discovered-id:8635-9",
+            "research-permitext_discovered-id:8743-10",
+            "research-permitext_cross_reference-id:8065-1",
+            "research-permitext_cross_reference-id:8071-2",
+            "research-permitext_cross_reference-id:8066-4",
+            "research-permitext_cross_reference-id:8067-5",
+            "research-permitext_cross_reference-id:8068-6",
+            "research-permitext_cross_reference-id:8069-7"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 15,
+            "reviewedOnlyProvisionCount": 15,
+            "assembledSourceCount": 16,
+            "assembledProvisionCount": 16
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:8063-1",
+              "sectionID": "8063",
+              "reference": "FGC 303.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.3 303.3 Prohibited locations. Appliances shall not be located in sleeping rooms, bathrooms, toilet rooms, storage closets or surgical rooms, or in a space that opens only into such rooms or spaces. Exceptions: 1. In rooms other than those used for sleeping purposes, direct-vent appliances that obtain all combustion air directly from the outdoors and installed in accordance with the conditions of the listing and the manufacturer's instructions. 2. In rooms other than those used for sleeping purposes, vented room heaters, wall furnaces, vented decorative appliances, vented gas fireplaces, vented gas fireplace heaters and decorative appliances for installation in vented solid fuel-burning fireplaces that are installed in rooms that meet the required volume criteria of Section 304.5. 3. In rooms other than those used for sleeping purposes, appliances installed in an enclosure in which all combustion air is taken from the outdoors, in accordance with Section 304.6. Access to such enclosure shall be through a solid weather-stripped door, equipped with an approved self-closing device."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8064-2",
+              "sectionID": "8064",
+              "reference": "FGC 303.3.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.3.1 303.3.1 Gas-fired direct vent appliances. Gas-fired direct vent space-heating appliances used for providing heat in rooms for sleeping purposes shall be deemed to be located outside of the sleeping room provided that the appliance and its installation comply with Sections 303.3.1.1 through 303.3.1.7."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8070-3",
+              "sectionID": "8070",
+              "reference": "FGC 303.3.1.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.3.1.6 303.3.1.6 Installation. Gas-fired direct vented appliances shall be installed in accordance with the following: 1. Carbon monoxide detectors installed with gas-fired direct vent space-heating appliance shall be provided in addition to code required carbon monoxide detector devices in dwelling units. 2. Carbon monoxide detectors installed with gas-fired direct vent space-heating appliance shall not be interconnected to other carbon monoxide detecting devices in the dwelling unit. 3. The appliance shall only be installed by a master licensed plumber."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8074-4",
+              "sectionID": "8074",
+              "reference": "FGC 303.5.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.5.1 303.5.1 Gas fired appliances. Boilers, furnaces and other centrally installed space heating equipment, regardless of btu per hour input, shall be located in an enclosure in accordance with Section 509 of the New York City Building Code. Exception: Gas fired direct vented appliances with a 350,000 btu per hour (102.6 kW) input or less may be installed in a non-fire rated enclosure."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10286-5",
+              "sectionID": "10286",
+              "reference": "MC 301.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "301.6 301.6 Fuel gas appliances and equipment. The approval and installation of fuel gas distribution piping and equipment, fuel gas-fired appliances and fuel gas-fired appliance venting systems shall be in accordance with the New York City Fuel Gas Code."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8023-6",
+              "sectionID": "8023",
+              "reference": "FGC 301.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "301.1.1 301.1.1 Other fuels. The requirements for combustion and dilution air for gas-fired appliances shall be governed by Section 304 . The requirements for combustion and dilution air for appliances operating with fuels other than fuel gas shall be regulated by the New York City Mechanical Code."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10957-7",
+              "sectionID": "10957",
+              "reference": "MC 801.2.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "801.2.5 801.2.5 Gas fired appliances. Gas fired appliances shall be vented in accordance with the New York City Fuel Gas Code."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8409-8",
+              "sectionID": "8409",
+              "reference": "FGC 501.2.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "501.2.2 501.2.2 Outlets. The outlet shall be arranged so that the flue gases are not directed so that they jeopardize people, overheat combustible structures, or enter building openings in the vicinity of the outlet. Gas-fired appliances shall be vented in accordance with this code and NFPA 54."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8635-9",
+              "sectionID": "8635",
+              "reference": "FGC 601.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "601.1 601.1 Scope. This chapter shall govern the approval, design, installation, construction, maintenance, alteration and repair of the appliances and equipment specifically identified herein. The approval, design, installation, construction, maintenance, alteration and repair of non gas-fired appliances shall be regulated by the New York City Mechanical Code."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8743-10",
+              "sectionID": "8743",
+              "reference": "FGC 627.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "627.1 627.1 General. Gas-fired air-conditioning appliances shall be tested in accordance with ANSI Z21.40.1/CGA 2.91 or ANSI Z21.40.2/CGA 2.92 and shall be installed in accordance with the manufacturer's instructions."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8065-1",
+              "sectionID": "8065",
+              "reference": "FGC 303.3.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.3.1.1 303.3.1.1 General. Such unit is factory assembled and manufactured with an integral, factory assembled and hard-wired carbon monoxide detector interlock and automatic main gas shut-off valve. The appliance shall be tested, designed and evaluated in accordance with Section 622 of this code. Acceptable gas-fired direct vent space-heating appliances shall be listed and labeled by an approved agency in accordance with Section 28-113.2.3 of the Administrative Code . Installation shall be in accordance with the manufacturer's instructions and the applicable listing."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8071-2",
+              "sectionID": "8071",
+              "reference": "FGC 303.3.1.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.3.1.7 303.3.1.7 Clearances. Gas-fired direct vented appliances shall be installed with the following clearances: 1. Clearances from adjacent combustible surfaces shall meet the minimum clearances indicated by the manufacturer's instructions and the listing agency. 2. Clearances from adjacent openings or packaged terminal air conditioners (PTAC) and packaged terminal heat pumps (PTHP), the bottom of the vent terminal and the air intake shall be located at least 12 inches (304.8 mm) above finished ground level and in accordance with Table 303.3.1.7 . 3. For all other equipment, all vent termination clearances from adjacent openings shall be in accordance with Section 503.8. Table 303.3.1.7 PTAC and PTHP Vent Termination Clearance to Air Openings Appliance Input Rating (BTU per hour) Vent Termination Clearance to Any Air Opening Into Same or Adjacent Building (inches) 10,000 or less 6 Over 10,000 but less than 50,000 9 50,000 or over 12 For SI: 1 inch = 25.4 mm, 1 British thermal unit per hour = 0.2931 W."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8066-4",
+              "sectionID": "8066",
+              "reference": "FGC 303.3.1.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.3.1.2 303.3.1.2 Carbon monoxide detector. The carbon monoxide detector shall be listed and labeled in accordance with UL 2034 and UL 2075 and installed in accordance with the carbon monoxide detector manufacturer's instructions. The carbon monoxide detector may be installed integral to the appliance, on the surface of the appliance or remotely, but hard-wired, no more than 5 feet (1.5 m) from the appliance."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8067-5",
+              "sectionID": "8067",
+              "reference": "FGC 303.3.1.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.3.1.3 303.3.1.3 Internal safety controls. The appliance shall be hard-wired to the carbon monoxide detector in a supervisory signaling mode. If the carbon monoxide detector connection is not sensed, the appliance shall not initiate a startup sequence and shall alert the operator to the fault condition. The appliance shall be supplied with a carbon monoxide fault indicator easily visible and recognizable to the operator. The appliance shall be equipped with a manual restart control. Automatic reset is not permitted."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8068-6",
+              "sectionID": "8068",
+              "reference": "FGC 303.3.1.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.3.1.4 303.3.1.4 Gas piping. The appliance shall be installed with natural gas only. All gas piping shall be hard-piped with no flexible connectors. Pursuant to Section 27-2034 (f) of the New York City Housing Maintenance Code , each heater shall be equipped with an effective device to automatically shut off the gas supply to the heater if its pilot light or other constantly burning flame is extinguished, or in the event of an interruption of the gas supply to the heater, and will not permit the heater to be relighted unless such shut-off device is first reset manually."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8069-7",
+              "sectionID": "8069",
+              "reference": "FGC 303.3.1.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.3.1.5 303.3.1.5 Venting. Such unit shall be of direct vent type, such that all air for combustion is derived from the outdoors and that all flue gases are discharged directly to the outdoors. Such unit shall be installed through a sleeve located in an exterior wall."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260831-zoning-canonical-source-output-table-legend-v17",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-table-context-integrity-v25",
+          "retrievalQuery": "A designer wants to install a gas-fired appliance in a bathroom. Is a gas appliance categorically prohibited in every bathroom?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A designer wants to install a gas-fired appliance in a bathroom. Is a gas appliance categorically prohibited in every bathroom?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A designer wants to install a gas-fired appliance in a bathroom. Is a gas appliance categorically prohibited in every bathroom?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "A designer wants to install a gas-fired appliance in a bathroom. Is a gas appliance categorically prohibited in every bathroom?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": true,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 7301,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 6,
+            "topicDependencyCount": 0,
+            "characterCount": 7301,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-descendant-coverage-scope-v26",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T04:20:40.637Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-09-08T04:20:40.637Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "durationMilliseconds": 12613,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "a30c6d80-387b-4750-aa99-f522b97b62b4",
+          "createdAt": "2026-09-08T04:20:40.584Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 19076,
+          "cachedInputTokens": 0,
+          "outputTokens": 822,
+          "totalTokens": 19898,
+          "estimatedCostUSD": 0.032621,
+          "actualProviderCostUSD": 0.032621,
+          "conservativeProviderCostUSD": 0.073502,
+          "durationMilliseconds": 12579,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ]
+    },
+    {
+      "id": "CC-03",
+      "question": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+      "status": "completed",
+      "startedAt": "2026-09-08T04:20:53.769Z",
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:conversational-v4",
+        "evidenceVersion": "20260908-table-context-integrity-v25:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-prior-code-technical-scope-v5",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T04:20:53.783Z"
+        },
+        "answerText": "**No—if the room is an assembly-purpose space that is accessory to the apartment building’s principal occupancy, it need not be classified as Group A-3.** A 900-net-square-foot room arranged with tables and chairs has an Assembly unconcentrated (tables and chairs) occupant load of 900 ÷ 15 = **60 occupants**. Because that is fewer than 75, BC 303.1.3 classifies an accessory assembly room as Group B or as part of the occupancy it serves; it nevertheless permits plumbing fixtures for that room to be calculated under the Assembly requirements. (BC §§ 1004.1.3, 303.1.3.)\n\nThe residents-only restriction does not by itself establish the required legal accessory relationship, and tables and chairs alone do not establish the room’s complete intended function. BC 303.4 covers assembly uses intended for worship, recreation, amusement, and other assembly uses not otherwise classified in Group A; classification must follow the actual intended use. If the room will be used for different purposes at different times, it must comply with the requirements applicable to each purpose. (BC §§ 303.4, 302.1.)\n\nThe separate under-75 rule in BC 303.1.2 applies to a **building or nonaccessory tenant space** used for assembly purposes; the supplied facts do not establish that this room is a nonaccessory tenant space. Confirmation of the room’s actual programmed uses and its accessory relationship to the principal occupancy is needed for final classification reliance.",
+        "conclusion": "**No—if the room is an assembly-purpose space that is accessory to the apartment building’s principal occupancy, it need not be classified as Group A-3.** A 900-net-square-foot room arranged with tables and chairs has an Assembly unconcentrated (tables and chairs) occupant load of 900 ÷ 15 = **60 occupants**. Because that is fewer than 75, BC 303.1.3 classifies an accessory assembly room as Group B or as part of the occupancy it serves; it nevertheless permits plumbing fixtures for that room to be calculated under the Assembly requirements. (BC §§ 1004.1.3, 303.1.3.)",
+        "supportedPoints": [
+          {
+            "heading": "Accessory assembly space below 75 occupants",
+            "explanation": "A room or space used for assembly purposes, with an occupant load of fewer than 75 persons, and accessory to another occupancy must be classified as Group B or as part of that occupancy. Plumbing fixtures for that room or space may be calculated under the Assembly-occupancy requirements.",
+            "sectionID": "132",
+            "sourceIDs": [
+              "research-permitext_discovered-id:132-4"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Tables-and-chairs occupant-load factor",
+            "explanation": "Table 1004.1.3 assigns an occupant-load factor of 15 net square feet per occupant to Assembly space without fixed seats that is unconcentrated and arranged with tables and chairs.",
+            "sectionID": "2152",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2152-2"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "A-3 scope depends on intended assembly use",
+            "explanation": "Group A-3 includes assembly uses intended for worship, recreation, amusement, and other assembly uses not classified elsewhere in Group A. A room or space intended for different purposes at different times must comply with the requirements applicable to each purpose.",
+            "sectionID": "135",
+            "sourceIDs": [
+              "research-permitext_discovered-id:135-1"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Occupancy classification and nonaccessory tenant-space rule",
+            "explanation": "Structures or portions of structures must be classified by occupancy. Separately, a building or nonaccessory tenant space used for assembly purposes with fewer than 75 occupants is classified as Group B, with an Assembly-fixture calculation permitted. That rule is expressly limited to a building or nonaccessory tenant space.",
+            "sectionID": "128",
+            "sourceIDs": [
+              "research-permitext_discovered-id:128-3"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Under-75 rule for buildings and nonaccessory tenant spaces",
+            "explanation": "A building or nonaccessory tenant space used for assembly purposes with fewer than 75 occupants is classified as Group B; its plumbing fixtures may be calculated under Assembly requirements.",
+            "sectionID": "131",
+            "sourceIDs": [
+              "research-permitext_discovered-id:131-5"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "The residents-only restriction does not by itself establish the required legal accessory relationship, and tables and chairs alone do not establish the room’s complete intended function. BC 303.4 covers assembly uses intended for worship, recreation, amusement, and other assembly uses not otherwise classified in Group A; classification must follow the actual intended use. If the room will be used for different purposes at different times, it must comply with the requirements applicable to each purpose. (BC §§ 303.4, 302.1.)\n\nThe separate under-75 rule in BC 303.1.2 applies to a **building or nonaccessory tenant space** used for assembly purposes; the supplied facts do not establish that this room is a nonaccessory tenant space. Confirmation of the room’s actual programmed uses and its accessory relationship to the principal occupancy is needed for final classification reliance.",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the room is legally accessory to the apartment building’s principal occupancy; resident-only use does not independently establish that relationship.",
+          "The room’s actual intended activities and all uses at different times, which determine whether it is used for assembly purposes and whether another occupancy classification applies."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The supplied enacted evidence establishes the under-75 accessory-assembly rule and the tables-and-chairs occupant-load factor, but does not define the complete intended program of this multipurpose room or establish its accessory status."
+        ],
+        "additionalEvidenceNeeded": [
+          "The programmed uses, operating restrictions, and approved occupancy/classification records or plans sufficient to verify the room’s intended use and accessory relationship."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "132",
+            "sectionNumber": "303.1.3",
+            "title": "303.1.3 Accessory assembly spaces.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:132-4"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:132-4",
+                "selectedText": "303.1.3 303.1.3 Accessory assembly spaces. A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies. Assembly occupancies shall include the following:",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the classification rule for an accessory assembly room with fewer than 75 occupants."
+          },
+          {
+            "sectionID": "2152",
+            "sectionNumber": "1004.1.3",
+            "title": "1004.1.3 Areas without fixed seating.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:2152-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:2152-2",
+                "selectedText": "Table 1004.1.3 Maximum Floor Area Allowances Per Occupant Function of Space Occupant Load Factor a Function of Space Occupant Load Factor a Accessory storage areas, mechanical equipment room 300 gross Agricultural building 300 gross Aircraft hangars 500 gross Assembly Gaming floors (keno, slots, etc.) Exhibit gallery and museum 11 gross 30 net Assembly with fixed seats See Section 1004.3 Assembly without fixed seats Concentrated (chairs only - not fixed) Dance floor Dance floor (ballroom) Standing space / waiting area Unconcentrated (tables and chairs) 7 net 5 net 10 net 5 net 15 net Bowling centers, allow 5 persons for each lane including 15 feet of runway, and for additional areas 7 net Business areas, including accessory areas on terraces and rooftops 100 gross b, d Courtrooms - other than fixed seating areas 40 net Day Care Age under 6 months Age 6 months - 2 years Age 2 years - 6 years Age above 6 years 50 net 40 net 30 net 50 net Dormitories 50 gross Educational Classroom area Shops and other vocational room areas Kindergarten, and pre-kindergarten 20 net 50 net 30 net Exercise rooms 50 gross Group H-5 Fabrication and manufacturing areas 200 gross Gymnasiums 15 net Industrial areas 100 gross Institutional areas Inpatient treatment areas Outpatient areas Sleeping areas 240 gross 100 gross 120 gross Kitchens, commercial 200 gross Library Reading rooms Stack area 50 net 100 gross Locker rooms 50 gross Mall buildings - covered and open See Section 402.8.2 Mercantile Areas on other floors Basement and grade floor areas Storage, stock, shipping areas 60 gross 30 gross 300 gross Parking garages 200 gross Passenger terminal Baggage claim Baggage handling Concourse Passenger terminal or platform Waiting area (Standing) Waiting areas (Seated) 20 gross 300 gross 100 gross 1.5 × C* 15 gross 5 net Residential Within dwelling units Rooftop and terrace accessory to Groups R-2 and R-3 Indoor residential amenity spaces accessory to Group R-2 (concentrated) e Indoor residential amenity spaces accessory to Group R-2 (unconcentrated) e 200 gross 200 gross b, c, d 15 net 50 net Skating rinks, swimming pools Rink and pool Decks 50 gross 15 gross Stages and platforms 15 net for performing area and 50 net remaining area Warehouses 500 gross C* - capacity of all passenger vehicles that can be unloaded simultaneously. For SI: 1 square foot = 0.0929 m 2 , 1 foot = 304.8 mm. a. Floor area in square feet per occupant. b. For the purposes of occupant load calculation, permanent fixtures and amenities such as shrubs, decorative pools, non-walkable paving surfaces, etc. may be deducted from the total floor area. c. A rooftop or terrace in Group R-2 or R-3 occupancies that is provided for the incidental, recreational use by the residential tenants residing in the same residential building. d. Where the maximum occupant load of the rooftop or terrace exceeds 74 persons based on occupant load calculations, a Place of Assembly Certificate of Operation is required pursuant to Section 28-117.1 of the Administrative Code and Item 1 of Section 303.7 of this code. e. To be used only when the occupant load for the function of the space is not listed elsewhere in Table 1004.1.3 .",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the 15-net-square-foot-per-occupant factor for unconcentrated Assembly space with tables and chairs."
+          },
+          {
+            "sectionID": "135",
+            "sectionNumber": "303.4",
+            "title": "303.4 Assembly Group A-3.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:135-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:135-1",
+                "selectedText": "303.4 303.4 Assembly Group A-3. Group A-3 occupancy includes assembly uses intended for worship, recreation or amusement and other assembly uses not classified elsewhere in Group A including, but not limited to: Amusement arcades Art galleries Bowling alleys Cafeterias for children up to and including the 12th grade Classrooms and instructional rooms with 75 persons or more; such rooms with fewer than 75 persons shall be classified as Group B or E Community halls Courtrooms Custodial care facilities with 75 or more persons, providing care to persons over the age of 2, where no more than four occupants are incapable of responding to an emergency situation without physical assistance from staff Dance studio or instruction (not including food or drink consumption) Exhibition halls Funeral parlors Gymnasiums (without spectator seating) Indoor swimming pools (without spectator seating) Indoor tennis courts (without spectator seating) Lecture halls Museums Places of religious worship (Houses of worship) Pool and billiard parlors School auditoriums Waiting areas in transportation terminals",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the stated scope of Group A-3 assembly uses."
+          },
+          {
+            "sectionID": "128",
+            "sectionNumber": "302.1",
+            "title": "302.1 General.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:128-3"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:128-3",
+                "selectedText": "302.1 302.1 General. Structures or portions of structures shall be classified with respect to occupancy in one or more of the groups listed below. A room or space that is intended to be occupied at different times for different purposes shall comply with all of the requirements that are applicable to each of the purposes for which the room or space will be occupied. Structures with multiple occupancies or uses shall comply with Section 508 . Where a structure, or portion thereof, is proposed for a purpose that is not specifically provided for in this code, such structure, or portion thereof, shall be classified in the group that the occupancy most nearly resembles, according to the fire safety and relative hazard involved, and as approved by the commissioner. 1. Assembly (see Section 303) : Groups A-1, A-2, A-3, A-4 and A-5 2. Business (see Section 304 ): Group B 3. Educational (see Section 305 ): Group E 4. Factory and Industrial (see Section 306 ): Groups F-1 and F-2 5. High Hazard (see Section 307 ): Groups H-1, H-2, H-3, H-4 and H-5 6. Institutional (see Section 308 ): Groups I-1, I-2, I-3 and I-4 7. Mercantile (see Section 309 ): Group M 8. Residential (see Section 310 ): Groups R-1, R-2 and R-3 9. Storage (see Section 311) : Groups S-1 and S-2 10. Utility and Miscellaneous (see Section 312 ): Group U For a listing of occupancy group classifications that corresponds with uses listed in the New York City Zoning Resolution, refer to department rules. For a listing of occupancy group classifications that corresponds with uses listed in the New York City Zoning Resolution, refer to department rules. Section BC 303: Assembly Group A",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes general occupancy classification and the requirement to address each intended purpose of a multipurpose room."
+          },
+          {
+            "sectionID": "131",
+            "sectionNumber": "303.1.2",
+            "title": "303.1.2 Buildings and nonaccessory tenant spaces.",
+            "codePrefix": "BC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:131-5"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:131-5",
+                "selectedText": "303.1.2 303.1.2 Buildings and nonaccessory tenant spaces. A building or nonaccessory tenant space used for assembly purposes with an occupant load of fewer than 75 persons shall be classified as a Group B occupancy, except that the number of plumbing fixtures for such a building or space is permitted to be calculated in accordance with the requirements for assembly occupancies.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the separately limited under-75 rule for buildings and nonaccessory tenant spaces."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "135",
+          "2152",
+          "128",
+          "132",
+          "131",
+          "2068",
+          "9693",
+          "1777",
+          "179",
+          "478",
+          "113",
+          "8796",
+          "2156",
+          "1770",
+          "1778",
+          "1780",
+          "479",
+          "482"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:135-1",
+          "research-permitext_discovered-id:2152-2",
+          "research-permitext_discovered-id:128-3",
+          "research-permitext_discovered-id:132-4",
+          "research-permitext_discovered-id:131-5",
+          "research-permitext_discovered-id:2068-6",
+          "research-permitext_discovered-id:9693-7",
+          "research-permitext_discovered-id:1777-8",
+          "research-permitext_discovered-id:179-9",
+          "research-permitext_discovered-id:478-10",
+          "research-permitext_discovered-id:113-13",
+          "research-permitext_discovered-id:8796-14",
+          "research-permitext_cross_reference-id:2156-2",
+          "research-permitext_cross_reference-id:1770-4",
+          "research-permitext_cross_reference-id:1778-5",
+          "research-permitext_cross_reference-id:1780-6",
+          "research-permitext_cross_reference-id:479-9",
+          "research-permitext_cross_reference-id:482-10"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 18,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 5,
+          "governingCitationCount": 5,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 13,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 12,
+          "crossReferenceCount": 6,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 2,
+          "requiredClaimCount": 5,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "BC 303.4",
+              "summary": "BC 303.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:135-1"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2152-2"
+              ]
+            },
+            {
+              "label": "BC 302.1",
+              "summary": "BC 302.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:128-3"
+              ]
+            },
+            {
+              "label": "BC 303.1.3",
+              "summary": "BC 303.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:132-4"
+              ]
+            },
+            {
+              "label": "BC 303.1.2",
+              "summary": "BC 303.1.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:131-5"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "BC 303.4",
+              "summary": "BC 303.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:135-1"
+              ]
+            },
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2152-2"
+              ]
+            },
+            {
+              "label": "BC 302.1",
+              "summary": "BC 302.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:128-3"
+              ]
+            },
+            {
+              "label": "BC 303.1.3",
+              "summary": "BC 303.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:132-4"
+              ]
+            },
+            {
+              "label": "BC 303.1.2",
+              "summary": "BC 303.1.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:131-5"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "BC 907.2.9.1.1",
+              "summary": "BC 907.2.9.1.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:1778-5"
+              ]
+            },
+            {
+              "label": "BC 408.8.4",
+              "summary": "BC 408.8.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:482-10"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-13"
+              ]
+            },
+            {
+              "label": "AC 28-101.5",
+              "summary": "AC 28-101.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8796-14"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "BC 1004.3",
+              "summary": "BC 1004.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:2156-2"
+              ]
+            },
+            {
+              "label": "BC 907.2.8",
+              "summary": "BC 907.2.8 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:1770-4"
+              ]
+            },
+            {
+              "label": "BC 907.2.9.1.1",
+              "summary": "BC 907.2.9.1.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:1778-5"
+              ]
+            },
+            {
+              "label": "BC 907.2.9.2",
+              "summary": "BC 907.2.9.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:1780-6"
+              ]
+            },
+            {
+              "label": "BC 408.8.1",
+              "summary": "BC 408.8.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:479-9"
+              ]
+            },
+            {
+              "label": "BC 408.8.4",
+              "summary": "BC 408.8.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:482-10"
+              ]
+            }
+          ],
+          "tables": [
+            {
+              "label": "BC 1004.1.3",
+              "summary": "BC 1004.1.3 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:2152-2"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:135-1",
+            "research-permitext_discovered-id:2152-2",
+            "research-permitext_discovered-id:128-3",
+            "research-permitext_discovered-id:132-4",
+            "research-permitext_discovered-id:131-5",
+            "research-permitext_discovered-id:2068-6",
+            "research-permitext_discovered-id:9693-7",
+            "research-permitext_discovered-id:1777-8",
+            "research-permitext_discovered-id:179-9",
+            "research-permitext_discovered-id:478-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_discovered-id:8796-14",
+            "research-permitext_cross_reference-id:2156-2",
+            "research-permitext_cross_reference-id:1770-4",
+            "research-permitext_cross_reference-id:1778-5",
+            "research-permitext_cross_reference-id:1780-6",
+            "research-permitext_cross_reference-id:479-9",
+            "research-permitext_cross_reference-id:482-10"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 5,
+          "coveredClaimCount": 5,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:135-1",
+            "research-permitext_discovered-id:2152-2",
+            "research-permitext_discovered-id:128-3",
+            "research-permitext_discovered-id:132-4",
+            "research-permitext_discovered-id:131-5"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:132-4",
+            "research-permitext_discovered-id:2152-2",
+            "research-permitext_discovered-id:135-1",
+            "research-permitext_discovered-id:128-3",
+            "research-permitext_discovered-id:131-5"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:132-4",
+            "research-permitext_discovered-id:2152-2",
+            "research-permitext_discovered-id:135-1",
+            "research-permitext_discovered-id:128-3",
+            "research-permitext_discovered-id:131-5"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:2068-6",
+            "research-permitext_discovered-id:9693-7",
+            "research-permitext_discovered-id:1777-8",
+            "research-permitext_discovered-id:179-9",
+            "research-permitext_discovered-id:478-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_discovered-id:8796-14",
+            "research-permitext_cross_reference-id:2156-2",
+            "research-permitext_cross_reference-id:1770-4",
+            "research-permitext_cross_reference-id:1778-5",
+            "research-permitext_cross_reference-id:1780-6",
+            "research-permitext_cross_reference-id:479-9",
+            "research-permitext_cross_reference-id:482-10"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:135-1",
+              "label": "BC 303.4 — 303.4 Assembly Group A-3.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:135-1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:2152-2",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2152-2"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:128-3",
+              "label": "BC 302.1 — 302.1 General.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:128-3"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:132-4",
+              "label": "BC 303.1.3 — 303.1.3 Accessory assembly spaces.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:132-4"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:131-5",
+              "label": "BC 303.1.2 — 303.1.2 Buildings and nonaccessory tenant spaces.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:131-5"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 5,
+          "coveredClaimCount": 5,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:132-4",
+            "research-permitext_discovered-id:2152-2",
+            "research-permitext_discovered-id:135-1",
+            "research-permitext_discovered-id:128-3",
+            "research-permitext_discovered-id:131-5"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:135-1",
+              "label": "BC 303.4 — 303.4 Assembly Group A-3.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:135-1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:135-1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:132-4"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:135-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2152-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:135-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:135-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:128-3"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:135-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:131-5"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:135-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:2152-2",
+              "label": "BC 1004.1.3 — 1004.1.3 Areas without fixed seating.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:2152-2"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:2152-2"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:132-4"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:2152-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2152-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:135-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:2152-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:128-3"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:2152-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:131-5"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:2152-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:128-3",
+              "label": "BC 302.1 — 302.1 General.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 3,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:128-3"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:128-3"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 3,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:132-4"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:128-3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2152-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:128-3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:135-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:128-3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:128-3"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:131-5"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:128-3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:132-4",
+              "label": "BC 303.1.3 — 303.1.3 Accessory assembly spaces.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:132-4"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:132-4"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:132-4"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2152-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:132-4"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:135-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:132-4"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:128-3"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:132-4"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:131-5"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:132-4"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:131-5",
+              "label": "BC 303.1.2 — 303.1.2 Buildings and nonaccessory tenant spaces.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 4,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:131-5"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:131-5"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 4,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:132-4"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:131-5"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:2152-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:131-5"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:135-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:131-5"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:128-3"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:131-5"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:131-5"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260902-generated-typography-v25",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:132-4",
+            "research-permitext_discovered-id:2152-2",
+            "research-permitext_discovered-id:135-1",
+            "research-permitext_discovered-id:128-3",
+            "research-permitext_discovered-id:131-5"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:2068-6",
+            "research-permitext_discovered-id:9693-7",
+            "research-permitext_discovered-id:1777-8",
+            "research-permitext_discovered-id:179-9",
+            "research-permitext_discovered-id:478-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_discovered-id:8796-14",
+            "research-permitext_cross_reference-id:2156-2",
+            "research-permitext_cross_reference-id:1770-4",
+            "research-permitext_cross_reference-id:1778-5",
+            "research-permitext_cross_reference-id:1780-6",
+            "research-permitext_cross_reference-id:479-9",
+            "research-permitext_cross_reference-id:482-10"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 5,
+            "citedProvisionCount": 5,
+            "governingCitationCount": 5,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 13,
+            "reviewedOnlyProvisionCount": 13,
+            "assembledSourceCount": 18,
+            "assembledProvisionCount": 18
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:135-1",
+              "sectionID": "135",
+              "reference": "BC 303.4",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.4 303.4 Assembly Group A-3. Group A-3 occupancy includes assembly uses intended for worship, recreation or amusement and other assembly uses not classified elsewhere in Group A including, but not limited to: Amusement arcades Art galleries Bowling alleys Cafeterias for children up to and including the 12th grade Classrooms and instructional rooms with 75 persons or more; such rooms with fewer than 75 persons shall be classified as Group B or E Community halls Courtrooms Custodial care facilities with 75 or more persons, providing care to persons over the age of 2, where no more than four occupants are incapable of responding to an emergency situation without physical assistance from staff Dance studio or instruction (not including food or drink consumption) Exhibition halls Funeral parlors Gymnasiums (without spectator seating) Indoor swimming pools (without spectator seating) Indoor tennis courts (without spectator seating) Lecture halls Museums Places of religious worship (Houses of worship) Pool and billiard parlors School auditoriums Waiting areas in transportation terminals"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2152-2",
+              "sectionID": "2152",
+              "reference": "BC 1004.1.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "Table 1004.1.3 Maximum Floor Area Allowances Per Occupant Function of Space Occupant Load Factor a Function of Space Occupant Load Factor a Accessory storage areas, mechanical equipment room 300 gross Agricultural building 300 gross Aircraft hangars 500 gross Assembly Gaming floors (keno, slots, etc.) Exhibit gallery and museum 11 gross 30 net Assembly with fixed seats See Section 1004.3 Assembly without fixed seats Concentrated (chairs only - not fixed) Dance floor Dance floor (ballroom) Standing space / waiting area Unconcentrated (tables and chairs) 7 net 5 net 10 net 5 net 15 net Bowling centers, allow 5 persons for each lane including 15 feet of runway, and for additional areas 7 net Business areas, including accessory areas on terraces and rooftops 100 gross b, d Courtrooms - other than fixed seating areas 40 net Day Care Age under 6 months Age 6 months - 2 years Age 2 years - 6 years Age above 6 years 50 net 40 net 30 net 50 net Dormitories 50 gross Educational Classroom area Shops and other vocational room areas Kindergarten, and pre-kindergarten 20 net 50 net 30 net Exercise rooms 50 gross Group H-5 Fabrication and manufacturing areas 200 gross Gymnasiums 15 net Industrial areas 100 gross Institutional areas Inpatient treatment areas Outpatient areas Sleeping areas 240 gross 100 gross 120 gross Kitchens, commercial 200 gross Library Reading rooms Stack area 50 net 100 gross Locker rooms 50 gross Mall buildings - covered and open See Section 402.8.2 Mercantile Areas on other floors Basement and grade floor areas Storage, stock, shipping areas 60 gross 30 gross 300 gross Parking garages 200 gross Passenger terminal Baggage claim Baggage handling Concourse Passenger terminal or platform Waiting area (Standing) Waiting areas (Seated) 20 gross 300 gross 100 gross 1.5 × C* 15 gross 5 net Residential Within dwelling units Rooftop and terrace accessory to Groups R-2 and R-3 Indoor residential amenity spaces accessory to Group R-2 (concentrated) e Indoor residential amenity spaces accessory to Group R-2 (unconcentrated) e 200 gross 200 gross b, c, d 15 net 50 net Skating rinks, swimming pools Rink and pool Decks 50 gross 15 gross Stages and platforms 15 net for performing area and 50 net remaining area Warehouses 500 gross C* - capacity of all passenger vehicles that can be unloaded simultaneously. For SI: 1 square foot = 0.0929 m 2 , 1 foot = 304.8 mm. a. Floor area in square feet per occupant. b. For the purposes of occupant load calculation, permanent fixtures and amenities such as shrubs, decorative pools, non-walkable paving surfaces, etc. may be deducted from the total floor area. c. A rooftop or terrace in Group R-2 or R-3 occupancies that is provided for the incidental, recreational use by the residential tenants residing in the same residential building. d. Where the maximum occupant load of the rooftop or terrace exceeds 74 persons based on occupant load calculations, a Place of Assembly Certificate of Operation is required pursuant to Section 28-117.1 of the Administrative Code and Item 1 of Section 303.7 of this code. e. To be used only when the occupant load for the function of the space is not listed elsewhere in Table 1004.1.3 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:128-3",
+              "sectionID": "128",
+              "reference": "BC 302.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "302.1 302.1 General. Structures or portions of structures shall be classified with respect to occupancy in one or more of the groups listed below. A room or space that is intended to be occupied at different times for different purposes shall comply with all of the requirements that are applicable to each of the purposes for which the room or space will be occupied. Structures with multiple occupancies or uses shall comply with Section 508 . Where a structure, or portion thereof, is proposed for a purpose that is not specifically provided for in this code, such structure, or portion thereof, shall be classified in the group that the occupancy most nearly resembles, according to the fire safety and relative hazard involved, and as approved by the commissioner. 1. Assembly (see Section 303) : Groups A-1, A-2, A-3, A-4 and A-5 2. Business (see Section 304 ): Group B 3. Educational (see Section 305 ): Group E 4. Factory and Industrial (see Section 306 ): Groups F-1 and F-2 5. High Hazard (see Section 307 ): Groups H-1, H-2, H-3, H-4 and H-5 6. Institutional (see Section 308 ): Groups I-1, I-2, I-3 and I-4 7. Mercantile (see Section 309 ): Group M 8. Residential (see Section 310 ): Groups R-1, R-2 and R-3 9. Storage (see Section 311) : Groups S-1 and S-2 10. Utility and Miscellaneous (see Section 312 ): Group U For a listing of occupancy group classifications that corresponds with uses listed in the New York City Zoning Resolution, refer to department rules. For a listing of occupancy group classifications that corresponds with uses listed in the New York City Zoning Resolution, refer to department rules. Section BC 303: Assembly Group A"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:132-4",
+              "sectionID": "132",
+              "reference": "BC 303.1.3",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.1.3 303.1.3 Accessory assembly spaces. A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies. Assembly occupancies shall include the following:"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:131-5",
+              "sectionID": "131",
+              "reference": "BC 303.1.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "303.1.2 303.1.2 Buildings and nonaccessory tenant spaces. A building or nonaccessory tenant space used for assembly purposes with an occupant load of fewer than 75 persons shall be classified as a Group B occupancy, except that the number of plumbing fixtures for such a building or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:2068-6",
+              "sectionID": "2068",
+              "reference": "BC 915.1.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "915.1.2 915.1.2 Buildings that are equipped with a fire alarm system and that contain Group A-1, A-2, A-3, Group B or Group M occupancies. Listed carbon monoxide detectors shall be installed in buildings that are equipped with a fire alarm system and that contain Group A-1, A-2 or A-3, Group B or Group M occupancies. Such carbon monoxide detectors installed pursuant to this section shall have built-in sounder bases, shall transmit a carbon monoxide alarm signal to a central supervising station and shall be permitted to initiate an audible and visual supervisory signal at a constantly attended location. The department shall adopt rules and/or reference standards governing the installation and location of carbon monoxide detectors provided such detectors shall be required within rooms containing carbon monoxide-producing equipment and addressing the installation of such detectors or any alternative means of compliance in existing buildings."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9693-7",
+              "sectionID": "9693",
+              "reference": "AC 28-315.11",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-315.11 § 28-315.11 Buildings that are equipped with a fire alarm system and that contain Group A-1, A-2, A-3, Group B or Group M occupancies. By July 1, 2021, existing buildings equipped with a fire alarm system and that contain group A-1, A-2 or A-3, Group B or Group M occupancies shall comply with the retroactive requirements of section 915.1.2.1 of the New York city building code. (L.L. 2018/191, 12/1/2018, eff. 8/28/2019; L.L. 2021/013, 1/17/2021, retro. eff. 1/1/2021; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:1777-8",
+              "sectionID": "1777",
+              "reference": "BC 907.2.9.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "907.2.9.1 907.2.9.1 Group R-2 student apartments. Where the main use or dominant occupancy of a building is classified as R-2 student apartments, as defined in Section 310.2, fire alarm systems shall be installed in accordance with Section 907.2.8. Where the main use or dominant occupancy of a building is not classified as R-2 student apartments and the building is occupied partially by Group R-2 student apartments, fire alarm systems shall be installed in accordance with Sections 907.2.9.1.1 through 907.2.9.2."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:179-9",
+              "sectionID": "179",
+              "reference": "BC 310.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "310.4 310.4 Residential Group R-2. Residential Group R-2 occupancies shall include buildings or portions thereof containing sleeping units or more than two dwelling units that are occupied for permanent residence purposes as defined in subparagraph (a) of paragraph 8 of subdivision a of Section 27-2004 of the New York City Housing Maintenance Code . Such occupancy shall be subject to the New York State Multiple Dwelling Law . This group shall include, but not be limited to, the following: Adult homes or enriched housing with 16 or fewer occupants requiring supervised care on a 24-hour basis in the same building, provided that the number of occupants per dwelling unit does not exceed the definition of a family Apartment houses Apartment hotels (nontransient) Class A multiple dwellings as defined in Section 27-2004 of the New York City Housing Maintenance Code and Section 4 of the New York State Multiple Dwelling Law , where not classified in Group I, including the following: 1. Dwelling units where the resident of the unit provides custodial care to no more than four persons on less than a 24-hour basis and not overnight, where not classified in Group I. 2. Dwelling units where the resident of the unit provides child custodial care as a family day care home registered with the New York City Department of Health and Mental Hygiene in accordance with the New York State Social Services Law , with no more than six children between the ages of 2 and 13, or with no more than five children if any are under the age of 2, receiving supervised care on less than a 24-hour basis and not overnight, where not classified in Group I. Convents and monasteries with more than 20 occupants in the building Student apartments (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:478-10",
+              "sectionID": "478",
+              "reference": "BC 408.8",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "408.8 408.8 Subdivision of resident housing areas. Sleeping areas and any contiguous day room, group activity space or other common spaces where residents are housed shall be separated from other spaces in accordance with Sections 408.8.1 through 408.8.4."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-13",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ALARM SIGNAL. A signal indicating an emergency requiring immediate action, such as a signal indicative of fire. CARBON MONOXIDE ALARM. A listed single- or multiple-station alarm responsive to carbon monoxide. CARBON MONOXIDE DETECTOR. A listed device that senses carbon monoxide. CARBON MONOXIDE-PRODUCING EQUIPMENT. Any furnace, boiler, water heater, fireplace, cooking appliance, gas clothes dryer, apparatus, appliance or device that burns coal, kerosene, oil, wood, fuel gases and other petroleum products including, but not limited to, methane, natural gas, liquefied natural gas and manufactured fuel gases. CONSTANTLY ATTENDED LOCATION. A designated location at a facility staffed by trained personnel on a continuous basis where alarm or supervisory signals are monitored and facilities are provided for notification of the Fire Department of other emergency services. CUSTODIAL CARE FACILITY. A building or part thereof occupied by persons, on less than a 24-hour basis and not overnight, who because of age, disability or other reasons, receive personal care services by individuals other than parents or guardians, relatives by blood, marriage, domestic partnership, or adoption, in a place other than the home of the person cared for. OCCUPANT LOAD . The number of persons for which the means of egress of a building or portion thereof is designed . PARKING GARAGE. A structure or portion of a structure, other than a private garage or carport, used for the parking or storage of motor vehicles."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8796-14",
+              "sectionID": "8796",
+              "reference": "AC 28-101.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ADMINISTRATIVE CODE. The administrative code of the city of New York. CITY. The city of New York. COMMISSIONER. The commissioner of buildings of the city of New York, or his or her duly authorized representative. DEPARTMENT. The department of buildings of the city of New York. MAIN USE OR DOMINANT OCCUPANCY (OF A BUILDING). Refers to a single occupancy classification assigned to a structure by the department according to such structure's main use or dominant occupancy. PERSON. An individual, partnership, corporation, or other legal entity. REQUIRED. Shall mean required by the provisions of this code. ZONING RESOLUTION. The zoning resolution of the city of New York, adopted December fifteenth, nineteen hundred sixty-one, including all amendments thereto. (Am. L.L. 2021/006, 1/10/2021, eff. 5/10/2021; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022; Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023; Am. L.L. 2023/126, 9/3/2023, eff. 3/1/2024; Am. L.L. 2024/128, 12/21/2024, eff. 12/21/2025) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 , L.L. 2021/126 , L.L. 2023/077 , and L.L. 2024/128 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:2156-2",
+              "sectionID": "2156",
+              "reference": "BC 1004.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1004.3 1004.3 Fixed seating. For areas having fixed seats and aisles, the occupant load shall be determined by the number of fixed seats installed therein. The occupant load for areas in which fixed seating is not installed, such as waiting spaces, shall be determined in accordance with Section 1004.1.3 and added to the number of fixed seats. The occupant load of wheelchair spaces and the associated companion seat shall be based on one occupant for each wheelchair space and one occupant for the associated companion seat provided in accordance with Section 1108.2.3. For areas having fixed seating without dividing arms, the occupant load shall be not less than the number of seats based on one person for each 18 inches (457.2 mm) of seating length. The occupant load of seating booths shall be based on one person for each 24 inches (609.6 mm) of booth seat length measured at the backrest of the seating booth."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:1770-4",
+              "sectionID": "1770",
+              "reference": "BC 907.2.8",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "907.2.8 907.2.8 Group R-1. Fire alarm systems shall be installed in Group R-1 occupancies as required in Sections 907.2.8.1 through 907.2.8.5."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:1778-5",
+              "sectionID": "1778",
+              "reference": "BC 907.2.9.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "907.2.9.1.1 907.2.9.1.1 Manual fire alarm system. A manual fire alarm system shall be installed throughout all public corridors serving student apartments and student-related uses. Student-related uses shall include common spaces such as recreation rooms, lounges, dining rooms, laundry rooms and storage rooms. Exceptions: 1. A manual fire alarm system is not required in buildings not over two stories in height where all individual dwelling units and contiguous attic and crawl spaces are separated from each other and public or common areas by at least 1-hour fire partitions and each individual dwelling unit has an exit directly to a public way, exit court or yard. 2. A manual fire alarm system is not required in buildings containing fewer than 15 student apartments."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:1780-6",
+              "sectionID": "1780",
+              "reference": "BC 907.2.9.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "907.2.9.2 907.2.9.2 Smoke alarms. Single- and multiple-station smoke alarms shall be installed in accordance with Section 907.2.11."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:479-9",
+              "sectionID": "479",
+              "reference": "BC 408.8.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "408.8.1 408.8.1 Occupancy Conditions 3 and 4. Each sleeping area in Occupancy Conditions 3 and 4 shall be separated from the adjacent common spaces by a smoke-tight partition where the distance of travel from the sleeping area through the common space to the corridor exceeds 50 feet (15 240 mm)."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:482-10",
+              "sectionID": "482",
+              "reference": "BC 408.8.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "408.8.4 408.8.4 Smoke-tight doors. Doors in openings in partitions required to be smoke tight by Section 408.8 shall be substantial doors, of construction that will resist the passage of smoke. Latches and door closures are not required on cell doors."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260831-zoning-canonical-source-output-table-legend-v17",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-table-context-integrity-v25",
+          "retrievalQuery": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 16163,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 2,
+            "crossReferenceCount": 6,
+            "topicDependencyCount": 0,
+            "characterCount": 16163,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 2,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-descendant-coverage-scope-v26",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-prior-code-technical-scope-v5",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T04:20:53.783Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-09-08T04:20:53.783Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "multiple_required_claims",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      },
+      "durationMilliseconds": 25458,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "a1840aa9-7157-49a4-b324-9052606e4d89",
+          "createdAt": "2026-09-08T04:20:53.782Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 29403,
+          "cachedInputTokens": 2490,
+          "outputTokens": 2188,
+          "totalTokens": 31591,
+          "estimatedCostUSD": 0.055877,
+          "actualProviderCostUSD": 0.055877,
+          "conservativeProviderCostUSD": 0.120367,
+          "durationMilliseconds": 25411,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ]
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "FGC-02",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_code_interpretation",
+      "requestBytes": 54107,
+      "maxOutputTokens": 3000,
+      "startedAt": "2026-09-08T04:20:41.804Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 8658,
+      "usage": {
+        "input_tokens": 11531,
+        "input_tokens_details": {
+          "cache_write_tokens": 11528,
+          "cached_tokens": 0
+        },
+        "output_tokens": 654,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12185
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0f2d743b00121d40016a9f8d1acd4887d2a4aa38291d431351",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"No. A gas appliance is generally prohibited in a bathroom, but FGC § 303.3 provides limited exceptions for rooms not used for sleeping. A bathroom installation can qualify only if it fits one of those exceptions: (1) a direct-vent appliance that takes all combustion air directly from outdoors and is installed per its listing and manufacturer’s instructions; (2) specified vented heaters, fireplaces, and decorative appliances in a room meeting the Section 304.5 volume criteria; or (3) an appliance in an enclosure taking all combustion air from outdoors under Section 304.6, with access through a solid, weather-stripped, approved self-closing door (FGC § 303.3).\\n\\nAccordingly, the proposed appliance is not permissible merely because it is gas-fired or vented; its appliance type, combustion-air arrangement, listing/instructions, and—depending on the chosen exception—the room-volume or enclosure conditions must establish an applicable exception. The supplied evidence does not establish compliance with the Section 304.5 or 304.6 cross-referenced conditions.\",\"supportedPoints\":[{\"heading\":\"Bathroom-location prohibition and exceptions\",\"explanation\":\"Appliances shall not be located in bathrooms. The prohibition has three exceptions, each limited to rooms not used for sleeping: qualifying direct-vent appliances with all combustion air directly from outdoors and installation consistent with listing and manufacturer instructions; specified vented appliances in rooms meeting Section 304.5 volume criteria; and appliances in a qualifying outdoor-combustion-air enclosure with the prescribed solid, weather-stripped, approved self-closing access door.\",\"sectionID\":\"8063\",\"sourceIDs\":[\"research-permitext_discovered-id:8063-1\"]}],\"assumptions\":[],\"missingFacts\":[\"The proposed appliance type and whether it is a direct-vent appliance obtaining all combustion air directly from outdoors.\",\"The appliance listing and manufacturer’s installation instructions applicable to the proposed bathroom installation.\",\"If relying on the specified vented-appliance exception: whether the appliance is one of the listed appliance types and the room-volume information needed to evaluate FGC Section 304.5.\",\"If relying on the enclosure exception: the enclosure combustion-air arrangement and whether its access door is solid, weather-stripped, and equipped with an approved self-closing device under FGC Section 304.6.\"],\"followUpQuestions\":[],\"evidenceLimitations\":[\"The supplied enacted evidence establishes the bathroom prohibition and the text of FGC § 303.3 exceptions, but does not include the requirements of the cross-referenced FGC §§ 304.5 and 304.6 needed to evaluate those exception paths.\"],\"additionalEvidenceNeeded\":[\"The applicable enacted text of FGC §§ 304.5 and 304.6 if the design relies on the room-volume or enclosure exception.\",\"Product listing documentation and manufacturer installation instructions for the proposed appliance.\"],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"8063\",\"sourceIDs\":[\"research-permitext_discovered-id:8063-1\"],\"relevance\":\"Controlling current-enacted NYC Fuel Gas Code provision prohibiting appliance locations in bathrooms and stating the limited exceptions.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "FGC-02",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_research_verification",
+      "requestBytes": 36876,
+      "maxOutputTokens": 4000,
+      "startedAt": "2026-09-08T04:20:50.489Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 2637,
+      "usage": {
+        "input_tokens": 7545,
+        "input_tokens_details": {
+          "cache_write_tokens": 7542,
+          "cached_tokens": 0
+        },
+        "output_tokens": 168,
+        "output_tokens_details": {
+          "reasoning_tokens": 146
+        },
+        "total_tokens": 7713
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_096d0ba85e416d07016a9f8d24f6dc87d2a891aa192385b6a1",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "CC-03",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_code_interpretation",
+      "requestBytes": 75336,
+      "maxOutputTokens": 3000,
+      "startedAt": "2026-09-08T04:20:54.493Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 18118,
+      "usage": {
+        "input_tokens": 16666,
+        "input_tokens_details": {
+          "cache_write_tokens": 16663,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1650,
+        "output_tokens_details": {
+          "reasoning_tokens": 507
+        },
+        "total_tokens": 18316
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0145ef1d65b91499016a9f8d2e47e087d2939bc39109bfefa3",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No—if the room is an assembly-purpose space that is accessory to the apartment building’s principal occupancy, it need not be classified as Group A-3.** A 900-net-square-foot room arranged with tables and chairs has an Assembly “unconcentrated (tables and chairs)” occupant load of 900 ÷ 15 = **60 occupants**. Because that is fewer than 75, BC 303.1.3 classifies an accessory assembly room as Group B or as part of the occupancy it serves; it nevertheless permits plumbing fixtures for that room to be calculated under the Assembly requirements. (BC §§ 1004.1.3, 303.1.3.)\\n\\nThe residents-only restriction does not by itself establish the required legal accessory relationship, and tables and chairs alone do not establish the room’s complete intended function. BC 303.4 covers assembly uses intended for worship, recreation, amusement, and other assembly uses not otherwise classified in Group A; classification must follow the actual intended use. If the room will be used for different purposes at different times, it must comply with the requirements applicable to each purpose. (BC §§ 303.4, 302.1.)\\n\\nThe separate under-75 rule in BC 303.1.2 applies to a **building or nonaccessory tenant space** used for assembly purposes; the supplied facts do not establish that this room is a nonaccessory tenant space. Confirmation of the room’s actual programmed uses and its accessory relationship to the principal occupancy is needed for final classification reliance.\",\"supportedPoints\":[{\"heading\":\"Accessory assembly space below 75 occupants\",\"explanation\":\"A room or space used for assembly purposes, with an occupant load of fewer than 75 persons, and accessory to another occupancy must be classified as Group B or as part of that occupancy. Plumbing fixtures for that room or space may be calculated under the Assembly-occupancy requirements.\",\"sectionID\":\"132\",\"sourceIDs\":[\"research-permitext_discovered-id:132-4\"]},{\"heading\":\"Tables-and-chairs occupant-load factor\",\"explanation\":\"Table 1004.1.3 assigns an occupant-load factor of 15 net square feet per occupant to Assembly space without fixed seats that is unconcentrated and arranged with tables and chairs.\",\"sectionID\":\"2152\",\"sourceIDs\":[\"research-permitext_discovered-id:2152-2\"]},{\"heading\":\"A-3 scope depends on intended assembly use\",\"explanation\":\"Group A-3 includes assembly uses intended for worship, recreation, amusement, and other assembly uses not classified elsewhere in Group A. A room or space intended for different purposes at different times must comply with the requirements applicable to each purpose.\",\"sectionID\":\"135\",\"sourceIDs\":[\"research-permitext_discovered-id:135-1\"]},{\"heading\":\"Occupancy classification and nonaccessory tenant-space rule\",\"explanation\":\"Structures or portions of structures must be classified by occupancy. Separately, a building or nonaccessory tenant space used for assembly purposes with fewer than 75 occupants is classified as Group B, with an Assembly-fixture calculation permitted. That rule is expressly limited to a building or nonaccessory tenant space.\",\"sectionID\":\"128\",\"sourceIDs\":[\"research-permitext_discovered-id:128-3\"]},{\"heading\":\"Under-75 rule for buildings and nonaccessory tenant spaces\",\"explanation\":\"A building or nonaccessory tenant space used for assembly purposes with fewer than 75 occupants is classified as Group B; its plumbing fixtures may be calculated under Assembly requirements.\",\"sectionID\":\"131\",\"sourceIDs\":[\"research-permitext_discovered-id:131-5\"]}],\"assumptions\":[],\"missingFacts\":[\"Whether the room is legally accessory to the apartment building’s principal occupancy; resident-only use does not independently establish that relationship.\",\"The room’s actual intended activities and all uses at different times, which determine whether it is used for assembly purposes and whether another occupancy classification applies.\"],\"followUpQuestions\":[],\"evidenceLimitations\":[\"The supplied enacted evidence establishes the under-75 accessory-assembly rule and the tables-and-chairs occupant-load factor, but does not define the complete intended program of this multipurpose room or establish its accessory status.\"],\"additionalEvidenceNeeded\":[\"The programmed uses, operating restrictions, and approved occupancy/classification records or plans sufficient to verify the room’s intended use and accessory relationship.\"],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"132\",\"sourceIDs\":[\"research-permitext_discovered-id:132-4\"],\"relevance\":\"Establishes the classification rule for an accessory assembly room with fewer than 75 occupants.\"},{\"sectionID\":\"2152\",\"sourceIDs\":[\"research-permitext_discovered-id:2152-2\"],\"relevance\":\"Establishes the 15-net-square-foot-per-occupant factor for unconcentrated Assembly space with tables and chairs.\"},{\"sectionID\":\"135\",\"sourceIDs\":[\"research-permitext_discovered-id:135-1\"],\"relevance\":\"Establishes the stated scope of Group A-3 assembly uses.\"},{\"sectionID\":\"128\",\"sourceIDs\":[\"research-permitext_discovered-id:128-3\"],\"relevance\":\"Establishes general occupancy classification and the requirement to address each intended purpose of a multipurpose room.\"},{\"sectionID\":\"131\",\"sourceIDs\":[\"research-permitext_discovered-id:131-5\"],\"relevance\":\"Establishes the separately limited under-75 rule for buildings and nonaccessory tenant spaces.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "CC-03",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_research_verification",
+      "requestBytes": 59228,
+      "maxOutputTokens": 4000,
+      "startedAt": "2026-09-08T04:21:12.635Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 6508,
+      "usage": {
+        "input_tokens": 12737,
+        "input_tokens_details": {
+          "cache_write_tokens": 10244,
+          "cached_tokens": 2490
+        },
+        "output_tokens": 538,
+        "output_tokens_details": {
+          "reasoning_tokens": 516
+        },
+        "total_tokens": 13275
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0656b0a02c8f84f1016a9f8d3ef35487d2aeb16855edc89033",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 1.8,
+    "reservedUSD": 0.088498,
+    "actualUSD": 0.088498,
+    "requestCount": 4,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 3.02638,
+  "completedAt": "2026-09-08T04:21:19.586Z"
+}
