@@ -8297,7 +8297,7 @@ function researchPrompt(question, evidence, options = {}) {
       `RELATIONSHIP: ${section.relationship || "Automatically assembled enacted evidence"}`,
       `RETRIEVAL_REASON: ${section.retrievalReason || section.relationship || "Authorized enacted evidence"}`,
       section.origin === "user_pinned" && section.userSelectedText && !section.pinnedSelectionExcerpted
-        ? `USER_SELECTED_TEXT: ${section.text}`
+        ? "USER_SELECTED_TEXT: same as ENACTED_TEXT"
         : "",
       zoningContextExcerptPrompt(section),
       `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
@@ -10493,7 +10493,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
     `RELATIONSHIP: ${source.relationship || "Automatically assembled enacted evidence"}`,
     `RETRIEVAL_REASON: ${source.retrievalReason || source.relationship || "Authorized enacted evidence"}`,
     source.origin === "user_pinned" && source.userSelectedText && !source.pinnedSelectionExcerpted
-      ? `USER_SELECTED_TEXT: ${source.text}`
+      ? "USER_SELECTED_TEXT: same as TEXT"
       : "",
     zoningContextExcerptPrompt(source),
     `TEXT: ${source.text}`

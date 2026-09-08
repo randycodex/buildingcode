@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { buildResearchRequestEnvelopeBuilders } from "./research-request-envelope-preflight.mjs";
 
 globalThis.fetch = async () => { throw new Error("Network forbidden in instruction contract."); };
-const { buildAnswerRequest } = await buildResearchRequestEnvelopeBuilders();
+const { buildAnswerRequest, buildVerifierRequest } = await buildResearchRequestEnvelopeBuilders();
 const source = (codePrefix, sectionNumber) => ({ sectionID: `synthetic-${codePrefix}-${sectionNumber}`,
   sourceID: `passage-${codePrefix}-${sectionNumber}`, codePrefix, sectionNumber, title: "Synthetic input fixture",
   text: "Exact selected text sentinel; condition A AND condition B.", origin: "user_pinned", userSelectedText: true,
@@ -61,4 +61,27 @@ assert.equal(authorizedGuidance.max_output_tokens, 1500);
 const malformed = structuredClone(evidence);
 malformed[0].visualSources[0].dataBase64 = "not valid base64!";
 assert.throws(() => buildAnswerRequest("Read this figure.", malformed, "offline-contract"), { code: "INVALID_RESEARCH_VISUAL_SOURCE" });
+for (const [label, selection] of [
+  ["complete", { ...source("ZR", "23-371"), canonicalContextComplete: true }],
+  ["partial", { ...source("BC", "1007.1.1"), canonicalContextComplete: false }],
+  ["excerpt", { ...source("ZR", "42-192"), canonicalContextComplete: false, pinnedSelectionExcerpted: true,
+    targetedZoningContext: { limitation: "Some selected source paragraphs are omitted; do not infer their contents." } }]
+]) {
+  selection.text = `Exact ${label} selected passage sentinel.\nClosing condition A AND condition B remain controlling.`;
+  const before = structuredClone(selection);
+  const draft = buildAnswerRequest("Apply the selection.", [selection], "offline-contract");
+  const verifier = buildVerifierRequest("Apply the selection.", [selection], { answerText: "Synthetic conclusion." }, "offline-contract");
+  for (const body of [draft, verifier]) {
+    assert.equal(body.input.split(selection.text).length - 1, 1, `${label}: supply the complete passage exactly once.`);
+    assert(body.input.includes(`PASSAGE_ID: ${selection.sourceID}`));
+    if (selection.pinnedSelectionExcerpted) {
+      assert.doesNotMatch(body.input, /USER_SELECTED_TEXT:/);
+      assert.match(body.input, /the complete section is not supplied/);
+      assert.match(body.input, /Some selected source paragraphs are omitted/);
+    } else {
+      assert.match(body.input, /USER_SELECTED_TEXT: same as (?:ENACTED_TEXT|TEXT)\n/);
+    }
+  }
+  assert.deepEqual(selection, before, "Rendering must not alter selected-text provenance or source metadata.");
+}
 console.log("Research instruction contract passed: scoped hints, preserved inputs and authority boundaries, strict schema and visual rejection.");

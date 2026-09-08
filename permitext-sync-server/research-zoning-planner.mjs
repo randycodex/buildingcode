@@ -1493,7 +1493,7 @@ export function zoningResearchPromptContext(plan, deterministicContext) {
     zoningConditionalExplanationPrompt(plan),
     `DETERMINISTIC_CONTEXT: ${JSON.stringify(deterministicContext || {})}`,
     deterministicContext?.answerObligations?.length
-      ? `MANDATORY_ANSWER_OBLIGATIONS: ${JSON.stringify(deterministicContext.answerObligations)}`
+      ? "MANDATORY_ANSWER_OBLIGATIONS: DETERMINISTIC_CONTEXT.answerObligations"
       : "",
     "Answer only the planned question path. Treat collateral provisions as reviewed-only and do not create conclusions from them.",
     "Preserve exact table symbols, dates, arithmetic inputs, prerequisite order, passage identifiers, and source hashes supplied by the server.",

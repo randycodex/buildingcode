@@ -5,7 +5,8 @@ import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { buildResearchRequestEnvelopeBuilders, researchRequestEnvelopeEnvironment } from "../tests/research-request-envelope-preflight.mjs";
 import { assembledResearchEvidenceForTurn, researchCorpusPlanForTurn, deterministicResearchEvidenceAnalysisForTurn } from "../app.mjs";
-import { beginResearchSpendReservation, reserveResearchProviderSpend, endResearchSpendReservation } from "../research-config.mjs";
+import { beginResearchSpendReservation, reserveResearchProviderSpend, endResearchSpendReservation,
+  reserveResearchEvaluationSpend, cancelResearchEvaluationSpendBeforeDispatch, researchEvaluationSpendStatus } from "../research-config.mjs";
 import { routeResearchAnswerModel } from "../research-model-routing.mjs";
 import { requiredResearchClaimsFromEvidence } from "../research-required-claim-coverage.mjs";
 import { createResearchCorpusRegistry } from "../research-corpus-registry.mjs";
@@ -25,11 +26,11 @@ globalThis.fetch = async () => { networkAttempts++; throw new Error("Network for
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1", PERMITEXT_RUN_PAID_RESEARCH_EVALS: "0" });
 const root = new URL("../", import.meta.url);
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const terminalFile = "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json";
+const terminalFile = "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json";
 const terminalBytes = await readFile(new URL(terminalFile, root));
 const terminal = JSON.parse(terminalBytes);
 const ledgerHashes = [...terminal.previousResultHashes, { file: terminalFile, sha256: hash(terminalBytes) }];
-assert.equal(ledgerHashes.length, 20);
+assert.equal(ledgerHashes.length, 21);
 let conservativeUSD = 0;
 const attempted = new Set();
 for (const entry of ledgerHashes) {
@@ -48,7 +49,7 @@ for (const entry of ledgerHashes) {
   }
 }
 conservativeUSD = Number(conservativeUSD.toFixed(6));
-assert.equal(conservativeUSD, 7.864152);
+assert.equal(conservativeUSD, 7.876233);
 const remainingAuthorizationUSD = Number((8 - conservativeUSD).toFixed(6));
 const key = JSON.parse(await readFile(new URL("evals/research-reconciled-answer-key.json", root)));
 await validateReconciledAnswerKey(key);
@@ -59,7 +60,30 @@ assert.equal(cases.length, 110);
 assert.equal(new Set(cases.map(({ item }) => item.id)).size, 110);
 const environment = { ...researchRequestEnvelopeEnvironment, PERMITEXT_RESEARCH_ROUTING_MODE: "hybrid", PERMITEXT_RESEARCH_ACCURATE_MODEL: "gpt-5.6-terra" };
 const { buildAnswerRequest } = await buildResearchRequestEnvelopeBuilders(environment);
+const evaluationEnvironment = { ...environment, PERMITEXT_RESEARCH_EVAL_MAX_USD: String(remainingAuthorizationUSD) };
 const registry = createResearchCorpusRegistry({ zoningResearchEligibility: true });
+function duplicateLineComparison(body, evidence, context) {
+  if (!body) return null;
+  const selected = evidence.filter((source) => source.origin === "user_pinned" && source.userSelectedText && !source.pinnedSelectionExcerpted);
+  let selectedIndex = 0, contextCopies = 0;
+  const restore = (text) => text.replaceAll("USER_SELECTED_TEXT: same as ENACTED_TEXT", () => {
+    assert(selectedIndex < selected.length, "Unexpected selection reference in the request.");
+    return `USER_SELECTED_TEXT: ${selected[selectedIndex++].text}`;
+  }).replaceAll("MANDATORY_ANSWER_OBLIGATIONS: DETERMINISTIC_CONTEXT.answerObligations", () => {
+    assert(context?.answerObligations?.length); contextCopies++;
+    return `MANDATORY_ANSWER_OBLIGATIONS: ${JSON.stringify(context.answerObligations)}`;
+  });
+  const input = typeof body.input === "string" ? restore(body.input) : body.input.map((message) => ({ ...message,
+    content: message.content.map((part) => part.type === "input_text" ? { ...part, text: restore(part.text) } : part) }));
+  assert.equal(selectedIndex, selected.length);
+  assert.equal(contextCopies, context?.answerObligations?.length ? 1 : 0);
+  const repeated = { ...body, input };
+  const beforeBytes = Buffer.byteLength(JSON.stringify(repeated)), afterBytes = Buffer.byteLength(JSON.stringify(body));
+  return { beforeBytes, afterBytes, removedBytes: beforeBytes - afterBytes,
+    selectedPassageCopiesRemoved: selectedIndex, obligationCopiesRemoved: contextCopies,
+    currentRequestSHA256: hash(JSON.stringify(body)), reconstructedRepeatedRequestSHA256: hash(JSON.stringify(repeated)),
+    evidenceSHA256: hash(JSON.stringify(evidence)), deterministicContextHash: context?.contextHash || null };
+}
 const results = [];
 for (const { item, original } of cases) {
   const input = await ownerResearchScopeInput(item, { original, zoningSummary: zoningSectionSummary });
@@ -87,32 +111,48 @@ for (const { item, original } of cases) {
   });
   let initialDraftMaximumUSD = null;
   let reservationError = null;
+  let initialAggregateReservationUSD = null;
+  let aggregateReservationError = null;
   if (body) {
     beginResearchSpendReservation({ id: `offline-${item.id}` }, environment);
     try { initialDraftMaximumUSD = reserveResearchProviderSpend(body, environment).maximumRequestUSD; }
     catch (error) { assert.equal(error.code, "RESEARCH_SPEND_CAP"); reservationError = error.code; }
     finally { endResearchSpendReservation(); }
+    try {
+      const reservation = reserveResearchEvaluationSpend(body, evaluationEnvironment);
+      initialAggregateReservationUSD = reservation.maximumRequestUSD;
+      cancelResearchEvaluationSpendBeforeDispatch(reservation);
+    } catch (error) { assert.equal(error.code, "RESEARCH_EVAL_SPEND_CAP"); aggregateReservationError = error.code; }
   }
   results.push({ id: item.id, inputSHA256: hash(JSON.stringify(input)), previouslyProviderAttempted: attempted.has(item.id),
     sourceCount: evidence.length, authoredPinCount: input.pinnedEvidence.length, projectFactCount: input.projectFacts.length,
     blockedByZoningPrerequisitesOrEvidence: blocked, zoningPath: zoningPlan?.path || null, conditionalExplanation: conditional,
     model: body?.model || null, routingReasons: routing.reasons, webSupportRequested,
     requestBytes: body ? Buffer.byteLength(JSON.stringify(body)) : null, maxOutputTokens: body?.max_output_tokens || null,
-    initialDraftMaximumUSD, reservationError,
+    initialDraftMaximumUSD, reservationError, initialAggregateReservationUSD, aggregateReservationError,
+    duplicateLineComparison: duplicateLineComparison(body, evidence, deterministicContext),
+    initialDraftFitsBothGuards: initialDraftMaximumUSD !== null && initialDraftMaximumUSD <= remainingAuthorizationUSD && initialAggregateReservationUSD !== null,
     initialDraftFitsRemainingAuthorization: initialDraftMaximumUSD !== null && initialDraftMaximumUSD <= remainingAuthorizationUSD });
 }
 assert.equal(networkAttempts, 0);
+assert.equal(researchEvaluationSpendStatus().pendingRequestCount, 0);
+assert.equal(researchEvaluationSpendStatus().reservedUSD, 0);
 const sourceFiles = ["app.mjs", "research-config.mjs", "research-model-routing.mjs", "research-corpus-registry.mjs", "research-code-basis.mjs",
   "research-source-policy.mjs", "research-evidence-assembly.mjs", "research-zoning-planner.mjs", "research-zoning-conditional-explanation.mjs",
   "research-required-claim-coverage.mjs", "research-conversation-facts.mjs", "evals/research-owner-scope-input.mjs",
   "evals/research-reconciled-answer-key.json", "evals/results/research-owner-code-source-review-2026-09-08.json",
   "tests/research-request-envelope-preflight.mjs", "scripts/inspect-research-owner-full-scope-envelopes-20260908.mjs"];
-const candidates = results.filter((item) => !item.previouslyProviderAttempted && !item.webSupportRequested && item.initialDraftFitsRemainingAuthorization);
+const candidates = results.filter((item) => !item.previouslyProviderAttempted && !item.webSupportRequested && item.initialDraftFitsBothGuards);
 const report = { schema: "permitext-owner-full-scope-envelope-diagnostic-v1", checkedAt: new Date().toISOString(),
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
   scope: "All 110 authored inputs, including supplied Project facts and selected passages/section IDs, through source assembly, existing hybrid routing and actual answer request construction. Local diagnostic Zoning eligibility. Initial draft bounds only; no returned web material, prior answer, verification, repair, full HTTP acceptance, latency or live answer grade. Standard pricing is a versioned offline fixture, not a live Production or provider-balance read. A draft fitting the remaining authorization does not authorize or prove a complete turn.",
   sourceHashes: Object.fromEntries(await Promise.all(sourceFiles.map(async (file) => [file, hash(await readFile(new URL(file, root)))]))), ledgerHashes,
+  comparisonMethod: "Reconstruct only the two formerly repeated prompt lines from the current complete evidence and deterministic context. All other request bytes remain fixed. This measures duplicate serialization overhead, not an old-runtime replay, tokenization, live answer quality or latency. Reference duplicate form: a74dddd2f14703d7d23ad3b2f919b45608744196.",
   summary: { cases: results.length, providerCalls: 0, networkAttempts, conservativeUSD, remainingAuthorizationUSD,
+    promptComparison: { requestsChecked: results.filter((item) => item.duplicateLineComparison).length,
+      smallerRequests: results.filter((item) => item.duplicateLineComparison?.removedBytes > 0).length,
+      totalRemovedBytes: results.reduce((sum, item) => sum + (item.duplicateLineComparison?.removedBytes || 0), 0),
+      maximumRemovedBytes: Math.max(...results.map((item) => item.duplicateLineComparison?.removedBytes || 0)) },
     previouslyProviderAttempted: results.filter((item) => item.previouslyProviderAttempted).length,
     notProviderAttempted: results.filter((item) => !item.previouslyProviderAttempted).length,
     candidateInitialDrafts: candidates.map(({ id, model, initialDraftMaximumUSD, zoningPath }) => ({ id, model, initialDraftMaximumUSD, zoningPath })) }, results };
