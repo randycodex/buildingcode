@@ -236,6 +236,7 @@ import {
   researchEconomicsReport
 } from "./research-economics.mjs";
 import { requestResearchProvider } from "./research-provider-client.mjs";
+import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 import { researchDecisionFactRepair } from "./research-decision-fact-repair.mjs";
 import {
   researchEvidenceForBoundedCitationLookup,
@@ -9126,6 +9127,7 @@ function researchUsageFromProviderPayload(payload, requestedModel = null) {
   const usage = {
     inputTokens: Number(payload?.usage?.input_tokens || 0),
     cachedInputTokens: Number(payload?.usage?.input_tokens_details?.cached_tokens || 0),
+    cacheWriteInputTokens: Number(payload?.usage?.input_tokens_details?.cache_write_tokens || 0),
     outputTokens: Number(payload?.usage?.output_tokens || 0),
     totalTokens: Number(payload?.usage?.total_tokens || 0),
     providerRequestCount: Math.max(0, Number(providerAccounting.attempts || 0)),
@@ -9136,7 +9138,8 @@ function researchUsageFromProviderPayload(payload, requestedModel = null) {
   };
   return {
     ...usage,
-    modelUsage: [{ model: payload?.model || requestedModel || null, ...usage }]
+    modelUsage: payload?.usage?.permitext_cost_entries ||
+      [researchProviderCostEntry(payload, requestedModel)].filter(Boolean)
   };
 }
 
@@ -9146,6 +9149,7 @@ function combinedResearchUsage(...entries) {
     return {
       inputTokens: total.inputTokens + Number(entry.inputTokens || 0),
       cachedInputTokens: total.cachedInputTokens + Number(entry.cachedInputTokens || 0),
+      cacheWriteInputTokens: total.cacheWriteInputTokens + Number(entry.cacheWriteInputTokens || 0),
       outputTokens: total.outputTokens + Number(entry.outputTokens || 0),
       totalTokens: total.totalTokens + Number(entry.totalTokens || 0),
       providerRequestCount: total.providerRequestCount + Number(entry.providerRequestCount || 0),
@@ -9157,6 +9161,7 @@ function combinedResearchUsage(...entries) {
   }, {
     inputTokens: 0,
     cachedInputTokens: 0,
+    cacheWriteInputTokens: 0,
     outputTokens: 0,
     totalTokens: 0,
     providerRequestCount: 0,
@@ -20471,6 +20476,7 @@ async function handleResearchConversationMessage(request, response) {
       providerRequestCount: result.usage.providerRequestCount,
       inputTokens: result.usage.inputTokens,
       cachedInputTokens: result.usage.cachedInputTokens,
+      cacheWriteInputTokens: result.usage.cacheWriteInputTokens,
       outputTokens: result.usage.outputTokens,
       totalTokens: result.usage.totalTokens,
       estimatedCostUSD: estimatedCost.estimatedUSD,
@@ -20702,6 +20708,7 @@ async function handleResearchConversationMessage(request, response) {
       ),
       pendingProviderRequestCount: Number(providerSpend?.pendingProviderReservationCount || 0),
       actualProviderCostUSD: providerSpend?.actualUSD ?? null,
+      cacheWriteInputTokens: providerSpend?.cacheWriteInputTokens ?? researchOperation.cacheWriteInputTokens ?? 0,
       conservativeProviderCostUSD: providerSpend?.reservedUSD ??
         researchOperation.estimatedCostUSD ?? null,
       durationMilliseconds: Math.round(performance.now() - researchOperationStartedAt)
@@ -20716,7 +20723,7 @@ async function handleResearchConversationMessage(request, response) {
           failureCode: researchOperation.failureCode || null,
           providerRequestCount: researchOperation.providerRequestCount,
           pendingProviderRequestCount: researchOperation.pendingProviderRequestCount,
-          estimatedTokenCostUSD: researchOperation.actualProviderCostUSD,
+          estimatedProviderCostUSD: researchOperation.actualProviderCostUSD,
           conservativeProviderCostUSD: researchOperation.conservativeProviderCostUSD,
           durationMilliseconds: researchOperation.durationMilliseconds
         }));

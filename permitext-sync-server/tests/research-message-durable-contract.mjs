@@ -23,7 +23,7 @@ const accountingFinally = messageHandlerSlice.lastIndexOf("} finally {");
 assert.ok(accountingFinally >= 0 && accountingStart > accountingFinally,
   "Operation accounting must include every completed or failed generation, not just an early rejection.");
 const accountingLog = messageHandlerSlice.slice(accountingStart, messageHandlerSlice.indexOf("}));", accountingStart));
-assert.match(accountingLog, /estimatedTokenCostUSD: researchOperation.actualProviderCostUSD/);
+assert.match(accountingLog, /estimatedProviderCostUSD: researchOperation.actualProviderCostUSD/);
 assert.match(accountingLog, /pendingProviderRequestCount: researchOperation.pendingProviderRequestCount/);
 assert.doesNotMatch(accountingLog, /userID|question|projectContext|draft|apiKey/,
   "Public runtime accounting must not log private request content or identity.");

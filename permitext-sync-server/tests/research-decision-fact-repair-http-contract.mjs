@@ -122,6 +122,14 @@ try {
     assert.equal(operation.charged, accept);
     assert.equal(operation.providerRequestCount, 3);
     assert.equal(operation.pendingProviderRequestCount, 0);
+    const expectedAccounting = active.id === "PC-04"
+      ? { cacheWrites: 35250, costUSD: .050629 }
+      : { cacheWrites: 18696, costUSD: .033381 };
+    assert.equal(operation.cacheWriteInputTokens, expectedAccounting.cacheWrites,
+      "Private telemetry must retain cache writes on both accepted and rejected answers.");
+    assert.equal(operation.actualProviderCostUSD, expectedAccounting.costUSD);
+    if (accept) assert(Math.abs(operation.estimatedCostUSD - expectedAccounting.costUSD) <= .000001,
+      "Answer cost and settled provider cost must agree at their rounding precision.");
     assert(operation.conservativeProviderCostUSD <= .50);
   }
 } finally {

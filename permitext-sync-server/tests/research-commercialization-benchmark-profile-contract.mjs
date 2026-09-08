@@ -102,7 +102,7 @@ assert.match(
 );
 assert.match(
   appSource,
-  /When Project facts explicitly list multiple unknowns[\s\S]*Do not collapse distinct approvals, records, capacity or dimension inputs, and technical inputs/,
+  /Carry each one into missingFacts only when it can materially affect the requested conclusion[\s\S]*identify separately each unresolved input[\s\S]*approved-record basis[\s\S]*quantities, rates, capacities, dimensions[\s\S]*technical, agency or approval conditions[\s\S]*do not collapse them into full design, additional evidence, other requirements or applicable approvals/,
   "The Research prompt does not preserve separately declared material unknowns."
 );
 

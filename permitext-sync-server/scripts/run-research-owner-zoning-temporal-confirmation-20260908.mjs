@@ -57,7 +57,7 @@ assert(previousConservativeSpendUSD + profile.maximumCumulativeSpendUSD <= 8);
 assert(profile.maximumTurnSpendUSD * profile.maximumTurns <= profile.maximumCumulativeSpendUSD);
 const preflightURL = new URL("evals/results/research-owner-zoning-temporal-preflight-2026-09-08.json", root);
 const resultURL = new URL("evals/results/research-owner-live-zoning-temporal-confirmation-2026-09-08.json", root);
-const sourceFiles = ["app.mjs", "research-config.mjs", "research-provider-client.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-safety.mjs",
+const sourceFiles = ["app.mjs", "research-config.mjs", "research-cost-usage.mjs", "research-provider-client.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-safety.mjs",
   "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs", "project-foundation-contract.mjs", "research-corpus-registry.mjs", "research-model-routing.mjs", "evals/research-owner-scope-input.mjs",
   "evals/research-reconciled-answer-key.json", "evals/research-owner-http-request-binding.mjs", "scripts/run-research-owner-zoning-temporal-confirmation-20260908.mjs"];
 const sourceHashes = Object.fromEntries(await Promise.all(sourceFiles.map(async (file) => [file, hash(await readFile(new URL(file, root)))])));

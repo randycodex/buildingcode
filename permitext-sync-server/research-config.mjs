@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import { researchProviderCostEntry } from "./research-cost-usage.mjs";
 
 export const supportedResearchPromptVersions = [
   "20260827-material-completeness-v31",
@@ -215,6 +216,7 @@ export function beginResearchSpendReservation(reservation, environment = process
     reservedUSD: 0,
     actualUSD: 0,
     providerRequestCount: 0,
+    cacheWriteInputTokens: 0,
     pendingProviderReservations: new Map()
   });
   return guardrails;
@@ -274,15 +276,7 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
     };
   }
   const actualCost = estimatedResearchCost({
-    inputTokens,
-    cachedInputTokens: usage.input_tokens_details?.cached_tokens,
-    outputTokens,
-    modelUsage: [{
-      model: reservation.model || providerPayload?.model || null,
-      inputTokens,
-      cachedInputTokens: usage.input_tokens_details?.cached_tokens,
-      outputTokens
-    }]
+    modelUsage: [researchProviderCostEntry(providerPayload, reservation.model)]
   }, environment).estimatedUSD;
   if (actualCost === null) {
     const error = new Error("Research provider usage could not be reconciled against versioned pricing.");
@@ -290,16 +284,17 @@ export function settleResearchProviderSpend(reservation, providerPayload, enviro
     throw error;
   }
   context.pendingProviderReservations.delete(reservation.reservationID);
-  // Tool fees are not included in usage.input_tokens/output_tokens. Retain the
-  // full reserved fee as a conservative bound rather than reporting it as paid.
+  // Actual recorded tool fees enter the usage estimate. The full permitted
+  // tool allowance still bounds spending, including unreported tool steps.
   const toolAllowanceUSD = reservation.toolAllowanceUSD || 0;
   const tokenCostBound = reservation.pricingCeiling
     ? Math.ceil(inputTokens * reservation.pricingCeiling.inputRate + outputTokens * reservation.pricingCeiling.outputRate) / 1_000_000
     : actualCost;
   context.actualUSD = Number((context.actualUSD + actualCost).toFixed(6));
+  context.cacheWriteInputTokens += Number(usage.input_tokens_details?.cache_write_tokens || 0);
   context.reservedUSD = Number(Math.max(
     0,
-    context.reservedUSD - maximumRequestUSD + Math.max(actualCost, tokenCostBound) + toolAllowanceUSD
+    context.reservedUSD - maximumRequestUSD + Math.max(actualCost, tokenCostBound + toolAllowanceUSD)
   ).toFixed(6));
   return {
     active: true,
@@ -322,6 +317,7 @@ export function endResearchSpendReservation() {
     reservedUSD: context.reservedUSD,
     actualUSD: context.actualUSD,
     providerRequestCount: context.providerRequestCount,
+    cacheWriteInputTokens: context.cacheWriteInputTokens,
     pendingProviderReservationCount: context.pendingProviderReservations.size
   } : null;
 }
@@ -364,6 +360,7 @@ export function estimatedResearchCost(usage, environment = process.env) {
   let estimatedUSD = 0;
   const versions = new Set();
   for (const entry of entries) {
+    if (!entry || entry.costUsageValid === false) return { estimatedUSD: null, pricingVersion: null };
     const { inputRate, cachedInputRate, outputRate, pricingVersion } = researchPricing(
       environment,
       entry?.model
@@ -373,9 +370,20 @@ export function estimatedResearchCost(usage, environment = process.env) {
     }
     const inputTokens = nonnegativeNumber(entry?.inputTokens) || 0;
     const cachedInputTokens = Math.min(inputTokens, nonnegativeNumber(entry?.cachedInputTokens) || 0);
-    const uncachedInputTokens = inputTokens - cachedInputTokens;
+    const cacheWriteInputTokens = nonnegativeNumber(entry?.cacheWriteInputTokens) || 0;
+    if (cachedInputTokens + cacheWriteInputTokens > inputTokens) return { estimatedUSD: null, pricingVersion: null };
+    const tiered = /^gpt-5\.6-(?:sol|terra|luna)(?:-\d{4}-\d{2}-\d{2})?$/.test(entry?.model || "");
+    if (cacheWriteInputTokens && !tiered) return { estimatedUSD: null, pricingVersion: null };
+    const longContext = tiered && entry?.pricingContext === "long";
+    const uncachedInputTokens = inputTokens - cachedInputTokens - cacheWriteInputTokens;
     const outputTokens = nonnegativeNumber(entry?.outputTokens) || 0;
-    estimatedUSD += (uncachedInputTokens * inputRate + cachedInputTokens * cachedInputRate + outputTokens * outputRate) / 1_000_000;
+    // Versioned environment rates remain the standard short-context prices.
+    // Official GPT-5.6 rates: writes 1.25x input; long context 2x input/cache
+    // and 1.5x output. Tier assignment belongs to each request, not the sum.
+    estimatedUSD += ((uncachedInputTokens * inputRate + cachedInputTokens * cachedInputRate +
+      cacheWriteInputTokens * inputRate * 1.25) * (longContext ? 2 : 1) +
+      outputTokens * outputRate * (longContext ? 1.5 : 1)) / 1_000_000;
+    estimatedUSD += (nonnegativeNumber(entry?.webSearchCalls) || 0) * 0.01;
     versions.add(pricingVersion);
   }
   return {
@@ -517,15 +525,7 @@ export function settleResearchEvaluationSpend(reservation, providerPayload, envi
     return { ...researchEvaluationSpendStatus(), reservationID: reservation.reservationID, settled: false };
   }
   const actualCost = estimatedResearchCost({
-    inputTokens,
-    cachedInputTokens: usage?.input_tokens_details?.cached_tokens,
-    outputTokens,
-    modelUsage: [{
-      model: providerPayload?.model || null,
-      inputTokens,
-      cachedInputTokens: usage?.input_tokens_details?.cached_tokens,
-      outputTokens
-    }]
+    modelUsage: [researchProviderCostEntry(providerPayload)]
   }, environment).estimatedUSD;
   if (actualCost === null) {
     const error = new Error("Paid evaluation usage could not be reconciled against versioned pricing.");

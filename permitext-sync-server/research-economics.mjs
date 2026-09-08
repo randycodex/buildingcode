@@ -173,6 +173,7 @@ function normalizedOperation(operation = {}) {
     structuredAttemptFailureStages,
     inputTokens: nonnegativeInteger(operation.inputTokens),
     cachedInputTokens: nonnegativeInteger(operation.cachedInputTokens),
+    cacheWriteInputTokens: nonnegativeInteger(operation.cacheWriteInputTokens),
     outputTokens: nonnegativeInteger(operation.outputTokens),
     totalTokens: nonnegativeInteger(operation.totalTokens),
     modelUsage: Array.from(new Set(
@@ -250,6 +251,7 @@ export function createResearchOperationMetric(operation = {}) {
     pendingProviderRequestCount: normalized.pendingProviderRequestCount,
     inputTokens: normalized.inputTokens,
     cachedInputTokens: normalized.cachedInputTokens,
+    cacheWriteInputTokens: normalized.cacheWriteInputTokens,
     outputTokens: normalized.outputTokens,
     totalTokens: normalized.totalTokens,
     estimatedCostUSD: normalized.estimatedCostUSD,

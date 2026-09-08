@@ -1,3 +1,5 @@
+import { researchProviderCostEntry } from "./research-cost-usage.mjs";
+
 const transientProviderStatuses = new Set([408, 409, 425, 429, 500, 502, 503, 504]);
 const transientProviderCauses = new Set([
   "ECONNRESET",
@@ -51,7 +53,7 @@ function nonnegativeProviderNumber(value) {
   return Number.isFinite(number) && number >= 0 ? number : null;
 }
 
-function providerUsageFromPayload(payload) {
+function providerUsageFromPayload(payload, model) {
   const inputTokens = nonnegativeProviderNumber(payload?.usage?.input_tokens);
   const outputTokens = nonnegativeProviderNumber(payload?.usage?.output_tokens);
   if (inputTokens === null || outputTokens === null) return null;
@@ -61,7 +63,11 @@ function providerUsageFromPayload(payload) {
   );
   return {
     input_tokens: inputTokens,
-    input_tokens_details: { cached_tokens: cachedInputTokens },
+    input_tokens_details: {
+      cached_tokens: cachedInputTokens,
+      cache_write_tokens: nonnegativeProviderNumber(payload?.usage?.input_tokens_details?.cache_write_tokens) || 0
+    },
+    permitext_cost_entries: [researchProviderCostEntry(payload, model)],
     output_tokens: outputTokens,
     total_tokens: nonnegativeProviderNumber(payload?.usage?.total_tokens) ?? inputTokens + outputTokens
   };
@@ -70,7 +76,8 @@ function providerUsageFromPayload(payload) {
 function emptyProviderUsage() {
   return {
     input_tokens: 0,
-    input_tokens_details: { cached_tokens: 0 },
+    input_tokens_details: { cached_tokens: 0, cache_write_tokens: 0 },
+    permitext_cost_entries: [],
     output_tokens: 0,
     total_tokens: 0
   };
@@ -81,8 +88,10 @@ function addProviderUsage(total, usage) {
   return {
     input_tokens: total.input_tokens + usage.input_tokens,
     input_tokens_details: {
-      cached_tokens: total.input_tokens_details.cached_tokens + usage.input_tokens_details.cached_tokens
+      cached_tokens: total.input_tokens_details.cached_tokens + usage.input_tokens_details.cached_tokens,
+      cache_write_tokens: total.input_tokens_details.cache_write_tokens + usage.input_tokens_details.cache_write_tokens
     },
+    permitext_cost_entries: [...total.permitext_cost_entries, ...usage.permitext_cost_entries],
     output_tokens: total.output_tokens + usage.output_tokens,
     total_tokens: total.total_tokens + usage.total_tokens
   };
@@ -277,7 +286,7 @@ async function performResearchProviderRequest({
     }
 
     const payload = await response.json().catch(() => ({}));
-    const attemptUsage = providerUsageFromPayload(payload);
+    const attemptUsage = providerUsageFromPayload(payload, requestBody.model);
     aggregateUsage = addProviderUsage(aggregateUsage, attemptUsage);
     if (!attemptUsage) {
       unreconciledProviderCostUSD += providerReservationAllowance(providerSpendReservation);

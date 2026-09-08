@@ -137,7 +137,7 @@ for (const { item, original } of cases) {
 assert.equal(networkAttempts, 0);
 assert.equal(researchEvaluationSpendStatus().pendingRequestCount, 0);
 assert.equal(researchEvaluationSpendStatus().reservedUSD, 0);
-const sourceFiles = ["app.mjs", "research-config.mjs", "research-model-routing.mjs", "research-corpus-registry.mjs", "research-code-basis.mjs",
+const sourceFiles = ["app.mjs", "research-config.mjs", "research-cost-usage.mjs", "research-model-routing.mjs", "research-corpus-registry.mjs", "research-code-basis.mjs",
   "research-source-policy.mjs", "research-evidence-assembly.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-conditional-explanation.mjs",
   "research-required-claim-coverage.mjs", "research-conversation-facts.mjs", "evals/research-owner-scope-input.mjs",
   "evals/research-reconciled-answer-key.json", "evals/results/research-owner-code-source-review-2026-09-08.json",

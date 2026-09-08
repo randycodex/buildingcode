@@ -112,9 +112,11 @@ function requestOptions(overrides = {}) {
   assert.equal(evaluationSettlements, 2);
   assert.equal(providerReservations, 2);
   assert.equal(providerSettlements, 2);
-  assert.deepEqual(result.payload.usage, {
+  const { permitext_cost_entries: costEntries, ...aggregateUsage } = result.payload.usage;
+  assert.deepEqual(costEntries.map((entry) => entry.inputTokens), [10, 20]);
+  assert.deepEqual(aggregateUsage, {
     input_tokens: 30,
-    input_tokens_details: { cached_tokens: 7 },
+    input_tokens_details: { cached_tokens: 7, cache_write_tokens: 0 },
     output_tokens: 10,
     total_tokens: 40
   });
