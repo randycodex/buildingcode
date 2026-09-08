@@ -1,0 +1,105 @@
+{
+  "schema": "permitext-owner-temporal-repair-verification-v1",
+  "checkedAt": "2026-09-08T14:28:47.622Z",
+  "sourceCommit": "55b925d34313b7f31574fe1e40550aec7a61ef74",
+  "scope": "Research source, prompt and verification pipeline only. Provider responses in HTTP tests are doubles. No paid dispatch, Project workflow, deployment, independent professional review or full-cohort answer-quality claim.",
+  "artifacts": [
+    {
+      "file": "evals/results/research-owner-full-scope-temporal-2026-09-08.json",
+      "sha256": "1738d9651dcd5536e6e49307360ae21ffbce20cb282fff49330b615727362e9b"
+    },
+    {
+      "file": "evals/results/research-owner-temporal-envelopes-2026-09-08.json",
+      "sha256": "c47def0afda31e3a2030b02c67e79df096c6f16507df2cbb2b96bde5a2e0d289"
+    },
+    {
+      "file": "evals/results/research-owner-zoning-temporal-preflight-2026-09-08.json",
+      "sha256": "54abc8c169746aea6690f09f13bccd9a7751a4afb6a83843cfd287be7d41db33"
+    }
+  ],
+  "sourceHashEntriesVerifiedAgainstCommit": 49,
+  "priorLedgerHashesVerified": 22,
+  "checks": [
+    {
+      "command": "npm run test:research-chat",
+      "exitCode": 0,
+      "logSHA256": "66c165f2bef7a18f5694aaa37f0ff40b07122ccaf21bc3ebfc9378e22287773f"
+    },
+    {
+      "command": "npm run test:zoning-architecture-v2",
+      "exitCode": 0,
+      "logSHA256": "8bab572fe0adce3a13bf672932dcf95ed6d7ee380d0d7887e06442fa026307cd"
+    },
+    {
+      "command": "npm run test:zoning-architecture-v21",
+      "exitCode": 0,
+      "logSHA256": "af491a781e29c397c39ace816036a740eded04ef6115039c14e3d14221efd590"
+    },
+    {
+      "command": "npm run test:research-routing",
+      "exitCode": 0,
+      "logSHA256": "df51ba1c8b7937de1b1ab08a05d5fc35f23bae9ffdea2aeca7f743089639a4d0"
+    }
+  ],
+  "sourceComparison": {
+    "baselineFile": "evals/results/research-owner-full-scope-direct-rule-2026-09-08.json",
+    "baselineSHA256": "7bab6cc775c69dfb0ecd8b49ed59bb5e59b65f9acc75741fa00c6c15e2cb3629",
+    "unchangedAuthoredInputs": 110,
+    "unchangedSourcePackets": 110,
+    "unchangedExactSelectedPassages": 8,
+    "authoredPins": 47,
+    "changedExpectedAnswers": false,
+    "existingMissingReferences": [
+      {
+        "id": "MC-01",
+        "missingExactReferences": [
+          "MC 403"
+        ]
+      }
+    ]
+  },
+  "answerRegression": {
+    "latestRetainedCase": "ZR-18",
+    "latestResult": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+    "latestDefect": "Unsupported temporal application in supportedPoints[1]",
+    "latestRetainedDefectRejected": true,
+    "correctedFixtureAccepted": true,
+    "dateAndFactCases": 20,
+    "olderRetainedDefect": "Assembly year alone disqualifies the lot under 77-11 in answerText and explanation",
+    "olderAcceptedAnswersStillAccepted": 14,
+    "olderKnownSemanticFailuresRejected": 5,
+    "olderNewlyExposedGaps": [
+      "construction_particular_controls_general",
+      "divided_lot_effective_date_application"
+    ],
+    "historicalScoresChanged": false,
+    "httpCases": [
+      "bad repair rejected before final verification and without charging a turn",
+      "correct repair receives existing final verification before delivery",
+      "correct draft completes directly"
+    ],
+    "httpProviderResponses": "synthetic, preserving recorded draft text except binding source IDs",
+    "liveQualityOfRepairConfirmed": false
+  },
+  "spend": {
+    "paidProviderCallsThisPass": 0,
+    "conservativeCampaignUSD": 7.887898,
+    "remainingAuthorizationUSD": 0.112102,
+    "requestedInitialAggregateMaximumUSD": 0.114874,
+    "preflightStatus": "preflight-blocked",
+    "unattemptedDraftsFittingBothGuards": 0,
+    "accountBalanceVerified": false
+  },
+  "coverage": {
+    "ownerCaseCount": 110,
+    "providerAttempted": 45,
+    "notProviderAttempted": 65,
+    "settledPaidPackages": 22
+  },
+  "limitations": [
+    "The temporal guard recognizes bounded source conditions and common claim/declaration wording; it is not an arbitrary-language semantic proof.",
+    "Corrected model behavior still requires fresh live confirmation.",
+    "The budget guard blocks this confirmation and every currently unattempted initial draft under the remaining authorization.",
+    "Project-workflow testing remains deferred until the owner explicitly asks."
+  ]
+}
