@@ -4,7 +4,7 @@ Reviewed September 8, 2026. Original file: `Permitext_60_Code_Evaluation_Cases.t
 
 All 60 questions and expected answers were checked against the cited code provisions. **53 answers can be retained; 7 need correction or tighter wording.** These counts describe this source review, not Permitext model performance or independent professional approval.
 
-The MC-15 simultaneous kitchen makeup-air rule was verified in the publisher’s 2022 NYC edition; its current consolidated American Legal page could not be retrieved, so that single freshness comparison remains pending. The other findings use the official publisher’s consolidated text as retrieved. Source snapshots include observed versions, captured-passage hashes, and limited excerpts in the companion JSON.
+The initial MC-15 review verified the kitchen makeup-air rule in the publisher’s 2022 NYC edition but could not retrieve its current American Legal page. A subsequent [September 8 source refresh](PERMITEXT_MC15_SOURCE_REFRESH_2026-09-08.md) confirmed the same rule in the September 2026 consolidation, closing that pending comparison. The original JSON retains its historical pending flag; the addendum preserves the later evidence. Source snapshots include observed versions, captured-passage hashes, and limited excerpts.
 
 ## Corrections
 
@@ -320,11 +320,11 @@ The original intake is retained separately. The 60 questions are already used to
 
 **Question:** A commercial kitchen has a mechanical makeup-air fan sized to offset the hood exhaust, but kitchen staff must switch the makeup-air fan on separately. Is that acceptable?
 
-**Finding — RETAIN:** The automatic simultaneous-operation rule is confirmed in the 2022 NYC publisher edition. Current American Legal retrieval timed out; a fresh consolidated-source comparison is outstanding.
+**Finding — RETAIN:** The automatic simultaneous-operation rule is confirmed in the 2022 NYC publisher edition and the subsequent [September 2026 consolidated-source refresh](PERMITEXT_MC15_SOURCE_REFRESH_2026-09-08.md). The initial timeout remains documented in the original JSON.
 
 **Reviewed answer:** No. MC 508.1 requires mechanical makeup air to be automatically controlled to start and operate simultaneously with the exhaust system. Proper airflow quantity alone does not satisfy the control requirement. Energy Code requirements should also be checked where applicable.
 
-**Sources:** [MC 508.1](https://codes.iccsafe.org/content/NYNYCMC2022P1/chapter-5-exhaust-systems).
+**Sources:** [2022 publisher edition, MC 508.1](https://codes.iccsafe.org/content/NYNYCMC2022P1/chapter-5-exhaust-systems); [September 2026 consolidation, MC 508.1](https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-194028).
 
 ### GAP-01 — Using the 1968 Building Code for new plumbing and mechanical work
 
