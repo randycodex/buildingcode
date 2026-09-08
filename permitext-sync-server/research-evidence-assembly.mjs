@@ -11,7 +11,7 @@ import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260908-complete-selected-zoning-v29";
+export const researchEvidenceAssemblyVersion = "20260908-focused-ventilation-v30";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -678,6 +678,30 @@ function deterministicSourceID(origin, value, index) {
   return `research-${origin}-${identity || "unknown"}-${index + 1}`;
 }
 
+function focusedVentilationCandidates(query, candidates, pinnedCount) {
+  const question = compactText(query.question);
+  if (pinnedCount || query.contextDependentFollowUp || query.relevanceComparison ||
+      !/\bair[- ]condition\w*\b/i.test(question) || !/\b(?:windows?|natural ventilation)\b/i.test(question) ||
+      !/\bventilat\w*\b/i.test(question)) return candidates;
+  // Scope only the window-versus-mechanical-ventilation decision. Preserve
+  // broader system design, residential exceptions and independently requested
+  // authorities in the normal retrieval path.
+  if ((question.match(/\?/g) || []).length > 1 ||
+      /\b(?:Building Code|Fuel Gas Code|Plumbing Code|Energy Code|Zoning Resolution|DOB|local law)\b/i.test(question) ||
+      /\b(?:without|no|not)\b[^.?]{0,35}\bair[- ]condition\w*\b|\b(?:airflow|cfm|calculat\w*|exhaust|smoke|fire|egress|accessib\w*|bathroom|bedroom|sleeping|dwelling|residential|hospital|clinic|ambulatory|healthcare|permit\w*|energy|existing|alteration|renovation|conversion|1968|2008|2014)\b|\b(?:all|complete|full)\s+(?:code\s+)?(?:requirements?|design)\b|\b(?:also|and|in addition)\s+(?:explain|check|assess|verify|what|how|which)\b/i.test(question)) return candidates;
+  const anchors = ["401.2", "403.1"].map((sectionNumber) => candidates.find((candidate) =>
+    candidate.codePrefix === "MC" && candidate.sectionNumber === sectionNumber && candidate.signals?.exactTopicRouteTarget &&
+    /\b2022\b/.test(candidate.codeEdition || "") && /new york city|nyc/i.test(candidate.jurisdiction || "")));
+  if (anchors.some((anchor) => !anchor) ||
+      !["codeEdition", "codeVersion", "corpusID", "jurisdiction"].every((field) =>
+        anchors[0][field] && anchors[0][field] === anchors[1][field]) ||
+      !/provided with air conditioning shall be mechanically ventilated/i.test(anchors[0].selectedText || "") ||
+      !/Mechanical ventilation shall be provided by a method of supply air/i.test(anchors[1].selectedText || "")) return candidates;
+  if (candidates.some((candidate) => candidate.codePrefix !== "MC" && candidate.signals?.exactTopicRouteTarget)) return candidates;
+  return candidates.filter((candidate) => candidate.codePrefix === "MC" || candidate.signals?.exactReference ||
+    candidate.signals?.contextualReference || candidate.evidencePriority?.primaryFunction === "definition");
+}
+
 /**
  * Assemble the text-only enacted evidence package for one Research answer.
  * Discovery and canonical section access are injected so this module remains
@@ -782,12 +806,13 @@ export async function assembleResearchEvidence({
     : prioritizedCandidates;
   const selectedBuildingCodePassageBoundary =
     /\bbased only on (?:the )?selected Building Code passages?\b/i.test(query.question);
-  const candidates = selectedBuildingCodePassageBoundary && routedTopicPresent
+  const boundaryCandidates = selectedBuildingCodePassageBoundary && routedTopicPresent
     ? relevanceCandidates.filter((candidate) =>
         candidate?.signals?.exactTopicRouteTarget === true &&
         compactText(candidate?.codePrefix).toUpperCase() === "BC"
       )
     : relevanceCandidates;
+  const candidates = focusedVentilationCandidates(query, boundaryCandidates, pinnedEvidence.length);
   const nonMaterialCandidateCount = prioritizedCandidates.length - candidates.length;
   await onStage?.("searching_authorized_library", "completed");
   await onStage?.("reviewing_provisions", "active");
