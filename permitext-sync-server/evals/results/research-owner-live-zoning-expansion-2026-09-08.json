@@ -1,0 +1,2922 @@
+{
+  "schema": "permitext-owner-zoning-expansion-v1",
+  "sourceCommit": "7c83b872344c152b2ff37fe0238b16c91d18aaad",
+  "authorization": "Owner authorized approximately $8 of API tests and repeated testing toward the 110-case answer target. This new package attempts ZR-21 and ZR-18 once each to expand coverage after prompt compaction, within the existing remaining authorization; it cannot replay a consumed package.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    }
+  ],
+  "previousConservativeSpendUSD": 7.876233,
+  "authorizationUSD": 8,
+  "maximumCumulativeSpendUSD": 0.123767,
+  "maximumTurnSpendUSD": 0.06,
+  "maximumTurns": 2,
+  "maximumProviderRequests": 6,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual selected-section HTTP Research flow on isolated local accounts and storage. Expected answers are not supplied to drafting or verification. Local diagnostic Zoning eligibility only; no public eligibility, deployment, or phone changes.",
+  "cases": [
+    "ZR-21",
+    "ZR-18"
+  ],
+  "preflightSHA256": "25e2f71a1f4e1cf2a90d19721b0857d9ec96b44b0e53ed5aae682dbc9b4d362c",
+  "sourceHashes": {
+    "app.mjs": "dfffda2e03a02b01cbc65e969422c023b6db3a95ea20ad73768ea66c31a2717c",
+    "research-config.mjs": "0ef7b3b32f7d480a92b5d598a260bdb116b2272bd7a0ed0711387b753f9f0f15",
+    "research-provider-client.mjs": "74a9d566ffdc89ad1540d3b42094c1fdc8ca8626cb3fd67e7ecc04400001d5b1",
+    "research-zoning-planner.mjs": "c9013cc99e984660bf7461ce2188da6f027f0979fe05182fcb10fd8b0a773b3f",
+    "research-zoning-safety.mjs": "d61971dfb9c6295e2ddf38d0298645c0a59f788e2fbf119feb352e5ae33ac744",
+    "research-evidence-assembly.mjs": "9623218d61695721099f60b3977d34ea538eb5a343e1ef4f12721a95eab3f59b",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "15e7dc17bd9ff1fa69938ba13b35686d56ee2cf5178a9350f1f5b5199e0ee97f",
+    "evals/research-reconciled-answer-key.json": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+    "evals/research-owner-http-request-binding.mjs": "eef06bb4d0acf230929cb355f15427d197f7f20c961651feaa8f2003d57dea54",
+    "scripts/run-research-owner-zoning-expansion-20260908.mjs": "1aa056b15f56aa4e0d5890f6962be993298498929b4482af7679f4ebcbfcbc2b"
+  },
+  "startedAt": "2026-09-08T13:49:44.477Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "ZR-21",
+      "question": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+      "inputSHA256": "78c1e6d1c6f1fcbd7a5079fc859c00763978859108d85f3166cfa830626afe45",
+      "readerSelectionsSHA256": "594575df95230d9838c273b9f00c6391e49e5ca2d124eda9fdf16e19f7270f84",
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.06,
+      "initialRequestSHA256": "4df0e547798d4b3c8e0bc25b87373cf738560b278874132234a72b9cfcb68510",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 40504,
+      "durationMilliseconds": 9149,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.026164,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "33fd26e3-59e3-458a-8bef-6d950be288d7",
+          "createdAt": "2026-09-08T13:49:45.188Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-luna",
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 8366,
+          "cachedInputTokens": 0,
+          "outputTokens": 724,
+          "totalTokens": 9090,
+          "estimatedCostUSD": 0.002542,
+          "actualProviderCostUSD": 0.002542,
+          "conservativeProviderCostUSD": 0.005487,
+          "durationMilliseconds": 9113,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-luna",
+        "requestedModel": "gpt-5.6-luna",
+        "promptVersion": "20260827-material-completeness-v31:compact-v2:conversational-v4",
+        "evidenceVersion": "20260908-complete-selected-zoning-v29:structured-v1",
+        "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "explicitly pinned evidence",
+              "blockedReason": null,
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: NYC Zoning Resolution",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T13:49:45.194Z"
+        },
+        "answerText": "**No.** Under ZR § 52-61, if active operation of substantially all non-conforming uses in a building is discontinued for a continuous period of two years, the building may thereafter be used only for a conforming use. Because the stated discontinuance was 30 months, the owner’s continuing intent to reopen does not preserve the non-conforming use; the provision expressly states that “Intent to resume active operations shall not affect the foregoing.” This conclusion is subject to the section’s stated exceptions, including discontinuance directly caused by war, strikes or other labor difficulties, materials rationing, or a duly authorized governmental or public-utility improvement project, as well as the specifically described residential-store and transient-hotel provisions.",
+        "conclusion": "**No.** Under ZR § 52-61, if active operation of substantially all non-conforming uses in a building is discontinued for a continuous period of two years, the building may thereafter be used only for a conforming use. Because the stated discontinuance was 30 months, the owner’s continuing intent to reopen does not preserve the non-conforming use; the provision expressly states that “Intent to resume active operations shall not affect the foregoing.” This conclusion is subject to the section’s stated exceptions, including discontinuance directly caused by war, strikes or other labor difficulties, materials rationing, or a duly authorized governmental or public-utility improvement project, as well as the specifically described residential-store and transient-hotel provisions.",
+        "supportedPoints": [
+          {
+            "heading": "Two-year discontinuance ends the non-conforming use",
+            "explanation": "ZR § 52-61 provides that when “the active operation of substantially all the non-conforming uses in any building or other structure is discontinued” for a continuous period of two years, the building or structure “shall thereafter be used only for a conforming use.” The stated 30-month period exceeds that two-year threshold. The same passage expressly provides: “Intent to resume active operations shall not affect the foregoing.”",
+            "sectionID": "20018658",
+            "sourceIDs": [
+              "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Stated exceptions remain part of the rule",
+            "explanation": "The same provision says its discontinuance rule does not apply where the discontinuance was directly caused by war, strikes or other labor difficulties, a governmental program of materials rationing, or construction of a duly authorized improvement project by a governmental body or public utility company. It also states specific exceptions for certain vacant ground-floor or basement stores in residential-use buildings in R1 through R12 Districts and for certain transient hotels, motels, or tourists cabins existing on December 9, 2021, subject to the stated conditions and dates.",
+            "sectionID": "20018658",
+            "sourceIDs": [
+              "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The answer is based on the assembled NYC Zoning Resolution text through 2026-08-13; no parcel-specific district, use classification, or factual basis for one of the expressly stated exceptions was supplied or established."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "20018658",
+            "sectionNumber": "52-61",
+            "title": "General Provisions",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "0e9b91b0-699f-4fc3-92dc-449041cc1985",
+                "selectedText": "If, for a continuous period of two years, either the non-conforming use of land with minor improvements is discontinued, or the active operation of substantially all the non-conforming uses in any building or other structure is discontinued, such land or building or other structure shall thereafter be used only for a conforming use. Intent to resume active operations shall not affect the foregoing. The provisions of this Section shall not apply where such discontinuance of active operations is directly caused by war, strikes or other labor difficulties, a governmental program of materials rationing, or the construction of a duly authorized improvement project by a governmental body or a public utility company. However, the provisions of this Section shall also not apply to vacant ground floor or basement stores in buildings designed for residential use located in R1 through R12 Districts, where the changed or reactivated use is a use listed in Use Group VI that would be permitted in a C1 District that is a select commercial overlay, or an office, as listed in Use Group VII. Furthermore, the provisions of this Section shall be modified to allow transient hotels, motels or tourists cabins existing on December 9, 2021, in a Residence District, to be restored to such use until December 9, 2027, regardless of more than two years of discontinuance of the use, and regardless of any change of use between December 9, 2021, and December 9, 2027. In addition, the changed or reactivated use shall be subject to the provisions of Section 52-34 (Commercial Uses in Residence Districts).",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Governing rule: two years of discontinuance of active operation of substantially all non-conforming uses ends the ability to continue the use, and intent to resume does not affect that result; the passage also contains the stated exceptions."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "20018658",
+          "20018523",
+          "20020860",
+          "20018621",
+          "20021459",
+          "20018636"
+        ],
+        "evidenceSourceIDs": [
+          "0e9b91b0-699f-4fc3-92dc-449041cc1985",
+          "research-permitext_discovered-id:20018523-1",
+          "research-permitext_discovered-id:20020860-3",
+          "research-permitext_discovered-id:20018621-4",
+          "research-permitext_discovered-id:20021459-5",
+          "research-permitext_cross_reference-id:20018636-1"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 6,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 5,
+          "userPinnedCount": 1,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 1,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "ZR 52-61",
+              "summary": "ZR 52-61 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "ZR 52-61",
+              "summary": "ZR 52-61 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-1"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "ZR 52-34",
+              "summary": "ZR 52-34 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:20018636-1"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [
+            "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20020860-3",
+            "research-permitext_discovered-id:20018621-4",
+            "research-permitext_discovered-id:20021459-5",
+            "research-permitext_cross_reference-id:20018636-1"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+          ],
+          "citedEvidenceSourceIDs": [
+            "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20020860-3",
+            "research-permitext_discovered-id:20018621-4",
+            "research-permitext_discovered-id:20021459-5",
+            "research-permitext_cross_reference-id:20018636-1"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:0e9b91b0-699f-4fc3-92dc-449041cc1985",
+              "label": "ZR 52-61 — General Provisions",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:0e9b91b0-699f-4fc3-92dc-449041cc1985",
+              "label": "ZR 52-61 — General Provisions",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "schemaVersion": 2,
+          "plannerVersion": "20260908-historical-source-intent-v5",
+          "compilerVersion": "20260908-direct-rule-obligations-v22",
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-fixture-permission-scope-v28",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "0e9b91b0-699f-4fc3-92dc-449041cc1985"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20020860-3",
+            "research-permitext_discovered-id:20018621-4",
+            "research-permitext_discovered-id:20021459-5",
+            "research-permitext_cross_reference-id:20018636-1"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 5,
+            "reviewedOnlyProvisionCount": 5,
+            "assembledSourceCount": 6,
+            "assembledProvisionCount": 6
+          },
+          "sources": [
+            {
+              "sourceID": "0e9b91b0-699f-4fc3-92dc-449041cc1985",
+              "sectionID": "20018658",
+              "reference": "ZR 52-61",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "If, for a continuous period of two years, either the non-conforming use of land with minor improvements is discontinued, or the active operation of substantially all the non-conforming uses in any building or other structure is discontinued, such land or building or other structure shall thereafter be used only for a conforming use. Intent to resume active operations shall not affect the foregoing. The provisions of this Section shall not apply where such discontinuance of active operations is directly caused by war, strikes or other labor difficulties, a governmental program of materials rationing, or the construction of a duly authorized improvement project by a governmental body or a public utility company. However, the provisions of this Section shall also not apply to vacant ground floor or basement stores in buildings designed for residential use located in R1 through R12 Districts, where the changed or reactivated use is a use listed in Use Group VI that would be permitted in a C1 District that is a select commercial overlay, or an office, as listed in Use Group VII. Furthermore, the provisions of this Section shall be modified to allow transient hotels, motels or tourists cabins existing on December 9, 2021, in a Residence District, to be restored to such use until December 9, 2027, regardless of more than two years of discontinuance of the use, and regardless of any change of use between December 9, 2021, and December 9, 2027. In addition, the changed or reactivated use shall be subject to the provisions of Section 52-34 (Commercial Uses in Residence Districts)."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20018523-1",
+              "sectionID": "20018523",
+              "reference": "ZR 12-10",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "building designed for residential use General Definition see designed for residential use building or other structure General Definition Last Amended 12/15/1961 A \"building or other structure\" includes any building or any other structure of any kind. land with minor improvements General Definition Last Amended 2/2/2011 \"Land with minor improvements\" is a tract of land or a zoning lot that: (a) does not contain any building or other structure; or (b) involves buildings or other structures, or other improvements, located underground or substantially at ground level, with a total assessed valuation, excluding land, of less than $14,500 as of February 2, 2011, as determined from the assessment rolls in effect on the applicable date on which such use is changed, damaged or destroyed, or terminated, in accordance with the provisions of Sections 52-32, 52-52 or 52-72 (Land with Minor Improvements). The Chairperson of the City Planning Commission shall adjust this figure annually. Such adjustment shall occur on August 1 of each calendar year, based on the percentage change in the Consumer Price Index for all urban consumers as defined by the U.S. Bureau of Labor Statistics for the twelve months ended on June 30 of that year. Select commercial overlay General Definition Last Amended 6/6/2024 “Select commercial overlays” shall be any of the following C1 or C2 Districts: C1-1, C1-2, C1-3 or C1-4 Districts or C2-1, C2-2, C2-3 or C2-4 Districts."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20020860-3",
+              "sectionID": "20020860",
+              "reference": "ZR 101-618",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "101-618 Termination of certain non-conforming signs In the Fulton Mall Subdistrict, Section 52-80 (REGULATIONS APPLYING TO NON-CONFORMING SIGNS) shall not apply. In lieu thereof, certain non-conforming signs may be continued until June 30, 1980, providing that after that date such non-conforming signs shall terminate and shall be removed in their entirety, including any supporting structure, frame or device. Such signs shall include: advertising signs; flashing signs; signs located more than 40 feet above curb level; roof signs; signs extending above a parapet; signs obscuring cornices and windows; double or multi-faced signs; and signs that project across a street line more than 12 inches. Any sign, as of January 1, 1978, that forms an integral part of the surface of a building or other structure (such as a sign carved in stone, cast in metal or molded in terra cotta on a building whose facade is of such material) shall not be subject to the provisions of this Section."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20018621-4",
+              "sectionID": "20018621",
+              "reference": "ZR 51-00",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "51-00 PURPOSE OF REGULATIONS GOVERNING NON-CONFORMING USES AND NON-COMPLYING BUILDINGS The zoning districts established in this Resolution (as set forth in the district regulations in Articles II, III and IV and on the zoning maps) are designed to guide the future use of the City's land by encouraging the development of desirable residential, commercial and manufacturing areas with appropriate groupings of compatible and related uses and thus to promote and to protect public health, safety and general welfare. As a necessary corollary, in order to carry out such purposes, non-conforming uses which adversely affect the development of such areas must be subject to certain limitations. The regulations governing non-conforming uses set forth in this Chapter are therefore adopted in order to provide a gradual remedy for existing undesirable conditions resulting from such incompatible non-conforming uses, which are detrimental to the achievement of such purposes. While such uses are generally permitted to continue, these regulations are designed to restrict further investment in such uses, which would make them more permanent establishments in inappropriate locations. In the case of a few objectionable non-conforming uses which are detrimental to the character of the districts in which such uses are located, a reasonable statutory period of life is established for such uses, in order to permit the owner gradually to make his plans for the future during the period when he is allowed to continue the non-conforming uses of his property, thereby minimizing any loss, while at the same time assuring the public that the district in which such non-conformity exists will eventually benefit from a more nearly uniform character. In the case of buildings not complyi"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20021459-5",
+              "sectionID": "20021459",
+              "reference": "ZR 65-13",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "65-13 Discontinuance Provisions In all districts, where a non-conforming use has been discontinued, the time limits associated with restoring active operations of such use to retain its non-conforming status shall be suspended. Subsequent to the expiration of the applicable time duration as set forth in Section 65-01 (Applicability of Article VI, Chapter 5), the time period established by the applicable provisions of this Resolution shall be resumed, and the remaining time associated with restoring active operations shall be the amount existing prior to the severe disaster."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:20018636-1",
+              "sectionID": "20018636",
+              "reference": "ZR 52-34",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "52-34 Commercial Uses in Residence Districts In all Residence Districts, a non-conforming use that is listed in Use Groups IV, VI, VII, VIII, IX or X and permitted as-of-right within C7 Districts, may be changed, initially or in any subsequent change, only to a conforming use or to a commercial use permitted as-of-right in C1 Districts, other than those listed in Use Group V. In the case of any such change any associated size limitation denoted with an “S” in the underlying Use Group tables, need not apply. Eating or drinking establishments where such establishment provides entertainment with a cover charge or specified showtime, or includes a dance floor, thus permitted as a change of use, shall be subject to the enclosure provisions of Section 32-411 (In C1, C5, C6-5 or C6-7 Districts)."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260908-zoning-unresolved-predicate-v18",
+          "pass": true,
+          "applies": true,
+          "categories": [
+            "citation-boundary",
+            "stable-passage",
+            "amendment"
+          ],
+          "zoningSourceIDs": [
+            "0e9b91b0-699f-4fc3-92dc-449041cc1985",
+            "research-permitext_discovered-id:20018523-1",
+            "research-permitext_discovered-id:20020860-3",
+            "research-permitext_discovered-id:20018621-4",
+            "research-permitext_discovered-id:20021459-5",
+            "research-permitext_cross_reference-id:20018636-1"
+          ],
+          "issues": []
+        },
+        "zoningArchitecture": {
+          "plannerVersion": "20260908-historical-source-intent-v5",
+          "plan": {
+            "schemaVersion": 2,
+            "plannerVersion": "20260908-historical-source-intent-v5",
+            "path": "direct_rule",
+            "pathLabel": "direct enacted rule",
+            "disposition": "ready",
+            "requirements": [],
+            "missingFacts": [],
+            "clarification": null,
+            "evidenceLimits": {
+              "maximumCandidates": 6,
+              "maximumDiscovered": 4,
+              "maximumTargetedDefinitions": 1,
+              "maximumCrossReferences": 2,
+              "maximumCharacters": 8000,
+              "maximumSupplementalCharacters": 6000,
+              "maximumCharactersPerSource": 4000
+            },
+            "deterministicControls": {
+              "exactPassageBinding": true,
+              "stableSourceHashes": true,
+              "tableGridAndLegend": false,
+              "effectiveDateEventBinding": false,
+              "arithmeticLedger": false,
+              "propertyAndMapPrerequisites": false
+            },
+            "callPolicy": {
+              "initialTier": "fast",
+              "initialModelRole": "luna_first",
+              "subjectiveVerification": false,
+              "verifierTier": null,
+              "maximumProviderCalls": 1,
+              "allowFullAnswerRewrite": false,
+              "repairEligible": false,
+              "repairTier": null,
+              "maximumRepairAttempts": 0,
+              "repairMode": null,
+              "terraEscalation": "provider_failure_or_one_source_bounded_repair"
+            },
+            "questionSignals": {
+              "sourceBoundaryExplanationOnly": false,
+              "historicalSubstantiveTextRequested": false,
+              "explicitMissingFact": false,
+              "propertyIdentifierPresent": false,
+              "mappedStatusPresent": false
+            },
+            "planHash": "8c50da1720d0170da84449b3cf520fb2674c9cdea4cf3444095ca021b5f249fd"
+          },
+          "deterministicContext": {
+            "schemaVersion": 2,
+            "compilerVersion": "20260908-direct-rule-obligations-v22",
+            "plannerVersion": "20260908-historical-source-intent-v5",
+            "planHash": "8c50da1720d0170da84449b3cf520fb2674c9cdea4cf3444095ca021b5f249fd",
+            "path": "direct_rule",
+            "dates": [],
+            "arithmetic": {
+              "measurements": [],
+              "calculations": []
+            },
+            "answerObligations": [],
+            "structuredTables": [],
+            "passages": [
+              {
+                "sourceID": "0e9b91b0-699f-4fc3-92dc-449041cc1985",
+                "sectionID": "20018658",
+                "sectionNumber": "52-61",
+                "textHash": "bd94c21d816b0b5bf84d8753c571299a3f61c6602cdcdc4874f48dc0f845c51c",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-1",
+                "sectionID": "20018523",
+                "sectionNumber": "12-10",
+                "textHash": "59be15ff66042455a97f5a372447030554a46d2346428a8b5b7f2744c61040a7",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20020860-3",
+                "sectionID": "20020860",
+                "sectionNumber": "101-618",
+                "textHash": "3d7608ed219dfa28faa64421c6e821c6ffd023df5703eac2906bd709ec0b1067",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018621-4",
+                "sectionID": "20018621",
+                "sectionNumber": "51-00",
+                "textHash": "9f7e17ec761643b703998da66b8b0341562b1f71e507bedf6dee1a79340321f7",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20021459-5",
+                "sectionID": "20021459",
+                "sectionNumber": "65-13",
+                "textHash": "4e7c5345ddd34038b55d73606a3ca670d56efaf5578b38969c85df42f75e50c5",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20018636-1",
+                "sectionID": "20018636",
+                "sectionNumber": "52-34",
+                "textHash": "11e295d4665e78cd64c43dbce5578deee733c355d4329d477bafe544953a9ccb",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              }
+            ],
+            "contextHash": "98e4ba6165756a50305d27e80a0f04f73d608939e63a5c79e9b7be96cd8fe6fe"
+          },
+          "evidenceSelection": {
+            "pass": true,
+            "sources": [
+              {
+                "sourceID": "0e9b91b0-699f-4fc3-92dc-449041cc1985",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Pinned by the user",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-complete-selected-zoning-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:49:45.472Z",
+                "sectionID": "20018658",
+                "codePrefix": "ZR",
+                "sectionNumber": "52-61",
+                "title": "General Provisions",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "If, for a continuous period of two years, either the non-conforming use of land with minor improvements is discontinued, or the active operation of substantially all the non-conforming uses in any building or other structure is discontinued, such land or building or other structure shall thereafter be used only for a conforming use. Intent to resume active operations shall not affect the foregoing. The provisions of this Section shall not apply where such discontinuance of active operations is directly caused by war, strikes or other labor difficulties, a governmental program of materials rationing, or the construction of a duly authorized improvement project by a governmental body or a public utility company. However, the provisions of this Section shall also not apply to vacant ground floor or basement stores in buildings designed for residential use located in R1 through R12 Districts, where the changed or reactivated use is a use listed in Use Group VI that would be permitted in a C1 District that is a select commercial overlay, or an office, as listed in Use Group VII. Furthermore, the provisions of this Section shall be modified to allow transient hotels, motels or tourists cabins existing on December 9, 2021, in a Residence District, to be restored to such use until December 9, 2027, regardless of more than two years of discontinuance of the use, and regardless of any change of use between December 9, 2021, and December 9, 2027. In addition, the changed or reactivated use shall be subject to the provisions of Section 52-34 (Commercial Uses in Residence Districts).",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null,
+                "userSelectedText": "If, for a continuous period of two years, either the non-conforming use of land with minor improvements is discontinued, or the active operation of substantially all the non-conforming uses in any building or other structure is discontinued, such land or building or other structure shall thereafter be used only for a conforming use. Intent to resume active operations shall not affect the foregoing. The provisions of this Section shall not apply where such discontinuance of active operations is directly caused by war, strikes or other labor difficulties, a governmental program of materials rationing, or the construction of a duly authorized improvement project by a governmental body or a public utility company. However, the provisions of this Section shall also not apply to vacant ground floor or basement stores in buildings designed for residential use located in R1 through R12 Districts, where the changed or reactivated use is a use listed in Use Group VI that would be permitted in a C1 District that is a select commercial overlay, or an office, as listed in Use Group VII. Furthermore, the provisions of this Section shall be modified to allow transient hotels, motels or tourists cabins existing on December 9, 2021, in a Residence District, to be restored to such use until December 9, 2027, regardless of more than two years of discontinuance of the use, and regardless of any change of use between December 9, 2021, and December 9, 2027. In addition, the changed or reactivated use shall be subject to the provisions of Section 52-34 (Commercial Uses in Residence Districts).",
+                "pinnedSelectionExact": true
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-1",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “building”, “contains”, “contain”, “lawful”, “non-conforming”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “building”, “contains”, “contain”, “lawful”, “non-conforming”.",
+                "retrievalRank": 5,
+                "retrievalScore": 24.275,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "definition",
+                  "functions": [
+                    "definition"
+                  ],
+                  "materialityRank": 6,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "definition provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:49:45.472Z",
+                "sectionID": "20018523",
+                "codePrefix": "ZR",
+                "sectionNumber": "12-10",
+                "title": "DEFINITIONS",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "building designed for residential use General Definition see designed for residential use\n\nbuilding or other structure General Definition Last Amended 12/15/1961 A \"building or other structure\" includes any building or any other structure of any kind.\n\nland with minor improvements General Definition Last Amended 2/2/2011 \"Land with minor improvements\" is a tract of land or a zoning lot that: (a) does not contain any building or other structure; or (b) involves buildings or other structures, or other improvements, located underground or substantially at ground level, with a total assessed valuation, excluding land, of less than $14,500 as of February 2, 2011, as determined from the assessment rolls in effect on the applicable date on which such use is changed, damaged or destroyed, or terminated, in accordance with the provisions of Sections 52-32, 52-52 or 52-72 (Land with Minor Improvements). The Chairperson of the City Planning Commission shall adjust this figure annually. Such adjustment shall occur on August 1 of each calendar year, based on the percentage change in the Consumer Price Index for all urban consumers as defined by the U.S. Bureau of Labor Statistics for the twelve months ended on June 30 of that year.\n\nSelect commercial overlay General Definition Last Amended 6/6/2024 “Select commercial overlays” shall be any of the following C1 or C2 Districts: C1-1, C1-2, C1-3 or C1-4 Districts or C2-1, C2-2, C2-3 or C2-4 Districts.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": false,
+                "targetedDefinition": {
+                  "schemaVersion": 1,
+                  "version": "20260908-zoning-far-definition-v2",
+                  "sourceMode": "canonical_enacted_definition_entries",
+                  "sectionID": "20018523",
+                  "codePrefix": "ZR",
+                  "sectionNumber": "12-10",
+                  "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                  "jurisdiction": "New York City",
+                  "labels": [
+                    "building designed for residential use",
+                    "building or other structure",
+                    "land with minor improvements",
+                    "Select commercial overlay"
+                  ],
+                  "passages": [
+                    "building designed for residential use General Definition see designed for residential use",
+                    "building or other structure General Definition Last Amended 12/15/1961 A \"building or other structure\" includes any building or any other structure of any kind.",
+                    "land with minor improvements General Definition Last Amended 2/2/2011 \"Land with minor improvements\" is a tract of land or a zoning lot that: (a) does not contain any building or other structure; or (b) involves buildings or other structures, or other improvements, located underground or substantially at ground level, with a total assessed valuation, excluding land, of less than $14,500 as of February 2, 2011, as determined from the assessment rolls in effect on the applicable date on which such use is changed, damaged or destroyed, or terminated, in accordance with the provisions of Sections 52-32, 52-52 or 52-72 (Land with Minor Improvements). The Chairperson of the City Planning Commission shall adjust this figure annually. Such adjustment shall occur on August 1 of each calendar year, based on the percentage change in the Consumer Price Index for all urban consumers as defined by the U.S. Bureau of Labor Statistics for the twelve months ended on June 30 of that year.",
+                    "Select commercial overlay General Definition Last Amended 6/6/2024 “Select commercial overlays” shall be any of the following C1 or C2 Districts: C1-1, C1-2, C1-3 or C1-4 Districts or C2-1, C2-2, C2-3 or C2-4 Districts."
+                  ],
+                  "canonicalSectionCharacterCount": 268088,
+                  "excerptCharacterCount": 1459,
+                  "canonicalContextComplete": false
+                }
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20020860-3",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “building”, “non-conforming”, “non”, “conforming”, “30”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “building”, “non-conforming”, “non”, “conforming”, “30”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "retrievalRank": 2,
+                "retrievalScore": 32.744,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-08T13:49:45.472Z",
+                "sectionID": "20020860",
+                "codePrefix": "ZR",
+                "sectionNumber": "101-618",
+                "title": "Termination of certain non-conforming signs",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "101-618 Termination of certain non-conforming signs In the Fulton Mall Subdistrict, Section 52-80 (REGULATIONS APPLYING TO NON-CONFORMING SIGNS) shall not apply. In lieu thereof, certain non-conforming signs may be continued until June 30, 1980, providing that after that date such non-conforming signs shall terminate and shall be removed in their entirety, including any supporting structure, frame or device. Such signs shall include: advertising signs; flashing signs; signs located more than 40 feet above curb level; roof signs; signs extending above a parapet; signs obscuring cornices and windows; double or multi-faced signs; and signs that project across a street line more than 12 inches. Any sign, as of January 1, 1978, that forms an integral part of the surface of a building or other structure (such as a sign carved in stone, cast in metal or molded in terra cotta on a building whose facade is of such material) shall not be subject to the provisions of this Section.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018621-4",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “building”, “non-conforming”, “non”, “conforming”, “owner”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “building”, “non-conforming”, “non”, “conforming”, “owner”.",
+                "retrievalRank": 3,
+                "retrievalScore": 30.094,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-08T13:49:45.472Z",
+                "sectionID": "20018621",
+                "codePrefix": "ZR",
+                "sectionNumber": "51-00",
+                "title": "PURPOSE OF REGULATIONS GOVERNING NON-CONFORMING USES AND NON-COMPLYING BUILDINGS",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "51-00 PURPOSE OF REGULATIONS GOVERNING NON-CONFORMING USES AND NON-COMPLYING BUILDINGS The zoning districts established in this Resolution (as set forth in the district regulations in Articles II, III and IV and on the zoning maps) are designed to guide the future use of the City's land by encouraging the development of desirable residential, commercial and manufacturing areas with appropriate groupings of compatible and related uses and thus to promote and to protect public health, safety and general welfare. As a necessary corollary, in order to carry out such purposes, non-conforming uses which adversely affect the development of such areas must be subject to certain limitations. The regulations governing non-conforming uses set forth in this Chapter are therefore adopted in order to provide a gradual remedy for existing undesirable conditions resulting from such incompatible non-conforming uses, which are detrimental to the achievement of such purposes. While such uses are generally permitted to continue, these regulations are designed to restrict further investment in such uses, which would make them more permanent establishments in inappropriate locations. In the case of a few objectionable non-conforming uses which are detrimental to the character of the districts in which such uses are located, a reasonable statutory period of life is established for such uses, in order to permit the owner gradually to make his plans for the future during the period when he is allowed to continue the non-conforming uses of his property, thereby minimizing any loss, while at the same time assuring the public that the district in which such non-conformity exists will eventually benefit from a more nearly uniform character. In the case of buildings not complyi",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20021459-5",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “non-conforming”, “non”, “conforming”, “active”, “operation”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “non-conforming”, “non”, “conforming”, “active”, “operation”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "retrievalRank": 4,
+                "retrievalScore": 26.604,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-08T13:49:45.472Z",
+                "sectionID": "20021459",
+                "codePrefix": "ZR",
+                "sectionNumber": "65-13",
+                "title": "Discontinuance Provisions",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "65-13 Discontinuance Provisions In all districts, where a non-conforming use has been discontinued, the time limits associated with restoring active operations of such use to retain its non-conforming status shall be suspended. Subsequent to the expiration of the applicable time duration as set forth in Section 65-01 (Applicability of Article VI, Chapter 5), the time period established by the applicable provisions of this Resolution shall be resumed, and the remaining time associated with restoring active operations shall be the amount existing prior to the severe disaster.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_cross_reference-id:20018636-1",
+                "origin": "permitext_cross_reference",
+                "sourceType": "enacted_text",
+                "relationship": "Direct enacted-text cross-reference from this answer's primary evidence",
+                "authorityClass": "enacted",
+                "retrievalReason": "Direct cross-reference to ZR 52-34",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 1,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "supporting_cross_reference",
+                  "functions": [
+                    "supporting_cross_reference"
+                  ],
+                  "materialityRank": 7,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "supporting cross-reference"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:49:45.472Z",
+                "sectionID": "20018636",
+                "codePrefix": "ZR",
+                "sectionNumber": "52-34",
+                "title": "Commercial Uses in Residence Districts",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "52-34 Commercial Uses in Residence Districts In all Residence Districts, a non-conforming use that is listed in Use Groups IV, VI, VII, VIII, IX or X and permitted as-of-right within C7 Districts, may be changed, initially or in any subsequent change, only to a conforming use or to a commercial use permitted as-of-right in C1 Districts, other than those listed in Use Group V. In the case of any such change any associated size limitation denoted with an “S” in the underlying Use Group tables, need not apply. Eating or drinking establishments where such establishment provides entertainment with a cover charge or specified showtime, or includes a dance floor, thus permitted as a change of use, shall be subject to the enclosure provisions of Section 32-411 (In C1, C5, C6-5 or C6-7 Districts).",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              }
+            ],
+            "rejected": [],
+            "gateFailures": [],
+            "usage": {
+              "sourceCount": 6,
+              "characterCount": 7194,
+              "pinnedCharacterCount": 1597,
+              "maximumCharacters": 8000
+            }
+          },
+          "evidenceReadiness": {
+            "schemaVersion": 1,
+            "pass": true,
+            "disposition": "ready",
+            "issues": [],
+            "requiredEvidence": []
+          },
+          "repairVersion": "20260901-source-bounded-patch-v2",
+          "sourceBoundedRepairApplied": false,
+          "repairPacketHashes": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-complete-selected-zoning-v29",
+          "retrievalQuery": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "A building contains a lawful non-conforming use, but active operation of substantially all of that use stopped for 30 continuous months even though the owner always intended to reopen it. Can the owner simply restart the use?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "question_not_bounded_to_selected_evidence"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 6,
+            "maximumDiscovered": 4,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 2,
+            "maximumCharacters": 8000,
+            "maximumSupplementalCharacters": 6000,
+            "maximumCharactersPerSource": 4000,
+            "maximumCompletePinnedSectionCharacters": 8000
+          },
+          "usage": {
+            "pinnedCount": 1,
+            "pinnedCharacterCount": 1597,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 1,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 7597,
+            "supplementalCharacterCount": 5600,
+            "candidateCount": 6,
+            "discoveredCount": 4,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 1,
+            "topicDependencyCount": 0,
+            "characterCount": 7197,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0,
+            "finalSourceCount": 6,
+            "finalCharacterCount": 7194
+          },
+          "limitations": [
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "visual-source-review-required",
+              "text": "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. Review and explicitly select the applicable visual source before preparing that candidate."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 4068,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codePrefixes": [
+                  "ZR"
+                ],
+                "routeReason": "explicitly pinned evidence"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "explicitly pinned evidence",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: NYC Zoning Resolution",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T13:49:45.194Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "permitext-deterministic-zoning-compiler"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-08T13:49:45.194Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "fast",
+          "reasons": [
+            "zoning_compiler_luna_first:direct_rule"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-luna",
+          "actualAnswerModel": "gpt-5.6-luna",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": [],
+          "zoningPlannerVersion": "20260908-historical-source-intent-v5",
+          "maximumProviderCalls": 1,
+          "fullAnswerRewriteAllowed": false,
+          "sourceBoundedRepairApplied": false,
+          "repairVersion": "20260901-source-bounded-patch-v2"
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    },
+    {
+      "id": "ZR-18",
+      "question": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+      "inputSHA256": "69c3e87b7fbed165b6850c1134ce1cd1c30ec5588a55d561f567c9aa3cd1d737",
+      "readerSelectionsSHA256": "cd5ff3bcfdd161fc2e6e0a94530ef2e1f84b32a8da21b1b322e9f1c1edb66ed7",
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.06,
+      "initialRequestSHA256": "349a85ee7c8e483628491ea73e404b7bf8ed9dfc5944664f98855711b89c98fd",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 38566,
+      "durationMilliseconds": 11499,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.025195,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "6bc94cfd-e1df-4d86-ab95-f857043c099c",
+          "createdAt": "2026-09-08T13:49:54.416Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-luna",
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 7999,
+          "cachedInputTokens": 0,
+          "outputTokens": 1210,
+          "totalTokens": 9209,
+          "estimatedCostUSD": 0.003052,
+          "actualProviderCostUSD": 0.003052,
+          "conservativeProviderCostUSD": 0.006178,
+          "durationMilliseconds": 11442,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-luna",
+        "requestedModel": "gpt-5.6-luna",
+        "promptVersion": "20260827-material-completeness-v31:compact-v2:conversational-v4",
+        "evidenceVersion": "20260908-complete-selected-zoning-v29:structured-v1",
+        "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "zoning cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: NYC Zoning Resolution",
+          "limitation": null,
+          "resolvedAt": "2026-09-08T13:49:54.420Z"
+        },
+        "answerText": "**No.** A zoning lot assembled in 2026 cannot automatically apply the majority district’s use regulations to the entire lot under Section 77-11. That section applies only when the zoning lot existed on December 15, 1961, or on an applicable subsequent amendment, and it also requires that the greatest perpendicular distance from the mapped district boundary to any lot line in the district containing less than 50 percent of the lot not exceed 25 feet. Even when those conditions are met, the majority-district regulations “may apply”—they do not apply automatically. (ZR § 77-11)\n\nFor a zoning lot that did not exist on the relevant effective date, Section 77-02 instead provides that each portion is regulated by the provisions applicable to the district in which that portion is located. Section 77-02 separately preserves the Section 77-22 floor-area-ratio calculation for zoning lots created at any time where different bulk regulations apply. (ZR §§ 77-02, 77-22)",
+        "conclusion": "**No.** A zoning lot assembled in 2026 cannot automatically apply the majority district’s use regulations to the entire lot under Section 77-11. That section applies only when the zoning lot existed on December 15, 1961, or on an applicable subsequent amendment, and it also requires that the greatest perpendicular distance from the mapped district boundary to any lot line in the district containing less than 50 percent of the lot not exceed 25 feet. Even when those conditions are met, the majority-district regulations “may apply”—they do not apply automatically. (ZR § 77-11)",
+        "supportedPoints": [
+          {
+            "heading": "Section 77-11 is limited and discretionary",
+            "explanation": "Section 77-11 applies when a zoning lot existed on December 15, 1961, or on an applicable subsequent amendment, and different uses are permitted in the two districts. It permits the use regulations of the district containing more than 50 percent of the lot area to apply to the entire zoning lot only if the greatest perpendicular distance from the mapped district boundary to any lot line in the less-than-50-percent portion does not exceed 25 feet. The text says those regulations “may apply,” so the majority percentage alone does not make the rule automatic. The section also contains specific single-/two-family versus multiple-dwelling rules and a special-purpose-district qualification.",
+            "sectionID": "20018894",
+            "sourceIDs": [
+              "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Newly created zoning lots are governed portion by portion",
+            "explanation": "Section 77-02 provides that when a zoning lot did not exist on December 15, 1961, or on an applicable subsequent amendment, each portion is regulated by all provisions applicable to the district in which that portion is located. On the stated premise that the zoning lot was assembled in 2026, this is the applicable supplied rule rather than the Section 77-11 whole-lot use-regulation option.",
+            "sectionID": "20018891",
+            "sourceIDs": [
+              "da946af8-7e8c-464c-9882-b7159b146498"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "FAR is treated separately",
+            "explanation": "Section 77-02 expressly states that Section 77-22 applies to zoning lots created at any time where different bulk regulations apply to different portions. Section 77-22 calculates an adjusted maximum floor area ratio by multiplying each applicable portion’s FAR by that portion’s percentage of the zoning lot and adding the products; it does not convert the majority district’s use regulations into automatic whole-lot use regulations.",
+            "sectionID": "20018899",
+            "sourceIDs": [
+              "e8874029-6980-4441-8267-6866f96363f6",
+              "da946af8-7e8c-464c-9882-b7159b146498"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "For a zoning lot that did not exist on the relevant effective date, Section 77-02 instead provides that each portion is regulated by the provisions applicable to the district in which that portion is located. Section 77-02 separately preserves the Section 77-22 floor-area-ratio calculation for zoning lots created at any time where different bulk regulations apply. (ZR §§ 77-02, 77-22)",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "The answer is limited to the continuously amended NYC Zoning Resolution text supplied through 2026-08-13 and the specific provisions assembled for this question; no separate mapped-location or project-record evidence was supplied or evaluated."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "20018894",
+            "sectionNumber": "77-11",
+            "title": "Conditions for Application of Use Regulations to Entire Zoning Lot",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+                "selectedText": "Whenever a zoning lot existing on December 15, 1961, or on any applicable subsequent amendment thereto, is divided by a boundary between districts in which different uses are permitted, the use regulations applicable to the district in which more than 50 percent of the lot area of the zoning lot is located may apply to the entire zoning lot, provided that the greatest distance from the mapped district boundary to any lot line of such zoning lot in the district in which less than 50 percent of its area is located does not exceed 25 feet. Such distance shall be measured perpendicular to the mapped district boundary. Whenever the use regulations are so applied, the district boundary may be assumed to be relocated accordingly, and the bulk, off-street parking and loading, and all other regulations applying to such expanded district shall apply to the entire zoning lot. However, when the zoning lot is divided by a district boundary between a district limited to single- or two-family residences and a district permitting multiple dwellings, the use and bulk regulations of an R3-2 District shall apply in the R1, R2, R3A, R3X or R3-1 portion, and the use and bulk regulations of an R4 District shall apply in the R2X, R4A, R4-1 or R4B portion. Except as specifically provided by the provisions of a special purpose district, the provisions of this Section shall apply to zoning lots which are divided by a special purpose district boundary line.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Controls whether use regulations may be applied to an entire zoning lot and states the effective-date, 25-foot, discretionary, special-residence, and special-purpose-district conditions."
+          },
+          {
+            "sectionID": "20018891",
+            "sectionNumber": "77-02",
+            "title": "Zoning Lots not Existing Prior to Effective Date or Amendment of Resolution",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "da946af8-7e8c-464c-9882-b7159b146498"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "da946af8-7e8c-464c-9882-b7159b146498",
+                "selectedText": "Whenever a zoning lot is divided by a boundary between two or more districts and such zoning lot did not exist on December 15, 1961, or any applicable subsequent amendment thereto, each portion of such zoning lot shall be regulated by all the provisions applicable to the district in which such portion of the zoning lot is located. However, the provisions of Section 77-22 (Floor Area Ratio) shall apply to zoning lots created at any time where different bulk regulations apply to different portions of such zoning lot.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Controls newly created or otherwise non-existing zoning lots by requiring each portion to follow the regulations of its district."
+          },
+          {
+            "sectionID": "20018899",
+            "sectionNumber": "77-22",
+            "title": "Floor Area Ratio",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "e8874029-6980-4441-8267-6866f96363f6"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "e8874029-6980-4441-8267-6866f96363f6",
+                "selectedText": "The maximum floor area ratio permitted on each portion of such zoning lot for the applicable type of building or buildings on such zoning lot shall be determined under the applicable regulations of this Resolution. Each such floor area ratio shall be multiplied by the percentage of the zoning lot to which such floor area ratio applies. The sum of the products thus obtained shall be the adjusted maximum floor area ratio applicable to such zoning lot. The floor area resulting from application of the adjusted maximum floor area ratio may be located anywhere on the zoning lot, subject to all other regulations of this Resolution, and provided that the floor area ratio for any portion of the zoning lot within one district shall not exceed the maximum floor area ratio, specified for that district, or the adjusted maximum floor area ratio for the zoning lot, whichever is greater, except that the portion of the zoning lot fronting on and within 100 feet of a wide street and permitting the greater maximum permitted residential floor area ratio may exceed the maximum permitted residential floor area ratio for the portion of the zoning lot by up to 20 percent. In applying the provisions of this Section, the following conditions shall apply: the floor area bonus permitted for publicly accessible open areas or arcades, under the applicable regulations of this Resolution, shall apply only to such publicly accessible open areas, arcades or portions thereof, as are located in a district in which such bonus is granted; and when a zoning lot contains a sky exposure plane building which does not have a specified maximum floor area ratio, for the purpose of computing the adjusted maximum floor area ratio, the floor area ratio of such zoning lot shall be deemed to be that which can be achieved at the minimum required open space ratio for such zoning lot.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "States the separate adjusted-FAR calculation for portions of a zoning lot subject to different bulk regulations."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "20018891",
+          "20018894",
+          "20018899",
+          "20018523"
+        ],
+        "evidenceSourceIDs": [
+          "da946af8-7e8c-464c-9882-b7159b146498",
+          "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+          "e8874029-6980-4441-8267-6866f96363f6",
+          "research-permitext_discovered-id:20018523-2"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 4,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 3,
+          "governingCitationCount": 3,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 1,
+          "userPinnedCount": 3,
+          "permitextDiscoveredCount": 1,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 3,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "ZR 77-02",
+              "summary": "ZR 77-02 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "da946af8-7e8c-464c-9882-b7159b146498"
+              ]
+            },
+            {
+              "label": "ZR 77-11",
+              "summary": "ZR 77-11 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+              ]
+            },
+            {
+              "label": "ZR 77-22",
+              "summary": "ZR 77-22 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e8874029-6980-4441-8267-6866f96363f6"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "ZR 77-02",
+              "summary": "ZR 77-02 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "da946af8-7e8c-464c-9882-b7159b146498"
+              ]
+            },
+            {
+              "label": "ZR 77-11",
+              "summary": "ZR 77-11 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+              ]
+            },
+            {
+              "label": "ZR 77-22",
+              "summary": "ZR 77-22 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e8874029-6980-4441-8267-6866f96363f6"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:20018523-2"
+              ]
+            }
+          ],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "da946af8-7e8c-464c-9882-b7159b146498",
+            "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+            "e8874029-6980-4441-8267-6866f96363f6"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:20018523-2"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260904-qualified-user-facts-v5",
+          "activeRootTopic": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "da946af8-7e8c-464c-9882-b7159b146498",
+            "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+            "e8874029-6980-4441-8267-6866f96363f6"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+            "da946af8-7e8c-464c-9882-b7159b146498",
+            "e8874029-6980-4441-8267-6866f96363f6"
+          ],
+          "citedEvidenceSourceIDs": [
+            "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+            "da946af8-7e8c-464c-9882-b7159b146498",
+            "e8874029-6980-4441-8267-6866f96363f6"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20018523-2"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:da946af8-7e8c-464c-9882-b7159b146498",
+              "label": "ZR 77-02 — Zoning Lots not Existing Prior to Effective Date or Amendment of Resolution",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "da946af8-7e8c-464c-9882-b7159b146498"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:e459c24a-b01e-47ac-9e6a-32899f526b4d",
+              "label": "ZR 77-11 — Conditions for Application of Use Regulations to Entire Zoning Lot",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:e8874029-6980-4441-8267-6866f96363f6",
+              "label": "ZR 77-22 — Floor Area Ratio",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e8874029-6980-4441-8267-6866f96363f6"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 3,
+          "coveredClaimCount": 3,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+            "da946af8-7e8c-464c-9882-b7159b146498",
+            "e8874029-6980-4441-8267-6866f96363f6"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:da946af8-7e8c-464c-9882-b7159b146498",
+              "label": "ZR 77-02 — Zoning Lots not Existing Prior to Effective Date or Amendment of Resolution",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "da946af8-7e8c-464c-9882-b7159b146498"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "da946af8-7e8c-464c-9882-b7159b146498"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "da946af8-7e8c-464c-9882-b7159b146498"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "da946af8-7e8c-464c-9882-b7159b146498"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "e8874029-6980-4441-8267-6866f96363f6",
+                        "da946af8-7e8c-464c-9882-b7159b146498"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:e459c24a-b01e-47ac-9e6a-32899f526b4d",
+              "label": "ZR 77-11 — Conditions for Application of Use Regulations to Entire Zoning Lot",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "da946af8-7e8c-464c-9882-b7159b146498"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "e8874029-6980-4441-8267-6866f96363f6",
+                        "da946af8-7e8c-464c-9882-b7159b146498"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:e8874029-6980-4441-8267-6866f96363f6",
+              "label": "ZR 77-22 — Floor Area Ratio",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e8874029-6980-4441-8267-6866f96363f6"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "e8874029-6980-4441-8267-6866f96363f6"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "e459c24a-b01e-47ac-9e6a-32899f526b4d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "e8874029-6980-4441-8267-6866f96363f6"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "da946af8-7e8c-464c-9882-b7159b146498"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "e8874029-6980-4441-8267-6866f96363f6"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "e8874029-6980-4441-8267-6866f96363f6",
+                        "da946af8-7e8c-464c-9882-b7159b146498"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "schemaVersion": 2,
+          "plannerVersion": "20260908-historical-source-intent-v5",
+          "compilerVersion": "20260908-direct-rule-obligations-v22",
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-fixture-permission-scope-v28",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+            "da946af8-7e8c-464c-9882-b7159b146498",
+            "e8874029-6980-4441-8267-6866f96363f6"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:20018523-2"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 3,
+            "citedProvisionCount": 3,
+            "governingCitationCount": 3,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 1,
+            "reviewedOnlyProvisionCount": 1,
+            "assembledSourceCount": 4,
+            "assembledProvisionCount": 4
+          },
+          "sources": [
+            {
+              "sourceID": "da946af8-7e8c-464c-9882-b7159b146498",
+              "sectionID": "20018891",
+              "reference": "ZR 77-02",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "Whenever a zoning lot is divided by a boundary between two or more districts and such zoning lot did not exist on December 15, 1961, or any applicable subsequent amendment thereto, each portion of such zoning lot shall be regulated by all the provisions applicable to the district in which such portion of the zoning lot is located. However, the provisions of Section 77-22 (Floor Area Ratio) shall apply to zoning lots created at any time where different bulk regulations apply to different portions of such zoning lot."
+            },
+            {
+              "sourceID": "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+              "sectionID": "20018894",
+              "reference": "ZR 77-11",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "Whenever a zoning lot existing on December 15, 1961, or on any applicable subsequent amendment thereto, is divided by a boundary between districts in which different uses are permitted, the use regulations applicable to the district in which more than 50 percent of the lot area of the zoning lot is located may apply to the entire zoning lot, provided that the greatest distance from the mapped district boundary to any lot line of such zoning lot in the district in which less than 50 percent of its area is located does not exceed 25 feet. Such distance shall be measured perpendicular to the mapped district boundary. Whenever the use regulations are so applied, the district boundary may be assumed to be relocated accordingly, and the bulk, off-street parking and loading, and all other regulations applying to such expanded district shall apply to the entire zoning lot. However, when the zoning lot is divided by a district boundary between a district limited to single- or two-family residences and a district permitting multiple dwellings, the use and bulk regulations of an R3-2 District shall apply in the R1, R2, R3A, R3X or R3-1 portion, and the use and bulk regulations of an R4 District shall apply in the R2X, R4A, R4-1 or R4B portion. Except as specifically provided by the provisions of a special purpose district, the provisions of this Section shall apply to zoning lots which are divided by a special purpose district boundary line."
+            },
+            {
+              "sourceID": "e8874029-6980-4441-8267-6866f96363f6",
+              "sectionID": "20018899",
+              "reference": "ZR 77-22",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "The maximum floor area ratio permitted on each portion of such zoning lot for the applicable type of building or buildings on such zoning lot shall be determined under the applicable regulations of this Resolution. Each such floor area ratio shall be multiplied by the percentage of the zoning lot to which such floor area ratio applies. The sum of the products thus obtained shall be the adjusted maximum floor area ratio applicable to such zoning lot. The floor area resulting from application of the adjusted maximum floor area ratio may be located anywhere on the zoning lot, subject to all other regulations of this Resolution, and provided that the floor area ratio for any portion of the zoning lot within one district shall not exceed the maximum floor area ratio, specified for that district, or the adjusted maximum floor area ratio for the zoning lot, whichever is greater, except that the portion of the zoning lot fronting on and within 100 feet of a wide street and permitting the greater maximum permitted residential floor area ratio may exceed the maximum permitted residential floor area ratio for the portion of the zoning lot by up to 20 percent. In applying the provisions of this Section, the following conditions shall apply: the floor area bonus permitted for publicly accessible open areas or arcades, under the applicable regulations of this Resolution, shall apply only to such publicly accessible open areas, arcades or portions thereof, as are located in a district in which such bonus is granted; and when a zoning lot contains a sky exposure plane building which does not have a specified maximum floor area ratio, for the purpose of computing the adjusted maximum floor area ratio, the floor area ratio of such zoning lot shall be deemed to be that which can be achieved at the minimum required open space ratio for such zoning lot."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20018523-2",
+              "sectionID": "20018523",
+              "reference": "ZR 12-10",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "floor area ratio General Definition Last Amended 2/2/2011 \"Floor area ratio\" is the total floor area on a zoning lot, divided by the lot area of that zoning lot. If two or more buildings are located on the same zoning lot, the floor area ratio is the sum of their floor areas divided by the lot area. (For example, a zoning lot of 10,000 square feet with a building containing 20,000 square feet of floor area has a floor area ratio of 2.0, and a zoning lot of 20,000 square feet with two buildings containing a total of 40,000 square feet of floor area also has a floor area ratio of 2.0) lot area General Definition Last Amended 2/20/1964 \"Lot area\" is the area of a zoning lot. lot, zoning General Definition see zoning lot open space ratio General Definition Last Amended 2/2/2011 The \"open space ratio\" of a zoning lot is the number of square feet of open space on the zoning lot, expressed as a percentage of the floor area on that zoning lot. (For example, if for a particular zoning lot an open space ratio of 20 is required, 20,000 square feet of floor area in the building would necessitate 4,000 square feet of open space on the zoning lot; or, if 6,000 square feet of lot area were in open space, 30,000 square feet of floor area could be on that zoning lot.) Each square foot of open space per 100 square feet of floor area is referred to as one point. publicly accessible open area General Definition Last Amended 10/17/2007 A “publicly accessible open area” is an open area for public use on a zoning lot developed in accordance with the requirements of a plaza, residential plaza, urban plaza or public plaza. residence district General Definition Last Amended 2/2/2011 A \"Residence District\" includes any district whose designation begins with the letter \"R.\" For example, an \"R6\" District includes any district whose designation begins with the symbol \"R6.\" sky exposure plane building General Definition Last Amended 12/5/2024 A “sky exposure plane building” is a building that: is located in R6 through R10 Districts without a letter suffix, or in Commercial Districts mapped within, or with a residential equivalent of, R6 through R10 Districts without a letter suffix; is developed or enlarged after December 5, 2024; and utilizes the optional bulk regulations set forth in Section 23-73, inclusive, or Section 35-81, inclusive. wide street General Definition see street, wide"
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260908-zoning-unresolved-predicate-v18",
+          "pass": true,
+          "applies": true,
+          "categories": [
+            "citation-boundary",
+            "stable-passage",
+            "definition",
+            "amendment",
+            "effective-date"
+          ],
+          "zoningSourceIDs": [
+            "da946af8-7e8c-464c-9882-b7159b146498",
+            "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+            "e8874029-6980-4441-8267-6866f96363f6",
+            "research-permitext_discovered-id:20018523-2"
+          ],
+          "issues": []
+        },
+        "zoningArchitecture": {
+          "plannerVersion": "20260908-historical-source-intent-v5",
+          "plan": {
+            "schemaVersion": 2,
+            "plannerVersion": "20260908-historical-source-intent-v5",
+            "path": "definition_cross_reference",
+            "pathLabel": "definition and cross-reference",
+            "disposition": "ready",
+            "requirements": [],
+            "missingFacts": [],
+            "clarification": null,
+            "evidenceLimits": {
+              "maximumCandidates": 8,
+              "maximumDiscovered": 3,
+              "maximumTargetedDefinitions": 2,
+              "maximumCrossReferences": 4,
+              "maximumCharacters": 10000,
+              "maximumSupplementalCharacters": 8000,
+              "maximumCharactersPerSource": 6000
+            },
+            "deterministicControls": {
+              "exactPassageBinding": true,
+              "stableSourceHashes": true,
+              "tableGridAndLegend": false,
+              "effectiveDateEventBinding": false,
+              "arithmeticLedger": false,
+              "propertyAndMapPrerequisites": false
+            },
+            "callPolicy": {
+              "initialTier": "fast",
+              "initialModelRole": "luna_first",
+              "subjectiveVerification": false,
+              "verifierTier": null,
+              "maximumProviderCalls": 2,
+              "allowFullAnswerRewrite": false,
+              "repairEligible": true,
+              "repairTier": "accurate",
+              "maximumRepairAttempts": 1,
+              "repairMode": "source_bounded_structured_patch",
+              "terraEscalation": "provider_failure_or_one_source_bounded_repair"
+            },
+            "questionSignals": {
+              "sourceBoundaryExplanationOnly": false,
+              "historicalSubstantiveTextRequested": false,
+              "explicitMissingFact": false,
+              "propertyIdentifierPresent": false,
+              "mappedStatusPresent": false
+            },
+            "planHash": "edd1920196245c994ed40b10bdc188854c6935ed175e0294ca12ff4f3e469dbe"
+          },
+          "deterministicContext": {
+            "schemaVersion": 2,
+            "compilerVersion": "20260908-direct-rule-obligations-v22",
+            "plannerVersion": "20260908-historical-source-intent-v5",
+            "planHash": "edd1920196245c994ed40b10bdc188854c6935ed175e0294ca12ff4f3e469dbe",
+            "path": "definition_cross_reference",
+            "dates": [],
+            "arithmetic": {
+              "measurements": [],
+              "calculations": []
+            },
+            "answerObligations": [],
+            "structuredTables": [],
+            "passages": [
+              {
+                "sourceID": "da946af8-7e8c-464c-9882-b7159b146498",
+                "sectionID": "20018891",
+                "sectionNumber": "77-02",
+                "textHash": "47c7a1461e8506bd408e0847a75027fbd7dd1f75e9dada69443fa381bafb8ea4",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+                "sectionID": "20018894",
+                "sectionNumber": "77-11",
+                "textHash": "47e3a1664b724f1215f897cb1e620c2f3bab866f6fdde4391d2f93d64e5635b6",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "e8874029-6980-4441-8267-6866f96363f6",
+                "sectionID": "20018899",
+                "sectionNumber": "77-22",
+                "textHash": "54565cfc4d4cf339560df8247f0c16da48dbd01cb79c5736a2726835a3611107",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-2",
+                "sectionID": "20018523",
+                "sectionNumber": "12-10",
+                "textHash": "b2235060cf8dbaef92e77b86fd9862bd98e31b1063ad8885a6a8023e7e0ed677",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              }
+            ],
+            "contextHash": "5743212913b68e72b572065a18da976669ec885ef208bfef26a590e6679b1ae9"
+          },
+          "evidenceSelection": {
+            "pass": true,
+            "sources": [
+              {
+                "sourceID": "da946af8-7e8c-464c-9882-b7159b146498",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Pinned by the user",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-complete-selected-zoning-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:49:54.624Z",
+                "sectionID": "20018891",
+                "codePrefix": "ZR",
+                "sectionNumber": "77-02",
+                "title": "Zoning Lots not Existing Prior to Effective Date or Amendment of Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "Whenever a zoning lot is divided by a boundary between two or more districts and such zoning lot did not exist on December 15, 1961, or any applicable subsequent amendment thereto, each portion of such zoning lot shall be regulated by all the provisions applicable to the district in which such portion of the zoning lot is located. However, the provisions of Section 77-22 (Floor Area Ratio) shall apply to zoning lots created at any time where different bulk regulations apply to different portions of such zoning lot.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null,
+                "userSelectedText": "Whenever a zoning lot is divided by a boundary between two or more districts and such zoning lot did not exist on December 15, 1961, or any applicable subsequent amendment thereto, each portion of such zoning lot shall be regulated by all the provisions applicable to the district in which such portion of the zoning lot is located. However, the provisions of Section 77-22 (Floor Area Ratio) shall apply to zoning lots created at any time where different bulk regulations apply to different portions of such zoning lot.",
+                "pinnedSelectionExact": true
+              },
+              {
+                "sourceID": "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Pinned by the user",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-complete-selected-zoning-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:49:54.624Z",
+                "sectionID": "20018894",
+                "codePrefix": "ZR",
+                "sectionNumber": "77-11",
+                "title": "Conditions for Application of Use Regulations to Entire Zoning Lot",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "Whenever a zoning lot existing on December 15, 1961, or on any applicable subsequent amendment thereto, is divided by a boundary between districts in which different uses are permitted, the use regulations applicable to the district in which more than 50 percent of the lot area of the zoning lot is located may apply to the entire zoning lot, provided that the greatest distance from the mapped district boundary to any lot line of such zoning lot in the district in which less than 50 percent of its area is located does not exceed 25 feet. Such distance shall be measured perpendicular to the mapped district boundary. Whenever the use regulations are so applied, the district boundary may be assumed to be relocated accordingly, and the bulk, off-street parking and loading, and all other regulations applying to such expanded district shall apply to the entire zoning lot. However, when the zoning lot is divided by a district boundary between a district limited to single- or two-family residences and a district permitting multiple dwellings, the use and bulk regulations of an R3-2 District shall apply in the R1, R2, R3A, R3X or R3-1 portion, and the use and bulk regulations of an R4 District shall apply in the R2X, R4A, R4-1 or R4B portion. Except as specifically provided by the provisions of a special purpose district, the provisions of this Section shall apply to zoning lots which are divided by a special purpose district boundary line.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null,
+                "userSelectedText": "Whenever a zoning lot existing on December 15, 1961, or on any applicable subsequent amendment thereto, is divided by a boundary between districts in which different uses are permitted, the use regulations applicable to the district in which more than 50 percent of the lot area of the zoning lot is located may apply to the entire zoning lot, provided that the greatest distance from the mapped district boundary to any lot line of such zoning lot in the district in which less than 50 percent of its area is located does not exceed 25 feet. Such distance shall be measured perpendicular to the mapped district boundary. Whenever the use regulations are so applied, the district boundary may be assumed to be relocated accordingly, and the bulk, off-street parking and loading, and all other regulations applying to such expanded district shall apply to the entire zoning lot. However, when the zoning lot is divided by a district boundary between a district limited to single- or two-family residences and a district permitting multiple dwellings, the use and bulk regulations of an R3-2 District shall apply in the R1, R2, R3A, R3X or R3-1 portion, and the use and bulk regulations of an R4 District shall apply in the R2X, R4A, R4-1 or R4B portion. Except as specifically provided by the provisions of a special purpose district, the provisions of this Section shall apply to zoning lots which are divided by a special purpose district boundary line.",
+                "pinnedSelectionExact": true
+              },
+              {
+                "sourceID": "e8874029-6980-4441-8267-6866f96363f6",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Pinned by the user",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260908-complete-selected-zoning-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:49:54.624Z",
+                "sectionID": "20018899",
+                "codePrefix": "ZR",
+                "sectionNumber": "77-22",
+                "title": "Floor Area Ratio",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "The maximum floor area ratio permitted on each portion of such zoning lot for the applicable type of building or buildings on such zoning lot shall be determined under the applicable regulations of this Resolution. Each such floor area ratio shall be multiplied by the percentage of the zoning lot to which such floor area ratio applies. The sum of the products thus obtained shall be the adjusted maximum floor area ratio applicable to such zoning lot. The floor area resulting from application of the adjusted maximum floor area ratio may be located anywhere on the zoning lot, subject to all other regulations of this Resolution, and provided that the floor area ratio for any portion of the zoning lot within one district shall not exceed the maximum floor area ratio, specified for that district, or the adjusted maximum floor area ratio for the zoning lot, whichever is greater, except that the portion of the zoning lot fronting on and within 100 feet of a wide street and permitting the greater maximum permitted residential floor area ratio may exceed the maximum permitted residential floor area ratio for the portion of the zoning lot by up to 20 percent. In applying the provisions of this Section, the following conditions shall apply: the floor area bonus permitted for publicly accessible open areas or arcades, under the applicable regulations of this Resolution, shall apply only to such publicly accessible open areas, arcades or portions thereof, as are located in a district in which such bonus is granted; and when a zoning lot contains a sky exposure plane building which does not have a specified maximum floor area ratio, for the purpose of computing the adjusted maximum floor area ratio, the floor area ratio of such zoning lot shall be deemed to be that which can be achieved at the minimum required open space ratio for such zoning lot.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null,
+                "userSelectedText": "The maximum floor area ratio permitted on each portion of such zoning lot for the applicable type of building or buildings on such zoning lot shall be determined under the applicable regulations of this Resolution. Each such floor area ratio shall be multiplied by the percentage of the zoning lot to which such floor area ratio applies. The sum of the products thus obtained shall be the adjusted maximum floor area ratio applicable to such zoning lot. The floor area resulting from application of the adjusted maximum floor area ratio may be located anywhere on the zoning lot, subject to all other regulations of this Resolution, and provided that the floor area ratio for any portion of the zoning lot within one district shall not exceed the maximum floor area ratio, specified for that district, or the adjusted maximum floor area ratio for the zoning lot, whichever is greater, except that the portion of the zoning lot fronting on and within 100 feet of a wide street and permitting the greater maximum permitted residential floor area ratio may exceed the maximum permitted residential floor area ratio for the portion of the zoning lot by up to 20 percent. In applying the provisions of this Section, the following conditions shall apply: the floor area bonus permitted for publicly accessible open areas or arcades, under the applicable regulations of this Resolution, shall apply only to such publicly accessible open areas, arcades or portions thereof, as are located in a district in which such bonus is granted; and when a zoning lot contains a sky exposure plane building which does not have a specified maximum floor area ratio, for the purpose of computing the adjusted maximum floor area ratio, the floor area ratio of such zoning lot shall be deemed to be that which can be achieved at the minimum required open space ratio for such zoning lot.",
+                "pinnedSelectionExact": true
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20018523-2",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “zoning”, “lot”, “2026”, “two”, “districts”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “zoning”, “lot”, “2026”, “two”, “districts”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "retrievalRank": 9,
+                "retrievalScore": 25.284,
+                "retrievalVersion": "20260908-fountain-premise-scope-v29",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "definition",
+                  "functions": [
+                    "definition"
+                  ],
+                  "materialityRank": 6,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": [
+                    "definition provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-08T13:49:54.624Z",
+                "sectionID": "20018523",
+                "codePrefix": "ZR",
+                "sectionNumber": "12-10",
+                "title": "DEFINITIONS",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "floor area ratio General Definition Last Amended 2/2/2011 \"Floor area ratio\" is the total floor area on a zoning lot, divided by the lot area of that zoning lot. If two or more buildings are located on the same zoning lot, the floor area ratio is the sum of their floor areas divided by the lot area. (For example, a zoning lot of 10,000 square feet with a building containing 20,000 square feet of floor area has a floor area ratio of 2.0, and a zoning lot of 20,000 square feet with two buildings containing a total of 40,000 square feet of floor area also has a floor area ratio of 2.0)\n\nlot area General Definition Last Amended 2/20/1964 \"Lot area\" is the area of a zoning lot.\n\nlot, zoning General Definition see zoning lot\n\nopen space ratio General Definition Last Amended 2/2/2011 The \"open space ratio\" of a zoning lot is the number of square feet of open space on the zoning lot, expressed as a percentage of the floor area on that zoning lot. (For example, if for a particular zoning lot an open space ratio of 20 is required, 20,000 square feet of floor area in the building would necessitate 4,000 square feet of open space on the zoning lot; or, if 6,000 square feet of lot area were in open space, 30,000 square feet of floor area could be on that zoning lot.) Each square foot of open space per 100 square feet of floor area is referred to as one point.\n\npublicly accessible open area General Definition Last Amended 10/17/2007 A “publicly accessible open area” is an open area for public use on a zoning lot developed in accordance with the requirements of a plaza, residential plaza, urban plaza or public plaza.\n\nresidence district General Definition Last Amended 2/2/2011 A \"Residence District\" includes any district whose designation begins with the letter \"R.\" For example, an \"R6\" District includes any district whose designation begins with the symbol \"R6.\"\n\nsky exposure plane building General Definition Last Amended 12/5/2024 A “sky exposure plane building” is a building that: is located in R6 through R10 Districts without a letter suffix, or in Commercial Districts mapped within, or with a residential equivalent of, R6 through R10 Districts without a letter suffix; is developed or enlarged after December 5, 2024; and utilizes the optional bulk regulations set forth in Section 23-73, inclusive, or Section 35-81, inclusive.\n\nwide street General Definition see street, wide",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": false,
+                "targetedDefinition": {
+                  "schemaVersion": 1,
+                  "version": "20260908-zoning-far-definition-v2",
+                  "sourceMode": "canonical_enacted_definition_entries",
+                  "sectionID": "20018523",
+                  "codePrefix": "ZR",
+                  "sectionNumber": "12-10",
+                  "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                  "jurisdiction": "New York City",
+                  "labels": [
+                    "floor area ratio",
+                    "lot area",
+                    "lot, zoning",
+                    "open space ratio",
+                    "publicly accessible open area",
+                    "residence district",
+                    "sky exposure plane building",
+                    "wide street"
+                  ],
+                  "passages": [
+                    "floor area ratio General Definition Last Amended 2/2/2011 \"Floor area ratio\" is the total floor area on a zoning lot, divided by the lot area of that zoning lot. If two or more buildings are located on the same zoning lot, the floor area ratio is the sum of their floor areas divided by the lot area. (For example, a zoning lot of 10,000 square feet with a building containing 20,000 square feet of floor area has a floor area ratio of 2.0, and a zoning lot of 20,000 square feet with two buildings containing a total of 40,000 square feet of floor area also has a floor area ratio of 2.0)",
+                    "lot area General Definition Last Amended 2/20/1964 \"Lot area\" is the area of a zoning lot.",
+                    "lot, zoning General Definition see zoning lot",
+                    "open space ratio General Definition Last Amended 2/2/2011 The \"open space ratio\" of a zoning lot is the number of square feet of open space on the zoning lot, expressed as a percentage of the floor area on that zoning lot. (For example, if for a particular zoning lot an open space ratio of 20 is required, 20,000 square feet of floor area in the building would necessitate 4,000 square feet of open space on the zoning lot; or, if 6,000 square feet of lot area were in open space, 30,000 square feet of floor area could be on that zoning lot.) Each square foot of open space per 100 square feet of floor area is referred to as one point.",
+                    "publicly accessible open area General Definition Last Amended 10/17/2007 A “publicly accessible open area” is an open area for public use on a zoning lot developed in accordance with the requirements of a plaza, residential plaza, urban plaza or public plaza.",
+                    "residence district General Definition Last Amended 2/2/2011 A \"Residence District\" includes any district whose designation begins with the letter \"R.\" For example, an \"R6\" District includes any district whose designation begins with the symbol \"R6.\"",
+                    "sky exposure plane building General Definition Last Amended 12/5/2024 A “sky exposure plane building” is a building that: is located in R6 through R10 Districts without a letter suffix, or in Commercial Districts mapped within, or with a residential equivalent of, R6 through R10 Districts without a letter suffix; is developed or enlarged after December 5, 2024; and utilizes the optional bulk regulations set forth in Section 23-73, inclusive, or Section 35-81, inclusive.",
+                    "wide street General Definition see street, wide"
+                  ],
+                  "canonicalSectionCharacterCount": 268088,
+                  "excerptCharacterCount": 2405,
+                  "canonicalContextComplete": false
+                }
+              }
+            ],
+            "rejected": [],
+            "gateFailures": [],
+            "usage": {
+              "sourceCount": 4,
+              "characterCount": 6236,
+              "pinnedCharacterCount": 3838,
+              "maximumCharacters": 10000
+            }
+          },
+          "evidenceReadiness": {
+            "schemaVersion": 1,
+            "pass": true,
+            "disposition": "ready",
+            "issues": [],
+            "requiredEvidence": []
+          },
+          "repairVersion": "20260901-source-bounded-patch-v2",
+          "sourceBoundedRepairApplied": false,
+          "repairPacketHashes": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-complete-selected-zoning-v29",
+          "retrievalQuery": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "relevance_comparison",
+            "question": {
+              "text": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "77-11",
+                  "referenceKind": "section",
+                  "reference": "§ 77-11"
+                }
+              ]
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "77-11",
+                  "referenceKind": "section",
+                  "reference": "§ 77-11"
+                }
+              ]
+            },
+            "nextCurrentTopic": {
+              "text": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+              "source": "current_question",
+              "codeReferences": [
+                {
+                  "codePrefix": null,
+                  "sectionNumber": "77-11",
+                  "referenceKind": "section",
+                  "reference": "§ 77-11"
+                }
+              ]
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": false
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": true,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260904-qualified-user-facts-v5",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "question_not_bounded_to_selected_evidence"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 8,
+            "maximumDiscovered": 3,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 10000,
+            "maximumSupplementalCharacters": 8000,
+            "maximumCharactersPerSource": 6000,
+            "maximumCompletePinnedSectionCharacters": 10000
+          },
+          "usage": {
+            "pinnedCount": 3,
+            "pinnedCharacterCount": 3838,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 3,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 10000,
+            "supplementalCharacterCount": 2405,
+            "candidateCount": 1,
+            "discoveredCount": 0,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 0,
+            "topicDependencyCount": 0,
+            "characterCount": 6243,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 7,
+            "finalSourceCount": 4,
+            "finalCharacterCount": 6236
+          },
+          "limitations": [
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "visual-source-review-required",
+              "text": "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. Review and explicitly select the applicable visual source before preparing that candidate."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 4068,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codePrefixes": [
+                  "ZR"
+                ],
+                "routeReason": "zoning cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "zoning cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: NYC Zoning Resolution",
+            "limitation": null,
+            "resolvedAt": "2026-09-08T13:49:54.420Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "permitext-deterministic-zoning-compiler"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-08T13:49:54.420Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "fast",
+          "reasons": [
+            "zoning_compiler_luna_first:definition_cross_reference"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-luna",
+          "actualAnswerModel": "gpt-5.6-luna",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": [],
+          "zoningPlannerVersion": "20260908-historical-source-intent-v5",
+          "maximumProviderCalls": 2,
+          "fullAnswerRewriteAllowed": false,
+          "sourceBoundedRepairApplied": false,
+          "repairVersion": "20260901-source-bounded-patch-v2"
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "ZR-21",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 40504,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "4df0e547798d4b3c8e0bc25b87373cf738560b278874132234a72b9cfcb68510",
+      "startedAt": "2026-09-08T13:49:45.553Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 8366,
+        "input_tokens_details": {
+          "cache_write_tokens": 8363,
+          "cached_tokens": 0
+        },
+        "output_tokens": 724,
+        "output_tokens_details": {
+          "reasoning_tokens": 97
+        },
+        "total_tokens": 9090
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0b1bfa235fd3a0e3016aa0127cded487d28fb20e89db5edc86",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** Under ZR § 52-61, if active operation of substantially all non-conforming uses in a building is discontinued for a continuous period of two years, the building may thereafter be used only for a conforming use. Because the stated discontinuance was 30 months, the owner’s continuing intent to reopen does not preserve the non-conforming use; the provision expressly states that “Intent to resume active operations shall not affect the foregoing.” This conclusion is subject to the section’s stated exceptions, including discontinuance directly caused by war, strikes or other labor difficulties, materials rationing, or a duly authorized governmental or public-utility improvement project, as well as the specifically described residential-store and transient-hotel provisions.\",\"supportedPoints\":[{\"heading\":\"Two-year discontinuance ends the non-conforming use\",\"explanation\":\"ZR § 52-61 provides that when “the active operation of substantially all the non-conforming uses in any building or other structure is discontinued” for a continuous period of two years, the building or structure “shall thereafter be used only for a conforming use.” The stated 30-month period exceeds that two-year threshold. The same passage expressly provides: “Intent to resume active operations shall not affect the foregoing.”\",\"sectionID\":\"20018658\",\"sourceIDs\":[\"0e9b91b0-699f-4fc3-92dc-449041cc1985\"]},{\"heading\":\"Stated exceptions remain part of the rule\",\"explanation\":\"The same provision says its discontinuance rule does not apply where the discontinuance was directly caused by war, strikes or other labor difficulties, a governmental program of materials rationing, or construction of a duly authorized improvement project by a governmental body or public utility company. It also states specific exceptions for certain vacant ground-floor or basement stores in residential-use buildings in R1 through R12 Districts and for certain transient hotels, motels, or tourists cabins existing on December 9, 2021, subject to the stated conditions and dates.\",\"sectionID\":\"20018658\",\"sourceIDs\":[\"0e9b91b0-699f-4fc3-92dc-449041cc1985\"]}],\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"The answer is based on the assembled NYC Zoning Resolution text through 2026-08-13; no parcel-specific district, use classification, or factual basis for one of the expressly stated exceptions was supplied or established.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"20018658\",\"sourceIDs\":[\"0e9b91b0-699f-4fc3-92dc-449041cc1985\"],\"relevance\":\"Governing rule: two years of discontinuance of active operation of substantially all non-conforming uses ends the ability to continue the use, and intent to resume does not affect that result; the passage also contains the stated exceptions.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 8447
+    },
+    {
+      "caseID": "ZR-18",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 38566,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "349a85ee7c8e483628491ea73e404b7bf8ed9dfc5944664f98855711b89c98fd",
+      "startedAt": "2026-09-08T13:49:54.702Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 7999,
+        "input_tokens_details": {
+          "cache_write_tokens": 7996,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1210,
+        "output_tokens_details": {
+          "reasoning_tokens": 240
+        },
+        "total_tokens": 9209
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0a87d635e791c7a7016aa01285f43887d2975388c938c9db5d",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** A zoning lot assembled in 2026 cannot automatically apply the majority district’s use regulations to the entire lot under Section 77-11. That section applies only when the zoning lot existed on December 15, 1961, or on an applicable subsequent amendment, and it also requires that the greatest perpendicular distance from the mapped district boundary to any lot line in the district containing less than 50 percent of the lot not exceed 25 feet. Even when those conditions are met, the majority-district regulations “may apply”—they do not apply automatically. (ZR § 77-11)\\n\\nFor a zoning lot that did not exist on the relevant effective date, Section 77-02 instead provides that each portion is regulated by the provisions applicable to the district in which that portion is located. Section 77-02 separately preserves the Section 77-22 floor-area-ratio calculation for zoning lots created at any time where different bulk regulations apply. (ZR §§ 77-02, 77-22)\",\"supportedPoints\":[{\"heading\":\"Section 77-11 is limited and discretionary\",\"explanation\":\"Section 77-11 applies when a zoning lot existed on December 15, 1961, or on an applicable subsequent amendment, and different uses are permitted in the two districts. It permits the use regulations of the district containing more than 50 percent of the lot area to apply to the entire zoning lot only if the greatest perpendicular distance from the mapped district boundary to any lot line in the less-than-50-percent portion does not exceed 25 feet. The text says those regulations “may apply,” so the majority percentage alone does not make the rule automatic. The section also contains specific single-/two-family versus multiple-dwelling rules and a special-purpose-district qualification.\",\"sectionID\":\"20018894\",\"sourceIDs\":[\"e459c24a-b01e-47ac-9e6a-32899f526b4d\"]},{\"heading\":\"Newly created zoning lots are governed portion by portion\",\"explanation\":\"Section 77-02 provides that when a zoning lot did not exist on December 15, 1961, or on an applicable subsequent amendment, each portion is regulated by all provisions applicable to the district in which that portion is located. On the stated premise that the zoning lot was assembled in 2026, this is the applicable supplied rule rather than the Section 77-11 whole-lot use-regulation option.\",\"sectionID\":\"20018891\",\"sourceIDs\":[\"da946af8-7e8c-464c-9882-b7159b146498\"]},{\"heading\":\"FAR is treated separately\",\"explanation\":\"Section 77-02 expressly states that Section 77-22 applies to zoning lots created at any time where different bulk regulations apply to different portions. Section 77-22 calculates an adjusted maximum floor area ratio by multiplying each applicable portion’s FAR by that portion’s percentage of the zoning lot and adding the products; it does not convert the majority district’s use regulations into automatic whole-lot use regulations.\",\"sectionID\":\"20018899\",\"sourceIDs\":[\"e8874029-6980-4441-8267-6866f96363f6\",\"da946af8-7e8c-464c-9882-b7159b146498\"]}],\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"The answer is limited to the continuously amended NYC Zoning Resolution text supplied through 2026-08-13 and the specific provisions assembled for this question; no separate mapped-location or project-record evidence was supplied or evaluated.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"20018894\",\"sourceIDs\":[\"e459c24a-b01e-47ac-9e6a-32899f526b4d\"],\"relevance\":\"Controls whether use regulations may be applied to an entire zoning lot and states the effective-date, 25-foot, discretionary, special-residence, and special-purpose-district conditions.\"},{\"sectionID\":\"20018891\",\"sourceIDs\":[\"da946af8-7e8c-464c-9882-b7159b146498\"],\"relevance\":\"Controls newly created or otherwise non-existing zoning lots by requiring each portion to follow the regulations of its district.\"},{\"sectionID\":\"20018899\",\"sourceIDs\":[\"e8874029-6980-4441-8267-6866f96363f6\"],\"relevance\":\"States the separate adjusted-FAR calculation for portions of a zoning lot subject to different bulk regulations.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 10849
+    }
+  ],
+  "cumulativeConservativeSpendUSD": 7.887898,
+  "spend": {
+    "active": true,
+    "capUSD": 0.123767,
+    "reservedUSD": 0.005594,
+    "actualUSD": 0.005594,
+    "requestCount": 2,
+    "pendingRequestCount": 0
+  },
+  "completedAt": "2026-09-08T13:50:05.947Z"
+}

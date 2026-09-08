@@ -1,0 +1,247 @@
+{
+  "schema": "permitext-owner-zoning-expansion-answer-review-v1",
+  "reviewedAt": "2026-09-08T14:00:19.195Z",
+  "sourceCommit": "7c83b872344c152b2ff37fe0238b16c91d18aaad",
+  "liveResult": {
+    "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+    "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+  },
+  "scope": "Source-based development review of retained Research answers, unchanged reference-key concepts, citations and point-specific applications. This reads saved artifacts and canonical sources; it does not test the project workflow, call a provider, constitute independent professional review, or establish all-case quality. Original answers and keys remain unchanged.",
+  "findings": [
+    {
+      "id": "ZR-21",
+      "mainConclusionSupported": true,
+      "requiredConcepts": [
+        {
+          "concept": "Section 52-61 generally requires the building thereafter to be used only for a conforming use after active operation of substantially all non-conforming uses is discontinued continuously for two years.",
+          "status": "met"
+        },
+        {
+          "concept": "The owner's intent to resume active operations does not preserve the use under the general rule.",
+          "status": "met"
+        },
+        {
+          "concept": "Thirty continuous months exceeds the section's two-year period.",
+          "status": "met"
+        },
+        {
+          "concept": "The answer checks the express governmental-project, vacant-store, transient-hotel, and other stated exceptions before reaching a project-specific conclusion.",
+          "status": "met"
+        }
+      ],
+      "strictExpectedAnswerAlignment": true,
+      "wholeAnswerDevelopmentReview": "passes-current-reference",
+      "issues": [],
+      "reviewDetail": "The answer states the substantially-all active-operation and continuous two-year conditions, applies 30 months, rejects intent as preserving the use and identifies the express exception groups. Its main conclusion is expressly subject to those exceptions; this meets the current reference.",
+      "presentationNotes": [],
+      "answerSHA256": "18239c0f9e1236f88d211755c0faf1c35e13084cbcdfcfb93885f2e6c6b064d5",
+      "reviewedAnswerProjectionFields": [
+        "answerText",
+        "conclusion",
+        "supportedPoints",
+        "explanation",
+        "assumptions",
+        "missingFacts",
+        "followUpQuestions",
+        "evidenceLimitations",
+        "additionalEvidenceNeeded",
+        "supportingSourceUses",
+        "supportingSources",
+        "citations",
+        "structuredEvidenceAnalysis",
+        "factUsage",
+        "conversationFacts"
+      ],
+      "reviewedAnswerProjectionSHA256": "90c3cb9de3fd92274aebadb903c248119abc42605c5eb758bed66aa213261e8e",
+      "officialSources": [
+        "https://zr.planning.nyc.gov/article-v/chapter-2/52-61"
+      ],
+      "providerCalls": 1,
+      "independentModelVerifierCalls": 0,
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "permitext-deterministic-zoning-compiler"
+          }
+        ]
+      },
+      "localHTTPDurationMilliseconds": 9149,
+      "providerDurationMilliseconds": 8447,
+      "sourcePacketFindings": [
+        {
+          "sectionNumber": "52-61",
+          "sourceID": "0e9b91b0-699f-4fc3-92dc-449041cc1985",
+          "characters": 1597,
+          "canonicalSelectedPassageExact": true,
+          "selectedTextSHA256": "b405a46b16f68c2ff4010b0e52f13ac40bb75ef5e324387946ae24eb3124f738"
+        }
+      ]
+    },
+    {
+      "id": "ZR-18",
+      "mainConclusionSupported": true,
+      "requiredConcepts": [
+        {
+          "concept": "Section 77-11's majority-district use treatment applies only to qualifying zoning lots existing on December 15, 1961 or on the date of an applicable subsequent amendment.",
+          "status": "met"
+        },
+        {
+          "concept": "For the stated lot created in 2026, Section 77-02 generally regulates each portion under the district in which it is located.",
+          "status": "partially-met"
+        },
+        {
+          "concept": "Section 77-22 separately applies an adjusted maximum FAR calculation to divided zoning lots created at any time.",
+          "status": "met"
+        },
+        {
+          "concept": "The answer distinguishes use-regulation treatment from the separate adjusted-FAR mechanism.",
+          "status": "met"
+        }
+      ],
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "needs-refinement",
+      "issues": [
+        {
+          "kind": "unsupported-temporal-application",
+          "severity": "material-qualification",
+          "field": "supportedPoints[1].explanation",
+          "observed": "After accurately reciting the effective-date condition, this point conclusively selects Section 77-02 from the 2026 assembly year alone.",
+          "whyItMatters": "No applicable subsequent amendment date is supplied. Assembly year alone does not establish whether the lot existed on such an amendment date. The main answer is conditional, but this supporting point treats that unresolved condition as established.",
+          "expected": "Keep the portion-by-portion application conditional on the lot not having existed on the applicable effective or amendment date. The direct answer that majority area alone does not automatically control can remain definite."
+        }
+      ],
+      "reviewDetail": "The main answer correctly rejects automatic majority treatment, preserves the date and distance conditions and separates FAR. All required citations are present and the FAR point binds both 77-02 and 77-22. The supporting application makes the date-dependent branch more definite than the supplied facts warrant. Automated deterministic verification accepted it.",
+      "presentationNotes": [
+        {
+          "field": "supportedPoints[0].heading and citations[0].relevance",
+          "note": "Discretionary is imprecise: Section 12-01 describes may as permissive. The answer does not explicitly invent agency approval; this wording note is separate from the material temporal-application finding.",
+          "suggestion": "Describe the option as available when the stated conditions are met, without suggesting an additional discretion or approval test."
+        }
+      ],
+      "answerSHA256": "03d7c3b9e7c8dda500350254861948835193b03a3b676295c79369c43537b5a6",
+      "reviewedAnswerProjectionFields": [
+        "answerText",
+        "conclusion",
+        "supportedPoints",
+        "explanation",
+        "assumptions",
+        "missingFacts",
+        "followUpQuestions",
+        "evidenceLimitations",
+        "additionalEvidenceNeeded",
+        "supportingSourceUses",
+        "supportingSources",
+        "citations",
+        "structuredEvidenceAnalysis",
+        "factUsage",
+        "conversationFacts"
+      ],
+      "reviewedAnswerProjectionSHA256": "3caf680b837e5896efb59f68a9071e5acb03c30f7fa2909b11e0e8e13b1bc035",
+      "officialSources": [
+        "https://zr.planning.nyc.gov/article-vii/chapter-7/77-02",
+        "https://zr.planning.nyc.gov/article-vii/chapter-7/77-11",
+        "https://zr.planning.nyc.gov/article-vii/chapter-7/77-22",
+        "https://zr.planning.nyc.gov/article-i/chapter-2/12-01"
+      ],
+      "providerCalls": 1,
+      "independentModelVerifierCalls": 0,
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "permitext-deterministic-zoning-compiler"
+          }
+        ]
+      },
+      "localHTTPDurationMilliseconds": 11499,
+      "providerDurationMilliseconds": 10849,
+      "sourcePacketFindings": [
+        {
+          "sectionNumber": "77-11",
+          "sourceID": "e459c24a-b01e-47ac-9e6a-32899f526b4d",
+          "characters": 1454,
+          "canonicalSelectedPassageExact": true,
+          "selectedTextSHA256": "295a14857278af2a86c1a3e36ab4fc7c45a318ebd697add076c8a094598b1a47"
+        },
+        {
+          "sectionNumber": "77-02",
+          "sourceID": "da946af8-7e8c-464c-9882-b7159b146498",
+          "characters": 520,
+          "canonicalSelectedPassageExact": true,
+          "selectedTextSHA256": "0bea66a6e45240d23d08bdcb45ec5b0c58a14719189ab01b46211f43975fa123"
+        },
+        {
+          "sectionNumber": "77-22",
+          "sourceID": "e8874029-6980-4441-8267-6866f96363f6",
+          "characters": 1864,
+          "canonicalSelectedPassageExact": true,
+          "selectedTextSHA256": "a99b5ef1d248ecff92b258a61d59933423766b4af1661e43f3cd75ebef7a4046"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "caseAttempts": 2,
+    "delivered": 2,
+    "mainConclusionsSupported": 2,
+    "strictWholeAnswerPasses": 1,
+    "needsRefinement": 1,
+    "providerCalls": 2,
+    "independentModelVerifierCalls": 0,
+    "pendingProviderCalls": 0,
+    "usageEstimateUSDIncludingCacheWrites": 0.00641175,
+    "usageEstimateBasis": {
+      "model": "gpt-5.6-luna",
+      "perMillionUSD": {
+        "uncachedInput": 0.2,
+        "cacheWriteInput": 0.25,
+        "cachedInput": 0.02,
+        "output": 1.2
+      },
+      "pricingCheckedOn": "2026-09-08",
+      "pricingSource": "https://developers.openai.com/api/docs/pricing",
+      "note": "Computed from retained standard-tier usage, not a provider invoice. The generic operation estimate omits the cache-write premium."
+    },
+    "conservativeUSD": 0.011665,
+    "latencyConclusion": "New local HTTP observations are 9149 and 11499 ms. There is no earlier same-case baseline or representative latency distribution. Prompt bytes were reduced; a general speed improvement is not established."
+  },
+  "campaign": {
+    "terminalLedger": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+    "packageCount": 22,
+    "providerCalls": 162,
+    "fullHTTPTurnAttempts": 72,
+    "verifierOnlyChecks": 17,
+    "conservativeUSD": 7.887898,
+    "remainingAuthorizationUSD": 0.112102,
+    "ownerCasesProviderAttempted": 45,
+    "ownerCasesNotProviderAttempted": 65,
+    "accountBalanceVerified": false,
+    "coverageCounting": "Full HTTP attempts include zero-provider failures and supplemental PDF-BPP. Numbered coverage counts only members of the 110-case key with at least one provider request and excludes verifier-only checks."
+  },
+  "artifactVerification": {
+    "sourceHashEntriesVerifiedAgainstCommit": 44,
+    "priorAndCurrentLedgerHashesVerified": 22,
+    "actualHTTPRequestsMatchPreflight": 2,
+    "canonicalCitedSelectedPassagesExact": 4,
+    "unchangedAuthoredInputsComparedWithPrior110CaseDiagnostic": 110,
+    "preflightFile": "evals/results/research-owner-zoning-expansion-preflight-2026-09-08.json",
+    "preflightSHA256": "25e2f71a1f4e1cf2a90d19721b0857d9ec96b44b0e53ed5aae682dbc9b4d362c",
+    "envelopeFile": "evals/results/research-owner-prompt-compaction-envelopes-2026-09-08.json",
+    "envelopeSHA256": "1464d041a58e2c4dbd3d7bcfa93f7505dfaf300af18de38dc9b33360651b30db",
+    "envelopeCampaignCheckpoint": "The all-110 request report predates this live package and intentionally retains its 21-package, 43-case, $7.876233 checkpoint."
+  },
+  "nextAction": "Repair and test the date-condition application gap using source-derived offline regressions with unfamiliar wording and unknown, before-amendment and after-amendment formation dates. Continue Research accuracy and speed work across the full 110-case scope within the remaining API authorization. Do not test the project workflow until the owner explicitly asks."
+}
