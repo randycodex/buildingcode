@@ -8,10 +8,10 @@ import {
   researchQuestionReturnsToOriginalTopic
 } from "./research-conversation-topic.mjs";
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
-import { targetedZoningContextExcerpt } from "./research-zoning-context-excerpts.mjs";
+import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260908-storage-source-coverage-v28";
+export const researchEvidenceAssemblyVersion = "20260908-complete-selected-zoning-v29";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -823,6 +823,26 @@ export async function assembleResearchEvidence({
     resolvedPins.push({ index, pinned, value, resolved, contextExcerpt });
   }
 
+  // Complete selected Zoning sections get first use of the existing turn
+  // budget. Do not cut its closing exceptions merely to leave room for
+  // opportunistic discovery. Partial selections, unresolved sections and
+  // oversized sections keep their existing source boundaries and limits.
+  const completeZoningPins = resolvedPins.map((entry) => {
+    const selected = compactText(entry.pinned.userSelectedText || entry.pinned.selectedText || entry.pinned.text);
+    const completeText = selected || canonicalText(entry.value);
+    if (entry.resolved && entry.value.codePrefix === "ZR" && !entry.pinned.richSourceID && !entry.contextExcerpt &&
+        completeText &&
+        (!selected || isCompleteSectionSelection(entry.value, selected))) {
+      return completeText;
+    }
+    return null;
+  });
+  if (completeZoningPins.length && completeZoningPins.every(Boolean) &&
+      completeZoningPins.reduce((sum, text) => sum + text.length, 0) <= limits.maximumCharacters) {
+    resolvedPins.forEach((entry, index) => { entry.completeZoningText = completeZoningPins[index]; });
+    limits.maximumCompletePinnedSectionCharacters = limits.maximumCharacters;
+  }
+
   // Reserve complete selected source excerpts before sharing the remaining
   // budget. A fair-share prefix must not cut a closing condition in half.
   const excerptReservation = resolvedPins.reduce((sum, entry) => sum + (entry.contextExcerpt?.text.length || 0), 0);
@@ -832,12 +852,15 @@ export async function assembleResearchEvidence({
         compactText(entry.pinned.userSelectedText || entry.pinned.selectedText || entry.pinned.text).length;
     }
   }
-  const reservationFor = (entry) => entry.contextExcerpt?.text.length || entry.atomicSelectedLength || 0;
+  const reservationFor = (entry) => entry.completeZoningText?.length || entry.contextExcerpt?.text.length || entry.atomicSelectedLength || 0;
+  const pinnedSourceLimit = (entry) => entry.completeZoningText
+    ? limits.maximumCompletePinnedSectionCharacters : limits.maximumCharactersPerSource;
   const atomicReservation = resolvedPins.reduce((sum, entry) => sum + reservationFor(entry), 0);
   const ordinaryPinCount = resolvedPins.filter((entry) => !reservationFor(entry)).length;
   if (atomicReservation + ordinaryPinCount > limits.maximumCharacters ||
-      resolvedPins.some((entry) => reservationFor(entry) > limits.maximumCharactersPerSource)) {
-    for (const entry of resolvedPins) { entry.contextExcerpt = null; entry.atomicSelectedLength = 0; }
+      resolvedPins.some((entry) => reservationFor(entry) > pinnedSourceLimit(entry))) {
+    for (const entry of resolvedPins) { entry.completeZoningText = null; entry.contextExcerpt = null; entry.atomicSelectedLength = 0; }
+    delete limits.maximumCompletePinnedSectionCharacters;
   }
 
   for (const [position, entry] of resolvedPins.entries()) {
@@ -847,9 +870,11 @@ export async function assembleResearchEvidence({
     const remainingOrdinaryPins = remainingEntries.filter((item) => !reservationFor(item)).length;
     const fairPinnedShare = remainingOrdinaryPins
       ? Math.floor(Math.max(0, remainingCharacters - reservedCharacters) / remainingOrdinaryPins) : 0;
-    const allowance = Math.min(limits.maximumCharactersPerSource,
+    const allowance = Math.min(pinnedSourceLimit(entry),
       reservationFor(entry) || fairPinnedShare, remainingCharacters);
-    let targeted = entry.contextExcerpt
+    let targeted = entry.completeZoningText
+      ? { value: { ...entry.value, text: entry.completeZoningText, canonicalText: entry.completeZoningText }, excerpt: null }
+      : entry.contextExcerpt
       ? { value: { ...entry.value, text: entry.contextExcerpt.text, canonicalText: entry.contextExcerpt.text,
           targetedZoningContext: entry.contextExcerpt.metadata }, excerpt: null }
       : !entry.pinned.richSourceID &&
@@ -861,7 +886,7 @@ export async function assembleResearchEvidence({
           allowance
         )
       : { value: entry.value, excerpt: null };
-    if (!targeted.excerpt && !entry.contextExcerpt && !entry.pinned.richSourceID && allowance > 0) {
+    if (!targeted.excerpt && !entry.contextExcerpt && !entry.completeZoningText && !entry.pinned.richSourceID && allowance > 0) {
       targeted = {
         ...targeted,
         value: questionSpecificBlockValue(targeted.value, query.retrievalQuery, allowance)

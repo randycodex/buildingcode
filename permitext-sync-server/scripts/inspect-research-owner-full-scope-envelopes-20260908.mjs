@@ -25,11 +25,11 @@ globalThis.fetch = async () => { networkAttempts++; throw new Error("Network for
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1", PERMITEXT_RUN_PAID_RESEARCH_EVALS: "0" });
 const root = new URL("../", import.meta.url);
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const terminalFile = "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json";
+const terminalFile = "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json";
 const terminalBytes = await readFile(new URL(terminalFile, root));
 const terminal = JSON.parse(terminalBytes);
 const ledgerHashes = [...terminal.previousResultHashes, { file: terminalFile, sha256: hash(terminalBytes) }];
-assert.equal(ledgerHashes.length, 19);
+assert.equal(ledgerHashes.length, 20);
 let conservativeUSD = 0;
 const attempted = new Set();
 for (const entry of ledgerHashes) {
@@ -48,7 +48,7 @@ for (const entry of ledgerHashes) {
   }
 }
 conservativeUSD = Number(conservativeUSD.toFixed(6));
-assert.equal(conservativeUSD, 7.853484);
+assert.equal(conservativeUSD, 7.864152);
 const remainingAuthorizationUSD = Number((8 - conservativeUSD).toFixed(6));
 const key = JSON.parse(await readFile(new URL("evals/research-reconciled-answer-key.json", root)));
 await validateReconciledAnswerKey(key);

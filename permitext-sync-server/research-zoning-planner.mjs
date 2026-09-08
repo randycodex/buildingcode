@@ -4,7 +4,7 @@ import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zon
 
 export const zoningResearchPlannerVersion = "20260908-historical-source-intent-v5";
 
-export const zoningResearchCompilerVersion = "20260901-answer-obligations-v21";
+export const zoningResearchCompilerVersion = "20260908-direct-rule-obligations-v22";
 export const zoningResearchRepairVersion = "20260901-source-bounded-patch-v2";
 
 export const zoningResearchPaths = Object.freeze({
@@ -693,6 +693,9 @@ function obligation(id, kind, detail, values = [], sourceIDs = [], options = {})
     record.requiredPatterns = options.requiredPatterns.map(String);
   }
   if (options.affirmativeRequiredPatterns === true) record.affirmativeRequiredPatterns = true;
+  if (options.qualifiedClaims?.length) record.qualifiedClaims = options.qualifiedClaims.map((claim) => ({
+    claimPattern: String(claim.claimPattern), qualifierPattern: String(claim.qualifierPattern)
+  }));
   return record;
 }
 
@@ -1207,6 +1210,72 @@ function observedFailureObligations({ question, evidence = [], plan, facts = que
   return obligations;
 }
 
+function directRuleAnswerObligations(question, evidence = []) {
+  const obligations = [];
+  const governing = evidence.filter((source) => source.codePrefix === "ZR" && sourceRole(source) === "governing");
+  const constructionRule = governing.find((source) => source.sectionNumber === "12-01" &&
+    /The particular shall control the general\./i.test(sourceText(source)) &&
+    /difference of meaning or implication[^.]+caption, illustration, summary table or illustrative table, the text shall control\./i.test(sourceText(source)));
+  if (constructionRule && /\b(?:conflict|difference|resolve|construction)\b/i.test(question) &&
+      /\b(?:text|illustration|caption|table|general|particular)\b/i.test(question)) {
+    const options = { requireSourceBound: true, coverageScope: "answer", affirmativeRequiredPatterns: true };
+    obligations.push(obligation("construction_particular_controls_general", "rule_priority",
+      "State the supplied Section 12-01 principle that the particular controls the general, alongside the text-over-illustration rule.", [], [constructionRule.sourceID], {
+        ...options, requiredPatterns: [String.raw`\b(?:the\s+)?(?:more\s+)?(?:particular|specific)(?:\s+(?:rules?|provisions?|requirements?|text))?\s+(?:(?:shall|must)\s+)?(?:controls?|governs?|prevails?\s+over|takes?\s+precedence\s+over)\s+(?:the\s+)?general\b`],
+        prohibitedPatterns: [String.raw`\b(?:particular|specific)(?:\s+(?:rules?|provisions?|requirements?|text))?\s+(?:does?\s+not|never|cannot)\s+(?:control|govern|prevail)\b`]
+      }));
+    obligations.push(obligation("construction_text_controls_illustrations", "rule_priority",
+      "Explain that the supplied enacted text controls a conflicting caption, illustration, summary table or illustrative table.", [], [constructionRule.sourceID], {
+        ...options, valueGroups: [["illustration", "illustrations"], ["summary table", "summary tables", "illustrative table", "illustrative tables"]],
+        requiredPatterns: [String.raw`\b(?:text\b[^.;]{0,80}\b(?:controls?|governs?|prevails?|takes? precedence)|(?:give|gives|giving)\s+controlling effect to\s+(?:the\s+)?(?:enacted\s+)?text)\b`],
+        prohibitedPatterns: [String.raw`\btext\b[^.;]{0,40}\b(?:does not|never|cannot)\s+(?:control|govern|prevail)\b`,
+          String.raw`\b(?:not|never|cannot)\s+give controlling effect to\s+(?:the\s+)?(?:enacted\s+)?text\b`]
+      }));
+  }
+
+  const spacingSource = governing.find((source) => source.sectionNumber === "23-371");
+  const spacingText = sourceText(spacingSource);
+  const lowerRule = spacingText.match(/minimum distance between two or more buildings on the same zoning lot that are not connected at any level shall be (\d+) feet[^.]+portions of buildings lower than (\d+) feet/i);
+  const statedUpperBound = firstQuestionNumber(question, [/\b(?:below|lower than|under)\s+(\d+(?:\.\d+)?)\s*(?:feet|ft)\b/i]);
+  const hasUnitCount = /\b(?:more than three|three or more|[3-9]|\d{2,})\s+dwelling units\b/i.test(question);
+  const unconnected = /\b(?:do not connect|don't connect|not connected)\s+at any level\b/i.test(question);
+  if (spacingSource && lowerRule && statedUpperBound !== null && statedUpperBound <= Number(lowerRule[2]) &&
+      hasUnitCount && unconnected && /\bsame zoning lot\b/i.test(question)) {
+    const distance = Number(lowerRule[1]), height = Number(lowerRule[2]);
+    const sourceIDs = [spacingSource.sourceID];
+    obligations.push(obligation("separate_buildings_lower_height_spacing", "tiered_dimension",
+      `For unconnected buildings below ${height} feet, apply ${distance} feet between closest points.`,
+      numberTextAlternatives(distance), sourceIDs, { requireSourceBound: true, coverageScope: "answer",
+        valueGroups: [["closest points", "closest point"]] }));
+    if (/provisions of this Section shall not apply to:[^.]+buildings that are separated from each other by a rear yard equivalent/i.test(spacingText)) {
+      obligations.push(obligation("separate_buildings_rear_yard_equivalent_exception", "scope_exception",
+        "Check the rear-yard-equivalent exception; avoid claiming it is the only exception.",
+        ["rear yard equivalent", "rear-yard-equivalent"], sourceIDs, { requireSourceBound: true, coverageScope: "answer",
+          requiredPatterns: [String.raw`\b(?:exception|exempt|does not apply|do not apply|inapplicable)\b`],
+          prohibitedPatterns: [String.raw`\b(?:conclusion|result|answer)\s+could\s+differ\s+only\s+if\b`] }));
+    }
+    const proposed = firstQuestionNumber(question, [/(\d+(?:\.\d+)?)\s*(?:feet|ft)\s+apart\b/i,
+      /(\d+(?:\.\d+)?)[- ](?:foot|ft)[- ](?:spacing|separation)\b/i]);
+    if (proposed !== null && proposed < distance) obligations.push(obligation("separate_buildings_spacing_shortfall", "arithmetic",
+      `Show the spacing shortfall: ${distance} - ${proposed} = ${Number((distance - proposed).toFixed(4))} feet.`,
+      numberTextAlternatives(Number((distance - proposed).toFixed(4))), sourceIDs, { coverageScope: "answer" }));
+    const upperRule = spacingText.match(/Portions of such buildings higher than (\d+) feet shall be at least (\d+) feet apart/i);
+    const numberWords = { 20: "twenty", 30: "thirty", 40: "forty", 50: "fifty", 60: "sixty", 70: "seventy", 80: "eighty", 90: "ninety" };
+    const upperSpacing = upperRule ? Number(upperRule[2]) : null;
+    const upperValues = upperSpacing === null ? [] : [...numberTextAlternatives(upperSpacing), numberWords[upperSpacing]].filter(Boolean);
+    const upperDimensionPattern = upperValues.length ? String.raw`\b(?:${upperValues.map(escapedPattern).join("|")})[-\s]*(?:feet|foot|ft)\b` : null;
+    if (upperDimensionPattern && /need not exceed \d+ feet(?:, provided that| if)/i.test(spacingText)) {
+      obligations.push(obligation("separate_buildings_requested_height_scope", "answer_scope",
+        `Answer the below-${height}-foot scenario. If mentioning ${upperSpacing}-foot upper-height spacing, include its conditional reduction or proviso.`,
+        [], sourceIDs, { requireSourceBound: true, coverageScope: "answer", qualifiedClaims: [{
+          claimPattern: upperDimensionPattern,
+          qualifierPattern: String.raw`\b(?:subject to (?:the )?(?:stated |applicable )?(?:proviso|exception|conditions?|conditional reduction)|provided that|may be reduced|can be reduced|need not exceed|does not apply|do not apply)\b`
+        }] }));
+    }
+  }
+  return obligations;
+}
+
 function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic, facts = question }) {
   const obligations = [];
   const sourceIDs = evidence.map((source) => source?.sourceID).filter(Boolean);
@@ -1358,7 +1427,7 @@ function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic, 
       sourceIDs
     ));
   }
-  return obligations.concat(observedFailureObligations({ question, evidence, plan, facts }));
+  return obligations.concat(observedFailureObligations({ question, evidence, plan, facts }), directRuleAnswerObligations(question, evidence));
 }
 
 export function zoningResearchDeterministicContext({
@@ -1894,6 +1963,23 @@ export function evaluateZoningDeterministicControls({
         detail: answerObligation.detail
       });
       break;
+    }
+    for (const claim of answerObligation?.qualifiedClaims || []) {
+      // Check the main explanation and each supported point independently:
+      // a qualification buried in a different point cannot qualify a claim.
+      const units = [answer?.answerText, answer?.conclusion, answer?.explanation, ...supportedPoints.map((point) => point.text)]
+        .filter(Boolean).flatMap((unit) => String(unit).split(/\n\s*\n/)).map(compactText);
+      const unqualified = units.some((unit) => {
+        if (!new RegExp(claim.claimPattern, "i").test(unit)) return false;
+        return !Array.from(unit.matchAll(new RegExp(claim.qualifierPattern, "ig"))).some((match) =>
+          !/\b(?:not|never|without)\s+(?:(?:be|being)\s+)?$/i.test(unit.slice(0, match.index)));
+      });
+      if (unqualified) issues.push({
+        code: "ANSWER_OBLIGATION_QUALIFICATION_MISSING",
+        obligationID: answerObligation.id,
+        sourceIDs: answerObligation.sourceIDs || [],
+        detail: answerObligation.detail
+      });
     }
   }
   const deduplicated = [];

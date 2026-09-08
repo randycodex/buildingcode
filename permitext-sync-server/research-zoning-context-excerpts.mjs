@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 export const zoningContextExcerptVersion = "20260908-storage-applicability-excerpt-v2";
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
-function isCompleteSectionSelection(source, selectedText) {
+export function isCompleteSectionSelection(source, selectedText) {
   const selected = compact(selectedText);
   const canonical = compact(source.canonicalText || source.text);
   if (selected === canonical) return true;

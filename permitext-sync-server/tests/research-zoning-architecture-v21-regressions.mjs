@@ -139,10 +139,14 @@ const expectedSemanticFailureIDs = retained.results
   .sort();
 assert.deepEqual(
   deliveredReplay.filter((item) => !item.pass).map((item) => item.id).sort(),
-  expectedSemanticFailureIDs,
-  "The V2.1 compiler must preserve all 16 accepted delivered answers and reject only the five observed semantic failures."
+  [...expectedSemanticFailureIDs, "zr-rules-of-construction"].sort(),
+  "Preserve the other accepted answers, reject the five known failures, and expose the newly enforced construction principle without changing the historical grading."
 );
-assert.equal(deliveredReplay.filter((item) => item.pass).length, 16);
+assert.equal(deliveredReplay.filter((item) => item.pass).length, 15);
+assert.deepEqual(deliveredReplay.find((item) => item.id === "zr-rules-of-construction").issues.map((issue) => issue.obligationID),
+  ["construction_particular_controls_general"]);
+assert.equal(deliveredReplay.find((item) => item.id === "zr-residential-building-spacing").pass, true,
+  "Preserve the qualified spacing explanation and main-text calculation.");
 
 const splitFixture = fixtures.cases.find((item) => item.id === "zr-candidate-b1-r7a-r8a-weighted-far");
 const splitResult = retained.results.find((item) => item.testCase.id === splitFixture.id);
@@ -451,7 +455,8 @@ console.log(JSON.stringify({
   verifierBlockFixtures: observedFailures.filter((item) => item.failureKind === "deterministic_verifier_block").length,
   semanticFailureFixtures: observedFailures.filter((item) => item.failureKind === "judged_semantic_failure").length,
   retainedAcceptedAnswersPreserved: deliveredReplay.filter((item) => item.pass).length,
-  retainedSemanticFailuresRejected: deliveredReplay.filter((item) => !item.pass).length,
+  retainedSemanticFailuresRejected: deliveredReplay.filter((item) => !item.pass && expectedSemanticFailureIDs.includes(item.id)).length,
+  newlyDetectedRequiredCoverageGaps: ["zr-rules-of-construction"],
   focusedAdversarialSuitePassed: true,
   ownerApprovedRubricsModified: false,
   paidModelCalls: 0

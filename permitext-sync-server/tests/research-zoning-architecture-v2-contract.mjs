@@ -59,6 +59,7 @@ const replay = new Map(await Promise.all(delivered.map(async (result) => [
   await controlsFor(result)
 ])));
 const knownObligationFailures = new Set([
+  "zr-rules-of-construction",
   "zr-r7a-lot-coverage",
   "zr-candidate-b1-r6a-uap-insufficient-affordable-area",
   "zr-candidate-b1-deep-through-lot-vertical-yard",
@@ -73,6 +74,8 @@ for (const result of delivered) {
     `${result.testCase.id} must preserve a retained answer or reject a later-confirmed obligation failure.`
   );
 }
+assert.deepEqual(replay.get("zr-rules-of-construction").controls.issues.map((issue) => issue.obligationID),
+  ["construction_particular_controls_general"], "The historical answer omits the owner key's particular-over-general principle; preserve its original score and expose that specific coverage gap.");
 
 const uap = replay.get("zr-candidate-b1-r6a-uap-insufficient-affordable-area");
 assert.ok(uap.controls.issues.some((issue) =>
@@ -135,8 +138,8 @@ assert.equal(missingMap.callPolicy.maximumProviderCalls, 0);
 console.log(JSON.stringify({
   pass: true,
   retainedDeliveredAnswers: delivered.length,
-  retainedAnswersPreserved: 10,
-  knownObligationFailuresRejected: 4,
+  retainedAnswersPreserved: Array.from(replay.values()).filter((item) => item.controls.pass).length,
+  knownObligationFailuresRejected: knownObligationFailures.size,
   formerVerifierBlocksWithBoundedRepair: 10,
   formerVerifierBlockConvertedToEarlyEvidenceBoundary: 1,
   paidModelCalls: 0

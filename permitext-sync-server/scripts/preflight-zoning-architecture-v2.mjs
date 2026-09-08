@@ -325,7 +325,8 @@ async function replayRetainedAnswers(retained) {
   return {
     deliveredCount: answers.length,
     preservedFullScoreIDs: answers.filter((item) => item.pass).map((item) => item.id),
-    rejectedKnownJudgeFailureIDs: answers.filter((item) => !item.pass).map((item) => item.id),
+    rejectedKnownJudgeFailureIDs: answers.filter((item) => !item.pass && !(architectureV21 && item.id === "zr-rules-of-construction")).map((item) => item.id),
+    ...(architectureV21 ? { rejectedRequiredCoverageIDs: answers.filter((item) => !item.pass && item.id === "zr-rules-of-construction").map((item) => item.id) } : {}),
     answers
   };
 }
@@ -524,7 +525,10 @@ async function buildResult() {
     productionAdverseCostAtMostSixPerHundred:
       readyCases.length > 0 && (adverseUSD / readyCases.length) * 100 <= 6,
     ...(architectureV21 ? {
-      sixteenAcceptedRetainedAnswersPreserved: answerReplay.preservedFullScoreIDs.length === 16,
+      fifteenAcceptedRetainedAnswersPreserved: answerReplay.preservedFullScoreIDs.length === 15,
+      missingConstructionPrincipleExposed: JSON.stringify(answerReplay.rejectedRequiredCoverageIDs) === JSON.stringify(["zr-rules-of-construction"]) &&
+        answerReplay.answers.find((item) => item.id === "zr-rules-of-construction").issues.every((issue) =>
+          issue.obligationID === "construction_particular_controls_general"),
       fiveObservedSemanticFailuresRejected: JSON.stringify(answerReplay.rejectedKnownJudgeFailureIDs.sort()) ===
         JSON.stringify(expectedJudgeFailures.sort()),
       eightObservedFailureFixturesLocked: regressionFixtures?.cases?.length === 8 &&
