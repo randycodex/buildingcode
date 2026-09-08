@@ -1,6 +1,6 @@
 # Permitext — Reconciled Research Questions and Answer Key
 
-Reconciled: 2026-09-07. Contains 5 Construction Code, 21 Zoning, and 24 DOB NOW cases.
+Reconciled: 2026-09-08. Contains 5 Construction Code, 21 Zoning, and 24 DOB NOW cases.
 
 This is a development-only acceptance reference. The uploaded file remains unchanged. Reference wording is illustrative; source correctness, complete qualifications, and useful answers govern acceptance.
 
@@ -16,8 +16,9 @@ Put a condition that changes Yes/No in the opening answer. Use adjacent citation
 - Current repository review states supersede the compilation's blanket DRAFT labels; approval remains limited to the originally recorded scope. Reconciled prose has not received a new independent professional review.
 - The repository also contains 30 additional Zoning cases in zoning-cases-expanded-batch-1.json. They are outside this 50-case reconciliation and have not been silently added.
 - No new model quality score or response-time benchmark is claimed. DOB conflicts need the current official materials and actual filing where applicable.
+- CC-04 has an explicit development correction for the optional Assembly calculation. Its original approved source is preserved, and approval of the corrected wording remains pending.
 - The 24 DOB NOW scenarios are restored. Several Zoning questions are replaced with their revised repository versions; their original intake wording remains visible below.
-- Construction answers retain the reviewed Plumbing Code scope and vanity/lavatory distinctions. DOB NOW answers retain the subsequent-filing completion distinction, PAA source conflict, site-safety applicability, DEP drainage condition, and distinct Loft Board routes.
+- Construction answers retain Plumbing Code scope and vanity/lavatory distinctions. Explicit development corrections below preserve the original source record and carry their own pending-review status. DOB NOW answers retain the subsequent-filing completion distinction, PAA source conflict, site-safety applicability, DEP drainage condition, and distinct Loft Board routes.
 - This work does not authorize paid model calls, change source approval status, enable public Research, or establish professional sign-off. New reconciled prose has no new independent professional approval.
 
 ## Source provenance
@@ -27,6 +28,7 @@ Intake: `Permitext_Consolidated_Evaluation_Questions_Answer_Key.md`; SHA-256 `40
 - [research-cases.json](../permitext-sync-server/evals/research-cases.json) — SHA-256 `da3a0e1061b94d9707abc713d0827a8c1df46b9d8a873e9544b35ac9d90eeefb`.
 - [zoning-cases.json](../permitext-sync-server/evals/zoning-cases.json) — SHA-256 `90b9cf4c5c3ea40522103d42a9b8ec052b044cf42be019cae53eed61cfa008a6`.
 - [review-packets/dob-now-expediter-draft-review.md](../permitext-sync-server/evals/review-packets/dob-now-expediter-draft-review.md) — SHA-256 `715301e11a99f50ea320402102bb5376e627a41fce0510f7d8705f05929be975`.
+- [research-answer-key-amendments.json](../permitext-sync-server/evals/research-answer-key-amendments.json) — SHA-256 `bff14ce88bc63d4e675aca87222c57d13b24f8887d25b280969bcf6b2810594f`.
 
 DOB workflow material remains dated to its review snapshot. Consult current [DOB FAQs](https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page), [NB/Alteration-CO FAQs](https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page), [PAA guidance](https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page), [Application User Guide](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf), [release notes](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf), and [service updates](https://www.nyc.gov/site/buildings/dob/service-updates.page) for live guidance. A source URL is not a claim that all 50 answers were newly verified online.
 
@@ -206,6 +208,8 @@ Source basis: 2022 New York City Construction Codes
 
 Source case: `accessory-assembly-plumbing-fixtures`; recorded status: approved; reviewed: 2026-07-22T00:00:00.000Z. Scope: Existing construction-code evaluation approval; no new live result or release approval.
 
+**Development correction:** `cc04-optional-assembly-calculation-20260908`. Status: development-correction-pending-professional-review. The original approval above is historical; it does not approve this corrected wording or rubric.
+
 **Project facts supplied to Research:**
 
 ```json
@@ -227,25 +231,31 @@ If the multipurpose room is permitted to be classified as Group B because it has
 
 **Expected answer:**
 
-Not automatically. BC 303.1.3 directly permits the plumbing fixtures for a qualifying accessory assembly room with fewer than 75 occupants to be calculated using the applicable Assembly fixture requirements even when the room is classified as Group B or as part of the occupancy it serves. The selected PC 403.1 passage supplies the general Table 403.1 framework, but its separate fewer-than-75 permission is expressly limited to a building or nonaccessory tenant assembly space and does not independently extend that permission to this accessory room. The appropriate assembly category must first be identified from the room's actual use. PC 403.1.1 supplies the selected calculation mechanics: divide the occupant load equally between the sexes unless approved statistical information supports another distribution, apply the fixture ratios, combine fractions as required for multiple occupancies, and round up. A final fixture count requires the calculated occupant load, applicable assembly use, existing shared facilities, and other relevant project conditions.
+Yes, if the room is properly classified as Group B as the question assumes. PC 403.1 ties fixture requirements to occupancy, so Group B provides the general baseline. BC 303.1.3 also permits a qualifying accessory assembly room with fewer than 75 occupants to use the applicable Assembly fixture requirements. That alternative is optional; Group B classification does not make the Group B calculation mandatory or prohibit it. Cite BC 303.1.3 for this accessory-room option. PC 403.1 note j separately concerns a building or nonaccessory tenant assembly space.
+
+The selected passages do not supply numerical Table 403.1 rates, so they cannot establish a final count. If using the Assembly alternative, identify its applicable use category. For a count, retain any established occupant load and obtain only remaining material inputs, including any proposed shared-facility arrangement. PC 403.1.1 generally divides the load equally between the sexes unless approved statistical data supports another distribution; apply the applicable rates, add fractional requirements across occupancies before rounding, and round up. The selected passages do not establish permission to share facilities.
 
 **Required concepts:**
 
-- State that Group B classification does not automatically control the fixture calculation.
-- Attribute permission to use applicable Assembly fixture requirements for the qualifying accessory assembly room directly to BC 303.1.3.
-- Explain that the selected PC 403.1 fewer-than-75 passage applies to a building or nonaccessory tenant assembly space and does not independently extend that permission to the accessory room.
-- Use PC 403.1 only for the general Table 403.1, occupant-load, and occupancy-classification framework supported by its selected text.
-- Require identification of the appropriate assembly category based on actual use.
-- Explain the general equal division between the sexes and the statistical-data exception.
-- Explain application of fixture ratios, combination of fractions for multiple occupancies, and rounding up.
-- Avoid providing a final fixture count without the required project facts.
+- Answer the permission question directly, conditional on the properly established or expressly assumed Group B classification.
+- Bind the Group B baseline to PC 403.1 occupancy-based fixture authority; do not rely only on the accessory-room classification provision.
+- Explain that BC 303.1.3 permits, rather than mandates, the qualifying accessory room to use applicable Assembly fixture requirements.
+- Preserve the distinct building/nonaccessory-tenant scope of PC 403.1 note j and cite BC 303.1.3 for the accessory-room option.
+- Distinguish an established general permission from unsupplied numerical rates and an uncomputed fixture count.
+- Identify the applicable Assembly use category only if applying the Assembly alternative.
+- For a numerical calculation, preserve the equal sex-distribution rule and statistical-data exception, application of rates, and addition of fractions across occupancies before rounding up.
+- Retain an occupant load established in the active conversation; ask for it only if still unknown and needed for a count.
+- Do not approve shared facilities or give a final count from the selected passages and unresolved project facts.
 
 **Forbidden conclusions:**
 
-- Group B classification always controls the plumbing fixture calculation.
-- State that the selected PC 403.1 fewer-than-75 provision independently applies its building or nonaccessory tenant-space rule to this accessory assembly room.
+- Group B fixture requirements are prohibited merely because BC 303.1.3 permits an Assembly calculation.
+- Assembly calculations are mandatory for every qualifying accessory room.
+- Group B classification always controls the plumbing fixture calculation or resolves a final count.
+- The selected PC 403.1 fewer-than-75 note independently applies its building/nonaccessory-tenant rule to this accessory room.
+- Unsupplied table rates prevent the general permission conclusion even though PC 403.1 occupancy-based authority is supplied.
 - Residential unit fixtures automatically satisfy the multipurpose-room requirement.
-- Provide a final fixture count without the occupant load, assembly use, shared facilities, and project conditions.
+- Supply numerical rates or a final fixture count without the applicable evidence and project inputs.
 
 **Authority / evidence to verify:**
 
@@ -255,15 +265,16 @@ Not automatically. BC 303.1.3 directly permits the plumbing fixtures for a quali
 
 **Missing facts:**
 
-- Confirm the calculated occupant load.
-- Confirm the applicable assembly use category.
-- Confirm existing shared facilities and relevant project conditions.
-- Confirm whether approved statistical information supports a different distribution between the sexes.
+- For a numerical count: occupant load, if not already established in the active conversation.
+- For the Assembly alternative: the applicable Assembly use category.
+- For a proposed shared-facility arrangement: the existing facilities and their permitted availability to this room.
+- For a numerical count: whether approved statistical data supports a different sex distribution.
 
 **Reconciliation notes:**
 
-- Use the current repository answer and rubric, with the selected evidence and project context restored.
-- BC 303.1.3 directly supports the accessory-room fixture option. Preserve the separate nonaccessory scope of PC 403.1; do not conflate their subjects.
+- Explicit development amendment cc04-optional-assembly-calculation-20260908 corrects the permission/requirement distinction. The original source case and its approval record remain unchanged.
+- Missing numerical table rates limit calculation, not the general occupancy-based rule supplied in PC 403.1.
+- The corrected wording and rubric remain pending independent professional review. No new paid-run, production or release approval follows from this amendment.
 
 ## CC-05 — Building Code evidence versus an HCR requirement
 

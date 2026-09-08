@@ -7,6 +7,7 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { approvedEvaluationCases, validateEvaluationDataset } from "../evals/evaluation-schema.mjs";
+import { assertResearchEvaluationReferencesCurrent } from "../evals/research-answer-key-reconciliation.mjs";
 import {
   adaptZoningEvaluationDataset,
   zoningAnswerKeySectionNumbers
@@ -4914,6 +4915,9 @@ async function main() {
     );
   }
   assert(selectedCases.length > 0, "No approved evaluation cases match the requested filters.");
+  if (liveMode && !zoningMode) {
+    await assertResearchEvaluationReferencesCurrent(selectedCases.map((testCase) => testCase.id));
+  }
   const filtered = Boolean(excludedCaseID || requestedTopic || requestedDifficulty || requestedCodeEdition);
   const suiteScope = zoningMode
     ? "diagnostic"

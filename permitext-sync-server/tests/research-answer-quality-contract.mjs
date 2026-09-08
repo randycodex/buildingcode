@@ -364,6 +364,33 @@ const boundedNormalGroupBFixtureAnswer = evaluateResearchAnswerQuality({
 });
 assert.equal(boundedNormalGroupBFixtureAnswer.pass, true);
 
+const pc403OccupancyFramework = {
+  ...source("pc-occupancy-framework", "403.1", "governing", "aligned"), codePrefix: "PC",
+  text: "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Occupancy classification shall be determined in accordance with the New York City Building Code."
+};
+const supportedGroupBBaseline = {
+  answerText: "Yes, assuming the room is properly classified as Group B. The normal Group B calculation remains permitted under the PC 403.1 occupancy-based framework. BC 303.1.3 also permits qualifying accessory rooms to use Assembly requirements. No numerical fixture rates or final count can be supplied from these selected passages.",
+  supportedPoints: [{ sourceIDs: ["pc-occupancy-framework", "bc-accessory-assembly"] }],
+  citations: [{ sourceIDs: ["pc-occupancy-framework", "bc-accessory-assembly"] }]
+};
+assert.equal(evaluateResearchAnswerQuality({ question: accessoryAssemblyQuestion,
+  evidence: [...accessoryAssemblyEvidence, pc403OccupancyFramework], answer: supportedGroupBBaseline }).pass, true,
+"Supplied occupancy-based authority supports a baseline without inventing unsupplied table rates.");
+for (const replacement of [
+  { ...pc403OccupancyFramework, text: "Table 403.1 is referenced but not supplied." },
+  { ...pc403OccupancyFramework, evidencePriority: { evidenceRole: "contextual" } },
+  { ...pc403OccupancyFramework, codePrefix: "BC" }
+]) assert.deepEqual(evaluateResearchAnswerQuality({ question: accessoryAssemblyQuestion,
+  evidence: [...accessoryAssemblyEvidence, replacement], answer: supportedGroupBBaseline })
+  .unsupportedNormalGroupBFixturePermissionSourceIDs, ["bc-accessory-assembly"]);
+const unboundFrameworkAnswer = { ...supportedGroupBBaseline,
+  supportedPoints: [{ sourceIDs: ["bc-accessory-assembly"] }], citations: [{ sourceIDs: ["bc-accessory-assembly"] }] };
+assert.deepEqual(evaluateResearchAnswerQuality({ question: accessoryAssemblyQuestion,
+  evidence: [...accessoryAssemblyEvidence, pc403OccupancyFramework], answer: unboundFrameworkAnswer })
+  .unsupportedNormalGroupBFixturePermissionSourceIDs, ["bc-accessory-assembly"]);
+assert.doesNotMatch(researchAnswerQualityRevisionIssues(overbroadNormalGroupBFixtureAnswer).at(-1).detail,
+  /Lead with Not automatically|absent Table.*prevents/, "Revision feedback must not manufacture a prohibition.");
+
 const priorCodeAccessibilityEvidence = [{
   ...source("bc-prior-code-accessibility-scope", "1101.3", "supporting", "aligned"),
   text: "The provisions of this chapter shall apply to alterations and changes of use or occupancy to prior code buildings in accordance with Sections 1101.3.1 through 1101.3.5."

@@ -2,7 +2,7 @@ import { researchRequestedAreaConversions } from "./research-answer-presentation
 import { applyResearchPlumbingSourceRepairs } from "./research-plumbing-source-repairs.mjs";
 
 export const researchAnswerQualityVersion =
-  "20260908-plumbing-source-repairs-v27";
+  "20260908-fixture-permission-scope-v28";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -243,6 +243,16 @@ function disclosesApplicability(source, answerText) {
   return true;
 }
 
+export function researchFixtureOccupancyFrameworkSourceIDs(evidence = []) {
+  return (Array.isArray(evidence) ? evidence : []).filter((source) =>
+    compactText(source?.codePrefix).toUpperCase() === "PC" && compactText(source?.sectionNumber) === "403.1" &&
+    !["contextual", "irrelevant"].includes(source.evidenceRole || source.evidencePriority?.evidenceRole) &&
+    source.evidencePriority?.topicRouteRelationship !== "collateral" &&
+    /\bplumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403\.1\b/i.test(compactText(source.text)) &&
+    /\boccupancy classification shall be determined in accordance with the (?:New York City )?Building Code\b/i.test(compactText(source.text))
+  ).map((source) => source.sourceID).filter(Boolean);
+}
+
 export function evaluateResearchAnswerQuality({ question = "", evidence = [], answer = {} } = {}) {
   const availableEvidence = normalizedEvidence(evidence);
   const bindings = answerBindings(answer);
@@ -350,7 +360,9 @@ export function evaluateResearchAnswerQuality({ question = "", evidence = [], an
   const assertsNormalGroupBFixturePermission =
     /\bnormal\s+Group B\s+(?:fixture\s+)?(?:calculation|requirements?)\s+(?:remain|remains|is|are)?\s*permitted\b|\bnormal\s+starting\s+point\s+is\s+(?:therefore\s+)?(?:the\s+)?Group B\s+fixture\s+requirements\b|\bGroup B\s+classification\s+(?:therefore\s+)?supports\s+use\s+of\s+(?:the\s+)?normal\s+Group B\s+fixture\s+requirements\b/i.test(applicabilityText);
   const unsupportedNormalGroupBFixturePermissionSourceIDs =
-    accessoryAssemblySourceIDs.length && assertsNormalGroupBFixturePermission
+    accessoryAssemblySourceIDs.length && assertsNormalGroupBFixturePermission &&
+    !researchFixtureOccupancyFrameworkSourceIDs(evidence).some((sourceID) =>
+      citedSet.has(sourceID) && supportedPointSet.has(sourceID))
       ? accessoryAssemblySourceIDs
       : [];
   const multipleOccupancyFractionSourceIDs = accessoryAssemblyPlumbingQuestion
@@ -835,7 +847,7 @@ export function researchAnswerQualityRevisionIssues(result) {
   if (result.unsupportedNormalGroupBFixturePermissionSourceIDs?.length) {
     issues.push({
       type: "overstated_compliance",
-      detail: `Do not conclude that the normal Group B fixture calculation remains permitted merely because the accessory assembly room is classified as Group B. Lead with Not automatically: the supplied BC 303.1.3 establishes the Assembly-calculation option, while the absent Table 403.1 prevents this evidence package from establishing that normal Group B ratios may also be used. Bind the limited conclusion to: ${references(result.unsupportedNormalGroupBFixturePermissionSourceIDs, result.sources)}.`
+      detail: `Bind a Group B fixture baseline to supplied PC 403.1 occupancy-based fixture authority, not solely to BC 303.1.3's Assembly option. If that framework is absent, identify the missing authority without inventing a prohibition. Missing table rates prevent a numerical count; they do not negate a supplied general rule. Preserve the optional Assembly path and its qualifying scope. Review: ${references(result.unsupportedNormalGroupBFixturePermissionSourceIDs, result.sources)}.`
     });
   }
   if (result.missingMultipleOccupancyFractionSequenceSourceIDs?.length) {

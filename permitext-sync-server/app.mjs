@@ -320,7 +320,8 @@ import {
 import {
   applyResearchDeterministicAnswerRepairs,
   evaluateResearchAnswerQuality,
-  researchAnswerQualityRevisionIssues
+  researchAnswerQualityRevisionIssues,
+  researchFixtureOccupancyFrameworkSourceIDs
 } from "./research-answer-quality.mjs";
 import {
   applyResearchOutsideAuthorityStartingPoints,
@@ -8975,7 +8976,10 @@ function mockResearchInterpretation(question, evidence, options = {}) {
       )
     );
   const accessoryAssemblyFixtureAnswer = [
-    "Not automatically. BC 303.1.3 directly permits a qualifying accessory assembly room to use the applicable Assembly fixture calculation. The selected PC 403.1 permission is limited to a building or nonaccessory tenant assembly space and does not independently extend to the accessory room. Without the applicable Table 403.1 rows, the assembled evidence does not establish whether normal Group B ratios may also be used.",
+    researchFixtureOccupancyFrameworkSourceIDs(answerEvidence).length
+      ? "If the room is properly classified as Group B, PC 403.1's occupancy-based framework supports the Group B fixture requirements as the general baseline. BC 303.1.3 also permits a qualifying accessory assembly room to use the applicable Assembly fixture calculation; that option does not prohibit the Group B baseline. Numerical rates and a final count still require the applicable table rows and project facts."
+      : "BC 303.1.3 permits a qualifying accessory assembly room to use the applicable Assembly fixture calculation. The selected evidence does not supply the general occupancy-based fixture framework needed to establish the Group B baseline; that evidence gap is not a prohibition.",
+    "The separate PC 403.1 fewer-than-75 permission is limited to a building or nonaccessory tenant assembly space and does not independently extend to the accessory room.",
     accessoryAssemblyFractionSequence
       ? "For multiple occupancies, apply the applicable ratio to each occupancy, add the resulting fractional fixture requirements, and only then round up."
       : ""
@@ -10217,7 +10221,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Preserve cumulative and alternative conditions exactly. When enacted text requires A and B, never restate it as A or B; when it permits alternatives, do not turn or into and.",
         "When the same supplied table row places the user's stated category beside a materially different conditional category, briefly identify the alternate value and its qualifying condition when that contrast explains the result. Never apply the alternate value without the qualifying fact.",
         "Preserve express subject-scope restrictions before using a special permission. For an accessory assembly-room fixture question, BC 303.1.3 is the direct authority for the Assembly fixture option; a selected PC 403.1 permission limited to a building or nonaccessory tenant assembly space must be identified as separately limited and must not be presented as independent authority for the accessory room.",
-        "For an accessory assembly room classified as Group B, do not infer from the classification alone that normal Group B fixture ratios may be used. When Table 403.1 is not supplied, lead with Not automatically: BC 303.1.3 establishes the Assembly-calculation option, while the selected evidence does not establish that a normal Group B calculation is also permitted.",
+        evidence.some((source) => source.codePrefix === "BC" && source.sectionNumber === "303.1.3")
+          ? "For an accessory assembly-room fixture question, distinguish permission from a numerical calculation. Supplied PC 403.1 occupancy-based fixture text supports the Group B baseline when lawful Group B classification is established or expressly assumed; BC 303.1.3 additionally permits the qualifying accessory room to use Assembly requirements. Do not turn this option into a prohibition or make Assembly mandatory. Cite the general framework separately from the accessory-room option. Missing table rates prevent an unsupported numerical count, not the general permission conclusion. If the occupancy-based framework is absent, identify that evidence gap without inventing a prohibition. Preserve unresolved classification facts only when the question has not established or stipulated them."
+          : "",
         "Do not infer that a room is legally accessory merely because it is used by residents or serves a principal occupancy. Unless the user expressly established the accessory relationship, make any BC 303.1.3 classification conclusion conditional on that relationship and include it in missingFacts.",
         "A missing fact belongs in missingFacts or followUpQuestions only when it can change the requested conclusion. A fact that merely confirms an already-supported, more conservative result may be identified as a professional validation item, but it must not weaken or condition that result.",
         "When a calculation rule permits a non-50/50 sex distribution only when approved statistical data supports it, identify whether that approved data exists as a missing project fact whenever the final fixture calculation remains unresolved.",
@@ -10490,7 +10496,9 @@ async function openAIResearchVerification(question, evidence, interpretation, us
       "Fail with overstated_compliance when the answer treats alternative applicability paths as exhaustive without evidence: an unresolved accessory relationship does not establish that a room is a nonaccessory tenant space, and a rule expressly limited to a building or nonaccessory tenant space must not be generalized to every room. Each path needs its own supplied factual basis or an explicit condition.",
       "Fail with missed_material_conclusion when a table answer omits a materially different conditional category supplied beside the user's category in the same row and that omission could mislead the user about why the stated value fails or passes. Do not demand unrelated rows or categories.",
       "For an accessory assembly-room fixture question, fail with wrong_attribution if the answer uses PC 403.1's separate permission as authority for that accessory room without stating that the selected PC sentence is limited to a building or nonaccessory tenant assembly space. BC 303.1.3 is the direct authority for the accessory-room Assembly fixture option.",
-      "For an accessory assembly room classified as Group B, fail with overstated_compliance if the answer says normal Group B fixture ratios remain permitted or are the normal starting point solely because of that classification. Without the applicable Table 403.1 rows, the supported conclusion is Not automatically; BC 303.1.3 establishes the Assembly-calculation option but not a separate affirmative Group B calculation permission.",
+      evidence.some((source) => source.codePrefix === "BC" && source.sectionNumber === "303.1.3")
+        ? "For an accessory assembly-room fixture question, evaluate the Group B baseline against supplied PC 403.1 occupancy-based fixture authority and the stated or expressly assumed lawful classification. BC 303.1.3 supplies an additional Assembly option for the qualifying accessory room. Fail an answer that turns this optional path into a prohibition on Group B or a mandatory Assembly calculation. Missing table rates bar unsupported numerical counts, not a general permission supported by the supplied framework. Fail a Group B baseline supported only by the accessory-room option when the general fixture authority is absent or wrongly bound. Preserve unresolved classification facts without demanding reconfirmation of an express premise."
+        : "",
       "Fail with overstated_compliance when an answer treats a room as legally accessory merely because residents use it or it serves a principal occupancy. If the user did not establish the accessory relationship, BC 303.1.3 classification must be conditional and the relationship must remain a missing project fact.",
       "Fail with missed_material_conclusion when supplied PC 403.1.1 multiple-occupancy text is material but the answer omits that the fractional requirements calculated for each occupancy are added before the total is rounded up.",
       "Fail with misstated_provision when supplied PC 403.1 states that the Building Code determines occupancy classification and occupant load but the answer attributes those determinations to Table 403.1. Table 403.1 supplies fixture minimums.",

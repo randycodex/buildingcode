@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import {
   reconciledAnswerKeyURL, reconciledAnswerKeyMarkdownURL,
-  validateReconciledAnswerKey, renderReconciledAnswerKey, reconciledResearchEvaluationInput
+  validateReconciledAnswerKey, renderReconciledAnswerKey, reconciledResearchEvaluationInput,
+  assertResearchEvaluationReferencesCurrent
 } from "../evals/research-answer-key-reconciliation.mjs";
 import { researchAnswerPresentationContract } from "../research-answer-presentation.mjs";
 
@@ -11,6 +14,16 @@ assert.deepEqual(await validateReconciledAnswerKey(dataset), { CC: 5, ZR: 21, DO
 assert.equal(await readFile(reconciledAnswerKeyMarkdownURL, "utf8"), renderReconciledAnswerKey(dataset));
 const caseByID = (id) => dataset.cases.find((item) => item.id === id);
 assert.match(caseByID("CC-04").expectedAnswer, /nonaccessory/);
+assert.match(caseByID("CC-04").expectedAnswer, /^Yes, if/);
+assert.match(caseByID("CC-04").expectedAnswer, /alternative is optional/);
+assert.equal(caseByID("CC-04").reconciliationStatus, "development-correction-pending-professional-review");
+const originalConstruction = JSON.parse(await readFile(new URL("../evals/research-cases.json", import.meta.url)));
+const originalFixtureCase = originalConstruction.cases.find((item) => item.id === "accessory-assembly-plumbing-fixtures");
+assert.match(originalFixtureCase.expectedConclusion, /^Not automatically/, "The original approved record is preserved.");
+assert.equal(originalFixtureCase.status, "approved");
+assert.equal(caseByID("CC-04").sourceCaseStatus, originalFixtureCase.status);
+assert.deepEqual(caseByID("CC-04").selectedEvidence, originalFixtureCase.selectedEvidence);
+assert.deepEqual(caseByID("CC-04").projectContext, originalFixtureCase.projectContext);
 assert.match(caseByID("CC-05").expectedAnswer, /lavatory and a vanity/);
 assert.match(caseByID("ZR-09").expectedAnswer, /limits.*amount of affordable housing/);
 assert.match(caseByID("ZR-17").question, /11-333/);
@@ -22,8 +35,8 @@ assert.match(caseByID("DOBNOW-016").expectedAnswer, /Narrative Statement/);
 assert.match(caseByID("DOBNOW-018").requiredConcepts.join(" "), /apparent typo/);
 
 for (const testCase of dataset.cases) {
-  const input = reconciledResearchEvaluationInput({ ...testCase, expectedAnswer: "ANSWER_KEY_LEAK", requiredConcepts: ["RUBRIC_LEAK"], forbiddenClaims: ["FORBIDDEN_LEAK"] });
-  assert.doesNotMatch(JSON.stringify(input), /ANSWER_KEY_LEAK|RUBRIC_LEAK|FORBIDDEN_LEAK/);
+  const input = reconciledResearchEvaluationInput({ ...testCase, expectedAnswer: "ANSWER_KEY_LEAK", requiredConcepts: ["RUBRIC_LEAK"], forbiddenClaims: ["FORBIDDEN_LEAK"], developmentAmendmentID: "AMENDMENT_LEAK", rationale: "RATIONALE_LEAK" });
+  assert.doesNotMatch(JSON.stringify(input), /ANSWER_KEY_LEAK|RUBRIC_LEAK|FORBIDDEN_LEAK|AMENDMENT_LEAK|RATIONALE_LEAK/);
   if (testCase.id.startsWith("DOBNOW")) assert.ok(input.question.includes(testCase.scenario));
   if (testCase.id.startsWith("CC")) assert.ok(input.selectedEvidence.length);
   if (testCase.id.startsWith("ZR")) assert.ok(input.selectedEvidenceSectionIDs.length);
@@ -38,4 +51,36 @@ await assert.rejects(() => validateReconciledAnswerKey(corrupted), /lost its sce
 const lostCorrection = structuredClone(dataset);
 lostCorrection.cases.find((item) => item.id === "DOBNOW-003").expectedAnswer = "Every subsequent filing needs its own LOC.";
 await assert.rejects(() => validateReconciledAnswerKey(lostCorrection), /lost a reviewed answer correction/);
+for (const [change, failure] of [
+  [(item) => { item.developmentAmendmentID = "unrecorded-correction"; }, /unknown or mismatched amendment/],
+  [(item) => { item.expectedAnswer = "Assembly calculations are mandatory."; }, /differs from its recorded amendment/],
+  [(item) => { item.reconciliationStatus = "approved"; }, /pending amendment review/],
+  [(item) => { item.sourceReviewedAt = "2026-09-08"; }, /original approval history/],
+  [(item) => { item.codeVersion = "UNREVIEWED EDITION"; }, /changed answering-model inputs/],
+  [(item) => { item.requiredConcepts = ["Force a prohibition to match the former opening."]; }, /differs from its recorded amendment/]
+]) {
+  const changed = structuredClone(dataset);
+  change(changed.cases.find((item) => item.id === "CC-04"));
+  await assert.rejects(() => validateReconciledAnswerKey(changed), failure);
+}
+const droppedAmendment = structuredClone(dataset);
+const droppedCase = droppedAmendment.cases.find((item) => item.id === "CC-04");
+delete droppedCase.developmentAmendmentID;
+droppedCase.expectedAnswer = originalFixtureCase.expectedConclusion;
+droppedCase.requiredConcepts = originalFixtureCase.requiredConcepts;
+droppedCase.forbiddenClaims = originalFixtureCase.forbiddenClaims;
+await assert.rejects(() => validateReconciledAnswerKey(droppedAmendment), /silently omitted/);
+await assertResearchEvaluationReferencesCurrent(["scissor-stair-two-exits"]);
+await assert.rejects(() => assertResearchEvaluationReferencesCurrent([originalFixtureCase.id]),
+  { code: "RESEARCH_EVALUATION_REFERENCE_AMENDED" });
+const legacy = spawnSync(process.execPath, ["--input-type=module", "--eval", `
+  globalThis.fetch = async () => { throw new Error("FORBIDDEN_NETWORK_REQUEST"); };
+  process.argv = [process.execPath, "tests/research-evals.mjs", "--run-live", "--case", "accessory-assembly-plumbing-fixtures"];
+  await import("./tests/research-evals.mjs");
+`], { cwd: fileURLToPath(new URL("../", import.meta.url)), encoding: "utf8",
+  env: { PATH: process.env.PATH, NODE_ENV: "test" }, timeout: 30_000 });
+assert.equal(legacy.status, 1, legacy.stderr);
+assert.match(legacy.stderr, /Evaluation reference corrected in the development key/);
+assert.doesNotMatch(legacy.stderr, /FORBIDDEN_NETWORK_REQUEST|OPENAI_API_KEY/,
+  "The actual legacy runner must reject the obsolete reference before provider configuration or dispatch.");
 console.log("Reconciled 50-case provenance, scenarios, corrections, input isolation and answer format passed.");

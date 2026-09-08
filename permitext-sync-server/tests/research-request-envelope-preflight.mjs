@@ -20,7 +20,7 @@ import { createResearchCorpusRegistry, routeResearchCorpora } from "../research-
 
 // Versioned offline fixture, NOT a read of Production. Standard prices checked
 // against https://developers.openai.com/api/docs/pricing on 2026-09-03.
-const environment = Object.freeze({
+export const researchRequestEnvelopeEnvironment = Object.freeze({
   VERCEL_ENV: "production",
   PERMITEXT_RESEARCH_MODEL: "gpt-5.6-terra",
   PERMITEXT_RESEARCH_FAST_MODEL: "gpt-5.6-luna",
@@ -39,7 +39,7 @@ const environment = Object.freeze({
   PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "openai-standard-2026-09-03"
 });
 
-export async function preflightRampRequestEnvelopes(evidence) {
+export async function buildResearchRequestEnvelopeBuilders(environment = researchRequestEnvelopeEnvironment) {
   const source = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
   const start = source.indexOf("async function openAIResearchInterpretation(");
   const end = source.indexOf("  const { payload } = await requestResearchProvider({", start);
@@ -59,6 +59,21 @@ export async function preflightRampRequestEnvelopes(evidence) {
   const buildAnswerRequest = new Function(...Object.keys(dependencies),
     `return ${source.slice(start, end).replace(/^async function/, "function")} return requestBody; };`
   )(...Object.values(dependencies));
+  const verificationStart = source.indexOf("async function openAIResearchVerification(");
+  const verificationEnd = source.indexOf("  const { payload } = await requestResearchProvider({", verificationStart);
+  const schemaStart = source.indexOf("const researchVerificationIssueTypes =");
+  const schemaEnd = source.indexOf("function validateResearchVerification(", schemaStart);
+  assert(verificationStart >= 0 && verificationEnd > verificationStart && schemaStart >= 0 && schemaEnd > schemaStart);
+  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext, evaluateResearchWebAttribution };
+  const buildVerifierRequest = new Function(...Object.keys(verificationDependencies),
+    `${source.slice(schemaStart, schemaEnd)} return ${source.slice(verificationStart, verificationEnd).replace(/^async function/, "function")} return requestBody; };`
+  )(...Object.values(verificationDependencies));
+  return { buildAnswerRequest, buildVerifierRequest };
+}
+
+export async function preflightRampRequestEnvelopes(evidence) {
+  const environment = researchRequestEnvelopeEnvironment;
+  const { buildAnswerRequest, buildVerifierRequest } = await buildResearchRequestEnvelopeBuilders(environment);
   const question = "What are the requirements for designing an accessible ramp under the 2022 NYC Building Code?";
   const userID = "synthetic-ramp-preflight";
   const answer = buildAnswerRequest(question, evidence, userID, { responseStyle: "conversational" });
@@ -93,15 +108,6 @@ export async function preflightRampRequestEnvelopes(evidence) {
   }));
   assert(projectAnswerBoundUSD <= 0.50);
 
-  const verificationStart = source.indexOf("async function openAIResearchVerification(");
-  const verificationEnd = source.indexOf("  const { payload } = await requestResearchProvider({", verificationStart);
-  const schemaStart = source.indexOf("const researchVerificationIssueTypes =");
-  const schemaEnd = source.indexOf("function validateResearchVerification(", schemaStart);
-  assert(verificationStart >= 0 && verificationEnd > verificationStart && schemaStart >= 0 && schemaEnd > schemaStart);
-  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext, evaluateResearchWebAttribution };
-  const buildVerifierRequest = new Function(...Object.keys(verificationDependencies),
-    `${source.slice(schemaStart, schemaEnd)} return ${source.slice(verificationStart, verificationEnd).replace(/^async function/, "function")} return requestBody; };`
-  )(...Object.values(verificationDependencies));
   const verifier = buildVerifierRequest(question, evidence, {
     answerText: "Synthetic answer-size placeholder. ".repeat(240)
   }, userID, { ...answerOptions, model: "gpt-5.6-luna" });

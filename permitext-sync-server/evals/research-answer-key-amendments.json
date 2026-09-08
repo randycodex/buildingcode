@@ -1,0 +1,69 @@
+{
+  "schema": "permitext-research-answer-key-amendments-v1",
+  "newProfessionalApproval": false,
+  "amendments": [
+    {
+      "id": "cc04-optional-assembly-calculation-20260908",
+      "caseID": "CC-04",
+      "sourceDataset": "research-cases.json",
+      "sourceCaseID": "accessory-assembly-plumbing-fixtures",
+      "sourceCaseSHA256": "63dce5d3f8d01547539a36fd528c6b0102e8ea80802d811843bc39aceefdc4e5",
+      "status": "development-correction-pending-professional-review",
+      "reviewedOn": "2026-09-08",
+      "rationale": "The previous Not automatically opening conflated a permitted Assembly alternative with an inability to use the Group B baseline. Supplied PC 403.1 establishes occupancy-based fixture requirements. Missing table rates limit a numerical calculation; they do not negate that supplied framework. This corrects development acceptance criteria without editing the original approved source case or inheriting its approval.",
+      "sourceReferences": [
+        {
+          "reference": "PC 403.1",
+          "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-161441",
+          "checkedOn": "2026-09-08",
+          "basis": "General occupancy-based fixture framework; separate building/nonaccessory-tenant scope of note j. The question selects the framework and note, not the numerical table rows."
+        },
+        {
+          "reference": "BC 303.1.3",
+          "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-165886",
+          "checkedOn": "2026-09-08",
+          "basis": "Express permission to use Assembly fixture requirements for a qualifying accessory room below 75 occupants."
+        },
+        {
+          "reference": "PC 403.1.1",
+          "basis": "The unchanged exact selected passage supplies sex distribution, its statistical-data exception, and the sum-before-rounding rule."
+        }
+      ],
+      "replacement": {
+        "expectedAnswer": "Yes, if the room is properly classified as Group B as the question assumes. PC 403.1 ties fixture requirements to occupancy, so Group B provides the general baseline. BC 303.1.3 also permits a qualifying accessory assembly room with fewer than 75 occupants to use the applicable Assembly fixture requirements. That alternative is optional; Group B classification does not make the Group B calculation mandatory or prohibit it. Cite BC 303.1.3 for this accessory-room option. PC 403.1 note j separately concerns a building or nonaccessory tenant assembly space.\n\nThe selected passages do not supply numerical Table 403.1 rates, so they cannot establish a final count. If using the Assembly alternative, identify its applicable use category. For a count, retain any established occupant load and obtain only remaining material inputs, including any proposed shared-facility arrangement. PC 403.1.1 generally divides the load equally between the sexes unless approved statistical data supports another distribution; apply the applicable rates, add fractional requirements across occupancies before rounding, and round up. The selected passages do not establish permission to share facilities.",
+        "requiredConcepts": [
+          "Answer the permission question directly, conditional on the properly established or expressly assumed Group B classification.",
+          "Bind the Group B baseline to PC 403.1 occupancy-based fixture authority; do not rely only on the accessory-room classification provision.",
+          "Explain that BC 303.1.3 permits, rather than mandates, the qualifying accessory room to use applicable Assembly fixture requirements.",
+          "Preserve the distinct building/nonaccessory-tenant scope of PC 403.1 note j and cite BC 303.1.3 for the accessory-room option.",
+          "Distinguish an established general permission from unsupplied numerical rates and an uncomputed fixture count.",
+          "Identify the applicable Assembly use category only if applying the Assembly alternative.",
+          "For a numerical calculation, preserve the equal sex-distribution rule and statistical-data exception, application of rates, and addition of fractions across occupancies before rounding up.",
+          "Retain an occupant load established in the active conversation; ask for it only if still unknown and needed for a count.",
+          "Do not approve shared facilities or give a final count from the selected passages and unresolved project facts."
+        ],
+        "forbiddenClaims": [
+          "Group B fixture requirements are prohibited merely because BC 303.1.3 permits an Assembly calculation.",
+          "Assembly calculations are mandatory for every qualifying accessory room.",
+          "Group B classification always controls the plumbing fixture calculation or resolves a final count.",
+          "The selected PC 403.1 fewer-than-75 note independently applies its building/nonaccessory-tenant rule to this accessory room.",
+          "Unsupplied table rates prevent the general permission conclusion even though PC 403.1 occupancy-based authority is supplied.",
+          "Residential unit fixtures automatically satisfy the multipurpose-room requirement.",
+          "Supply numerical rates or a final fixture count without the applicable evidence and project inputs."
+        ],
+        "missingFacts": [
+          "For a numerical count: occupant load, if not already established in the active conversation.",
+          "For the Assembly alternative: the applicable Assembly use category.",
+          "For a proposed shared-facility arrangement: the existing facilities and their permitted availability to this room.",
+          "For a numerical count: whether approved statistical data supports a different sex distribution."
+        ],
+        "reconciliationNotes": [
+          "Explicit development amendment cc04-optional-assembly-calculation-20260908 corrects the permission/requirement distinction. The original source case and its approval record remain unchanged.",
+          "Missing numerical table rates limit calculation, not the general occupancy-based rule supplied in PC 403.1.",
+          "The corrected wording and rubric remain pending independent professional review. No new paid-run, production or release approval follows from this amendment."
+        ]
+      },
+      "evaluationInputSHA256": "e2545e30a7f393de68db66578469064981a092e927dcdf919e3f7db9e7672c71"
+    }
+  ]
+}

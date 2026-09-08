@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 
 export const reconciledAnswerKeyURL = new URL("./research-reconciled-answer-key.json", import.meta.url);
 export const reconciledAnswerKeyMarkdownURL = new URL("../../docs/PERMITEXT_RECONCILED_RESEARCH_ANSWER_KEY_2026-09-07.md", import.meta.url);
+const amendmentSource = "research-answer-key-amendments.json";
+const amendmentFields = new Set(["expectedAnswer", "requiredConcepts", "forbiddenClaims", "missingFacts", "reconciliationNotes"]);
 
 // Explicit allowlist: reference answers, rubrics, reviewer notes, and forbidden
 // claims are evaluator data. They must never become answering-model input.
@@ -15,6 +17,21 @@ export function reconciledResearchEvaluationInput(testCase) {
     selectedEvidence: structuredClone(testCase.selectedEvidence || []),
     selectedEvidenceSectionIDs: [...(testCase.selectedEvidenceSectionIDs || [])]
   };
+}
+
+// Preserve historical source approvals without paying a judge to score a new
+// answer against wording that the development key has explicitly corrected.
+export async function assertResearchEvaluationReferencesCurrent(sourceCaseIDs, sourceDataset = "research-cases.json") {
+  const dataset = JSON.parse(await readFile(reconciledAnswerKeyURL, "utf8"));
+  await validateReconciledAnswerKey(dataset);
+  const requested = new Set(sourceCaseIDs);
+  const amended = dataset.cases.filter((testCase) => testCase.sourceDataset === sourceDataset &&
+    requested.has(testCase.sourceCaseID) && testCase.developmentAmendmentID);
+  if (amended.length) throw Object.assign(new Error(
+    `Evaluation reference corrected in the development key: ${amended.map((item) => item.sourceCaseID).join(", ")}. ` +
+    "The legacy evaluator must not score these original source answers as current approved references. " +
+    "Use the separately recorded amended development rubric for diagnostics; its professional review remains pending."
+  ), { code: "RESEARCH_EVALUATION_REFERENCE_AMENDED" });
 }
 
 export function parseDOBReviewCases(packet) {
@@ -45,6 +62,22 @@ export async function validateReconciledAnswerKey(dataset) {
       `Reviewed source changed: ${path}. Reconcile explicitly instead of silently using an older answer.`);
     sources[path] = path.endsWith(".json") ? JSON.parse(bytes) : parseDOBReviewCases(bytes.toString("utf8"));
   }
+  const amendments = new Map();
+  if (sources[amendmentSource]) {
+    const registry = sources[amendmentSource];
+    assert(registry.schema === "permitext-research-answer-key-amendments-v1", "Unknown amendment registry schema.");
+    assert(registry.newProfessionalApproval === false, "Development corrections cannot confer professional approval.");
+    for (const amendment of registry.amendments) {
+      assert(amendment.id && !amendments.has(amendment.id), "Missing or duplicate amendment ID.");
+      assert(amendment.status === "development-correction-pending-professional-review", "Amendment approval must remain pending.");
+      assert(amendment.rationale && amendment.sourceReferences?.length, "An amendment needs its rationale and source basis.");
+      assert(Object.keys(amendment.replacement || {}).every((field) => amendmentFields.has(field)), "Amendments cannot change answering-model inputs or source approval history.");
+      assert(typeof amendment.replacement?.expectedAnswer === "string" && amendment.replacement.expectedAnswer,
+        "An amendment must state its corrected answer.");
+      amendments.set(amendment.id, amendment);
+    }
+  }
+  const usedAmendments = new Set();
   const ids = new Set();
   const counts = { CC: 0, ZR: 0, DOBNOW: 0 };
   for (const testCase of dataset.cases) {
@@ -56,17 +89,34 @@ export async function validateReconciledAnswerKey(dataset) {
       ? sourceDataset.get(testCase.sourceCaseID)
       : sourceDataset?.cases.find((item) => item.id === testCase.sourceCaseID);
     assert(sourceCase, `Missing reviewed source for ${testCase.id}.`);
+    const amendment = testCase.developmentAmendmentID ? amendments.get(testCase.developmentAmendmentID) : null;
+    if (testCase.developmentAmendmentID) {
+      assert(amendment && amendment.caseID === testCase.id && amendment.sourceDataset === testCase.sourceDataset &&
+        amendment.sourceCaseID === testCase.sourceCaseID, `${testCase.id} has an unknown or mismatched amendment.`);
+      assert(!usedAmendments.has(amendment.id), "An amendment cannot apply to multiple cases.");
+      assert(createHash("sha256").update(JSON.stringify(sourceCase)).digest("hex") === amendment.sourceCaseSHA256,
+        `${testCase.id} amendment no longer matches its original source case.`);
+      assert(createHash("sha256").update(JSON.stringify(reconciledResearchEvaluationInput(testCase))).digest("hex") === amendment.evaluationInputSHA256,
+        `${testCase.id} amendment changed answering-model inputs.`);
+      assert(testCase.reconciliationStatus === amendment.status, `${testCase.id} must identify its pending amendment review.`);
+      assert(testCase.sourceCaseStatus === sourceCase.status && testCase.sourceReviewedAt === sourceCase.reviewedAt,
+        `${testCase.id} changed its original approval history.`);
+      for (const [field, value] of Object.entries(amendment.replacement)) {
+        assert(JSON.stringify(testCase[field]) === JSON.stringify(value), `${testCase.id} differs from its recorded amendment: ${field}.`);
+      }
+      usedAmendments.add(amendment.id);
+    }
     assert(testCase.question === sourceCase.question, `${testCase.id} does not use its reviewed question.`);
     assert(testCase.expectedAnswer && testCase.requiredConcepts.length && testCase.forbiddenClaims.length,
       `${testCase.id} is missing its answer or acceptance rubric.`);
-    assert(JSON.stringify(testCase.requiredConcepts) === JSON.stringify(sourceCase.requiredConcepts), `${testCase.id} lost a required concept.`);
-    assert(JSON.stringify(testCase.forbiddenClaims) === JSON.stringify(sourceCase.forbiddenClaims), `${testCase.id} lost a forbidden-claim boundary.`);
+    assert(JSON.stringify(testCase.requiredConcepts) === JSON.stringify(amendment?.replacement.requiredConcepts || sourceCase.requiredConcepts), `${testCase.id} lost a required concept.`);
+    assert(JSON.stringify(testCase.forbiddenClaims) === JSON.stringify(amendment?.replacement.forbiddenClaims || sourceCase.forbiddenClaims), `${testCase.id} lost a forbidden-claim boundary.`);
     if (testCase.id.startsWith("DOBNOW")) {
       assert(testCase.scenario && testCase.scenario === sourceCase.scenario, `${testCase.id} lost its scenario.`);
-      assert(testCase.expectedAnswer === sourceCase.expectedAnswer, `${testCase.id} lost a reviewed answer correction.`);
+      assert(testCase.expectedAnswer === (amendment?.replacement.expectedAnswer || sourceCase.expectedAnswer), `${testCase.id} lost a reviewed answer correction.`);
     } else {
       if (testCase.id.startsWith("CC")) {
-        assert(testCase.expectedAnswer === sourceCase.expectedConclusion, `${testCase.id} differs from its reviewed construction answer.`);
+        assert(testCase.expectedAnswer === (amendment?.replacement.expectedAnswer || sourceCase.expectedConclusion), `${testCase.id} differs from its reviewed construction answer.`);
         assert(JSON.stringify(testCase.selectedEvidence) === JSON.stringify(sourceCase.selectedEvidence), `${testCase.id} lost its selected passages.`);
         assert(JSON.stringify(testCase.projectContext) === JSON.stringify(sourceCase.projectContext), `${testCase.id} lost its project facts.`);
       } else {
@@ -75,6 +125,7 @@ export async function validateReconciledAnswerKey(dataset) {
       }
     }
   }
+  assert(usedAmendments.size === amendments.size, "A recorded amendment was silently omitted from the development key.");
   assert(counts.CC === 5 && counts.ZR === 21 && counts.DOBNOW === 24, "Reconciled case families do not match the intake.");
   return counts;
 }
@@ -90,7 +141,7 @@ export function renderReconciledAnswerKey(dataset) {
     "", "## Reconciliation and review boundaries", "",
     ...dataset.sourceNotes.map((note) => `- ${note}`),
     "- The 24 DOB NOW scenarios are restored. Several Zoning questions are replaced with their revised repository versions; their original intake wording remains visible below.",
-    "- Construction answers retain the reviewed Plumbing Code scope and vanity/lavatory distinctions. DOB NOW answers retain the subsequent-filing completion distinction, PAA source conflict, site-safety applicability, DEP drainage condition, and distinct Loft Board routes.",
+    "- Construction answers retain Plumbing Code scope and vanity/lavatory distinctions. Explicit development corrections below preserve the original source record and carry their own pending-review status. DOB NOW answers retain the subsequent-filing completion distinction, PAA source conflict, site-safety applicability, DEP drainage condition, and distinct Loft Board routes.",
     "- This work does not authorize paid model calls, change source approval status, enable public Research, or establish professional sign-off. New reconciled prose has no new independent professional approval.",
     "", "## Source provenance", "",
     `Intake: \`${dataset.intake.filename}\`; SHA-256 \`${dataset.intake.sha256}\`.`,
@@ -103,6 +154,8 @@ export function renderReconciledAnswerKey(dataset) {
     lines.push(`## ${testCase.id} — ${testCase.title}`, "",
       `Source basis: ${testCase.codeVersion}`, "",
       `Source case: \`${testCase.sourceCaseID}\`; recorded status: ${testCase.sourceCaseStatus}; reviewed: ${testCase.sourceReviewedAt}. Scope: ${testCase.sourceApprovalScope}`, "");
+    if (testCase.developmentAmendmentID) lines.push(
+      `**Development correction:** \`${testCase.developmentAmendmentID}\`. Status: ${testCase.reconciliationStatus}. The original approval above is historical; it does not approve this corrected wording or rubric.`, "");
     if (testCase.scenario) lines.push("**Scenario supplied to Research:**", "", testCase.scenario, "");
     if (testCase.projectContext && Object.keys(testCase.projectContext).length) {
       lines.push("**Project facts supplied to Research:**", "", "```json", JSON.stringify(testCase.projectContext, null, 2), "```", "");
