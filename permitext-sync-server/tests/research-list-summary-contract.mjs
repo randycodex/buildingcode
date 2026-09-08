@@ -568,11 +568,6 @@ assert.match(appSource, /max_output_tokens: 6_000,/, "The evidence-analysis mode
 assert.match(appSource, /max_output_tokens: 4_000,/, "The Research verifier can still be cut off before returning its structured result.");
 assert.match(appSource, /timeoutMilliseconds: 45_000,[\s\S]*?failureMessage: "The Research verifier request failed\."/, "The Research verifier timeout is too short for a complex evidence package.");
 assert.match(appSource, /maximumResearchVerificationAttempts = 2/, "Research must allow at most one bounded correction behind the verifier gate.");
-assert.match(
-  appSource,
-  /if \(attempt > 0\) \{[\s\S]*?model: "permitext-deterministic-post-repair-acceptance"[\s\S]*?break;/,
-  "A repaired answer that passes objective gates must not face a second subjective verifier rejection."
-);
 assert.match(clientSource, /function wireResearchDetailsMotion\(details, body\)/, "Research disclosures do not share the standard collapsible motion helper.");
 assert.match(clientSource, /wireResearchDetailsMotion\(evidenceReviewed, evidenceReviewedBody\)/, "Evidence reviewed does not use the shared disclosure motion.");
 assert.match(clientSource, /wireResearchDetailsMotion\(details, detailsBody\)/, "The nested evidence details do not use the shared disclosure motion.");

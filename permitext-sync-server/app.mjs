@@ -19701,6 +19701,28 @@ async function handleResearchConversationMessage(request, response) {
         zoningSafety,
         webAttribution
       });
+      const verifyZoningRepair = async () => {
+        const verification = await openAIResearchVerification(
+          question, assembledEvidence, result.interpretation, context.userID, {
+            projectContextFacts: combinedProjectFacts, conversationFactContext,
+            webSupport, allowOfficialGuidanceOnly, codeBasis: answerCodeBasis,
+            requiredClaims, structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
+            zoningPlan, zoningDeterministicContext,
+            model: modelRouting.configuration.verificationModel, signal: progressResponse.signal
+          }
+        );
+        verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
+        const checked = researchVerificationResultForWebContext(
+          verification.result, { webSupport, webAttribution }
+        );
+        verificationAttempts.push({ ...checked, model: verification.model });
+        if (!checked.pass) {
+          const error = new Error("The revised Zoning answer did not pass source verification.");
+          error.code = "RESEARCH_VERIFICATION_FAILED";
+          error.verificationAttempts = verificationAttempts;
+          throw error;
+        }
+      };
       let repairAttempted = false;
       const repairZoningAnswer = async (issues, reasonCode) => {
         if (!zoningPlan.callPolicy.repairEligible || repairAttempted) {
@@ -19776,11 +19798,7 @@ async function handleResearchConversationMessage(request, response) {
             error.verificationAttempts = verificationAttempts;
             throw error;
           }
-          verificationAttempts.push({
-            pass: true,
-            issues: [],
-            model: "permitext-deterministic-post-repair-acceptance"
-          });
+          await verifyZoningRepair();
         }
       } else if (!zoningPlan.callPolicy.subjectiveVerification) {
         verificationAttempts.push({
@@ -19836,11 +19854,7 @@ async function handleResearchConversationMessage(request, response) {
             error.verificationAttempts = verificationAttempts;
             throw error;
           }
-          verificationAttempts.push({
-            pass: true,
-            issues: [],
-            model: "permitext-deterministic-post-repair-acceptance"
-          });
+          await verifyZoningRepair();
         }
       }
     } else {
@@ -19970,19 +19984,9 @@ async function handleResearchConversationMessage(request, response) {
           });
           break;
         }
-        if (attempt > 0) {
-          // The repaired answer already passed the objective citation,
-          // evidence-economy, and source-attribution gates. A second subjective
-          // model-verifier pass used to reject otherwise usable repairs and
-          // expose a 502 to the user. One verifier critique plus one Terra
-          // repair is the complete bounded subjective review cycle.
-          verificationAttempts.push({
-            pass: true,
-            issues: [],
-            model: "permitext-deterministic-post-repair-acceptance"
-          });
-          break;
-        }
+        // A generated revision can change the legal conclusion even when its
+        // citations and coverage pass. Verify the actual revised answer before
+        // delivery; the two-attempt limit still permits only one revision.
         const verification = await openAIResearchVerification(
           question,
           assembledEvidence,

@@ -19,3 +19,19 @@ Both turns delivered, but **this is not a two-case quality pass**. CC-03 retaine
 The permission language also needs a careful answer-key review: the cited text permits Assembly calculations; agreement with an expected “Not automatically” must not be achieved by inventing a prohibition on Group B calculations. Preserve this distinction and the original approved benchmark while reviewing the interpretation. The live CC-04 result remains unresolved.
 
 Exact answers and ordered provider outputs are retained in `permitext-sync-server/evals/results/research-owner-live-fixture-confirmation-2026-09-08.json`; the separate review is `research-owner-fixture-confirmation-review-2026-09-08.json` in that folder. All five requests settled, with zero pending requests. The next required repair is semantic review of the generated revision before delivery. No deployment occurred.
+
+This batch's usage estimate is $0.222974 including the estimated cache-write premium. Across seven packages, the cumulative usage estimate is **$1.74661036**, the conservative bound is **$3.492894**, and pending requests are **zero** (29 turns, 59 provider requests). These are usage-derived estimates, not an invoice or account balance.
+
+## Revision verification repair
+
+The general Research loop now semantically checks the generated revision after its structural/source gates pass. It still allows at most one revision. The equivalent Zoning repair branches also request semantic review of the generated repair before delivery. A failed final check stops delivery; it does not trigger another rewrite or silently approve the answer. Existing provider reservations and spending caps apply to the additional verification call.
+
+A no-network HTTP replay uses the actual five recorded draft/verifier/revision outputs plus a controlled final-verifier response. It proves that the final verifier receives the changed “Yes” conclusion. A rejection leaves the follow-up unsaved and uncharged, with all four follow-up requests settled. Acceptance persists and reopens exactly the revised answer with the final provider verification in its history. These controlled outcomes test the gate, not the legal correctness of the recorded answer. The full `npm run check` and `npm run smoke` passed after this repair. No fresh paid run has yet exercised the final semantic check; the HTTP proof above uses controlled provider responses.
+
+## Answer-key reconciliation candidate
+
+The original approved evaluation case remains unchanged while this ambiguity is reconciled. A candidate correction, based on the general occupancy-based requirement in PC 403.1 and the express Assembly option in BC 303.1.3, is:
+
+> If the room is properly classified as Group B, the Group B fixture requirements provide the general baseline. BC 303.1.3 also permits a qualifying accessory assembly room below 75 occupants to use the applicable Assembly fixture requirements. Group B classification therefore does not make a Group B fixture calculation mandatory. For an accessory room, cite BC 303.1.3 for the Assembly option; PC 403.1 note j has a separate building/nonaccessory-tenant-space scope. Identify the applicable Assembly use before applying those ratios. Apply PC 403.1.1's sex-distribution and rounding rules, preserving its statistical-data exception, and retain the occupant load already established in the conversation when its premises still hold.
+
+This is a proposed interpretation, not new professional approval or a replacement of the original source case. The rubric should distinguish an optional Assembly calculation from a supposed prohibition on Group B calculations. It must not force the model to manufacture that prohibition merely to reproduce “Not automatically.” CC-04 remains excluded from positive quality counts pending reconciliation and a properly verified live answer.
