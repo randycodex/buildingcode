@@ -6,18 +6,24 @@ const escapePattern = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\
 function visibleReplacementHeight(answerText, inches, millimeters) {
   const units = [`${escapePattern(inches)}\\s*[- ]?\\s*(?:inches|inch|in\\b|[″"])`];
   if (millimeters) units.push(`${escapePattern(millimeters)}\\s*[- ]?\\s*mm\\b`);
-  const dimension = new RegExp(`(?:${units.join("|")})`, "i");
+  const dimension = new RegExp(`\\b(?:${units.join("|")})`, "i");
   const sentences = String(answerText || "").replace(/[*_`]/g, "")
     .split(/(?<=[.!?])\s+|\n+/);
   return sentences.some((sentence) => {
     const actor = sentence.match(/\b(?:replacement|substitut(?:ed|e)|dedicated|bottle[- ]filling)\s+(?:(?:bottle[- ]filling|container[- ]filling)\s+)?(?:fixtures?|stations?|units?)\b/i);
     if (!actor) return false;
     const condition = sentence.slice(actor.index + actor[0].length);
+    const measurement = condition.match(dimension);
+    if (!measurement) return false;
     // A height subsequently attributed to a retained fountain does not supply
     // the replacement-fixture condition. This detects omission, not truth;
     // the ordinary semantic verifier still judges the entire resulting answer.
-    return !/\bdrinking[- ]fountains?\b|\b(?:width|diameter)\b/i.test(condition) &&
-      /\b(?:containers?|bottles?)\b/i.test(condition) && dimension.test(condition) &&
+    // A later adjacency clause can legitimately name the retained fountain.
+    // Only a subject change before the dimension makes that height ambiguous.
+    const beforeMeasurement = condition.slice(0, measurement.index);
+    return !/\bdrinking[- ]fountains?\b/i.test(beforeMeasurement) &&
+      !/\b(?:width|diameter)\b/i.test(condition) &&
+      /\b(?:containers?|bottles?)\b/i.test(condition) &&
       /\b(?:height|high|tall|fill\w*|accommodat\w*|accept\w*)\b/i.test(condition);
   });
 }

@@ -25,7 +25,8 @@ const compatibility = repair({ ...fountain, conclusion: "old", explanation: "old
 assert.equal([compatibility.conclusion, compatibility.explanation].join("\n\n"), compatibility.answerText);
 for (const text of [
   "Replacement fixtures must accommodate containers at least 10 inches tall.",
-  "Dedicated container-filling fixtures must fill a container at least 254 mm high."
+  "Dedicated container-filling fixtures must fill a container at least 254 mm high.",
+  "Each substituted fixture must have a faucet designed to fill a container at least 10 inches high and be adjacent to or readily visible from a drinking fountain that conforms to PC § 410.1 (PC § 410.3)."
 ]) {
   const answer = { ...fountain, answerText: text };
   assert.equal(repair(answer, fountainSources, options).answerText, text);

@@ -2,7 +2,7 @@ import { researchRequestedAreaConversions } from "./research-answer-presentation
 import { applyResearchPlumbingSourceRepairs } from "./research-plumbing-source-repairs.mjs";
 
 export const researchAnswerQualityVersion =
-  "20260908-plumbing-source-repairs-v26";
+  "20260908-plumbing-source-repairs-v27";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;

@@ -1,0 +1,257 @@
+{
+  "schema": "permitext-owner-plumbing-repair-confirmation-20260908-v1",
+  "authorization": "Owner: approximately $8 available for API testing; test as many times as needed. Two plumbing source repair confirmations and three previously undispatched plumbing cases, one attempt each, capped at $0.60 conservative aggregate with no manual retries.",
+  "previousConservativeSpendUSD": 7.376368,
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "sourceCommit": "1c7daab996d3a4ce3ab42920d7d737ec35b0c148",
+  "execution": "Isolated local HTTP Research conversations with live OpenAI responses; automatic evidence discovery; no reference answers supplied to the answering model.",
+  "maximumCumulativeSpendUSD": 0.6,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 5,
+  "authorizationUSD": 8,
+  "turnBudgetPolicy": "Cap each complete provider pipeline at the lesser of $0.50 and the remaining settled conservative $0.60 batch budget. Missing or pending accounting stops all further requests.",
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing; general answers medium reasoning; standard service tier",
+  "zoning": "Local diagnostic eligibility only; no public gate or deployment changes",
+  "cases": [
+    {
+      "id": "PC-03",
+      "conversation": "PC-03",
+      "question": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?"
+    },
+    {
+      "id": "PC-04",
+      "conversation": "PC-04",
+      "question": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?"
+    },
+    {
+      "id": "PC-10",
+      "conversation": "PC-10",
+      "question": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?"
+    },
+    {
+      "id": "PC-11",
+      "conversation": "PC-11",
+      "question": "A new 3-inch horizontal sanitary drainage pipe is designed at a slope of 1/16 inch per foot. Is that enough?"
+    },
+    {
+      "id": "PC-13",
+      "conversation": "PC-13",
+      "question": "A designer places two traps in series on a sink waste line to provide “extra protection” against sewer gas. Is double trapping permitted?"
+    }
+  ],
+  "preflightSHA256": "baab912d10cac3deb3631d6e7bfb7df2253e3220376ab8dba370d2d76df9ee32",
+  "startedAt": "2026-09-08T07:03:38.599Z",
+  "status": "stopped",
+  "results": [
+    {
+      "id": "PC-03",
+      "question": "A building is required to provide four drinking fountains. The designer proposes four bottle-filling stations and no drinking fountains. Is that permitted?",
+      "maximumTurnSpendUSD": 0.5,
+      "status": "failed",
+      "startedAt": "2026-09-08T07:03:38.725Z",
+      "error": {
+        "message": "Research is temporarily unavailable. Your question is still here.",
+        "httpStatus": 503,
+        "error": "Research is temporarily unavailable. Your question is still here.",
+        "code": "RESEARCH_SPEND_CAP",
+        "status": 503
+      },
+      "durationMilliseconds": 20437,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "b0dbb459-3d35-4821-a560-5835211be75e",
+          "createdAt": "2026-09-08T07:03:38.738Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0.014317,
+          "conservativeProviderCostUSD": 0.111916,
+          "durationMilliseconds": 20397,
+          "failureCode": "RESEARCH_SPEND_CAP",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "PC-03",
+      "model": "gpt-5.6-terra",
+      "phase": "permitext_code_interpretation",
+      "requestBytes": 81314,
+      "maxOutputTokens": 3000,
+      "startedAt": "2026-09-08T07:03:40.145Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 9700,
+      "usage": {
+        "input_tokens": 18658,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 18655
+        },
+        "output_tokens": 703,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 19361
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_08744eebf111deb2016a9fb34e397487d29166c99532623d54",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** Four bottle-filling stations with no drinking fountains are not permitted as a substitute for four required drinking fountains. At most 50% may be substituted: for a requirement of four, the proposal may include **two** qualifying dedicated bottle-filling fixtures, but it must retain **two drinking fountains**. Each substituted fixture must have a faucet designed to fill a container at least 10 inches high and be adjacent to or readily visible from a drinking fountain that conforms to PC § 410.1 (PC § 410.3).\\n\\nFurther, drinking fountains required by Table 403.1 must themselves have both a bubbler faucet and a separate 10-inch-minimum container-filling faucet (PC § 410.1). The supplied evidence does not establish the particular products' conformance or the proposed fixture locations; those facts would be needed to approve a revised two-fountain/two-filling-fixture arrangement.\",\"supportedPoints\":[{\"heading\":\"Bottle-filling substitution is capped at 50 percent\",\"explanation\":\"Where drinking fountains are required, no more than 50 percent of the required drinking fountains may be substituted with dedicated plumbing fixtures having faucets designed to fill containers at least 10 inches high. Each substitute must be adjacent to or readily visible from a drinking fountain conforming to PC § 410.1. Bottled-water dispensers cannot substitute for required drinking fountains.\",\"sectionID\":\"11961\",\"sourceIDs\":[\"research-permitext_discovered-id:11961-1\"]},{\"heading\":\"Required drinking fountains need both drinking and filling faucets\",\"explanation\":\"Drinking fountains required by Table 403.1 must be equipped with both a bubbler faucet for drinking and a separate faucet designed to fill a container at least 10 inches high.\",\"sectionID\":\"11959\",\"sourceIDs\":[\"research-permitext_discovered-id:11959-2\"]}],\"assumptions\":[],\"missingFacts\":[\"For a revised arrangement, whether each proposed bottle-filling station is a dedicated plumbing fixture with a faucet designed to fill a container at least 10 inches high.\",\"For a revised arrangement, whether each substituted fixture is adjacent to or readily visible from a drinking fountain conforming to PC § 410.1.\",\"For a revised arrangement, product documentation showing the retained drinking fountains conform to the standards and lead requirements referenced in PC § 410.1.\"],\"followUpQuestions\":[],\"evidenceLimitations\":[\"This answer is limited to the supplied 2022 NYC Plumbing Code provisions and does not establish product compliance, installation details, or all accessibility and location requirements.\"],\"additionalEvidenceNeeded\":[\"Cut sheets and proposed plans identifying the retained drinking fountains, the bottle-filling fixtures, and their relative locations.\",\"Compliance documentation for the retained drinking fountains under the standards referenced by PC § 410.1.\"],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"11961\",\"sourceIDs\":[\"research-permitext_discovered-id:11961-1\"],\"relevance\":\"Establishes the 50-percent maximum substitution rule, the qualifying bottle-filling-fixture conditions, and the prohibition on bottled-water-dispenser substitution.\"},{\"sectionID\":\"11959\",\"sourceIDs\":[\"research-permitext_discovered-id:11959-2\"],\"relevance\":\"Establishes the bubbler and separate container-filling-faucet requirement for drinking fountains required by Table 403.1.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    },
+    {
+      "caseID": "PC-03",
+      "model": "gpt-5.6-luna",
+      "phase": "permitext_research_verification",
+      "requestBytes": 47909,
+      "maxOutputTokens": 4000,
+      "startedAt": "2026-09-08T07:03:49.874Z",
+      "httpStatus": 200,
+      "durationMilliseconds": 9236,
+      "usage": {
+        "input_tokens": 10179,
+        "input_tokens_details": {
+          "cache_write_tokens": 7512,
+          "cached_tokens": 2664
+        },
+        "output_tokens": 490,
+        "output_tokens_details": {
+          "reasoning_tokens": 406
+        },
+        "total_tokens": 10669
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0bbbf0a73d7ed0cd016a9fb35de28087d2b4a60705e4157c51",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"repeated_established_fact\",\"detail\":\"The answer repeats the PC 410.3 requirement for each replacement bottle-filling fixture to have a faucet designed to fill a container at least 10 inches high. That condition is already stated in the preceding paragraph and should be removed from answerText.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 0.6,
+    "reservedUSD": 0.014317,
+    "actualUSD": 0.014317,
+    "requestCount": 3,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 7.488284,
+  "stopReason": "Spending guard stopped this pilot; remaining cases skipped.",
+  "completedAt": "2026-09-08T07:03:59.552Z"
+}
