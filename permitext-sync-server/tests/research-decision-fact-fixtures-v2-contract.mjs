@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { researchDecisionFactFixtures, decisionFactVerifierInput } from "../evals/research-decision-fact-fixtures.mjs";
 import { researchDecisionFactFixturesV2, assessDecisionFactVerifierResult } from "../evals/research-decision-fact-fixtures-v2.mjs";
 import { buildResearchRequestEnvelopeBuilders, researchRequestEnvelopeEnvironment } from "./research-request-envelope-preflight.mjs";
@@ -33,7 +34,10 @@ for (const fixture of fixtures) {
   try { initialReservationsUSD += reserveResearchProviderSpend(body, researchRequestEnvelopeEnvironment).maximumRequestUSD; }
   finally { endResearchSpendReservation(); }
 }
-assert(initialReservationsUSD < .21, "All six initial verifier requests must fit the planned package cap.");
+// V2 is consumed. Preserve its committed preflight cost rather than asserting
+// that every future runtime still fits that historical package's cap.
+const historicalPreflight = JSON.parse(await readFile(new URL("../evals/results/research-decision-fact-verifier-v2-preflight-2026-09-08.json", import.meta.url)));
+assert(historicalPreflight.entries.reduce((sum, entry) => sum + entry.maximumRequestUSD, 0) < historicalPreflight.maximumCumulativeSpendUSD);
 const mixedIssues = { pass: false, issues: [{ type: "unnecessary_qualification", detail: "Optional fact" },
   { type: "incorrect_citation", detail: "Separate citation defect" }], unnecessaryMissingFactIndices: [0, 1] };
 assert.deepEqual(assessDecisionFactVerifierResult(fixtures[0], mixedIssues), {
@@ -46,4 +50,4 @@ assert.deepEqual(broken.answer.citations, fixtures[1].answer.citations, "The neg
 const review = fixtures.at(-1);
 assert.doesNotMatch(JSON.stringify(review.answer.supportedPoints), /standpipes/);
 assert(review.answer.missingFacts.length > 0);
-console.log(`Corrected diagnostic contracts passed: exact delivered answer, paired fact-only change, broken-binding control, strict issue/repair grading, six reservations totaling $${initialReservationsUSD.toFixed(6)}.`);
+console.log(`Corrected diagnostic contracts passed: exact delivered answer, paired fact-only change, broken-binding control, strict issue/repair grading. Current six-request reservation sum $${initialReservationsUSD.toFixed(6)}; historical V2 cap checked against its retained preflight.`);

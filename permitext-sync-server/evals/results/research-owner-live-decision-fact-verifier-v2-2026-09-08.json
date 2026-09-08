@@ -1,0 +1,589 @@
+{
+  "schema": "permitext-decision-fact-verifier-diagnostic-v2",
+  "sourceCommit": "56c5e29c38ed4a3b992c204f86fced4898426605",
+  "authorization": "Owner authorized repeated Research testing within approximately $8 total. This package uses at most $0.21 of the remaining $0.210256 conservative allowance for six production-verifier checks of the exact delivered laundry answer, its fact correction, a broken citation, unresolved applicability, a mixed entry and a proposed-layout review.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    }
+  ],
+  "previousConservativeSpendUSD": 7.789744,
+  "authorizationUSD": 8,
+  "maximumCumulativeSpendUSD": 0.21,
+  "maximumTurnSpendUSD": 0.21,
+  "maximumChecks": 6,
+  "maximumProviderRequests": 12,
+  "scope": "Production verifier only; no answering-model generation, new user Research delivery, web search, paid benchmark scoring, manual retry, deployment or professional approval. Native provider-client retries remain bounded by the same conservative ledger.",
+  "originalFullHTTPTurnAttempts": 66,
+  "originalProviderCalls": 146,
+  "originalVerifierOnlyChecks": 7,
+  "pricingSource": "Versioned local standard-price fixture in tests/research-request-envelope-preflight.mjs; not a provider invoice or account balance.",
+  "preflightSHA256": "3272d75b9aaacb68d22da2713546e54f31bece41e6556b8142e7a11405cafe62",
+  "status": "completed",
+  "startedAt": "2026-09-08T09:31:24.173Z",
+  "results": [
+    {
+      "id": "PC-04-delivered-decision-facts",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": false,
+      "expectedIssueTypes": [
+        "unnecessary_qualification"
+      ],
+      "expectedRepairApplied": true,
+      "expectedMissingFactIndices": [
+        0,
+        1
+      ],
+      "purpose": "Actual delivered answer with all source bindings preserved; only unnecessary missing facts should fail.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-delivered-decision-facts",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006666,
+          "estimatedTokenCostUSD": 0.002915
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "unsupported_requirement",
+            "detail": "The statement that trapped washer standpipes do not replace or negate the floor-drain requirement is not stated in the bound PC 412.4 passage. That passage requires floor drains but does not address whether standpipes are a substitute."
+          },
+          {
+            "type": "incorrect_citation",
+            "detail": "The PC 412.4 citation is attached to the standpipe-substitution conclusion, but the bound passage does not support that comparison."
+          },
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The missing-facts entries are unnecessary for the requested yes-or-no determination. The requirement to provide floor drains is established; floor-area configuration and proposed drain details are optional downstream design information, not facts needed to determine whether omission is permitted."
+          }
+        ],
+        "unnecessaryMissingFactIndices": [
+          0,
+          1
+        ]
+      },
+      "expectationMatched": false,
+      "actualIssueTypes": [
+        "incorrect_citation",
+        "unnecessary_qualification",
+        "unsupported_requirement"
+      ],
+      "actualMissingFactIndices": [
+        0,
+        1
+      ],
+      "repairApplied": false,
+      "durationMilliseconds": 6445
+    },
+    {
+      "id": "PC-04-delivered-facts-corrected",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": true,
+      "expectedIssueTypes": [],
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Identical delivered answer after the limited missing-fact correction; full verification must pass.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-delivered-facts-corrected",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006405,
+          "estimatedTokenCostUSD": 0.002226
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "incorrect_citation",
+            "detail": "The supported point stating that trapped washer standpipes do not replace the floor-drain requirement is bound only to PC 412.4. That passage requires floor drains in the specified rooms but does not address whether a trapped standpipe can replace one. The answer cites PC 412.4 for this additional claim without a bound passage establishing it."
+          },
+          {
+            "type": "unsupported_requirement",
+            "detail": "The statement that trapped standpipes do not replace the floor-drain requirement is not expressly supported by the passage bound to that supported point. The supplied PC 406.2 passage addresses washer discharge through a standpipe but is not included in the point's sourceIDs and does not expressly state that a standpipe cannot substitute for a floor drain."
+          }
+        ]
+      },
+      "expectationMatched": false,
+      "actualIssueTypes": [
+        "incorrect_citation",
+        "unsupported_requirement"
+      ],
+      "actualMissingFactIndices": [],
+      "repairApplied": false,
+      "durationMilliseconds": 4565
+    },
+    {
+      "id": "PC-04-missing-point-binding",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": false,
+      "expectedIssueTypes": [
+        "incorrect_citation"
+      ],
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Negative control: PC 412.4 remains elsewhere in the answer but is deliberately removed from the lint-strainer point.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-missing-point-binding",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006283,
+          "estimatedTokenCostUSD": 0.00215
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "incorrect_citation",
+            "detail": "Supported point 1's explanation correctly states the mandatory floor-drain rule and is bound to PC 412.4. However, supported point 2 combines the 3-inch outlet requirement with the lint-strainer requirement while its sourceIDs array contains only PC 412.3. PC 412.3 supports the 3-inch size but does not state the lint-strainer requirement; that requirement appears in PC 412.4, which must also be included in point 2's sourceIDs and corresponding citation binding."
+          }
+        ]
+      },
+      "expectationMatched": true,
+      "actualIssueTypes": [
+        "incorrect_citation"
+      ],
+      "actualMissingFactIndices": [],
+      "repairApplied": false,
+      "durationMilliseconds": 5958
+    },
+    {
+      "id": "PC-04-unresolved-applicability-v2",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": true,
+      "expectedIssueTypes": [],
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Counterfactual control: genuinely unresolved facility applicability remains in missingFacts.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-unresolved-applicability-v2",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.005946,
+          "estimatedTokenCostUSD": 0.001936
+        }
+      ],
+      "verification": {
+        "pass": true,
+        "issues": []
+      },
+      "expectationMatched": true,
+      "actualIssueTypes": [],
+      "actualMissingFactIndices": [],
+      "repairApplied": false,
+      "durationMilliseconds": 2345
+    },
+    {
+      "id": "PC-04-mixed-material-entry-v2",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": false,
+      "expectedIssueTypes": [
+        "unnecessary_qualification"
+      ],
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "A single entry contains both a material applicability question and optional design requests. Flag the unnecessary request without deleting the material entry.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-mixed-material-entry-v2",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006449,
+          "estimatedTokenCostUSD": 0.002269
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "unnecessary_qualification",
+            "detail": "The missingFacts entry improperly includes proposed drain locations and outlet specifications. Those are optional downstream design-review inputs and cannot change the requested applicability conclusion. Only whether the room is a public coin-operated laundry or a central washing facility of a multiple-family dwelling is a material missing fact."
+          }
+        ]
+      },
+      "expectationMatched": true,
+      "actualIssueTypes": [
+        "unnecessary_qualification"
+      ],
+      "actualMissingFactIndices": [],
+      "repairApplied": false,
+      "durationMilliseconds": 5436
+    },
+    {
+      "id": "PC-04-requested-layout-review",
+      "sourceCaseID": "PC-04",
+      "scope": "verifier-only",
+      "expectedPass": true,
+      "expectedIssueTypes": [],
+      "expectedRepairApplied": false,
+      "expectedMissingFactIndices": [],
+      "purpose": "Proposed drain positions and specifications are material inputs when reviewing an existing design, rather than outputs to request before creating one.",
+      "status": "completed",
+      "operations": [
+        {
+          "id": "decision-fact-PC-04-requested-layout-review",
+          "status": "completed",
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "conservativeProviderCostUSD": 0.006222,
+          "estimatedTokenCostUSD": 0.002168
+        }
+      ],
+      "verification": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "missed_material_conclusion",
+            "detail": "The answer correctly states the PC 412.4 requirements and requests relevant layout information, but it omits the separately required PC 412.3 passage from the supported points and citations. PC 412.3 independently establishes that floor-drain outlets must be at least 3 inches (76 mm) in diameter, so that mandatory enacted passage must also be evaluated and cited."
+          }
+        ]
+      },
+      "expectationMatched": false,
+      "actualIssueTypes": [
+        "missed_material_conclusion"
+      ],
+      "actualMissingFactIndices": [],
+      "repairApplied": false,
+      "durationMilliseconds": 5080
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "PC-04-delivered-decision-facts",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 55137,
+      "startedAt": "2026-09-08T09:31:24.175Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11466,
+        "input_tokens_details": {
+          "cache_write_tokens": 11463,
+          "cached_tokens": 0
+        },
+        "output_tokens": 518,
+        "output_tokens_details": {
+          "reasoning_tokens": 338
+        },
+        "total_tokens": 11984
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0267895d57dff3fe016a9fd5f0e7fc87d292013828ebd75a54",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"unsupported_requirement\",\"detail\":\"The statement that trapped washer standpipes do not replace or negate the floor-drain requirement is not stated in the bound PC 412.4 passage. That passage requires floor drains but does not address whether standpipes are a substitute.\"},{\"type\":\"incorrect_citation\",\"detail\":\"The PC 412.4 citation is attached to the standpipe-substitution conclusion, but the bound passage does not support that comparison.\"},{\"type\":\"unnecessary_qualification\",\"detail\":\"The missing-facts entries are unnecessary for the requested yes-or-no determination. The requirement to provide floor drains is established; floor-area configuration and proposed drain details are optional downstream design information, not facts needed to determine whether omission is permitted.\"}],\"unnecessaryMissingFactIndices\":[0,1]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 6440
+    },
+    {
+      "caseID": "PC-04-delivered-facts-corrected",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 54795,
+      "startedAt": "2026-09-08T09:31:30.623Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11409,
+        "input_tokens_details": {
+          "cache_write_tokens": 8503,
+          "cached_tokens": 2903
+        },
+        "output_tokens": 389,
+        "output_tokens_details": {
+          "reasoning_tokens": 206
+        },
+        "total_tokens": 11798
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0bb6aec684c0daa4016a9fd5f589f087d2b6ce145ccde89014",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"incorrect_citation\",\"detail\":\"The supported point stating that trapped washer standpipes do not replace the floor-drain requirement is bound only to PC 412.4. That passage requires floor drains in the specified rooms but does not address whether a trapped standpipe can replace one. The answer cites PC 412.4 for this additional claim without a bound passage establishing it.\"},{\"type\":\"unsupported_requirement\",\"detail\":\"The statement that trapped standpipes do not replace the floor-drain requirement is not expressly supported by the passage bound to that supported point. The supplied PC 406.2 passage addresses washer discharge through a standpipe but is not included in the point's sourceIDs and does not expressly state that a standpipe cannot substitute for a floor drain.\"}],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 4560
+    },
+    {
+      "caseID": "PC-04-missing-point-binding",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 54641,
+      "startedAt": "2026-09-08T09:31:35.195Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11366,
+        "input_tokens_details": {
+          "cache_write_tokens": 8460,
+          "cached_tokens": 2903
+        },
+        "output_tokens": 333,
+        "output_tokens_details": {
+          "reasoning_tokens": 190
+        },
+        "total_tokens": 11699
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0c493c4fbf92e586016a9fd5fb57ac87d2aaf80ca6d54358a0",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"incorrect_citation\",\"detail\":\"Supported point 1's explanation correctly states the mandatory floor-drain rule and is bound to PC 412.4. However, supported point 2 combines the 3-inch outlet requirement with the lint-strainer requirement while its sourceIDs array contains only PC 412.3. PC 412.3 supports the 3-inch size but does not state the lint-strainer requirement; that requirement appears in PC 412.4, which must also be included in point 2's sourceIDs and corresponding citation binding.\"}],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 5953
+    },
+    {
+      "caseID": "PC-04-unresolved-applicability-v2",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 54239,
+      "startedAt": "2026-09-08T09:31:41.154Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11287,
+        "input_tokens_details": {
+          "cache_write_tokens": 8381,
+          "cached_tokens": 2903
+        },
+        "output_tokens": 168,
+        "output_tokens_details": {
+          "reasoning_tokens": 139
+        },
+        "total_tokens": 11455
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0bb6a0d4fd620d50016a9fd5ff1d6487d2a9f7484a1b693eb4",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 2341
+    },
+    {
+      "caseID": "PC-04-mixed-material-entry-v2",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 54334,
+      "startedAt": "2026-09-08T09:31:43.504Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11302,
+        "input_tokens_details": {
+          "cache_write_tokens": 8396,
+          "cached_tokens": 2903
+        },
+        "output_tokens": 443,
+        "output_tokens_details": {
+          "reasoning_tokens": 349
+        },
+        "total_tokens": 11745
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0ad27ff639a3daf0016a9fd603fd3c87d2bf027e0ece44f09a",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"unnecessary_qualification\",\"detail\":\"The missingFacts entry improperly includes proposed drain locations and outlet specifications. Those are optional downstream design-review inputs and cannot change the requested applicability conclusion. Only whether the room is a public coin-operated laundry or a central washing facility of a multiple-family dwelling is a material missing fact.\"}],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 5431
+    },
+    {
+      "caseID": "PC-04-requested-layout-review",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 52834,
+      "startedAt": "2026-09-08T09:31:48.940Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10923,
+        "input_tokens_details": {
+          "cache_write_tokens": 8017,
+          "cached_tokens": 2903
+        },
+        "output_tokens": 422,
+        "output_tokens_details": {
+          "reasoning_tokens": 306
+        },
+        "total_tokens": 11345
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0049b96cf9419e8a016a9fd608dcfc87d285eef127f81eec67",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"missed_material_conclusion\",\"detail\":\"The answer correctly states the PC 412.4 requirements and requests relevant layout information, but it omits the separately required PC 412.3 passage from the supported points and citations. PC 412.3 independently establishes that floor-drain outlets must be at least 3 inches (76 mm) in diameter, so that mandatory enacted passage must also be evaluated and cited.\"}],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 5075
+    }
+  ],
+  "spend": {
+    "active": true,
+    "capUSD": 0.21,
+    "reservedUSD": 0.013664,
+    "actualUSD": 0.013664,
+    "requestCount": 6,
+    "pendingRequestCount": 0
+  },
+  "cumulativeConservativeSpendUSD": 7.827715,
+  "completedAt": "2026-09-08T09:31:54.019Z"
+}
