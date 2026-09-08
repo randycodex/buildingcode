@@ -1,0 +1,148 @@
+{
+  "schema": "permitext-owner-zoning-small-answer-review-v1",
+  "reviewedAt": "2026-09-08T12:53:18.919Z",
+  "sourceCommit": "fd4b7c963166fc786b10cb85cdc9bebc525aa959",
+  "liveResult": {
+    "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+    "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+  },
+  "scope": "Source-based development review of complete delivered answer fields, required answer-key concepts and point-specific citation bindings. No paid model judge, professional approval, release acceptance or all-case quality claim. Original live answers and reference key are preserved.",
+  "findings": [
+    {
+      "id": "ZR-01",
+      "mainConclusionSupported": true,
+      "requiredConcepts": [
+        {
+          "concept": "The particular controls the general.",
+          "status": "missing"
+        },
+        {
+          "concept": "The enacted text controls over a caption, illustration, summary table, or illustrative table.",
+          "status": "met"
+        },
+        {
+          "concept": "The answer identifies Section 12-01.",
+          "status": "met"
+        }
+      ],
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "needs-refinement",
+      "issues": [
+        {
+          "type": "expected_concept_omission",
+          "detail": "The answer correctly explains that enacted text controls a conflicting illustration or summary table and cites 12-01(b), but does not state the particular-over-general principle required by the existing key. The key has not been weakened or rescored."
+        }
+      ],
+      "officialSources": [
+        "https://zr.planning.nyc.gov/article-i/chapter-2/12-01"
+      ],
+      "answerSHA256": "0c17bf946450a9d4284ed65c2e97c9f86128c71206010910c753db965c810547",
+      "reviewedAnswerProjectionSHA256": "c1690bcdf7ca8d8b7879d8512f2d364ddb2ca3af2672aca89f6762e521c9da28",
+      "providerCalls": 1,
+      "independentModelVerifierCalls": 0,
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "permitext-deterministic-zoning-compiler"
+          }
+        ]
+      },
+      "localHTTPDurationMilliseconds": 6277
+    },
+    {
+      "id": "ZR-14",
+      "mainConclusionSupported": true,
+      "requiredConcepts": [
+        {
+          "concept": "Section 23-371 requires buildings on the same zoning lot that do not connect at any level to be 40 feet apart for portions below 125 feet.",
+          "status": "met"
+        },
+        {
+          "concept": "The stated 30-foot separation is 10 feet short of that standard requirement.",
+          "status": "met"
+        },
+        {
+          "concept": "The answer recognizes the section's exception for buildings separated by a rear yard equivalent and does not convert the rule into a universal spacing rule.",
+          "status": "met"
+        }
+      ],
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "needs-refinement",
+      "issues": [
+        {
+          "type": "unrequested_branch_with_omitted_exception",
+          "detail": "The main answer correctly gives 40 feet, the 10-foot shortfall and the rear-yard-equivalent exception. It also introduces the above-125-foot branch. The supported point presents 80 feet as mandatory without the same paragraph's exception allowing 40 feet under specified aggregate lot-coverage conditions. The user asked about portions below 125 feet. This extra statement is not a safe universal rule."
+        },
+        {
+          "type": "overexclusive_exception_wording",
+          "detail": "The narrative says the conclusion could differ only if there is a rear yard equivalent. The expected answer describes that section exception without purporting to exclude every other legally modifying path. The narrower wording is preferable."
+        }
+      ],
+      "officialSources": [
+        "https://zr.planning.nyc.gov/article-ii/chapter-3/23-371"
+      ],
+      "answerSHA256": "d31dc2017d90c33465708792a9752ca10cb9777a15e95200360a49833b2f1835",
+      "reviewedAnswerProjectionSHA256": "f2e4de1dd61851872c95f1d1618acbfb7892d6e85e944e5abd2f5fc4bc7a874c",
+      "providerCalls": 1,
+      "independentModelVerifierCalls": 0,
+      "verification": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "permitext-deterministic-zoning-compiler"
+          }
+        ]
+      },
+      "localHTTPDurationMilliseconds": 8751,
+      "sourcePacketFinding": {
+        "sectionNumber": "23-371",
+        "suppliedCharacters": 4000,
+        "truncated": true,
+        "upperHeightExceptionLeadPresent": true,
+        "detail": "The actual supplied Reader passage includes the 40-foot upper-height exception lead but is cut off within its lot-coverage conditions. The requested below-125-foot rule and rear-yard-equivalent exception are present. The draft should not introduce an unrequested branch whose full conditions are not supplied."
+      }
+    }
+  ],
+  "summary": {
+    "caseAttempts": 2,
+    "delivered": 2,
+    "mainConclusionsSupported": 2,
+    "strictWholeAnswerPasses": 0,
+    "needsRefinement": 2,
+    "providerCalls": 2,
+    "independentModelVerifierCalls": 0,
+    "pendingProviderCalls": 0,
+    "usageEstimateUSDIncludingCacheWrites": 0.00563875,
+    "conservativeUSD": 0.010668,
+    "localHTTPDurationsMilliseconds": [
+      6277,
+      8751
+    ]
+  },
+  "campaign": {
+    "terminalLedger": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+    "packageCount": 20,
+    "providerCalls": 158,
+    "fullHTTPTurnAttempts": 68,
+    "verifierOnlyChecks": 17,
+    "conservativeUSD": 7.864152,
+    "remainingAuthorizationUSD": 0.135848,
+    "ownerCasesProviderAttempted": 43,
+    "ownerCasesNotProviderAttempted": 67,
+    "accountBalanceVerified": false
+  },
+  "nextAction": "Retain both misses as failing reference-alignment evidence. Improve required-principle coverage and complete source/exception units for direct-rule answers, using the retained outputs as regressions before any new paid package."
+}
