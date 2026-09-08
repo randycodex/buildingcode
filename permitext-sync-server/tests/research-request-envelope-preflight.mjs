@@ -15,6 +15,7 @@ import { researchEvidenceAssemblyVersion } from "../research-evidence-assembly.m
 import { researchAnswerPresentationContract, researchDecisionFactInstruction } from "../research-answer-presentation.mjs";
 import { zoningResearchSafetyInstruction, zoningResearchSafetyPromptContext } from "../research-zoning-safety.mjs";
 import { zoningResearchPromptContext } from "../research-zoning-planner.mjs";
+import { zoningContextExcerptPrompt } from "../research-zoning-context-excerpts.mjs";
 import { resolveResearchCodeBasis } from "../research-code-basis.mjs";
 import { createResearchCorpusRegistry, routeResearchCorpora } from "../research-corpus-registry.mjs";
 
@@ -66,7 +67,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
   const schemaStart = source.indexOf("const researchVerificationIssueTypes =");
   const schemaEnd = source.indexOf("function validateResearchVerification(", schemaStart);
   assert(verificationStart >= 0 && verificationEnd > verificationStart && schemaStart >= 0 && schemaEnd > schemaStart);
-  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext, evaluateResearchWebAttribution };
+  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext, zoningContextExcerptPrompt, evaluateResearchWebAttribution };
   const buildVerifierRequest = new Function(...Object.keys(verificationDependencies),
     `${source.slice(schemaStart, schemaEnd)} return ${source.slice(verificationStart, verificationEnd).replace(/^async function/, "function")} return requestBody; };`
   )(...Object.values(verificationDependencies));

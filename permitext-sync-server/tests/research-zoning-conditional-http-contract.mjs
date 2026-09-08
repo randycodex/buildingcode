@@ -8,8 +8,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { ownerResearchScopeInput } from "../evals/research-owner-scope-input.mjs";
 import { conditionalFixtureAnswer } from "./research-zoning-conditional-fixtures.mjs";
-import { targetedZoningContextExcerpt } from "../research-zoning-context-excerpts.mjs";
-import { planZoningResearchQuestion } from "../research-zoning-planner.mjs";
 
 const scratch = await mkdtemp(join(tmpdir(), "permitext-conditional-http-"));
 for (const name of Object.keys(process.env)) {
@@ -31,7 +29,7 @@ Object.assign(process.env, {
   PERMITEXT_RESEARCH_MODEL_EVIDENCE_ANALYSIS: "1", PERMITEXT_RESEARCH_WEB_SUPPORT: "1"
 });
 const nativeFetch = globalThis.fetch;
-let activeID, mode, phases, proposed, doubleError;
+let activeID, surface, mode, phases, proposed, doubleError;
 const respondWithDouble = async (url, options) => {
   assert.equal(String(url), "https://api.openai.com/v1/responses", "Unexpected external request.");
   const body = JSON.parse(options.body);
@@ -41,13 +39,17 @@ const respondWithDouble = async (url, options) => {
   const input = typeof body.input === "string" ? body.input : body.input.flatMap((item) => item.content.map((part) => part.text || "")).join("\n");
   assert.match(input, /ANSWER_SCOPE: conditional_source_explanation; PROPERTY_DETERMINATION: unresolved/);
   assert.match(input, /MISSING_PROJECT_FACTS/);
+  if (activeID === "ZR-06") {
+    assert(input.includes("documentation satisfactory to the Department of Buildings"), "Storage closing conditions must reach both draft and verifier.");
+    assert.match(input, /SOURCE_SCOPE_LIMITATION:.*provisions are omitted/);
+    if (surface === "reader") assert.match(input, /READER_SELECTION_SCOPE: The user selected the full section/);
+  }
   if (mode === "provider_error") return Response.json({ error: { message: "Synthetic unavailable provider" } }, { status: 503 });
   let output;
   if (phase === "permitext_code_interpretation") {
     assert.equal(phases.length, 1);
     const evidence = Array.from(input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)\nCODE: [^\n]+\nSECTION: ([^\n]+)/g),
       ([, sourceID, sectionID, sectionNumber]) => ({ sourceID, sectionID, sectionNumber }));
-    if (activeID === "ZR-06") assert(input.includes("documentation satisfactory to the Department of Buildings"), "Storage closing conditions must be supplied to the answering model.");
     proposed = conditionalFixtureAnswer(activeID, evidence);
     if (mode === "unsafe") proposed.answerText = `Yes. This property is approved.\n\n${proposed.answerText}`;
     output = mode === "invalid_draft" ? "invalid JSON double" : JSON.stringify(proposed);
@@ -86,26 +88,21 @@ try {
   const auth = { accountUserID: account.appUserID };
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const seen = new Set();
-  for (activeID of ["ZR-06", "ZR-07", "ZR-13"]) {
+  for (const scenario of [["ZR-06", "reader"], ["ZR-06", "chat"], ["ZR-07", "reader"], ["ZR-13", "reader"]]) {
+    [activeID, surface] = scenario;
     const input = await ownerResearchScopeInput(key.cases.find((item) => item.id === activeID), { original: true, zoningSummary: zoningSectionSummary });
-    // Exercise the Reader's real exact-passage protocol. These canonical
-    // passages cover the test double's cited rules; they are not reference-key
-    // prose. The separate assembly contract covers all authored section pins.
-    const selectedIDs = activeID === "ZR-06" ? [20022473, 20022474] : activeID === "ZR-07" ? [20018425] : [20018060];
+    // Reader cases select whole canonical sections. Chat supplies no selected
+    // sources, so retrieval must find the closing conditions and dependencies.
+    const selectedIDs = surface === "chat" ? [] : activeID === "ZR-06" ? [20022473, 20022474] : activeID === "ZR-07" ? [20018425] : [20018060];
     const selections = (await Promise.all(selectedIDs.map(async (sectionID) => {
       const section = await zoningSection(sectionID);
       const text = section.blocks.map((block) => block.plainText || "").join("\n\n").replace(/\s+/g, " ").trim();
-      if (sectionID === 20022473) {
-        const excerpt = targetedZoningContextExcerpt({ codePrefix: "ZR", sectionNumber: "42-192", text }, { question: input.question, plan: planZoningResearchQuestion(input) });
-        assert(excerpt);
-        return excerpt.metadata.spans.map(({ start, end }) => ({ sectionID: String(sectionID), selectedText: text.slice(start, end) }));
-      }
       return [{ sectionID: String(sectionID), selectedText: text }];
     }))).flat();
     for (mode of ["accept", "verification_reject", "unsafe", "provider_error", "invalid_draft"]) {
       phases = [];
       doubleError = null;
-      const created = await request("/research/conversations/create", { auth, selections, originSurface: "reader" }, token);
+      const created = await request("/research/conversations/create", { auth, ...(selections.length ? { selections } : {}), originSurface: surface }, token);
       assert.equal(created.status, 201, JSON.stringify(created.body));
       const conversationID = created.body.conversation.id;
       const response = await request("/research/conversations/message", { auth, conversationID, question: input.question, requestID: randomUUID() }, token);
@@ -125,6 +122,19 @@ try {
         assert.equal(saved.body.answer.answer.answerText, proposed.answerText);
         assert.deepEqual(saved.body.answer.answer.zoningArchitecture.plan, plan);
         assert(saved.body.answer.evidence.length);
+        if (activeID === "ZR-06") {
+          const source = saved.body.answer.evidence.find((item) => item.sectionNumber === "42-192");
+          assert.match(source.passageText, /documentation satisfactory to the Department of Buildings/);
+          assert.match(source.provenance.targetedZoningContext.limitation, /omitted/);
+          assert.equal(source.provenance.canonicalContextComplete, false);
+          if (surface === "reader") {
+            assert.equal(source.provenance.userSelectedText, selections.find((item) => item.sectionID === "20022473").selectedText);
+            assert.equal(source.provenance.pinnedSelectionExcerpted, true);
+            assert.equal(source.provenance.pinnedSelectionExact, false);
+          } else {
+            for (const number of ["42-191", "42-193"]) assert(saved.body.answer.evidence.some((item) => item.sectionNumber === number));
+          }
+        }
       } else {
         assert.equal(response.status, 502, `${activeID}/${mode}: ${JSON.stringify(response.body)}`);
         const reopened = await request("/research/conversations/get", { auth, conversationID }, token);
@@ -156,7 +166,7 @@ try {
   assert.equal(boundary.body.charged, false);
   assert(boundary.body.zoningPlan.missingFacts.some((fact) => fact.id === "dated_substantive_text"));
   assert.deepEqual(phases, [], "Missing historical law must still stop before provider dispatch.");
-  console.log("Conditional HTTP contract passed: 16 offline flows; cited answers persist with unresolved determination, rejected/invalid/unavailable answers stay unsaved and uncharged, maximum two provider doubles, missing historical law blocks dispatch, zero external calls.");
+  console.log("Conditional HTTP contract passed: 21 offline flows including full Reader sections and unpinned storage chat; cited answers and excerpt provenance persist, failures stay unsaved and uncharged, maximum two provider doubles, missing historical law blocks dispatch, zero external calls.");
 } finally {
   globalThis.fetch = nativeFetch;
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

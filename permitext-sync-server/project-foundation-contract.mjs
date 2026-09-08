@@ -584,6 +584,14 @@ export function immutableEvidenceSnapshot({
     provenance.userSelectedText = userSelectedText;
     provenance.userSelectedTextHash = createHash("sha256").update(userSelectedText).digest("hex");
   }
+  if (source?.targetedZoningContext) {
+    provenance.targetedZoningContext = structuredClone(source.targetedZoningContext);
+    provenance.canonicalContextComplete = false;
+    if (source.pinnedSelectionExcerpted === true) {
+      provenance.pinnedSelectionExcerpted = true;
+      provenance.pinnedSelectionExact = false;
+    }
+  }
   snapshot.provenance = provenance;
   const structuredSource = immutableStructuredEvidenceSource(source, passageText);
   if (structuredSource) snapshot.structuredSource = structuredSource;

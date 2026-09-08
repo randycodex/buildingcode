@@ -26,6 +26,8 @@ The governing source wording used to inspect the test doubles was checked agains
 
 ## Remaining work found during this pass
 
+Follow-up: the [storage source coverage pass](PERMITEXT_RESEARCH_STORAGE_SOURCE_COVERAGE_2026-09-08.md) addresses the full Reader-selection truncation and unpinned storage dependencies below. It preserves these original findings and describes the tested scope. Historical routing remains open.
+
 1. A full, long Reader selection of ZR 42-192 is still shortened by the existing per-source/fair-share limits, losing closing conditions. The successful HTTP fixture uses exact, individually selected canonical spans within those limits. It does not prove that the long-selection case is fixed.
 2. Unpinned self-storage chat retrieval returned Appendix J, ZR 42-192, ZR 12-10 and ZR 42-19. It did not supply ZR 42-193, and the storage source omitted the closing existing-facility documentation text. Conditional response eligibility alone does not establish completeness; generation and verification still have to reject unsupported claims. Automatic retrieval needs the same material-condition coverage as the selected-source case.
 3. Historical routing remains too dependent on wording. “What did ZR Section 23-343 require on January 1, 2020? Reconstruct the rules in force.” currently receives a direct-rule plan rather than the historical-text prerequisite. A mention of “official archived” text can also be mistaken for availability even when prefaced by “without.” These are existing planner gaps, not resolved by this response-scope change. The passing HTTP boundary control explicitly asks to reconstruct the text in force under the NYC Zoning Resolution.

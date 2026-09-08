@@ -279,7 +279,7 @@ import {
   researchOfficialGuidanceSummaryProof
 } from "./research-official-guidance-summary.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
-import { refreshZoningContextEvidence } from "./research-zoning-context-excerpts.mjs";
+import { refreshZoningContextEvidence, zoningContextExcerptPrompt } from "./research-zoning-context-excerpts.mjs";
 import { isZoningConditionalExplanation, planZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
 import {
   createResearchCorpusRegistry,
@@ -8296,9 +8296,10 @@ function researchPrompt(question, evidence, options = {}) {
       `TOPIC_ROUTE_RELATIONSHIP: ${section.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
       `RELATIONSHIP: ${section.relationship || "Automatically assembled enacted evidence"}`,
       `RETRIEVAL_REASON: ${section.retrievalReason || section.relationship || "Authorized enacted evidence"}`,
-      section.origin === "user_pinned" && section.userSelectedText
+      section.origin === "user_pinned" && section.userSelectedText && !section.pinnedSelectionExcerpted
         ? `USER_SELECTED_TEXT: ${section.text}`
         : "",
+      zoningContextExcerptPrompt(section),
       `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
       section.evidencePriority?.claimCoverageReason
         ? `REQUIRED_CLAIM_REASON: ${section.evidencePriority.claimCoverageReason}`
@@ -10491,9 +10492,10 @@ export async function openAIResearchVerification(question, evidence, interpretat
     `TOPIC_ROUTE_RELATIONSHIP: ${source.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
     `RELATIONSHIP: ${source.relationship || "Automatically assembled enacted evidence"}`,
     `RETRIEVAL_REASON: ${source.retrievalReason || source.relationship || "Authorized enacted evidence"}`,
-    source.origin === "user_pinned" && source.userSelectedText
+    source.origin === "user_pinned" && source.userSelectedText && !source.pinnedSelectionExcerpted
       ? `USER_SELECTED_TEXT: ${source.text}`
       : "",
+    zoningContextExcerptPrompt(source),
     `TEXT: ${source.text}`
   ].join("\n")).join("\n\n---\n\n");
   // Structural lookup only. The verifier must still read the exact bound text;
@@ -11644,7 +11646,7 @@ async function resolveResearchAssemblySection(request, catalog) {
   const requestedID = String(request?.sectionID || "").trim();
   const requestedPrefix = String(request?.codePrefix || "").trim().toUpperCase();
   const requestedNumber = String(request?.sectionNumber || "").trim().replace(/\.$/, "").toUpperCase();
-  const summary = catalog.find((item) => String(item.id) === requestedID || String(item.webSectionID || "") === requestedID) ||
+  const summary = (requestedID && catalog.find((item) => String(item.id) === requestedID || String(item.webSectionID || "") === requestedID)) ||
     catalog.find((item) =>
       String(item.codePrefix || "").toUpperCase() === requestedPrefix &&
       String(item.sectionNumber || "").replace(/\.$/, "").toUpperCase() === requestedNumber

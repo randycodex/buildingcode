@@ -11,7 +11,7 @@ import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt } from "./research-zoning-context-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260908-pinned-source-blocks-v27";
+export const researchEvidenceAssemblyVersion = "20260908-storage-source-coverage-v28";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -817,9 +817,9 @@ export async function assembleResearchEvidence({
     } catch {
       resolverFailureCount += 1;
     }
-    const contextExcerpt = resolved && !pinned.richSourceID &&
-      !compactText(pinned.userSelectedText || pinned.selectedText || pinned.text)
-      ? targetedZoningContextExcerpt(value, { question: query.question, plan: questionPlan }) : null;
+    const contextExcerpt = resolved && !pinned.richSourceID
+      ? targetedZoningContextExcerpt({ ...value, canonicalText: value.text }, { question: query.question, plan: questionPlan,
+          selectedText: pinned.userSelectedText || pinned.selectedText || pinned.text }) : null;
     resolvedPins.push({ index, pinned, value, resolved, contextExcerpt });
   }
 
@@ -850,7 +850,8 @@ export async function assembleResearchEvidence({
     const allowance = Math.min(limits.maximumCharactersPerSource,
       reservationFor(entry) || fairPinnedShare, remainingCharacters);
     let targeted = entry.contextExcerpt
-      ? { value: { ...entry.value, text: entry.contextExcerpt.text, targetedZoningContext: entry.contextExcerpt.metadata }, excerpt: null }
+      ? { value: { ...entry.value, text: entry.contextExcerpt.text, canonicalText: entry.contextExcerpt.text,
+          targetedZoningContext: entry.contextExcerpt.metadata }, excerpt: null }
       : !entry.pinned.richSourceID &&
       allowance > 0 &&
       targetedDefinitionCount < limits.maximumTargetedDefinitions
@@ -889,9 +890,14 @@ export async function assembleResearchEvidence({
     record.userSelectedText = compactText(
       entry.pinned.userSelectedText || entry.pinned.selectedText || entry.pinned.text
     );
+    if (entry.contextExcerpt && record.userSelectedText) {
+      record.pinnedSelectionExcerpted = true;
+      record.pinnedSelectionExact = false;
+    }
     if (
       entry.resolved &&
       !entry.pinned.richSourceID &&
+      !entry.contextExcerpt &&
       record.userSelectedText &&
       compactText(record.text) !== record.userSelectedText
     ) {
@@ -960,7 +966,10 @@ export async function assembleResearchEvidence({
     source.origin === sourceOrigins.pinned && source.pinnedSelectionExact === true
   ).length;
   const pinnedSelectionTruncatedCount = sources.filter((source) =>
-    source.origin === sourceOrigins.pinned && source.pinnedSelectionExact === false
+    source.origin === sourceOrigins.pinned && source.pinnedSelectionExact === false && !source.pinnedSelectionExcerpted
+  ).length;
+  const pinnedSelectionExcerptedCount = sources.filter((source) =>
+    source.origin === sourceOrigins.pinned && source.pinnedSelectionExcerpted === true
   ).length;
   const structuredPinnedCount = sources.filter((source) =>
     source.origin === sourceOrigins.pinned && source.richSourceID
@@ -993,7 +1002,14 @@ export async function assembleResearchEvidence({
       remainingCharacters,
       fairCandidateShare
     );
-    const targeted = targetedDefinitionCount < limits.maximumTargetedDefinitions
+    const contextExcerpt = candidate?.signals?.useSelectedPassageOnly === true ? null
+      : targetedZoningContextExcerpt(resolved, { question: query.question, plan: questionPlan });
+    // A scoped excerpt is atomic. When it cannot fit, retain the ordinary
+    // shortened-source limitation rather than mislabel a partial excerpt.
+    const targeted = contextExcerpt && contextExcerpt.text.length <= allowance
+      ? { value: { ...resolved, text: contextExcerpt.text, canonicalText: contextExcerpt.text,
+          targetedZoningContext: contextExcerpt.metadata }, excerpt: null }
+      : targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
           resolved,
           definitionSelectionContext(query.retrievalQuery, canonicalForExpansion),
@@ -1049,7 +1065,7 @@ export async function assembleResearchEvidence({
   const dependencyPlan = !pinnedEvidence.length && appliedStrategy.mode === researchEvidenceStrategies.broad
     ? researchTopicDependencyPlan({ question: query.retrievalQuery, sources })
     : null;
-  // A reviewed design plan already reserves its dimensional dependencies. Keep
+  // A reviewed topic plan already reserves its governing dependencies. Keep
   // that package within its established request budget; incidental dictionaries
   // must not consume the space needed for those complete governing provisions.
   const definitionCandidates = dependencyPlan ? [] : [...candidates, ...prioritizeResearchEvidence(
@@ -1106,9 +1122,8 @@ export async function assembleResearchEvidence({
   await onStage?.("reviewing_provisions", "completed");
   await onStage?.("following_cross_references", "active");
 
-  // A routed design question needs its dimensional dependencies, not whichever
-  // six references happen to appear first after lexical ranking. This separate,
-  // reviewed set shares the existing character and provider-spend ceilings.
+  // Reviewed topic dependencies precede opportunistic references and share
+  // the existing character and provider-spend ceilings.
   let topicDependencyCount = 0;
   const missingTopicDependencies = [];
   for (const [index, reference] of (dependencyPlan?.references || []).entries()) {
@@ -1118,8 +1133,9 @@ export async function assembleResearchEvidence({
       if (!existing.canonicalContextComplete) missingTopicDependencies.push(reference.sectionNumber);
       else existing.evidencePriority = {
         ...existing.evidencePriority,
+        evidenceRole: "governing",
         claimCoverageRequired: true,
-        claimCoverageReason: "Dimensional dependency; retain scope and exceptions."
+        claimCoverageReason: dependencyPlan.coverageReason
       };
       continue;
     }
@@ -1152,16 +1168,17 @@ export async function assembleResearchEvidence({
     const record = sourceRecord(resolved, {
       origin: sourceOrigins.crossReference,
       sourceID: deterministicSourceID(sourceOrigins.crossReference, resolved, index),
-      relationship: `Ramp design: ${reference.purpose}`,
+      relationship: `${dependencyPlan.label}: ${reference.purpose}`,
       characterAllowance: remainingCharacters,
       canonicalResolved: true,
-      retrievalReason: "Reviewed edition-matched dimensional dependency",
+      retrievalReason: "Reviewed edition-matched governing dependency",
       retrievalVersion: dependencyPlan.version,
       retrievalDepth: 1,
       evidencePriority: {
         ...researchEvidencePriorityMetadata({ ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: 1 }),
+        evidenceRole: "governing",
         claimCoverageRequired: true,
-        claimCoverageReason: "Dimensional dependency; retain scope and exceptions."
+        claimCoverageReason: dependencyPlan.coverageReason
       },
       retrievedAt
     });
@@ -1306,16 +1323,16 @@ export async function assembleResearchEvidence({
   // Generic expansion may recover a dependency that the topic-specific count
   // limit omitted. Report final coverage, not an intermediate false absence.
   const unresolvedTopicDependencies = missingTopicDependencies.filter((sectionNumber) => {
-    const recovered = sources.find((source) => source.codePrefix === "BC" && source.sectionNumber === sectionNumber &&
+    const recovered = sources.find((source) => source.codePrefix === dependencyPlan.corpusPrefix && source.sectionNumber === sectionNumber &&
       source.canonicalContextComplete && sameTopicDependencyCorpus(source, dependencyPlan.anchor));
     if (!recovered) return true;
-    recovered.evidencePriority = { ...recovered.evidencePriority, claimCoverageRequired: true,
-      claimCoverageReason: "Dimensional dependency; retain scope and exceptions." };
+    recovered.evidencePriority = { ...recovered.evidencePriority, evidenceRole: "governing", claimCoverageRequired: true,
+      claimCoverageReason: dependencyPlan.coverageReason };
     return false;
   });
   if (unresolvedTopicDependencies.length) limitations.push({
     kind: "topic-dependency-coverage-gap",
-    text: `The routed ramp-design package could not include complete edition-matched BC sections: ${unresolvedTopicDependencies.join(", ")}. Do not infer those requirements from memory.`,
+    text: `The routed ${dependencyPlan.label.toLowerCase()} package could not include complete edition-matched ${dependencyPlan.corpusPrefix} sections: ${unresolvedTopicDependencies.join(", ")}. Do not infer those requirements from memory.`,
     planID: dependencyPlan.id
   });
 
@@ -1406,6 +1423,7 @@ export async function assembleResearchEvidence({
       pinnedCanonicalContextCharacterCount,
       pinnedSelectionExactCount,
       pinnedSelectionTruncatedCount,
+      pinnedSelectionExcerptedCount,
       structuredPinnedCount,
       supplementalCharacterCeiling,
       supplementalCharacterCount: Math.max(0, characterCount - pinnedCharacterCount),

@@ -3,7 +3,9 @@
 // Basis: NYC DOB 2022 BC Chapter 10, Sections 1012, 1014 and 1020.2.
 // This is baseline ramp coverage, not the entire referenced accessibility or
 // guard standard. Guard scoping stays present; detailed guard design is separate.
-export const researchTopicDependencyVersion = "20260903-ramp-dependencies-v1";
+import { zoningContextExcerptVersion } from "./research-zoning-context-excerpts.mjs";
+
+export const researchTopicDependencyVersion = "20260908-storage-dependencies-v2";
 
 const rampDependencies = Object.freeze([
   ["1012.6.1", "landing slope"],
@@ -23,6 +25,23 @@ const rampDependencies = Object.freeze([
 ]);
 
 export function researchTopicDependencyPlan({ question = "", sources = [] } = {}) {
+  // ZR 42-191 marks self-service storage with both the limited-applicability
+  // and additional-conditions notations. A 42-192 excerpt alone cannot supply
+  // that row or the 42-193 performance-standard dependency. This plan is only
+  // for an independently assembled, unresolved-applicability source excerpt.
+  const storageAnchor = sources.find((source) => source.codePrefix === "ZR" && source.sectionNumber === "42-192" &&
+    source.targetedZoningContext?.version === zoningContextExcerptVersion &&
+    source.targetedZoningContext?.purpose === "unresolved_storage_applicability" &&
+    ["codeEdition", "codeVersion", "corpusID", "jurisdiction"].every((field) => String(source[field] || "").trim()));
+  if (storageAnchor && /\bself[- ](?:service\s+)?storage\b/i.test(question)) return {
+    id: "nyc-zoning-storage-applicability", version: researchTopicDependencyVersion, anchor: storageAnchor,
+    label: "Storage applicability", corpusPrefix: "ZR",
+    coverageReason: "Use-allowance and additional-condition dependency; retain scope and exceptions.",
+    references: [["42-191", "use allowances and notation legend"], ["42-193", "additional conditions"]]
+      .map(([sectionNumber, purpose]) => ({ codePrefix: "ZR", sectionNumber, purpose,
+        codeEdition: storageAnchor.codeEdition, codeVersion: storageAnchor.codeVersion,
+        corpusID: storageAnchor.corpusID, jurisdiction: storageAnchor.jurisdiction }))
+  };
   if (!/\bramps?\b/i.test(question) || !/\b(?:requirements?|design(?:ing)?|layout)\b/i.test(question)) return null;
   if (/\b(?:construction[- ]site|construction\s+ramps?|runways?|motor[- ]vehicle|vehicular|curb\s+ramps?)\b/i.test(question)) return null;
   if (/\b(?:only|selected|2014|2008|1968)\b/i.test(question)) return null;
@@ -39,6 +58,8 @@ export function researchTopicDependencyPlan({ question = "", sources = [] } = {}
     id: "nyc-2022-pedestrian-ramp-design",
     version: researchTopicDependencyVersion,
     anchor,
+    label: "Ramp design", corpusPrefix: "BC",
+    coverageReason: "Dimensional dependency; retain scope and exceptions.",
     references: rampDependencies.map(([sectionNumber, purpose]) => ({
       codePrefix: "BC", sectionNumber, purpose,
       codeEdition: anchor.codeEdition, codeVersion: anchor.codeVersion,

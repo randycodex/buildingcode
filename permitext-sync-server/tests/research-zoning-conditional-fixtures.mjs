@@ -5,7 +5,11 @@ export const conditionalFixtures = {
     lead: "Cannot determine whether the proposed facility is permitted as-of-right on this property from the supplied facts.",
     rules: [
       ["42-192", "Conditional storage paths", "ZR 42-192 distinguishes the Appendix J subareas: Subarea 1 has a conditional as-of-right path requiring industrial or business-sized storage space, while Subarea 2 uses the City Planning Commission special-permit path under ZR 74-192. Neither rule locates this property. Existing-facility treatment requires proof satisfactory to DOB of qualifying existence on December 19, 2017. Enlargement relief depends on unchanged zoning-lot area; documented reconstruction has a floor-area limit; inadequate documentation leads to nonconforming-use treatment. Those historical facts cannot be assumed."],
-      ["42-193", "Performance requirements", "ZR 42-193 also subjects Manufacturing District uses to the applicable performance standards. A use allowance alone does not establish compliance."]
+      ["42-193", "Performance requirements", "ZR 42-193 subjects uses marked P in ZR 42-191, with stated exceptions, to the performance standards in ZR 42-40 through 42-48. A use allowance alone does not establish compliance."]
+    ],
+    additionalRules: [
+      ["APPENDIX J", "Mapped designated areas", "Appendix J identifies designated-area maps for the Subarea 1 as-of-right provisions and Subarea 2 special-permit provisions. Its text does not locate the unspecified property on an official map."],
+      ["42-191", "Use-table conditions", "The self-service storage row in ZR 42-191 carries both the limited-applicability and P additional-condition notations in M1, M2 and M3. The row does not establish this property's mapped district or satisfy those conditions."]
     ],
     application: "The address or BBL and controlling official map are needed before any parcel-specific conclusion. Confirm the mapped district, special-district status, Appendix J subarea, lot area and any claimed existing-facility history; the selected rules do not establish these facts.",
     missingFacts: ["Property address or BBL", "Controlling official map and mapped zoning district", "Special-district status", "Applicable Appendix J subarea", "Lot area", "December 19, 2017 existing-facility status and documentation, including any later lot-area change"],
@@ -29,7 +33,8 @@ export const conditionalFixtures = {
 
 export function conditionalFixtureAnswer(id, evidence) {
   const fixture = conditionalFixtures[id];
-  const supportedPoints = fixture.rules.map(([number, heading, explanation]) => {
+  const rules = [...fixture.rules, ...(fixture.additionalRules || []).filter(([number]) => evidence.some((item) => item.sectionNumber === number))];
+  const supportedPoints = rules.map(([number, heading, explanation]) => {
     const sources = evidence.filter((item) => item.sectionNumber === number);
     if (!sources.length) throw new Error(`Missing fixture source: ${number}`);
     return { heading, explanation, sectionID: String(sources[0].sectionID), sourceIDs: sources.map((source) => source.sourceID) };
