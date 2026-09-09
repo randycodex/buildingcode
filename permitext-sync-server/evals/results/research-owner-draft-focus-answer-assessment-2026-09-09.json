@@ -1,0 +1,464 @@
+{
+  "schema": "permitext-owner-draft-focus-answer-assessment-v1",
+  "reviewedAt": "2026-09-09T22:35:12.678Z",
+  "liveSourceCommit": "3688bd6503736ed91dd48ffe06bf9ddca33aae31",
+  "runFile": "evals/results/research-owner-api-round2-live-draft-focus-2026-09-09.json",
+  "runSHA256": "8d5a6d2721446e9880590741989745c3ad08522e0e97a7e379856cdee4c1940b",
+  "referenceFile": "evals/research-reconciled-answer-key.json",
+  "referenceSHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "costAuditFile": "evals/results/research-owner-api-round2-draft-focus-cost-audit-2026-09-09.json",
+  "costAuditSHA256": "60d8effec177dbd8152dc54215cb2d844540e93fcbb5b21b4461506ed85a417a",
+  "summary": {
+    "newLiveHTTPTurns": 2,
+    "newLiveProviderCalls": 4,
+    "delivered": 0,
+    "undelivered": 2,
+    "strictWholeAnswerPasses": 0,
+    "reviewProviderCalls": 0,
+    "reviewNetworkCalls": 0,
+    "batchConservativeUSD": 0.085572,
+    "batchUsageEstimateUSD": 0.04623475,
+    "cumulativeConservativeUSD": 8.094222,
+    "remainingConservativeAuthorizationUSD": 0.405778
+  },
+  "limitations": [
+    "Development review, not professional approval. Neither case is a complete accepted answer.",
+    "Draft-only prompt v12 did not improve delivery: both answers failed verification, and the timing contradiction recurred. The prior v11 drafting instructions will be restored; no failed result or expected answer is changed.",
+    "No retries, separate judges or Project workflow were used. The consumed driver must not be replayed.",
+    "Full HTTP times are 19.373 seconds and 16.867 seconds; both answers were undelivered. This small failed comparison does not establish p50/p90 or a speed improvement.",
+    "Budget figures are retained conservative accounting and usage estimates, not an account-balance or invoice check."
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-003",
+      "sourceCommit": "3688bd6503736ed91dd48ffe06bf9ddca33aae31",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-draft-focus-2026-09-09.json",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "resultSHA256": "d54572f81ea18a0374ca62c67d5bf604dddb948237bec39d280b39ee42176a90",
+      "expectedAnswerSHA256": "53bf3d5275364916c22ce10e93a49e67045ac92efd0406ade504570b578ea6bc",
+      "delivered": false,
+      "httpStatus": 502,
+      "durationMilliseconds": 19373,
+      "mainWordCount": 204,
+      "allAuthoredWordCount": 265,
+      "retainedDraft": {
+        "paragraphs": [
+          {
+            "text": "File the plumbing scope as a subsequent filing under the existing job number, rather than as a new unrelated job, if it is part of the same construction project. DOB guidance says all filings for the same project should share the job number; a subsequent filing adds new scope and work types and may use a new applicant. It is separately processed and may have a different review type from the initial filing. The initial filing must be submitted—not remain in pre-filing status—before the subsequent filing can be initiated and submitted; it may be submitted before the initial filing is permitted and until an LOC is issued for the initial filing.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-428c9a63763857482c22e082"
+              }
+            ]
+          },
+          {
+            "text": "For completion, the general guidance says an LOC is requested separately for each initial and subsequent filing. However, if the existing job is an NB or Alteration-CO filing, the specialized FAQ says no LOC is requested for its subsequent filing: that filing remains Permit Entire, while only the I1 changes to CO issued. The supplied guidance does not resolve whether the subsequent record may be created before I1 is submitted; it says the fields will not update until I1 is submitted and recommends completing as much of I1 as possible before creating it.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-428c9a63763857482c22e082"
+              },
+              {
+                "sourceID": "dob-nb-altco-faq",
+                "claimID": "official-passage-97a623845c39a7f44602f604"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [
+          "Whether the initial GC job is an NB or Alteration-CO filing, which determines the stated completion path for the subsequent filing."
+        ],
+        "evidenceLimitations": [
+          "The supplied passages do not resolve whether a subsequent filing can be created before the initial filing is submitted; they establish that it cannot be initiated and submitted then, and that its fields will not update until I1 is submitted."
+        ]
+      },
+      "retainedVerifier": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "misstated_provision",
+            "detail": "The answer says the subsequent filing must be initiated only after the initial filing is submitted, but the supplied guidance acknowledges a subsequent filing can be in pre-filing status before I1 submission; it establishes only that submission requires I1 to have been submitted and that fields do not update until then."
+          },
+          {
+            "type": "missed_premise_contradiction",
+            "detail": "The first paragraph makes a categorical initiation-timing claim, while the second says the supplied guidance does not resolve whether creation before I1 submission is allowed."
+          }
+        ],
+        "qualificationReview": {
+          "packetSHA256": "6ee05eab12fb558656cbf3155d0e5f084e9e23dd13d8da99526dd0be16e6f0b9",
+          "passages": [
+            {
+              "passageIndex": 0,
+              "finding": "missing_or_misstated",
+              "conditionSpanIDs": [
+                6,
+                9,
+                10,
+                11,
+                13,
+                14,
+                15,
+                16
+              ],
+              "answerReferences": [
+                "paragraph:0",
+                "paragraph:1"
+              ],
+              "reason": "The answer preserves the same-job, new-applicant, separate-application and completion points but overstates when the subsequent filing may be initiated."
+            },
+            {
+              "passageIndex": 1,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "This passage gives the interface action and unrelated job-type guidance, not a material condition for the filing-choice conclusion."
+            },
+            {
+              "passageIndex": 2,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "This passage concerns related job-number fields and specialized work questions that do not materially qualify the requested plumbing filing choice."
+            },
+            {
+              "passageIndex": 3,
+              "finding": "missing_or_misstated",
+              "conditionSpanIDs": [
+                0,
+                1,
+                2,
+                20,
+                21,
+                22,
+                23
+              ],
+              "answerReferences": [
+                "paragraph:0",
+                "paragraph:1"
+              ],
+              "reason": "The answer correctly states the submission window and field-update limitation but incorrectly makes submission a prerequisite to initiation and does not preserve the acknowledged pre-filing creation scenario."
+            },
+            {
+              "passageIndex": 4,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "This passage addresses FO and ST work types for NB filings, not the plumbing subsequent-filing decision."
+            },
+            {
+              "passageIndex": 5,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0,
+                1,
+                2
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer preserves the specialized NB or Alteration-CO completion consequence and keeps it conditional on the initial job type."
+            }
+          ]
+        }
+      },
+      "reviewedDeliveredProjection": null,
+      "sourcePacketSHA256": "4b916fe0311af461879e8f9a4f2bfeaaa8b4beae8542f1fc0a8f31847bdf9914",
+      "sourceBindings": [
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-789cc7ccd439eb8374132031",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5",
+          "page": 5
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-5b682c1399f57019c03eda89",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6",
+          "page": 6
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-5bdd162d6e75ae930ee42abc",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=19",
+          "page": 19
+        },
+        {
+          "sourceID": "dob-subsequent-faq",
+          "claimID": "official-passage-428c9a63763857482c22e082",
+          "contentHash": "a3dc26b9203974b0e7174a92f14095d0774196c6863b6a9c391742dacc418a1f",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "page": null
+        },
+        {
+          "sourceID": "dob-nb-altco-faq",
+          "claimID": "official-passage-95c0c0b217e1c6ce17a285c5",
+          "contentHash": "db128bd9ddc4ee892b51b7eb25cbd90045d47a0495378130a5bf87d429dd741f",
+          "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+          "page": null
+        },
+        {
+          "sourceID": "dob-nb-altco-faq",
+          "claimID": "official-passage-97a623845c39a7f44602f604",
+          "contentHash": "db128bd9ddc4ee892b51b7eb25cbd90045d47a0495378130a5bf87d429dd741f",
+          "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+          "page": null
+        }
+      ],
+      "requiredConcepts": [
+        "Preserve one job number for related construction work on the same property.",
+        "Distinguish the job number from the filing extension.",
+        "State that each filing still requires separate processing and completion.",
+        "Preserve the public-source conflicts about creation timing and completion path.",
+        "Obtain the initial job type before stating whether the subsequent filing closes through an LOC or the initial filing's CO process."
+      ],
+      "backlogDisposition": "latest_attempt_undelivered",
+      "workItemIDs": [
+        "R1",
+        "R7"
+      ],
+      "reviewStatus": "undelivered-timing-contradiction-recurred-review-permission-restored",
+      "confirmed": [
+        "The subsequent-filing recommendation, same job number, different-applicant permission, separate processing and different-review-type permission are supported.",
+        "The general LOC and conditional NB/Alteration-CO completion branches remain present, with the initial job type identified as missing.",
+        "The draft omits the prior unasked interface directions."
+      ],
+      "missingExpected": [
+        "The first paragraph again makes I1 submission a categorical prerequisite to initiation. The later paragraph acknowledges unresolved earlier creation, and the evidence limitation repeats the categorical initiation bar. This fails the source-conflict and internal-consistency requirements."
+      ],
+      "presentationGaps": [
+        "The supplied same-project premise is again restated conditionally instead of applied.",
+        "The timing rule and uncertainty remain lengthy and repeated across fields."
+      ],
+      "checkerFindings": "The negative verifier verdict correctly identifies the categorical initiation restriction and its contradiction with the later uncertainty. The source-conflict repair is not reliable across these samples; a restored review-type permission does not offset the material regression.",
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "undelivered-no-full-answer-acceptance"
+    },
+    {
+      "id": "DOBNOW-004",
+      "sourceCommit": "3688bd6503736ed91dd48ffe06bf9ddca33aae31",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-draft-focus-2026-09-09.json",
+      "inputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "resultSHA256": "51ab93b91441152699734221a57e41eac8e31628247744b8243c1bcba1dfe2d4",
+      "expectedAnswerSHA256": "fb0fbdf6d2cfec2d84bede1764713e9567a24bc7f5b4fc41b146dd785c111eff",
+      "delivered": false,
+      "httpStatus": 502,
+      "durationMilliseconds": 16867,
+      "mainWordCount": 184,
+      "allAuthoredWordCount": 214,
+      "retainedDraft": {
+        "paragraphs": [
+          {
+            "text": "The appropriate DOB NOW action is a Post Approval Amendment (PAA): it is the stated route for changes after a filing has been approved, and the Applicant of Record must file it using the same Applicant of Record as the original filing. Because this filing was not submitted for legalization, the stated legalization bar does not apply. Only one PAA may be in progress, and Department review and approval are required; a PAA cannot be used to request sign-off.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-paa-process",
+                "claimID": "official-passage-c49c2af150c2e998ace4bce1"
+              },
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-paa-faq",
+                "claimID": "official-passage-0ff2282039c3155f2a43dbdb"
+              },
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-ce20f813e92241a7bc12804a"
+              }
+            ]
+          },
+          {
+            "text": "Disclose the revised scope in the Plans/Work (PW1) Comments field. Revised plans call for a complete plan set: include new unapproved sheets and previously approved, DOB-stamped sheets; following approval, the uploaded new set replaces the prior plan set. The filing review type, application/location address, Applicant of Record information, owner information, and building type are not editable. The supplied guidance is unresolved on Work on Floors: the process page lists it as non-editable, while the FAQ specifically says a PAA can add or remove a floor and requires PW3 to reflect the resulting increase or decrease in estimated work cost. Cost changes can also recalculate fees.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-paa-process",
+                "claimID": "official-passage-c49c2af150c2e998ace4bce1"
+              },
+              {
+                "sourceID": "dob-paa-faq",
+                "claimID": "official-passage-0ff2282039c3155f2a43dbdb"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [],
+        "evidenceLimitations": [
+          "The supplied official guidance gives incompatible directions on whether Work on Floors is editable in a PAA; it does not resolve how that field should be handled for this revision."
+        ]
+      },
+      "retainedVerifier": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "missed_material_conclusion",
+            "detail": "The answer omits the stated flat, one-time $100 fee charged when a new PAA is filed."
+          },
+          {
+            "type": "missed_material_conclusion",
+            "detail": "The answer omits the stated requirement that additional fees caused by a changed cost or scope be paid online before submitting the PAA."
+          },
+          {
+            "type": "missed_material_conclusion",
+            "detail": "For revised plans, the answer omits that new unapproved sheets should indicate the P1 suffix on the filing extension and that previously approved DOB-stamped plans should not be changed."
+          }
+        ],
+        "qualificationReview": {
+          "packetSHA256": "163c3f030d99502a2a1fd9cee2e52464f2baa90ccff5f6b43157b4dd43fa8977",
+          "passages": [
+            {
+              "passageIndex": 0,
+              "finding": "missing_or_misstated",
+              "conditionSpanIDs": [
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14
+              ],
+              "answerReferences": [
+                "paragraph:0",
+                "paragraph:1"
+              ],
+              "reason": "The answer addresses the PAA route, actor, legalization scope, concurrency, comments, and cost recalculation but omits the $100 fee and the online payment consequence for increased cost."
+            },
+            {
+              "passageIndex": 1,
+              "finding": "missing_or_misstated",
+              "conditionSpanIDs": [
+                1,
+                2,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer preserves the complete-plan-set and stamped-sheet requirements but omits the P1 suffix instruction and the instruction not to change approved stamped plans."
+            },
+            {
+              "passageIndex": 2,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                7,
+                9,
+                17
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer identifies a PAA as the route for changes after approval and does not incorrectly substitute a subsequent filing."
+            },
+            {
+              "passageIndex": 3,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                7
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer correctly states that the filing review type cannot be changed."
+            },
+            {
+              "passageIndex": 4,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                17,
+                29,
+                30
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer conditionally applies the legalization prohibition consistently with the supplied fact that the filing was not submitted for legalization."
+            }
+          ]
+        }
+      },
+      "reviewedDeliveredProjection": null,
+      "sourcePacketSHA256": "cf42687ace6b2a6391f46dbd8dae9c61a068dafd33a238fbbf7b3cad2b5d581e",
+      "sourceBindings": [
+        {
+          "sourceID": "dob-paa-process",
+          "claimID": "official-passage-c49c2af150c2e998ace4bce1",
+          "contentHash": "6f49ec38ed32f94012762190ccfc2c69d00e4818ecb7d7cc7835d9ff282118e9",
+          "url": "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page",
+          "page": null
+        },
+        {
+          "sourceID": "dob-paa-faq",
+          "claimID": "official-passage-0ff2282039c3155f2a43dbdb",
+          "contentHash": "645c377392e3566840ca4d30d4eec780b3a6ba2946bf88c5842c9620d512d49a",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "page": null
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-789cc7ccd439eb8374132031",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5",
+          "page": 5
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-99e3ff631d01ad61590ccecf",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=13",
+          "page": 13
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-ce20f813e92241a7bc12804a",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=16",
+          "page": 16
+        }
+      ],
+      "requiredConcepts": [
+        "Confirm that the original filing is approved.",
+        "Confirm that the requested change is within the PAA route.",
+        "Identify immutable fields before promising that a PAA can accomplish the requested change.",
+        "Disclose the official-source conflict concerning Work on Floors."
+      ],
+      "backlogDisposition": "latest_attempt_undelivered",
+      "workItemIDs": [
+        "R5",
+        "R7"
+      ],
+      "reviewStatus": "undelivered-procedural-detours-remain-checker-demands-expanded-fee-and-plan-details",
+      "confirmed": [
+        "The PAA route, same Applicant of Record, one-open-PAA limit and supplied nonlegalization premise remain supported.",
+        "Work on Floors is excluded from the unconditional locked-field list; the main text preserves both conflicting directions and the FAQ PW3 work-cost condition.",
+        "The separate sign-off limitation is supported."
+      ],
+      "missingExpected": [],
+      "presentationGaps": [
+        "The draft still adds PW1 Comments directions, plan-set instructions and a fee-recalculation sentence to the route-and-limits question.",
+        "The same Applicant of Record point is repeated within one sentence, and the field-conflict limitation repeats the main explanation."
+      ],
+      "checkerFindings": "The verifier rejects omitted flat $100 fee, online payment before submission when scope/cost raises fees, P1 sheet suffix and no-change instruction for previously approved stamped plans. The volunteered procedural and fee claims invite a broader checklist. Requiring the flat fee for this route-and-limits answer remains questionable because it does not claim complete fee or readiness coverage. Plan-sheet details relate to the volunteered plan instructions. Preserve the negative verdict; neither override it nor expand the unchanged reference into an exhaustive filing manual.",
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "undelivered-no-full-answer-acceptance"
+    }
+  ]
+}
