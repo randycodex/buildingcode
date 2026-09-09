@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-09-09T02:18:59.400Z",
+  "method": "Read official NYC Planning pages with web browsing outside the Permitext provider harness.",
+  "providerCalls": 0,
+  "findings": [
+    {
+      "url": "https://zr.planning.nyc.gov/article-iv/chapter-2/42-111",
+      "result": "The selected table itself contains the full legend. Outdoor racket courts have the additional-conditions P notation in M1; M2 and M3 prohibit that row."
+    },
+    {
+      "url": "https://zr.planning.nyc.gov/article-x/chapter-1/101-75",
+      "result": "The current official page preserves both owner prerequisites, the words letter trust, and the unsafe-building exception."
+    },
+    {
+      "url": "https://zr.planning.nyc.gov/article-iv/chapter-2/42-00",
+      "result": "The current text page was accessible; its History link could not be retrieved."
+    },
+    {
+      "url": "https://zr.planning.nyc.gov/nojs/get/amendment/section/17271",
+      "result": "404 when following the public History link. Current amendment metadata remains unverified."
+    }
+  ],
+  "professionalApproval": false
+}

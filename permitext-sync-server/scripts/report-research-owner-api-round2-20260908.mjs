@@ -33,7 +33,7 @@ const environment = {
   PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS: ".02", PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS: "1.2",
   PERMITEXT_RESEARCH_FAST_PRICING_VERSION: "standard-luna-20260908"
 };
-const calls = [], attempts = [];
+const calls = [], attempts = [], notDispatched = [];
 for (const ledger of ledgers) {
   const bytes = await read(ledger.file);
   assert.equal(hash(bytes), ledger.sha256);
@@ -72,6 +72,14 @@ for (const ledger of ledgers) {
     related.forEach((call) => matched.add(call.index));
     const operations = result.operations || [];
     assert(operations.every((operation) => operation.pendingProviderRequestCount === 0));
+    if (result.status === "not-dispatched") {
+      assert.equal(related.length, 0, "An undispatched case cannot contain provider calls.");
+      assert.equal(operations.length, 0, "An undispatched case cannot contain an HTTP Research operation.");
+      assert(!result.answer && !result.durationMilliseconds);
+      notDispatched.push({ file: ledger.file, id: result.id, reason: result.reason,
+        failureStage: result.failureStage, errorCode: result.error?.code });
+      continue;
+    }
     const answeringCalls = related.filter((call) => ["permitext_code_interpretation", "permitext_official_guidance_summary"].includes(call.phase));
     attempts.push({ file: ledger.file, sourceCommit: run.sourceCommit || null, id: result.id,
       scope: result.scope === "verifier-only" ? "verifier-only" : "research-http",
@@ -103,6 +111,7 @@ const summary = {
   webSearchCalls: sum(calls.map((call) => call.webSearchCalls)),
   components: Object.fromEntries(Object.keys(calls[0].components).map((key) => [key, sum(calls.map((call) => call.components[key]))])),
   fullHTTPAttempts: full.length, deliveredAttempts: delivered.length, undeliveredAttempts: failed.length,
+  notDispatchedCases: notDispatched.length,
   verifierOnlyChecks: verifierOnly.length, verifierOnlyCostUSD: sum(verifierOnly.map((item) => item.usageEstimateUSD)),
   fullHTTPCostUSD: sum(full.map((item) => item.usageEstimateUSD)),
   failedAttemptCostUSD: sum(failed.map((item) => item.usageEstimateUSD)),
@@ -149,7 +158,7 @@ const report = {
   pricing: { checkedOn: "2026-09-08", source: "https://developers.openai.com/api/docs/pricing", tier: "standard short context",
     perMillionUSD: prices, webSearchCallUSD: .01, providerInvoiceVerified: false },
   sourceHashes, ledgers, historicalLedgerHashes: terminal.previousResultHashes, roundID: terminal.roundID, summary, byPhase: group("phase"), byModel: group("model"),
-  highestCostAttempts: full.slice().sort((a, b) => b.usageEstimateUSD - a.usageEstimateUSD).slice(0, 10), attempts,
+  highestCostAttempts: full.slice().sort((a, b) => b.usageEstimateUSD - a.usageEstimateUSD).slice(0, 10), attempts, notDispatched,
   limitations: ["Mixed development versions, repeated cases and synthetic evaluation accounts; not a representative customer-month forecast.",
     "Delivered answers include known quality defects. A consistent strict review of all answers is absent, so no cost per quality-accepted answer is claimed.",
     "Additional answering requests and failed-attempt costs overlap; do not add them as independent savings.",

@@ -1,0 +1,1240 @@
+{
+  "schema": "permitext-owner-api-round2-original-code-v1",
+  "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+  "authorization": "Owner explicitly authorized fresh API tests with $8 currently available and requested notice if more is needed. This is a new $8 round; historical costs stay separate. This single-use batch checks all 18 unattempted original code and Zoning cases, preserving authored questions, selected passages, section references and supplied facts and dispatches only turns that fit the offline preflight. Maximum $2.00 for the batch within the remaining $8 round allowance. Each next turn requires a full $0.50 remaining conservative allowance. No Project workflow tests or deployment.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 3.332059,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 2,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 18,
+  "maximumProviderRequests": 90,
+  "maximumProviderRequestsPerTurn": 5,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "6953d0c784e839e7724b7b8641b6e24b97ed1f8989c5a01ab649b848de362cf8",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual selected-passage HTTP Research flow on isolated local accounts and storage. Supplied facts for CC-02 and CC-05 are seeded only into a Research conversation fixture; no Project is created or exercised. Oversized section selections and visual-review requirements are recorded, never bypassed. Expected answers are not supplied to drafting or verification. Automatic web support remains enabled in configuration; each selected-code question must avoid it. The driver rejects web tools and document reads. Offline preflight intercepts every provider call. Preflight-blocked turns are skipped without spending. No public eligibility, deployment, Project workflow or phone changes.",
+  "cases": [
+    "CC-02",
+    "CC-05",
+    "ZR-02",
+    "ZR-03",
+    "ZR-04",
+    "ZR-05",
+    "ZR-06",
+    "ZR-07",
+    "ZR-09",
+    "ZR-10",
+    "ZR-11",
+    "ZR-12",
+    "ZR-13",
+    "ZR-15",
+    "ZR-16",
+    "ZR-17",
+    "ZR-19",
+    "ZR-20"
+  ],
+  "sourceHashes": {
+    "app.mjs": "ee781714a773d2bd6b61020e3ab50728e665b1c366a65ff2b5f257d036862c2a",
+    "research-answer-quality.mjs": "cad6d658ff2805ee6e56e48b2b135f5dec28863b02020183731b0815b2ecec4f",
+    "research-focused-technical-scope.mjs": "4c7f8ff22bc4bd11bf87a55417b8795b164443e0a704d9e64ebc33f27fc27f49",
+    "research-conversation-topic.mjs": "77baee9c8db51501fca1bfee6ea192869f8e6fd8a7c35b48eb8d5a7f848f7858",
+    "research-technical-topic-routes.mjs": "319075fb7223e387a70ee4038b62cab0c1df839c68de374317277d4548c8ef62",
+    "evidence-discovery.mjs": "47f76c9ba11ea1d5c05edc996eebe110fd4f467bccffe05c4fc1b2e6b6e2d714",
+    "research-conversation-facts.mjs": "a8ae9fe2815d17f1cbd61d1995f4ad311bdf3267904ed52bdc070b73b7e57213",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-source-policy.mjs": "f916933dd3ac3609bc4cf0b71fbe29e3d9c30ee71ca1272ae506da4bfc76b8af",
+    "research-official-html-attribution.mjs": "1df895ea6b221335f4e1daebf2d7d881d5a3a93e0a3910f43a9146b9cc3491ee",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "525ed1ae6faa3640926462d9dd423bc3ea17b1261cde3d94d3a3a26b37039104",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "d61971dfb9c6295e2ddf38d0298645c0a59f788e2fbf119feb352e5ae33ac744",
+    "research-evidence-assembly.mjs": "b7bc0cf480804991b877993498268e01c277a31699dc6bd3f948b370a051b36a",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "15e7dc17bd9ff1fa69938ba13b35686d56ee2cf5178a9350f1f5b5199e0ee97f",
+    "evals/research-reconciled-answer-key.json": "6953d0c784e839e7724b7b8641b6e24b97ed1f8989c5a01ab649b848de362cf8",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "eef06bb4d0acf230929cb355f15427d197f7f20c961651feaa8f2003d57dea54",
+    "scripts/run-research-owner-api-round2-original-code-20260909.mjs": "8f4b7a0c6bd9acd6786e28485f8309a745e8e918791cf4a0645c69ab237b3997"
+  },
+  "startedAt": "2026-09-09T02:11:19.036Z",
+  "status": "preflight-passed",
+  "results": [
+    {
+      "id": "CC-02",
+      "question": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+      "inputSHA256": "a906f35bfafb4eeff9f65dba51df3d12e8aca111b47c237a5db9f3b12e9fcbb7",
+      "requestedCodeVersion": "2022 New York City Construction Codes",
+      "readerSelectionsSHA256": "9bbe534bd0bf9fe3697270560a89f22aecb0dc8d24fbfdd4911c5ee8dde1272c",
+      "authoredProjectFacts": [
+        "stories: 6",
+        "areaPerStorySquareFeet: 1950",
+        "use: Residential building",
+        "unknowns: occupancy classification",
+        "unknowns: construction type"
+      ],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "2185",
+          "characters": 150
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "b316a91313d0ac6fc93a5e4d5fd5468c9c56d2b4abe89497bf40411beeabf91b",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 47447,
+      "interceptCount": 1,
+      "durationMilliseconds": 1485,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.296355,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "10362268-291a-4212-933f-0788921eadfe",
+          "createdAt": "2026-09-09T02:11:20.017Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 1446,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "CC-05",
+      "question": "Does this section prove that HCR requires a vanity in the bathroom?",
+      "inputSHA256": "fde91613c682799238433de4b23b245cbe60231337591bbc5ef634581a4bc28b",
+      "requestedCodeVersion": "2022 New York City Construction Codes",
+      "readerSelectionsSHA256": "d7c51c53f8504e06b1dce432b59202512e468be35249a87955cf2697c64d1df1",
+      "authoredProjectFacts": [
+        "questionedAuthority: New York State Homes and Community Renewal (HCR)",
+        "selectedAuthority: New York City Building Code only",
+        "unknowns: applicable HCR standard",
+        "unknowns: funding requirements",
+        "unknowns: agency guidance"
+      ],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "2713",
+          "characters": 378
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "de66f5d46d1b2de8ff055da88bd925a63f136cb5273a600cdc5455c48843312d",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 45378,
+      "interceptCount": 1,
+      "durationMilliseconds": 551,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.28601,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "a0a471a5-902e-4a20-8121-395fa7b34529",
+          "createdAt": "2026-09-09T02:11:21.597Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 513,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-02",
+      "question": "Using only the selected table, summarize how Use Group I allowances differ across M1, M2, and M3 districts and explain the table symbols.",
+      "inputSHA256": "3e3869b33fdfbc7593abb68ed8cc0abe24493bf6db0d34c467385d0c240fe9a7",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "a36868465eb5b242afabddac690a18fa211605f34d5f426012594abef4e1c973",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20017276",
+          "characters": 902
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "3358cdf30fded504adbbbdc02c19ec71e7ed03c08d259cc9b54d9b8132e64127",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 44413,
+      "interceptCount": 1,
+      "durationMilliseconds": 310,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.281185,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "40a532dd-7803-41c4-ad86-0aa2e958a311",
+          "createdAt": "2026-09-09T02:11:22.215Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 277,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-03",
+      "question": "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+      "inputSHA256": "98b25e17083b1ec7beca9a5d94072cc89db6409f3be51c6ae5612952f8f1770c",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "9504b2e9b837f80e98dbb7196bd4581eafcb9eb506424b7d63406c779539ebe5",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20021237",
+          "characters": 1550
+        }
+      ],
+      "status": "preflight-blocked",
+      "maximumTurnSpendUSD": 0.5,
+      "failureStage": "authored_selection_creation",
+      "httpStatus": 400,
+      "error": {
+        "error": "Permitext detected official visual evidence elsewhere in this enacted section. Use Find Relevant Evidence to review and explicitly select any applicable visuals before analysis; Permitext will not silently include unselected visual material.",
+        "code": "RESEARCH_VISUAL_REVIEW_REQUIRED"
+      },
+      "operations": []
+    },
+    {
+      "id": "ZR-04",
+      "question": "Within the Atlantic Avenue Subdistrict of the Special Downtown Brooklyn District, what two prerequisites does Section 101-75 state before a demolition permit may be issued, and what unsafe-building exception does it recognize?",
+      "inputSHA256": "fcac143a86f5cd072ca2a9dcf935e3593360d9539f33cd10597986f068c1a2bc",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "a8f53bf30d2af0771a9242dca4b333a295a62086f64a769df8ea51cd6aff5238",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20020818",
+          "characters": 870
+        },
+        {
+          "sectionID": "20020889",
+          "characters": 670
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "be168705e17afa349dae60b4a1084d99c7cc5718e5f3bed69a4480e75a73a848",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 46305,
+      "interceptCount": 2,
+      "durationMilliseconds": 307,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.029065,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "6d28a198-2a26-4987-9177-0ea4a0a2dc45",
+          "createdAt": "2026-09-09T02:11:22.614Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 276,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-05",
+      "question": "What does NYC Planning's official amendment-history metadata currently identify for Section 42-00, and what must a professional still verify before reconstructing the text in force on a particular date?",
+      "inputSHA256": "f4cb3b9f53534ff845962746c7eade46a3cab446c240106138dc3c447c8d9861",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "7fc02487d982878280b3932a3efc1720477dfb60ab4091b96e46a622bdea9d47",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20017271",
+          "characters": 2640
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "9936f826f4d5e1e8caa8c7f6070231563aa004d01538c10eb573632188283a0b",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 45401,
+      "interceptCount": 1,
+      "durationMilliseconds": 309,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.286125,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "5bff93c9-c6b6-465c-98ec-2ee0b0f7f1bc",
+          "createdAt": "2026-09-09T02:11:22.984Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 280,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-06",
+      "question": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+      "inputSHA256": "3fa70b15d9febe7d7d05102c8f7db199350747b8e2788f3801538039284b985f",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "e568025ca9eac4fcf9fe43eac092f6d06d48129a4709b81c872d71abec399e65",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20022472",
+          "characters": 2257
+        },
+        {
+          "sectionID": "20022473",
+          "characters": 9089
+        },
+        {
+          "sectionID": "20022474",
+          "characters": 724
+        },
+        {
+          "sectionID": "20019206",
+          "characters": 2688
+        },
+        {
+          "sectionID": "20021237",
+          "characters": 1550
+        }
+      ],
+      "status": "preflight-blocked",
+      "maximumTurnSpendUSD": 0.5,
+      "failureStage": "authored_selection_creation",
+      "httpStatus": 400,
+      "error": {
+        "error": "Permitext detected official visual evidence elsewhere in this enacted section. Use Find Relevant Evidence to review and explicitly select any applicable visuals before analysis; Permitext will not silently include unselected visual material.",
+        "code": "RESEARCH_VISUAL_REVIEW_REQUIRED"
+      },
+      "operations": []
+    },
+    {
+      "id": "ZR-07",
+      "question": "A 10,000-square-foot site in the Bronx is proposed for a 40,000-square-foot residential building. What is the maximum permitted residential FAR when the mapped zoning district has not been established?",
+      "inputSHA256": "5fcc4f363aa30b6b3ee1d496c834ee9271eedaff47b3eecc5ef00f92155e3cdf",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "316a0b0fc004cc4791ec30bba415a3a33c933aba76309a0b307be5fdad50d7b2",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018425",
+          "characters": 338
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "6f82e25fce8c570d90c024339d111a5c4b02c9c6cc18f428058b5118b007178d",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 40933,
+      "interceptCount": 1,
+      "durationMilliseconds": 282,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.263785,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "6271010a-cf26-474b-a3ae-34c5a7cecfda",
+          "createdAt": "2026-09-09T02:11:23.382Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 248,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-09",
+      "question": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area and is merely described as containing qualifying affordable housing. What does the Section 23-22 table establish numerically, and what qualification and affordable-floor-area facts are still needed before concluding that the higher FAR is available?",
+      "inputSHA256": "2a988abd132792a81e4104ea4ce3d9c61ea56b1df51c66079d5c317c599a60c4",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "397bba4030b788420fd1d01e0389d098f516d31c53432194171614808ed1e86a",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018017",
+          "characters": 1037
+        },
+        {
+          "sectionID": "20022699",
+          "characters": 19814
+        },
+        {
+          "sectionID": "20022711",
+          "characters": 9120
+        },
+        {
+          "sectionID": "20018523",
+          "characters": 268070
+        }
+      ],
+      "status": "preflight-blocked",
+      "maximumTurnSpendUSD": 0.5,
+      "failureStage": "authored_selection_creation",
+      "httpStatus": 400,
+      "error": {
+        "error": "Each Research passage may contain no more than 12,000 readable characters.",
+        "code": "INVALID_RESEARCH_SELECTION"
+      },
+      "operations": []
+    },
+    {
+      "id": "ZR-10",
+      "question": "Can a standard residential building in an R7A district be 90 feet tall under the basic height-and-setback table?",
+      "inputSHA256": "8777b3d4e1d6da63f697ae1cd06bdf9bbe589a9e854809d1f5083fe446da5dd6",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "d63ac700ba98f7ad440131ffcfe1be90716df38dce79d48063a7798d6f9275e6",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018085",
+          "characters": 2084
+        },
+        {
+          "sectionID": "20018087",
+          "characters": 3388
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "d8317f4874104b10d9fec3f9e5c434211886509ceda51f6a4df5043024e25ebf",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 53920,
+      "interceptCount": 1,
+      "durationMilliseconds": 253,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.32872,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "31c09d70-bde3-48ad-850f-1e118a5e116d",
+          "createdAt": "2026-09-09T02:11:23.740Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 221,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-11",
+      "question": "An R7A interior zoning lot contains 10,000 square feet. Can a standard residential development cover 8,500 square feet of the lot under the basic lot-coverage regulation?",
+      "inputSHA256": "5e3bcf4cc7e2e99244b95de2ed4cd101b7798d182f5586cd39e60f39899d08db",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "7fc0da4a702c3cf73dd74443d97ba81a326b382e9c9d195dbddb03befc5e6dec",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20022764",
+          "characters": 855
+        },
+        {
+          "sectionID": "20018020",
+          "characters": 1886
+        },
+        {
+          "sectionID": "20018051",
+          "characters": 1901
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "eeb92b9092654d9762a01b6a354b80e901d492b2bf6f89996934a408fe84848c",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 56442,
+      "interceptCount": 1,
+      "durationMilliseconds": 265,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.34133,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "928555ef-0776-4acd-a3ea-d1bb29eac07b",
+          "createdAt": "2026-09-09T02:11:24.059Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 236,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-12",
+      "question": "An attached residential building is proposed on a 35-foot-wide interior zoning lot with a 20-foot rear yard. Is that sufficient under the standard rear-yard rule?",
+      "inputSHA256": "7492e120892a71f4528120959248a148d45755c00bae85ab984aed75d42251d1",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "969a1abfb26b635698d364608997764ea358eb6cb4e3d5cc73303c25337fc8a3",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018051",
+          "characters": 1901
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "12d0e489459242a5e7a9137296a380c3efe779c40b008122abbc0d4a93323392",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 43264,
+      "interceptCount": 2,
+      "durationMilliseconds": 251,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.027544,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "489f7e21-9cc9-4f85-aff0-ccf387cf7517",
+          "createdAt": "2026-09-09T02:11:24.378Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 219,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-13",
+      "question": "A through lot is 150 feet deep and the proposal provides a 20-foot rear yard equivalent. Is that enough when the lot's historical shallow-lot condition is unknown?",
+      "inputSHA256": "a17cbe13280fa26ce9a3a717d4f32374b528835058fb32f5de58c24194f7b3d3",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "1d5e287462c06809fb594b9c9c89e8c89a5345a6d242f589ad13fc173fc6fe99",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018060",
+          "characters": 3321
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "faa855d89aeec383e536c60ff4f5c46c83d014e3f8efbd3720b3d0a7db402189",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 51260,
+      "interceptCount": 1,
+      "durationMilliseconds": 251,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.31542,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "f0c36d4b-f6d3-41f1-a8b8-3652f3e352de",
+          "createdAt": "2026-09-09T02:11:24.691Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 223,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-15",
+      "question": "A 1,500-square-foot architectural office is proposed in a C3 district. Is the professional office use permitted as-of-right under the underlying C3 use regulations?",
+      "inputSHA256": "db55f664247fb1caf7a12d7d7cf1d845a4bda7a2e6cd97e102e4569a399e49d8",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "259d4d764d89bc7f138de05fceccb8a95e0c26124a64d9ed33e4834b908a32f8",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20017827",
+          "characters": 722
+        },
+        {
+          "sectionID": "20022494",
+          "characters": 624
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "f589181c1e8ddcc7a20d0b049255e40f6a7a15f0c226c1f2269489b4c8edc7f9",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 43804,
+      "interceptCount": 2,
+      "durationMilliseconds": 192,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.027814,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "25d4fcf6-8424-4759-8c82-4a16912f4172",
+          "createdAt": "2026-09-09T02:11:25.010Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 161,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-16",
+      "question": "A C4-4 zoning lot is proposed with retail on the ground floor and apartments above. Is the residential use permitted under the underlying use regulations?",
+      "inputSHA256": "c5278db259385dc8b5aede97d363f05daa1e9d805b635e9d2de56be9b1212351",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "dfd7e05d9e6021a4dbdcad6f1b776bcdc25e0f06a759660a33cfe16824eafed1",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20022450",
+          "characters": 722
+        },
+        {
+          "sectionID": "20022452",
+          "characters": 572
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "ceab75031aeb7752d5c7b19d2aeb63fc568210ed52febf347a7f41e693048171",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 44771,
+      "interceptCount": 2,
+      "durationMilliseconds": 255,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.028298,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "502769a9-3bf9-4fc2-b184-044c9caf1d0b",
+          "createdAt": "2026-09-09T02:11:25.265Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 220,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-17",
+      "question": "An 80-unit R7A residential development is within the Inner Transit Zone; every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333. How many accessory off-street residential parking spaces does Section 25-211 require for those units?",
+      "inputSHA256": "d36cee85c04c7abb76a6addb287a2fe5087e46d8b11847635f7e9305e81f33af",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "f87df50cd1b097953620d1e66f0e4a91de8f9222a630cf4be3f5148236bb7642",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018444",
+          "characters": 8518
+        },
+        {
+          "sectionID": "20017540",
+          "characters": 411
+        },
+        {
+          "sectionID": "20017541",
+          "characters": 1146
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "4c39945a88adc24d2de35f0f704b32ac04f14cc436b2bdcff9ef7a9282b42a66",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 49396,
+      "interceptCount": 1,
+      "durationMilliseconds": 612,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.3061,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "6a8bd6e8-5a65-41ad-b88d-0a6d036869e9",
+          "createdAt": "2026-09-09T02:11:25.597Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 577,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-19",
+      "question": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+      "inputSHA256": "cbe137fe86be80a9f03d4eb2bf95f04e45e0eac5b49d3fd27ba7a6a7e1632ce0",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "c343f3d662eb95aefc3098a270bdfc0700f6ee3e4ea5aea319444151c2a2d01f",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018523",
+          "characters": 268070
+        }
+      ],
+      "status": "preflight-blocked",
+      "maximumTurnSpendUSD": 0.5,
+      "failureStage": "authored_selection_creation",
+      "httpStatus": 400,
+      "error": {
+        "error": "Each Research passage may contain no more than 12,000 readable characters.",
+        "code": "INVALID_RESEARCH_SELECTION"
+      },
+      "operations": []
+    },
+    {
+      "id": "ZR-20",
+      "question": "A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?",
+      "inputSHA256": "88fcfb02683d0a05b4450b076d775d94bed04a1e54ff18addcb29afb40add985",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "c343f3d662eb95aefc3098a270bdfc0700f6ee3e4ea5aea319444151c2a2d01f",
+      "authoredProjectFacts": [],
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018523",
+          "characters": 268070
+        }
+      ],
+      "status": "preflight-blocked",
+      "maximumTurnSpendUSD": 0.5,
+      "failureStage": "authored_selection_creation",
+      "httpStatus": 400,
+      "error": {
+        "error": "Each Research passage may contain no more than 12,000 readable characters.",
+        "code": "INVALID_RESEARCH_SELECTION"
+      },
+      "operations": []
+    }
+  ],
+  "providerCalls": [],
+  "documentRequests": [],
+  "completedAt": "2026-09-09T02:11:26.269Z",
+  "spend": {
+    "active": true,
+    "capUSD": 2,
+    "reservedUSD": 0,
+    "actualUSD": 0,
+    "requestCount": 17,
+    "pendingRequestCount": 0
+  }
+}

@@ -1,0 +1,482 @@
+{
+  "schema": "permitext-owner-original-code-answer-review-v1",
+  "checkedAt": "2026-09-09T02:18:59.397Z",
+  "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+  "artifacts": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sha256": "f406901dcca5f06398166f4a08bcfbadf6639bf24755777a0c7a9434d8ca7d8f"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-original-code-preflight-2026-09-09.json",
+      "sha256": "f7e534e32f4a38180db386a71009876162c9facbfbbdb3197370685aebe47809"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-original-code-cost-audit-2026-09-09.json",
+      "sha256": "83d42d701959c617c4874ec25f8d6606e6933a7faade50140ad31fe73d04acff"
+    }
+  ],
+  "verification": {
+    "sourceHashesMatchRecordedCommit": true,
+    "sourceFileCount": 28,
+    "all18AuthoredInputHashesMatch": true,
+    "exactCCSelectionsAndFactsReachedHTTP": true,
+    "preflightProviderCalls": 0,
+    "liveProviderCalls": 23,
+    "pendingProviderRequests": 0,
+    "projectWorkflowTested": false,
+    "phoneOrUIWorkflowTested": false,
+    "deployed": false
+  },
+  "summary": {
+    "preparedCases": 18,
+    "liveAttempts": 13,
+    "delivered": 8,
+    "failed": 5,
+    "notDispatched": 5,
+    "deliveredCoreMatches": 7,
+    "deliveredCoreMismatch": 1,
+    "strictProfessionalPassesClaimed": 0,
+    "batchUsageEstimateUSD": 0.43815554,
+    "batchConservativeUSD": 0.818582,
+    "attemptDurationP50Milliseconds": 14607,
+    "attemptDurationP90Milliseconds": 26245,
+    "roundUsageEstimateUSD": 2.07817479,
+    "roundConservativeUSD": 4.150641,
+    "remainingConservativeAuthorizationUSD": 3.849359,
+    "fullCohortProviderAttempted": 83,
+    "fullCohortNotProviderAttempted": 27
+  },
+  "cases": [
+    {
+      "id": "CC-02",
+      "status": "completed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": true,
+      "review": "The single-exit conditions and application match. Missing facts repeat occupancy and construction type, add actual area despite a supplied 1950-square-foot fact, and expand the response into mixed occupancy. Tighten the distinction between the stated allowance and complete design review.",
+      "answerTextSHA256": "84f28d217feb9766460f2f5a28ece467307ba2087208e70ae270c4ff5d5c483a",
+      "runtimeVerificationPassed": true,
+      "sourceReferences": [
+        "BC 1006.3.2"
+      ]
+    },
+    {
+      "id": "CC-05",
+      "status": "completed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": true,
+      "review": "Correctly distinguishes HCR, vanity, lavatory, and the Type B+NYC context. The answer separately cites the ancestor lavatory requirement. Missing facts duplicate the HCR standard, funding and guidance entries.",
+      "answerTextSHA256": "0f87129801a3b2881f19701997cdcb67502a5b3cf6955c373eea63130384aaea",
+      "runtimeVerificationPassed": true,
+      "sourceReferences": [
+        "BC 1107.2.2.7.2.2"
+      ]
+    },
+    {
+      "id": "ZR-02",
+      "status": "completed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": true,
+      "review": "The principal district comparisons and symbol meanings match, but the answer cites ZR 42-151 for the legend despite the selected-table-only question. Its grouped M1 description also loses the specific P notation on outdoor racket courts. The official selected 42-111 table contains its own legend; supplemental table retrieval and the resulting repair are unnecessary.",
+      "answerTextSHA256": "cb0f301a572bc44936bdf9019c8b9d719e49dab78e3747c011e7d293e18dce63",
+      "runtimeVerificationPassed": true,
+      "sourceReferences": [
+        "[ZR 42-111 — Use Group I – general use allowances](https://zr.planning.nyc.gov/article-iv/chapter-2/42-111)"
+      ]
+    },
+    {
+      "id": "ZR-03",
+      "status": "not-dispatched",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "Not dispatched. Resolve the recorded passage-size or visual-source requirement without dropping the authored section reference or fabricating visual review.",
+      "errorCode": "RESEARCH_VISUAL_REVIEW_REQUIRED",
+      "sourceReferences": [
+        "[ZR APPENDIX J — APPENDIX J — Designated Areas Within Manufacturing Districts](https://zr.planning.nyc.gov/appendix-j-designated-areas-within-manufacturing-districts)"
+      ]
+    },
+    {
+      "id": "ZR-04",
+      "status": "failed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "No delivered answer. The draft preserves both prerequisites, letter trust and the unsafe-building exception, but omits the parent Special Downtown Brooklyn District name. The deterministic scope check rejects it even though the Atlantic Avenue Subdistrict is named. Preserve both scope names in the answer before another paid confirmation.",
+      "failureDiagnostics": {
+        "message": "The Zoning answer did not pass the bounded correction policy.",
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass": false,
+            "issues": [
+              {
+                "type": "zoning_special_district_scope",
+                "detail": "Preserve the exact special-purpose scope in the answer: Special Downtown Brooklyn District. Do not generalize a district or subdistrict rule to the citywide Zoning Resolution."
+              }
+            ]
+          }
+        ]
+      },
+      "errorCode": "RESEARCH_VERIFICATION_FAILED",
+      "sourceReferences": [
+        "[ZR 101-04 — Subdistricts](https://zr.planning.nyc.gov/article-x/chapter-1/101-04)",
+        "[ZR 101-75 — Special Provisions for Demolition of Buildings](https://zr.planning.nyc.gov/article-x/chapter-1/101-75)"
+      ]
+    },
+    {
+      "id": "ZR-05",
+      "status": "completed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": false,
+      "review": "The delivered answer honestly says amendment-history metadata is absent, but does not deliver the requested three amendment events. The section-text-only HTTP selection omitted the structured history source. A current metadata refresh also remains unresolved: the public History link returned 404 during this review.",
+      "answerTextSHA256": "9c034107496bae09b98794ea426d3cb2a31eb1b869a1a26960055706c703818e",
+      "runtimeVerificationPassed": true,
+      "sourceReferences": [
+        "[ZR 42-00 — GENERAL PROVISIONS](https://zr.planning.nyc.gov/article-iv/chapter-2/42-00)"
+      ]
+    },
+    {
+      "id": "ZR-06",
+      "status": "not-dispatched",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "Not dispatched. Resolve the recorded passage-size or visual-source requirement without dropping the authored section reference or fabricating visual review.",
+      "errorCode": "RESEARCH_VISUAL_REVIEW_REQUIRED",
+      "sourceReferences": [
+        "[ZR 42-191 — Use Group IX – general use allowances](https://zr.planning.nyc.gov/article-iv/chapter-2/42-191)",
+        "[ZR 42-192 — Use Group IX – uses permitted with limited applicability](https://zr.planning.nyc.gov/article-iv/chapter-2/42-192)",
+        "[ZR 42-193 — Use Group IX – uses subject to additional conditions](https://zr.planning.nyc.gov/article-iv/chapter-2/42-193)",
+        "[ZR 74-192 — Self-service storage facility in designated areas within Manufacturing Districts](https://zr.planning.nyc.gov/article-vii/chapter-4/74-192)",
+        "[ZR APPENDIX J — APPENDIX J — Designated Areas Within Manufacturing Districts](https://zr.planning.nyc.gov/appendix-j-designated-areas-within-manufacturing-districts)"
+      ]
+    },
+    {
+      "id": "ZR-07",
+      "status": "failed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "No delivered answer. The draft starts with an unresolved maximum FAR and explains the missing mapped district. The checks do not recognize the wording No maximum permitted residential FAR can be selected and reject the boundary. Add semantic-equivalence regression coverage, retaining rejection of an appended property approval.",
+      "failureDiagnostics": {
+        "message": "The Zoning answer did not pass the bounded correction policy.",
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass": false,
+            "issues": [
+              {
+                "type": "conditional_determination_boundary_missing",
+                "detail": "Lead with the unresolved determination, not an approval or prohibition. Keep any conclusion conditional too."
+              },
+              {
+                "type": "zoning_missing_mapped_location",
+                "detail": "Do not make a parcel-specific Zoning conclusion while mapped applicability is unresolved. State the boundary, keep the conclusion conditional, and name the missing address/BBL, mapped district, map area, or special-district fact in missingFacts."
+              }
+            ],
+            "diagnostics": {
+              "zoningSafety": {
+                "schemaVersion": 1,
+                "kind": "zoning_mapped_location",
+                "sourceBoundaryQuestion": false,
+                "citedAppendixJ": false,
+                "mappedLocationBoundaryPresent": false,
+                "triggeringClauses": [
+                  {
+                    "fieldKind": "answer_text",
+                    "clauseHash": "dd1963bcc9add08e29f51e120eb9b560a4901952d1c9eabc53394ae09ae55fd5",
+                    "clauseLength": 111,
+                    "locationBoundary": false,
+                    "sourceRule": false,
+                    "directConclusion": true
+                  },
+                  {
+                    "fieldKind": "answer_text",
+                    "clauseHash": "67dde8073a15a17f57c02a0de6e5dc7750e3aaa84feeb34a0cdee524b80998f1",
+                    "clauseLength": 74,
+                    "locationBoundary": false,
+                    "sourceRule": false,
+                    "directConclusion": true
+                  },
+                  {
+                    "fieldKind": "answer_text",
+                    "clauseHash": "6790917e77a8e8b80c81ef9f9d1c1a8b6de39037936ce7a7fb2945648b08cabb",
+                    "clauseLength": 161,
+                    "locationBoundary": false,
+                    "sourceRule": false,
+                    "directConclusion": true
+                  },
+                  {
+                    "fieldKind": "answer_text",
+                    "clauseHash": "12f11bd13a41fa019dee85fb533f131652a7c79b581d5f6e83c1a5a804eb75b9",
+                    "clauseLength": 95,
+                    "locationBoundary": false,
+                    "sourceRule": false,
+                    "directConclusion": true
+                  },
+                  {
+                    "fieldKind": "answer_text",
+                    "clauseHash": "71d942603639106c35a8844b75aab1ef1c3a09a8f10d60241488f2dbff711367",
+                    "clauseLength": 108,
+                    "locationBoundary": false,
+                    "sourceRule": false,
+                    "directConclusion": true
+                  },
+                  {
+                    "fieldKind": "answer_text",
+                    "clauseHash": "5ff5389b334c414785f130831a663b43fb64df53a90dc875456170515dae67b3",
+                    "clauseLength": 111,
+                    "locationBoundary": false,
+                    "sourceRule": false,
+                    "directConclusion": true
+                  },
+                  {
+                    "fieldKind": "conclusion",
+                    "clauseHash": "dd1963bcc9add08e29f51e120eb9b560a4901952d1c9eabc53394ae09ae55fd5",
+                    "clauseLength": 111,
+                    "locationBoundary": false,
+                    "sourceRule": false,
+                    "directConclusion": true
+                  },
+                  {
+                    "fieldKind": "conclusion",
+                    "clauseHash": "67dde8073a15a17f57c02a0de6e5dc7750e3aaa84feeb34a0cdee524b80998f1",
+                    "clauseLength": 74,
+                    "locationBoundary": false,
+                    "sourceRule": false,
+                    "directConclusion": true
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "errorCode": "RESEARCH_VERIFICATION_FAILED",
+      "sourceReferences": [
+        "[ZR 11-14 — Incorporation of Maps](https://zr.planning.nyc.gov/article-i/chapter-1/11-14)"
+      ]
+    },
+    {
+      "id": "ZR-09",
+      "status": "not-dispatched",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "Not dispatched. Resolve the recorded passage-size or visual-source requirement without dropping the authored section reference or fabricating visual review.",
+      "errorCode": "INVALID_RESEARCH_SELECTION",
+      "sourceReferences": [
+        "[ZR 23-22 — Floor Area Regulations for R6 Through R12 Districts](https://zr.planning.nyc.gov/article-ii/chapter-3/23-22)",
+        "[ZR 27-111 — General definitions](https://zr.planning.nyc.gov/article-ii/chapter-7/27-111)",
+        "[ZR 27-16 — Requirements for MIH Sites or UAP Sites](https://zr.planning.nyc.gov/article-ii/chapter-7/27-16)",
+        "[ZR 12-10 — DEFINITIONS](https://zr.planning.nyc.gov/article-i/chapter-2/12-10)"
+      ]
+    },
+    {
+      "id": "ZR-10",
+      "status": "completed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": true,
+      "review": "The delivered answer matches the basic height, overage, separate qualifying-housing column, and exclusion of letter-suffix R7A from the eligible-site modification. No additional defect identified in this focused review.",
+      "answerTextSHA256": "4e10e5eca488a23a92679989cb317abdbcf8183bea5b1eaf0d1ca8301ae47337",
+      "runtimeVerificationPassed": true,
+      "sourceReferences": [
+        "[ZR 23-432 — Height and setback requirements](https://zr.planning.nyc.gov/article-ii/chapter-3/23-432)",
+        "[ZR 23-434 — Height and setback modifications for eligible sites](https://zr.planning.nyc.gov/article-ii/chapter-3/23-434)"
+      ]
+    },
+    {
+      "id": "ZR-11",
+      "status": "failed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "No delivered answer. Both draft and repair preserve the shallow-lot, near-corner and short-block routes, but the literal obligation matcher requires shallow lot without the hyphen. Offline normalization and negative controls are needed before another paid run.",
+      "failureDiagnostics": {
+        "message": "The source-bounded Zoning repair did not pass every deterministic safety gate.",
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass": false,
+            "issues": [
+              {
+                "type": "answer_obligation_not_covered",
+                "detail": "Preserve the shallow-lot, near-corner, and short-block-dimension modification routes instead of presenting the basic percentage as universal."
+              }
+            ]
+          },
+          {
+            "attempt": 2,
+            "pass": false,
+            "issues": [
+              {
+                "type": "answer_obligation_not_covered",
+                "detail": "Preserve the shallow-lot, near-corner, and short-block-dimension modification routes instead of presenting the basic percentage as universal."
+              }
+            ]
+          }
+        ]
+      },
+      "errorCode": "RESEARCH_VERIFICATION_FAILED",
+      "sourceReferences": [
+        "[ZR 23-362 — Maximum lot coverage in R6 through R12 Districts](https://zr.planning.nyc.gov/article-ii/chapter-3/23-362)",
+        "[ZR 23-363 — Special rules for certain interior or through lots](https://zr.planning.nyc.gov/article-ii/chapter-3/23-363)",
+        "[ZR 23-342 — Rear yard requirements](https://zr.planning.nyc.gov/article-ii/chapter-3/23-342)"
+      ]
+    },
+    {
+      "id": "ZR-12",
+      "status": "completed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": true,
+      "review": "The standard rear-yard conclusion and shortfall match. The answer adds mapped-district and modification questions even though the question asks about the stated standard rule; keep those applicability limits separate from the direct calculation.",
+      "answerTextSHA256": "bf0619824777f7c718199b0197e99833c93a477547635bbba0c53fd9ebea433f",
+      "runtimeVerificationPassed": true,
+      "sourceReferences": [
+        "[ZR 23-342 — Rear yard requirements](https://zr.planning.nyc.gov/article-ii/chapter-3/23-342)"
+      ]
+    },
+    {
+      "id": "ZR-13",
+      "status": "failed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "No delivered answer. Verification rejects asking for height because both height branches produce the same minimum for the stated qualifying 150-foot lot. The draft also needs to acknowledge the section categorical exceptions. Do not count the retained draft as a user answer.",
+      "failureDiagnostics": {
+        "message": "The Zoning answer did not pass the bounded correction policy.",
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass": false,
+            "issues": [
+              {
+                "type": "unnecessary_qualification",
+                "detail": "The proposal's height relative to 75 feet does not determine the result on the stated 150-foot qualifying shallow lot: both the 40-foot and 60-foot standards, reduced by 40 feet, are subject to the same 20-foot minimum. It is therefore unnecessary as a missing fact for deciding whether the proposed 20 feet is enough."
+              }
+            ]
+          }
+        ]
+      },
+      "errorCode": "RESEARCH_VERIFICATION_FAILED",
+      "sourceReferences": [
+        "[ZR 23-343 — Rear yard equivalent requirements](https://zr.planning.nyc.gov/article-ii/chapter-3/23-343)"
+      ]
+    },
+    {
+      "id": "ZR-15",
+      "status": "completed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": true,
+      "review": "The underlying C3 office-use result and classification match. Evidence limitations preserve possible separate mapped provisions or approvals. No additional material defect identified in this focused review.",
+      "answerTextSHA256": "e08316f8449f7cd833986ee83a4b5c6af66b10fb24f53bd6610b864527cce3c0",
+      "runtimeVerificationPassed": true,
+      "sourceReferences": [
+        "[ZR 32-17 — Use Group VII – Offices and Laboratories](https://zr.planning.nyc.gov/article-iii/chapter-2/32-17)",
+        "[ZR 32-171 — Use Group VII – general use allowances](https://zr.planning.nyc.gov/article-iii/chapter-2/32-171)"
+      ]
+    },
+    {
+      "id": "ZR-16",
+      "status": "completed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": true,
+      "review": "The underlying residential-use result and C4-1 Staten Island distinction match. The table discussion should preserve the P additional-conditions notation explicitly. Evidence limitations separate the use result from building form, density and site-specific requirements.",
+      "answerTextSHA256": "81666f2027c56de90bcf93a0380614e7e56ef5868c840c5e63e24137fd1ac3e2",
+      "runtimeVerificationPassed": true,
+      "sourceReferences": [
+        "[ZR 32-121 — Use Group II – general use allowances](https://zr.planning.nyc.gov/article-iii/chapter-2/32-121)",
+        "[ZR 32-123 — Use Group II – uses subject to additional conditions](https://zr.planning.nyc.gov/article-iii/chapter-2/32-123)"
+      ]
+    },
+    {
+      "id": "ZR-17",
+      "status": "failed",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "No delivered answer. The main zero-parking calculation and certificate timing are correct, but the draft reopens the stipulated Inner Transit Zone status with assuming. The source-bound repair fixed an existing-unit citation and expanded date language; the semantic verifier then rejected that unnecessary qualification.",
+      "failureDiagnostics": {
+        "message": "The revised Zoning answer did not pass source verification.",
+        "attempts": [
+          {
+            "attempt": 1,
+            "pass": false,
+            "issues": [
+              {
+                "type": "zoning_effective_date_omission",
+                "detail": "Tie the effective-date or transition analysis to the exact project date(s) stated in the question: December 5, 2024."
+              }
+            ]
+          },
+          {
+            "attempt": 2,
+            "pass": false,
+            "issues": [
+              {
+                "type": "unnecessary_qualification",
+                "detail": "The answer conditions the direct result on “assuming the supplied Inner Transit Zone status,” even though the question expressly establishes that the development is within the Inner Transit Zone. The result should be stated directly, not conditionally."
+              }
+            ]
+          }
+        ]
+      },
+      "errorCode": "RESEARCH_VERIFICATION_FAILED",
+      "sourceReferences": [
+        "[ZR 11-333 — Special allowances for building permits issued prior to certain dates](https://zr.planning.nyc.gov/article-i/chapter-1/11-333)",
+        "[ZR 25-20 — REQUIRED ACCESSORY OFF-STREET PARKING SPACES FOR RESIDENCES](https://zr.planning.nyc.gov/article-ii/chapter-5/25-20)",
+        "[ZR 25-211 — General provisions](https://zr.planning.nyc.gov/article-ii/chapter-5/25-211)"
+      ]
+    },
+    {
+      "id": "ZR-19",
+      "status": "not-dispatched",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "Not dispatched. Resolve the recorded passage-size or visual-source requirement without dropping the authored section reference or fabricating visual review.",
+      "errorCode": "INVALID_RESEARCH_SELECTION",
+      "sourceReferences": [
+        "[ZR 12-10 — DEFINITIONS](https://zr.planning.nyc.gov/article-i/chapter-2/12-10)"
+      ]
+    },
+    {
+      "id": "ZR-20",
+      "status": "not-dispatched",
+      "wholeAnswerProfessionallyApproved": false,
+      "coreMatch": null,
+      "review": "Not dispatched. Resolve the recorded passage-size or visual-source requirement without dropping the authored section reference or fabricating visual review.",
+      "errorCode": "INVALID_RESEARCH_SELECTION",
+      "sourceReferences": [
+        "[ZR 12-10 — DEFINITIONS](https://zr.planning.nyc.gov/article-i/chapter-2/12-10)"
+      ]
+    }
+  ],
+  "remainingCaseIDs": [
+    "ZR-03",
+    "ZR-06",
+    "ZR-09",
+    "ZR-19",
+    "ZR-20",
+    "DOBNOW-001",
+    "DOBNOW-002",
+    "DOBNOW-003",
+    "DOBNOW-004",
+    "DOBNOW-005",
+    "DOBNOW-006",
+    "DOBNOW-007",
+    "DOBNOW-008",
+    "DOBNOW-009",
+    "DOBNOW-010",
+    "DOBNOW-011",
+    "DOBNOW-012",
+    "DOBNOW-013",
+    "DOBNOW-014",
+    "DOBNOW-015",
+    "DOBNOW-016",
+    "DOBNOW-017",
+    "DOBNOW-020",
+    "DOBNOW-021",
+    "DOBNOW-022",
+    "DOBNOW-023",
+    "DOBNOW-024"
+  ],
+  "limitations": [
+    "Core matches are focused comparisons to the reconciled development key, not whole-answer professional acceptance.",
+    "The reconciled questions and selected passages are preserved; exact original upload wording differs for previously documented reconciliations.",
+    "No provider invoice or account balance was read. Costs are reconstructed usage estimates and a separate conservative authorization ledger.",
+    "Generic routing and source assembly still need attention for the 22 untested DOB workflow cases; their scenarios must not be silently rewritten to add missing context."
+  ]
+}
