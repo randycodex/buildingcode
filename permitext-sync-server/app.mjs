@@ -10145,10 +10145,10 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   const configuration = conversational
     ? {
         ...baseConfiguration,
-        promptVersion: `${baseConfiguration.promptVersion}:compact-v2:conversational-v4`,
+        promptVersion: `${baseConfiguration.promptVersion}:compact-v3:conversational-v4`,
         evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
       }
-    : { ...baseConfiguration, promptVersion: `${baseConfiguration.promptVersion}:compact-v2` };
+    : { ...baseConfiguration, promptVersion: `${baseConfiguration.promptVersion}:compact-v3` };
   const model = configuration.model;
   const passageEvidence = evidence.map((section) => ({
     ...section,
@@ -10211,15 +10211,15 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Adapt the presentation to the question instead of forcing a fixed report template. Lead with a direct plain-language answer. For several parallel requirements, use a compact hyphen-led checklist; for a genuine side-by-side comparison with at least three shared features, a concise Markdown table is permitted; use a short descriptive heading only when it makes a longer answer easier to scan.",
         "Use Markdown bold sparingly for the controlling result, key dimensions, or short labels. Place a compact human-readable code reference such as (BC § 1012.2) next to the sentence, bullet, or table value it supports, using only section numbers present in the supplied enacted evidence. The structured sourceIDs remain the binding citation map.",
         "Place a supported calculation, design implication, correction or drawing note after the governing rule and label it. Do not introduce outside requirements. Honor an expressly short request unless a material qualification requires more room.",
-        "Never omit a material qualification, applicability issue, conflicting provision or evidence limitation for brevity. Do not lengthen a complete answer for visual consistency.",
+        "Never omit a material qualification, applicability issue, conflicting provision or evidence limitation for brevity. If describing the consequences of a permission, preserve the supplied exceptions to those consequences. Do not lengthen a complete answer for visual consistency.",
         "Separate natural paragraphs in answerText with a blank line. Use headings or lists only when they make the reasoning clearer.",
         conversational
           ? "For this ordinary Research conversation, write in direct plain language. Avoid report boilerplate, process narration, repeated question text, and phrases such as a project-specific answer requires reading. Keep the tone professional but conversational."
           : "Use a formal governed-analysis tone in answerText.",
         "Do not print SECTION_ID or PASSAGE_ID markers in answerText or supported-point prose; those identifiers belong only in the structured mapping fields.",
         "Break the material rules established by the assembled enacted evidence into ordered supportedPoints. Give each point a short plain-language heading, a complete explanation, and the exact supplied sectionID and sourceIDs that support it.",
-        "Examples, consequences, code categories and practical requirements must be grounded in assembled evidence or supplied Project facts. Label illustrations hypothetical; never use them to introduce unsupported law.",
-        "Stay within the current question. Discuss or cite another code topic only if it materially qualifies the requested conclusion or the user requests it; a fact merely mattering elsewhere is insufficient.",
+        "Examples, consequences, code categories and practical requirements must be grounded in assembled evidence or supplied Project facts. When a point derives a classification from a definition, bind the definition passage to that same point as well as the operative rule. Label illustrations hypothetical; never use them to introduce unsupported law.",
+        "Stay within the current question. For a narrow yes/no trigger, omit optional downstream design rates and collateral permissions unless needed to resolve or qualify that decision. Silence about an existing component does not establish permission to retain it. Discuss or cite another code topic only if it materially qualifies the requested conclusion or the user requests it; a fact merely mattering elsewhere is insufficient.",
         "State every material conclusion directly supported by the enacted evidence before discussing unresolved matters.",
         "For an open-ended request for design requirements, when the assembled evidence supplies multiple directly responsive dimensional or configuration rules, summarize those usable baseline rules before asking for project facts. Do not let a narrow exception, a specialized ramp or equipment type, or an unavailable referenced standard erase responsive requirements that the supplied enacted evidence does establish.",
         "For every required selected passage, preserve each material qualifier contained in that exact passage—including a proviso, exception, deeming rule, definition, second-sentence clarification, or stated limit. Merely citing the passage or summarizing a broader rule is not enough.",
@@ -19517,7 +19517,7 @@ async function handleResearchConversationMessage(request, response) {
           model: "permitext-mock",
           configuration: {
             ...researchModelConfiguration(),
-            promptVersion: `${researchModelConfiguration().promptVersion}:compact-v2:conversational-v4`,
+            promptVersion: `${researchModelConfiguration().promptVersion}:compact-v3:conversational-v4`,
             evidenceVersion: `${researchEvidenceAssemblyVersion}:structured-v1`
           },
           usage: combinedResearchUsage()

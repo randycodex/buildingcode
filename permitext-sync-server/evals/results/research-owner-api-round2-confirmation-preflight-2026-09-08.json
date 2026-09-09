@@ -1,0 +1,439 @@
+{
+  "schema": "permitext-owner-api-round2-confirmation-v1",
+  "sourceCommit": "d11d615f300e4f18c2f718bf00c597d4d6a7ce46",
+  "authorization": "Owner explicitly authorized fresh API tests with $8 currently available and requested notice if more is needed. This is a new $8 round; historical costs stay separate. This single-use first batch attempts five recently repaired cases once with a $2.50 ceiling. No Project workflow tests or deployment.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 0,
+  "authorizationUSD": 8,
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 2.5,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 5,
+  "maximumProviderRequests": 25,
+  "maximumProviderRequestsPerTurn": 5,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual selected-section HTTP Research flow on isolated local accounts and storage. Expected answers are not supplied to drafting or verification. Local diagnostic Zoning eligibility only; no public eligibility, deployment, or phone changes.",
+  "cases": [
+    "ZR-18",
+    "MC-01",
+    "PC-04",
+    "PC-10",
+    "MC-15"
+  ],
+  "sourceHashes": {
+    "app.mjs": "590500eac1c6fed3bd41892420b4b8c0b2aa1a88e95e8d2a00bfc194bb35b759",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "525ed1ae6faa3640926462d9dd423bc3ea17b1261cde3d94d3a3a26b37039104",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "d61971dfb9c6295e2ddf38d0298645c0a59f788e2fbf119feb352e5ae33ac744",
+    "research-evidence-assembly.mjs": "365c5f7fc87041479ef2bc373e76fbc365e841f5532acc63b6528a6da2be7663",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "15e7dc17bd9ff1fa69938ba13b35686d56ee2cf5178a9350f1f5b5199e0ee97f",
+    "evals/research-reconciled-answer-key.json": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "eef06bb4d0acf230929cb355f15427d197f7f20c961651feaa8f2003d57dea54",
+    "scripts/run-research-owner-api-round2-confirmation-20260908.mjs": "75fa38fa99f0de9ed7db340718f9bf076c253d86640f0c633d236851c12670fa"
+  },
+  "startedAt": "2026-09-09T00:24:28.359Z",
+  "status": "preflight-passed",
+  "results": [
+    {
+      "id": "ZR-18",
+      "question": "A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?",
+      "inputSHA256": "69c3e87b7fbed165b6850c1134ce1cd1c30ec5588a55d561f567c9aa3cd1d737",
+      "readerSelectionsSHA256": "cd5ff3bcfdd161fc2e6e0a94530ef2e1f84b32a8da21b1b322e9f1c1edb66ed7",
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "7119d7653e77272b6d1eaf837caebd4e52f7996da2694e21cd36a8538375fff8",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 39437,
+      "interceptCount": 2,
+      "durationMilliseconds": 502,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.025631,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "00856132-7713-4edc-ae29-677aaa1a2ce9",
+          "createdAt": "2026-09-09T00:24:29.101Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 473,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "MC-01",
+      "question": "A new office has large operable windows that appear to provide enough natural ventilation. The office will also be fully air-conditioned. Can the design rely only on the operable windows for code-required ventilation?",
+      "inputSHA256": "d60effb81376608e59a1463704885b1990bec1462d39b39323480702faac7364",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "3dea11635c236ea97263a0348d5c20661bf36f72c94ce42c3e233136143be92f",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 79347,
+      "interceptCount": 1,
+      "durationMilliseconds": 1553,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.455855,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "11cd2d0c-312d-4ba4-b637-8dd6bc018935",
+          "createdAt": "2026-09-09T00:24:29.667Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 1524,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "PC-04",
+      "question": "A multiple-family residential building has a common laundry room with several automatic clothes washers, but the design omits a floor drain because each washer has a trapped standpipe. Is the floor drain optional?",
+      "inputSHA256": "9d41ecca4caac0adb046438eafb997bf18f96dedc05f406de96f0b943a7f5e90",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "9f29b08a530946f94326232b185693de1b8d2ac18990b9f5816727ce27738ff1",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 69028,
+      "interceptCount": 1,
+      "durationMilliseconds": 866,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.40426,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "054aaaa5-d035-4af7-9292-bf3d3d898eba",
+          "createdAt": "2026-09-09T00:24:31.287Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 832,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "PC-10",
+      "question": "A storage-type water heater is installed above a finished office ceiling. Leakage from the heater could damage the ceiling and occupied space below, but no drain pan is shown. Is a pan required?",
+      "inputSHA256": "6f54cb02dc567786e865e76a29259f515079ded9d04eef43139cce8ae3b88e0a",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "ffc5710bb101aff619f76df7ad9871159ec39d3dfcfdee1504cb470b66518861",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 42918,
+      "interceptCount": 1,
+      "durationMilliseconds": 351,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.27371,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "bea3f1aa-dad5-4082-9bff-fcf0e11de538",
+          "createdAt": "2026-09-09T00:24:32.210Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 319,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "MC-15",
+      "question": "A commercial kitchen has a mechanical makeup-air fan sized to offset the hood exhaust, but kitchen staff must switch the makeup-air fan on separately. Is that acceptable?",
+      "inputSHA256": "db058bab439a31cc71a91b6b9fcf8c9936af0ae7b3a952ad11569eca577867b8",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "d71fd65a881cd910ce3a2b70126914f960623199a8178b912a60b82721a2b15e",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 86337,
+      "interceptCount": 1,
+      "durationMilliseconds": 318,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.490805,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "4556111d-7095-4a40-a846-b47108a4f192",
+          "createdAt": "2026-09-09T00:24:32.613Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 288,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    }
+  ],
+  "providerCalls": [],
+  "completedAt": "2026-09-09T00:24:32.960Z",
+  "spend": {
+    "active": true,
+    "capUSD": 2.5,
+    "reservedUSD": 0,
+    "actualUSD": 0,
+    "requestCount": 6,
+    "pendingRequestCount": 0
+  }
+}
