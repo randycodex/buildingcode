@@ -1,0 +1,281 @@
+{
+  "schema": "permitext-owner-api-round2-work-premise-v1",
+  "sourceCommit": "53685fb3e3adad62084abd17de974db9d471107d",
+  "authorization": "Owner explicitly authorized fresh API tests with $8 currently available and requested notice if more is needed. This is a new $8 round; historical costs stay separate. This single-use batch confirms the negative-commencement fact repair on GAP-06 and tests the previously skipped GAP-15. Maximum $1.00 for the batch within the remaining $8 round allowance. Each next turn requires a full $0.50 remaining conservative allowance. No Project workflow tests or deployment.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 2.431722,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 1,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 2,
+  "maximumProviderRequests": 10,
+  "maximumProviderRequestsPerTurn": 5,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual automatic-retrieval HTTP Research flow on isolated local accounts and storage. Expected answers are not supplied to drafting or verification. Local diagnostic Zoning eligibility only; no public eligibility, deployment, or phone changes.",
+  "cases": [
+    "GAP-06",
+    "GAP-15"
+  ],
+  "sourceHashes": {
+    "app.mjs": "076d78638b821139282aba9f8bf01e2159f72f4966a92d614dd9cb0e27ee7d76",
+    "research-conversation-facts.mjs": "a8ae9fe2815d17f1cbd61d1995f4ad311bdf3267904ed52bdc070b73b7e57213",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "525ed1ae6faa3640926462d9dd423bc3ea17b1261cde3d94d3a3a26b37039104",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "d61971dfb9c6295e2ddf38d0298645c0a59f788e2fbf119feb352e5ae33ac744",
+    "research-evidence-assembly.mjs": "365c5f7fc87041479ef2bc373e76fbc365e841f5532acc63b6528a6da2be7663",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "15e7dc17bd9ff1fa69938ba13b35686d56ee2cf5178a9350f1f5b5199e0ee97f",
+    "evals/research-reconciled-answer-key.json": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "eef06bb4d0acf230929cb355f15427d197f7f20c961651feaa8f2003d57dea54",
+    "scripts/run-research-owner-api-round2-work-premise-20260908.mjs": "8df90a104a530f4d264170df4373827b0830ecd2d1a70c9400579df09700e86d"
+  },
+  "startedAt": "2026-09-09T00:43:56.414Z",
+  "status": "preflight-passed",
+  "results": [
+    {
+      "id": "GAP-06",
+      "question": "DOB issued a construction permit fourteen months ago, but no work has begun. The permit was not otherwise renewed or preserved by a special provision. Is it still valid merely because the printed permit has not been physically surrendered?",
+      "inputSHA256": "0abe1174604be439e088918b89beef2ba039554791e0e3d142f3d01ac41d8ef8",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "d50d39b996456d62f5cc4441c7539114a336e45ccdf0673261365290ca2857f4",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 56505,
+      "interceptCount": 1,
+      "durationMilliseconds": 4785,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.341645,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "3e906f80-6334-42ec-8941-cd46e65649d5",
+          "createdAt": "2026-09-09T00:43:56.738Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 4743,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "GAP-15",
+      "question": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue. The contractor believes interior work in another area is unrelated to the cited violation. May that work continue?",
+      "inputSHA256": "9bd1ba44113017fe6fd6c553d295c26a12fbec24a9b6febf8de1f21d6701c272",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "4d6b016776d38106f51af641240ee46c759280cdb812f9e4cba9e76511da1b45",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 53832,
+      "interceptCount": 1,
+      "durationMilliseconds": 984,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.32828,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "13332ba8-7fed-483e-9cdc-e8740b491817",
+          "createdAt": "2026-09-09T00:44:01.992Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 920,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    }
+  ],
+  "providerCalls": [],
+  "completedAt": "2026-09-09T00:44:03.086Z",
+  "spend": {
+    "active": true,
+    "capUSD": 1,
+    "reservedUSD": 0,
+    "actualUSD": 0,
+    "requestCount": 2,
+    "pendingRequestCount": 0
+  }
+}

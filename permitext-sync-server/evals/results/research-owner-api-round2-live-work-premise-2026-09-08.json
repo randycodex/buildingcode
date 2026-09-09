@@ -1,0 +1,2732 @@
+{
+  "schema": "permitext-owner-api-round2-work-premise-v1",
+  "sourceCommit": "53685fb3e3adad62084abd17de974db9d471107d",
+  "authorization": "Owner explicitly authorized fresh API tests with $8 currently available and requested notice if more is needed. This is a new $8 round; historical costs stay separate. This single-use batch confirms the negative-commencement fact repair on GAP-06 and tests the previously skipped GAP-15. Maximum $1.00 for the batch within the remaining $8 round allowance. Each next turn requires a full $0.50 remaining conservative allowance. No Project workflow tests or deployment.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 2.431722,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 1,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 2,
+  "maximumProviderRequests": 10,
+  "maximumProviderRequestsPerTurn": 5,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual automatic-retrieval HTTP Research flow on isolated local accounts and storage. Expected answers are not supplied to drafting or verification. Local diagnostic Zoning eligibility only; no public eligibility, deployment, or phone changes.",
+  "cases": [
+    "GAP-06",
+    "GAP-15"
+  ],
+  "preflightSHA256": "4f0be06f0621c6a2b5f7f313eb8d87cef1ad0513cd278439c301359afa7a0e68",
+  "sourceHashes": {
+    "app.mjs": "076d78638b821139282aba9f8bf01e2159f72f4966a92d614dd9cb0e27ee7d76",
+    "research-conversation-facts.mjs": "a8ae9fe2815d17f1cbd61d1995f4ad311bdf3267904ed52bdc070b73b7e57213",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "525ed1ae6faa3640926462d9dd423bc3ea17b1261cde3d94d3a3a26b37039104",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "d61971dfb9c6295e2ddf38d0298645c0a59f788e2fbf119feb352e5ae33ac744",
+    "research-evidence-assembly.mjs": "365c5f7fc87041479ef2bc373e76fbc365e841f5532acc63b6528a6da2be7663",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "15e7dc17bd9ff1fa69938ba13b35686d56ee2cf5178a9350f1f5b5199e0ee97f",
+    "evals/research-reconciled-answer-key.json": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "eef06bb4d0acf230929cb355f15427d197f7f20c961651feaa8f2003d57dea54",
+    "scripts/run-research-owner-api-round2-work-premise-20260908.mjs": "8df90a104a530f4d264170df4373827b0830ecd2d1a70c9400579df09700e86d"
+  },
+  "startedAt": "2026-09-09T00:47:44.984Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "GAP-06",
+      "question": "DOB issued a construction permit fourteen months ago, but no work has begun. The permit was not otherwise renewed or preserved by a special provision. Is it still valid merely because the printed permit has not been physically surrendered?",
+      "inputSHA256": "0abe1174604be439e088918b89beef2ba039554791e0e3d142f3d01ac41d8ef8",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "d50d39b996456d62f5cc4441c7539114a336e45ccdf0673261365290ca2857f4",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 56505,
+      "durationMilliseconds": 13179,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.341645,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "8f419dee-9dc6-4471-84a3-a56a1bb1e7ce",
+          "createdAt": "2026-09-09T00:47:45.474Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 22997,
+          "cachedInputTokens": 6859,
+          "cacheWriteInputTokens": 16132,
+          "outputTokens": 735,
+          "totalTokens": 23732,
+          "estimatedCostUSD": 0.030254,
+          "actualProviderCostUSD": 0.030254,
+          "conservativeProviderCostUSD": 0.07649,
+          "durationMilliseconds": 13126,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+        "evidenceVersion": "20260908-focused-ventilation-v30:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-09T00:47:45.688Z"
+        },
+        "answerText": "**No.** On the facts given, the permit expired by limitation and became invalid once the permitted work had not commenced within 12 months of issuance; keeping the printed permit does not preserve it. Fourteen months with no work begun is two months beyond that commencement deadline. (AC § 28-105.9)\n\nThis conclusion assumes the stated absence of a renewal or special preservation provision. The supplied rule separately provides a flood-hazard-area exception governed by Appendix G § G104; that exception’s timeframe is not included in the evidence, so it could matter if the work is in a flood hazard area. (AC § 28-105.9)",
+        "conclusion": "**No.** On the facts given, the permit expired by limitation and became invalid once the permitted work had not commenced within 12 months of issuance; keeping the printed permit does not preserve it. Fourteen months with no work begun is two months beyond that commencement deadline. (AC § 28-105.9)",
+        "supportedPoints": [
+          {
+            "heading": "Uncommenced permits expire after 12 months",
+            "explanation": "All permits issued by the commissioner expire by limitation and become invalid when the permitted work is not commenced within 12 months after issuance. With no work commenced for 14 months, the stated permit is beyond that deadline.",
+            "sectionID": "9013",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9013-2"
+            ],
+            "evidenceRole": "supporting"
+          },
+          {
+            "heading": "Flood-hazard-area exception",
+            "explanation": "Permits for work in a flood hazard area expire under the timeframes established by Appendix G, Section G104, rather than the stated general expiration rule. The supplied evidence does not include that section’s timeframes.",
+            "sectionID": "9013",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9013-2"
+            ],
+            "evidenceRole": "supporting"
+          }
+        ],
+        "explanation": "This conclusion assumes the stated absence of a renewal or special preservation provision. The supplied rule separately provides a flood-hazard-area exception governed by Appendix G § G104; that exception’s timeframe is not included in the evidence, so it could matter if the work is in a flood hazard area. (AC § 28-105.9)",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the permitted work is in a flood hazard area, which would invoke the Appendix G § G104 exception; the supplied evidence does not provide that section’s timeframe."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "Permitext limited this answer to the enacted evidence assembled for the current question. The supplied evidence identifies, but does not include, the Appendix G § G104 flood-hazard-area timeframe."
+        ],
+        "additionalEvidenceNeeded": [
+          "If the work is in a flood hazard area, the applicable Appendix G § G104 text and the project’s flood-hazard-area status."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "9013",
+            "sectionNumber": "28-105.9",
+            "title": "§ 28-105.9 Expiration.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9013-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:9013-2",
+                "selectedText": "28-105.9 § 28-105.9 Expiration. All permits issued by the commissioner shall expire by limitation and become invalid if the permitted work or use is not commenced within 12 months from the date of issuance of the permit. Subsequent to the 12-month period following the issuance of the initial permit, all permits shall expire if the permitted work is suspended or abandoned for a continuous period of 12 months unless such permits expire earlier pursuant to applicable provisions of this code. The permit shall automatically expire upon the expiration of required insurance or if the applicant holds a license issued by the department upon the expiration or revocation of such license during the term of the permit or if the permit is not renewed. Exception: All permits for work in a flood hazard area shall expire in accordance with the timeframes established by section G104 of appendix G of the New York city building code. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/070 and L.L. 2021/126 .",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes the 12-month commencement expiration rule and the flood-hazard-area exception."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "8785",
+          "9013",
+          "8784",
+          "9400",
+          "9401",
+          "9011",
+          "8792",
+          "10183",
+          "8981",
+          "8926",
+          "8786",
+          "8806",
+          "8986"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:8785-1",
+          "research-permitext_discovered-id:9013-2",
+          "research-permitext_discovered-id:8784-3",
+          "research-permitext_discovered-id:9400-4",
+          "research-permitext_discovered-id:9401-5",
+          "research-permitext_discovered-id:9011-6",
+          "research-permitext_discovered-id:8792-7",
+          "research-permitext_discovered-id:10183-8",
+          "research-permitext_discovered-id:8981-9",
+          "research-permitext_discovered-id:8926-10",
+          "research-permitext_cross_reference-id:8786-1",
+          "research-permitext_cross_reference-id:8806-5",
+          "research-permitext_cross_reference-id:8986-6"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 13,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 0,
+          "supportingCitationCount": 1,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 12,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 10,
+          "crossReferenceCount": 3,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 1,
+          "requiredClaimCount": 0,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [],
+          "generalRules": [],
+          "exceptions": [
+            {
+              "label": "AC 28-105.9",
+              "summary": "AC 28-105.9 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9013-2"
+              ]
+            },
+            {
+              "label": "AC 28-105.8.1",
+              "summary": "AC 28-105.8.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9011-6"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.5",
+              "summary": "AC 28-101.4.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8792-7"
+              ]
+            },
+            {
+              "label": "AC 28-101.4.3",
+              "summary": "AC 28-101.4.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8786-1"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [
+            {
+              "label": "AC 28-101.4.3",
+              "summary": "AC 28-101.4.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8786-1"
+              ]
+            },
+            {
+              "label": "AC 28-102.4.3",
+              "summary": "AC 28-102.4.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8806-5"
+              ]
+            },
+            {
+              "label": "AC 28-105.2",
+              "summary": "AC 28-105.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8986-6"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:8785-1",
+            "research-permitext_discovered-id:9013-2",
+            "research-permitext_discovered-id:8784-3",
+            "research-permitext_discovered-id:9400-4",
+            "research-permitext_discovered-id:9401-5",
+            "research-permitext_discovered-id:9011-6",
+            "research-permitext_discovered-id:8792-7",
+            "research-permitext_discovered-id:10183-8",
+            "research-permitext_discovered-id:8981-9",
+            "research-permitext_discovered-id:8926-10",
+            "research-permitext_cross_reference-id:8786-1",
+            "research-permitext_cross_reference-id:8806-5",
+            "research-permitext_cross_reference-id:8986-6"
+          ],
+          "projectFactsUsed": [
+            "DOB issued a construction permit fourteen months ago, but no work has begun."
+          ],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [
+            "DOB issued a construction permit fourteen months ago, but no work has begun."
+          ],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260908-negative-work-premise-v6",
+          "activeRootTopic": "DOB issued a construction permit fourteen months ago, but no work has begun. The permit was not otherwise renewed or preserved by a special provision. Is it still valid merely because the printed permit has not been physically surrendered?",
+          "turnKind": "established",
+          "establishedFacts": [
+            {
+              "id": "work_commencement",
+              "key": "work_commencement",
+              "value": "not_commenced",
+              "statement": "DOB issued a construction permit fourteen months ago, but no work has begun.",
+              "kind": "established",
+              "sourceText": "DOB issued a construction permit fourteen months ago, but no work has begun.",
+              "source": "user",
+              "qualificationVersion": "20260908-negative-work-premise-v6"
+            }
+          ],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [
+            "work_commencement"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "DOB issued a construction permit fourteen months ago, but no work has begun. The permit was not otherwise renewed or preserved by a special provision. Is it still valid merely because the printed permit has not been physically surrendered?",
+              "establishedFacts": [
+                {
+                  "id": "work_commencement",
+                  "key": "work_commencement",
+                  "value": "not_commenced",
+                  "statement": "DOB issued a construction permit fourteen months ago, but no work has begun.",
+                  "kind": "established",
+                  "sourceText": "DOB issued a construction permit fourteen months ago, but no work has begun.",
+                  "source": "user",
+                  "qualificationVersion": "20260908-negative-work-premise-v6"
+                }
+              ],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9013-2"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9013-2"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8785-1",
+            "research-permitext_discovered-id:9013-2",
+            "research-permitext_discovered-id:8784-3",
+            "research-permitext_discovered-id:9400-4",
+            "research-permitext_discovered-id:9401-5",
+            "research-permitext_discovered-id:9011-6",
+            "research-permitext_discovered-id:8792-7",
+            "research-permitext_discovered-id:10183-8",
+            "research-permitext_discovered-id:8981-9",
+            "research-permitext_discovered-id:8926-10",
+            "research-permitext_cross_reference-id:8786-1",
+            "research-permitext_cross_reference-id:8806-5",
+            "research-permitext_cross_reference-id:8986-6"
+          ],
+          "claims": []
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9013-2"
+          ],
+          "claims": []
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-fixture-permission-scope-v28",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:9013-2"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:8785-1",
+            "research-permitext_discovered-id:8784-3",
+            "research-permitext_discovered-id:9400-4",
+            "research-permitext_discovered-id:9401-5",
+            "research-permitext_discovered-id:9011-6",
+            "research-permitext_discovered-id:8792-7",
+            "research-permitext_discovered-id:10183-8",
+            "research-permitext_discovered-id:8981-9",
+            "research-permitext_discovered-id:8926-10",
+            "research-permitext_cross_reference-id:8786-1",
+            "research-permitext_cross_reference-id:8806-5",
+            "research-permitext_cross_reference-id:8986-6"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 0,
+            "supportingCitationCount": 1,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 12,
+            "reviewedOnlyProvisionCount": 12,
+            "assembledSourceCount": 13,
+            "assembledProvisionCount": 13
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:8785-1",
+              "sectionID": "8785",
+              "reference": "AC 28-101.4.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.2 § 28-101.4.2 Applications for construction document approval submitted prior to and within twelve months after July 1, 2008. Any work for which an application for construction document approval was submitted to the department prior to July 1, 2008 and not thereafter abandoned, or for which an application for construction document approval is submitted to the department within a period of twelve months after such date may, at the option of the owner, be performed in its entirety in accordance with the provisions of this code, or in accordance with the 1968 building code, provided that such work is commenced within twelve months after the date of issuance of a permit therefor and is diligently carried on to completion. The commissioner may, for good cause, extend the time period for commencement of the work beyond 12 months. Where the owner elects to perform the work in compliance with the 1968 building code, the following conditions shall apply: 1. Except as otherwise limited by the commissioner, administration and enforcement of the 1968 building code shall be in accordance with this code, including but not limited to approval of construction documents, issuance of permits and certificates of occupancy, tests and inspections, penalties and enforcement. Controlled inspections and semi-controlled inspections as referenced in the 1968 building code shall be deemed to be special inspections and shall comply with the provisions of this code relating to special inspections. Materials regulated in their use by the 1968 building code shall be subject to applicable provisions of this code. 2. Safety of public and property during construction operations including demolition shall be governed by chapter 33 of the New York city building code. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9013-2",
+              "sectionID": "9013",
+              "reference": "AC 28-105.9",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.9 § 28-105.9 Expiration. All permits issued by the commissioner shall expire by limitation and become invalid if the permitted work or use is not commenced within 12 months from the date of issuance of the permit. Subsequent to the 12-month period following the issuance of the initial permit, all permits shall expire if the permitted work is suspended or abandoned for a continuous period of 12 months unless such permits expire earlier pursuant to applicable provisions of this code. The permit shall automatically expire upon the expiration of required insurance or if the applicant holds a license issued by the department upon the expiration or revocation of such license during the term of the permit or if the permit is not renewed. Exception: All permits for work in a flood hazard area shall expire in accordance with the timeframes established by section G104 of appendix G of the New York city building code. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/070 and L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8784-3",
+              "sectionID": "8784",
+              "reference": "AC 28-101.4.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.1 § 28-101.4.1 Permit issued or work commenced prior to July 1, 2008. If a permit for work was issued prior to July 1, 2008 or, if no permit was necessary, work was commenced prior to July 1, 2008, all of the provisions of chapter 1 of title 27 of the administrative code as heretofore in effect shall apply to such work."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9400-4",
+              "sectionID": "9400",
+              "reference": "AC 28-213.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-213.1.1 § 28-213.1.1 Penalty for work without permit on one- or two-family dwelling. Where work has been performed without a permit on a one- or two-family dwelling the penalty shall equal six times the amount of the fee payable for the permit. Where only part of the work has been performed without a permit, the penalty shall be reduced proportionately according to the amount of work still to be performed at the time a permit is issued. Notwithstanding the foregoing, no such penalty shall be less than $600, nor more than $10,000. (Am. L.L. 2017/156, 8/30/2017, eff. 12/28/2017; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9401-5",
+              "sectionID": "9401",
+              "reference": "AC 28-213.1.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-213.1.2 § 28-213.1.2 Penalty for work without permit on other than one- or two-family dwelling. The penalty for work without a permit on buildings other than one- or two-family dwellings shall be 21 times the amount of the fee payable for such permit. Where only part of the work has been performed without a permit, the penalty shall be reduced proportionately according to the amount of work still to be performed at the time a permit is issued. Notwithstanding the foregoing, no such penalty shall be less than $6,000, nor more than $15,000. (Am. L.L. 2017/156, 8/30/2017, eff. 12/28/2017; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9011-6",
+              "sectionID": "9011",
+              "reference": "AC 28-105.8.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.8.1 § 28-105.8.1 Duration of permit. Permits may be issued for a period of up to 2 years unless otherwise limited by law. Exception: Sidewalk shed permits shall be issued for a period of 90 days and may not be renewed until department penalties for sidewalk sheds in the public right-of-way are paid. (Am. L.L. 2025/048, 4/17/2025, eff. 1/12/2026) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2025/048 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8792-7",
+              "sectionID": "8792",
+              "reference": "AC 28-101.4.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.5 § 28-101.4.5 Work that increases existing floor surface area of a prior code building by more than 110 percent. Notwithstanding sections 28-101.4.3 and 28-102.4.3 or any other provision of this code that would authorize alterations of prior code buildings in accordance with the 1968 building code or prior codes, where the proposed work at the completion of construction will increase the amount of floor surface area of a prior code building by more than 110%, over the amount of existing floor surface area, such entire building shall be made to comply with the provisions of this code as if it were a new building hereafter erected. See section 28-105.2 for permits for such work. Exceptions. When determining the amount of existing floor surface area for the purposes of section 28-101.4.5 , the following shall be excluded from the measured square footage of floor surface area: 1. The square footage of floors removed during the course of the work when such floors are removed together with the supporting beams, joists, decking and slabs on grade. 2. The square footage of any floor that was installed together with the supporting beams, joists, decking and slabs on grade less than 12 months prior to submission of the application for construction document approval for the proposed work. For the purposes of this exception, floors installed pursuant to a work permit signed off less than 12 months before such submission shall not be counted as existing floor surface area."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10183-8",
+              "sectionID": "10183",
+              "reference": "AC 28-507.4.5.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-507.4.5.1 § 28-507.4.5.1 Requirements within 3 months. Not later than 3 months following the date such authorization is issued, the owner must submit documentation in a form and manner determined by the department establishing that: 1. Such eligible basement or cellar residence has smoke and carbon monoxide alarms in accordance with sections U103.6.2 and U103.6.3 of appendix U of the New York city building code; 2. Such eligible basement or cellar residence has water sensors and alarms in accordance with section U202.11 of appendix U of the New York city building code; 3. Such eligible basement or cellar residence has the required signage posted in a manner prescribed by chapter 2 of title 27 and the rules of the department of housing preservation and development; and 4. The owner has notified any tenants in such eligible basement or cellar residence about enrollment in an emergency alert system operated by the office of emergency management. (L.L. 2024/126, 12/18/2024, eff. 6/16/2025)"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8981-9",
+              "sectionID": "8981",
+              "reference": "AC 28-105.1.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.1.2 § 28-105.1.2 Projects for which a stormwater construction permit is required. It shall be a violation of this code to engage in any development activity with respect to a covered development project without a stormwater construction permit issued by the department of environmental protection. The issuance of a permit pursuant to this code shall not be construed to be permission for any activity that requires a stormwater construction permit issued by the department of environmental protection pursuant to chapter 5-A of title 24 of the administrative code. The issuance of a stormwater construction permit by the department of environmental protection shall not be construed as permission for work that requires a permit from the department of buildings pursuant to this code. (L.L. 2017/097, 5/30/2017, eff. 6/1/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8926-10",
+              "sectionID": "8926",
+              "reference": "AC 28-104.2.10.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.2.10.1 § 28-104.2.10.1 Effect on work permit. The effect of revocation of approval of construction documents is the automatic revocation of all work permits that may have been issued based on such construction documents."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8786-1",
+              "sectionID": "8786",
+              "reference": "AC 28-101.4.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-101.4.3 § 28-101.4.3 Optional use of the 1968 building code for work on prior code buildings. Exceptions: 1. Fuel gas, plumbing, electrical, and mechanical work. The installation of and work on all appliances, equipment and systems regulated by the New York city fuel gas code, the New York city plumbing code, the New York city electrical code, and the New York city mechanical code shall be governed by applicable provisions of those codes relating to new and existing installations. 2. Fire protection systems. Alterations of buildings and changes of use or occupancy shall be governed by chapter 9 of the New York city building code, subject to special provisions for prior code buildings as set forth therein. 3. Elevators, conveyors and amusement rides. The installation of and work on elevators, conveyors, and amusement rides shall be governed by chapter 30 and appendix K of the New York city building code and the rules of the department, subject to special provisions for prior code buildings as set forth therein. 4. Safety during construction operations. Safety of public and property during construction operations including demolition shall be governed by chapter 33 of the New York city building code. 5. Accessibility. Alterations, including minor alterations, of buildings and changes of use or occupancy, shall be governed by chapter 11 of the New York city building code, subject to special provisions for prior code buildings as set forth therein. 6. Encroachments into the public right of way. Encroachments onto the public right of way shall be governed by chapter 32 of the New York city building code. 7. Administration and enforcement. Except as otherwise limited by the commissioner, administration and enforcement of the 1968 building code shall be in accordance with this code, including but not limited to approval of construction documents, issuance of permits and certificates of occupancy, tests and inspections, penalties and enforcement. 8. Special inspections. Controlled inspections and semi-controlled inspections as referenced in the 1968 building code shall be deemed to be special inspections and shall be governed by the provisions of this code relating to special inspections. 9. Materials. Materials regulated in their use by the 1968 building code shall be subject to applicable provisions of this code. 10. Security grilles. The installation and replacement of security grilles shall comply with section 1010.1.4.4 of the New York city building code. 11. Energy efficiency. All work related to energy efficiency shall be regulated by the New York city energy conservation code. 12. Roof recovering and replacements. 12.1 Installation and materials. Work involving the recovering or replacing of an existing roof covering shall be governed by sections 1511.1 through 1511.7 of the New York city building code; 12.2 Cool roofs. Work involving the recovering or replacing of an existing roof covering shall comply with section 1504.9 of the New York city building code unless the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46 m 2 ). 12.3 Green roofs. Notwithstanding the applicant's election to use the 1968 building code or prior code, work involving green roof systems and container gardens shall be permitted to be performed pursuant to Chapter 15 of the New York city building code. 12.4 Sustainable roofs. Work involving the replacing of an entire existing roof deck or roof assembly shall comply with section 1512.2 of the New York city building code. 13. Handrails. Where the alteration of a building includes the addition or replacement of an entire stair enclosure including the stairs, handrails shall comply with section 1011.11 and section 1014 of the New York city building code. Where the alteration of a building includes the addition or replacement of ramps, handrails shall comply with section 1012.8 and section 1014 of such code. 14. Guards. Where the alteration or repair of a building involves the addition or replacement of guards, such guards shall comply with sections 1015 and 1607.8 of the New York city building code. 15. Flood hazard areas. Within flood hazard areas in accordance with section 28-104.9.4 , all work for any activity regulated by Appendix G of the New York city building code shall be governed by such appendix. 16. Structural. The use of load resistance factor design (LRFD), calculation of live loads, and applicability of seismic and wind loads shall be governed by special provisions for prior code buildings as set forth in section 1601.2 of the New York city building code. 17. Emergency and standby power systems. The installation of and work on emergency and standby power systems shall comply with section 2702.1 of the New York city building code. 18. Parking garages and open parking lots. Parking garages and open parking lots shall comply with section 406.4.10 or 406.9.8 of the New York city building code, as applicable. 19. Mold protection. Alterations shall comply with sections 2506 and 2509 of the New York city building code relating to areas subject to moisture or water damage. 20. Where the alteration of a building includes the replacement of all exterior glazing, such alteration shall comply with section 1403.8 of the New York city building code. (Am. L.L. 2019/094, 5/19/2019, eff. 11/15/2019; Am. L.L. 2020/015, 1/10/2020, eff. 1/10/2021; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022; Am. L.L. 2024/055, 4/6/2024, eff. 12/21/2025; Am. L.L. 2024/128, 12/21/2024, eff. 12/21/2025) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2011/021 , L.L. 2013/130 , L.L. 2014/013 , L.L. 2020/015 , L.L. 2021/126 , L.L. 2024/055 , and L.L. 2024/128 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8806-5",
+              "sectionID": "8806",
+              "reference": "AC 28-102.4.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-102.4.3 § 28-102.4.3 Alteration of prior code buildings. Except as otherwise provided in sections 28-101.4.1 , 28-101.4.2 , 28-101.4.3 and 28-101.4.4 , prior code buildings altered after July 1, 2008 shall comply with the provisions of this code. In accordance with subdivision eleven of section three of the New York state multiple dwelling law and article 4 of subchapter 1 of the 1968 building code, at the option of the owner, multiple dwellings erected prior to December 6, 1969 may be altered and buildings erected prior to December 6, 1969 may be converted to multiple dwellings in accordance with applicable provisions of the New York state multiple dwelling law and the building laws and regulations in effect prior to December 6, 1968, provided the general safety and public welfare are not thereby endangered. At a minimum, the application of sections 28-101.4.3 , 28-101.4.4 and 28-101.4.5 to any such alteration shall be deemed necessary to protect the general safety and public welfare. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8986-6",
+              "sectionID": "8986",
+              "reference": "AC 28-105.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.2 § 28-105.2 Classification of work permits. For the purposes of this code, work permits shall be classified as follows: 1. New building permits: for the construction of new buildings, including as provided for in section 28-101.4.5 . 2. Alteration permits: for the alteration of buildings or structures, including new and existing sign structures and partial demolition in conjunction with such building or structure. 3. Foundation and earthwork permits: for the construction or alteration of foundations, including earthwork, excavation, fill, and foundation insulation. 4. Earthwork permits: for work solely involving earthwork, excavation, or fill operations. 5. Full demolition permits: for the full demolition and removal of buildings or structures. 6. Plumbing permits: for the installation or alteration of plumbing and plumbing systems, including gas piping. Such permits shall include permits for limited plumbing alterations. 7. Sign permits: for the erection, installation, display or alteration of signs. 8. Service equipment permits: for the installation or alteration of service equipment, including but not limited to air conditioning and ventilating systems, boilers, elevators, escalators, moving walkways, dumbwaiters, mobile boilers and mobile oil tanks. Such permits shall include permits for limited oil-burning appliance alterations. 9. Temporary construction installation permits: for the erection, installation and use of temporary construction installations to facilitate construction and/or safety during construction, including but not limited to temporary fences, railings, catch platforms, over-the-sidewalk chutes, footbridges, sidewalk sheds, and scaffolds. 10. Fire protection and suppression system permits: for the installation and alteration of fire protection and suppression systems, including sprinkler systems and standpipe systems. Such permits shall include permits for limited sprinkler alterations and limited standpipe alterations. 11. Crane and derrick permits: for the use of power-operated cranes and derricks during construction. 12. Temporary structure permits and temporary use authorizations: for temporary structures and uses, see article 111 . 13. Electrical permits: for electrical work other than low voltage electrical work. Such permits shall include permits for minor electrical work. (Am. L.L. 2018/195, 12/1/2018, eff. 5/30/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022; Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023; Am. L.L. 2024/128, 12/21/2024, eff. 12/21/2025) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2011/001 , L.L. 2018/195 , L.L. 2021/126 , L.L. 2023/077 , and L.L. 2024/128 ."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260908-zoning-unresolved-predicate-v18",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-focused-ventilation-v30",
+          "retrievalQuery": "DOB issued a construction permit fourteen months ago, but no work has begun. The permit was not otherwise renewed or preserved by a special provision. Is it still valid merely because the printed permit has not been physically surrendered?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "DOB issued a construction permit fourteen months ago, but no work has begun. The permit was not otherwise renewed or preserved by a special provision. Is it still valid merely because the printed permit has not been physically surrendered?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "DOB issued a construction permit fourteen months ago, but no work has begun. The permit was not otherwise renewed or preserved by a special provision. Is it still valid merely because the printed permit has not been physically surrendered?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "DOB issued a construction permit fourteen months ago, but no work has begun. The permit was not otherwise renewed or preserved by a special provision. Is it still valid merely because the printed permit has not been physically surrendered?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260908-negative-work-premise-v6",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 18477,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 3,
+            "topicDependencyCount": 0,
+            "characterCount": 18477,
+            "resolverFailureCount": 4,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 4,
+              "text": "4 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-09T00:47:45.688Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-09-09T00:47:45.688Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    },
+    {
+      "id": "GAP-15",
+      "question": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue. The contractor believes interior work in another area is unrelated to the cited violation. May that work continue?",
+      "inputSHA256": "9bd1ba44113017fe6fd6c553d295c26a12fbec24a9b6febf8de1f21d6701c272",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "4d6b016776d38106f51af641240ee46c759280cdb812f9e4cba9e76511da1b45",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 53832,
+      "durationMilliseconds": 30181,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.32828,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "d001b6de-f2ff-4bff-bbb3-0058bab9fe31",
+          "createdAt": "2026-09-09T00:47:59.579Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 2,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [
+            "incorrect_citation"
+          ],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 4,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 49549,
+          "cachedInputTokens": 9934,
+          "cacheWriteInputTokens": 39603,
+          "outputTokens": 2748,
+          "totalTokens": 52297,
+          "estimatedCostUSD": 0.084595,
+          "actualProviderCostUSD": 0.084595,
+          "conservativeProviderCostUSD": 0.178913,
+          "durationMilliseconds": 30082,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+        "evidenceVersion": "20260908-focused-ventilation-v30:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-09T00:47:59.580Z"
+        },
+        "answerText": "**No.** On the stated facts, interior work in the other area may not continue unless the stop-work order itself otherwise specifies that work may proceed, or the Commissioner orders work necessary to remove danger. Upon issuance, “all work shall immediately stop unless otherwise specified.” A person with knowledge or notice may not continue—or allow, authorize, promote, or cause continuation of—work covered by the order, except work required by the Commissioner. The contractor’s view that a separate area is unrelated does not create an exception. (AC §§ 28-207.2.1, 28-207.2.2)\n\nThe order can be rescinded upon application when the underlying condition is corrected and the stated penalty/fine or security conditions are met, or where it was issued in error or should not have been issued. If this is a mandatory stop-work order, work also may not resume until DOB rescinds it, and rescission cannot occur fewer than two business days after issuance. (AC §§ 28-207.2.3, 28-207.2.4)",
+        "conclusion": "**No.** On the stated facts, interior work in the other area may not continue unless the stop-work order itself otherwise specifies that work may proceed, or the Commissioner orders work necessary to remove danger. Upon issuance, “all work shall immediately stop unless otherwise specified.” A person with knowledge or notice may not continue—or allow, authorize, promote, or cause continuation of—work covered by the order, except work required by the Commissioner. The contractor’s view that a separate area is unrelated does not create an exception. (AC §§ 28-207.2.1, 28-207.2.2)",
+        "supportedPoints": [
+          {
+            "heading": "Stop-work order halts all work unless it says otherwise",
+            "explanation": "Upon issuance of a stop-work order, all work must immediately stop unless the order otherwise specifies. The Commissioner may also order work necessary to remove danger.",
+            "sectionID": "9336",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9336-2"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Contractor belief does not authorize continuation",
+            "explanation": "A person with knowledge or notice may not allow, authorize, promote, continue, or cause continuation of work covered by a stop-work order, except work required by order of the Commissioner. Read with the rule that all work must stop unless otherwise specified, the stated order’s failure to identify permitted work does not allow the contractor to continue interior work based on its own view that the area is unrelated.",
+            "sectionID": "9337",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9337-4",
+              "research-permitext_discovered-id:9336-2"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Issuance authority and mandatory-order resumption",
+            "explanation": "The Commissioner may issue a stop-work order for the enumerated violations, unsafe or dangerous work, notice-of-proposed-revocation, or specified unsafe-lead-work referral circumstances. For a mandatory stop-work order, work must immediately stop and cannot resume until the Department rescinds the order; rescission cannot occur less than two business days after issuance.",
+            "sectionID": "9339",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9339-3",
+              "research-permitext_discovered-id:9335-1"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "The order can be rescinded upon application when the underlying condition is corrected and the stated penalty/fine or security conditions are met, or where it was issued in error or should not have been issued. If this is a mandatory stop-work order, work also may not resume until DOB rescinds it, and rescission cannot occur fewer than two business days after issuance. (AC §§ 28-207.2.3, 28-207.2.4)",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "Permitext limited this answer to the enacted evidence assembled for the current question. The supplied evidence does not identify the particular basis for this stop-work order or establish whether it is a mandatory stop-work order; neither unresolved point changes the conclusion under the stated fact that the order does not specify permitted continuation."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "9336",
+            "sectionNumber": "28-207.2.1",
+            "title": "§ 28-207.2.1 Issuance.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9336-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:9336-2",
+                "selectedText": "28-207.2.1 § 28-207.2.1 Issuance. Upon issuance of a stop work order by the commissioner, all work shall immediately stop unless otherwise specified. Such order may require all persons to forthwith vacate the premises pursuant to the provisions of section 28-207.4 and may also require such work to be done as, in the opinion of the commissioner, may be necessary to remove any danger therefrom. The police department or other law enforcement agency or officer shall, upon the request of the commissioner, assist the department in the enforcement of section 28-207.2 . The stop work order may be given verbally or in writing to the owner, lessee or occupant of the property involved, or to the agent of any of them, or to the person or persons executing the work. A verbal order shall be followed promptly by a written order and shall include the reason for the issuance of the stop work order. All written orders issued pursuant to section 28-207.2 shall be posted upon the premises and made available to the public. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 .",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes that all work must immediately stop upon issuance unless otherwise specified, while preserving Commissioner-directed danger-removal work."
+          },
+          {
+            "sectionID": "9337",
+            "sectionNumber": "28-207.2.2",
+            "title": "§ 28-207.2.2 Unlawful continuance.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9337-4"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:9337-4",
+                "selectedText": "28-207.2.2 § 28-207.2.2 Unlawful continuance. No person shall with knowledge or notice of a stop work order allow, authorize, promote, continue or cause to be continued any work covered by the stop work order, except such work that may be required by order of the commissioner.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Prohibits knowing continuation or authorization of work covered by a stop-work order except Commissioner-required work."
+          },
+          {
+            "sectionID": "9339",
+            "sectionNumber": "28-207.2.4",
+            "title": "§ 28-207.2.4 Mandatory stop work orders.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9339-3"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:9339-3",
+                "selectedText": "28-207.2.4 § 28-207.2.4 Mandatory stop work orders. The commissioner shall issue stop work orders in the circumstances set forth below. Upon issuance of such stop work order, the work shall immediately stop and shall not resume until the stop work order is rescinded by the department. The stop work order shall not be rescinded less than two business days after the date of issuance of such order. Nothing in the following sections shall be construed to limit the commissioner's power to issue stop work orders in other circumstances. Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 .",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "States the no-resumption-until-rescission rule and two-business-day minimum rescission period for mandatory stop-work orders."
+          },
+          {
+            "sectionID": "9335",
+            "sectionNumber": "28-207.2",
+            "title": "§ 28-207.2 Stop work orders.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9335-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:9335-1",
+                "selectedText": "28-207.2 § 28-207.2 Stop work orders. Whenever the commissioner has issued a notice of proposed revocation pursuant to section 28-105.10.1 of this code or finds that any building work is being executed in violation of the provisions of this code, the 1968 building code, the zoning resolution or of any laws or rules enforced by the department, or in a dangerous or unsafe manner, or, if the department of health and mental hygiene makes a referral to the department regarding unsafe lead work practices, the commissioner or his or her authorized representative may issue a stop work order. (Am. L.L. 2019/062, 3/31/2019, eff. 9/27/2019; Am. L.L. 2021/040, 4/18/2021, eff. 4/18/2022)",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "States the circumstances in which the Commissioner may issue a stop-work order."
+          },
+          {
+            "sectionID": "9338",
+            "sectionNumber": "28-207.2.3",
+            "title": "§ 28-207.2.3 Rescission.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_cross_reference-id:9338-10"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_cross_reference-id:9338-10",
+                "selectedText": "28-207.2.3 § 28-207.2.3 Rescission. Upon application, the commissioner shall rescind the stop work order when the condition that gave rise to its issuance has been corrected and either all civil penalties or criminal fines assessed for any violation of such order have been paid or, where a violation is pending, security for the payment of such penalties or fines has been posted in accordance with department rules, or where the stop work order was issued in error or conditions are such that it should not have been issued. The commissioner may by rule require the payment of a fee in the amount of the expense of additional inspection and administrative expense related to such stop work order.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Supports the stated rescission paths and conditions."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "9335",
+          "9336",
+          "9339",
+          "9337",
+          "9051",
+          "10171",
+          "9808",
+          "9481",
+          "8883",
+          "9032",
+          "8796",
+          "9345",
+          "9016",
+          "9305",
+          "9338"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:9335-1",
+          "research-permitext_discovered-id:9336-2",
+          "research-permitext_discovered-id:9339-3",
+          "research-permitext_discovered-id:9337-4",
+          "research-permitext_discovered-id:9051-5",
+          "research-permitext_discovered-id:10171-6",
+          "research-permitext_discovered-id:9808-7",
+          "research-permitext_discovered-id:9481-8",
+          "research-permitext_discovered-id:8883-9",
+          "research-permitext_discovered-id:9032-10",
+          "research-permitext_discovered-id:8796-14",
+          "research-permitext_cross_reference-id:9345-1",
+          "research-permitext_cross_reference-id:9016-4",
+          "research-permitext_cross_reference-id:9305-8",
+          "research-permitext_cross_reference-id:9338-10"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 15,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 5,
+          "governingCitationCount": 4,
+          "supportingCitationCount": 1,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 10,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 11,
+          "crossReferenceCount": 4,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 4,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "AC 28-207.2",
+              "summary": "AC 28-207.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9335-1"
+              ]
+            },
+            {
+              "label": "AC 28-207.2.1",
+              "summary": "AC 28-207.2.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9336-2"
+              ]
+            },
+            {
+              "label": "AC 28-207.2.4",
+              "summary": "AC 28-207.2.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9339-3"
+              ]
+            },
+            {
+              "label": "AC 28-207.2.2",
+              "summary": "AC 28-207.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9337-4"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "AC 28-207.2",
+              "summary": "AC 28-207.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9335-1"
+              ]
+            },
+            {
+              "label": "AC 28-207.2.1",
+              "summary": "AC 28-207.2.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9336-2"
+              ]
+            },
+            {
+              "label": "AC 28-207.2.4",
+              "summary": "AC 28-207.2.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9339-3"
+              ]
+            },
+            {
+              "label": "AC 28-207.2.2",
+              "summary": "AC 28-207.2.2 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9337-4"
+              ]
+            }
+          ],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "AC 28-101.5",
+              "summary": "AC 28-101.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8796-14"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "AC 28-207.4",
+              "summary": "AC 28-207.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:9345-1"
+              ]
+            },
+            {
+              "label": "AC 28-105.10.1",
+              "summary": "AC 28-105.10.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:9016-4"
+              ]
+            },
+            {
+              "label": "AC 28-204.4",
+              "summary": "AC 28-204.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:9305-8"
+              ]
+            },
+            {
+              "label": "AC 28-207.2.3",
+              "summary": "AC 28-207.2.3 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:9338-10"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:9335-1",
+            "research-permitext_discovered-id:9336-2",
+            "research-permitext_discovered-id:9339-3",
+            "research-permitext_discovered-id:9337-4",
+            "research-permitext_discovered-id:9051-5",
+            "research-permitext_discovered-id:10171-6",
+            "research-permitext_discovered-id:9808-7",
+            "research-permitext_discovered-id:9481-8",
+            "research-permitext_discovered-id:8883-9",
+            "research-permitext_discovered-id:9032-10",
+            "research-permitext_discovered-id:8796-14",
+            "research-permitext_cross_reference-id:9345-1",
+            "research-permitext_cross_reference-id:9016-4",
+            "research-permitext_cross_reference-id:9305-8",
+            "research-permitext_cross_reference-id:9338-10"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260908-negative-work-premise-v6",
+          "activeRootTopic": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue. The contractor believes interior work in another area is unrelated to the cited violation. May that work continue?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [
+            {
+              "id": "work_scope",
+              "key": "work_scope",
+              "value": "unknown",
+              "statement": "Qualified user statement; do not infer an unqualified fact: DOB issues a stop-work order that does not identify any portion of the project as permitted to continue.",
+              "kind": "unknown",
+              "sourceText": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue.",
+              "source": "user",
+              "qualificationVersion": "20260908-negative-work-premise-v6"
+            }
+          ],
+          "extractedFactKeys": [
+            "work_scope"
+          ],
+          "nextFactTopics": [
+            {
+              "rootTopic": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue. The contractor believes interior work in another area is unrelated to the cited violation. May that work continue?",
+              "establishedFacts": [],
+              "unknownFacts": [
+                {
+                  "id": "work_scope",
+                  "key": "work_scope",
+                  "value": "unknown",
+                  "statement": "Qualified user statement; do not infer an unqualified fact: DOB issues a stop-work order that does not identify any portion of the project as permitted to continue.",
+                  "kind": "unknown",
+                  "sourceText": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue.",
+                  "source": "user",
+                  "qualificationVersion": "20260908-negative-work-premise-v6"
+                }
+              ]
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 4,
+          "coveredClaimCount": 4,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9335-1",
+            "research-permitext_discovered-id:9336-2",
+            "research-permitext_discovered-id:9339-3",
+            "research-permitext_discovered-id:9337-4"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9336-2",
+            "research-permitext_discovered-id:9337-4",
+            "research-permitext_discovered-id:9339-3",
+            "research-permitext_discovered-id:9335-1"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9336-2",
+            "research-permitext_discovered-id:9337-4",
+            "research-permitext_discovered-id:9339-3",
+            "research-permitext_discovered-id:9335-1",
+            "research-permitext_cross_reference-id:9338-10"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9051-5",
+            "research-permitext_discovered-id:10171-6",
+            "research-permitext_discovered-id:9808-7",
+            "research-permitext_discovered-id:9481-8",
+            "research-permitext_discovered-id:8883-9",
+            "research-permitext_discovered-id:9032-10",
+            "research-permitext_discovered-id:8796-14",
+            "research-permitext_cross_reference-id:9345-1",
+            "research-permitext_cross_reference-id:9016-4",
+            "research-permitext_cross_reference-id:9305-8",
+            "research-permitext_cross_reference-id:9338-10"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:9335-1",
+              "label": "AC 28-207.2 — § 28-207.2 Stop work orders.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9335-1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:9336-2",
+              "label": "AC 28-207.2.1 — § 28-207.2.1 Issuance.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9336-2"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:9339-3",
+              "label": "AC 28-207.2.4 — § 28-207.2.4 Mandatory stop work orders.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9339-3"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:9337-4",
+              "label": "AC 28-207.2.2 — § 28-207.2.2 Unlawful continuance.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9337-4"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 4,
+          "coveredClaimCount": 4,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9336-2",
+            "research-permitext_discovered-id:9337-4",
+            "research-permitext_discovered-id:9339-3",
+            "research-permitext_discovered-id:9335-1",
+            "research-permitext_cross_reference-id:9338-10"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:9335-1",
+              "label": "AC 28-207.2 — § 28-207.2 Stop work orders.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9335-1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:9335-1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9336-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9335-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9337-4",
+                        "research-permitext_discovered-id:9336-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9335-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9339-3",
+                        "research-permitext_discovered-id:9335-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:9336-2",
+              "label": "AC 28-207.2.1 — § 28-207.2.1 Issuance.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9336-2"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:9336-2"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9336-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9337-4",
+                        "research-permitext_discovered-id:9336-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9339-3",
+                        "research-permitext_discovered-id:9335-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9336-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:9339-3",
+              "label": "AC 28-207.2.4 — § 28-207.2.4 Mandatory stop work orders.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9339-3"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:9339-3"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9336-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9339-3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9337-4",
+                        "research-permitext_discovered-id:9336-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9339-3"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9339-3",
+                        "research-permitext_discovered-id:9335-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:9337-4",
+              "label": "AC 28-207.2.2 — § 28-207.2.2 Unlawful continuance.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9337-4"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:9337-4"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9336-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9337-4"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9337-4",
+                        "research-permitext_discovered-id:9336-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9339-3",
+                        "research-permitext_discovered-id:9335-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9337-4"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-fixture-permission-scope-v28",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [
+            "research-permitext_cross_reference-id:9338-10"
+          ],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:9336-2",
+            "research-permitext_discovered-id:9337-4",
+            "research-permitext_discovered-id:9339-3",
+            "research-permitext_discovered-id:9335-1",
+            "research-permitext_cross_reference-id:9338-10"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:9051-5",
+            "research-permitext_discovered-id:10171-6",
+            "research-permitext_discovered-id:9808-7",
+            "research-permitext_discovered-id:9481-8",
+            "research-permitext_discovered-id:8883-9",
+            "research-permitext_discovered-id:9032-10",
+            "research-permitext_discovered-id:8796-14",
+            "research-permitext_cross_reference-id:9345-1",
+            "research-permitext_cross_reference-id:9016-4",
+            "research-permitext_cross_reference-id:9305-8"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 5,
+            "citedProvisionCount": 5,
+            "governingCitationCount": 4,
+            "supportingCitationCount": 1,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 10,
+            "reviewedOnlyProvisionCount": 10,
+            "assembledSourceCount": 15,
+            "assembledProvisionCount": 15
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:9335-1",
+              "sectionID": "9335",
+              "reference": "AC 28-207.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-207.2 § 28-207.2 Stop work orders. Whenever the commissioner has issued a notice of proposed revocation pursuant to section 28-105.10.1 of this code or finds that any building work is being executed in violation of the provisions of this code, the 1968 building code, the zoning resolution or of any laws or rules enforced by the department, or in a dangerous or unsafe manner, or, if the department of health and mental hygiene makes a referral to the department regarding unsafe lead work practices, the commissioner or his or her authorized representative may issue a stop work order. (Am. L.L. 2019/062, 3/31/2019, eff. 9/27/2019; Am. L.L. 2021/040, 4/18/2021, eff. 4/18/2022)"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9336-2",
+              "sectionID": "9336",
+              "reference": "AC 28-207.2.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-207.2.1 § 28-207.2.1 Issuance. Upon issuance of a stop work order by the commissioner, all work shall immediately stop unless otherwise specified. Such order may require all persons to forthwith vacate the premises pursuant to the provisions of section 28-207.4 and may also require such work to be done as, in the opinion of the commissioner, may be necessary to remove any danger therefrom. The police department or other law enforcement agency or officer shall, upon the request of the commissioner, assist the department in the enforcement of section 28-207.2 . The stop work order may be given verbally or in writing to the owner, lessee or occupant of the property involved, or to the agent of any of them, or to the person or persons executing the work. A verbal order shall be followed promptly by a written order and shall include the reason for the issuance of the stop work order. All written orders issued pursuant to section 28-207.2 shall be posted upon the premises and made available to the public. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9339-3",
+              "sectionID": "9339",
+              "reference": "AC 28-207.2.4",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-207.2.4 § 28-207.2.4 Mandatory stop work orders. The commissioner shall issue stop work orders in the circumstances set forth below. Upon issuance of such stop work order, the work shall immediately stop and shall not resume until the stop work order is rescinded by the department. The stop work order shall not be rescinded less than two business days after the date of issuance of such order. Nothing in the following sections shall be construed to limit the commissioner's power to issue stop work orders in other circumstances. Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9337-4",
+              "sectionID": "9337",
+              "reference": "AC 28-207.2.2",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-207.2.2 § 28-207.2.2 Unlawful continuance. No person shall with knowledge or notice of a stop work order allow, authorize, promote, continue or cause to be continued any work covered by the stop work order, except such work that may be required by order of the commissioner."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9051-5",
+              "sectionID": "9051",
+              "reference": "AC 28-107.8",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-107.8 § 28-107.8 Request for stop-work or rescission. The commissioner shall be empowered to issue a stop-work notice or order with respect to an alteration or demolition permit and/or to rescind approval of construction documents at the request of the commissioner of housing preservation and development pursuant to section 27-2093 of the New York city housing maintenance code."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10171-6",
+              "sectionID": "10171",
+              "reference": "AC 28-505.8",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-505.8 § 28-505.8 Request for stop-work or rescission. The commissioner shall be empowered to issue a stop-work notice or order with respect to an alteration or demolition permit or to rescind approval of construction documents at the request of the commissioner of housing preservation and development pursuant to section 27-2093.1 of the housing maintenance code. (L.L. 2018/001, 12/31/2017, eff. 9/27/2018; Am. L.L. 2021/119, 10/25/2021, eff. 9/27/2021) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2018/001 , L.L. 2021/119 , and L.L. 2025/144 . Article 506: Emission Profile of Buildings"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9808-7",
+              "sectionID": "9808",
+              "reference": "AC 28-326.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-326.1 § 28-326.1 Proactive inspection program. The commissioner shall establish a proactive inspection program to identify buildings where unlicensed or unpermitted work may be occurring, or where maintenance issues, facade or structural issues, or other issues of concern could affect the integrity of a building or neighboring site. The department shall use predictive analytics to weigh the factors identified in items 1 through 8 of this section that may indicate potential safety or other issues. The department shall evaluate such factors and conduct inspections at buildings where such evaluation indicates there is a potential for a hazardous condition or other safety concern. Such program shall consider the following factors: 1. building information and characteristics, including but not limited to building age, occupancy type, ownership type, and construction material; 2. permit history; 3. violation history; 4. applicable compliance filings; 5. disciplinary history of registered design professionals, contractors, or licensees; 6. relevant 311 complaints; 7. neighboring site characteristics and construction activity; and 8. any other factors determined by the commissioner. (L.L. 2024/079, 7/20/2024, eff. 1/16/2025)"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9481-8",
+              "sectionID": "9481",
+              "reference": "AC 28-219.2.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-219.2.1 § 28-219.2.1 Continued noncompliance. If, upon reinspection, the commissioner determines the condition continues to pose a threat of imminent danger to public safety or property, and the person against whom the initial violation was directed is not in compliance with section 28-204.4 , the commissioner shall issue an appropriate violation and shall issue a stop-work order, pursuant to section 28-207.2 , where appropriate, or the commissioner shall, if the commissioner is unable to obtain access to the premises, request the corporation counsel to institute legal proceedings to compel correction of the violation and abate the condition or take such other action as is appropriate. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/051 and L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8883-9",
+              "sectionID": "8883",
+              "reference": "AC 28-103.30.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-103.30.4 § 28-103.30.4 Violations. The real time enforcement unit shall issue notices of violation or stop work orders as necessary. (L.L. 2017/188, 10/16/2017, eff. 2/13/2018; Am. L.L. 2017/233, 12/1/2017, eff. 12/1/2018)"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9032-10",
+              "sectionID": "9032",
+              "reference": "AC 28-105.12.11",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.12.11 § 28-105.12.11 Inspections. Upon issuance of a permit and at any time during such permit period, the commissioner or his or her authorized representatives, in the discharge of their duties, shall have the right to enter, in accordance with applicable law, upon any buildings, enclosures, premises, or any part thereof, or attached thereto for the purposes of an inspection of work pursuant to such permit to ensure that such work is not occurring in an unsafe or dangerous manner, and that such work is being performed in compliance with applicable code provisions. If the commissioner or his or her authorized representative is unable to gain access to such property expeditiously for the purposes of an inspection of work pursuant to such permit and there is a reason to believe that the work is being done in violation of the law, the commissioner shall issue a stop work order. Such stop work order may be rescinded in accordance with section 28-207.2.3 . (L.L. 2019/111, 6/8/2019, eff. 10/6/2019)"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8796-14",
+              "sectionID": "8796",
+              "reference": "AC 28-101.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "CITY. The city of New York. CONSTRUCTION DOCUMENTS. Plans and specifications and other written, graphic and pictorial documents, prepared or assembled for describing the design, location, physical characteristics, and other elements of the project necessary for obtaining a building permit. DEMOLITION. Full or partial demolition. DEPARTMENT. The department of buildings of the city of New York. PREMISES. Land, improvements thereon, or any part thereof. REGISTERED DESIGN PROFESSIONAL. An architect or engineer. REQUIRED. Shall mean required by the provisions of this code. ZONING RESOLUTION. The zoning resolution of the city of New York, adopted December fifteenth, nineteen hundred sixty-one, including all amendments thereto. (Am. L.L. 2021/006, 1/10/2021, eff. 5/10/2021; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022; Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023; Am. L.L. 2023/126, 9/3/2023, eff. 3/1/2024; Am. L.L. 2024/128, 12/21/2024, eff. 12/21/2025) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 , L.L. 2021/126 , L.L. 2023/077 , and L.L. 2024/128 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9345-1",
+              "sectionID": "9345",
+              "reference": "AC 28-207.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-207.4 § 28-207.4 Vacate order. Where there is a condition that is or may be imminently perilous, dangerous or detrimental to life, public safety or property, or where an order to remedy such condition has not been immediately complied with, or the commissioner determines that an emergency exists requiring such action, the commissioner may order and immediately cause any building, structure, place or premises to be vacated. The vacate order may be given verbally or in writing to the owner, lessee or occupant of the property involved, or to the agent of any of them, or to the person or persons executing the work. Any verbal order to vacate shall be followed promptly by a written order and shall include the reason for the issuance of the vacate order. The written vacate order shall include the date by which the owner shall certify the correction of any and all violations giving rise to such vacate order. (Am. L.L. 2017/150, 8/30/2017, eff. 12/28/2017; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9016-4",
+              "sectionID": "9016",
+              "reference": "AC 28-105.10.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.10.1 § 28-105.10.1 Notice of proposed revocation. The commissioner may, on written notice to the permit holder, revoke any permit for failure to comply with the provisions of this code or other applicable laws or rules; or whenever there has been any false statement or any misrepresentation as to a material fact in the application or submittal documents upon the basis of which such approval was issued; or whenever a permit has been issued in error and conditions are such that the permit should not have been issued. Such notice may be accompanied by a stop work order pursuant to section 28-207.2 and shall inform the permit holder of the reasons for the proposed revocation and that the applicant has the right to present to the commissioner or his or her representative within 10 business days of delivery of the notice by hand or electronic delivery or 15 business days of the posting of notice by mail, information as to why the permit should not be revoked. (Am. L.L. 2019/062, 3/31/2019, eff. 9/27/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9305-8",
+              "sectionID": "9305",
+              "reference": "AC 28-204.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-204.4 § 28-204.4 Failure to certify the correction of a violation. Failure to comply with an order of the commissioner issued pursuant to section 28-204.2 or pursuant to any provision of law or rule enforced by the department in effect at the time the order was issued to correct and to certify correction of a violation within the applicable time period shall be a violation of this code for which penalties may be imposed in addition to the penalties that may be or have been imposed for the violation referred to in such order. Upon application, for good cause, the commissioner may extend the time for filing the certification of correction of a violation, but not for more than 30 days for each extension."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9338-10",
+              "sectionID": "9338",
+              "reference": "AC 28-207.2.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-207.2.3 § 28-207.2.3 Rescission. Upon application, the commissioner shall rescind the stop work order when the condition that gave rise to its issuance has been corrected and either all civil penalties or criminal fines assessed for any violation of such order have been paid or, where a violation is pending, security for the payment of such penalties or fines has been posted in accordance with department rules, or where the stop work order was issued in error or conditions are such that it should not have been issued. The commissioner may by rule require the payment of a fee in the amount of the expense of additional inspection and administrative expense related to such stop work order."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260908-zoning-unresolved-predicate-v18",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-focused-ventilation-v30",
+          "retrievalQuery": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue. The contractor believes interior work in another area is unrelated to the cited violation. May that work continue?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue. The contractor believes interior work in another area is unrelated to the cited violation. May that work continue?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue. The contractor believes interior work in another area is unrelated to the cited violation. May that work continue?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue. The contractor believes interior work in another area is unrelated to the cited violation. May that work continue?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260908-negative-work-premise-v6",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 11844,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 4,
+            "topicDependencyCount": 0,
+            "characterCount": 11844,
+            "resolverFailureCount": 2,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 2,
+              "text": "2 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-09T00:47:59.580Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 2,
+          "regenerated": true,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": false,
+              "issues": [
+                {
+                  "type": "incorrect_citation",
+                  "detail": "The supported point titled “An unrelated-work belief is not an exception” cites only AC 28-207.2.2 (sourceID research-permitext_discovered-id:9337-4), but its explanation relies on the separate AC 28-207.2.1 rule that all work must stop unless otherwise specified to establish that the interior work is covered by the order. Under the binding rule, support from AC 28-207.2.1 cannot be imported from another supported point or citation. Add sourceID research-permitext_discovered-id:9336-2 to that supported point, or narrow the point to what AC 28-207.2.2 alone establishes."
+                }
+              ],
+              "model": "gpt-5.6-luna"
+            },
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-09T00:47:59.580Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 2,
+          "verificationIssueTypes": [
+            "incorrect_citation"
+          ]
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "GAP-06",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-terra",
+      "requestBytes": 56505,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "d50d39b996456d62f5cc4441c7539114a336e45ccdf0673261365290ca2857f4",
+      "startedAt": "2026-09-09T00:47:48.648Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 12370,
+        "input_tokens_details": {
+          "cache_write_tokens": 8519,
+          "cached_tokens": 3848
+        },
+        "output_tokens": 494,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12864
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_060de08f1ea370e3016aa0acb60a0c87d284301549a5eacc41",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** On the facts given, the permit expired by limitation and became invalid once the permitted work had not commenced within 12 months of issuance; keeping the printed permit does not preserve it. Fourteen months with no work begun is two months beyond that commencement deadline. (AC § 28-105.9)\\n\\nThis conclusion assumes the stated absence of a renewal or special preservation provision. The supplied rule separately provides a flood-hazard-area exception governed by Appendix G § G104; that exception’s timeframe is not included in the evidence, so it could matter if the work is in a flood hazard area. (AC § 28-105.9)\",\"supportedPoints\":[{\"heading\":\"Uncommenced permits expire after 12 months\",\"explanation\":\"All permits issued by the commissioner expire by limitation and become invalid when the permitted work is not commenced within 12 months after issuance. With no work commenced for 14 months, the stated permit is beyond that deadline.\",\"sectionID\":\"9013\",\"sourceIDs\":[\"research-permitext_discovered-id:9013-2\"]},{\"heading\":\"Flood-hazard-area exception\",\"explanation\":\"Permits for work in a flood hazard area expire under the timeframes established by Appendix G, Section G104, rather than the stated general expiration rule. The supplied evidence does not include that section’s timeframes.\",\"sectionID\":\"9013\",\"sourceIDs\":[\"research-permitext_discovered-id:9013-2\"]}],\"assumptions\":[],\"missingFacts\":[\"Whether the permitted work is in a flood hazard area, which would invoke the Appendix G § G104 exception; the supplied evidence does not provide that section’s timeframe.\"],\"followUpQuestions\":[],\"evidenceLimitations\":[\"Permitext limited this answer to the enacted evidence assembled for the current question. The supplied evidence identifies, but does not include, the Appendix G § G104 flood-hazard-area timeframe.\"],\"additionalEvidenceNeeded\":[\"If the work is in a flood hazard area, the applicable Appendix G § G104 text and the project’s flood-hazard-area status.\"],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"9013\",\"sourceIDs\":[\"research-permitext_discovered-id:9013-2\"],\"relevance\":\"Establishes the 12-month commencement expiration rule and the flood-hazard-area exception.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 6287
+    },
+    {
+      "caseID": "GAP-06",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 50102,
+      "maxOutputTokens": 4000,
+      "requestSHA256": "3bd47856b33ee303c742e5dd08ecd226bd6c0773f3a3112e06fdb024301f4c38",
+      "startedAt": "2026-09-09T00:47:54.957Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10627,
+        "input_tokens_details": {
+          "cache_write_tokens": 7613,
+          "cached_tokens": 3011
+        },
+        "output_tokens": 241,
+        "output_tokens_details": {
+          "reasoning_tokens": 212
+        },
+        "total_tokens": 10868
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_07400dee19c3ad33016aa0acbe0e9087d28ad380a29c636190",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 3572
+    },
+    {
+      "caseID": "GAP-15",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-terra",
+      "requestBytes": 53832,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "4d6b016776d38106f51af641240ee46c759280cdb812f9e4cba9e76511da1b45",
+      "startedAt": "2026-09-09T00:48:01.458Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11969,
+        "input_tokens_details": {
+          "cache_write_tokens": 11966,
+          "cached_tokens": 0
+        },
+        "output_tokens": 857,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 12826
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_01d92d684944b7a5016aa0acc298b487d29c71c118ea8c7261",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** On the stated facts, the unrelated interior work may not continue unless the stop-work order itself otherwise specifies that work may proceed, or the Commissioner orders work necessary to remove danger. Upon issuance, “all work shall immediately stop unless otherwise specified.” A person with knowledge or notice may not continue—or allow, authorize, promote, or cause continuation of—work covered by the order, except work required by the Commissioner. The contractor’s view that a separate area is unrelated does not create an exception. (AC §§ 28-207.2.1, 28-207.2.2)\\n\\nThe order can be rescinded upon application when the underlying condition is corrected and the stated penalty/fine or security conditions are met, or where it was issued in error or should not have been issued. Mandatory stop-work orders additionally may not resume until DOB rescinds them, and cannot be rescinded fewer than two business days after issuance. (AC §§ 28-207.2.3, 28-207.2.4)\",\"supportedPoints\":[{\"heading\":\"Stop-work order halts all work unless it says otherwise\",\"explanation\":\"Upon issuance of a stop-work order, all work must immediately stop unless the order otherwise specifies. The Commissioner may also order work necessary to remove danger.\",\"sectionID\":\"9336\",\"sourceIDs\":[\"research-permitext_discovered-id:9336-2\"]},{\"heading\":\"An unrelated-work belief is not an exception\",\"explanation\":\"A person with knowledge or notice of a stop-work order may not allow, authorize, promote, continue, or cause continuation of work covered by the order, except work required by order of the Commissioner. Because the stated order does not identify any work permitted to continue, the contractor's assessment that another area is unrelated does not authorize continued work under the supplied provisions.\",\"sectionID\":\"9337\",\"sourceIDs\":[\"research-permitext_discovered-id:9337-4\"]},{\"heading\":\"Authority and mandatory-order resumption rule\",\"explanation\":\"The Commissioner may issue a stop-work order for the enumerated violations, unsafe or dangerous work, notice-of-proposed-revocation, or specified unsafe-lead-work referral circumstances. For a mandatory stop-work order, work must immediately stop and cannot resume until the Department rescinds the order; rescission cannot occur less than two business days after issuance.\",\"sectionID\":\"9339\",\"sourceIDs\":[\"research-permitext_discovered-id:9339-3\",\"research-permitext_discovered-id:9335-1\"]}],\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"Permitext limited this answer to the enacted evidence assembled for the current question. The supplied evidence does not identify the particular basis for this stop-work order or establish whether it is a mandatory stop-work order; neither unresolved point changes the conclusion under the stated fact that the order does not specify permitted continuation.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"9336\",\"sourceIDs\":[\"research-permitext_discovered-id:9336-2\"],\"relevance\":\"Establishes that all work must immediately stop upon issuance unless otherwise specified, and preserves the Commissioner-directed danger-removal-work exception.\"},{\"sectionID\":\"9337\",\"sourceIDs\":[\"research-permitext_discovered-id:9337-4\"],\"relevance\":\"Prohibits knowing continuation or authorization of work covered by a stop-work order except Commissioner-required work.\"},{\"sectionID\":\"9339\",\"sourceIDs\":[\"research-permitext_discovered-id:9339-3\"],\"relevance\":\"States the stop-and-no-resumption-until-rescission rule and the two-business-day minimum for mandatory stop-work orders.\"},{\"sectionID\":\"9335\",\"sourceIDs\":[\"research-permitext_discovered-id:9335-1\"],\"relevance\":\"States the circumstances in which the Commissioner may issue a stop-work order.\"},{\"sectionID\":\"9338\",\"sourceIDs\":[\"research-permitext_cross_reference-id:9338-10\"],\"relevance\":\"Supports the stated rescission paths and conditions.\"}] }"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 9403
+    },
+    {
+      "caseID": "GAP-15",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 52284,
+      "maxOutputTokens": 4000,
+      "requestSHA256": "4a3b5f8e0a354541447437f678aa3129ffdae9fb82b87e084520d80405fb971e",
+      "startedAt": "2026-09-09T00:48:10.885Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11297,
+        "input_tokens_details": {
+          "cache_write_tokens": 8283,
+          "cached_tokens": 3011
+        },
+        "output_tokens": 685,
+        "output_tokens_details": {
+          "reasoning_tokens": 504
+        },
+        "total_tokens": 11982
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_09b60d30aa3f76f0016aa0acd0ff9887d298b4c994b64a1a63",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":false,\"issues\":[{\"type\":\"incorrect_citation\",\"detail\":\"The supported point titled “An unrelated-work belief is not an exception” cites only AC 28-207.2.2 (sourceID research-permitext_discovered-id:9337-4), but its explanation relies on the separate AC 28-207.2.1 rule that all work must stop unless otherwise specified to establish that the interior work is covered by the order. Under the binding rule, support from AC 28-207.2.1 cannot be imported from another supported point or citation. Add sourceID research-permitext_discovered-id:9336-2 to that supported point, or narrow the point to what AC 28-207.2.2 alone establishes.\"}],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 7643
+    },
+    {
+      "caseID": "GAP-15",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-terra",
+      "requestBytes": 67074,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "2e9d52da221e8c3fd4017d2f282126f4a3a9a44629ffc74990e86af07958d1c1",
+      "startedAt": "2026-09-09T00:48:18.539Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 14917,
+        "input_tokens_details": {
+          "cache_write_tokens": 11002,
+          "cached_tokens": 3912
+        },
+        "output_tokens": 884,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 15801
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_00d44f0b74beb4cd016aa0acd382f487d28c6b297fb5c4c7a4",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** On the stated facts, interior work in the other area may not continue unless the stop-work order itself otherwise specifies that work may proceed, or the Commissioner orders work necessary to remove danger. Upon issuance, “all work shall immediately stop unless otherwise specified.” A person with knowledge or notice may not continue—or allow, authorize, promote, or cause continuation of—work covered by the order, except work required by the Commissioner. The contractor’s view that a separate area is unrelated does not create an exception. (AC §§ 28-207.2.1, 28-207.2.2)\\n\\nThe order can be rescinded upon application when the underlying condition is corrected and the stated penalty/fine or security conditions are met, or where it was issued in error or should not have been issued. If this is a mandatory stop-work order, work also may not resume until DOB rescinds it, and rescission cannot occur fewer than two business days after issuance. (AC §§ 28-207.2.3, 28-207.2.4)\",\"supportedPoints\":[{\"heading\":\"Stop-work order halts all work unless it says otherwise\",\"explanation\":\"Upon issuance of a stop-work order, all work must immediately stop unless the order otherwise specifies. The Commissioner may also order work necessary to remove danger.\",\"sectionID\":\"9336\",\"sourceIDs\":[\"research-permitext_discovered-id:9336-2\"]},{\"heading\":\"Contractor belief does not authorize continuation\",\"explanation\":\"A person with knowledge or notice may not allow, authorize, promote, continue, or cause continuation of work covered by a stop-work order, except work required by order of the Commissioner. Read with the rule that all work must stop unless otherwise specified, the stated order’s failure to identify permitted work does not allow the contractor to continue interior work based on its own view that the area is unrelated.\",\"sectionID\":\"9337\",\"sourceIDs\":[\"research-permitext_discovered-id:9337-4\",\"research-permitext_discovered-id:9336-2\"]},{\"heading\":\"Issuance authority and mandatory-order resumption\",\"explanation\":\"The Commissioner may issue a stop-work order for the enumerated violations, unsafe or dangerous work, notice-of-proposed-revocation, or specified unsafe-lead-work referral circumstances. For a mandatory stop-work order, work must immediately stop and cannot resume until the Department rescinds the order; rescission cannot occur less than two business days after issuance.\",\"sectionID\":\"9339\",\"sourceIDs\":[\"research-permitext_discovered-id:9339-3\",\"research-permitext_discovered-id:9335-1\"]}],\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"Permitext limited this answer to the enacted evidence assembled for the current question. The supplied evidence does not identify the particular basis for this stop-work order or establish whether it is a mandatory stop-work order; neither unresolved point changes the conclusion under the stated fact that the order does not specify permitted continuation.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"9336\",\"sourceIDs\":[\"research-permitext_discovered-id:9336-2\"],\"relevance\":\"Establishes that all work must immediately stop upon issuance unless otherwise specified, while preserving Commissioner-directed danger-removal work.\"},{\"sectionID\":\"9337\",\"sourceIDs\":[\"research-permitext_discovered-id:9337-4\"],\"relevance\":\"Prohibits knowing continuation or authorization of work covered by a stop-work order except Commissioner-required work.\"},{\"sectionID\":\"9339\",\"sourceIDs\":[\"research-permitext_discovered-id:9339-3\"],\"relevance\":\"States the no-resumption-until-rescission rule and two-business-day minimum rescission period for mandatory stop-work orders.\"},{\"sectionID\":\"9335\",\"sourceIDs\":[\"research-permitext_discovered-id:9335-1\"],\"relevance\":\"States the circumstances in which the Commissioner may issue a stop-work order.\"},{\"sectionID\":\"9338\",\"sourceIDs\":[\"research-permitext_cross_reference-id:9338-10\"],\"relevance\":\"Supports the stated rescission paths and conditions.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 6923
+    },
+    {
+      "caseID": "GAP-15",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 52496,
+      "maxOutputTokens": 4000,
+      "requestSHA256": "717c640da2f187c8fe6618242c7d94d3b33c48498437d38572c48f28c2054853",
+      "startedAt": "2026-09-09T00:48:25.546Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11366,
+        "input_tokens_details": {
+          "cache_write_tokens": 8352,
+          "cached_tokens": 3011
+        },
+        "output_tokens": 322,
+        "output_tokens_details": {
+          "reasoning_tokens": 293
+        },
+        "total_tokens": 11688
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_03bb29fea6a11813016aa0acdd56e487d2b23b5231d709eedd",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 3988
+    }
+  ],
+  "cumulativeConservativeSpendUSD": 2.687125,
+  "spend": {
+    "active": true,
+    "capUSD": 1,
+    "reservedUSD": 0.114849,
+    "actualUSD": 0.114849,
+    "requestCount": 6,
+    "pendingRequestCount": 0
+  },
+  "completedAt": "2026-09-09T00:48:30.084Z"
+}
