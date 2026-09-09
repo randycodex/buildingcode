@@ -4,7 +4,7 @@ import { researchQualifiedFactInstruction } from "./research-conversation-facts.
 
 export const researchOfficialGuidanceSummaryVersion = "20260908-document-summary-v1";
 // Prompt revisions do not invalidate integrity records for saved summaries.
-export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v3";
+export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v4";
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 const stringList = { type: "array", maxItems: 6, items: { type: "string" } };
 const bindingKey = (sourceID, claimID) => `${sourceID}\u0000${claimID}`;
@@ -66,11 +66,13 @@ export function researchOfficialGuidanceSummaryRequest({ question, webSupport, c
       "This is official supporting guidance, not an enacted-code determination. Explain the workflow or guidance accurately without claiming that it establishes legal compliance or permit approval.",
       "Respect stated dates, new-versus-existing filing scope, cumulative conditions, exceptions, waivers, authority names, and what each approval actually authorizes. Never infer a missing table-cell relationship from flattened PDF text.",
       "Preserve the measured quantity, its units and operative action; do not replace a specified measurement with a broader term. A heading limits the statements beneath it: do not generalize a scoped exception to every project. Publication dates alone do not establish supersession; identify an unresolved source conflict instead of silently discarding a material condition.",
+      "Call passages conflicting only when they give incompatible directions for the same material conditions. Different scopes or an unknown relationship are an applicability gap, not by themselves a conflict. Name the specific field or question being answered; do not apply one response to another question on the same page. Preserve who must make or attest to the statement and the event at which an item is required.",
       "Use supplied user facts as premises. Ask for a missing fact only if it changes the answer. Earlier assistant text is context, never source authority. If the passages cannot resolve the question, say exactly what remains unresolved and give the responsive guidance they do establish.",
       ...(input.conversationFacts.qualified?.length ? [researchQualifiedFactInstruction] : []),
       verification
         ? "Independently verify every substantive sentence and its cited source/claim pair against the complete passages. A valid ID alone does not establish support. Reject an unsupported detail, changed condition, omitted material exception, wrong date or source, ungrounded Yes/No, or a claim of enacted authority. Also reject an answer that omits a requested step supplied by the document. Do not require unrelated fees, legacy filing rules, document boilerplate or other unasked topics. Return the verification schema; use existing issue types such as unsupported_requirement, missed_material_conclusion, misstated_provision or wrong_attribution."
         : "Answer the actual question directly in the opening sentence. Follow with the needed rule or workflow step, its application, and only material conditions. Use concise paragraphs or compact lists as useful. Summarize; do not paste the page or repeat its headings, footer, contact information or unrelated sections. Do not pad a narrow question with a general project checklist.",
+      "Include a different filing, work-type or inspection branch only if the user asks about it or it is a material exception to your conclusion. Do not reopen a fact already supplied. Do not invent what a program does or does not authorize to restate the authority boundary; the server supplies that label.",
       verification
         ? "Check that every cited paragraph is supported by its own selected passages. The server appends the noncontrolling authority label and source links; those are not additional legal claims."
         : "Give each paragraph at least one exact sourceID/claimID pair for its claims. Preserve any material qualification from those passages. Write text without URLs, Markdown links or internal evidence IDs; the server adds the source links and authority label. Place source-specific facts in paragraphs; missingFacts and evidenceLimitations are only genuine gaps, never new rules."

@@ -24,6 +24,19 @@ assert.equal(researchWebSupportTrigger({ question: "What does PC 403.1 require?"
 const originalCases = JSON.parse(await readFile(new URL("../evals/research-reconciled-answer-key.json", import.meta.url)));
 const paaCase = originalCases.cases.find((item) => item.id === "DOBNOW-004");
 const paaQuestion = [`Context: ${paaCase.questionContext}`, paaCase.scenario, paaCase.question].join("\n\n");
+for (const [question, topic] of [
+  [paaQuestion, "post_approval_amendments"],
+  ["Explain post approval amendments in DOB NOW.", "post_approval_amendments"],
+  ["Explain subsequent filings in DOB NOW.", "subsequent_filings"],
+  ["How should the DOB NOW stormwater question be answered?", "stormwater_documents"]
+]) {
+  const route = researchDOBWorkflowRoute(question);
+  assert.equal(route.topic, topic);
+  assert.equal(route.directDocumentRetrieval, true);
+  assert.equal(researchDOBWorkflowRoute(`${question} Use https://www.nyc.gov/specific-other-source.page.`).directDocumentRetrieval, false);
+  assert.equal(researchDOBWorkflowRoute(`${question} Does my project comply with BC 1007.1.1?`).guidanceOnly, false);
+  assert.equal(researchWebSupportTrigger({ question: `Do not use the internet. ${question}` }, {}).useWeb, false);
+}
 for (const question of [paaQuestion,
   "The DOB NOW filing includes legalization. Which filing action changes the drawings?",
   "The DOB NOW filing does not include legalization. How do I submit a PAA?"

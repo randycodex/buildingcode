@@ -58,13 +58,51 @@ function nodeText(node) {
   return (node.childNodes || []).map(nodeText).join(" ");
 }
 
-function semanticNodesInDocumentOrder(node, output = []) {
+function attribute(node, name) {
+  return node?.attrs?.find((item) => item.name === name)?.value;
+}
+
+function linkedFAQPairs(document) {
+  const nodes = [];
+  const collect = (node) => {
+    nodes.push(node);
+    for (const child of node.childNodes || []) collect(child);
+  };
+  collect(document);
+  const byID = new Map(), references = new Map();
+  for (const node of nodes) {
+    const id = attribute(node, "id"), target = attribute(node, "data-answer");
+    if (id) byID.set(id, [...(byID.get(id) || []), node]);
+    if (target) references.set(target, [...(references.get(target) || []), node]);
+  }
+  const pairs = new Map(), answers = new Set();
+  for (const [id, questions] of references) {
+    if (questions.length !== 1 || byID.get(id)?.length !== 1) continue;
+    const question = questions[0], answer = byID.get(id)[0];
+    const siblings = question.parentNode?.childNodes || [];
+    const nextElement = siblings.slice(siblings.indexOf(question) + 1).find((node) => node.tagName);
+    // Group only an explicit, unique link to the next answer container. An
+    // orphan, duplicate ID or intervening heading must not acquire a new scope.
+    if (nextElement !== answer || !/(?:^|\s)faq-questions(?:\s|$)/.test(attribute(question, "class") || "") ||
+        !/(?:^|\s)faq-answers(?:\s|$)/.test(attribute(answer, "class") || "")) continue;
+    pairs.set(question, answer);
+    answers.add(answer);
+  }
+  return { pairs, answers };
+}
+
+function semanticNodesInDocumentOrder(node, faq, output = []) {
   if (!node || ignoredNodeNames.has(node.nodeName)) return output;
+  if (faq.answers.has(node)) return output;
+  if (faq.pairs.has(node)) {
+    output.push({ nodeName: "#faq_pair", question: node, answer: faq.pairs.get(node) });
+    return output;
+  }
   if (semanticNodeNames.has(node.nodeName)) {
     output.push(node);
     return output;
   }
-  for (const child of node.childNodes || []) semanticNodesInDocumentOrder(child, output);
+  for (const child of node.childNodes || []) semanticNodesInDocumentOrder(child, faq, output);
   return output;
 }
 
@@ -78,7 +116,7 @@ function claimText({ heading, intro, text }) {
 
 export function researchOfficialHTMLPassages(html, sourceURL) {
   const document = parse(String(html || ""));
-  const semanticNodes = semanticNodesInDocumentOrder(document);
+  const semanticNodes = semanticNodesInDocumentOrder(document, linkedFAQPairs(document));
   const headingPath = [];
   const passages = [];
   let precedingParagraph = "";
@@ -102,6 +140,11 @@ export function researchOfficialHTMLPassages(html, sourceURL) {
   };
 
   for (const node of semanticNodes) {
+    if (node.nodeName === "#faq_pair") {
+      appendPassage({ kind: "faq_pair", intro: nodeText(node.question), text: nodeText(node.answer) });
+      precedingParagraph = "";
+      continue;
+    }
     if (/^h[1-6]$/.test(node.nodeName)) {
       const level = Number(node.nodeName.slice(1));
       headingPath.splice(level - 1);
@@ -115,13 +158,8 @@ export function researchOfficialHTMLPassages(html, sourceURL) {
       continue;
     }
     if (node.nodeName === "ul" || node.nodeName === "ol") {
-      for (const item of directChildren(node, "li")) {
-        appendPassage({
-          kind: "list_item",
-          intro: precedingParagraph,
-          text: nodeText(item)
-        });
-      }
+      appendPassage({ kind: "list", intro: precedingParagraph,
+        text: directChildren(node, "li").map((item, index) => `${node.nodeName === "ol" ? `${index + 1}.` : "•"} ${nodeText(item)}`).join("\n") });
       precedingParagraph = "";
       continue;
     }
@@ -186,7 +224,7 @@ export function selectResearchOfficialHTMLPassages(passages, query, options = {}
         total + (normalizedText(searchableText).toLowerCase().includes(token) ? 1 : 0), 0);
       return {
         passage,
-        score: sharedTokens.length ? sharedTokens.length * 10 + phraseBoost + (passage?.kind === "list_item" ? 2 : 0) : 0
+        score: sharedTokens.length ? sharedTokens.length * 10 + phraseBoost + (["list", "list_item"].includes(passage?.kind) ? 2 : 0) : 0
       };
     })
     .filter(({ passage, score }) => score > 0 && (!requiredTerms.size ||
@@ -196,6 +234,27 @@ export function selectResearchOfficialHTMLPassages(passages, query, options = {}
     .slice(0, maximum)
     .sort((left, right) => left.passage.index - right.passage.index)
     .map(({ passage }) => passage);
+}
+
+// A curated heading is a source location, never an answer. Preserve its whole
+// section (including subheadings) so ranking cannot separate adjacent limits.
+// Missing or oversized sections fail source validation instead of being cut.
+export function researchOfficialHTMLSectionPassages(passages, sectionHeadings, sourceURL) {
+  const sections = [];
+  for (const section of [...new Set(sectionHeadings)].slice(0, 3)) {
+    const selected = passages.filter((passage) => passage.heading.split(" > ").includes(section));
+    if (!selected.length) throw Object.assign(new Error("A requested official HTML section is unavailable."),
+      { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_UNAVAILABLE" });
+    const contentHash = selected[0].contentHash;
+    if (selected.some((passage) => passage.contentHash !== contentHash)) throw new Error("Mixed official section content hashes.");
+    const text = selected.map((passage) => passage.claim).join("\n\n");
+    if (text.length > 16_000) throw Object.assign(new Error("The complete official HTML section exceeds its retrieval bound."),
+      { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_TOO_LARGE" });
+    sections.push({ index: selected[0].index, kind: "html_section", heading: section, intro: "", text,
+      claim: text, contentHash,
+      id: `official-passage-${createHash("sha256").update(`${sourceURL}\u0000${contentHash}\u0000${section}\u0000${text}`).digest("hex").slice(0, 24)}` });
+  }
+  return sections;
 }
 
 async function responseBodyWithinLimit(response, maximumBytes) {
@@ -348,8 +407,11 @@ export async function bindResearchWebSupportToOfficialDocuments(webSupport, opti
         maximumBytes: options.maximumBytes
       });
       const providerContext = (source.attributedClaims || []).map((claim) => claim?.text).join(" ");
+      const candidates = fetched.format === "html" && source.sectionHeadings?.length
+        ? researchOfficialHTMLSectionPassages(fetched.passages, source.sectionHeadings, fetched.url)
+        : fetched.passages;
       const selected = selectResearchOfficialHTMLPassages(
-        fetched.passages,
+        candidates,
         `${options.question || ""} ${providerContext}`,
         { ...(fetched.format === "pdf" ? { maximum: 3 } : {}), requiredPassageTerms: options.requiredPassageTerms }
       );

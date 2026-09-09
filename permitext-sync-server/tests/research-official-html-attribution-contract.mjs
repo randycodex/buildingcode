@@ -1,8 +1,13 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { researchDOBWorkflowRoute } from "../research-dob-workflow-routing.mjs";
+import { reconciledResearchEvaluationInput } from "../evals/research-answer-key-reconciliation.mjs";
 import {
   bindResearchWebSupportToOfficialHTML,
   fetchResearchOfficialHTMLPassages,
   researchOfficialHTMLPassages,
+  researchOfficialHTMLSectionPassages,
   selectResearchOfficialHTMLPassages
 } from "../research-official-html-attribution.mjs";
 
@@ -65,7 +70,63 @@ const fetched = await fetchResearchOfficialHTMLPassages(boilerURL, {
   fetchImpl: async () => responseFor(boilerHTML)
 });
 assert.equal(fetched.url, boilerURL);
-assert.ok(fetched.passages.length >= 9);
+assert(fetched.passages.some((passage) => /5 families or fewer/.test(passage.text) && /supplying heat only to that unit/.test(passage.text)),
+  "Keep a complete exception list together instead of counting its items as independent evidence.");
+
+const faqHTML = `<h1>Workflow</h1><h2>Initial filings</h2>
+<div class="faq-questions" data-answer="initial"><p>May the initial filing close with an LOC?</p></div>
+<div class="faq-answers" id="initial"><p>Yes, after its required inspections.</p><p>Do not apply this to a subsequent CO filing.</p></div>
+<h2>Subsequent CO filings</h2>
+<div class="faq-questions" data-answer="subsequent"><p>May a subsequent CO filing close with its own LOC?</p></div>
+<div class="faq-answers" id="subsequent"><p>No. Completion uses the initial CO process.</p></div>`;
+const faqPassages = researchOfficialHTMLPassages(faqHTML, boilerURL);
+assert.equal(faqPassages.length, 2);
+assert.match(faqPassages[0].intro, /initial filing/);
+assert.match(faqPassages[0].text, /Yes.*Do not apply/);
+assert.match(faqPassages[1].claim, /Subsequent CO filings.*May a subsequent CO filing.*No\./);
+assert.throws(() => researchOfficialHTMLSectionPassages(faqPassages, ["Initial filings", "Missing condition"], boilerURL),
+  { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_UNAVAILABLE" });
+assert.throws(() => researchOfficialHTMLSectionPassages([{ ...faqPassages[0], claim: "x".repeat(16_001) }], ["Initial filings"], boilerURL),
+  { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_TOO_LARGE" });
+for (const malformed of [faqHTML.replace('id="initial"', 'id="other"'),
+  faqHTML.replace('<div class="faq-answers" id="initial">', '<h2>Unrelated section</h2><div class="faq-answers" id="initial">'),
+  faqHTML + '<div id="initial"><p>Duplicate target.</p></div>']) {
+  assert(!researchOfficialHTMLPassages(malformed, boilerURL).some((passage) => passage.kind === "faq_pair" && /May the initial filing/.test(passage.intro)),
+    "An explicit link must have one adjacent target before its question becomes answer context.");
+}
+
+const companionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-companion-source-fragments-20260909.json", import.meta.url)));
+for (const document of companionFixture.documents) assert.equal(createHash("sha256").update(document.html).digest("hex"), document.fixtureHTMLSHA256);
+const reconciled = JSON.parse(await readFile(new URL("../evals/research-reconciled-answer-key.json", import.meta.url)));
+const boundCompanions = {};
+for (const id of ["DOBNOW-003", "DOBNOW-004", "DOBNOW-012"]) {
+  const question = reconciledResearchEvaluationInput(reconciled.cases.find((item) => item.id === id)).question;
+  const route = researchDOBWorkflowRoute(question);
+  assert.equal(route.directDocumentRetrieval, true);
+  const htmlSources = route.sources.filter((source) => !source.url.endsWith(".pdf"));
+  const bound = await bindResearchWebSupportToOfficialHTML({ sources: htmlSources }, {
+    question, officialDomains: ["nyc.gov"], requiredPassageTerms: route.passageTerms,
+    fetchImpl: async (url) => {
+      const document = companionFixture.documents.find((document) => document.url === String(url));
+      assert(document, `Unexpected companion request: ${url}`);
+      return responseFor(document.html, document.url);
+    }
+  });
+  assert.equal(bound.sources.length, htmlSources.length);
+  assert.deepEqual(bound.sourceValidation.failures, []);
+  boundCompanions[id] = bound.sources.flatMap((source) => source.attributedClaims.map((claim) => claim.text)).join("\n");
+}
+assert.match(boundCompanions["DOBNOW-003"], /can be initiated and submitted after the initial job filing is submitted/);
+assert.match(boundCompanions["DOBNOW-003"], /subsequent filing in pre-filing status/);
+assert.match(boundCompanions["DOBNOW-003"], /Letter of Completion for the subsequent filing of an NB or Alteration-CO filing/);
+assert.match(boundCompanions["DOBNOW-003"], /No, the status of the subsequent filings will remain Permit Entire/);
+assert.match(boundCompanions["DOBNOW-004"], /Only one PAA can be in progress/);
+assert.match(boundCompanions["DOBNOW-004"], /same Applicant of Record as the original filing/);
+assert.match(boundCompanions["DOBNOW-004"], /fields are NOT editable.*Work on Floors/s);
+assert.match(boundCompanions["DOBNOW-004"], /Work on floors can be changed with a PAA/);
+assert.doesNotMatch(boundCompanions["DOBNOW-004"], /The PAA process – BIS Job Filings/);
+assert.match(boundCompanions["DOBNOW-012"], /City-owned sewer system.*20,000.*5,000/s);
+assert.match(boundCompanions["DOBNOW-012"], /exclusions and definitions/);
 
 const bound = await bindResearchWebSupportToOfficialHTML({
   summary: "SRO dwellings are exempt.",

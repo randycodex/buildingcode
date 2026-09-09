@@ -1,0 +1,136 @@
+{
+  "schema": "permitext-companion-request-binding-inspection-v1",
+  "checkedAt": "2026-09-09T05:18:22.675Z",
+  "baseline": {
+    "file": "evals/results/research-owner-companion-source-inspection-2026-09-09.json",
+    "sha256": "c2ca46dba1d38f5752a7c03986241017c9413e176c0d146360223071ec072b98"
+  },
+  "sourceHashes": {
+    "research-dob-workflow-routing.mjs": "2664929cb8dfc7f6b35d8e65fe735ff4b46ddd2628692fdc35182c2123348747",
+    "research-official-html-attribution.mjs": "97e0e666a244e6969a9cb690e042fed74fa1a68a8f58351d8f79e0bbb85290c7",
+    "research-official-guidance-summary.mjs": "4c8f30c855b6c07ece5917fe488474d6dfb1ff677b3ffd25ef2c1f07c2cb710a",
+    "research-source-policy.mjs": "6203ec7bc257c3a949d6198be71d01c837c0b9f7804c2595122ac843c59e69bd",
+    "evals/research-owner-http-request-binding.mjs": "7ed6285b7bb1fae0117cc89e95ad4443b6423884818bf3a729341ffb8fc84500",
+    "scripts/inspect-research-companion-request-binding-20260909.mjs": "594573455c8e943b0c5258809be844b867ca9864858405c056f46a1f51e2a1a8"
+  },
+  "status": "passed",
+  "paidAPICalls": 0,
+  "providerCalls": 0,
+  "publicDocumentGETs": 8,
+  "requests": [
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/dep/water/stormwater-permits.page",
+      "status": 200
+    }
+  ],
+  "results": [
+    {
+      "id": "DOBNOW-003",
+      "originalRawRequestSHA256": "d66a61e0b6fa6e445549e2d9407c414e5ab4fe113a4b5950318875cb5ed121b4",
+      "currentRawRequestSHA256": "b5d28913d6c875c171f0e83f23f19eb8f7703dd22a63597f78630e8f023b21f0",
+      "equivalentRequestSHA256": "2e82f8ad33bfb9b8de9b5dcaeb9db44f04259e4792e7de322a84185e21c16946",
+      "actualPassageMutationDetected": true,
+      "sourceFingerprints": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "format": "official_pdf",
+          "original": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "current": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5"
+        },
+        {
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "format": "official_html",
+          "original": "a43e15612cfed9f60464028f41e2d2f2bc6998f3ad336f9399efcca51ebafe8e",
+          "current": "8cbed73a440a4f122408031dd91969899df8e2105c6d750d29dec8a2ce90adba"
+        },
+        {
+          "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+          "format": "official_html",
+          "original": "8b0baf1ceefd4f5207ccdb69cf146c5e67e5edb2c0dc9bb48771ce564990eb59",
+          "current": "44d03a0895eaeb8bd70fc0874c63cc4e5d688b75c798c9a24b0ce3649379e8bc"
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-004",
+      "originalRawRequestSHA256": "8f9043ee598f7e5047c67037df7a7c9785ebc69f1e4587abb535011aa2ac352c",
+      "currentRawRequestSHA256": "87b446c0fc6d63f90a4b7f550c0583babba39b9bad8043ada428ac071228ad2f",
+      "equivalentRequestSHA256": "b84d5cd22c86dbff42f7b5091f71e91c70566c5ff3d00d1757f0b6e8362fd0d8",
+      "actualPassageMutationDetected": true,
+      "sourceFingerprints": [
+        {
+          "url": "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page",
+          "format": "official_html",
+          "original": "a092e9755dcaf77f595167eba4b22e06f35dcbee99a29177c138b16d4eb3f333",
+          "current": "fd1caf1c3cd554fa9ce5b364661e5baba29d3c90771dad5066c4e2fd0487fea0"
+        },
+        {
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "format": "official_html",
+          "original": "e196d8bb6256c286b287e6f8cc1f15cb94712213a1df8e9f8138e375c7ca1830",
+          "current": "330001670c73763ecc4f598fba5e256aff16e4766bd5676b7e9e7239c3dce7a6"
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "format": "official_pdf",
+          "original": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "current": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5"
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-012",
+      "originalRawRequestSHA256": "8cadf08ecc3738f34f3d60d98d811aaf8c433ed20208253e341883d21cf1b319",
+      "currentRawRequestSHA256": "2be12c7e65cb5c0ac962d71f9b334c2f0991f56718a3d22059e8fbb173cae22e",
+      "equivalentRequestSHA256": "628ee650412c5c35dea450f83675c165f4968cfc3959dcbae9b702c5a269846a",
+      "actualPassageMutationDetected": true,
+      "sourceFingerprints": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "format": "official_pdf",
+          "original": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "current": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5"
+        },
+        {
+          "url": "https://www.nyc.gov/site/dep/water/stormwater-permits.page",
+          "format": "official_html",
+          "original": "e7165a32bde6e4cff281aef82a12092572a5119bcc79b2e448cb4915bf967cfc",
+          "current": "bb2681aad5030b76095fe77883eca05160a26fd7958c038a22508ebc0ad5af72"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This is a fetched-source and request-factory inspection, not an HTTP generation or semantic-verification run.",
+    "Only the opt-in diagnostic comparison normalizes opaque HTML identifiers. Runtime source hashes, citations and persistence verification remain unchanged.",
+    "Existing consumed packages retain the default comparison; a new paid package must explicitly select the new comparison and bind a new committed HTTP preflight."
+  ]
+}

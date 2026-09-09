@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { ownerHTTPResearchRequestHash } from "../evals/research-owner-http-request-binding.mjs";
+import { researchOfficialGuidanceSummaryRequest } from "../research-official-guidance-summary.mjs";
 const makeBody = (id, section = "20018521", text = "Canonical selected text.") => {
   const context = { sourceID: id, sectionID: section, text };
   return { model: "gpt-5.6-luna", safety_identifier: id, instructions: "Bind the claim.",
@@ -35,4 +36,35 @@ assert.equal(ownerHTTPResearchRequestHash(withLegend(second)), legendHash);
 assert.notEqual(ownerHTTPResearchRequestHash(withLegend(second, "S")), legendHash);
 assert.notEqual(ownerHTTPResearchRequestHash(withLegend(second, "P", "Permitted")), legendHash);
 assert.throws(() => ownerHTTPResearchRequestHash(withLegend(second, "P", "Additional conditions", true)), /Invalid table legend/);
+const guidance = (claimID, contentHash) => researchOfficialGuidanceSummaryRequest({
+  question: "Which filing completes through the CO process?", userID: first, model: "test-model",
+  webSupport: { sources: [{ id: "faq", url: "https://www.nyc.gov/faq", title: "FAQ", sourceValidation: "official_html",
+    sourceContentHash: contentHash, attributedClaims: [{ id: claimID, contentHash,
+      text: "Subsequent CO filings remain Permit Entire.", heading: "Subsequent CO filings", intro: "May I request a separate LOC?" }] }] }
+});
+const htmlA = guidance("claim-a", "a".repeat(64)), htmlB = guidance("claim-b", "b".repeat(64));
+const htmlHash = (body) => ownerHTTPResearchRequestHash(body, { normalizeOfficialHTML: true });
+assert.notEqual(ownerHTTPResearchRequestHash(htmlA), ownerHTTPResearchRequestHash(htmlB), "Legacy package comparisons retain their original hash behavior.");
+assert.equal(htmlHash(htmlA), htmlHash(htmlB), "Opaque IDs can differ while every model-visible passage and its schema association stays the same.");
+for (const field of ["sourceID", "url", "title", "text", "heading", "intro", "extractionLimitations"]) {
+  const changed = structuredClone(htmlB), input = JSON.parse(changed.input);
+  input.passages[0][field] = field === "extractionLimitations" ? ["A source limitation changed."] : `Changed ${field}`;
+  if (field === "url") input.passages[0][field] = "https://www.nyc.gov/other";
+  changed.input = JSON.stringify(input);
+  assert.notEqual(htmlHash(changed), htmlHash(htmlA), field);
+}
+for (const patch of [{ instructions: "Changed instructions" }, { model: "other-model" }, { max_output_tokens: 1000 }, { service_tier: "priority" }]) {
+  assert.notEqual(htmlHash({ ...htmlB, ...patch }), htmlHash(htmlA));
+}
+const mismatchedSchema = structuredClone(htmlB);
+mismatchedSchema.text.format.schema.properties.paragraphs.items.properties.sourceUses.items.properties.claimID.enum = ["wrong-claim"];
+assert.throws(() => htmlHash(mismatchedSchema), /schema must bind/);
+const missingPassage = structuredClone(htmlB); missingPassage.input = JSON.stringify({ ...JSON.parse(htmlB.input), passages: [] });
+assert.throws(() => htmlHash(missingPassage), /schema must bind/);
+const pdfBody = (body) => {
+  const next = structuredClone(body), input = JSON.parse(next.input);
+  input.passages[0].page = 1; input.passages[0].url = "https://www.nyc.gov/notice.pdf#page=1";
+  next.input = JSON.stringify(input); return next;
+};
+assert.notEqual(htmlHash(pdfBody(htmlA)), htmlHash(pdfBody(htmlB)), "PDF hashes and passage IDs remain strict under the HTML-only comparison.");
 console.log("Owner HTTP request binding passed: isolated account/passage IDs normalize; source text, section identity, citation binding, instructions, model, tier and token ceilings remain bound.");

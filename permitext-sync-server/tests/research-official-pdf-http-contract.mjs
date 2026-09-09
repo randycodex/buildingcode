@@ -40,6 +40,7 @@ const releaseURL = "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_relea
 const guideURL = "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf";
 const codeChangesURL = "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf";
 const familyNoticeURL = "https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf";
+const companionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-companion-source-fragments-20260909.json", import.meta.url)));
 const guideDocument = new PDFDocument();
 const guideChunks = [];
 const guideComplete = new Promise((resolve) => { guideDocument.on("data", (chunk) => guideChunks.push(chunk)); guideDocument.on("end", () => resolve(Buffer.concat(guideChunks))); });
@@ -47,6 +48,8 @@ guideDocument.text("Synthetic routing regression source. DOB NOW Alteration rout
 guideDocument.addPage().text("Synthetic review-field regression source. The DOB NOW Building Code review year selection depends on job type, filing date and work type. The address identifies the property; an address alone does not select a review year. This describes the portal field, not enacted code applicability.");
 guideDocument.addPage().text("Synthetic percentage-question regression source. Does the alteration alter more than 50 percent of the building gross floor area? A Yes response triggers the Site Safety Plan workflow item. Actual applicability needs the appropriate site safety criteria.");
 guideDocument.addPage().text("Synthetic amendment regression source. To revise approved scope and drawings in a DOB NOW filing, the Applicant of Record submits a Post Approval Amendment (PAA). A PAA is unavailable when the filing includes legalization. This describes the filing action, not legal approval of the revised work.");
+guideDocument.addPage().text("Synthetic subsequent-filing regression source. Related work on the same construction project uses one job number with separate filing extensions. A subsequent filing may have a different applicant. Check the job type and current companion guidance before stating its completion process.");
+guideDocument.addPage().text("Synthetic stormwater regression source. Question one asks whether this project disturbs 20,000 square feet or more of soil or creates 5,000 square feet or more of impervious surface. Question two separately asks whether it is part of a larger common plan of development. A Yes triggers the stormwater document workflow.");
 guideDocument.end();
 const guideBytes = await guideComplete;
 async function syntheticPDF(text) {
@@ -114,6 +117,18 @@ const responseDouble = async (url, options) => {
         assert.equal(input.conversationFacts.qualified.length, 2);
         assert.match(body.instructions, /on the stated facts/);
       }
+      if (portalCase === "DOBNOW-003") {
+        assert(input.passages.some((passage) => /subsequent filing of an NB or Alteration-CO filing/.test(passage.intro) && /remain Permit Entire/.test(passage.text)));
+        assert(input.passages.some((passage) => /subsequent filing in pre-filing status/.test(passage.text)));
+      }
+      if (portalCase === "DOBNOW-004") {
+        assert(input.passages.some((passage) => /same Applicant of Record as the original filing/.test(passage.text) && /fields are NOT editable/.test(passage.text)));
+        assert(input.passages.some((passage) => /Work on floors can be changed with a PAA/.test(passage.text)));
+      }
+      if (portalCase === "DOBNOW-012") {
+        assert(input.passages.some((passage) => /City-owned sewer system/.test(passage.text) && /exclusions and definitions/.test(passage.text)));
+        assert(input.passages.some((passage) => /Question two separately/.test(passage.text)));
+      }
       if (portalCase === "DOBNOW-008") {
         assert(input.passages.some((passage) => passage.url.startsWith(guideURL) && /gross floor area/.test(passage.text)));
         if (missingSafetySources) {
@@ -131,10 +146,10 @@ const responseDouble = async (url, options) => {
     if (body.text.format.name === "permitext_official_guidance_summary") {
       summaryDoubles += 1;
       const wetlands = /wetlands/i.test(input.question);
-      const passages = portalCase === "DOBNOW-008" ? input.passages
+      const passages = ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012"].includes(portalCase) ? input.passages
         : portalCase ? input.passages.filter((passage) => passage.url.startsWith(guideURL) && passage.page === (portalCase === "DOBNOW-001" ? 1 : portalCase === "DOBNOW-004" ? 4 : 2))
         : wetlands ? input.passages : input.passages.slice(0, 1);
-      if (portalCase && portalCase !== "DOBNOW-008") assert.equal(passages.length, 1);
+      if (["DOBNOW-001", "DOBNOW-021"].includes(portalCase)) assert.equal(passages.length, 1);
       value = {
         paragraphs: [{
           text: rejectSummary ? "The filing automatically grants the construction permit."
@@ -144,6 +159,10 @@ const responseDouble = async (url, options) => {
               ? "An address alone is insufficient to select the review year. Provide the job type, filing date and work type."
             : portalCase === "DOBNOW-004"
               ? "The Applicant of Record submits a Post Approval Amendment to revise the approved scope and drawings. The stated filing does not include legalization."
+            : portalCase === "DOBNOW-003"
+              ? "Use a subsequent filing under the same job number. Confirm the job type before stating the completion path; an NB or Alteration-CO subsequent filing remains Permit Entire and closes through the initial CO process."
+            : portalCase === "DOBNOW-012"
+              ? "Answer Yes to the first project-specific threshold question because exactly 5,000 square feet satisfies it. The larger-common-plan question remains separate. Final DEP applicability also depends on City-owned-sewer drainage and current exclusions."
             : portalCase === "DOBNOW-008"
               ? missingSafetySources
                 ? "Answer Yes to the percentage question: the alteration alters 60 percent of gross floor area. The exception documents could not be retrieved, so final Site Safety Plan applicability remains unresolved."
@@ -176,6 +195,8 @@ const responseDouble = async (url, options) => {
   }
   if (String(url) === releaseURL) return new Response(releaseBytes, { headers: { "content-type": "application/pdf" } });
   if (String(url) === guideURL) return new Response(guideBytes, { headers: { "content-type": "application/pdf" } });
+  const companion = companionFixture.documents.find((document) => document.url === String(url));
+  if (companion) return new Response(companion.html, { headers: { "content-type": "text/html" } });
   if (String(url) === codeChangesURL || String(url) === familyNoticeURL) return missingSafetySources
     ? new Response("Synthetic unavailable source", { status: 503 })
     : new Response(String(url) === codeChangesURL ? codeChangesBytes : familyNoticeBytes, { headers: { "content-type": "application/pdf" } });
@@ -247,7 +268,7 @@ try {
   assert.equal(summaryDoubles, 3);
   assert.equal(verificationDoubles, 3);
   const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json", import.meta.url)));
-  for (const id of ["DOBNOW-001", "DOBNOW-004", "DOBNOW-021", "DOBNOW-008"]) {
+  for (const id of ["DOBNOW-001", "DOBNOW-003", "DOBNOW-004", "DOBNOW-012", "DOBNOW-021", "DOBNOW-008"]) {
     portalCase = id;
     question = retained.results.find((item) => item.id === id).question;
     const beforePortal = providerDoubles;
@@ -257,9 +278,10 @@ try {
     assert.equal(answer.retrieval.allowOfficialGuidanceOnly, true);
     assert.equal(answer.citations.length, 0, "Portal guidance must not acquire irrelevant enacted citations.");
     assert.equal(answer.verification.pass, true);
-    assert.equal(providerDoubles - beforePortal, id === "DOBNOW-008" ? 2 : 3, "Known site-safety documents bypass search; summary and verifier remain required.");
-    assert.match(answer.answerText, id === "DOBNOW-001" ? /On the stated facts/ : id === "DOBNOW-004" ? /Applicant of Record submits a Post Approval Amendment/ : id === "DOBNOW-021" ? /address alone is insufficient/ : /alters 60 percent/);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v3");
+    assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
+    const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/ };
+    assert.match(answer.answerText, expected[id]);
+    assert.equal(answer.promptVersion, "20260909-document-summary-v4");
     assert.equal(answer.officialGuidanceSummary.version, "20260908-document-summary-v1",
       "A prompt update must preserve the saved integrity-proof contract.");
   }
