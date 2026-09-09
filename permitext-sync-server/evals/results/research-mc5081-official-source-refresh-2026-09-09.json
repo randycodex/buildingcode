@@ -1,0 +1,31 @@
+{
+  "schema": "permitext-official-source-refresh-v1",
+  "checkedAt": "2026-09-09T01:43:52.322483+00:00",
+  "caseID": "MC-15",
+  "reference": "MC 508.1",
+  "retrieval": "Codex web tool; no application provider key or paid Research dispatch",
+  "sources": [
+    {
+      "url": "https://www.nyc.gov/site/buildings/codes/2022-construction-codes.page",
+      "finding": "The DOB code index links its 2022 Mechanical Code Chapter 5 PDF viewer."
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/apps/pdf_viewer/viewer.html?file=2022MC_Chapter5_ExhaustWB.pdf&section=conscode_2022",
+      "finding": "Current DOB index target for the chapter."
+    },
+    {
+      "url": "https://www.bers.nyc.gov/assets/buildings/codes-pdf/cons_codes_2022/2022MC_Chapter5_ExhaustWB.pdf",
+      "pdfPageOneBased": 28,
+      "finding": "NYC-hosted copy of the same named chapter. Section 508.1 requires automatic simultaneous startup and operation of mechanical makeup air with exhaust; airflow balance alone is insufficient. The provision also refers to 401.4 and the Energy Conservation Code. The chapter header records Local Law 77 of 2023 effective June 10, 2023."
+    },
+    {
+      "url": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-203358",
+      "finding": "Current September 2026 section-parent page was retrieved, but contained only the MC 508 heading without the operative child text. This does not complete a current consolidated-text comparison."
+    }
+  ],
+  "published2022RuleReconfirmed": true,
+  "currentConsolidationRefreshPending": true,
+  "professionalApproval": false,
+  "originalAnswerKeyChanged": false,
+  "limitation": "Fresh retrieval of a DOB-hosted publication confirms the scoped control rule, but is not proof that every later amendment has been incorporated. Preserve the outstanding consolidated-source comparison and professional review."
+}

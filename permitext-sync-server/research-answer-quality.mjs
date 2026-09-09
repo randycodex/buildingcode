@@ -2,7 +2,7 @@ import { researchRequestedAreaConversions } from "./research-answer-presentation
 import { applyResearchPlumbingSourceRepairs } from "./research-plumbing-source-repairs.mjs";
 
 export const researchAnswerQualityVersion =
-  "20260908-fixture-permission-scope-v28";
+  "20260909-dining-percentage-domain-v29";
 
 const accessibleDiningSurfaceMisstatementPattern =
   /(?:at\s+least\s+)?10\s*percent\s+of\s+(?:the\s+)?(?:total\s+)?(?:number\s+of\s+)?(?:seating\s+and\s+standing\s+)?spaces?\s+(?:of|for)\s+each\s+(?:dining[- ]surface\s+)?type|(?:at\s+least\s+)?10\s*percent\s+(?:of|for)\s+each\s+(?:type|dining[- ]surface)|minimum\s+accessible\s+share\s+of\s+(?:the\s+)?total\s+(?:number\s+of\s+)?seating\s+and\s+standing\s+spaces?\s+for\s+each\s+(?:type|dining[- ]surface)/i;
@@ -47,7 +47,7 @@ const table403AuthorityCanonicalPhrase =
   "The Building Code determines occupancy classification and occupant load; Table 403.1 supplies the applicable minimum fixture counts";
 
 const diningSurfaceCalculationPattern =
-  /\b10\s*percent\b|\bminimum\s+accessible\s+share\b/i;
+  /^(?=[\s\S]*(?:\b10\s*(?:percent\b|%)|\bminimum\s+accessible\s+share\b))(?=[\s\S]*(?:\bdining[- ]surfaces?\b|\bseating\s+(?:and\s+standing\s+)?spaces?\b|\bstanding\s+spaces?\b))/i;
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();

@@ -1,0 +1,68 @@
+{
+  "schema": "permitext-focused-technical-source-comparison-v1",
+  "checkedAt": "2026-09-09T01:46:02.599Z",
+  "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+  "files": [
+    {
+      "file": "evals/results/research-owner-full-scope-focused-technical-2026-09-09.json",
+      "sha256": "3a9f216fbee5623ff5db5a6b56d2377bfdb66b86bf528ce2805bbdadf3d47d87"
+    },
+    {
+      "file": "evals/results/research-owner-full-scope-ventilation-2026-09-08.json",
+      "sha256": "196e97ea857d3c3e8fd7ef1da6ae925db566e0b2b4ddc5edc6860b3605897798"
+    }
+  ],
+  "inputCasesVerified": 110,
+  "exactSelectedPassagesVerified": 8,
+  "unchangedOtherSourcePackages": 105,
+  "newMissingReferences": [],
+  "paidProviderCalls": 0,
+  "changed": [
+    {
+      "id": "MC-09",
+      "previousSources": 17,
+      "sources": 10,
+      "previousCharacters": 22676,
+      "characters": 10584,
+      "previousWeb": false,
+      "web": false
+    },
+    {
+      "id": "MC-13",
+      "previousSources": 16,
+      "sources": 10,
+      "previousCharacters": 29086,
+      "characters": 7324,
+      "previousWeb": false,
+      "web": false
+    },
+    {
+      "id": "MC-15",
+      "previousSources": 16,
+      "sources": 2,
+      "previousCharacters": 15709,
+      "characters": 3246,
+      "previousWeb": false,
+      "web": false
+    },
+    {
+      "id": "GAP-03",
+      "previousSources": 17,
+      "sources": 10,
+      "previousCharacters": 31990,
+      "characters": 25618,
+      "previousWeb": true,
+      "web": false
+    },
+    {
+      "id": "GAP-08",
+      "previousSources": 14,
+      "sources": 4,
+      "previousCharacters": 15446,
+      "characters": 3315,
+      "previousWeb": true,
+      "web": false
+    }
+  ],
+  "limitation": "Source selection comparison only. Answer correctness and speed require separate provider results and review."
+}
