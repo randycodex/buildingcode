@@ -67,4 +67,24 @@ const pdfBody = (body) => {
   next.input = JSON.stringify(input); return next;
 };
 assert.notEqual(htmlHash(pdfBody(htmlA)), htmlHash(pdfBody(htmlB)), "PDF hashes and passage IDs remain strict under the HTML-only comparison.");
+const withRelationship = (body) => {
+  const next = structuredClone(body), input = JSON.parse(next.input), passage = input.passages[0];
+  input.sourceRelationships = [{ kind: "scope", questionToResolve: "Check the completion scope.", evidence: {
+    sourceID: passage.sourceID, claimID: passage.claimID, contentHash: passage.contentHash, excerpts: [passage.text]
+  } }];
+  next.input = JSON.stringify(input); return next;
+};
+assert.equal(htmlHash(withRelationship(htmlA)), htmlHash(withRelationship(htmlB)), "Opaque HTML IDs normalize consistently in source relationship evidence.");
+for (const mutate of [
+  (input) => { input.sourceRelationships[0].evidence.claimID = "invented"; },
+  (input) => { input.sourceRelationships[0].evidence.contentHash = "c".repeat(64); },
+  (input) => { input.sourceRelationships[0].evidence.excerpts = ["Invented permission."]; }
+]) {
+  const body = withRelationship(htmlA), input = JSON.parse(body.input); mutate(input); body.input = JSON.stringify(input);
+  assert.throws(() => htmlHash(body));
+}
+const changedRelationship = withRelationship(htmlA), changedInput = JSON.parse(changedRelationship.input);
+changedInput.sourceRelationships[0].questionToResolve = "A different applicability question.";
+changedRelationship.input = JSON.stringify(changedInput);
+assert.notEqual(htmlHash(changedRelationship), htmlHash(withRelationship(htmlA)), "Diagnostic normalization must retain the actual relationship question.");
 console.log("Owner HTTP request binding passed: isolated account/passage IDs normalize; source text, section identity, citation binding, instructions, model, tier and token ceilings remain bound.");

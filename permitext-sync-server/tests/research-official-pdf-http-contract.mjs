@@ -43,6 +43,7 @@ const familyNoticeURL = "https://www.nyc.gov/assets/buildings/pdf/code_site_safe
 const loftNoticeURL = "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf";
 const companionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-companion-source-fragments-20260909.json", import.meta.url)));
 const stakeholderFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-stakeholder-source-fragments-20260909.json", import.meta.url)));
+const submissionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-filing-submission-source-20260909.json", import.meta.url)));
 const loftFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-loft-service-document-20260909.json", import.meta.url)));
 const officialDocuments = JSON.parse(await readFile(new URL("../evals/fixtures/dob-official-document-pages-20260909.json", import.meta.url)));
 const boardUpdate = officialDocuments.documents.find((document) => document.source.id === "dob-build-release-notes")
@@ -57,6 +58,10 @@ guideDocument.addPage().text("Synthetic percentage-question regression source. D
 guideDocument.addPage().text("Synthetic amendment regression source. To revise approved scope and drawings in a DOB NOW filing, the Applicant of Record submits a Post Approval Amendment (PAA). A PAA is unavailable when the filing includes legalization. This describes the filing action, not legal approval of the revised work.");
 guideDocument.addPage().text("Synthetic subsequent-filing regression source. Related work on the same construction project uses one job number with separate filing extensions. A subsequent filing may have a different applicant. Check the job type and current companion guidance before stating its completion process.");
 guideDocument.addPage().text("Synthetic stormwater regression source. Question one asks whether this project disturbs 20,000 square feet or more of soil or creates 5,000 square feet or more of impervious surface. Question two separately asks whether it is part of a larger common plan of development. A Yes triggers the stormwater document workflow.");
+const attestationPage = officialDocuments.documents.find((document) => document.source.id === "dob-application-guide")
+  .document.passages.find((passage) => passage.pageNumber === 38);
+assert.match(attestationPage.text, /Applicant o\s*f Record/);
+guideDocument.addPage().text(attestationPage.text);
 guideDocument.end();
 const guideBytes = await guideComplete;
 async function syntheticPDF(text) {
@@ -161,6 +166,12 @@ const responseDouble = async (url, options) => {
         assert.match(update.text, /Condo Unit Owner or Co\s*-\s*Op Tenant\s*-\s*Shareholder/);
         assert.match(update.text, /NYC\.ID/);
         assert.match(update.text, /Both the owner and the Board representative/);
+        const steps = input.passages.filter((passage) => passage.url === submissionFixture.url).map((passage) => passage.text).join(" ");
+        assert.match(steps, /Applicant officially submits the job filing/);
+        assert.match(steps, /Applicant must review the filing and provide a final electronic signature/);
+        assert.match(steps, /other stakeholders must electronically sign the job filing/);
+        assert(input.sourceRelationships.some((relationship) => relationship.kind === "conditional_stakeholder"),
+          "The source-derived conditional-actor relationship must reach both model stages.");
       }
       if (portalCase === "DOBNOW-008") {
         assert(input.passages.some((passage) => passage.url.startsWith(guideURL) && /gross floor area/.test(passage.text)));
@@ -183,6 +194,13 @@ const responseDouble = async (url, options) => {
         : portalCase ? input.passages.filter((passage) => passage.url.startsWith(guideURL) && passage.page === (portalCase === "DOBNOW-001" ? 1 : portalCase === "DOBNOW-004" ? 4 : 2))
         : wetlands ? input.passages : input.passages.slice(0, 1);
       if (["DOBNOW-001", "DOBNOW-021"].includes(portalCase)) assert.equal(passages.length, 1);
+      const citedPassages = portalCase === "DOBNOW-023" ? [
+        passages.find((passage) => passage.url.startsWith(guideURL) && /Applicant o\s*f Record/.test(passage.text)),
+        passages.find((passage) => passage.sourceID === "dob-stakeholder-faq" && /cannot upload plans or submit filings/.test(passage.text)),
+        passages.find((passage) => passage.url.startsWith(releaseURL) && /Board added as a Stakeholder/.test(passage.text)),
+        passages.find((passage) => passage.url === submissionFixture.url && /Applicant officially submits/.test(passage.text))
+      ] : passages;
+      assert(citedPassages.every(Boolean));
       value = {
         paragraphs: [{
           text: rejectSummary ? "The filing automatically grants the construction permit."
@@ -209,7 +227,7 @@ const responseDouble = async (url, options) => {
               : replayPath
                 ? "For new BPP applications beginning August 17, 2026, file in DOB NOW: Build using Standard Plan Review and complete the BPP5 Authorization to DOT."
                 : "Use Standard Plan Review for the new BPP filing. This filing step does not automatically approve the permit.",
-          sourceUses: passages.map((passage) => ({ sourceID: passage.sourceID, claimID: passage.claimID }))
+          sourceUses: citedPassages.map((passage) => ({ sourceID: passage.sourceID, claimID: passage.claimID }))
         }], missingFacts: [], evidenceLimitations: []
       };
     } else {
@@ -248,6 +266,7 @@ const responseDouble = async (url, options) => {
   if (String(url) === guideURL) return new Response(guideBytes, { headers: { "content-type": "application/pdf" } });
   if (String(url) === loftNoticeURL) return new Response(loftNoticeBytes, { headers: { "content-type": "application/pdf" } });
   if (portalCase === "DOBNOW-023" && String(url) === stakeholderFixture.url) return new Response(stakeholderFixture.html, { headers: { "content-type": "text/html" } });
+  if (portalCase === "DOBNOW-023" && String(url) === submissionFixture.url) return new Response(submissionFixture.html, { headers: { "content-type": "text/html" } });
   const companion = companionFixture.documents.find((document) => document.url === String(url));
   if (companion) return new Response(companion.html, { headers: { "content-type": "text/html" } });
   if (String(url) === codeChangesURL || String(url) === familyNoticeURL) return missingSafetySources
@@ -336,7 +355,7 @@ try {
     assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
     const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
     assert.match(answer.answerText, expected[id]);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v8");
+    assert.equal(answer.promptVersion, "20260909-document-summary-v9");
     assert.equal(answer.officialGuidanceSummary.version, "20260909-document-summary-v2",
       "New summaries retain the required qualification receipt; older v1 records remain readable.");
   }

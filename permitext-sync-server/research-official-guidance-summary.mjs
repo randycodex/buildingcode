@@ -6,11 +6,12 @@ import {
   guidanceQualificationReviewInstruction,
   guidanceQualificationVerificationSchema
 } from "./research-guidance-qualification-review.mjs";
+import { guidanceSourceRelationships, guidanceSourceRelationshipInstruction } from "./research-guidance-source-relationships.mjs";
 
 export const researchOfficialGuidanceSummaryVersion = "20260908-document-summary-v1";
 const qualifiedSummaryVersion = "20260909-document-summary-v2";
 // Prompt revisions do not invalidate integrity records for saved summaries.
-export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v8";
+export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v9";
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 const stringList = { type: "array", maxItems: 6, items: { type: "string" } };
 const bindingKey = (sourceID, claimID) => `${sourceID}\u0000${claimID}`;
@@ -65,6 +66,8 @@ export function researchOfficialGuidanceSummaryInput(question, webSupport, conte
 
 export function researchOfficialGuidanceSummaryRequest({ question, webSupport, context, model, userID, verificationSchema, proposedAnswer } = {}) {
   const input = researchOfficialGuidanceSummaryInput(question, webSupport, context);
+  const relationships = guidanceSourceRelationships(input);
+  if (relationships.length) input.sourceRelationships = relationships;
   const verification = Boolean(proposedAnswer);
   const sourceIDs = [...new Set(input.passages.map((passage) => passage.sourceID))];
   const claimIDs = [...new Set(input.passages.map((passage) => passage.claimID))];
@@ -83,6 +86,7 @@ export function researchOfficialGuidanceSummaryRequest({ question, webSupport, c
       "Use supplied user facts as premises. Ask for a missing fact only if it changes the answer. Earlier assistant text is context, never source authority. If the passages cannot resolve the question, say exactly what remains unresolved and give the responsive guidance they do establish.",
       "Apply known facts to select the source-supported branch, then state its action and approval condition directly. Retain an explicit prerequisite or sequence needed for that action; page layout alone is not a sequence. Direct logical application and faithful paraphrase are allowed, but may not add a condition, actor, deadline or process order. Distinguish an unresolved recommendation from a prohibition. Use acronyms as written unless the evidence supplies their expansion; do not invent document chronology.",
       ...(input.conversationFacts.qualified?.length ? [researchQualifiedFactInstruction] : []),
+      ...(relationships.length ? [guidanceSourceRelationshipInstruction] : []),
       ...(verification ? [guidanceQualificationReviewInstruction] : []),
       verification
         ? "Independently verify every substantive sentence and its cited source/claim pair against the complete passages. A valid ID alone does not establish support. Reject an unsupported detail, changed condition, omitted material exception, wrong date or source, ungrounded Yes/No, or a claim of enacted authority. Also reject an answer that omits a requested step or a source-stated prerequisite material to the requested action or approval. Check uncited passages for qualifications to each conclusion, not only whether its cited passage agrees. Report only errors actually present in the proposed answer, with the offending statement and the source condition or missing support. Do not reject faithful paraphrase merely because it uses different words. Do not require unrelated fees, legacy filing rules, document boilerplate or other unasked topics. Return the verification schema; use existing issue types such as unsupported_requirement, missed_material_conclusion, misstated_provision or wrong_attribution."

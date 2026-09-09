@@ -19512,6 +19512,7 @@ async function handleResearchConversationMessage(request, response) {
         }, {
           question: evidencePackage.retrievalQuery || question,
           requiredPassageTerms: workflow.passageTerms,
+          maximumSources: Math.min(workflow.sources.length, 4),
           officialDomains: researchSourcePolicyConfiguration().officialDomains,
           signal: progressResponse.signal
         });

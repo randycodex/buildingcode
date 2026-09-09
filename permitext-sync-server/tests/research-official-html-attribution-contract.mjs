@@ -104,6 +104,8 @@ for (const malformed of [faqHTML.replace('id="initial"', 'id="other"'),
 
 const companionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-companion-source-fragments-20260909.json", import.meta.url)));
 const stakeholderFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-stakeholder-source-fragments-20260909.json", import.meta.url)));
+const submissionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-filing-submission-source-20260909.json", import.meta.url)));
+assert.equal(createHash("sha256").update(submissionFixture.html).digest("hex"), submissionFixture.sourceContentHash);
 assert.equal(createHash("sha256").update(stakeholderFixture.html).digest("hex"), stakeholderFixture.fixtureHTMLSHA256);
 for (const document of companionFixture.documents) assert.equal(createHash("sha256").update(document.html).digest("hex"), document.fixtureHTMLSHA256);
 const reconciled = JSON.parse(await readFile(new URL("../evals/research-reconciled-answer-key.json", import.meta.url)));
@@ -116,7 +118,7 @@ for (const id of ["DOBNOW-003", "DOBNOW-004", "DOBNOW-012", "DOBNOW-023"]) {
   const bound = await bindResearchWebSupportToOfficialHTML({ sources: htmlSources }, {
     question, officialDomains: ["nyc.gov"], requiredPassageTerms: route.passageTerms,
     fetchImpl: async (url) => {
-      const document = id === "DOBNOW-023" ? stakeholderFixture : companionFixture.documents.find((document) => document.url === String(url));
+      const document = id === "DOBNOW-023" ? [stakeholderFixture, submissionFixture].find((document) => document.url === String(url)) : companionFixture.documents.find((document) => document.url === String(url));
       assert(document, `Unexpected companion request: ${url}`);
       assert.equal(document.url, String(url));
       return responseFor(document.html, document.url);
@@ -141,6 +143,18 @@ assert.match(boundCompanions["DOBNOW-023"], /Roles & Responsibilities: Owner/);
 assert.match(boundCompanions["DOBNOW-023"], /Roles & Responsibilities: Professionals/);
 assert.match(boundCompanions["DOBNOW-023"], /cannot upload plans or submit filings\/permits/);
 assert.match(boundCompanions["DOBNOW-023"], /owner must be logged in with the same email address/);
+assert.match(boundCompanions["DOBNOW-023"], /Applicant officially submits the job filing/);
+assert.match(boundCompanions["DOBNOW-023"], /Applicant must review the filing and provide a final electronic signature/);
+const catalogueSources = Array.from({ length: 5 }, (_, index) => ({ id: `catalogue-${index}`, url: `${boilerURL}?source=${index}` }));
+for (const [maximumSources, expected] of [[undefined, 3], [4, 4], [100, 4]]) {
+  let fetches = 0;
+  const scoped = await bindResearchWebSupportToOfficialHTML({ sources: catalogueSources }, {
+    question: "Which boilers require inspections?", officialDomains: ["nyc.gov"], maximumSources,
+    fetchImpl: async (url) => { fetches++; return responseFor(boilerHTML, String(url)); }
+  });
+  assert.equal(fetches, expected);
+  assert.equal(scoped.sources.length, expected, "Default retrieval stays at three sources; explicit catalogues may use at most four.");
+}
 assert.doesNotMatch(boundCompanions["DOBNOW-023"], /withdrawal option|Demolition Sub-Contractor/i,
   "Other workflows on the same FAQ must not displace the applicable stakeholder sections.");
 

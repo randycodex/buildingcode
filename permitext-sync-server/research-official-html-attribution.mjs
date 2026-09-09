@@ -403,7 +403,8 @@ export async function bindResearchWebSupportToOfficialDocuments(webSupport, opti
   const officialDomains = options.officialDomains || [];
   const sources = [];
   const validationFailures = [];
-  for (const source of originalSources.slice(0, 3)) {
+  const maximumSources = Math.max(1, Math.min(4, Math.trunc(Number(options.maximumSources)) || 3));
+  for (const source of originalSources.slice(0, maximumSources)) {
     try {
       const fetched = await fetchResearchOfficialDocumentPassages(source.url, {
         ...options,
@@ -418,7 +419,10 @@ export async function bindResearchWebSupportToOfficialDocuments(webSupport, opti
         ? researchOfficialHTMLSectionPassages(fetched.passages, source.sectionHeadings, fetched.url,
           { independentFAQPairs: source.independentFAQPairs === true })
         : fetched.passages;
-      const selected = selectResearchOfficialHTMLPassages(
+      // Explicitly curated companion steps form one requested source group;
+      // a topic-keyword filter must not discard its review/submission steps.
+      const selected = fetched.format === "html" && source.sectionHeadings?.length && source.preserveSections === true
+        ? candidates : selectResearchOfficialHTMLPassages(
         candidates,
         `${options.question || ""} ${providerContext}`,
         { ...(fetched.format === "pdf" ? { maximum: 3 } : {}), requiredPassageTerms: options.requiredPassageTerms }

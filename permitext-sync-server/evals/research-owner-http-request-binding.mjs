@@ -17,6 +17,7 @@ export function ownerHTTPResearchRequestHash(body, { normalizeOfficialHTML = fal
     const normalized = structuredClone(body), input = JSON.parse(body.input);
     const ids = new Map(), hashes = new Map();
     assert(Array.isArray(input.passages));
+    const originals = new Map(input.passages.map((passage) => [passage.claimID, { ...passage }]));
     for (const [index, passage] of input.passages.entries()) {
       assert(!ids.has(passage.claimID), "Ambiguous repeated guidance claim identifier.");
       ids.set(passage.claimID, passage.claimID);
@@ -35,6 +36,16 @@ export function ownerHTTPResearchRequestHash(body, { normalizeOfficialHTML = fal
     assert(Array.isArray(claimSchema.enum) && claimSchema.enum.length === ids.size && new Set(claimSchema.enum).size === ids.size &&
       claimSchema.enum.every((id) => ids.has(id)), "The guidance schema must bind exactly the declared passages.");
     claimSchema.enum = claimSchema.enum.map((id) => ids.get(id));
+    for (const relationship of input.sourceRelationships || []) {
+      const evidence = relationship?.evidence, passage = originals.get(evidence?.claimID);
+      assert(passage && evidence.sourceID === passage.sourceID && evidence.contentHash === passage.contentHash,
+        "A source relationship must retain its original passage binding.");
+      assert(Array.isArray(evidence.excerpts) && evidence.excerpts.length && evidence.excerpts.every((excerpt) =>
+        typeof excerpt === "string" && excerpt.trim() && passage.text.replace(/\s+/g, " ").trim().includes(excerpt)),
+      "Source relationship excerpts must match their declared passage.");
+      evidence.claimID = ids.get(evidence.claimID);
+      if (hashes.has(evidence.sourceID)) evidence.contentHash = `html-content:${evidence.sourceID}`;
+    }
     normalized.input = JSON.stringify(input);
     normalized.safety_identifier = "isolated-account";
     return hash(JSON.stringify(normalized));

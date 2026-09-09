@@ -1,6 +1,6 @@
 // Source locations are discovery hints, never an answer key. Each document is
 // fetched and validated again before its contents may support an answer.
-export const researchDOBWorkflowRoutingVersion = "20260909-stakeholder-faq-focus-v9";
+export const researchDOBWorkflowRoutingVersion = "20260909-applicant-submission-source-v10";
 const source = (id, title, filename, catalogReviewedOn = "2026-09-08") => Object.freeze({
   id, title, url: `https://www.nyc.gov/assets/buildings/pdf/${filename}`,
   publisher: "NYC Department of Buildings", catalogReviewedOn
@@ -18,6 +18,7 @@ export const researchDOBWorkflowSources = Object.freeze({
   familySiteSafety: source("dob-family-site-safety-notice", "2022 Construction Codes: Construction Superintendent on 1-, 2- or 3-family buildings", "code_site_safety_1-3_family_sn.pdf", "2026-09-09"),
   loftNotice: source("dob-loft-board-service-notice", "Loft Board Requests in DOB NOW: Build service notice", "26_lb_dn-sn.pdf", "2026-09-09"),
   stakeholderFAQ: htmlSource("dob-stakeholder-faq", "DOB NOW: Build FAQs — Owner and Professional Responsibilities", buildFAQ, ["Roles & Responsibilities: Owner", "Roles & Responsibilities: Professionals"], { independentFAQPairs: true }),
+  filingSteps: htmlSource("dob-filing-submission-steps", "Filing through DOB NOW: Build — attestation, preview and submission", "https://www.nyc.gov/site/buildings/property-or-business-owner/filing-through-dob-now-build.page", ["STEP 4: Obtain Attestation", "STEP 6: Preview Submission", "STEP 7: Submit Job Filing"], { preserveSections: true }),
   subsequentFAQ: htmlSource("dob-subsequent-faq", "DOB NOW: Build FAQs — Subsequent Filings", buildFAQ, ["Subsequent Filings"]),
   nbFAQ: htmlSource("dob-nb-altco-faq", "DOB NOW: New Building and Alteration-CO FAQs", "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page"),
   paaPage: htmlSource("dob-paa-process", "DOB NOW: Post Approval Amendment process", "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page", ["The PAA Process – DOB NOW: Build Job Filings"]),
@@ -60,7 +61,7 @@ export function researchDOBWorkflowRoute(question) {
     : subsequent ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.subsequentFAQ, researchDOBWorkflowSources.nbFAQ]
     : stormwater ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stormwater]
     : loft ? [researchDOBWorkflowSources.loftNotice, researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.applicationGuide]
-    : filingRepresentative ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stakeholderFAQ, researchDOBWorkflowSources.releaseNotes]
+    : filingRepresentative ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stakeholderFAQ, researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.filingSteps]
     : [researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.applicationGuide];
   const requestedURLs = text.match(/https:\/\/[^\s<>"\])]+/gi) || [];
   // An explicit source request takes priority over a catalog shortcut.
