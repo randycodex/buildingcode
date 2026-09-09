@@ -1,6 +1,6 @@
 // Source locations are discovery hints, never an answer key. Each document is
 // fetched and validated again before its contents may support an answer.
-export const researchDOBWorkflowRoutingVersion = "20260909-site-safety-document-sources-v4";
+export const researchDOBWorkflowRoutingVersion = "20260909-legalization-workflow-sources-v5";
 const source = (id, title, filename, catalogReviewedOn = "2026-09-08") => Object.freeze({
   id, title, url: `https://www.nyc.gov/assets/buildings/pdf/${filename}`,
   publisher: "NYC Department of Buildings", catalogReviewedOn
@@ -30,7 +30,7 @@ export function researchDOBWorkflowRoute(question) {
   const reviewField = /\bBuilding Code(?:[ -]+review)?[ -]+(?:year|edition|version)\b/gi;
   const fieldSelection = namedPortal && /\b(?:select|choose|pick|selection|field|dropdown|drop-down|option|which|what)\b/i.test(text);
   const legalQuestion = fieldSelection ? text.replace(reviewField, "portal review field") : text;
-  const requiresEnactedAnswer = /\b(?:FAR|floor area ratio|zoning|as[- ]of[- ]right|legal(?:ly)?|compli(?:ance|ant|es)|comply|violat(?:ion|e)|permit[- ]exempt|exempt(?:ion)? from|(?:building|plumbing|mechanical|fuel gas|construction) code|code (?:requirement|compliance)|(?:BC|PC|AC|ZR|MC|FGC)\s*(?:§|Section)?\s*\d)/i.test(legalQuestion) ||
+  const requiresEnactedAnswer = /\b(?:FAR|floor area ratio|zoning|as[- ]of[- ]right|legal(?:ly)?\b|compli(?:ance|ant|es)|comply|violat(?:ion|e)|permit[- ]exempt|exempt(?:ion)? from|(?:building|plumbing|mechanical|fuel gas|construction) code|code (?:requirement|compliance)|(?:BC|PC|AC|ZR|MC|FGC)\s*(?:§|Section)?\s*\d)/i.test(legalQuestion) ||
     (legalQuestion !== text && /\b(?:govern(?:s|ing)?|appl(?:y|ies|icable|icability)|controll?ing|requires?|required|requirements?|must|mandatory|allowed|permitted|eligib(?:le|ility))\b/i.test(legalQuestion));
   const topic = bpp ? "builders_pavement" : wetlands ? "wetland_documents" : siteSafety ? "site_safety_documents" : "dob_now_workflow";
   const guidanceOnly = (bpp || namedPortal) && !requiresEnactedAnswer;

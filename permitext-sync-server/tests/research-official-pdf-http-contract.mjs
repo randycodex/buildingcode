@@ -46,6 +46,7 @@ const guideComplete = new Promise((resolve) => { guideDocument.on("data", (chunk
 guideDocument.text("Synthetic routing regression source. DOB NOW Alteration routing asks whether the work must meet New Building requirements, is inconsistent with the Certificate of Occupancy, changes occupancy or use, makes a major change to exits, or changes the number of stories. All five No responses result in the Alteration job type. This is portal guidance, not a compliance determination.");
 guideDocument.addPage().text("Synthetic review-field regression source. The DOB NOW Building Code review year selection depends on job type, filing date and work type. The address identifies the property; an address alone does not select a review year. This describes the portal field, not enacted code applicability.");
 guideDocument.addPage().text("Synthetic percentage-question regression source. Does the alteration alter more than 50 percent of the building gross floor area? A Yes response triggers the Site Safety Plan workflow item. Actual applicability needs the appropriate site safety criteria.");
+guideDocument.addPage().text("Synthetic amendment regression source. To revise approved scope and drawings in a DOB NOW filing, the Applicant of Record submits a Post Approval Amendment (PAA). A PAA is unavailable when the filing includes legalization. This describes the filing action, not legal approval of the revised work.");
 guideDocument.end();
 const guideBytes = await guideComplete;
 async function syntheticPDF(text) {
@@ -104,7 +105,7 @@ const responseDouble = async (url, options) => {
       return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 50 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text, annotations: [{ type: "url_citation", start_index: 0, end_index: text.length, url: guideURL, title: "Synthetic application guide" }] }] }] });
     }
     if (portalCase) assert(["permitext_official_guidance_summary", "permitext_official_guidance_verification"].includes(body.text.format.name),
-      "The field-selection question must not enter general enacted-code interpretation.");
+      "The portal workflow question must not enter general enacted-code interpretation.");
     const input = JSON.parse(body.input);
     if (portalCase) {
       assert.equal(input.question, question.replace(/\s+/g, " ").trim(), "Retain the complete authored question through normal HTTP whitespace normalization.");
@@ -131,7 +132,7 @@ const responseDouble = async (url, options) => {
       summaryDoubles += 1;
       const wetlands = /wetlands/i.test(input.question);
       const passages = portalCase === "DOBNOW-008" ? input.passages
-        : portalCase ? input.passages.filter((passage) => passage.url.startsWith(guideURL) && passage.page === (portalCase === "DOBNOW-001" ? 1 : 2))
+        : portalCase ? input.passages.filter((passage) => passage.url.startsWith(guideURL) && passage.page === (portalCase === "DOBNOW-001" ? 1 : portalCase === "DOBNOW-004" ? 4 : 2))
         : wetlands ? input.passages : input.passages.slice(0, 1);
       if (portalCase && portalCase !== "DOBNOW-008") assert.equal(passages.length, 1);
       value = {
@@ -141,6 +142,8 @@ const responseDouble = async (url, options) => {
               ? "On the stated facts, answer No to all five routing questions; the resulting job type is Alteration."
             : portalCase === "DOBNOW-021"
               ? "An address alone is insufficient to select the review year. Provide the job type, filing date and work type."
+            : portalCase === "DOBNOW-004"
+              ? "The Applicant of Record submits a Post Approval Amendment to revise the approved scope and drawings. The stated filing does not include legalization."
             : portalCase === "DOBNOW-008"
               ? missingSafetySources
                 ? "Answer Yes to the percentage question: the alteration alters 60 percent of gross floor area. The exception documents could not be retrieved, so final Site Safety Plan applicability remains unresolved."
@@ -243,8 +246,8 @@ try {
   assert.equal(providerDoubles, beforeWorkflow + 4, "The wetlands workflow bypasses search but verifies its summary.");
   assert.equal(summaryDoubles, 3);
   assert.equal(verificationDoubles, 3);
-  const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json", import.meta.url)));
-  for (const id of ["DOBNOW-001", "DOBNOW-021", "DOBNOW-008"]) {
+  const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json", import.meta.url)));
+  for (const id of ["DOBNOW-001", "DOBNOW-004", "DOBNOW-021", "DOBNOW-008"]) {
     portalCase = id;
     question = retained.results.find((item) => item.id === id).question;
     const beforePortal = providerDoubles;
@@ -255,7 +258,7 @@ try {
     assert.equal(answer.citations.length, 0, "Portal guidance must not acquire irrelevant enacted citations.");
     assert.equal(answer.verification.pass, true);
     assert.equal(providerDoubles - beforePortal, id === "DOBNOW-008" ? 2 : 3, "Known site-safety documents bypass search; summary and verifier remain required.");
-    assert.match(answer.answerText, id === "DOBNOW-001" ? /On the stated facts/ : id === "DOBNOW-021" ? /address alone is insufficient/ : /alters 60 percent/);
+    assert.match(answer.answerText, id === "DOBNOW-001" ? /On the stated facts/ : id === "DOBNOW-004" ? /Applicant of Record submits a Post Approval Amendment/ : id === "DOBNOW-021" ? /address alone is insufficient/ : /alters 60 percent/);
     assert.equal(answer.promptVersion, "20260909-document-summary-v3");
     assert.equal(answer.officialGuidanceSummary.version, "20260908-document-summary-v1",
       "A prompt update must preserve the saved integrity-proof contract.");

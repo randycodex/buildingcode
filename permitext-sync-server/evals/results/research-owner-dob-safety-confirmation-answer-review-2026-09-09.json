@@ -1,0 +1,172 @@
+{
+  "schema": "permitext-owner-dob-safety-confirmation-review-v1",
+  "reviewedOn": "2026-09-09",
+  "liveSourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+  "referenceKeySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "liveResult": {
+    "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+    "sha256": "68f098015f6d49060f62a725dc805f76b6f4692203e30f9de45cd3e8282a6cc9"
+  },
+  "costAudit": {
+    "file": "evals/results/research-owner-api-round2-dob-safety-confirmation-cost-audit-2026-09-09.json",
+    "sha256": "8217cd50f6f2b2625d987c4ae4a58244f34736751f0a4c32844381b3021ae0bc"
+  },
+  "newProfessionalApproval": false,
+  "strictQualityAcceptedCostPerAnswerUSD": null,
+  "reviewMethod": "Manual development review of retained answers and verifier outputs against the reconciled key, cited source text, current official FAQ/PAA/DEP pages and the visually checked presentation page. No separate paid judge; not professional sign-off. Core confirmation is narrower than complete rubric acceptance.",
+  "summary": {
+    "attempted": 11,
+    "delivered": 8,
+    "failed": 3,
+    "providerCalls": 32,
+    "pendingProviderRequests": 0,
+    "publicDocumentGETs": 17,
+    "usageEstimateUSD": 0.4349986,
+    "conservativeUSD": 0.771194,
+    "durationP50Milliseconds": 14222,
+    "durationP90Milliseconds": 22474,
+    "totalRoundUsageEstimateUSD": 3.20868407,
+    "totalRoundConservativeUSD": 6.188751,
+    "remainingConservativeAuthorizationUSD": 1.811249,
+    "fullCohortAttempted": 98,
+    "fullCohortUnattempted": [
+      "ZR-03",
+      "ZR-06",
+      "ZR-09",
+      "ZR-19",
+      "ZR-20",
+      "DOBNOW-014",
+      "DOBNOW-015",
+      "DOBNOW-016",
+      "DOBNOW-017",
+      "DOBNOW-022",
+      "DOBNOW-023",
+      "DOBNOW-024"
+    ]
+  },
+  "sourceReviewLinks": [
+    "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+    "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page",
+    "https://www.nyc.gov/site/dep/water/stormwater-permits.page",
+    "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf"
+  ],
+  "nextWork": [
+    "Retrieve related FAQ and specialized workflow sources before giving universal filing-completion or PAA-limit conclusions.",
+    "Keep relevant source exceptions while excluding unasked branch summaries; preserve ownership/attestation and the exact portal field.",
+    "Distinguish different applicability scopes from actual source conflicts and avoid unsupported authority boilerplate.",
+    "Repair the legalization/ legal routing collision offline; confirm actual HTTP routing and all 110 scope boundaries.",
+    "Retain the 12 unattempted cases and all earlier quality failures; never replace full-cohort acceptance with this batch delivery rate."
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-001",
+      "liveStatus": "completed",
+      "reviewStatus": "development-core-confirmed",
+      "durationMilliseconds": 17309,
+      "inputSHA256": "4cd643ac879632820aa66d55ba8afcd692c2d67d9e9aea087e5d723623515879",
+      "expectedAnswerSHA256": "042b9aea80495a72aabcf596bed8824be7401ad136ac58f850a4f0cd557eaa54",
+      "deliveredAnswerSHA256": "f49f8eb574d561bc7a576cc83e18993336119e0fd93fd08c260a4eedeb8e5c3f",
+      "notes": "The saved answer now accepts the supplied negative scope facts, answers all five questions No and gives Alteration on those facts. It retains the stories/building-type qualification when describing the alternative route. The unasked alternative routes and locked-field detail can be shortened; this is not a complete professional approval."
+    },
+    {
+      "id": "DOBNOW-008",
+      "liveStatus": "completed",
+      "reviewStatus": "development-core-confirmed-with-wording-gap",
+      "durationMilliseconds": 13699,
+      "inputSHA256": "d33c19c69ab1f6fb5981386eadcf5c1cd65c58f7f5b67258492f365ffe884815",
+      "expectedAnswerSHA256": "f76f360fbf1fb7244bdcba55e87e2dc5b3b10f11117f701750b1c387bc524b30",
+      "deliveredAnswerSHA256": "0e08a0166e40a933846ad81739d526e0aaaaa77ba5a1134f04d66e4c901788ec",
+      "notes": "The answer preserves 60 percent of gross floor area altered, delivers Yes, retrieves guide page 23 and presentation pages 16/17, and scopes the family-building/registered-GC exception. Page 16 was checked visually against the retained PDF image. Calling the unresolved relationship a conflict is stronger than necessary: distinguish a conditionally applicable exception from incompatible instructions. Final site-safety applicability is not established."
+    },
+    {
+      "id": "DOBNOW-020",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-verification-failed",
+      "durationMilliseconds": 24315,
+      "inputSHA256": "bcf9e23c1414c2f06aff5870151d2f1f716074e011da2778eb0d48da75fa7611",
+      "expectedAnswerSHA256": "7d31ef49f13b8ea69dc48f62d1abd26958b385793d7421ca59622845f26374a6",
+      "deliveredAnswerSHA256": null,
+      "notes": "The draft reaches No and the 40-day hold, but turns differences between calendared and landmarked requirements into a claimed source conflict and adds broader LPC-processing conclusions. Verification rejects those additions. The prior saved-answer integrity fix therefore has no fresh completion confirmation from this attempt. Conditional document timing still needs complete source coverage."
+    },
+    {
+      "id": "DOBNOW-021",
+      "liveStatus": "completed",
+      "reviewStatus": "delivered-incomplete",
+      "durationMilliseconds": 19571,
+      "inputSHA256": "5522267061751e82aef377a93ef8b6b8f5eab50a57a9ed9739e46e010c65c70c",
+      "expectedAnswerSHA256": "aaf3236a061e02249d0df65345402dcc5470f1f00dddd631dc71771d94fd0372",
+      "deliveredAnswerSHA256": "a444aa7d1879f50f0f75dded29493826b3d8093527b518081f93c824ca1583bf",
+      "notes": "The address-only refusal is correct and the answer stays in official-guidance mode. It adds an unasked electrical-filing branch and requests only job type, work types and filing date. It does not cover the remaining existing/prior-code, scope, related-filing and legal-basis facts in the development reference. Do not count this as complete acceptance."
+    },
+    {
+      "id": "DOBNOW-003",
+      "liveStatus": "completed",
+      "reviewStatus": "delivered-quality-failure",
+      "durationMilliseconds": 15710,
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "expectedAnswerSHA256": "53bf3d5275364916c22ce10e93a49e67045ac92efd0406ade504570b578ea6bc",
+      "deliveredAnswerSHA256": "9a70caca430505ba8fb8f0f2dc7222d8571e7b811685deb1d9c8dbe6740437dc",
+      "notes": "The same-job-number and different-applicant conclusions are supported. The answer then universally requires a separate LOC, missing the NB/Alteration-CO completion distinction, and does not acknowledge the creation-timing inconsistency. It adds an unnecessary LAA hypothetical despite the stated same-construction-project premise. Only the Application User Guide was fetched; current FAQ material was absent."
+    },
+    {
+      "id": "DOBNOW-004",
+      "liveStatus": "completed",
+      "reviewStatus": "delivered-quality-failure",
+      "durationMilliseconds": 22474,
+      "inputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "expectedAnswerSHA256": "fb0fbdf6d2cfec2d84bede1764713e9567a24bc7f5b4fc41b146dd785c111eff",
+      "deliveredAnswerSHA256": "b8e895c696ec4333c9cfab143cd75e88aecf231acb51b789cd32c35bd82cc9b8",
+      "notes": "The answer identifies PAA but omits the same-Applicant-of-Record, one-open-PAA and locked-field limits and the Work on Floors conflict. Its answerText also lacks adjacent source links and refers to irrelevant enacted structural passages. The routing regex matched legal inside legalization, selecting the general code path. A subsequent offline fix adds the word boundary; it does not repair this retained answer or prove the missing PAA source coverage."
+    },
+    {
+      "id": "DOBNOW-006",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-verification-failed",
+      "durationMilliseconds": 13241,
+      "inputSHA256": "30f752164ffaa6cd9862b763c580bf220adafd21651ea9d20f1680ea6aff8698",
+      "expectedAnswerSHA256": "7f045586581a2a2c7ceb4de55489d521126f6d6253dd13b98ae0e705aace8144",
+      "deliveredAnswerSHA256": null,
+      "notes": "The core No/enrollment answer is present in the draft. It adds an unsupported statement about what MPP does not authorize; verification rejects that addition. Avoid invented positive or negative authorization claims when the server already supplies the noncontrolling-guidance label."
+    },
+    {
+      "id": "DOBNOW-010",
+      "liveStatus": "completed",
+      "reviewStatus": "development-core-confirmed",
+      "durationMilliseconds": 9673,
+      "inputSHA256": "00c7df7639cf812e7df4c94ae0006a28b21175b965d5317863a9d16ad96faeb3",
+      "expectedAnswerSHA256": "ec51a80a7579a20fc6f4fab27a9dbe18cf4b13cb6939f724b333c8fef1aa8bd6",
+      "deliveredAnswerSHA256": "97852df4e480aa7214c8c6c3bc0d0fa8436ebe9fe38bfa690f7364c5c0143c40",
+      "notes": "The saved response gives Yes for the stated impact on sprinkler/standpipe water supply and the FDNY Letter of No Objection before approval, citing guide page 22. It is concise and responsive. Separate professional/current-rule confirmation remains pending."
+    },
+    {
+      "id": "DOBNOW-011",
+      "liveStatus": "completed",
+      "reviewStatus": "development-core-confirmed",
+      "durationMilliseconds": 10766,
+      "inputSHA256": "13fc63df66732233b28a7e0781ca0e5dc12c2a5529145016571469f60491952d",
+      "expectedAnswerSHA256": "ec51a80a7579a20fc6f4fab27a9dbe18cf4b13cb6939f724b333c8fef1aa8bd6",
+      "deliveredAnswerSHA256": "4209c55746054ac1f0cabd68217578a11795f622973e265d74db81158cae6eac",
+      "notes": "The saved response correctly compares 36 hours with the greater-than-24-hours question and gives the FDNY Letter of No Objection before approval with guide page 22. Separate impairment obligations are outside the answer and remain unchecked; do not call it a complete fire-safety determination."
+    },
+    {
+      "id": "DOBNOW-012",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-verification-failed",
+      "durationMilliseconds": 13803,
+      "inputSHA256": "fdce0b3e6b5040b5b8daca22240582b5e3f0713f736c68505845d230cb6206af",
+      "expectedAnswerSHA256": "76b2ff9e0af3d3e7edfe672927026a200449402667aaa9e7d4cf61200a25baad",
+      "deliveredAnswerSHA256": null,
+      "notes": "The draft correctly applies exactly 5,000 square feet and the alternative threshold, but does not distinguish the project-specific question from the separate larger-common-plan question on the same page. The verifier rejects that ambiguous field application. DEP City-owned-sewer drainage and current exclusions are also absent from the source package; the numerical field response cannot establish final permit applicability."
+    },
+    {
+      "id": "DOBNOW-013",
+      "liveStatus": "completed",
+      "reviewStatus": "delivered-incomplete",
+      "durationMilliseconds": 14222,
+      "inputSHA256": "dd2377f7a8a14f78b23aafbf7037ec97a7adc04efea80db4407e1c462460dd04",
+      "expectedAnswerSHA256": "f5ce5f3c60c701866d272bc383e4bba9ab3c424a293add519648ad3d51fe75a0",
+      "deliveredAnswerSHA256": "fc618066758c146a61b2b63ced80ff0f99baff1692f0dd06b146432da3fc3508",
+      "notes": "The saved Yes/TPP answer preserves any occupancy before permit sign-off, but does not identify the owner statement/attestation and adds unasked numbered-question/special-inspection branches without their text. Current FAQ also identifies an Alt-CO subsequent-filing exception when TPP is approved on the initial filing. The answer and development reference require that applicability review before strict acceptance."
+    }
+  ]
+}

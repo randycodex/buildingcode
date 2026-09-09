@@ -22,6 +22,22 @@ assert.equal(researchDOBWorkflowRoute("For my DOB NOW application, does the prop
 assert.equal(researchWebSupportTrigger({ question: "What authorization step appears?", retrievalQuery: "A new Builders Pavement Plan application. What authorization step appears?" }, {}).workflow.topic, "builders_pavement");
 assert.equal(researchWebSupportTrigger({ question: "What does PC 403.1 require?", retrievalQuery: "What does PC 403.1 require?" }, {}).workflow, undefined);
 const originalCases = JSON.parse(await readFile(new URL("../evals/research-reconciled-answer-key.json", import.meta.url)));
+const paaCase = originalCases.cases.find((item) => item.id === "DOBNOW-004");
+const paaQuestion = [`Context: ${paaCase.questionContext}`, paaCase.scenario, paaCase.question].join("\n\n");
+for (const question of [paaQuestion,
+  "The DOB NOW filing includes legalization. Which filing action changes the drawings?",
+  "The DOB NOW filing does not include legalization. How do I submit a PAA?"
+]) {
+  assert.equal(researchDOBWorkflowRoute(question).guidanceOnly, true,
+    "Legalization names a portal filing status, not a request for a legal determination.");
+  assert.equal(researchWebSupportTrigger({ question }, {}).workflow.guidanceOnly, true);
+}
+for (const question of [
+  `${paaQuestion} Is the proposed alteration legal?`,
+  `${paaQuestion} Can I legally proceed with the work?`,
+  `${paaQuestion} Does the legalization comply with BC 1007.1.1?`
+]) assert.equal(researchDOBWorkflowRoute(question).guidanceOnly, false,
+  "A separate request for legal or enacted-code applicability must retain the enacted-evidence path.");
 for (const id of ["DOBNOW-007", "DOBNOW-016"]) {
   const item = originalCases.cases.find((item) => item.id === id);
   const question = [item.scenario, item.question].filter(Boolean).join("\n\n");
