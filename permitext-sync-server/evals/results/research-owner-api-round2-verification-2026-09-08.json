@@ -1,0 +1,224 @@
+{
+  "schema": "permitext-owner-api-round2-verification-v1",
+  "checkedAt": "2026-09-09T01:02:28.095Z",
+  "sourceCommit": "2c46599b2ec292930ebcf1de145a5e9d636a7820",
+  "scope": "Settled paid-run provenance, offline validation and retained findings only. No new paid call, current provider balance read, Project/Notebook/Report/export/phone workflow, push or deployment.",
+  "packages": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d",
+      "sourceCommit": "d11d615f300e4f18c2f718bf00c597d4d6a7ce46",
+      "sourceHashEntries": 18,
+      "preflightFile": "evals/results/research-owner-api-round2-confirmation-preflight-2026-09-08.json",
+      "preflightSHA256": "41e538003388b1275c07c65aca3ad51deabd6dcb6eb04e4c1bce0ac7f1b18ed2",
+      "actualProviderCalls": 3,
+      "pendingProviderCalls": 0
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "sourceHashEntries": 18,
+      "preflightFile": "evals/results/research-owner-api-round2-repair-confirmation-preflight-2026-09-08.json",
+      "preflightSHA256": "cb08f43451adbc98547903df58252f3117e06950ee16bda8b9f8feed03a5c869",
+      "actualProviderCalls": 9,
+      "pendingProviderCalls": 0
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "sourceHashEntries": 18,
+      "preflightFile": "evals/results/research-owner-api-round2-code-coverage-preflight-2026-09-08.json",
+      "preflightSHA256": "9fdd719018e7ef55a13c1a275395302378e448d7803b4806980297e8ca898dda",
+      "actualProviderCalls": 51,
+      "pendingProviderCalls": 0
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5",
+      "sourceCommit": "53685fb3e3adad62084abd17de974db9d471107d",
+      "sourceHashEntries": 20,
+      "preflightFile": "evals/results/research-owner-api-round2-work-premise-preflight-2026-09-08.json",
+      "preflightSHA256": "4f0be06f0621c6a2b5f7f313eb8d87cef1ad0513cd278439c301359afa7a0e68",
+      "actualProviderCalls": 6,
+      "pendingProviderCalls": 0
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1",
+      "sourceCommit": "3dd14d266ba31d4df51306946e7448bb1c115c2f",
+      "sourceHashEntries": 23,
+      "preflightFile": "evals/results/research-owner-api-round2-remaining-code-preflight-2026-09-08.json",
+      "preflightSHA256": "d916db5cd685714a6a483fe15f2fa58e7f5a98e71e31bdaccc99da461e325483",
+      "actualProviderCalls": 3,
+      "pendingProviderCalls": 0
+    }
+  ],
+  "tests": [
+    {
+      "command": "npm run test:research-chat",
+      "log": "/tmp/permitext-api-round2-research-chat.log",
+      "scope": "Offline Research contracts and isolated Research HTTP response doubles; no paid provider requests or Project workflow.",
+      "exitCode": 0,
+      "logSHA256": "ab9739bfd1a628d33bc94bd15299f9a675d3d8003f53c4b638699612e732e427"
+    },
+    {
+      "command": "node tests/research-answer-key-reconciliation-contract.mjs",
+      "log": "/tmp/permitext-api-round2-final-key-test.log",
+      "scope": "Final ZR-18 wording, immutable approval/input history, amendment guard and rendered key after final reference refinement.",
+      "exitCode": 0,
+      "logSHA256": "4aa276b5247596a672bc526cf4259d22dad23d6dbe32d15b5707211bb55099fb"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "evals/results/research-owner-api-round2-cost-audit-2026-09-08.json",
+      "sha256": "e17221897a4e3629b5eeacc89e5a942e5f2ef6d1a80cc20b5cf7d933912df681"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-answer-review-2026-09-08.json",
+      "sha256": "462bbceddfdcb8a4667bf729ed0a1cb6cf2ed49fbaa17852d562851f57e4ddc7"
+    },
+    {
+      "file": "evals/research-answer-key-amendments.json",
+      "sha256": "aaa414e7d011656407cc4f79327c45c9f76d748779fb09c94cbf199b965564c7"
+    },
+    {
+      "file": "evals/research-reconciled-answer-key.json",
+      "sha256": "6953d0c784e839e7724b7b8641b6e24b97ed1f8989c5a01ab649b848de362cf8"
+    },
+    {
+      "file": "research-conversation-facts.mjs",
+      "sha256": "a8ae9fe2815d17f1cbd61d1995f4ad311bdf3267904ed52bdc070b73b7e57213"
+    },
+    {
+      "file": "tests/research-answer-key-reconciliation-contract.mjs",
+      "sha256": "4856ec6809273fe41790de3dbad7566745361131e3870d7fc1917357e90ba124"
+    },
+    {
+      "file": "tests/research-evals.mjs",
+      "sha256": "c5c47c40b6c9084910ca7f1fb8bc6c4ff835bec678cfabbc3caaeacc35af33f3"
+    },
+    {
+      "file": "scripts/report-research-owner-api-round2-20260908.mjs",
+      "sha256": "9fee312f73a1437a56394463a3efab29a2322444ba4d14c639ade3f1e4992cec"
+    }
+  ],
+  "reproducedCostSummary": {
+    "packages": 5,
+    "recordedProviderCalls": 72,
+    "newProviderCalls": 0,
+    "networkCalls": 0,
+    "usageEstimateUSD": 1.40369853,
+    "conservativeUSD": 2.810965,
+    "previouslyOmittedCacheWritePremiumUSD": 0.21575845,
+    "webSearchCalls": 3,
+    "components": {
+      "uncachedInputUSD": 0.0041068,
+      "cacheReadUSD": 0.00752748,
+      "cacheWriteUSD": 1.07879225,
+      "outputUSD": 0.283272,
+      "webSearchUSD": 0.03
+    },
+    "fullHTTPAttempts": 30,
+    "deliveredAttempts": 26,
+    "undeliveredAttempts": 4,
+    "verifierOnlyChecks": 0,
+    "verifierOnlyCostUSD": 0,
+    "fullHTTPCostUSD": 1.40369853,
+    "failedAttemptCostUSD": 0.24557093,
+    "additionalAnsweringCallsUSD": 0.2065854,
+    "deliveredAttemptCostP50USD": 0.03715402,
+    "deliveredAttemptCostP90USD": 0.07991744,
+    "failureAmortizedCostPerDeliveredUSD": 0.053988405,
+    "strictQualityAcceptedCostPerAnswerUSD": null,
+    "fullHTTPDurationP50Milliseconds": 12591,
+    "fullHTTPDurationP90Milliseconds": 30125,
+    "deliveredDurationP50Milliseconds": 12235,
+    "deliveredDurationP90Milliseconds": 30125,
+    "newRoundUniqueProviderAttemptedCases": 27,
+    "authorizationUSD": 8,
+    "remainingConservativeAuthorizationUSD": 5.189035,
+    "historicalSupplementalCaseIDs": [
+      "PDF-BPP"
+    ],
+    "fullCohortProviderAttempted": 67,
+    "fullCohortNotProviderAttempted": [
+      "CC-02",
+      "CC-05",
+      "ZR-02",
+      "ZR-03",
+      "ZR-04",
+      "ZR-05",
+      "ZR-06",
+      "ZR-07",
+      "ZR-09",
+      "ZR-10",
+      "ZR-11",
+      "ZR-12",
+      "ZR-13",
+      "ZR-15",
+      "ZR-16",
+      "ZR-17",
+      "ZR-19",
+      "ZR-20",
+      "DOBNOW-001",
+      "DOBNOW-002",
+      "DOBNOW-003",
+      "DOBNOW-004",
+      "DOBNOW-005",
+      "DOBNOW-006",
+      "DOBNOW-007",
+      "DOBNOW-008",
+      "DOBNOW-009",
+      "DOBNOW-010",
+      "DOBNOW-011",
+      "DOBNOW-012",
+      "DOBNOW-013",
+      "DOBNOW-014",
+      "DOBNOW-015",
+      "DOBNOW-016",
+      "DOBNOW-017",
+      "DOBNOW-020",
+      "DOBNOW-021",
+      "DOBNOW-022",
+      "DOBNOW-023",
+      "DOBNOW-024",
+      "MC-09",
+      "MC-13",
+      "GAP-03"
+    ],
+    "newlyProviderAttemptedCases": [
+      "FGC-11",
+      "FGC-12",
+      "FGC-14",
+      "FGC-15",
+      "MC-11",
+      "MC-12",
+      "MC-14",
+      "PC-06",
+      "PC-07",
+      "PC-09",
+      "PC-11",
+      "PC-13",
+      "PC-14",
+      "GAP-06",
+      "GAP-07",
+      "GAP-09",
+      "GAP-10",
+      "GAP-12",
+      "GAP-13",
+      "GAP-14",
+      "GAP-15",
+      "GAP-08"
+    ]
+  },
+  "latestCaseReview": {
+    "cases": 27,
+    "coreMatches": 21,
+    "coreWithQualityGap": 4,
+    "noDeliverable": 2,
+    "professionalApproval": false
+  }
+}

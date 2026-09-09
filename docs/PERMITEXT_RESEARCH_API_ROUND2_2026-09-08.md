@@ -54,7 +54,7 @@ This batch verifies provider web access, including PDF URLs. It does not indepen
 
 The [remaining-case HTTP preflight](../permitext-sync-server/evals/results/research-owner-api-round2-remaining-code-preflight-2026-09-08.json) intercepted every provider call, spent no API funds and left no pending reservations. MC-09, MC-13 and GAP-03 were excluded from the subsequent paid batch because that preflight hit the existing turn guard. GAP-08 alone was dispatched and completed. No larger turn cap or model substitution was used to force completion.
 
-The full offline Research chat suite covers fact state, source assembly, HTML/PDF attribution, answer structure, edition boundaries and isolated Research HTTP checks. Its final result is recorded in the round verification artifact. General project workflow and release checks are intentionally outside this verification.
+The full offline Research chat suite passed, covering fact state, source assembly, HTML/PDF attribution, answer structure, edition boundaries and isolated Research HTTP checks. The final key-specific contract also passed after the last wording refinement. The [verification record](../permitext-sync-server/evals/results/research-owner-api-round2-verification-2026-09-08.json) binds these checks and all 97 paid-package source-hash entries to their recorded commits. General project workflow and release checks are outside this verification.
 
 Reproduce cost accounting without credentials or network access:
 
