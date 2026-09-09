@@ -3,7 +3,7 @@ import { unresolvedZoningFARSelectionPattern, unresolvedZoningPropertyDeterminat
 import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
 
 export const zoningResearchSafetyVersion =
-  "20260909-zoning-source-scope-v24";
+  "20260909-markdown-determination-boundaries-v25";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -960,7 +960,8 @@ function mappedAnswerFields(answer) {
           { fieldKind: "supported_point_explanation", value: point?.explanation }
         ])
       : [])
-  ].map((entry) => ({ ...entry, value: compactText(withoutMappedReferenceParentheticals(entry.value)) })).filter((entry) => entry.value);
+  ].map((entry) => ({ ...entry, value: compactText(withoutMappedReferenceParentheticals(entry.value))
+    .replace(/\*\*|__|`/g, "") })).filter((entry) => entry.value);
 }
 
 function splitMappedConclusionClauses(value) {

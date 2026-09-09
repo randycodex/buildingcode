@@ -69,6 +69,12 @@ if (!process.argv.includes("--inspect")) {
   const boundStorage = structuredClone(storage.answer);
   boundStorage.supportedPoints[4].sourceIDs.push(existingFacilitySource);
   boundStorage.missingFacts.push("Special-district status", "Current zoning-lot area");
+  assert.deepEqual(storage.controls(boundStorage).issues.map((issue) => issue.obligationID),
+    ["storage_documented_reconstruction_branch", "storage_undocumented_nonconforming_branch"]);
+  // A handwritten completeness contrast, not a repair of the retained draft or
+  // proof that the provider generated these missing branches.
+  boundStorage.supportedPoints.push({ heading: "Historical alternatives", sourceIDs: [existingFacilitySource],
+    explanation: "Documented reconstruction after damage or destruction on the same zoning lot has a Section 43-10 floor-area limit; inadequate documentation leads to nonconforming-use treatment under Article V. Neither historical alternative can be applied without the missing 2017 facts." });
   assert(storage.controls(boundStorage).pass, JSON.stringify(storage.controls(boundStorage).issues));
   const switchedStorage = structuredClone(boundStorage);
   switchedStorage.supportedPoints[4].sourceIDs = [existingFacilitySource];

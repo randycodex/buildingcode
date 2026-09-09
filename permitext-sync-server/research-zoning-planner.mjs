@@ -4,10 +4,11 @@ import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zon
 import { zoningTemporalApplicationObligations, zoningTemporalApplicationIssues } from "./research-zoning-temporal-application.mjs";
 import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
 import { zoningExplicitAttributionIssues, zoningAttributionPrompt } from "./research-zoning-attribution.mjs";
+import { zoningStorageBranchObligations } from "./research-zoning-storage-branches.mjs";
 
 export const zoningResearchPlannerVersion = "20260909-declared-missing-map-facts-v7";
 
-export const zoningResearchCompilerVersion = "20260909-explicit-source-attribution-v28";
+export const zoningResearchCompilerVersion = "20260909-storage-branch-coverage-v29";
 export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
 
 export const zoningResearchPaths = Object.freeze({
@@ -1484,7 +1485,7 @@ export function zoningResearchDeterministicContext({
     arithmetic,
     lotHistoryPremise: zoningLotHistoryPremise({ question, projectFacts, conversationFactContext }),
     facts: resolvedFactText({ question, projectFacts, conversationFactContext })
-  }).concat(tableLegendObligations(question, evidence), zoningTemporalApplicationObligations({
+  }).concat(zoningStorageBranchObligations(evidence), tableLegendObligations(question, evidence), zoningTemporalApplicationObligations({
     question, evidence, facts: resolvedFactText({ question, projectFacts, conversationFactContext }),
     uncertainty: [question, ...(Array.isArray(projectFacts) ? projectFacts : []),
       ...(Array.isArray(conversationFactContext?.qualified) ? conversationFactContext.qualified : []),
@@ -2012,7 +2013,9 @@ export function evaluateZoningDeterministicControls({
       const sourceBound = supportedPoints.some((point) =>
         obligationCoveredByText(answerObligation, point.text) &&
         point.sourceIDs.size > 0 &&
-        Array.from(point.sourceIDs).every((sourceID) => allowedSourceIDs.has(sourceID))
+        (answerObligation.allowAdditionalBoundSources === true
+          ? Array.from(point.sourceIDs).some((sourceID) => allowedSourceIDs.has(sourceID))
+          : Array.from(point.sourceIDs).every((sourceID) => allowedSourceIDs.has(sourceID)))
       );
       if (!sourceBound) {
         issues.push({

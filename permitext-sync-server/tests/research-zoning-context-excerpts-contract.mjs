@@ -9,6 +9,7 @@ import { ownerResearchScopeInput } from "../evals/research-owner-scope-input.mjs
 import { assembledResearchEvidenceForTurn, researchCorpusPlanForTurn } from "../app.mjs";
 import { immutableEvidenceSnapshot } from "../project-foundation-contract.mjs";
 import { researchTopicDependencyPlan } from "../research-topic-dependencies.mjs";
+import { zoningStorageBranchObligations } from "../research-zoning-storage-branches.mjs";
 
 globalThis.fetch = async () => { throw new Error("Network forbidden in Zoning context excerpt contract."); };
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1" });
@@ -52,6 +53,15 @@ assert.equal(targetedZoningContextExcerpt({ ...source, text: canonical.slice(0, 
 const assembled = await assembledResearchEvidenceForTurn({ ...input, corpusPlan: await researchCorpusPlanForTurn(input), zoningPlan: plan });
 const delivered = assembled.sources.find((item) => item.sectionID === source.sectionID);
 assert.equal(delivered.text, excerpt.text);
+assert.deepEqual(zoningStorageBranchObligations([delivered]).map((item) => item.id),
+  ["storage_documented_reconstruction_branch", "storage_undocumented_nonconforming_branch"]);
+for (const candidate of [source, { ...delivered, codePrefix: "BC" }, { ...delivered, sectionNumber: "42-193" },
+  { ...delivered, targetedZoningContext: { ...delivered.targetedZoningContext, version: "unreviewed-version" } },
+  { ...delivered, targetedZoningContext: { ...delivered.targetedZoningContext, purpose: "unrelated-question" } }]) {
+  assert.deepEqual(zoningStorageBranchObligations([candidate]), [], "Coverage duties must come from the reviewed scoped source packet.");
+}
+assert.deepEqual(zoningStorageBranchObligations([{ ...delivered, text: "No reconstruction or historical provisions supplied." }]), [],
+  "Metadata alone cannot supply an absent rule.");
 assert.equal(delivered.canonicalContextComplete, false);
 assert.equal(delivered.truncated, false, "The selected spans are complete; the canonical section is explicitly partial.");
 assert.ok(delivered.targetedZoningContext);

@@ -51,6 +51,10 @@ const respondWithDouble = async (url, options) => {
     const evidence = Array.from(input.matchAll(/PASSAGE_ID: ([^\n]+)\nSECTION_ID: ([^\n]+)\nCODE: [^\n]+\nSECTION: ([^\n]+)/g),
       ([, sourceID, sectionID, sectionNumber]) => ({ sourceID, sectionID, sectionNumber }));
     proposed = conditionalFixtureAnswer(activeID, evidence);
+    if (mode.startsWith("binding_")) {
+      proposed.supportedPoints[0].explanation += " Separately, ZR 42-193 requires performance standards.";
+      assert(!proposed.supportedPoints[0].sourceIDs.some((id) => proposed.supportedPoints[1].sourceIDs.includes(id)));
+    }
     if (mode === "unsafe") proposed.answerText = `Yes. This property is approved.\n\n${proposed.answerText}`;
     output = mode === "invalid_draft" ? "invalid JSON double" : JSON.stringify(proposed);
   } else {
@@ -59,7 +63,12 @@ const respondWithDouble = async (url, options) => {
     const actual = JSON.parse(input.split("PROPOSED ANSWER JSON\n")[1]);
     assert.equal(actual.answerText, proposed.answerText, "Verify the actual final narrative.");
     assert(actual.missingFacts.length);
-    const accepted = mode === "accept";
+    if (mode.startsWith("binding_")) {
+      assert.equal(actual.supportedPoints[0].explanation, proposed.supportedPoints[0].explanation);
+      assert.deepEqual(actual.supportedPoints[0].sourceIDs, [...proposed.supportedPoints[0].sourceIDs, ...proposed.supportedPoints[1].sourceIDs],
+        "The mandatory verifier receives the added canonical binding, preserving the original binding and prose.");
+    }
+    const accepted = ["accept", "binding_accept"].includes(mode);
     output = JSON.stringify({ pass: accepted, issues: accepted ? [] : [{ type: "unsupported_requirement", detail: "Synthetic rejection of a cited rule; a boundary alone must not make the answer successful." }], unnecessaryMissingFactIndices: [] });
   }
   return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 10, output_tokens: 10, total_tokens: 20 },
@@ -100,7 +109,8 @@ try {
       const text = section.blocks.map((block) => block.plainText || "").join("\n\n").replace(/\s+/g, " ").trim();
       return [{ sectionID: String(sectionID), selectedText: text }];
     }))).flat();
-    for (mode of ["accept", "verification_reject", "unsafe", "provider_error", "invalid_draft"]) {
+    for (mode of ["accept", "verification_reject", "unsafe", "provider_error", "invalid_draft",
+      ...(activeID === "ZR-06" && surface === "reader" ? ["binding_accept", "binding_reject"] : [])]) {
       phases = [];
       doubleError = null;
       const created = await request("/research/conversations/create", { auth, ...(selections.length ? { selections } : {}), originSurface: surface }, token);
@@ -108,12 +118,19 @@ try {
       const conversationID = created.body.conversation.id;
       const response = await request("/research/conversations/message", { auth, conversationID, question: input.question, requestID: randomUUID() }, token);
       if (doubleError) throw doubleError;
-      if (mode === "accept") {
+      if (["accept", "binding_accept"].includes(mode)) {
         assert.equal(response.status, 200, `${activeID}: ${JSON.stringify(response.body)}`);
         if (activeID === "ZR-13") currentRuleConversationID = conversationID;
         const message = response.body.conversation.messages.findLast((item) => item.role === "assistant");
         assert.equal(message.answer.answerText, proposed.answerText);
         const { plan } = message.answer.zoningArchitecture;
+        if (mode === "binding_accept") {
+          const repairs = message.answer.zoningArchitecture.sourceBindingRepairs;
+          assert.equal(repairs.length, 1);
+          assert.equal(repairs[0].sectionNumber, "42-193");
+          assert.equal(repairs[0].pointIndex, 0);
+          assert(message.answer.supportedPoints[0].sourceIDs.includes(repairs[0].sourceID));
+        }
         assert.equal(message.answer.zoningArchitecture.deterministicContext.planHash, plan.planHash);
         assert.equal(plan.disposition, "conditional_source_explanation");
         assert.equal(plan.conditionalExplanation.determinationStatus, "unresolved");
@@ -142,14 +159,14 @@ try {
         const reopened = await request("/research/conversations/get", { auth, conversationID }, token);
         assert.equal(reopened.body.conversation.messages.filter((item) => item.role === "assistant").length, 0);
       }
-      assert.deepEqual(phases, ["accept", "verification_reject"].includes(mode)
+      assert.deepEqual(phases, ["accept", "verification_reject", "binding_accept", "binding_reject"].includes(mode)
         ? ["permitext_code_interpretation", "permitext_research_verification"] : ["permitext_code_interpretation"]);
       const telemetry = await request("/internal/evaluations/data", { auth }, token);
       const operations = telemetry.body.researchSpend.operationMetrics.filter((operation) => !seen.has(operation.id));
       assert.equal(operations.length, 1);
       const operation = operations[0];
       seen.add(operation.id);
-      assert.equal(operation.charged, mode === "accept");
+      assert.equal(operation.charged, ["accept", "binding_accept"].includes(mode));
       assert.equal(operation.providerRequestCount, phases.length);
       // A 503 without usage retains its conservative accounting reservation;
       // lack of a saved user answer must not be mistaken for zero API cost.
@@ -194,7 +211,7 @@ try {
   assert.deepEqual(phases, []);
   const priorAnswer = await request("/research/conversations/get", { auth, conversationID: currentRuleConversationID }, token);
   assert.equal(priorAnswer.body.conversation.messages.filter((item) => item.role === "assistant").length, 1);
-  console.log(`Conditional HTTP contract passed: ${21 + historicalQuestions.length} offline flows including full Reader sections and unpinned storage chat; cited answers and excerpt provenance persist, failures stay unsaved and uncharged, maximum two provider doubles, eight historical source boundaries including a follow-up block dispatch, zero external calls.`);
+  console.log(`Conditional HTTP contract passed: ${23 + historicalQuestions.length} offline flows including source-binding repair with accepting and rejecting semantic-verifier doubles; full Reader sections and unpinned storage chat; failures stay unsaved and uncharged, maximum two provider doubles, zero external calls.`);
 } finally {
   globalThis.fetch = nativeFetch;
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }

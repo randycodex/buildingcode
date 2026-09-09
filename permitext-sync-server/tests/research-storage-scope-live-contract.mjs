@@ -6,6 +6,8 @@ import { assembledResearchEvidenceForTurn, researchCorpusPlanForTurn } from "../
 import { planZoningResearchQuestion, zoningResearchDeterministicContext, evaluateZoningEvidenceReadiness,
   evaluateZoningDeterministicControls } from "../research-zoning-planner.mjs";
 import { planZoningConditionalExplanation } from "../research-zoning-conditional-explanation.mjs";
+import { bindExplicitZoningRuleSources } from "../research-zoning-attribution.mjs";
+import { zoningMappedClauseAnalysis } from "../research-zoning-safety.mjs";
 
 globalThis.fetch = async () => { throw new Error("No network in retained storage-scope checks."); };
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1" });
@@ -37,4 +39,19 @@ assert(result.issues.some((issue) => issue.code === "EXPLICIT_ZONING_RULE_SOURCE
   "The actual new mixed-source point must remain rejected until its missing source is bound.");
 // Do not encode the observed wording-related false rejections as desired
 // behavior. The live result preserves them for the next parser repair.
-console.log("Retained storage-scope draft: missing facts preserved, real source-binding defect still rejected; no new API calls or full-quality acceptance.");
+const reconciled = bindExplicitZoningRuleSources({ answer, evidence: assembled.sources, plan });
+assert.equal(reconciled.repairs.length, 1);
+assert.equal(reconciled.repairs[0].sectionNumber, "42-193");
+assert.equal(reconciled.repairs[0].pointIndex, 4);
+const after = evaluateZoningDeterministicControls({ plan, deterministicContext: context, answer: reconciled.answer, providerRequestCount: 1 });
+assert(!after.issues.some((issue) => ["EXPLICIT_ZONING_RULE_SOURCE_NOT_BOUND", "CONDITIONAL_DETERMINATION_BOUNDARY_MISSING"].includes(issue.code)),
+  JSON.stringify(after.issues));
+assert.deepEqual(after.issues.filter((issue) => issue.code === "ANSWER_OBLIGATION_NOT_COVERED").map((issue) => issue.obligationID),
+  ["storage_documented_reconstruction_branch", "storage_undocumented_nonconforming_branch"],
+  "The actual draft's omitted source branches must remain visible after metadata repair.");
+assert.equal(reconciled.answer.answerText, answer.answerText);
+const clauses = zoningMappedClauseAnalysis(reconciled.answer);
+assert(clauses.some((clause) => clause.locationBoundary && /an as-of-right determination/.test(clause.clause)));
+assert(!clauses.some((clause) => /supplied facts.*The property/.test(clause.clause)),
+  "Closing Markdown emphasis must not join adjacent sentences into one assertion.");
+console.log("Retained storage-scope draft: missing facts preserved; source binding and nominal boundary repaired; two omitted branches rejected; zero new API calls or full-quality acceptance.");

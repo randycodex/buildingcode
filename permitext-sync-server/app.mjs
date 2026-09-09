@@ -1,3 +1,4 @@
+import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
 import {
   X509Certificate,
   createHash,
@@ -19658,6 +19659,7 @@ async function handleResearchConversationMessage(request, response) {
               evidenceAnalysisResult.analysis.unresolvedProjectFacts
             )
           };
+    const zoningSourceBindingRepairs = [];
     const applyDeterministicAnswerRepairs = (candidate) => {
       const repairedInterpretation = officialGuidanceOnly
         ? candidate.interpretation
@@ -19670,10 +19672,12 @@ async function handleResearchConversationMessage(request, response) {
             assembledEvidence,
             { question }
           );
+      const binding = bindExplicitZoningRuleSources({ answer: repairedInterpretation, evidence: assembledEvidence, plan: zoningPlan });
+      zoningSourceBindingRepairs.push(...binding.repairs);
       return {
         ...candidate,
         interpretation: applyResearchOutsideAuthorityStartingPoints(
-          repairedInterpretation,
+          binding.answer,
           evidencePackage.discovery?.outsideCurrentLibrary,
           { sourcePolicy: webSupportPolicyDecision, question }
         )
@@ -20361,6 +20365,8 @@ async function handleResearchConversationMessage(request, response) {
             evidenceSelection: evidencePackage.zoningSelection,
             evidenceReadiness: zoningEvidenceReadiness,
             repairVersion: zoningResearchRepairVersion,
+            sourceBindingVersion: zoningAttributionBindingVersion,
+            sourceBindingRepairs: zoningSourceBindingRepairs,
             sourceBoundedRepairApplied: zoningRepairApplied,
             repairPacketHashes: zoningRepairPacketHashes
           }

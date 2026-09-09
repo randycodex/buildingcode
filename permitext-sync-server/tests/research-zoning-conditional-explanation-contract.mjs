@@ -50,6 +50,25 @@ for (const id of ["ZR-06", "ZR-07", "ZR-13"]) {
   const safety = evaluateZoningResearchSafety({ ...input, evidence: assembled.sources, answer, questionPlan: responsePlan });
   assert.equal(safety.pass, true, `${id}: ${JSON.stringify(safety.issues)}`);
   if (id === "ZR-06") {
+    for (const [obligationID, pattern] of [
+      ["storage_documented_reconstruction_branch", /Documented reconstruction[^;]+;/],
+      ["storage_undocumented_nonconforming_branch", /inadequate documentation[^.]+\./]
+    ]) {
+      const incomplete = structuredClone(answer);
+      incomplete.answerText = incomplete.answerText.replace(pattern, "");
+      incomplete.supportedPoints[0].explanation = incomplete.supportedPoints[0].explanation.replace(pattern, "");
+      const issues = evaluateZoningDeterministicControls({ plan: responsePlan, deterministicContext, answer: incomplete }).issues;
+      assert(issues.some((issue) => issue.code === "ANSWER_OBLIGATION_NOT_COVERED" && issue.obligationID === obligationID));
+    }
+    const misbound = structuredClone(answer);
+    misbound.supportedPoints[0].sourceIDs = answer.supportedPoints[1].sourceIDs;
+    const misboundIssues = evaluateZoningDeterministicControls({ plan: responsePlan, deterministicContext, answer: misbound }).issues;
+    assert.equal(misboundIssues.filter((issue) => issue.code === "ANSWER_OBLIGATION_SOURCE_NOT_BOUND" && issue.obligationID.startsWith("storage_")).length, 2);
+    const multiSource = structuredClone(answer);
+    multiSource.supportedPoints[0].sourceIDs.push(...answer.supportedPoints[1].sourceIDs);
+    assert(!evaluateZoningDeterministicControls({ plan: responsePlan, deterministicContext, answer: multiSource }).issues
+      .some((issue) => issue.obligationID?.startsWith("storage_")),
+    "An additional valid binding must not invalidate the controlling historical source in a mixed point.");
     assert(responsePlan.missingFacts.some((fact) => fact.id === "special_district_status"));
     assert(responsePlan.missingFacts.some((fact) => fact.id === "zoning_lot_area"));
     const historicalAreaOnly = { ...answer, missingFacts: answer.missingFacts.filter((fact) => fact !== "Lot area") };
@@ -72,7 +91,11 @@ for (const id of ["ZR-06", "ZR-07", "ZR-13"]) {
       "Permitext cannot establish whether the facility is permitted from the stated facts.",
       "No site, property, or parcel conclusion can be made from the supplied facts.",
       "No parcel-specific as-of-right finding can be made from the supplied facts.",
-      "No property determination may yet be reached from the supplied facts."
+      "No property determination may yet be reached from the supplied facts.",
+      "An as-of-right determination for a specific property cannot be made from the supplied facts.",
+      "The requested finding cannot yet be reached from the supplied facts.",
+      "The property determination could not be confirmed from the supplied facts.",
+      "**No—an as-of-right determination for a specific property cannot be made from the supplied facts.**"
     ]) {
       const bounded = { ...answer, conclusion: lead, answerText: answer.answerText.replace(/^[^.]+\./, lead) };
       assert.equal(evaluateZoningDeterministicControls({ plan: responsePlan, deterministicContext, answer: bounded, providerRequestCount: 2 }).pass, true, lead);

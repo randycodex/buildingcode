@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const zoningConditionalExplanationVersion = "20260909-declared-missing-map-facts-v4";
+export const zoningConditionalExplanationVersion = "20260909-nominal-unresolved-determination-v5";
 // Withholding a permitted FAR is an unresolved determination, not a finding
 // that the property is prohibited. Keep this separate from positive approval
 // predicates so the safety check can still inspect any appended claim.
@@ -8,7 +8,12 @@ export const unresolvedZoningFARSelectionPattern = /\bno\s+(?:(?:maximum|minimum
 // These negative nominal statements withhold a determination. They do not
 // assert that a property is prohibited. Appended assertions are checked by
 // the mapped-clause safety analysis, independently of this phrase match.
-export const unresolvedZoningPropertyDeterminationPattern = /\bno\s+(?:site|property|parcel)(?:[- ]specific)?(?:\s*,?\s*(?:or\s+|and\s+)?(?:site|property|parcel)(?:[- ]specific)?){0,2}\s+(?:as[- ]of[- ]right\s+)?(?:conclusion|determination|finding|result|assessment)\s+(?:can|may)\s+(?:yet\s+)?be\s+(?:made|reached|given|established|confirmed)\b/i;
+const determinationNoun = String.raw`(?:conclusion|determination|finding|result|assessment)`;
+const determinationVerb = String.raw`(?:made|reached|given|established|confirmed)`;
+const propertyNominal = String.raw`(?:site|property|parcel)(?:[- ]specific)?`;
+const negativeNominal = String.raw`no\s+${propertyNominal}(?:\s*,?\s*(?:or\s+|and\s+)?${propertyNominal}){0,2}\s+(?:as[- ]of[- ]right\s+)?${determinationNoun}\s+(?:can|may)\s+(?:yet\s+)?be\s+${determinationVerb}`;
+const passiveNominal = String.raw`(?:an?|the)\s+(?:(?:${propertyNominal}|as[- ]of[- ]right|requested)\s+)?${determinationNoun}(?:\s+(?:for|about|on)\s+(?:a|the|this)\s+(?:(?:specific|subject|proposed)\s+)?(?:site|property|parcel|project))?\s+(?:cannot|can['’]t|could\s+not)\s+(?:yet\s+)?be\s+${determinationVerb}`;
+export const unresolvedZoningPropertyDeterminationPattern = new RegExp(String.raw`\b(?:${negativeNominal}|${passiveNominal})\b`, "i");
 const disposition = "conditional_source_explanation";
 const factPatterns = Object.freeze({
   property_identifier: /\b(?:address|BBL|block\s*(?:and|\/)\s*lot|property identifier|parcel identifier)\b/i,
@@ -88,6 +93,7 @@ export function zoningConditionalExplanationPrompt(plan) {
     `MISSING_PROJECT_FACTS: ${JSON.stringify(plan.missingFacts)}`,
     "Lead with a clear statement that the requested determination cannot yet be made from the supplied facts.",
     "Then explain the relevant supplied rule with exact citations, apply only established facts, and identify the material unresolved conditions in missingFacts.",
+    "Put the direct answer and concise application in answerText; explain each distinct rule or material alternative once in supportedPoints. Avoid repeating the full rule in both fields. Preserve material branch conditions while grouping related historical alternatives into one compact point.",
     "Do not answer with a prerequisite checklist alone. Do not assign a district, map area, historical lot condition, approval, prohibition, permitted FAR or compliance result to the property.",
     "Conditional rule explanations do not establish that the property satisfies their antecedents. Source excerpts may omit detail: explain only what the supplied passages establish and preserve their limits.",
     "Verification must reject a property determination, invented premise, unsupported branch, missing material condition, or generic boundary with no substantive cited explanation."
