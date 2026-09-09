@@ -163,12 +163,21 @@ assert.equal(discoverySelection.sources.some((item) => item.targetedZoningContex
 assert.equal(discoverySelection.usage.topicDependencyCount, 0);
 
 assert.equal(await refreshZoningContextEvidence(assembled, plan, () => { throw new Error("Unneeded reassembly"); }), assembled);
-const resolvedPlan = planZoningResearchQuestion({ ...input, projectFacts: ["Verified mapped district M1-1."] });
+const partiallyResolvedPlan = planZoningResearchQuestion({ ...input, projectFacts: ["Verified mapped district M1-1."] });
+assert.deepEqual(partiallyResolvedPlan.missingFacts.map((fact) => fact.id),
+  ["special_district_status", "zoning_lot_area"],
+  "Resolving the mapped district does not resolve the other explicitly missing facts.");
+// Once the user's question no longer asserts those missing facts, the resolved
+// map can remove the conditional excerpt. Keep the full authored case above.
+const resolvedInput = { ...input,
+  question: "What conditions apply to a self-service storage facility on this property?",
+  projectFacts: ["Verified mapped district M1-1.", "Special-district status: none.", "Current zoning-lot area: 10,000 square feet."] };
+const resolvedPlan = planZoningResearchQuestion(resolvedInput);
 assert.deepEqual(resolvedPlan.missingFacts, []);
 let refreshes = 0;
 const refreshed = await refreshZoningContextEvidence(assembled, resolvedPlan, async (questionPlan) => {
   refreshes++;
-  return assembledResearchEvidenceForTurn({ ...input, corpusPlan: await researchCorpusPlanForTurn(input), zoningPlan: questionPlan });
+  return assembledResearchEvidenceForTurn({ ...resolvedInput, corpusPlan: await researchCorpusPlanForTurn(resolvedInput), zoningPlan: questionPlan });
 });
 assert.equal(refreshes, 1);
 assert.equal(refreshed.sources.some((item) => item.targetedZoningContext), false,

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const zoningConditionalExplanationVersion = "20260909-conditional-source-explanation-v3";
+export const zoningConditionalExplanationVersion = "20260909-declared-missing-map-facts-v4";
 // Withholding a permitted FAR is an unresolved determination, not a finding
 // that the property is prohibited. Keep this separate from positive approval
 // predicates so the safety check can still inspect any appended claim.
@@ -13,9 +13,30 @@ const disposition = "conditional_source_explanation";
 const factPatterns = Object.freeze({
   property_identifier: /\b(?:address|BBL|block\s*(?:and|\/)\s*lot|property identifier|parcel identifier)\b/i,
   official_mapped_status: /\b(?:official map|mapped (?:zoning )?district|verified mapped|controlling map)\b/i,
+  special_district_status: /\bspecial[- ]district\b/i,
+  zoning_lot_area: /\blot[- ]area\b/i,
   historical_lot_condition: /\b(?:historical|historic|history|1961)\b/i
 });
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
+
+// Preserve facts explicitly listed as unknown by the question. The closed
+// noun-list grammar prevents an earlier supplied value from inheriting a later
+// item's "unknown" predicate. This does not invent prerequisites for all lots.
+export function declaredMissingZoningMapFacts(question) {
+  const datedHistory = String.raw`(?:[A-Za-z]+\s+\d{1,2},?\s+\d{4}\s+)?existing[- ]facility\s+facts`;
+  const attribute = String.raw`(?:(?:its|the|any)\s+)?(?:address|BBL|mapped\s+(?:zoning\s+)?district|special[- ]district\s+status|Appendix\s+J\s+subarea|(?:zoning[- ]|zoning\s+)?lot[- ]area|${datedHistory})`;
+  const separator = String.raw`(?:,\s*(?:(?:and|or)\s+)?|\s+(?:and|or)\s+)`;
+  const absent = String.raw`(?:(?:have|has)\s+not\s+been\s+(?:provided|supplied)|(?:is|are|remains?)\s+(?:unknown|unprovided|unverified|unresolved|not\s+(?:provided|supplied)))`;
+  const list = new RegExp(String.raw`\b(${attribute}(?:\s*${separator}${attribute})*)\s+${absent}\b`, "gi");
+  const unknown = [...compact(question).matchAll(list)].map((match) => match[1]).join(" ");
+  return [
+    ["special_district_status", "special-district status"],
+    ["zoning_lot_area", "current zoning-lot area"]
+  ].filter(([id]) => factPatterns[id].test(unknown)).map(([id, label]) => ({
+    id, label, present: false,
+    reason: "The question explicitly identifies this project fact as unresolved; preserve it before a property determination."
+  }));
+}
 
 export function isZoningConditionalExplanation(plan) {
   return plan?.disposition === disposition &&
@@ -85,7 +106,12 @@ export function zoningConditionalExplanationIssues({ plan, answer = {} } = {}) {
   }
   const missing = (answer.missingFacts || []).join(" ");
   for (const fact of plan.missingFacts) {
-    if (!factPatterns[fact.id]?.test(missing)) issues.push({
+    const covered = fact.id === "zoning_lot_area"
+      ? (answer.missingFacts || []).some((item) => factPatterns.zoning_lot_area.test(item) &&
+        (!/\b(?:historical|history|since|unchanged|increased?|changed?|change)\b|\b2017\b/i.test(item) ||
+          /\b(?:current|actual|total)\s+(?:zoning[- ]|zoning\s+)?lot[- ]area\b/i.test(item)))
+      : factPatterns[fact.id]?.test(missing);
+    if (!covered) issues.push({
       code: "CONDITIONAL_PROJECT_FACT_OMITTED", factID: fact.id,
       detail: `Keep the unresolved ${fact.label} in missingFacts.`
     });

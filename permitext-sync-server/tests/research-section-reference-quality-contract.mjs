@@ -6,7 +6,7 @@ import { assembledResearchEvidenceForTurn, researchCorpusPlanForTurn } from "../
 import { planZoningResearchQuestion, zoningResearchDeterministicContext, evaluateZoningEvidenceReadiness,
   evaluateZoningDeterministicControls, applyZoningResearchRepairPatch } from "../research-zoning-planner.mjs";
 import { planZoningConditionalExplanation } from "../research-zoning-conditional-explanation.mjs";
-import { evaluateZoningResearchSafety } from "../research-zoning-safety.mjs";
+import { evaluateZoningResearchSafety, zoningMappedClauseAnalysis } from "../research-zoning-safety.mjs";
 
 globalThis.fetch = async () => { throw new Error("No network in retained section-reference checks."); };
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1" });
@@ -59,18 +59,53 @@ if (!process.argv.includes("--inspect")) {
   // valid top-level citations. This runs through the conditional-plan compiler.
   const storageIssues = storage.controls(storage.answer).issues;
   assert(!storageIssues.some((issue) => issue.code === "CONDITIONAL_DETERMINATION_BOUNDARY_MISSING"));
-  assert.deepEqual(storageIssues.map((issue) => [issue.code, issue.pointIndex, issue.sectionNumber]),
+  assert.deepEqual(storageIssues.filter((issue) => issue.code === "EXPLICIT_ZONING_RULE_SOURCE_NOT_BOUND")
+    .map((issue) => [issue.code, issue.pointIndex, issue.sectionNumber]),
     [["EXPLICIT_ZONING_RULE_SOURCE_NOT_BOUND", 4, "42-192"]]);
+  assert.deepEqual(storageIssues.filter((issue) => issue.code === "CONDITIONAL_PROJECT_FACT_OMITTED").map((issue) => issue.factID),
+    ["special_district_status", "zoning_lot_area"]);
   const existingFacilitySource = storage.answer.citations.find((citation) => citation.sectionID === "20022473").sourceIDs[0];
   const performanceSource = storage.answer.supportedPoints[4].sourceIDs[0];
   const boundStorage = structuredClone(storage.answer);
   boundStorage.supportedPoints[4].sourceIDs.push(existingFacilitySource);
+  boundStorage.missingFacts.push("Special-district status", "Current zoning-lot area");
   assert(storage.controls(boundStorage).pass, JSON.stringify(storage.controls(boundStorage).issues));
-  const switchedStorage = structuredClone(storage.answer);
+  const switchedStorage = structuredClone(boundStorage);
   switchedStorage.supportedPoints[4].sourceIDs = [existingFacilitySource];
   assert.deepEqual(storage.controls(switchedStorage).issues.map((issue) => [issue.code, issue.sectionNumber, issue.sourceIDs]),
     [["EXPLICIT_ZONING_RULE_SOURCE_NOT_BOUND", "42-193", [performanceSource]]]);
-  assert(!storage.safety(storage.answer).pass, "The retained storage draft still has unresolved defects.");
+  assert(storage.safety(storage.answer).pass, JSON.stringify(storage.safety(storage.answer).issues));
+  assert(storage.safety(boundStorage).pass, JSON.stringify(storage.safety(boundStorage).issues));
+  assert(!zoningMappedClauseAnalysis(storage.answer).some((clause) => /^\(ZR\b/.test(clause.clause)),
+    "Reference-only parentheticals must not become assertion fragments.");
+  assert(zoningMappedClauseAnalysis(storage.answer).some((clause) => clause.locationBoundary && /no property location/i.test(clause.clause)));
+  assert(zoningMappedClauseAnalysis(storage.answer).some((clause) => clause.locationBoundary && /no selected map/i.test(clause.clause)));
+  // Every field remains accountable for its own claims. These mutations retain
+  // the real draft and sources, including its general rule and unknown facts.
+  const targetFields = ["answerText", "conclusion", ...boundStorage.supportedPoints.flatMap((_, index) =>
+    [`${index}.heading`, `${index}.explanation`])];
+  for (const field of targetFields) {
+    for (const delimiter of [". ", "; ", ", and ", ", but ", " — ", " (ZR § 42-192; "]) {
+      for (const assertion of ["the property is approved", "the owner may proceed", "this applies to the project", "this site is in Subarea 1", "the proposed facility is not permitted as-of-right"]) {
+        const unsafe = structuredClone(boundStorage);
+        const [index, key] = field.split(".");
+        const target = key ? unsafe.supportedPoints[Number(index)] : unsafe;
+        const name = key || field;
+        target[name] = (target[name] || unsafe.answerText).replace(/\.$/, "") + delimiter + assertion + (delimiter.includes("(") ? ".)" : ".");
+        assert(storage.safety(unsafe).issues.some((issue) => issue.type === "zoning_missing_mapped_location"),
+          `${field}: ${delimiter}${assertion}`);
+      }
+    }
+  }
+  for (const sentence of [
+    "The owner should verify the map. It is not an as-of-right authorization.",
+    "He cannot determine the mapped status without the official map, but retains the right to proceed.",
+    "He cannot determine the mapped status without the official map, but is cleared to proceed."
+  ]) {
+    const unsafe = structuredClone(boundStorage);
+    unsafe.answerText += ` ${sentence}`;
+    assert(storage.safety(unsafe).issues.some((issue) => issue.type === "zoning_missing_mapped_location"), sentence);
+  }
   const { answer, repaired, controls, safety } = records.get("ZR-20");
   assert(controls(answer).pass, JSON.stringify(controls(answer).issues));
   // The first draft still has an unqualified classification in a supported

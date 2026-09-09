@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { planZoningConditionalExplanation, isZoningConditionalExplanation, zoningConditionalExplanationIssues } from "../research-zoning-conditional-explanation.mjs";
+import { planZoningConditionalExplanation, isZoningConditionalExplanation, zoningConditionalExplanationIssues, declaredMissingZoningMapFacts } from "../research-zoning-conditional-explanation.mjs";
 import { planZoningResearchQuestion, zoningResearchDeterministicContext, evaluateZoningEvidenceReadiness, evaluateZoningDeterministicControls, zoningResearchPromptContext } from "../research-zoning-planner.mjs";
 import { routeResearchAnswerModel } from "../research-model-routing.mjs";
 import { evaluateZoningResearchSafety } from "../research-zoning-safety.mjs";
@@ -12,6 +12,15 @@ import { assembledResearchEvidenceForTurn, researchCorpusPlanForTurn } from "../
 globalThis.fetch = async () => { throw new Error("External calls forbidden in conditional explanation contract."); };
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1" });
 const key = JSON.parse(await readFile(new URL("../evals/research-reconciled-answer-key.json", import.meta.url)));
+for (const [question, expected] of [
+  ["The lot area is 10,000 square feet and special-district status is unknown.", ["special_district_status"]],
+  ["The special-district status is verified and the lot area is unknown.", ["zoning_lot_area"]],
+  ["Its special-district status and lot area have not been supplied.", ["special_district_status", "zoning_lot_area"]],
+  ["Its address, special district status, Appendix J subarea and zoning-lot area are unresolved.", ["special_district_status", "zoning_lot_area"]],
+  ["The lot area has not been provided, but special-district status is verified.", ["zoning_lot_area"]],
+  ["The lot area is 10,000 square feet; the mapped district is unknown.", []],
+  ["What rules apply in special districts to lots of different areas?", []]
+]) assert.deepEqual(declaredMissingZoningMapFacts(question).map((fact) => fact.id), expected, question);
 for (const id of ["ZR-06", "ZR-07", "ZR-13"]) {
   const input = await ownerResearchScopeInput(key.cases.find((item) => item.id === id), { original: true, zoningSummary: zoningSectionSummary });
   const plan = planZoningResearchQuestion(input);
@@ -41,6 +50,11 @@ for (const id of ["ZR-06", "ZR-07", "ZR-13"]) {
   const safety = evaluateZoningResearchSafety({ ...input, evidence: assembled.sources, answer, questionPlan: responsePlan });
   assert.equal(safety.pass, true, `${id}: ${JSON.stringify(safety.issues)}`);
   if (id === "ZR-06") {
+    assert(responsePlan.missingFacts.some((fact) => fact.id === "special_district_status"));
+    assert(responsePlan.missingFacts.some((fact) => fact.id === "zoning_lot_area"));
+    const historicalAreaOnly = { ...answer, missingFacts: answer.missingFacts.filter((fact) => fact !== "Lot area") };
+    assert(zoningConditionalExplanationIssues({ plan: responsePlan, answer: historicalAreaOnly })
+      .some((issue) => issue.factID === "zoning_lot_area"), "Historical lot-area changes do not supply the missing current area.");
     for (const extension of [
       "The property is approved.", "The owner may proceed.", "This site is within Subarea 1.",
       "The proposed facility is not permitted as-of-right.",

@@ -3,12 +3,22 @@ import { unresolvedZoningFARSelectionPattern, unresolvedZoningPropertyDeterminat
 import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
 
 export const zoningResearchSafetyVersion =
-  "20260909-zoning-stated-history-premise-v23";
+  "20260909-zoning-source-scope-v24";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
 function compactText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function withoutMappedReferenceParentheticals(value) {
+  const number = String.raw`\d{1,3}-\d{2,3}`;
+  const reference = String.raw`(?:(?:ZR\s*)?(?:§{1,2}\s*|Sections?\s+)?${number}|(?:ZR\s+)?Appendix\s+J)`;
+  const referencesOnly = new RegExp(String.raw`^${reference}(?:\s*(?:,|;|and)\s*${reference})*[.]?$`, "i");
+  // Only discard closed, reference-only parentheticals. Parentheses containing
+  // prose (including an appended approval) must remain subject to inspection.
+  return String(value || "").replace(/\(([^()]*)\)/g, (whole, content) =>
+    referencesOnly.test(compactText(content)) ? " " : whole);
 }
 
 function unique(values) {
@@ -200,7 +210,7 @@ function hasProjectHeadReference(value) {
     /\b(?:sites?|propert(?:y|ies)|parcels?|(?:tax|zoning) lots?|lots?|projects?|developments?|buildings?|proposals?|uses?|facilit(?:y|ies)|premises|tracts?|structures?)\b/i.test(text);
 }
 
-const zoningSectionReferencePattern = String.raw`Section\s+[0-9A-Za-z.-]+`;
+const zoningSectionReferencePattern = String.raw`(?:Section\s+|ZR\s*(?:§{1,2}\s*)?)[0-9A-Za-z.-]+`;
 const zoningCommissionPattern = String.raw`(?:CPC|City Planning Commission)`;
 const zoningPermitObjectPattern = String.raw`(?:(?:a\s+)?(?:${zoningCommissionPattern}\s+)?special permit(?:\s+of\s+(?:the\s+)?City Planning Commission)?(?:\s+(?:under|pursuant to)\s+${zoningSectionReferencePattern})?|(?:(?:the\s+)?${zoningCommissionPattern}(?:['’]s)?\s+approval|(?:the\s+)?approval\s+(?:of|from|by)\s+(?:the\s+)?${zoningCommissionPattern})|(?:an?\s+)?(?:${zoningCommissionPattern}\s+)?authorization(?:\s+(?:under|pursuant to)\s+${zoningSectionReferencePattern})?)`;
 const zoningSpecialPermitPredicatePattern = String.raw`(?:(?:requires?|need(?:s)?)\s+${zoningPermitObjectPattern}|need(?:s)?\s+to\s+(?:obtain|secure|have)\s+${zoningPermitObjectPattern}|(?:has|have)\s+to\s+(?:(?:obtain|secure|have)\s+${zoningPermitObjectPattern}|be\s+(?:subject to|contingent on)\s+${zoningPermitObjectPattern})|must\s+(?:obtain|secure|have)\s+${zoningPermitObjectPattern}|(?:cannot|may|can)\s+proceed\s+(?:without|subject to|only\s+(?:by|with))\s+${zoningPermitObjectPattern}|(?:may|shall|must|can)\s+not\s+proceed\s+without\s+${zoningPermitObjectPattern}|(?:is|are|shall be|must be)\s+(?:subject to|contingent on)\s+${zoningPermitObjectPattern})`;
@@ -231,7 +241,8 @@ function hasMappedOrRegulatoryPredicate(value) {
     hasSpecialPermitOrAuthorizationPredicate(text) ||
     /^(?:permitted|allowed|authorized)\s+as[- ]of[- ]right\b[^.]{0,140}\b(?:Subarea\s*[12]|Appendix\s+[A-Z]|mapped area|designated area)\b/i.test(text) ||
     /^(?:within|in|outside)\s+(?:the\s+)?(?:Subarea\s*[12]|Appendix\s+[A-Z]|mapped area|designated area)\b[^.]{0,140}\b(?:permitted|allowed|authorized|as[- ]of[- ]right|special permit)\b/i.test(text) ||
-    /\b(?:complies|satisfies)\b/i.test(text);
+    /\b(?:complies|satisfies)\b/i.test(text) ||
+    /\b(?:appl(?:y|ies)|extends?|(?:is|are)\s+applicable)\s+to\s+(?:the|this|that|our|your|their)\s+(?:(?:proposed|subject|specific)\s+)?(?:project|site|property|parcel|facility|proposal)\b/i.test(text);
 }
 
 function withoutReviewedGenericParentheticals(value) {
@@ -396,6 +407,10 @@ function hasAppendedMappedActorConclusion(value) {
 function statesLocationBoundary(value) {
   value = compactText(value).replace(/\*\*|__/g, "");
   if (unresolvedWhetherBoundary(value) || statesUnprovenFARAllowance(value)) return true;
+  const missingLocationInput = String.raw`(?:(?:the\s+)?property\s+location|(?:an?\s+)?official\s+map\s+determination|(?:the\s+)?(?:property\s+)?address|BBL)`;
+  const absentLocationStatement = new RegExp(String.raw`^no\s+${missingLocationInput}(?:\s+(?:or|and)\s+${missingLocationInput})*\s+(?:was|were|has\s+been|have\s+been)\s+(?:supplied|provided|established|verified)[.]?$`, "i");
+  const unlocatedProperty = /^no\s+(?:(?:selected|official|applicable)\s+)?map\s+or\s+property\s+location\s+establishes\s+which,?\s+(?:if\s+any,?\s+)?applies\s+to\s+(?:this|the)\s+property[.]?$/i;
+  if (absentLocationStatement.test(value) || unlocatedProperty.test(value)) return true;
   const boundaryPresent = unresolvedZoningFARSelectionPattern.test(value) ||
     unresolvedZoningPropertyDeterminationPattern.test(value) ||
     unresolvedMappedDecisionPattern.test(value) ||
@@ -467,6 +482,33 @@ function statesMappedEvidenceGatheringInstruction(value) {
   ).test(text);
 }
 
+function statesScopedMappedSourceExplanation(value) {
+  const text = compactText(value).replace(/\*\*|__/g, "");
+  if (!text || hasConcretePropertyIdentifier(text)) return false;
+  const subarea = String.raw`(?:(?:an?|the)\s+)?(?:Appendix\s+J\s+)?Subarea\s*[12](?:\s+designated\s+area)?`;
+  const genericUse = String.raw`(?:the\s+use|a\s+self[- ]service storage facility|self[- ]service storage facilities|it)`;
+  const asOfRight = String.raw`(?:is|are)\s+subject\s+to\s+(?:the\s+)?as[- ]of[- ]right\s+provisions(?:\s+of\s+${zoningSectionReferencePattern})?`;
+  const permit = String.raw`${zoningSpecialPermitPredicatePattern}(?:\s+rather\s+than\s+being\s+as[- ]of[- ]right)?`;
+  const spaceLimit = String.raw`(?:\s+but\s+must\s+be\s+limited\s+to\s+establishments\s+providing\s+industrial\s+floor\s+space\s+or\s+(?:the\s+specified\s+)?[“"]?business[- ]sized[”"]?\s+storage\s+space)?`;
+  const limitationNote = String.raw`(?:,\s+with\s+the\s+stated\s+industrial[- ]floor[- ]space\s+or\s+business[- ]sized[- ]storage\s+limitation)?`;
+  const conditionalUse = new RegExp(String.raw`^(?:in|within|for)\s+${subarea},\s+${genericUse}\s+(?:${asOfRight}|${permit})${spaceLimit}${limitationNote}[.]?$`, "i");
+  const categoryRule = new RegExp(String.raw`^within\s+designated\s+Manufacturing\s+District\s+areas\s+shown\s+in\s+Appendix\s+J,\s+Subarea\s*[12]\s+${asOfRight}${limitationNote}[.]?$`, "i");
+
+  // A classification with an explicit unknown district is not a placement of
+  // the property in any of the listed districts. Keep both clauses closed.
+  const district = String.raw`[MCR]\d+(?:-\d+)?[A-Z]?`;
+  const districts = String.raw`${district}(?:\s*(?:,\s*(?:and\s+)?|and\s+)${district})*`;
+  const unknownDistrict = String.raw`(?:the\s+)?property['’]s\s+zoning\s+district\s+and\s+Appendix\s+J\s+map\s+status\s+are\s+unknown`;
+  const classification = new RegExp(String.raw`^(?:although\s+)?a\s+self[- ]service storage facility\s+is\s+marked\s+[“"]?♦P[”"]?\s+in\s+${districts}\s+districts?[—–]\s*meaning\s+permitted\s+with\s+limitations\s+plus\s+additional\s+conditions[—–]\s*${unknownDistrict}[.]?$`, "i");
+
+  const actions = String.raw`(?:development|(?:certain\s+)?enlargement|change\s+of\s+use)`;
+  const actionList = String.raw`${actions}(?:,\s*(?:or\s+)?${actions})*`;
+  const commissionRule = new RegExp(String.raw`^for\s+a\s+zoning\s+lot\s+in\s+${subarea},\s+${zoningSectionReferencePattern}\s+authorizes\s+the\s+City\s+Planning\s+Commission\s+to\s+permit\s+${actionList}\s+for\s+a\s+Use\s+Group\s+[IVX]+\([A-Z]\)\s+self[- ]service storage facility,\s+subject\s+to\s+the\s+Commission['’]s\s+required\s+finding\s+of\s+appropriateness[.]?$`, "i");
+  const sourceConditions = /^(?:the\s+supplied\s+text\s+(?:also\s+)?makes\s+the\s+[“"]?P[”"]?\s+conditions\s+applicable|for\s+this\s+use,\s+those\s+conditions\s+require\s+conformance\s+with\s+the\s+cited\s+performance\s+standards)[.]?$/i;
+  return conditionalUse.test(text) || categoryRule.test(text) ||
+    classification.test(text) || commissionRule.test(text) || sourceConditions.test(text);
+}
+
 function hasMappedSpecificExample(value) {
   const clauses = compactText(value)
     .split(/(?<!\d)\.|\.(?!\d)|[!?;]+|\b(?:but|however)\b[\s,]*/i)
@@ -482,7 +524,11 @@ function hasMappedSpecificExample(value) {
   const assertedText = clauses.filter((clause) => !statesLocationBoundary(clause) &&
     !statesMappedEvidenceGatheringInstruction(clause)).join(". ");
   if (!text || (!hasMappedOrRegulatoryPredicate(assertedText) && !hasAffirmativeMappedResult(assertedText))) return false;
-  const normalized = withoutReviewedGenericParentheticals(text);
+  // Source rules establish regulatory context for an implicit continuation
+  // such as "this applies to the project", but their generic use/district
+  // nouns must not themselves be treated as concrete project identifiers.
+  const normalized = withoutReviewedGenericParentheticals(clauses
+    .filter((clause) => !statesScopedMappedSourceExplanation(clause)).join(". "));
   if (/\b(?:including|such\s+as|namely)\b|\bthis\s+includes\b/i.test(normalized)) {
     return true;
   }
@@ -556,6 +602,10 @@ function hasMappedSpecificExample(value) {
       continue;
     }
     const ellipticalClause = withoutDiscourseLead(clause);
+    if (specificAntecedentEstablished && /^(?:is|are|has|have)\b/i.test(ellipticalClause) &&
+      (hasAffirmativeMappedResult(ellipticalClause) || hasMappedOrRegulatoryPredicate(ellipticalClause))) {
+      return true;
+    }
     if (specificAntecedentEstablished &&
       /^(?:may|can|could|would|will|shall|must)\s+(?!not\b)/i.test(ellipticalClause) &&
       !statesMappedEvidenceGatheringInstruction(`the owner ${ellipticalClause}`)) {
@@ -800,7 +850,9 @@ function statesAppendixJMapDescription(value) {
   const designatedAreas = String.raw`(?:certain\s+)?designated areas within Manufacturing Districts`;
   const mapStatement = new RegExp(String.raw`^${authority}\s+(?:states|establishes|shows)\s+that\s+(?:boundaries\s+of\s+)?${designatedAreas}\s+are\s+(?:shown|identified)\s+on\s+(?:its|the Appendix J)\s+maps(?:\s+and\s+assigns\s+different\s+self[- ]service[- ]storage\s+approval\s+paths\s+by\s+subarea)?[.]?$`, "i");
   const comparison = /^(?:Appendix J|It) distinguishes Subarea 1, where self[- ]service storage facilities (?:follow|are subject to) the as[- ]of[- ]right provisions of Section 42-19, from Subarea 2, where those facilities require a City Planning Commission special permit under Section 74-192[.]?$/i;
-  return mapStatement.test(text) || comparison.test(text);
+  const mappedCategories = /^Appendix\s+J\s+identifies\s+the\s+designated\s+areas\s+and\s+their\s+Subarea\s+1\s+or\s+2\s+status\s+by\s+map[.]?$/i;
+  const framework = /^Appendix\s+J\s+supplies\s+the\s+Subarea\s+framework[.]?$/i;
+  return mapStatement.test(text) || comparison.test(text) || mappedCategories.test(text) || framework.test(text);
 }
 
 function statesGenericAppendixJTreatment(value) {
@@ -908,18 +960,21 @@ function mappedAnswerFields(answer) {
           { fieldKind: "supported_point_explanation", value: point?.explanation }
         ])
       : [])
-  ].map((entry) => ({ ...entry, value: compactText(entry.value) })).filter((entry) => entry.value);
+  ].map((entry) => ({ ...entry, value: compactText(withoutMappedReferenceParentheticals(entry.value)) })).filter((entry) => entry.value);
 }
 
 function splitMappedConclusionClauses(value) {
   const fieldText = compactText(value);
+  const dashActor = String.raw`(?:(?:the|this|that|our|your|their)\s+(?:(?:proposed|existing|subject|specific)\s+)?(?:project|site|property|parcel|facility|owner|applicant|developer|operator)|he|she|they|it|this|that)`;
+  const clauseBreak = new RegExp(String.raw`;\s+|[—–]\s*(?=${dashActor}\s+)`, "i");
   return fieldText
     .split(/[.!?](?:[)\]}"'”’]+)?\s+/)
-    .flatMap((sentence) => compactText(sentence).split(/;\s+/))
+    .flatMap((sentence) => compactText(sentence).split(clauseBreak))
     .flatMap((clause) => {
         const compactClause = compactText(clause);
         if (!compactClause) return [];
         if (statesSourceLevelMappedAreaRule(compactClause) ||
+          statesScopedMappedSourceExplanation(compactClause) ||
           statesGenericAppendixJTreatment(compactClause)) return [compactClause];
         const commaBoundaryConclusion = compactClause.match(/^(.+),\s+([^,]+)$/);
         if (
@@ -964,14 +1019,20 @@ function hasUnboundedMappedParcelPlacement(value) {
   );
 }
 
-function mappedClauseAnalysis(answer) {
+export function zoningMappedClauseAnalysis(answer) {
   return mappedAnswerFields(answer).flatMap((field) => {
     const fieldSpecificMappedExample = hasMappedSpecificExample(field.value);
-    return splitMappedConclusionClauses(field.value).map((clause) => {
+    let precedingSourceRule = false;
+    const clauses = splitMappedConclusionClauses(field.value).map((clause) => {
       const establishedSourceRule = statesSourceLevelMappedAreaRule(clause);
       const genericAppendixJTreatment = statesGenericAppendixJTreatment(clause);
       const sourceDescription = statesAppendixJMapDescription(clause);
-      const sourceRule = establishedSourceRule || genericAppendixJTreatment;
+      const scopedSourceExplanation = statesScopedMappedSourceExplanation(clause);
+      // This source-authorization clarification inherits only the immediately
+      // preceding rule in the same field, never a property/actor antecedent.
+      const sourceAuthorizationBoundary = precedingSourceRule && /^it\s+is\s+not\s+an\s+as[- ]of[- ]right\s+authorization[.]?$/i.test(clause);
+      const sourceRule = establishedSourceRule || genericAppendixJTreatment || scopedSourceExplanation || sourceAuthorizationBoundary;
+      precedingSourceRule = sourceRule;
       const clauseHasMappedOrRegulatoryPredicate =
         hasMappedOrRegulatoryPredicate(clause);
       const parcelSpecificConclusion = !sourceDescription && (
@@ -1001,6 +1062,17 @@ function mappedClauseAnalysis(answer) {
         )
       };
     });
+    // Keep a compound assertion's actor attached to its elliptical continuation
+    // before adversative splitting ("he cannot determine ..., but retains the
+    // right to proceed"). A boundary in another sentence cannot excuse it.
+    const actorSubject = /^(?:he|she|they|we|you|it|this|that|the\s+same|the\s+former|the\s+latter|(?:(?:the|this|that|our|your|their|said)\s+)?(?:applicant|owner|tenant|client|customer|developer|operator|lessee|landlord)|(?:the|this|that|our|your|their)\s+(?:project|site|property|parcel|facility))\b/i;
+    const compoundAssertions = field.value.split(/[.!?](?:[)\]}"'”’]+)?\s+/)
+      .filter((clause) => actorSubject.test(clause) && hasAppendedMappedActorConclusion(clause)).map((clause) => ({
+        fieldKind: field.fieldKind, clause, locationBoundary: false,
+        sourceRule: false, genericAppendixJTreatment: false,
+        parcelSpecificConclusion: true, directConclusion: true, compoundAssertion: true
+      }));
+    return clauses.concat(compoundAssertions);
   });
 }
 
@@ -1380,8 +1452,8 @@ export function evaluateZoningResearchSafety({
       ? answer.supportedPoints.map((point) => point?.explanation)
       : [])
   ].filter(Boolean).join(" "));
-  const mappedLocationBoundaryPresent = statesLocationBoundary(mappedConclusionNarrative);
-  const mappedClauses = mappedClauseAnalysis(answer);
+  const mappedClauses = zoningMappedClauseAnalysis(answer);
+  const mappedLocationBoundaryPresent = mappedClauses.some((clause) => clause.locationBoundary);
   const sourceBoundaryQuestion = isAppendixJSourceBoundaryQuestion(questionText);
   const citedAppendixJ = zoningEvidence(evidence).some((source) =>
     citationSet.has(compactText(source?.sourceID)) &&
@@ -1393,6 +1465,7 @@ export function evaluateZoningResearchSafety({
   const structuralAppendixJBoundary = sourceBoundaryQuestion && citedAppendixJ;
   const mappedClauseTriggers = (clause) => {
     if (clause.locationBoundary) return false;
+    if (clause.parcelSpecificConclusion) return true;
     if (structuralAppendixJBoundary) {
       if (!mappedLocationBoundaryPresent) {
         return clause.sourceRule || clause.directConclusion;

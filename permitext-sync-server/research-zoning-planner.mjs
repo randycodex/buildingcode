@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
 import { isAppendixJSourceBoundaryQuestion } from "./research-zoning-safety.mjs";
-import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zoningConditionalExplanationPrompt } from "./research-zoning-conditional-explanation.mjs";
+import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zoningConditionalExplanationPrompt, declaredMissingZoningMapFacts } from "./research-zoning-conditional-explanation.mjs";
 import { zoningTemporalApplicationObligations, zoningTemporalApplicationIssues } from "./research-zoning-temporal-application.mjs";
 import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
 import { zoningExplicitAttributionIssues, zoningAttributionPrompt } from "./research-zoning-attribution.mjs";
 
-export const zoningResearchPlannerVersion = "20260909-complete-definition-budget-v6";
+export const zoningResearchPlannerVersion = "20260909-declared-missing-map-facts-v7";
 
 export const zoningResearchCompilerVersion = "20260909-explicit-source-attribution-v28";
 export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
@@ -210,6 +210,7 @@ function factRequirements(path, facts, question) {
   const requirements = [];
   if (path === zoningResearchPaths.propertyMapApplicability) {
     const asksSourceBoundary = appendixJSourceExplanationOnly(question);
+    if (!asksSourceBoundary) requirements.push(...declaredMissingZoningMapFacts(question));
     const historicMIHLot = /\bMIH\b|Mandatory Inclusionary Housing/i.test(question) &&
       /\b(?:established in|date of establishment|combined in|historical zoning lot|small[- ]development exception)\b/i.test(question);
     const needsMappedDistrict = /\b(?:mapped zoning district|mapped district|transit zone|Appendix [A-Z]|subarea|specific property|self-service storage|close to (?:a|the) subway)\b/i.test(question) ||
