@@ -38,7 +38,7 @@ assert.equal(fixture.schema, "permitext-research-product-examples-v1");
 assert.equal(fixture.paidModelCallsAuthorized, false);
 assert.equal(fixture.cases.length, 7);
 assert.equal(new Set(fixture.cases.map((item) => item.id)).size, fixture.cases.length);
-assert.equal(researchAnswerPresentationVersion, "20260909-verified-guidance-preservation-v12");
+assert.equal(researchAnswerPresentationVersion, "20260909-claim-adjacent-conditions-v13");
 
 const manySources = Array.from({ length: 15 }, (_, i) => ({ sectionID: `source-${i}` }));
 for (const question of [

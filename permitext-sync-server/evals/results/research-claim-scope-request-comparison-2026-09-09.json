@@ -1,0 +1,308 @@
+{
+  "schema": "permitext.research-claim-scope-request-comparison.v1",
+  "checkedAt": "2026-09-09T22:05:49.872Z",
+  "baselineCommit": "842781a1ef68ef11848792a68b931f744ffeb19c",
+  "baselineSourceHashes": {
+    "summary": "babe3cd54a0cff50616c4bdc42fac78df040f68dc9cd1b7ee2aa31d668f1fff0",
+    "relationships": "853d84499b72914eefd1ad9837ad354b04594ffd8ebbcad358d8ed42b7bfaecf"
+  },
+  "sourceHashes": {
+    "app.mjs": "9308b04d017241fb66978b2ec96ba8707c956de50db7978b10b000755601214f",
+    "research-claim-scope.mjs": "2c8435c8676c077e2f782cf9cf56afa0f0fb94af48004d1e3dae8e032296c6e0",
+    "research-answer-presentation.mjs": "eba771b56d1265b9b0a8d56917194e53c378df231b7d4190c426d794cac2655f",
+    "research-guidance-source-relationships.mjs": "d8e4c0531afc863d77476067128f226bf4624d56655f4faef4ecc7e74af61bd4",
+    "research-official-guidance-summary.mjs": "aeb77f3430b61f2eae85de620963d7831fbf284b91d85e8ce8818a6736911dd1",
+    "research-guidance-qualification-review.mjs": "5844b5e1913e04a501e4c2bbbce184f95ccfbd088ff7e34d6de5492b141be0d1",
+    "tests/research-claim-scope-contract.mjs": "47db85ca4bccfafb4307f85f521854eaa6a6dae9a175ff12a76d2622ec6e94c0",
+    "scripts/check-research-claim-scope-20260909.mjs": "7bba9ff41dcce0914bb17cc0f3809b4008348b29954e5f9172d54834ed4a77f8"
+  },
+  "inputs": [
+    {
+      "path": "evals/results/research-owner-dob-source-conditions-inspection-2026-09-09.json",
+      "sha256": "078bff086ef7129c952d78372d83b0860177cfdf50a55610347e40313d711971"
+    },
+    {
+      "path": "evals/results/research-owner-api-round2-live-decision-scope-2026-09-09.json",
+      "sha256": "44404c9d63762081603834b505584fcd04dd15f2be87d260664f76da14892896"
+    },
+    {
+      "path": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    },
+    {
+      "path": "evals/results/research-owner-backlog-v2-2026-09-09.json",
+      "sha256": "9af45561835a277cb40aa04c46996fe472311f66018cd0ff8651197423ac90a7"
+    }
+  ],
+  "summary": {
+    "savedCases": 2,
+    "requestEnvelopes": 4,
+    "newProviderCalls": 0,
+    "newNetworkCalls": 0,
+    "generatedAnswersTested": 0,
+    "sourceAndFactChanges": 0,
+    "outputBudgetChanges": 0,
+    "liveQualityConfirmed": false,
+    "liveLatencyMeasured": false
+  },
+  "method": "Build old and current requests against the same retained official source snapshots and failed draft text. Rebind only unambiguous single-passage source IDs that changed across the recorded fetches; do not rewrite draft prose. This diagnoses request changes, not whether a model will now answer correctly. Public sources have not been refreshed by this check. No answer key enters a request.",
+  "budget": {
+    "auditFile": "evals/results/research-owner-api-round2-decision-scope-cost-audit-2026-09-09.json",
+    "auditSHA256": "89f5fc78bd249ed1c61cd5549214ab855090b4950e3528df7f2b559730ed75d3",
+    "authorizationUSD": 8.5,
+    "conservativeUSD": 7.921699,
+    "usageEstimateUSD": 4.18561632,
+    "remainingConservativeAuthorizationUSD": 0.578301,
+    "accountBalanceVerified": false
+  },
+  "results": [
+    {
+      "id": "DOBNOW-003",
+      "question": "Context: DOB NOW workflow\n\nAn initial GC filing has been created for a project. Plumbing work for the same construction project and property will be filed later, potentially by a different applicant.\n\nShould the plumbing scope receive a new unrelated job number or a subsequent filing under the existing job?",
+      "sourceSnapshotInputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "sourceCount": 3,
+      "retainedDraftSHA256": "0426267fd562ffd8a167580be69f168cf1c57174ea0c692e11a8ddaa907d3642",
+      "citationRebindings": [
+        {
+          "sourceID": "dob-subsequent-faq",
+          "from": "official-passage-0331bd114a1e55398f206b9e",
+          "to": "official-passage-1063e94f13c3228f90c31eb2",
+          "binding": "exact-normalized-passage-text"
+        },
+        {
+          "sourceID": "dob-subsequent-faq",
+          "from": "official-passage-0331bd114a1e55398f206b9e",
+          "to": "official-passage-1063e94f13c3228f90c31eb2",
+          "binding": "exact-normalized-passage-text"
+        },
+        {
+          "sourceID": "dob-nb-altco-faq",
+          "from": "official-passage-a9f2e262ed308f26503f48f3",
+          "to": "official-passage-64b43fbb85e879d5982496bc",
+          "binding": "exact-normalized-passage-text"
+        }
+      ],
+      "comparisons": [
+        {
+          "phase": "draft",
+          "beforeBytes": 22323,
+          "afterBytes": 23310,
+          "additionalBytes": 987,
+          "beforeRequestSHA256": "31acfad2e0307a3bda886ddd3ea9e5b04a24d06fbc6660e7758d5400aa219c30",
+          "afterRequestSHA256": "4d1425deb4150569e9a0d44c2bd19a923449e6fb299efeb9cd3b0989f544525e",
+          "maxOutputTokens": 2200,
+          "completePassagesUnchanged": true,
+          "factsAndQuestionUnchanged": true,
+          "proposedAnswerUnchanged": null,
+          "sourceRelationships": [
+            {
+              "kind": "creation_and_submission_timing",
+              "questionToResolve": "Reconcile the after-initial-submission initiation statement with the passage acknowledging a subsequent filing before initial submission. Distinguish creation from submission and identify any unresolved creation-timing question instead of presenting one statement as universal.",
+              "evidence": {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-1063e94f13c3228f90c31eb2",
+                "contentHash": "dab207980b1e10379c55e8aaf44f1fb879e4bd972d02dba5c14e57722e65be67",
+                "excerpts": [
+                  "Subsequent filings can be initiated and submitted after the initial job filing is submitted (not in pre-filing status).",
+                  "Fields from the subsequent filing are populated from the initial filing (I1). The fields will not update on the subsequent filing until the I1 is submitted. To prevent this issue, we recommend completing as much of the I1 as possible before creating the subsequent filing."
+                ]
+              }
+            },
+            {
+              "kind": "filing_completion_scope",
+              "questionToResolve": "The chosen filing path has separate processing and a job-type-dependent completion consequence. Reconcile the general separate-LOC direction with the specialized NB/Alteration-CO initial-CO path. State the branches briefly and identify the initial job type if unknown; do not drop the completion consequence while explaining which filing to use.",
+              "evidence": {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031",
+                "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+                "excerpts": [
+                  "a Letter of Completion (LOC) is requested separately on each filing."
+                ]
+              },
+              "relatedEvidence": [
+                {
+                  "sourceID": "dob-nb-altco-faq",
+                  "claimID": "official-passage-64b43fbb85e879d5982496bc",
+                  "contentHash": "acaed01262d04162a36fa44166544c690f1ffab717651b2d295b8f5d11e33620",
+                  "excerpts": [
+                    "Do I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing? — No, the status of the subsequent filings will remain Permit Entire. Only the status of the initial (I1) filing will change to CO issued."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "verification",
+          "beforeBytes": 41727,
+          "afterBytes": 42714,
+          "additionalBytes": 987,
+          "beforeRequestSHA256": "5df25c817d944fcf8a9d07814b6b107bca54a1de593c0a131783f09458bb3c64",
+          "afterRequestSHA256": "f804449c2c54eaa3f67c0842be61c5ee8056dda2f1579af9de1ec13de15bef09",
+          "maxOutputTokens": 1800,
+          "completePassagesUnchanged": true,
+          "factsAndQuestionUnchanged": true,
+          "proposedAnswerUnchanged": true,
+          "sourceRelationships": [
+            {
+              "kind": "creation_and_submission_timing",
+              "questionToResolve": "Reconcile the after-initial-submission initiation statement with the passage acknowledging a subsequent filing before initial submission. Distinguish creation from submission and identify any unresolved creation-timing question instead of presenting one statement as universal.",
+              "evidence": {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-1063e94f13c3228f90c31eb2",
+                "contentHash": "dab207980b1e10379c55e8aaf44f1fb879e4bd972d02dba5c14e57722e65be67",
+                "excerpts": [
+                  "Subsequent filings can be initiated and submitted after the initial job filing is submitted (not in pre-filing status).",
+                  "Fields from the subsequent filing are populated from the initial filing (I1). The fields will not update on the subsequent filing until the I1 is submitted. To prevent this issue, we recommend completing as much of the I1 as possible before creating the subsequent filing."
+                ]
+              }
+            },
+            {
+              "kind": "filing_completion_scope",
+              "questionToResolve": "The chosen filing path has separate processing and a job-type-dependent completion consequence. Reconcile the general separate-LOC direction with the specialized NB/Alteration-CO initial-CO path. State the branches briefly and identify the initial job type if unknown; do not drop the completion consequence while explaining which filing to use.",
+              "evidence": {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031",
+                "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+                "excerpts": [
+                  "a Letter of Completion (LOC) is requested separately on each filing."
+                ]
+              },
+              "relatedEvidence": [
+                {
+                  "sourceID": "dob-nb-altco-faq",
+                  "claimID": "official-passage-64b43fbb85e879d5982496bc",
+                  "contentHash": "acaed01262d04162a36fa44166544c690f1ffab717651b2d295b8f5d11e33620",
+                  "excerpts": [
+                    "Do I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing? — No, the status of the subsequent filings will remain Permit Entire. Only the status of the initial (I1) filing will change to CO issued."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-004",
+      "question": "Context: DOB NOW workflow\n\nThe initial filing is approved, and the approved scope and drawings must now be revised. The filing was not submitted for legalization.\n\nWhat filing action is appropriate, and what limits must be disclosed?",
+      "sourceSnapshotInputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "sourceCount": 3,
+      "retainedDraftSHA256": "eca05475a7a7d72ef9ff8dd7599dc66859cd6e559df83c4469779331f713d311",
+      "citationRebindings": [
+        {
+          "sourceID": "dob-paa-process",
+          "from": "official-passage-1141913e9cd0abc0c49a31d7",
+          "to": "official-passage-f6267c241da8f46e42c70947",
+          "binding": "single-passage-source-in-fixed-comparison-snapshot"
+        },
+        {
+          "sourceID": "dob-paa-process",
+          "from": "official-passage-1141913e9cd0abc0c49a31d7",
+          "to": "official-passage-f6267c241da8f46e42c70947",
+          "binding": "single-passage-source-in-fixed-comparison-snapshot"
+        },
+        {
+          "sourceID": "dob-paa-faq",
+          "from": "official-passage-d8ed61e13fa59530ec6ee691",
+          "to": "official-passage-8d5a37f609f3a00200f390c0",
+          "binding": "single-passage-source-in-fixed-comparison-snapshot"
+        },
+        {
+          "sourceID": "dob-paa-process",
+          "from": "official-passage-1141913e9cd0abc0c49a31d7",
+          "to": "official-passage-f6267c241da8f46e42c70947",
+          "binding": "single-passage-source-in-fixed-comparison-snapshot"
+        },
+        {
+          "sourceID": "dob-paa-process",
+          "from": "official-passage-1141913e9cd0abc0c49a31d7",
+          "to": "official-passage-f6267c241da8f46e42c70947",
+          "binding": "single-passage-source-in-fixed-comparison-snapshot"
+        },
+        {
+          "sourceID": "dob-paa-faq",
+          "from": "official-passage-d8ed61e13fa59530ec6ee691",
+          "to": "official-passage-8d5a37f609f3a00200f390c0",
+          "binding": "single-passage-source-in-fixed-comparison-snapshot"
+        }
+      ],
+      "comparisons": [
+        {
+          "phase": "draft",
+          "beforeBytes": 23606,
+          "afterBytes": 26896,
+          "additionalBytes": 3290,
+          "beforeRequestSHA256": "fbecd26a4da62380df046af990d486b216a76aefd7dc59d6dc3a8b789c28acbf",
+          "afterRequestSHA256": "7b28780d013e6a2ba485607ecfe1afb6f9af38b2494f2c0e6519960590e68057",
+          "maxOutputTokens": 2200,
+          "completePassagesUnchanged": true,
+          "factsAndQuestionUnchanged": true,
+          "proposedAnswerUnchanged": null,
+          "sourceRelationships": [
+            {
+              "kind": "field_editability",
+              "field": "Work on Floors",
+              "questionToResolve": "The PAA locked-field list and a separate editing direction both name Work on Floors. Determine whether their complete contexts reconcile the directions. If they do not, disclose the unresolved field-editability issue in the main answer; do not include this field in an unconditional locked-or-editable list.",
+              "evidence": {
+                "sourceID": "dob-paa-process",
+                "claimID": "official-passage-f6267c241da8f46e42c70947",
+                "contentHash": "95fc900d48f59f4a6e01a88366aeeae87c01343fb14fb4ef6b06c10afe958ce0",
+                "excerpts": [
+                  "Post Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — When a PAA is filed, the following fields are NOT editable: — • Filing Review Type (e.g. Standard Plan Examination to Professional Certification) • Application/Location Address • Work on Floors (e.g. Location details) • Applicant of Record Information • Owner Information • Building Type"
+                ]
+              },
+              "relatedEvidence": [
+                {
+                  "sourceID": "dob-paa-faq",
+                  "claimID": "official-passage-8d5a37f609f3a00200f390c0",
+                  "contentHash": "3cb0a3c6fd77242f8f8a98db69419289c6c66e61b3a6e2c221547f57150207ce",
+                  "excerpts": [
+                    "DOB NOW: Build Frequently Asked Questions > Post Approval Amendments — My filing is approved. How do I add or remove a floor from an application? — Work on floors can be changed with a PAA. The PW3 must also be updated to include the increase or decrease in the estimated work cost."
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "phase": "verification",
+          "beforeBytes": 49305,
+          "afterBytes": 52595,
+          "additionalBytes": 3290,
+          "beforeRequestSHA256": "83e9724d01ce0aa9921dfb0f062f0d0bb800ea5186cee8f3cb5948e8ba4366ef",
+          "afterRequestSHA256": "abaf3c04bb5c20b7cb24462e2ec2be437fa1e70bfc9fb5158cf2fefc68d96217",
+          "maxOutputTokens": 1800,
+          "completePassagesUnchanged": true,
+          "factsAndQuestionUnchanged": true,
+          "proposedAnswerUnchanged": true,
+          "sourceRelationships": [
+            {
+              "kind": "field_editability",
+              "field": "Work on Floors",
+              "questionToResolve": "The PAA locked-field list and a separate editing direction both name Work on Floors. Determine whether their complete contexts reconcile the directions. If they do not, disclose the unresolved field-editability issue in the main answer; do not include this field in an unconditional locked-or-editable list.",
+              "evidence": {
+                "sourceID": "dob-paa-process",
+                "claimID": "official-passage-f6267c241da8f46e42c70947",
+                "contentHash": "95fc900d48f59f4a6e01a88366aeeae87c01343fb14fb4ef6b06c10afe958ce0",
+                "excerpts": [
+                  "Post Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — When a PAA is filed, the following fields are NOT editable: — • Filing Review Type (e.g. Standard Plan Examination to Professional Certification) • Application/Location Address • Work on Floors (e.g. Location details) • Applicant of Record Information • Owner Information • Building Type"
+                ]
+              },
+              "relatedEvidence": [
+                {
+                  "sourceID": "dob-paa-faq",
+                  "claimID": "official-passage-8d5a37f609f3a00200f390c0",
+                  "contentHash": "3cb0a3c6fd77242f8f8a98db69419289c6c66e61b3a6e2c221547f57150207ce",
+                  "excerpts": [
+                    "DOB NOW: Build Frequently Asked Questions > Post Approval Amendments — My filing is approved. How do I add or remove a floor from an application? — Work on floors can be changed with a PAA. The PW3 must also be updated to include the increase or decrease in the estimated work cost."
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

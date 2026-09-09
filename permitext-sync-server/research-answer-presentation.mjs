@@ -1,6 +1,7 @@
 import { hasVerifiedResearchOfficialGuidanceSummary } from "./research-official-guidance-summary.mjs";
+import { researchClaimScopeInstruction } from "./research-claim-scope.mjs";
 
-export const researchAnswerPresentationVersion = "20260909-verified-guidance-preservation-v12";
+export const researchAnswerPresentationVersion = "20260909-claim-adjacent-conditions-v13";
 
 // Shared by generation and verification, independent of numeric comparisons.
 export const researchDecisionFactInstruction =
@@ -131,6 +132,7 @@ function contractFor(mode, preferredStructure, requiredElements) {
       "Place each material code citation next to the claim it supports.",
       "Separate governing enacted requirements from outside guidance or unsupplied standards.",
       "Keep material conditions and unresolved facts in answerText, attached to the correct object; expandable details alone are insufficient.",
+      researchClaimScopeInstruction,
       "Establish each alternative rule's applicability independently; an unresolved condition does not establish another path. Preserve the stated subject, such as a building or nonaccessory tenant space, without generalizing to any room.",
       "Keep the opening, calculation and closing consistent. State a failed applicable limit directly; a scope note must not imply compliance. Broader compliance remains unevaluated.",
       "Use stipulated quantities and applicability unless contradicted; verify them when asked. Include secondary rules only when material to the result, retaining conditions for the proposed substitution.",

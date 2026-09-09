@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { researchOfficialGuidanceAuthorityStatement } from "./research-source-policy.mjs";
 import { researchQualifiedFactInstruction } from "./research-conversation-facts.mjs";
+import { researchClaimScopeInstruction } from "./research-claim-scope.mjs";
 import {
   guidanceQualificationReviewPacket,
   guidanceQualificationReviewInstruction,
@@ -11,7 +12,7 @@ import { guidanceSourceRelationships, guidanceSourceRelationshipInstruction } fr
 export const researchOfficialGuidanceSummaryVersion = "20260908-document-summary-v1";
 const qualifiedSummaryVersion = "20260909-document-summary-v2";
 // Prompt revisions do not invalidate integrity records for saved summaries.
-export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v10";
+export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v11";
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 const stringList = { type: "array", maxItems: 6, items: { type: "string" } };
 const bindingKey = (sourceID, claimID) => `${sourceID}\u0000${claimID}`;
@@ -83,6 +84,7 @@ export function researchOfficialGuidanceSummaryRequest({ question, webSupport, c
       "Preserve the measured quantity, its units and operative action; do not replace a specified measurement with a broader term. A heading limits the statements beneath it: do not generalize a scoped exception to every project. Publication dates alone do not establish supersession; identify an unresolved source conflict instead of silently discarding a material condition.",
       "Call passages conflicting only when they give incompatible directions for the same material conditions. Different scopes or an unknown relationship are an applicability gap, not by themselves a conflict. Name the specific field or question being answered; do not apply one response to another question on the same page. Preserve who must make or attest to the statement and the event at which an item is required.",
       "Reconcile general directions with every supplied passage that narrows them, including uncited passages and the question in a FAQ pair. A general rule does not erase a specialized exception. If the project fact needed to choose between those scopes is unknown, give the branches conditionally; do not present either branch as universal. Cite both sides of a material conflict and identify the unresolved item.",
+      researchClaimScopeInstruction,
       "Use supplied user facts as premises. Ask for a missing fact only if it changes the answer. Earlier assistant text is context, never source authority. If the passages cannot resolve the question, say exactly what remains unresolved and give the responsive guidance they do establish.",
       "Match completeness to the requested decision. An actor-authority question requires who may prepare, attest or submit and any conditional additional actors. A negative permission answer or a statement of necessary conditions does not assert that every submission requirement has been met. Require a complete document, fee or readiness checklist only when the user asks for it or the answer claims the filing is ready or its listed steps are sufficient; continue checking every volunteered claim and material actor condition. A filing-choice question also needs the source-stated separate processing and conditional completion consequences of the chosen path.",
       "Apply known facts to select the source-supported branch, then state its action and approval condition directly. Retain an explicit prerequisite or sequence needed for that action; page layout alone is not a sequence. Direct logical application and faithful paraphrase are allowed, but may not add a condition, actor, deadline or process order. Distinguish an unresolved recommendation from a prohibition. Use acronyms as written unless the evidence supplies their expansion; do not invent document chronology.",

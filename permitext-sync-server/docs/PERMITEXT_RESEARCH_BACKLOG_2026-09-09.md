@@ -40,6 +40,12 @@ Affected questions: CC-04, FGC-02, MC-09, ZR-18, ZR-19, DOBNOW-003, DOBNOW-004, 
 
 Closure: The delivered main conclusion and every supporting claim preserve the applicable condition; a caveat elsewhere cannot contradict or repair an unconditional claim.
 
+Local preparation, September 9: the shared [claim-scope instruction](../research-claim-scope.mjs) now reaches code drafting and semantic verification, as well as official-guidance drafting and verification. It requires claim-adjacent conditions, consistent main text and secondary fields, and distinguishes a conditional document requirement from an unsupported sequence. Secondary claims remain subject to complete conditions and citations; unasked claims should be omitted. This directly addresses the retained timing contradiction, added before-selection/before-response requirements and collateral claims with missing conditions. It is a prompt change awaiting live confirmation, not proof those answers now pass.
+
+The source-relationship detector also compares the PAA locked-field list with an editing permission for the same field. The field name comes from fetched source text; no case ID or expected answer enters runtime. Both complete paragraph/FAQ contexts and their source/claim/hash bindings remain available. The comparison disappears for unrelated questions, missing sources, removed restrictions or removed permissions. The ordinary semantic verifier still decides whether scope resolves the apparent conflict; no failed verdict is overridden.
+
+Validation: `npm run test:research-chat` passed. The [claim-scope contract](../tests/research-claim-scope-contract.mjs) checks 220 code request envelopes using all 110 question texts and synthetic source sentinels, plus both official-guidance stages with the retained PAA sources. These are request/coverage checks, not 110 generated-answer evaluations. The [fixed-source request comparison](../evals/results/research-claim-scope-request-comparison-2026-09-09.json) preserves all source passages, facts, candidate prose, schemas, models, reasoning settings and output budgets between old and new requests. It records an additional 987 bytes per timing-case request and 3,290 bytes per PAA-case request. No live latency or answer-quality improvement is established. The full local suite log is `/tmp/permitext-claim-scope-research-suite-20260909.log`.
+
 ### R2 — Retain the material source scope and required answer branches
 
 Status: open. Area: Complete sources and answers.
@@ -125,7 +131,7 @@ Closure: A prepriced, authorized sample measures full-turn p50/p90 latency and c
 ## Execution order and stopping rules
 
 1. The two demonstrated parser scope defects under R3 are locally repaired with negative controls and a 110-question parser comparison. Continue the remaining R3 answer-level findings; preserve the distinction between supplied qualified premises and actual missing facts.
-2. Continue R1 and R5 for the demonstrated timing contradiction and verification-scope failure. Group related cases rather than repeating only the same two examples. Preserve all other work items and affected questions.
+2. Confirm the new R1 claim-scope instructions and PAA source comparison using a freshly priced, committed-source API package within the remaining authorized allowance. Include the PAA conflict alongside the timing case; preserve R5 actor-authority confirmation and all other repair groups rather than treating two cases as the complete scope.
 3. Complete local regressions before a newly priced, single-use live comparison. Do not replay consumed drivers or infer that the remaining allowance covers the complete cohort.
 4. A case closes only with a delivered answer meeting its unchanged substantive reference, material qualifications, point-specific citations and presentation requirements. An automatic verifier pass alone is insufficient. Proposed reference corrections remain separate from scoring.
 5. Report changes against this backlog. Current-baseline validation and representative speed/cost acceptance remain open for all 110 questions.

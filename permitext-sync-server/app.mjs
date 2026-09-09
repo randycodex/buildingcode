@@ -336,6 +336,7 @@ import {
   researchAnswerPresentationContract,
   researchDecisionFactInstruction
 } from "./research-answer-presentation.mjs";
+import { researchClaimScopeInstruction } from "./research-claim-scope.mjs";
 import {
   applyResearchProjectFactCoverage,
   researchProjectFactIsExplicitlyUnresolved,
@@ -10583,6 +10584,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "A source whose RELATIONSHIP identifies it as governing ancestor scope for pinned evidence is material only when its enacted text establishes an applicability category or condition needed to interpret the pinned descendant. Do not classify such material scope as collateral merely because the ancestor is broader, but do not require or cite a generic ancestor heading or redundant parent restatement merely because it was supplied. Preserve any genuinely unresolved applicability fact without weakening an independently supported conclusion.",
       "Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion.",
       researchDecisionFactInstruction,
+      researchClaimScopeInstruction,
       "Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields.",
       "When rejecting an answer solely for unnecessary missingFacts entries, return their zero-based array indices in unnecessaryMissingFactIndices. Select an entry only when its entire content is unnecessary for the requested decision; never select an entry containing a material applicability or exception fact. Return an empty index array for other failures or a passing answer. These indices propose a limited edit; the edited answer must still pass a new full verification.",
       "Fail with repeated_established_fact when the answer asks the user to establish or reconfirm a fact already supplied for the active topic. Independent professional verification of documents or measurements is different and may still be identified when material.",

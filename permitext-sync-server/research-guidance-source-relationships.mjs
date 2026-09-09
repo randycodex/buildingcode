@@ -2,7 +2,7 @@
 // These DOB workflow relationships are emitted only while both their question
 // context and the fetched source wording are present. Full passages remain in
 // the request and the ordinary semantic verifier remains mandatory.
-export const guidanceSourceRelationshipsVersion = "20260909-source-relationships-v2";
+export const guidanceSourceRelationshipsVersion = "20260909-field-editability-relationships-v3";
 const compact = (value) => typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
 const evidenceFor = (passage, excerpts) => ({ sourceID: passage.sourceID, claimID: passage.claimID, contentHash: passage.contentHash, excerpts });
 
@@ -11,7 +11,8 @@ export function guidanceSourceRelationships(input) {
   const actorQuestion = /\b(?:attest(?:ations?|ing|s)?|sign(?:atures?|ing)?|stakeholders?)\b/i.test(question) &&
     /\b(?:owner|applicant|representative)\b/i.test(question);
   const subsequentQuestion = /\bsubsequent\s+filings?\b/i.test(question);
-  if (!actorQuestion && !subsequentQuestion) return [];
+  const amendmentQuestion = /\b(?:PAA|post[ -]approval amendments?)\b|\bapproved\b[^.?]{0,100}\b(?:scope|drawings)\b[^.?]{0,100}\b(?:revis(?:e|ed|ion)|amend(?:ed|ment)?|chang(?:e|ed))\b/i.test(question);
+  if (!actorQuestion && !subsequentQuestion && !amendmentQuestion) return [];
   const relationships = [], seen = new Set();
   const validPassages = (input.passages || []).filter((passage) => passage.sourceID && passage.claimID && /^[a-f0-9]{64}$/.test(passage.contentHash || ""));
   for (const passage of validPassages) {
@@ -48,6 +49,34 @@ export function guidanceSourceRelationships(input) {
       evidence: evidenceFor(general.passage, [general.excerpt]),
       relatedEvidence: [evidenceFor(specialized.passage, [specialized.excerpt])]
     });
+  }
+  if (amendmentQuestion) {
+    // Identify the field from an actual PAA locked-field list, then locate a
+    // contrary editing direction for that same field. Preserve both complete
+    // paragraph/FAQ contexts: matching words alone do not resolve applicability.
+    const paragraphs = validPassages.flatMap((passage) => String(passage.text || "").split(/\n\s*\n/)
+      .map((text) => ({ passage, text: compact(text) })));
+    for (const locked of paragraphs) {
+      const list = locked.text.match(/\bWhen a PAA is filed, the following fields are NOT editable:\s*(?:—\s*)?(•.+)$/i)?.[1];
+      if (!list) continue;
+      for (const item of list.split("•").map(compact).filter(Boolean)) {
+        const field = compact(item.replace(/\s*\([^)]*\)\s*/g, " "));
+        if (!field || field.length > 100) continue;
+        const escaped = field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const permission = new RegExp(`\\b${escaped}\\s+can be changed with a PAA\\b`, "i");
+        const editable = paragraphs.find((candidate) => permission.test(candidate.text));
+        if (!editable) continue;
+        const key = `field_editability:${field.toLowerCase()}:${locked.passage.sourceID}:${editable.passage.sourceID}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        relationships.push({
+          kind: "field_editability", field,
+          questionToResolve: `The PAA locked-field list and a separate editing direction both name ${field}. Determine whether their complete contexts reconcile the directions. If they do not, disclose the unresolved field-editability issue in the main answer; do not include this field in an unconditional locked-or-editable list.`,
+          evidence: evidenceFor(locked.passage, [locked.text]),
+          relatedEvidence: [evidenceFor(editable.passage, [editable.text])]
+        });
+      }
+    }
   }
   return relationships;
 }
