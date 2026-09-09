@@ -19,4 +19,20 @@ for (const mutation of [
 ]) assert.notEqual(ownerHTTPResearchRequestHash(mutation), expected);
 assert.throws(() => ownerHTTPResearchRequestHash({ ...b, input: b.input.replace(/"contextHash":"[a-f0-9]+"/, '"contextHash":"invalid"') }), /Invalid deterministic context hash/);
 assert.throws(() => ownerHTTPResearchRequestHash({ ...b, input: `${b.input}\nPASSAGE_ID: ${second}\nSECTION_ID: 20018102\n` }), /Repeated random passage/);
+const digest = (value) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
+const withLegend = (id, symbol = "P", meaning = "Additional conditions", invalidID = false) => {
+  const body = makeBody(id);
+  const context = { answerObligations: [{
+    id: invalidID ? "table_legend_invalid" : `table_legend_${digest(`${id}:${symbol}:${meaning}`).slice(0, 12)}`,
+    kind: "table_legend", sourceIDs: [id], values: [symbol, meaning], requireAllValues: true
+  }] };
+  body.input = body.input.replace(/^DETERMINISTIC_CONTEXT: .+$/m,
+    `DETERMINISTIC_CONTEXT: ${JSON.stringify({ ...context, contextHash: digest(context) })}`);
+  return body;
+};
+const legendHash = ownerHTTPResearchRequestHash(withLegend(first));
+assert.equal(ownerHTTPResearchRequestHash(withLegend(second)), legendHash);
+assert.notEqual(ownerHTTPResearchRequestHash(withLegend(second, "S")), legendHash);
+assert.notEqual(ownerHTTPResearchRequestHash(withLegend(second, "P", "Permitted")), legendHash);
+assert.throws(() => ownerHTTPResearchRequestHash(withLegend(second, "P", "Additional conditions", true)), /Invalid table legend/);
 console.log("Owner HTTP request binding passed: isolated account/passage IDs normalize; source text, section identity, citation binding, instructions, model, tier and token ceilings remain bound.");
