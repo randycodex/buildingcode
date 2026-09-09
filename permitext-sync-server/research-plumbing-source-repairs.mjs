@@ -3,6 +3,51 @@ import { stipulatedFountainSubstitutionQuestion } from "./evidence-discovery.mjs
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 const escapePattern = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+function consistentlyCited(source, answer) {
+  const citations = (answer.citations || []).filter((citation) => citation.sourceIDs?.includes(source.sourceID));
+  return Boolean(source.sectionID) && citations.length > 0 && citations.every((citation) =>
+    String(citation.sectionID || "") === String(source.sectionID) &&
+    ["corpusID", "codeVersion", "codeEdition"].every((field) => !citation[field] || citation[field] === source[field])
+  );
+}
+
+// Reconcile a mixed fixture-credit/signage point with an already returned
+// signage citation. This only adds provenance before semantic verification;
+// neither matching words nor adding an ID establishes that the claim is true.
+function bindSingleOccupantSignage(answer, sources) {
+  const text = (value) => compact(value).replace(/[*_`]/g, "").replace(/[-‐‑]\s*/g, " ");
+  const eligible = sources.filter((source) =>
+    ![source.evidenceRole, source.evidencePriority?.evidenceRole].some((role) => ["contextual", "irrelevant"].includes(role)) &&
+    source.evidencePriority?.topicRouteRelationship !== "collateral" && consistentlyCited(source, answer)
+  );
+  const signage = eligible.filter((source) => compact(source.sectionNumber) === "403.4" &&
+    /\brequired public facilities shall be designated by a legible sign for each sex or,? for a single occupant toilet room,? for all sexes\b/i.test(text(source.text)) &&
+    /\bsigns shall be readily visible and located near the entrance to each toilet facility\b/i.test(text(source.text)));
+  // Do not choose between duplicate identities, multiple passages or editions.
+  if (signage.length !== 1) return answer;
+  const source = signage[0];
+  if (sources.filter((candidate) => candidate.sourceID === source.sourceID).length !== 1) return answer;
+  const fixtureIDs = new Set(eligible.filter((fixture) => compact(fixture.sectionNumber) === "403.1.3" &&
+    ["corpusID", "codeVersion", "codeEdition"].every((field) => fixture[field] === source[field]) &&
+    /\bfixtures located within single occupant toilet rooms are permitted to be included\b/i.test(text(fixture.text))
+  ).map((fixture) => fixture.sourceID));
+  let changed = false;
+  const supportedPoints = (answer.supportedPoints || []).map((point) => {
+    if (!Array.isArray(point.sourceIDs) || point.sourceIDs.includes(source.sourceID) ||
+        !point.sourceIDs.some((id) => fixtureIDs.has(id))) return point;
+    // The complete clause, not a heading or a word shared with another point,
+    // must identify the required public single-occupant room and its sign.
+    const hasSignageClause = text(point.explanation).split(/(?<=[.!?])\s+|\n+/).some((sentence) =>
+      /\brequired public single occupant toilet rooms?\b/i.test(sentence) &&
+      /\bsign(?:s|age)?\b/i.test(sentence) && /\ball sexes\b/i.test(sentence)
+    );
+    if (!hasSignageClause) return point;
+    changed = true;
+    return { ...point, sourceIDs: [...point.sourceIDs, source.sourceID] };
+  });
+  return changed ? { ...answer, supportedPoints } : answer;
+}
+
 function visibleReplacementHeight(answerText, inches, millimeters) {
   const units = [`${escapePattern(inches)}\\s*[- ]?\\s*(?:inches|inch|in\\b|[″"])`];
   if (millimeters) units.push(`${escapePattern(millimeters)}\\s*[- ]?\\s*mm\\b`);
@@ -72,5 +117,5 @@ export function applyResearchPlumbingSourceRepairs(answer, evidence = [], { ques
     });
     if (changed) result = { ...result, supportedPoints };
   }
-  return result;
+  return bindSingleOccupantSignage(result, sources);
 }

@@ -128,6 +128,12 @@ Affected questions: GAP-14, MC-05, PC-01.
 
 Closure: Mixed-source points and additional narrative claims retain every needed source identity, or unasked claims are omitted. Top-level citations or a separate correctly cited point do not cure a missing binding in another point. Occupancy-exception claims remain included in this repair.
 
+Local signage-binding repair, September 9: the saved PC-01 mixed fixture-credit/signage point now receives the already returned PC 403.4 source ID before semantic verification. The repair requires the supplied signage passage's complete public/single-occupant/all-sexes rule and sign-location text, a consistent existing citation, and fixture-credit evidence from the same source basis. Missing, duplicate, mismatched, contextual, irrelevant or collateral signage sources cannot supply the binding. Only the source ID changes; prose, qualifications, top-level citations and the separate signage point remain intact. This does not remove repetition or establish that an arbitrary signage claim is correct.
+
+The [retained-answer comparison](../evals/results/research-signage-binding-check-2026-09-09.json) inventories all 110 cases and compares 97 delivered answers: 79 have returned enacted passages and 18 have none. Only PC-01 changes; the other 96 compared answers remain identical. Thirteen undelivered cases have no delivered answer to compare. This checks the provenance transformation using returned citation snapshots, not full retrieval or 110 new generated answers. All historical results, reference keys and acceptance counts remain unchanged.
+
+The focused unit replay and mocked HTTP replay passed, followed by `npm run test:research-chat`. The actual Research request path sends the added binding and unchanged wording to the existing independent verifier; a negative verdict still prevents saving or charging for a completed answer. Successful mocked turns retain two provider stages, with no added call or retry policy. The full local Research suite is recorded in `/tmp/permitext-signage-binding-research-suite-20260909.log`. The comparison's source/result hashes, 110 inventory rows, live-execution rejection and overwrite guard were verified. No paid API call, live quality confirmation or speed claim results from this repair. MC-05's uncited additional narrative rule and GAP-14's occupancy-exception attribution remain open.
+
 ### R7 — Remove repeated rules, unrelated branches and unasked navigation
 
 Status: open. Area: Answer format.

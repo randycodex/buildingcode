@@ -10,6 +10,9 @@ const run = JSON.parse(await readFile(new URL("../evals/results/research-owner-l
 assert.equal(run.providerCalls.length, 15);
 const recent = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json", import.meta.url)));
 assert.equal(recent.providerCalls.length, 2);
+const cafeRun = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json", import.meta.url)));
+const cafeDraft = JSON.parse(cafeRun.providerCalls.find((call) => call.caseID === "PC-01" && call.phase === "permitext_code_interpretation")
+  .output.flatMap((message) => message.content || []).find((content) => content.type === "output_text").text);
 const scratch = await mkdtemp(join(tmpdir(), "permitext-plumbing-repairs-"));
 for (const name of Object.keys(process.env)) {
   if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$)/.test(name)) delete process.env[name];
@@ -55,7 +58,17 @@ globalThis.fetch = async (url, options) => {
   let output;
   if (phase === "permitext_research_verification") {
     reviewed = JSON.parse(body.input.split("PROPOSED ANSWER JSON\n")[1]);
-    if (activeID === "PC-03" && activeRun === recent) {
+    if (activeID === "PC-01") {
+      assert.deepEqual(reviewed.supportedPoints[2].sourceIDs, [
+        ...cafeDraft.supportedPoints[2].sourceIDs, "research-permitext_cross_reference-id:11923-4"
+      ]);
+      assert.equal(reviewed.supportedPoints[2].explanation, cafeDraft.supportedPoints[2].explanation);
+      assert.equal(reviewed.answerText, cafeDraft.answerText);
+      assert.deepEqual(reviewed.citations.map(({ sectionID, sourceIDs }) => ({ sectionID, sourceIDs })),
+        cafeDraft.citations.map(({ sectionID, sourceIDs }) => ({ sectionID, sourceIDs })));
+      assert.match(body.input, /Required public facilities shall be designated by a legible sign/);
+      assert.match(body.instructions, /Fail with incorrect_citation if a claim lacks support in that point's bound passages/);
+    } else if (activeID === "PC-03" && activeRun === recent) {
       assert.match(reviewed.answerText, /Each substituted fixture.*at least 10 inches high and be adjacent/);
       assert(!reviewed.answerText.includes("Each replacement bottle-filling fixture"), "A correct condition followed by adjacency must not acquire a duplicate.");
     } else if (activeID === "PC-03") {
@@ -90,11 +103,11 @@ try {
   const token = account.backendSessionToken;
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const auth = { accountUserID: account.appUserID };
-  for (const [id, recordedRun] of [["PC-03", run], ["PC-04", run], ["PC-03", recent]]) for (const accepted of [false, true]) {
+  for (const [id, recordedRun] of [["PC-03", run], ["PC-04", run], ["PC-03", recent], ["PC-01", cafeRun]]) for (const accepted of [false, true]) {
     activeRun = recordedRun; activeID = id; accept = accepted; phases = []; reviewed = null;
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
-    const response = await request("/research/conversations/message", { auth, conversationID, question: run.cases.find((item) => item.id === id).question, requestID: randomUUID() }, token);
+    const response = await request("/research/conversations/message", { auth, conversationID, question: activeRun.cases.find((item) => item.id === id).question, requestID: randomUUID() }, token);
     assert.deepEqual(phases, accepted
       ? ["permitext_code_interpretation", "permitext_research_verification"]
       : ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]);

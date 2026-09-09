@@ -68,5 +68,61 @@ for (const sources of [
 ]) assert.deepEqual(repair(laundry, sources, laundryOptions).supportedPoints, laundry.supportedPoints);
 const uncited = { ...laundry, citations: laundry.citations.filter((citation) => !citation.sourceIDs.includes(lintSource.sourceID)) };
 assert.deepEqual(repair(uncited, laundrySources, laundryOptions).supportedPoints, laundry.supportedPoints);
+
+const cafeRun = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json", import.meta.url)));
+const cafe = cafeRun.results.find((result) => result.id === "PC-01").answer;
+const originalCafe = structuredClone(cafe);
+const cafeSources = cafe.citations.flatMap((citation) => citation.supportingPassages.map((passage) => ({
+  ...citation, sourceID: passage.sourceID, text: passage.selectedText
+})));
+const signSource = cafeSources.find((source) => source.sectionNumber === "403.4");
+const cafeOptions = { question: cafeRun.cases.find((item) => item.id === "PC-01").question };
+const signedCafe = repair(cafe, cafeSources, cafeOptions);
+const expectedCafe = structuredClone(cafe);
+expectedCafe.supportedPoints[2].sourceIDs.push(signSource.sourceID);
+assert.deepEqual(signedCafe, expectedCafe, "Only the mixed point's missing source ID may change.");
+assert.deepEqual(cafe, originalCafe, "The saved answer must remain immutable.");
+assert.deepEqual(repair(signedCafe, cafeSources, cafeOptions), signedCafe);
+const changeSignage = (change) => cafeSources.map((source) => source === signSource ? change(source) : source);
+for (const sources of [
+  cafeSources.filter((source) => source !== signSource),
+  [...cafeSources, signSource],
+  [...cafeSources, { ...signSource, codeEdition: "A different edition" }],
+  changeSignage((source) => ({ ...source, text: source.text.replace("all sexes", "female occupants") })),
+  changeSignage((source) => ({ ...source, text: "403.4 Signage." })),
+  changeSignage((source) => ({ ...source, evidenceRole: "contextual" })),
+  changeSignage((source) => ({ ...source, evidenceRole: "irrelevant" })),
+  changeSignage((source) => ({ ...source, evidencePriority: { evidenceRole: "irrelevant" } })),
+  changeSignage((source) => ({ ...source, evidencePriority: { topicRouteRelationship: "collateral" } })),
+  changeSignage((source) => ({ ...source, sectionID: "different-section" })),
+  changeSignage((source) => ({ ...source, codeEdition: "A different edition" }))
+]) assert.deepEqual(repair(cafe, sources, cafeOptions), cafe, "Ambiguous, missing or mismatched sources cannot add a binding.");
+const noSignCitation = { ...cafe, citations: cafe.citations.filter((citation) => !citation.sourceIDs.includes(signSource.sourceID)) };
+assert.deepEqual(repair(noSignCitation, cafeSources, cafeOptions), noSignCitation);
+const inconsistentCitation = structuredClone(cafe);
+inconsistentCitation.citations.push({ ...cafe.citations.at(-1), sectionID: "wrong-section" });
+assert.deepEqual(repair(inconsistentCitation, cafeSources, cafeOptions), inconsistentCitation);
+const mixedEditionSources = cafeSources.map((source) => source.sectionNumber === "403.1.3" ? { ...source, codeEdition: "A different edition" } : source);
+assert.deepEqual(repair(cafe, mixedEditionSources, cafeOptions), cafe);
+for (const explanation of [
+  "Fixtures in single-occupant toilet rooms may be credited to either sex.",
+  "Signage for all sexes may need further research.",
+  "Required public single-occupant toilet rooms need research. Signs for all sexes are a separate topic.",
+  "Required private single-occupant toilet rooms need a sign for all sexes."
+]) {
+  const variant = structuredClone(cafe);
+  variant.supportedPoints[2].explanation = explanation;
+  assert.deepEqual(repair(variant, cafeSources, cafeOptions), variant, "A heading, separate sentence or different subject must not trigger binding.");
+}
+const unboundFixture = structuredClone(cafe);
+unboundFixture.supportedPoints[2].sourceIDs = cafe.supportedPoints[0].sourceIDs;
+assert.deepEqual(repair(unboundFixture, cafeSources, cafeOptions), unboundFixture);
+// Contradictory prose is preserved for the semantic verifier, never corrected
+// or silently treated as supported by this provenance-only operation.
+const falseSignage = structuredClone(cafe);
+falseSignage.supportedPoints[2].explanation = "Required public single-occupant toilet rooms must not have a sign for all sexes.";
+const falseBound = repair(falseSignage, cafeSources, cafeOptions);
+assert.equal(falseBound.supportedPoints[2].explanation, falseSignage.supportedPoints[2].explanation);
+assert.equal(falseBound.supportedPoints[2].sourceIDs.at(-1), signSource.sourceID);
 assert.equal(networkAttempts, 0);
 console.log("Plumbing repair replay passed: exact cited evidence supplies missing condition/binding; no invention, context promotion, source mutation or external requests.");
