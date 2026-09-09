@@ -1,0 +1,192 @@
+{
+  "schema": "permitext-owner-workflow-coverage-review-v1",
+  "reviewedOn": "2026-09-09T09:39:18.564Z",
+  "liveSourceCommit": "d44137366df8261df031e586a5543a153a4f4ada",
+  "sources": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-workflow-coverage-v2-2026-09-09.json",
+      "sha256": "2335d7b512ff17f7a76f46fd4fd6a249fe76d4e81484cbcf45a5fcc9757fc0e4"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-workflow-coverage-preflight-v2-2026-09-09.json",
+      "sha256": "1d79e570923046fb650a75e77b1f4df032bcfa7c13750e48790f49763067c3bb"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-workflow-coverage-cost-audit-2026-09-09.json",
+      "sha256": "b10bc9c02c10dbae42915b872670aa917c2b5258fe4b8024940abec42da50ebf"
+    },
+    {
+      "file": "evals/research-reconciled-answer-key.json",
+      "sha256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    }
+  ],
+  "method": "Assistant review of each complete delivered answer against the unchanged authored key and its source conditions. The initial live request matched the captured preflight. Source-selection and HTTP contracts verify full passage delivery into drafting and verification; this is distinct from the provider verifier result.",
+  "newProfessionalApproval": false,
+  "strictQualityAcceptedCostPerAnswerUSD": null,
+  "cases": [
+    {
+      "id": "DOBNOW-023",
+      "inputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "question": "Context: DOB NOW workflow\n\nA filing representative has completed data entry and uploaded the documents. The applicant and owner have not yet completed their attestations.\n\nCan the filing representative attest for them and submit the job filing?",
+      "expectedAnswerSHA256": "e86124c25bcf3bda49f5a5a11bfcca6aa4ac1834c1df639ada5e323e3f4b595e",
+      "deliveredAnswerSHA256": "44851d92ebea45e74e49f7b4ede9fdbcaf596a91cdcbdf2b01f9a6b6ebc8a892",
+      "runtimeVerifierPass": true,
+      "manualBenchmarkPass": false,
+      "newProfessionalApproval": false,
+      "reviewStatus": "delivery-repaired-core-supported-with-missing-stakeholder-condition",
+      "criteria": [
+        {
+          "concept": "Distinguish preparation access from legal attestation authority.",
+          "result": "supported",
+          "evidence": "The answer distinguishes preparation/data access from attestation and submission authority."
+        },
+        {
+          "concept": "Identify the Applicant of Record and owner attestations.",
+          "result": "supported",
+          "evidence": "It names separate Applicant of Record and owner attestations and associated logins."
+        },
+        {
+          "concept": "Check whether another required stakeholder, such as a condo/co-op board representative, must also attest.",
+          "result": "missing",
+          "evidence": "The additional conditional board attestation is not mentioned, despite release-note page 20 in the matched initial source packet."
+        }
+      ],
+      "remainingFindings": [
+        "The conditional board-stakeholder requirement remains absent.",
+        "DPL-1 age and step-by-step owner-login details exceed the narrow permission question; the core prohibition and outstanding attestations are repeated."
+      ],
+      "metrics": {
+        "durationMilliseconds": 10792,
+        "usageEstimateUSD": 0.02164665,
+        "conservativeUSD": 0.041003,
+        "providerCalls": 2,
+        "paidSearchCalls": 0,
+        "draftParagraphWords": 165,
+        "previousStatus": "failed",
+        "previousDurationMilliseconds": 13033,
+        "stageMilliseconds": [
+          {
+            "phase": "permitext_official_guidance_summary",
+            "duration": 5841,
+            "headers": 5785,
+            "bodyRead": 55
+          },
+          {
+            "phase": "permitext_official_guidance_verification",
+            "duration": 2605,
+            "headers": 2599,
+            "bodyRead": 6
+          }
+        ]
+      }
+    },
+    {
+      "id": "DOBNOW-003",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "question": "Context: DOB NOW workflow\n\nAn initial GC filing has been created for a project. Plumbing work for the same construction project and property will be filed later, potentially by a different applicant.\n\nShould the plumbing scope receive a new unrelated job number or a subsequent filing under the existing job?",
+      "expectedAnswerSHA256": "53bf3d5275364916c22ce10e93a49e67045ac92efd0406ade504570b578ea6bc",
+      "deliveredAnswerSHA256": "e336b62bb11ae15d9dd9452269ef8883818de54f28683124005d753e321c80f5",
+      "runtimeVerifierPass": true,
+      "manualBenchmarkPass": false,
+      "newProfessionalApproval": false,
+      "reviewStatus": "delivered-with-universal-timing-and-omitted-completion-qualifications",
+      "criteria": [
+        {
+          "concept": "Preserve one job number for related construction work on the same property.",
+          "result": "supported",
+          "evidence": "It directs the related plumbing scope to the existing job number."
+        },
+        {
+          "concept": "Distinguish the job number from the filing extension.",
+          "result": "supported",
+          "evidence": "It distinguishes the job number and filing extension."
+        },
+        {
+          "concept": "State that each filing still requires separate processing and completion.",
+          "result": "partial",
+          "evidence": "Separate application processing is stated, but separate approval/permit and the applicable completion process are not explained."
+        },
+        {
+          "concept": "Preserve the public-source conflicts about creation timing and completion path.",
+          "result": "failed",
+          "evidence": "It gives a universal after-submission initiation rule and omits the other FAQ entry acknowledging a subsequent filing in pre-filing before initial submission. It does not explain the general LOC versus NB/Alteration-CO completion distinction."
+        },
+        {
+          "concept": "Obtain the initial job type before stating whether the subsequent filing closes through an LOC or the initial filing's CO process.",
+          "result": "missing",
+          "evidence": "It neither identifies the unknown initial job type nor gives the conditional completion paths."
+        }
+      ],
+      "remainingFindings": [
+        "The timing claim is broader than the combined supplied guidance supports.",
+        "The source-specific NB/Alteration-CO completion exception remains absent.",
+        "Plan-examiner routing, fees and related-job-field instructions add length while material qualifications are missing."
+      ],
+      "metrics": {
+        "durationMilliseconds": 11715,
+        "usageEstimateUSD": 0.0177208,
+        "conservativeUSD": 0.032184,
+        "providerCalls": 2,
+        "paidSearchCalls": 0,
+        "draftParagraphWords": 231,
+        "previousStatus": "completed",
+        "previousDurationMilliseconds": 13631,
+        "stageMilliseconds": [
+          {
+            "phase": "permitext_official_guidance_summary",
+            "duration": 7095,
+            "headers": 7092,
+            "bodyRead": 3
+          },
+          {
+            "phase": "permitext_official_guidance_verification",
+            "duration": 3164,
+            "headers": 3148,
+            "bodyRead": 16
+          }
+        ]
+      }
+    }
+  ],
+  "qualificationEvidence": [
+    {
+      "caseID": "DOBNOW-023",
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=20",
+      "checkedOn": "2026-09-09",
+      "basis": "Conditional additional board stakeholder and its separate attestation for the stated owner types."
+    },
+    {
+      "caseID": "DOBNOW-003",
+      "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "checkedOn": "2026-09-09",
+      "basis": "Both the general after-submission initiation statement and the subsequent-in-pre-filing FAQ were available."
+    },
+    {
+      "caseID": "DOBNOW-003",
+      "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+      "checkedOn": "2026-09-09",
+      "basis": "The scoped NB/Alteration-CO answer distinguishes subsequent filing status from the initial filing CO process."
+    }
+  ],
+  "budget": {
+    "authorizationUSD": 8,
+    "maximumPackageUSD": 0.4,
+    "packageUsageEstimateUSD": 0.03936745,
+    "packageConservativeUSD": 0.073187,
+    "cumulativeConservativeUSD": 7.593176,
+    "remainingUSD": 0.406824,
+    "cumulativeUsageEstimateUSD": 4.00698307,
+    "providerAccountBalanceChecked": false
+  },
+  "nextAction": "Strengthen qualification coverage before another paid rerun. A simple verifier pass is demonstrably insufficient here. Require an explicit source-bound account of checked conditions and omitted qualifications, within the existing verification stage where possible; retain no-cost rejection tests and all 110 cases.",
+  "limitations": [
+    "The two answers are not full benchmark passes.",
+    "These timings and costs are developmental observations, not general product latency or subscription economics.",
+    "No Project workflow, UI, phone, pricing, push or deployment was exercised.",
+    "Full raw verifier inputs were not retained by this driver. An attempted offline reconstruction did not match their recorded hashes, so it is not claimed as direct proof of those inputs; source visibility relies on the matched initial request and the tested runtime path."
+  ]
+}

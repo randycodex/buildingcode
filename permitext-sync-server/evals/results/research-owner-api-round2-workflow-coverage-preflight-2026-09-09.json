@@ -1,0 +1,442 @@
+{
+  "promptVersion": "20260909-document-summary-v6",
+  "schema": "permitext-owner-api-round2-workflow-coverage-v1",
+  "sourceCommit": "5f36bb0f28eb24ce45698d155db58ed3cb4a9d4d",
+  "authorization": "Owner authorized continued API tests within a fresh $8 round, with notice before more is needed. Historical costs remain separate. This single-use confirmation tests the repaired stakeholder source coverage and subsequent-filing qualifications under guidance prompt v6 on unchanged authored DOBNOW-023 and DOBNOW-003 scenarios and questions, once each. The preceding conservative round total is $7.519989, leaving $0.480011. Maximum $0.40 for two unassigned Research HTTP turns, at most $0.20 and two provider requests per turn, four provider requests in total, no paid search, manual retry, separate judge, Project workflow or deployment.",
+  "preDispatchAbortEvidence": {
+    "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-2026-09-09.json",
+    "sha256": "890f8a447d3a6326c1579d41ddad140a9b64dfdeabe1e43d9d9bf09e0bd68143",
+    "providerCalls": 0,
+    "providerCostUSD": 0,
+    "reason": "Initial request binding guard aborted before recording or sending any provider request; the isolated runtime reservation is not a provider charge."
+  },
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 7.519989,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sha256": "f406901dcca5f06398166f4a08bcfbadf6639bf24755777a0c7a9434d8ca7d8f"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sha256": "f991b5d3ce3757dddbea968291341571817c8cf9f3703101766766047c39ba57"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sha256": "6cacf237b64e02d3b388adafea5f0b48865f3c9778e5d15e77b8fc19b8de03ca"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sha256": "485cba41a9c4a277347fa950f590c2ed25ebb6f48fe35b55f5d3e8fdae3bba12"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sha256": "68f098015f6d49060f62a725dc805f76b6f4692203e30f9de45cd3e8282a6cc9"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-lot-history-2026-09-09.json",
+      "sha256": "102534c93f3b63786d3ac946a3b8af1270def90a7693acae633c8a2d921869bb"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-storage-scope-2026-09-09.json",
+      "sha256": "38d20c59f2b62a81f6f8e5a89855708f53124b390e5b075f48b2cec3bfc74eae"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-mapped-review-2026-09-09.json",
+      "sha256": "5aa60daf1e734b9f4ff386d71abff2f4c20b80db96a3c968343c3b873881b7b5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-loft-pdf-2026-09-09.json",
+      "sha256": "f89cce9d535794630a575361d9ad86ec5795b1c6eba825294628af0f4d503042"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-guidance-precision-2026-09-09.json",
+      "sha256": "150a16789728f63b6520ceca8102eb9f1ced85bb20af0f3a9d826b433be8fc31"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 0.4,
+  "maximumTurnSpendUSD": 0.2,
+  "maximumTurns": 2,
+  "maximumProviderRequests": 4,
+  "maximumProviderRequestsPerTurn": 2,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-09",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual unassigned HTTP Research on isolated local accounts and storage. No Project is created or exercised. Each question includes the source packet's explicit DOB NOW workflow context plus its unchanged scenario and question. No answer key, rubric, required-citation hint or professional-review expectation is supplied to drafting or verification. The existing direct official-document route retrieves its declared public NYC sources; paid search is forbidden. Existing generation and verification models are retained. The no-API preflight intercepts every provider dispatch and permits only public NYC document GETs, needed to bind direct-document summary requests for the repaired companion-source paths. Earlier no-context attempts and all 110 numbered cases remain in the cumulative scope; this two-case confirmation does not narrow acceptance. No live filing, saved-project workflow, phone, UI or deployment changes.",
+  "requestComparison": "Opt-in HTML opaque-identifier normalization preserves every supplied passage, its source identity and schema binding. Runtime hashes and outgoing provider bodies remain unchanged. Raw request fingerprints are also recorded.",
+  "repairedCaseIDs": [
+    "DOBNOW-023",
+    "DOBNOW-003"
+  ],
+  "newCaseIDs": [],
+  "cases": [
+    "DOBNOW-023",
+    "DOBNOW-003"
+  ],
+  "sourceHashes": {
+    "app.mjs": "188187fa9df9ad66a652605dd25b1e6e054f7d8dfbd71674297838dabd5e70eb",
+    "research-answer-presentation.mjs": "f8f3853d4441d4940de0bf222104dce0ee81a1e91e450b3e08dfdb02ff6049ba",
+    "research-official-guidance-summary.mjs": "a1caed747fd74f82f28583d155ad736a3e7843c74bc6dcb3369b5572decdc501",
+    "evals/research-answer-key-amendments.json": "ddcf7fb5675285991b0a7275749890794c3671a1f7888cc6c5ebee2b5977bc24",
+    "research-answer-quality.mjs": "cad6d658ff2805ee6e56e48b2b135f5dec28863b02020183731b0815b2ecec4f",
+    "research-focused-technical-scope.mjs": "4c7f8ff22bc4bd11bf87a55417b8795b164443e0a704d9e64ebc33f27fc27f49",
+    "research-conversation-topic.mjs": "77baee9c8db51501fca1bfee6ea192869f8e6fd8a7c35b48eb8d5a7f848f7858",
+    "research-technical-topic-routes.mjs": "319075fb7223e387a70ee4038b62cab0c1df839c68de374317277d4548c8ef62",
+    "evidence-discovery.mjs": "47f76c9ba11ea1d5c05edc996eebe110fd4f467bccffe05c4fc1b2e6b6e2d714",
+    "research-conversation-facts.mjs": "67ec6ab2e04908151af796b1a08d2ebd9bdc58bdfb7a748642efb83dd9068ef2",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-source-policy.mjs": "0f569a60606aaace85c6cfde2dd179720717603da47ca7d898b1c66630d63980",
+    "research-official-html-attribution.mjs": "97e0e666a244e6969a9cb690e042fed74fa1a68a8f58351d8f79e0bbb85290c7",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "research-official-pdf-ranking.mjs": "c0d326957b27d2501065ba652f682b911afcffb134a95f74f0b8f1fd2953c6b4",
+    "research-official-pdf-worker.mjs": "39ec76ae01ef399819d5a815f980e2ac52b4fc0844510b7944622d18f4539587",
+    "research-dob-workflow-routing.mjs": "c024a9c6696d3ffbd3c50afffbdc800b93ea4fea3a0952245ffe19dd7682ebab",
+    "evals/research-answer-key-reconciliation.mjs": "3e3a2294a5ea9363e0f242690f8548b5593b77181300c55ecbf6051b47cf4b69",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "d18671f901c0d7eb6f518f9974b7fafe0383630534eddc1225f84d54a6a40ab1",
+    "research-zoning-planner.mjs": "77b3f32262862ae5eff1330d941afe8548a9f88c5b5c7ab2417b118df5e8c275",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "f6b4ac11432838d26504bc94aa48059c9383dacf45d77ac6aced42a0c136a90e",
+    "research-evidence-assembly.mjs": "a79b90be6c7ebee41e1ecb5156fddd47bfe41f00067640cddde625aec228967b",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "research-zoning-metadata.mjs": "4f877fd927b2844b1636eaad971047dbff371292e583f389e9ae7fe63f59303c",
+    "research-zoning-conditional-explanation.mjs": "628c735595bb294606399c3aa88ffe739591d78b98d9791a91de9c9c960a8853",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "03a5cce96d6434fe33ffd9ec120cca2f53be56317b31486d3ce35452eddce78e",
+    "package.json": "f0737993c5d717802403602ebf598ce93ddcc703cfdd2d768ba424ee7d2fab05",
+    "package-lock.json": "6ae8d89d23b69e1e44402b5ded9b0876a6bd97a4291135d76648ebaf64aa48a9",
+    "evals/research-reconciled-answer-key.json": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "7ed6285b7bb1fae0117cc89e95ad4443b6423884818bf3a729341ffb8fc84500",
+    "scripts/run-research-owner-api-round2-workflow-coverage-20260909.mjs": "ecbcc2436de0575c3f6ea7f9cba76ff6c97de2e79f0824b2d3b889ed9d07edd8"
+  },
+  "startedAt": "2026-09-09T09:22:05.756Z",
+  "status": "preflight-passed",
+  "results": [
+    {
+      "id": "DOBNOW-023",
+      "question": "Context: DOB NOW workflow\n\nA filing representative has completed data entry and uploaded the documents. The applicant and owner have not yet completed their attestations.\n\nCan the filing representative attest for them and submit the job filing?",
+      "inputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "requestedCodeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": "DOB NOW workflow",
+      "selectionCharacterCounts": [],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.2,
+      "initialPhase": "permitext_official_guidance_summary",
+      "initialRequestSHA256": "4a8a77296e0d99aa770d1f2f0e958b1ab9b752158cd25416243eed36a30c6040",
+      "initialRawRequestSHA256": "1db36438e44ac9d6419a952c7cddb6ec0929ed597673ffa259b93e32d729bdb6",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 25630,
+      "interceptCount": 1,
+      "durationMilliseconds": 2453,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.17287,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "d5a30abb-51d0-4e98-8412-0e17d8bc373e",
+          "createdAt": "2026-09-09T09:22:05.922Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 2417,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": true,
+          "webSupportSearched": true,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-003",
+      "question": "Context: DOB NOW workflow\n\nAn initial GC filing has been created for a project. Plumbing work for the same construction project and property will be filed later, potentially by a different applicant.\n\nShould the plumbing scope receive a new unrelated job number or a subsequent filing under the existing job?",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "requestedCodeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": "DOB NOW workflow",
+      "selectionCharacterCounts": [],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.2,
+      "initialPhase": "permitext_official_guidance_summary",
+      "initialRequestSHA256": "b2280fac6d74428c372fcbf555240ef84c5c3a4041b8a4433390aa0ffa596899",
+      "initialRawRequestSHA256": "d20d3dc8076280e715ee3a6951de766c843e6607428e5ef8b5233e1382ab2ba9",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 18566,
+      "interceptCount": 1,
+      "durationMilliseconds": 1285,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.13755,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "46676c63-e9e2-47f4-8c74-73e474d8cd23",
+          "createdAt": "2026-09-09T09:22:08.615Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 1253,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": true,
+          "webSupportSearched": true,
+          "pricingVersion": null
+        }
+      ]
+    }
+  ],
+  "providerCalls": [],
+  "documentRequests": [
+    {
+      "caseID": "DOBNOW-023",
+      "preflight": true,
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "startedAt": "2026-09-09T09:22:07.299Z",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "finalURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "durationMilliseconds": 62
+    },
+    {
+      "caseID": "DOBNOW-023",
+      "preflight": true,
+      "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "startedAt": "2026-09-09T09:22:07.989Z",
+      "httpStatus": 200,
+      "contentType": "text/html;charset=UTF-8",
+      "finalURL": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "durationMilliseconds": 245
+    },
+    {
+      "caseID": "DOBNOW-003",
+      "preflight": true,
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "startedAt": "2026-09-09T09:22:09.372Z",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "finalURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "durationMilliseconds": 17
+    },
+    {
+      "caseID": "DOBNOW-003",
+      "preflight": true,
+      "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "startedAt": "2026-09-09T09:22:09.667Z",
+      "httpStatus": 200,
+      "contentType": "text/html;charset=UTF-8",
+      "finalURL": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "durationMilliseconds": 27
+    },
+    {
+      "caseID": "DOBNOW-003",
+      "preflight": true,
+      "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+      "startedAt": "2026-09-09T09:22:09.734Z",
+      "httpStatus": 200,
+      "contentType": "text/html;charset=UTF-8",
+      "finalURL": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+      "durationMilliseconds": 108
+    }
+  ],
+  "completedAt": "2026-09-09T09:22:09.943Z",
+  "spend": {
+    "active": true,
+    "capUSD": 0.4,
+    "reservedUSD": 0,
+    "actualUSD": 0,
+    "requestCount": 2,
+    "pendingRequestCount": 0
+  }
+}
