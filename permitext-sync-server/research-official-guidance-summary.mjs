@@ -10,7 +10,7 @@ import {
 export const researchOfficialGuidanceSummaryVersion = "20260908-document-summary-v1";
 const qualifiedSummaryVersion = "20260909-document-summary-v2";
 // Prompt revisions do not invalidate integrity records for saved summaries.
-export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v7";
+export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v8";
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 const stringList = { type: "array", maxItems: 6, items: { type: "string" } };
 const bindingKey = (sourceID, claimID) => `${sourceID}\u0000${claimID}`;

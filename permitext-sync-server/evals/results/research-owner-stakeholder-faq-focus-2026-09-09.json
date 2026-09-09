@@ -1,0 +1,132 @@
+{
+  "checkedAt": "2026-09-09T10:07:08.653Z",
+  "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+  "sourceHash": "bb8dfdf044a90c64ff3efb960e35cd4a233ce27c653e75b30417d689ebaec8e1",
+  "oldCharacters": 12540,
+  "focusedCharacters": 3166,
+  "questions": [
+    {
+      "kind": "faq_pair",
+      "question": "How do I get associated to a job as the owner?",
+      "characters": 856
+    },
+    {
+      "kind": "faq_pair",
+      "question": "As an owner, what information can I enter and access in DOB NOW: Build ?",
+      "characters": 354
+    },
+    {
+      "kind": "faq_pair",
+      "question": "As an owner, how do I sign the required documents and when should I do this?",
+      "characters": 591
+    },
+    {
+      "kind": "faq_pair",
+      "question": "Where do the Design Professional and Owner provide their authorized electronic signature on the PW2 form?",
+      "characters": 303
+    },
+    {
+      "kind": "faq_pair",
+      "question": "As a Filing Representative, what information can I enter and access in DOB NOW: Build ?",
+      "characters": 436
+    },
+    {
+      "kind": "faq_pair",
+      "question": "How can a filing representative see what needs to be completed on an application before it is submitted by the applicant?",
+      "characters": 343
+    },
+    {
+      "kind": "faq_pair",
+      "question": "Can a filing representative submit a work permit?",
+      "characters": 283
+    }
+  ],
+  "fullSourceFetched": true,
+  "paidProviderCalls": 0,
+  "selectedPassages": [
+    {
+      "index": 47,
+      "kind": "faq_pair",
+      "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner",
+      "intro": "How do I get associated to a job as the owner?",
+      "text": "The person who creates the filing (registered design professional, filing representative or owner) enters your email address in the Stakeholders section of the job. Jobs that you are associated with will appear on your dashboard when you log into DOB NOW: Build . An NYC.ID account Is required to access DOB NOW. Go to nyc.gov/dobnow and select create account. You will be redirected to the NYC.ID registration page. Use the email address and password you want associated with all your filings in DOB NOW. After an NYC.ID account is created, login to DOB NOW and create a profile as a non-licensee or licensee. See nyc.gov/dobnowtips for more resources and the NYC.ID New Users Guide (Non-Licensees) for step-by-step instructions",
+      "claim": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — How do I get associated to a job as the owner? — The person who creates the filing (registered design professional, filing representative or owner) enters your email address in the Stakeholders section of the job. Jobs that you are associated with will appear on your dashboard when you log into DOB NOW: Build . An NYC.ID account Is required to access DOB NOW. Go to nyc.gov/dobnow and select create account. You will be redirected to the NYC.ID registration page. Use the email address and password you want associated with all your filings in DOB NOW. After an NYC.ID account is created, login to DOB NOW and create a profile as a non-licensee or licensee. See nyc.gov/dobnowtips for more resources and the NYC.ID New Users Guide (Non-Licensees) for step-by-step instructions",
+      "id": "official-passage-ad66c9799ed24cbd5b1cf911",
+      "contentHash": "bb8dfdf044a90c64ff3efb960e35cd4a233ce27c653e75b30417d689ebaec8e1"
+    },
+    {
+      "index": 50,
+      "kind": "faq_pair",
+      "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner",
+      "intro": "As an owner, what information can I enter and access in DOB NOW: Build ?",
+      "text": "Owners can review the filing, complete the Owner’s Attestation section on the Statements and Signatures tab and make payments on their jobs. They can also view all documents that are part of their job.",
+      "claim": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — As an owner, what information can I enter and access in DOB NOW: Build ? — Owners can review the filing, complete the Owner’s Attestation section on the Statements and Signatures tab and make payments on their jobs. They can also view all documents that are part of their job.",
+      "id": "official-passage-b338feafe6f8e92111fc6ef0",
+      "contentHash": "bb8dfdf044a90c64ff3efb960e35cd4a233ce27c653e75b30417d689ebaec8e1"
+    },
+    {
+      "index": 51,
+      "kind": "faq_pair",
+      "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner",
+      "intro": "As an owner, how do I sign the required documents and when should I do this?",
+      "text": "After you review the filing, you must complete the Owner’s Attestation section on the Statements and Signatures tab. The owner must be logged in with the same email address that was entered in the filing under the Owner Information in the Stakeholders section. Open the job from the dashboard and then select the Statements & Signatures tab. Check the box to attest the filing and then select the Save button at the top of the screen.",
+      "claim": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — As an owner, how do I sign the required documents and when should I do this? — After you review the filing, you must complete the Owner’s Attestation section on the Statements and Signatures tab. The owner must be logged in with the same email address that was entered in the filing under the Owner Information in the Stakeholders section. Open the job from the dashboard and then select the Statements & Signatures tab. Check the box to attest the filing and then select the Save button at the top of the screen.",
+      "id": "official-passage-62da36594a53e0a387105ad0",
+      "contentHash": "bb8dfdf044a90c64ff3efb960e35cd4a233ce27c653e75b30417d689ebaec8e1"
+    },
+    {
+      "index": 60,
+      "kind": "faq_pair",
+      "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals",
+      "intro": "Where do the Design Professional and Owner provide their authorized electronic signature on the PW2 form?",
+      "text": "The Design Professional and Owner attest on the Plans/Work (PW1) section of the filing, not the permit (PW2).",
+      "claim": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Where do the Design Professional and Owner provide their authorized electronic signature on the PW2 form? — The Design Professional and Owner attest on the Plans/Work (PW1) section of the filing, not the permit (PW2).",
+      "id": "official-passage-ff86a5e1c8f4da787b70ee0d",
+      "contentHash": "bb8dfdf044a90c64ff3efb960e35cd4a233ce27c653e75b30417d689ebaec8e1"
+    },
+    {
+      "index": 67,
+      "kind": "faq_pair",
+      "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals",
+      "intro": "As a Filing Representative, what information can I enter and access in DOB NOW: Build ?",
+      "text": "Filing Representatives can enter and view all filing information (PW1, Scope of Work, PW3, Technical Reports and PW2) that are part of the filing. They can make payments on jobs that they are associated with. They cannot upload plans or submit filings/permits.",
+      "claim": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Filing Representative, what information can I enter and access in DOB NOW: Build ? — Filing Representatives can enter and view all filing information (PW1, Scope of Work, PW3, Technical Reports and PW2) that are part of the filing. They can make payments on jobs that they are associated with. They cannot upload plans or submit filings/permits.",
+      "id": "official-passage-6587920750b1a95f3bf3711f",
+      "contentHash": "bb8dfdf044a90c64ff3efb960e35cd4a233ce27c653e75b30417d689ebaec8e1"
+    },
+    {
+      "index": 68,
+      "kind": "faq_pair",
+      "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals",
+      "intro": "How can a filing representative see what needs to be completed on an application before it is submitted by the applicant?",
+      "text": "Filing representatives now have the capability to select the Preview to File button to see what is needed to proceed with the filing.",
+      "claim": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How can a filing representative see what needs to be completed on an application before it is submitted by the applicant? — Filing representatives now have the capability to select the Preview to File button to see what is needed to proceed with the filing.",
+      "id": "official-passage-8fb2af64e9d1623566ae54d6",
+      "contentHash": "bb8dfdf044a90c64ff3efb960e35cd4a233ce27c653e75b30417d689ebaec8e1"
+    },
+    {
+      "index": 69,
+      "kind": "faq_pair",
+      "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals",
+      "intro": "Can a filing representative submit a work permit?",
+      "text": "No, a filing representative can do the data entry of the work permit application but only the applicant of the permit (contractor) can submit it.",
+      "claim": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Can a filing representative submit a work permit? — No, a filing representative can do the data entry of the work permit application but only the applicant of the permit (contractor) can submit it.",
+      "id": "official-passage-c70f8a4fa658292c82215861",
+      "contentHash": "bb8dfdf044a90c64ff3efb960e35cd4a233ce27c653e75b30417d689ebaec8e1"
+    }
+  ],
+  "originalSections": [
+    {
+      "heading": "Roles & Responsibilities: Owner",
+      "characters": 4267,
+      "sha256": "708d67fb6170da7123de3ddd6a1fc94c0590b221f115616da3aff470513b0ae3"
+    },
+    {
+      "heading": "Roles & Responsibilities: Professionals",
+      "characters": 8273,
+      "sha256": "80901a0500854e1cb7295c23edf95442c471906fb1898e9f0c906c4467376f72"
+    }
+  ],
+  "allSelectedClaimsAreExactOriginalSectionSubstrings": true,
+  "semanticQualityAccepted": false
+}

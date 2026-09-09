@@ -23,9 +23,9 @@ const value = {
   pass: true, issues: [], qualificationReview: {
     packetSHA256: input.qualificationReviewPacket.packetSHA256,
     passages: [
-      { passageIndex: 0, finding: "addressed", conditionQuotes: [input.passages[0].text], answerReferences: ["paragraph:0"], reason: "The answer separates preparation from the outstanding attestations." },
-      { passageIndex: 1, finding: "addressed", conditionQuotes: [input.passages[1].text], answerReferences: ["paragraph:0"], reason: "The answer preserves the conditional additional attestation." },
-      { passageIndex: 2, finding: "not_material", conditionQuotes: [], answerReferences: [], reason: "Payment-tab location does not qualify this attestation permission." }
+      { passageIndex: 0, finding: "addressed", conditionSpanIDs: [0], answerReferences: ["paragraph:0"], reason: "The answer separates preparation from the outstanding attestations." },
+      { passageIndex: 1, finding: "addressed", conditionSpanIDs: [0], answerReferences: ["paragraph:0"], reason: "The answer preserves the conditional additional attestation." },
+      { passageIndex: 2, finding: "not_material", conditionSpanIDs: [], answerReferences: [], reason: "Payment-tab location does not qualify this attestation permission." }
     ]
   }
 };
@@ -38,6 +38,7 @@ assert.equal(passed.pass, true);
 assert.equal(passed.qualificationReview.pass, true);
 assert.equal(passed.qualificationReview.passages[1].sourceID, "update");
 assert.equal(passed.qualificationReview.passages[1].contentHash, "b".repeat(64));
+assert.deepEqual(passed.qualificationReview.passages[1].conditionQuotes, [input.passages[1].text], "The server retains exact source text, never a model's shortened quotation.");
 assert.deepEqual({ input, value }, original, "Review validation must not rewrite source text or the candidate answer.");
 
 // Contradictory top-level approval cannot override a recorded omission.
@@ -52,12 +53,13 @@ for (const mutate of [
   (candidate) => { candidate.qualificationReview.passages.pop(); },
   (candidate) => { candidate.qualificationReview.passages[1].passageIndex = 0; },
   (candidate) => { candidate.qualificationReview.packetSHA256 = "d".repeat(64); },
-  (candidate) => { candidate.qualificationReview.passages[1].conditionQuotes = ["An invented unconditional permission."]; },
-  (candidate) => { candidate.qualificationReview.passages[1].conditionQuotes = [input.passages[0].text]; },
+  (candidate) => { candidate.qualificationReview.passages[1].conditionSpanIDs = ["An invented unconditional permission."]; },
+  (candidate) => { candidate.qualificationReview.passages[1].conditionSpanIDs = [1]; },
+  (candidate) => { candidate.qualificationReview.passages[1].conditionSpanIDs = [0, 0]; },
   (candidate) => { candidate.qualificationReview.passages[1].answerReferences = ["paragraph:1"]; },
   (candidate) => { candidate.qualificationReview.passages[1].answerReferences = ["missing_fact:0"]; },
   (candidate) => { candidate.qualificationReview.passages[1].answerReferences = []; },
-  (candidate) => { candidate.qualificationReview.passages[1].conditionQuotes = []; },
+  (candidate) => { candidate.qualificationReview.passages[1].conditionSpanIDs = []; },
   (candidate) => { candidate.qualificationReview.passages[2].reason = " "; },
   (candidate) => { candidate.qualificationReview.passages[1] = null; }
 ]) {
@@ -76,10 +78,21 @@ for (const mutate of [
   mutate(changed);
   assert.equal(check(value, changed).pass, false, "A receipt cannot be reused after its question, facts, draft or source changed.");
 }
+const corruptedCatalogue = structuredClone(input);
+corruptedCatalogue.qualificationReviewPacket.passages[1].spans[0].text = "An invented unconditional permission.";
+assert.equal(check(value, corruptedCatalogue).pass, false, "A copied hash cannot authorize altered span text.");
+for (const text of [
+  "Heading — Who may submit? Only the named applicant.\nUnless the stated exception applies, first obtain approval.",
+  "First complete A. ".repeat(140) + "The final exception remains part of the source."
+]) {
+  const packet = guidanceQualificationReviewPacket({ ...input, passages: [{ ...input.passages[0], text }] });
+  assert.equal(packet.passages[0].spans.map((span) => span.text).join(""), text);
+  assert(packet.passages[0].spans.length <= 128, "Bounded catalogue creation must preserve its complete tail.");
+}
 const spoof = structuredClone(value);
 spoof.qualificationReview.passages[1].sourceID = "invented";
 assert.equal(check(spoof).qualificationReview.passages[1].sourceID, "update", "Only server-bound source IDs enter the saved receipt.");
 const schema = guidanceQualificationVerificationSchema({ properties: { pass: { type: "boolean" } }, required: ["pass"] }, input.qualificationReviewPacket);
 assert.deepEqual(schema.required, ["pass", "qualificationReview"]);
 assert.equal(schema.properties.qualificationReview.properties.passages.minItems, 3);
-console.log("Guidance qualification receipt rejects omissions, bare approvals, stale inputs, missing coverage and invalid source/answer bindings; no provider calls or semantic acceptance claimed.");
+console.log("Guidance qualification receipt rejects omissions, bare approvals, stale inputs, missing coverage and invalid span/answer bindings; exact source spans are preserved without model quotation copying. No provider calls or semantic acceptance claimed.");

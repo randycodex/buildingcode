@@ -228,7 +228,7 @@ const responseDouble = async (url, options) => {
       value.qualificationReview = {
         packetSHA256: input.qualificationReviewPacket.packetSHA256,
         passages: input.passages.map((passage, passageIndex) => ({
-          passageIndex, finding: "addressed", conditionQuotes: [passage.text.slice(0, 160)],
+          passageIndex, finding: "addressed", conditionSpanIDs: [0],
           answerReferences: ["paragraph:0"], reason: "Synthetic verifier fixture for source-review transport."
         }))
       };
@@ -336,7 +336,7 @@ try {
     assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
     const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
     assert.match(answer.answerText, expected[id]);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v7");
+    assert.equal(answer.promptVersion, "20260909-document-summary-v8");
     assert.equal(answer.officialGuidanceSummary.version, "20260909-document-summary-v2",
       "New summaries retain the required qualification receipt; older v1 records remain readable.");
   }

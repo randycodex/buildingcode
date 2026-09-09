@@ -239,7 +239,7 @@ export function selectResearchOfficialHTMLPassages(passages, query, options = {}
 // A curated heading is a source location, never an answer. Preserve its whole
 // section (including subheadings) so ranking cannot separate adjacent limits.
 // Missing or oversized sections fail source validation instead of being cut.
-export function researchOfficialHTMLSectionPassages(passages, sectionHeadings, sourceURL) {
+export function researchOfficialHTMLSectionPassages(passages, sectionHeadings, sourceURL, { independentFAQPairs = false } = {}) {
   const sections = [];
   for (const section of [...new Set(sectionHeadings)].slice(0, 3)) {
     const selected = passages.filter((passage) => passage.heading.split(" > ").includes(section));
@@ -250,6 +250,13 @@ export function researchOfficialHTMLSectionPassages(passages, sectionHeadings, s
     const text = selected.map((passage) => passage.claim).join("\n\n");
     if (text.length > 16_000) throw Object.assign(new Error("The complete official HTML section exceeds its retrieval bound."),
       { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_TOO_LARGE" });
+    // Opt in only for independently scoped, explicitly linked FAQ pairs.
+    // A preamble, list or unpaired paragraph retains whole-section handling.
+    // Each returned pair keeps its complete question, answer and heading.
+    if (independentFAQPairs && selected.every((passage) => passage.kind === "faq_pair")) {
+      sections.push(...selected);
+      continue;
+    }
     sections.push({ index: selected[0].index, kind: "html_section", heading: section, intro: "", text,
       claim: text, contentHash,
       id: `official-passage-${createHash("sha256").update(`${sourceURL}\u0000${contentHash}\u0000${section}\u0000${text}`).digest("hex").slice(0, 24)}` });
@@ -408,7 +415,8 @@ export async function bindResearchWebSupportToOfficialDocuments(webSupport, opti
       });
       const providerContext = (source.attributedClaims || []).map((claim) => claim?.text).join(" ");
       const candidates = fetched.format === "html" && source.sectionHeadings?.length
-        ? researchOfficialHTMLSectionPassages(fetched.passages, source.sectionHeadings, fetched.url)
+        ? researchOfficialHTMLSectionPassages(fetched.passages, source.sectionHeadings, fetched.url,
+          { independentFAQPairs: source.independentFAQPairs === true })
         : fetched.passages;
       const selected = selectResearchOfficialHTMLPassages(
         candidates,

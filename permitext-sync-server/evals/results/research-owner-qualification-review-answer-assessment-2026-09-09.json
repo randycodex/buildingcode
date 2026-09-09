@@ -1,0 +1,152 @@
+{
+  "schema": "permitext-owner-qualification-review-live-assessment-v1",
+  "reviewedAt": "2026-09-09T10:07:08.651Z",
+  "liveSourceCommit": "f8070a14b78bd55f0fc882353a00f552f01a3bfb",
+  "sources": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-qualification-review-2026-09-09.json",
+      "sha256": "c15946fd67a5b6c0b59635ddaea9c6ed61aa384b81ea0997eb503cdf30228a95"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-qualification-review-preflight-2026-09-09.json",
+      "sha256": "f6932107b16d5c66a6eb6713ae20f813f42e2fc94abd4c8356bb855a16fc89b3"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-qualification-review-cost-audit-2026-09-09.json",
+      "sha256": "ed780e049d38b37f8e4750ba84a7f389e2ea0095ed29b4d03a433a4bfcc62202"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-workflow-coverage-v2-2026-09-09.json",
+      "sha256": "2335d7b512ff17f7a76f46fd4fd6a249fe76d4e81484cbcf45a5fcc9757fc0e4"
+    },
+    {
+      "file": "evals/research-reconciled-answer-key.json",
+      "sha256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455"
+    }
+  ],
+  "method": "Manual review of retained drafts, complete outgoing source packets and real verifier output against the unchanged authored benchmark. Actual request bodies are retained with only the isolated-account safety identifier replaced; normalized hashes match the outgoing requests. No paid extra judge or retry.",
+  "cases": [
+    {
+      "id": "DOBNOW-023",
+      "inputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "httpStatus": 502,
+      "delivered": false,
+      "providerVerifierPass": false,
+      "serverVerificationPassed": false,
+      "manualBenchmarkPass": false,
+      "newProfessionalApproval": false,
+      "draftCore": "Preparation and attestation/submission authority are distinguished; applicant and owner attestations are stated.",
+      "missingExpected": [
+        "Conditional additional board representative attestation."
+      ],
+      "checkerFindings": "The board omission is correctly identified. The claim that applicant submission is unsupported ignores the application-guide owner authorization and the companion FAQ scope. The account-registration objection goes beyond the permission question and proposed generic login step.",
+      "reviewStatus": "undelivered; true omission detected with additional overbroad objections and invalid copied quotations",
+      "invalidQuotes": [
+        {
+          "passageIndex": 2,
+          "quote": "After you review the filing, you must complete the Owner’s Attestation section."
+        },
+        {
+          "passageIndex": 5,
+          "quote": "Both the owner and the Board representative are required complete their attestations ... before the filing can proceed."
+        },
+        {
+          "passageIndex": 6,
+          "quote": "A stakeholder on a filing ... can delete ... filings"
+        }
+      ],
+      "draftParagraphWords": 149,
+      "metrics": {
+        "file": "evals/results/research-owner-api-round2-live-qualification-review-2026-09-09.json",
+        "sourceCommit": "f8070a14b78bd55f0fc882353a00f552f01a3bfb",
+        "id": "DOBNOW-023",
+        "scope": "research-http",
+        "delivered": false,
+        "charged": false,
+        "providerCalls": 2,
+        "answeringCalls": 1,
+        "additionalAnsweringCallsUSD": 0,
+        "usageEstimateUSD": 0.0233403,
+        "conservativeUSD": 0.043672,
+        "historicalFailureCodes": [
+          "RESEARCH_VERIFICATION_FAILED"
+        ],
+        "durationMilliseconds": 22718,
+        "draftMilliseconds": 5234,
+        "verificationMilliseconds": 15082
+      },
+      "fullDraftAndVerifierSourcesEqual": true,
+      "retainedNormalizedRequestHashesMatch": true
+    },
+    {
+      "id": "DOBNOW-003",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "httpStatus": 502,
+      "delivered": false,
+      "providerVerifierPass": true,
+      "serverVerificationPassed": false,
+      "manualBenchmarkPass": false,
+      "newProfessionalApproval": false,
+      "draftCore": "The same job number, separate subsequent processing, different applicant and conditional NB/Alteration-CO LOC exception are stated; the unknown job type is identified.",
+      "missingExpected": [
+        "Explicit job-number versus filing-extension distinction.",
+        "Public-source qualification about creation timing. The draft discusses submission timing; do not misreport that sentence as an explicit universal prohibition on earlier creation.",
+        "The complete NB/Alteration-CO initial-filing CO completion path."
+      ],
+      "checkerFindings": "The provider passes the draft. The exact-quotation gate rejects an ellipsis and a changed-capitalization excerpt. Its review still credits the completion condition without requiring the complete expected explanation.",
+      "reviewStatus": "undelivered; draft improves conditional LOC discussion but remains incomplete against the unchanged benchmark",
+      "invalidQuotes": [
+        {
+          "passageIndex": 0,
+          "quote": "allows an applicant ... to add new scope of work and new work types"
+        },
+        {
+          "passageIndex": 2,
+          "quote": "Do not include any filings with the same job number (subsequent filings)"
+        }
+      ],
+      "draftParagraphWords": 215,
+      "metrics": {
+        "file": "evals/results/research-owner-api-round2-live-qualification-review-2026-09-09.json",
+        "sourceCommit": "f8070a14b78bd55f0fc882353a00f552f01a3bfb",
+        "id": "DOBNOW-003",
+        "scope": "research-http",
+        "delivered": false,
+        "charged": false,
+        "providerCalls": 2,
+        "answeringCalls": 1,
+        "additionalAnsweringCallsUSD": 0,
+        "usageEstimateUSD": 0.0188476,
+        "conservativeUSD": 0.033988,
+        "historicalFailureCodes": [
+          "RESEARCH_VERIFICATION_FAILED"
+        ],
+        "durationMilliseconds": 19221,
+        "draftMilliseconds": 6464,
+        "verificationMilliseconds": 11242
+      },
+      "fullDraftAndVerifierSourcesEqual": true,
+      "retainedNormalizedRequestHashesMatch": true
+    }
+  ],
+  "newProfessionalApproval": false,
+  "strictQualityAcceptedCostPerAnswerUSD": null,
+  "budget": {
+    "authorizationUSD": 8,
+    "maximumPackageUSD": 0.4,
+    "packageConservativeUSD": 0.07766,
+    "packageUsageEstimateUSD": 0.0421879,
+    "cumulativeConservativeUSD": 7.670836,
+    "remainingUSD": 0.329164,
+    "cumulativeUsageEstimateUSD": 4.04917097,
+    "providerAccountBalanceChecked": false
+  },
+  "nextAction": "Replace model-copied quotations with selections from a server-generated exact source-span catalogue. Narrow only independently scoped responsibilities FAQ pairs; preserve whole answers and shared preambles. Test offline before any fresh capped live comparison.",
+  "limitations": [
+    "Neither HTTP turn delivered an accepted answer.",
+    "The stronger checker increased measured latency in this pair and introduced overbroad objections.",
+    "The unchanged drafting prompt makes the improved LOC paragraph evidence of a different sample, not proof that the new checker improved drafting.",
+    "All 110 numbered cases remain in scope; historical attempts are not quality acceptance.",
+    "No Project workflow, UI, phone, pricing, push or deployment was exercised."
+  ]
+}

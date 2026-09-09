@@ -84,6 +84,13 @@ assert.equal(faqPassages.length, 2);
 assert.match(faqPassages[0].intro, /initial filing/);
 assert.match(faqPassages[0].text, /Yes.*Do not apply/);
 assert.match(faqPassages[1].claim, /Subsequent CO filings.*May a subsequent CO filing.*No\./);
+const independentPairs = researchOfficialHTMLSectionPassages(faqPassages, ["Initial filings", "Subsequent CO filings"], boilerURL, { independentFAQPairs: true });
+assert.deepEqual(independentPairs, faqPassages, "Opt-in FAQ focus preserves every complete linked question/answer and its scope.");
+const contextualSection = [{ ...faqPassages[0], kind: "paragraph", intro: "", text: "These exceptions apply to every question below.", claim: "These exceptions apply to every question below." }, faqPassages[0]];
+const retainedSection = researchOfficialHTMLSectionPassages(contextualSection, ["Initial filings"], boilerURL, { independentFAQPairs: true });
+assert.equal(retainedSection.length, 1);
+assert.equal(retainedSection[0].kind, "html_section", "A shared preamble prevents treating its FAQ as an independent unit.");
+assert.match(retainedSection[0].text, /exceptions apply.*initial filing/s);
 assert.throws(() => researchOfficialHTMLSectionPassages(faqPassages, ["Initial filings", "Missing condition"], boilerURL),
   { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_UNAVAILABLE" });
 assert.throws(() => researchOfficialHTMLSectionPassages([{ ...faqPassages[0], claim: "x".repeat(16_001) }], ["Initial filings"], boilerURL),
