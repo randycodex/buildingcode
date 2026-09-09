@@ -8,6 +8,7 @@ import {
   researchEvidenceAssemblyLimits
 } from "../research-evidence-assembly.mjs";
 import { withOfflineResearchHTTPHarness } from "./research-benchmark-http-harness.mjs";
+import { zoningSection } from "../zoning-content.mjs";
 
 const syntheticDefinitionSection = {
   sectionID: "definition-202",
@@ -106,4 +107,42 @@ await withOfflineResearchHTTPHarness("definition-excerpts", async ({ discover, r
 assert.equal(researchDefinitionExcerptLimits.maximumCharacters, 12_000);
 assert.equal(researchEvidenceAssemblyLimits.maximumTargetedDefinitions, 2);
 
+const zoningDefinitions = { ...await zoningSection("20018523"), codePrefix: "ZR" };
+for (const query of [
+  "Can two tax lots under common ownership become one zoning lot?",
+  "Two tax lots have the same owner and a short common boundary. Can they be treated as one zoning lot?"
+]) {
+  const value = targetedDefinitionExcerpt(zoningDefinitions, query);
+  assert.deepEqual(value.labels, ["zoning lot"]);
+  assert.match(value.text, /contiguous for a minimum of 10 linear feet/);
+  const complete = targetedDefinitionExcerpt(zoningDefinitions, "zoning lot", { requiredTextTerms: ["zoning lot"] });
+  assert.equal(value.text, complete.text, "The complete ownership pathways must survive, not just an alias.");
+}
+for (const query of [
+  "Does a below-grade storage level count as zoning floor area?",
+  "How does the zoning floor area definition treat basements and cellars?"
+]) {
+  const value = targetedDefinitionExcerpt(zoningDefinitions, query);
+  assert.deepEqual(value.labels, ["basement", "cellar", "floor area"]);
+  for (const [index, label] of value.labels.entries()) {
+    const complete = targetedDefinitionExcerpt(zoningDefinitions, label, { requiredTextTerms: [label] });
+    assert.equal(value.passages[index], complete.text, `${label}: preserve the full definition and closing conditions.`);
+  }
+  assert.match(value.text, /sloping base plane/);
+  assert.match(value.text, /dwelling purposes/);
+}
+
+const housingDefinitions = { ...await zoningSection("20022699"), codePrefix: "ZR" };
+for (const query of [
+  "What qualifying affordable housing facts establish that a higher FAR is available?",
+  "Which definitions control the floor area allowance for qualifying affordable housing?"
+]) {
+  const value = targetedDefinitionExcerpt(housingDefinitions, query, { maximumCharacters: 4_301 });
+  assert.deepEqual(value.labels, ["Affordable floor area", "Affordable housing regulatory agreement", "MIH development", "UAP development"]);
+  assert.match(value.text, /only by the amount of affordable housing provided/);
+  for (const [index, label] of value.labels.entries()) {
+    const complete = targetedDefinitionExcerpt(housingDefinitions, label, { maximumCharacters: 4_301, requiredTextTerms: [label] });
+    assert.equal(value.passages[index], complete.text, `${label}: preserve each full chapter definition.`);
+  }
+}
 console.log("research definition excerpt contract passed");

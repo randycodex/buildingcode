@@ -3,7 +3,7 @@ import { isAppendixJSourceBoundaryQuestion } from "./research-zoning-safety.mjs"
 import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zoningConditionalExplanationPrompt } from "./research-zoning-conditional-explanation.mjs";
 import { zoningTemporalApplicationObligations, zoningTemporalApplicationIssues } from "./research-zoning-temporal-application.mjs";
 
-export const zoningResearchPlannerVersion = "20260908-historical-source-intent-v5";
+export const zoningResearchPlannerVersion = "20260909-complete-definition-budget-v6";
 
 export const zoningResearchCompilerVersion = "20260909-numeric-comparison-relations-v25";
 export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
@@ -38,9 +38,9 @@ const pathLimits = Object.freeze({
     maximumDiscovered: 3,
     maximumTargetedDefinitions: 2,
     maximumCrossReferences: 4,
-    maximumCharacters: 10_000,
-    maximumSupplementalCharacters: 8_000,
-    maximumCharactersPerSource: 6_000
+    maximumCharacters: 14_000,
+    maximumSupplementalCharacters: 12_000,
+    maximumCharactersPerSource: 12_000
   }),
   [zoningResearchPaths.structuredTableSymbol]: Object.freeze({
     maximumCandidates: 6,
@@ -72,7 +72,7 @@ const pathLimits = Object.freeze({
   [zoningResearchPaths.calculationScenario]: Object.freeze({
     maximumCandidates: 8,
     maximumDiscovered: 3,
-    maximumTargetedDefinitions: 1,
+    maximumTargetedDefinitions: 2,
     maximumCrossReferences: 4,
     maximumCharacters: 14_000,
     maximumSupplementalCharacters: 12_000,

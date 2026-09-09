@@ -1,4 +1,4 @@
-export const researchDefinitionExcerptVersion = "20260908-zoning-far-definition-v2";
+export const researchDefinitionExcerptVersion = "20260909-zoning-definition-dependencies-v3";
 
 export const researchDefinitionExcerptLimits = Object.freeze({
   minimumSectionCharacters: 20_000,
@@ -73,6 +73,23 @@ function richHTML(section) {
     .map((block) => String(block?.html || ""))
     .filter(Boolean)
     .join("\n");
+}
+
+function zoningHousingDefinitionEntries(section) {
+  if (String(section?.codePrefix || "").toUpperCase() !== "ZR" || String(section?.sectionNumber) !== "27-111") return [];
+  const blocks = section?.body?.blocks || section?.blocks || [];
+  // This chapter uses standalone paragraph labels, unlike 12-10's defined-term
+  // articles. Keep every following paragraph/list until the next label.
+  const labels = blocks.flatMap((block, index) => {
+    const match = String(block.html || "").match(/^<p>(?:\s|<br\s*\/?>)*([A-Z][A-Za-z ’'()-]{1,119})\s*<\/p>$/);
+    return match ? [{ label: definitionLabel(match[1]), index }] : [];
+  });
+  return labels.map((entry, order) => ({
+    label: entry.label,
+    text: compactText(blocks.slice(entry.index, labels[order + 1]?.index ?? blocks.length)
+      .map((block) => block.plainText || "").join("\n\n")),
+    order
+  }));
 }
 
 function zoningDefinitionEntriesFromHTML(section, html) {
@@ -163,6 +180,8 @@ function definitionEntriesFromText(section) {
 }
 
 function definitionEntries(section) {
+  const housingEntries = zoningHousingDefinitionEntries(section);
+  if (housingEntries.length) return housingEntries;
   const richEntries = definitionEntriesFromHTML(section);
   return richEntries.length ? richEntries : definitionEntriesFromText(section);
 }
@@ -221,6 +240,23 @@ function requiredTermSelection(entries, requiredTextTerms) {
   return Array.from(selected.values()).sort((left, right) => left.order - right.order);
 }
 
+function zoningDefinitionDependencies(section, query) {
+  if (String(section?.codePrefix || "").toUpperCase() !== "ZR") return [];
+  const text = String(query || "");
+  if (String(section?.sectionNumber) === "27-111" && /\bqualifying affordable housing\b/i.test(text) && /\b(?:FAR|floor area)\b/i.test(text))
+    return ["affordable floor area", "affordable housing regulatory agreement", "MIH development", "UAP development"];
+  if (String(section?.sectionNumber) !== "12-10") return [];
+  // These are source labels, not conclusions. A below-grade classification
+  // needs both sides of the height distinction and the floor-area definition.
+  if (/\b(?:below[ -]grade|below ground|cellars?|basements?)\b/i.test(text) && /\bfloor area\b/i.test(text))
+    return ["basement", "cellar", "floor area"];
+  // Do not substitute the short "lot, zoning: see zoning lot" alias for the
+  // definition that contains the ownership/contiguity pathways.
+  if (/\bzoning lots?\b/i.test(text) && /\b(?:ownership|owners?|tax lots?|contigu(?:ous|ity))\b/i.test(text))
+    return ["zoning lot"];
+  return [];
+}
+
 function boundedRequiredTermEntry(entry, maximumCharacters) {
   if (entry.text.length <= maximumCharacters) return entry.text;
   const comparableEntry = comparableText(entry.text);
@@ -256,7 +292,8 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
       .filter(Boolean)
       .join("\n\n"));
   if (
-    canonicalText.length < researchDefinitionExcerptLimits.minimumSectionCharacters ||
+    (canonicalText.length < researchDefinitionExcerptLimits.minimumSectionCharacters &&
+      !(zoningHousingDefinitionEntries(section).length && canonicalText.length > (options.maximumCharacters || researchDefinitionExcerptLimits.maximumCharacters))) ||
     !isDefinitionSection(section, canonicalText)
   ) return null;
 
@@ -279,7 +316,14 @@ export function targetedDefinitionExcerpt(section, query, options = {}) {
     researchDefinitionExcerptLimits.maximumCharacters
   );
   const entries = definitionEntries(section);
-  const requiredEntries = requiredTermSelection(entries, options.requiredTextTerms);
+  const dependencies = options.requiredTextTerms?.length ? [] : zoningDefinitionDependencies(section, query);
+  const dependencyEntries = dependencies.length ? requiredTermSelection(entries, dependencies) : null;
+  // Automatically inferred dependencies must be complete entries. Never cut
+  // a measurement exception simply to fit another definition in the package.
+  const completeDependenciesFit = dependencyEntries?.length === dependencies.length &&
+    dependencyEntries.reduce((sum, entry) => sum + entry.text.length, Math.max(0, dependencies.length - 1) * 2) <= maximumCharacters;
+  const requiredEntries = dependencies.length && completeDependenciesFit
+    ? dependencyEntries : requiredTermSelection(entries, options.requiredTextTerms);
   const ranked = requiredEntries || entries
     .map((entry) => entryScore(entry, queryTerms, normalizedQuery))
     .filter(Boolean)

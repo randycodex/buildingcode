@@ -11359,6 +11359,18 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
   ];
 }
 
+async function researchSourcesForSectionReference(sectionID) {
+  const [primary] = await researchEvidenceForSectionIDs([sectionID], { allowOptInCorpora: true });
+  // A reference pins the section identity, not an invented passage or a map.
+  // Canonical retrieval selects relevant text for the actual question later.
+  return [{
+    ...researchSourceFromEvidence(primary, {
+      kind: "selection", relationship: "Section referenced by you; relevant enacted text is retrieved for each question"
+    }),
+    selectionMode: "section_reference"
+  }];
+}
+
 function requestedResearchSelections(body) {
   let selections;
   if (body.selections !== undefined) {
@@ -11376,6 +11388,7 @@ function requestedResearchSelections(body) {
     }
     selections = body.selections.map((selection) => ({
       sectionID: selection.sectionID,
+      selectionMode: selection.selectionMode,
       selectedText: selection.selectedText,
       richSourceIDs: selection.richSourceIDs ?? (body.selections.length === 1 ? body.richSourceIDs : undefined),
       visualSourceIDs: selection.visualSourceIDs ?? (body.selections.length === 1 ? body.visualSourceIDs : undefined),
@@ -11390,12 +11403,29 @@ function requestedResearchSelections(body) {
   } else {
     selections = [{
       sectionID: body.sectionID,
+      selectionMode: body.selectionMode,
       selectedText: body.selectedText,
       richSourceIDs: body.richSourceIDs,
       visualSourceIDs: body.visualSourceIDs,
       visualReviewConfirmed: body.visualReviewConfirmed,
       savedItemID: String(body.savedItemID || "").trim()
     }];
+  }
+  for (const selection of selections) {
+    if (selection.selectionMode !== undefined && selection.selectionMode !== "section_reference" && selection.selectionMode !== "passage") {
+      const error = new Error("The Research selection mode is invalid.");
+      error.code = "INVALID_RESEARCH_SELECTION";
+      throw error;
+    }
+    if (selection.selectionMode === "section_reference" && (
+      selection.selectedText !== undefined && selection.selectedText !== null && selection.selectedText !== "" ||
+      selection.richSourceIDs !== undefined || selection.visualSourceIDs !== undefined ||
+      selection.visualReviewConfirmed !== undefined || selection.visualReviewDisposition !== undefined || selection.savedItemID
+    )) {
+      const error = new Error("A section reference cannot claim a selected passage, structured source, visual review or saved passage.");
+      error.code = "INVALID_RESEARCH_SELECTION";
+      throw error;
+    }
   }
   const selectionLengths = selections.map((selection) =>
     readableResearchSelectionText(
@@ -11424,7 +11454,9 @@ function requestedResearchSelections(body) {
 async function researchSourcesForSelections(selections, existingSources = []) {
   const resolvedBatches = [];
   for (const selection of selections) {
-    resolvedBatches.push(await researchSourcesForSelection(
+    resolvedBatches.push(selection.selectionMode === "section_reference"
+      ? await researchSourcesForSectionReference(selection.sectionID)
+      : await researchSourcesForSelection(
       selection.sectionID,
       selection.selectedText,
       {
@@ -11633,7 +11665,7 @@ async function currentResearchEvidence(conversation) {
 function selectedResearchEvidence(conversation, currentEvidence) {
   const evidenceByID = new Map(currentEvidence.map((item) => [item.sectionID, item]));
   return (conversation.sources || [])
-    .filter((source) => source.kind === "selection" && source.selectedText)
+    .filter((source) => source.kind === "selection" && (source.selectedText || source.selectionMode === "section_reference"))
     .map((source) => {
       const evidence = evidenceByID.get(source.sectionID);
       const richSource = source.richSourceID
@@ -11643,6 +11675,10 @@ function selectedResearchEvidence(conversation, currentEvidence) {
         ...evidence,
         sourceID: source.id,
         text: source.selectedText,
+        ...(source.selectionMode === "section_reference" ? {
+          selectionMode: "section_reference",
+          relationship: "Section referenced by the user; no exact passage or visual was selected"
+        } : {}),
         // Canonical evidence owns edition identity; older stored metadata may
         // have been stamped with the default library during a source refresh.
         codeVersion: evidence.codeVersion,
@@ -17710,6 +17746,7 @@ function researchConversationCreateFingerprint({ projectID, selections, originSu
     originSurface: normalizedResearchText(originSurface, 40),
     selections: selections.map((selection) => ({
       sectionID: String(selection.sectionID || "").trim(),
+      ...(selection.selectionMode === "section_reference" ? { selectionMode: "section_reference" } : {}),
       selectedText: readableResearchSelectionText(
         selection.selectedText,
         maximumResearchSelectionCharacters

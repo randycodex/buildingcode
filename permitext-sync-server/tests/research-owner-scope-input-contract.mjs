@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { ownerResearchScopeInput } from "../evals/research-owner-scope-input.mjs";
+import { ownerResearchScopeInput, ownerResearchHTTPSelections } from "../evals/research-owner-scope-input.mjs";
 import { zoningSectionSummary } from "../zoning-content.mjs";
 import { researchCorpusPlanForTurn } from "../app.mjs";
 
@@ -38,10 +38,20 @@ for (const { item, original } of cases) {
     assert.equal(pin.sectionNumber, (await zoningSectionSummary(id)).sectionNumber);
     assert.equal(pin.selectedText, undefined, "A whole-section pin must resolve through the canonical source assembler.");
   }
+  const selections = ownerResearchHTTPSelections(input);
+  assert.equal(selections.length, input.pinnedEvidence.length);
+  for (const [index, selection] of selections.entries()) {
+    const pin = input.pinnedEvidence[index];
+    assert.equal(selection.sectionID, pin.sectionID);
+    if (pin.selectedText !== undefined) assert.deepEqual(selection, { sectionID: pin.sectionID, selectedText: pin.selectedText });
+    else assert.deepEqual(selection, { sectionID: pin.sectionID, selectionMode: "section_reference" });
+  }
   pins += input.pinnedEvidence.length;
 }
 assert.equal(pins, 47);
 assert.equal(exactPassages, 8);
+assert.throws(() => ownerResearchHTTPSelections({ pinnedEvidence: [{ sectionID: "113", selectedText: "" }] }));
+assert.throws(() => ownerResearchHTTPSelections({ pinnedEvidence: [{ selectedText: "Exact passage" }] }));
 const cc01 = await ownerResearchScopeInput(original.cases.find((item) => item.id === "CC-01"), { original: true });
 assert.deepEqual(cc01.projectFacts, [
   "occupancy: Group R-2 stated by the question", "configuration: Scissor stair with entrance doors 15 feet apart",

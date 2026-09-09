@@ -486,7 +486,7 @@ assert.equal(researchEvidenceAssemblyLimits.maximumCharacters, 48_000);
 assert.equal(researchEvidenceAssemblyLimits.maximumSupplementalCharacters, 48_000);
 assert.deepEqual(researchPinnedEvidenceAssemblyLimits, {
   maximumDiscovered: 4,
-  maximumTargetedDefinitions: 1,
+  maximumTargetedDefinitions: 2,
   maximumCrossReferences: 3
 });
 
@@ -502,7 +502,7 @@ const defaultPinnedBudget = await assembleResearchEvidence({
   resolveSection
 });
 assert.equal(defaultPinnedBudget.limits.maximumDiscovered, 4);
-assert.equal(defaultPinnedBudget.limits.maximumTargetedDefinitions, 1);
+assert.equal(defaultPinnedBudget.limits.maximumTargetedDefinitions, 2);
 assert.equal(defaultPinnedBudget.limits.maximumCrossReferences, 3);
 assert.equal(defaultPinnedBudget.limits.maximumSupplementalCharacters, 48_000);
 assert.equal(defaultPinnedBudget.usage.pinnedSelectionExactCount, 1);

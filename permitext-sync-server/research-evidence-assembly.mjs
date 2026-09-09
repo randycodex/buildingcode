@@ -13,7 +13,7 @@ import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./resear
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260909-selected-table-boundary-v32";
+export const researchEvidenceAssemblyVersion = "20260909-pinned-excerpt-precedence-v33";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -28,7 +28,7 @@ export const researchEvidenceAssemblyLimits = Object.freeze({
 
 export const researchPinnedEvidenceAssemblyLimits = Object.freeze({
   maximumDiscovered: 4,
-  maximumTargetedDefinitions: 1,
+  maximumTargetedDefinitions: 2,
   maximumCrossReferences: 3
 });
 
@@ -560,7 +560,9 @@ function targetedDefinitionValue(value, context, maximumCharacters) {
   if (!excerpt) return { value, excerpt: null };
   const { text, ...metadata } = excerpt;
   return {
-    value: { ...value, text },
+    // HTTP pins can carry the full canonicalText as well as text. Both fields
+    // must represent this excerpt or sourceRecord will restore the full section.
+    value: { ...value, text, canonicalText: text },
     excerpt: metadata
   };
 }
@@ -608,9 +610,11 @@ function questionSpecificBlockValue(value, question, maximumCharacters) {
   }
   if (!selected.length) return value;
   selected.sort((left, right) => left.index - right.index);
+  const text = selected.map((block) => block.text).join("\n\n");
   return {
     ...value,
-    text: selected.map((block) => block.text).join("\n\n"),
+    text,
+    canonicalText: text,
     questionSpecificPassage: {
       version: "20260901-question-specific-block-v1",
       canonicalSectionCharacterCount: original.length,
@@ -622,7 +626,11 @@ function questionSpecificBlockValue(value, question, maximumCharacters) {
 function definitionSelectionContext(query, values = []) {
   return [
     compactText(query),
-    ...values.map((value) => canonicalText(value).slice(0, 4_000))
+    // A section reference supplies no passage. Feeding the first 4,000
+    // characters of its entire definitions section into ranking makes those
+    // unrelated opening entries outrank the user's question.
+    ...values.map((value) => value?.selectionMode === "section_reference"
+      ? "" : canonicalText(value).slice(0, 4_000))
   ].filter(Boolean).join("\n").slice(0, 32_000);
 }
 
@@ -1015,7 +1023,7 @@ export async function assembleResearchEvidence({
     const identity = sectionIdentity(record);
     if (identity) includedSectionIdentities.add(identity);
     if (entry.resolved) {
-      canonicalForExpansion.push(query.relevanceComparison
+      canonicalForExpansion.push(query.relevanceComparison || targeted.excerpt
         ? { ...entry.value, text: record.text, canonicalText: record.text, crossReferences: [] }
         : entry.value);
     }
@@ -1133,7 +1141,7 @@ export async function assembleResearchEvidence({
     }
     if (targeted.excerpt) targetedDefinitionCount += 1;
     canonicalForExpansion.push({
-      ...(useSelectedPassageOnly || query.relevanceComparison
+      ...(useSelectedPassageOnly || query.relevanceComparison || targeted.excerpt
         ? { ...resolved, text: record.text, canonicalText: record.text, crossReferences: [] }
         : resolved),
       researchAssemblyOrigin: sourceOrigins.discovered
