@@ -39,6 +39,29 @@ for (const [question, topic] of [
   assert.equal(researchDOBWorkflowRoute(`${question} Does my project comply with BC 1007.1.1?`).guidanceOnly, false);
   assert.equal(researchWebSupportTrigger({ question: `Do not use the internet. ${question}` }, {}).useWeb, false);
 }
+const authorityQuestion = "Can the filing representative attest for the owner and submit the DOB NOW job filing?";
+assert.equal(researchDOBWorkflowRoute(authorityQuestion).sources.find((source) => source.id === "dob-stakeholder-faq").faqQuestionFocus, "actor_authority");
+for (const question of [
+  `${authorityQuestion} How does the owner log in?`,
+  "The filing representative entered an email address in DOB NOW. Why is the owner unable to attest?",
+  "What are all the steps for a filing representative to prepare and submit a DOB NOW filing?",
+  `${authorityQuestion} I need help with logging in.`,
+  `${authorityQuestion} Is the filing ready to submit?`
+]) assert.equal(researchDOBWorkflowRoute(question).sources.find((source) => source.id === "dob-stakeholder-faq").faqQuestionFocus, undefined,
+  "Procedural and readiness questions retain the complete role FAQ selection.");
+for (const [id, topic] of [["DOBNOW-014", "rent_regulation_attestation"], ["DOBNOW-017", "adu_certificate_documents"]]) {
+  const item = originalCases.cases.find((item) => item.id === id);
+  const question = [`Context: ${item.questionContext}`, item.scenario, item.question].join("\n\n");
+  const route = researchDOBWorkflowRoute(question);
+  assert.equal(route.topic, topic);
+  assert.equal(route.directDocumentRetrieval, true);
+  assert.equal(route.sources.length, 1);
+  assert.equal(researchDOBWorkflowRoute(`${question} Use https://www.nyc.gov/another-source.pdf.`).directDocumentRetrieval, false);
+  assert.equal(researchDOBWorkflowRoute(`${question} Is the proposed occupancy legally permitted?`).guidanceOnly, false);
+  assert.equal(researchWebSupportTrigger({ question: `Do not use the internet. ${question}` }, {}).useWeb, false);
+}
+assert.equal(researchDOBWorkflowRoute("Which DOB NOW documents apply to an ADU?").directDocumentRetrieval, false,
+  "A general ADU-document question is broader than the known certificate source group.");
 for (const question of [paaQuestion,
   "The DOB NOW filing includes legalization. Which filing action changes the drawings?",
   "The DOB NOW filing does not include legalization. How do I submit a PAA?"

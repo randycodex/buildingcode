@@ -1,6 +1,6 @@
 // Source locations are discovery hints, never an answer key. Each document is
 // fetched and validated again before its contents may support an answer.
-export const researchDOBWorkflowRoutingVersion = "20260909-applicant-submission-source-v10";
+export const researchDOBWorkflowRoutingVersion = "20260909-focused-roles-and-document-groups-v11";
 const source = (id, title, filename, catalogReviewedOn = "2026-09-08") => Object.freeze({
   id, title, url: `https://www.nyc.gov/assets/buildings/pdf/${filename}`,
   publisher: "NYC Department of Buildings", catalogReviewedOn
@@ -25,6 +25,14 @@ export const researchDOBWorkflowSources = Object.freeze({
   paaFAQ: htmlSource("dob-paa-faq", "DOB NOW: Build FAQs — Post Approval Amendments", buildFAQ, ["Post Approval Amendments"]),
   stormwater: htmlSource("dep-stormwater-permits", "DEP Stormwater Permits", "https://www.nyc.gov/site/dep/water/stormwater-permits.page", ["Stormwater Permits"])
 });
+const aduDocumentSource = Object.freeze({
+  ...researchDOBWorkflowSources.releaseNotes,
+  pdfSectionHeadings: Object.freeze([
+    "DOHMH Radon and Vapor Level Certificate for Ancillary Dwelling Units",
+    "Local Law 127 Build PW1 Updates for Ancillary Dwelling Units",
+    "Local Law 127 ADU Filing Restrictions for One Family Dwellings"
+  ])
+});
 
 export function researchDOBWorkflowRoute(question) {
   const text = String(question || "").replace(/\s+/g, " ").trim();
@@ -42,6 +50,13 @@ export function researchDOBWorkflowRoute(question) {
   const stormwater = /\bstormwater\b|\bimpervious\s+(?:area|surface)\b/i.test(text);
   const loft = /\b(?:Loft (?:Law|Board)|interim multiple dwelling|IMD)\b/i.test(text);
   const filingRepresentative = /\bfiling representatives?\b/i.test(text) && /\b(?:attest(?:ation|ations)?|sign(?:ature)?|submit|submission)\b/i.test(text);
+  const actorAuthority = filingRepresentative && /\b(?:can|may|allowed|authorized|permitted)\b/i.test(text) &&
+    /\b(?:attest|sign)\b[^.?]{0,60}\bfor\b|\b(?:authority|permissions?)\b/i.test(text) &&
+    !/\b(?:how|where|when|why|steps?|procedures?|instructions?|help|troubleshoot|log(?:ging)?[ -]?in|sign(?:ing)?[ -]?in|email|account|dashboard|unable|errors?|problems?|blocked|button|preview|ready|checklist)\b/i.test(text);
+  const rentRegulation = /\bDHCR\b|\brent[ -]+(?:regulated|controlled|stabilized)\b/i.test(text);
+  const adu = /\bADUs?\b|\bancillary dwelling units?\b/i.test(text);
+  const aduDocument = adu && (/\b(?:radon|vapor)\b/i.test(text) ||
+    (/\b(?:certificate|document)\b/i.test(text) && /\bnewly erected\b[^.?]{0,80}\bsingle[ -]family\b/i.test(text)));
   // Naming the portal's Building Code review-year field is not itself a
   // request to determine enacted applicability. Mask only that field name;
   // any separate legal/technical request still requires enacted evidence.
@@ -52,7 +67,8 @@ export function researchDOBWorkflowRoute(question) {
     (legalQuestion !== text && /\b(?:govern(?:s|ing)?|appl(?:y|ies|icable|icability)|controll?ing|requires?|required|requirements?|must|mandatory|allowed|permitted|eligib(?:le|ility))\b/i.test(legalQuestion));
   const topic = bpp ? "builders_pavement" : wetlands ? "wetland_documents" : siteSafety ? "site_safety_documents"
     : paa ? "post_approval_amendments" : subsequent ? "subsequent_filings" : stormwater ? "stormwater_documents"
-    : loft ? "loft_board_documents" : filingRepresentative ? "filing_stakeholder_roles" : "dob_now_workflow";
+    : loft ? "loft_board_documents" : filingRepresentative ? "filing_stakeholder_roles"
+    : rentRegulation ? "rent_regulation_attestation" : aduDocument ? "adu_certificate_documents" : "dob_now_workflow";
   const guidanceOnly = (bpp || namedPortal) && !requiresEnactedAnswer;
   const sources = bpp ? [researchDOBWorkflowSources.buildersPavement]
     : wetlands ? [researchDOBWorkflowSources.releaseNotes]
@@ -61,7 +77,11 @@ export function researchDOBWorkflowRoute(question) {
     : subsequent ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.subsequentFAQ, researchDOBWorkflowSources.nbFAQ]
     : stormwater ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stormwater]
     : loft ? [researchDOBWorkflowSources.loftNotice, researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.applicationGuide]
-    : filingRepresentative ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stakeholderFAQ, researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.filingSteps]
+    : filingRepresentative ? [researchDOBWorkflowSources.applicationGuide,
+      actorAuthority ? { ...researchDOBWorkflowSources.stakeholderFAQ, faqQuestionFocus: "actor_authority" } : researchDOBWorkflowSources.stakeholderFAQ,
+      researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.filingSteps]
+    : rentRegulation ? [researchDOBWorkflowSources.applicationGuide]
+    : aduDocument ? [aduDocumentSource]
     : [researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.applicationGuide];
   const requestedURLs = text.match(/https:\/\/[^\s<>"\])]+/gi) || [];
   // An explicit source request takes priority over a catalog shortcut.
@@ -72,10 +92,11 @@ export function researchDOBWorkflowRoute(question) {
     version: researchDOBWorkflowRoutingVersion,
     topic,
     guidanceOnly,
-    directDocumentRetrieval: (bpp || wetlands || siteSafety || paa || subsequent || stormwater || loft || filingRepresentative) && guidanceOnly && catalogMatchesRequest,
+    directDocumentRetrieval: (bpp || wetlands || siteSafety || paa || subsequent || stormwater || loft || filingRepresentative || rentRegulation || aduDocument) && guidanceOnly && catalogMatchesRequest,
     passageTerms: bpp ? ["bpp", "bpp5", "pavement"] : wetlands ? ["wetland", "wetlands", "ceha"] : siteSafety ? ["safety", "superintendent"]
       : paa ? ["paa", "amendment", "amendments"] : subsequent ? ["subsequent"] : stormwater ? ["stormwater", "impervious"]
-      : loft ? ["loft", "imd"] : filingRepresentative ? ["attestation", "attestations", "attest", "representative", "representatives"] : [],
+      : loft ? ["loft", "imd"] : filingRepresentative ? ["attestation", "attestations", "attest", "representative", "representatives"]
+      : rentRegulation ? ["dhcr", "rent-controlled", "rent-stabilized", "regulated"] : aduDocument ? ["adu", "radon", "vapor", "ancillary"] : [],
     sources
   };
 }

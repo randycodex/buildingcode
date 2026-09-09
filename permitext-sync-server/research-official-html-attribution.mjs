@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { parse } from "parse5";
 import { researchOfficialPDFPassages } from "./research-official-pdf-attribution.mjs";
-import { researchOfficialPDFPageScores } from "./research-official-pdf-ranking.mjs";
+import { researchOfficialPDFPageScores, researchOfficialPDFSectionPassages } from "./research-official-pdf-ranking.mjs";
 
 const defaultMaximumBytes = 1_500_000;
 const defaultMaximumPDFBytes = 15_000_000;
@@ -239,7 +239,7 @@ export function selectResearchOfficialHTMLPassages(passages, query, options = {}
 // A curated heading is a source location, never an answer. Preserve its whole
 // section (including subheadings) so ranking cannot separate adjacent limits.
 // Missing or oversized sections fail source validation instead of being cut.
-export function researchOfficialHTMLSectionPassages(passages, sectionHeadings, sourceURL, { independentFAQPairs = false } = {}) {
+export function researchOfficialHTMLSectionPassages(passages, sectionHeadings, sourceURL, { independentFAQPairs = false, faqQuestionFocus } = {}) {
   const sections = [];
   for (const section of [...new Set(sectionHeadings)].slice(0, 3)) {
     const selected = passages.filter((passage) => passage.heading.split(" > ").includes(section));
@@ -254,7 +254,13 @@ export function researchOfficialHTMLSectionPassages(passages, sectionHeadings, s
     // A preamble, list or unpaired paragraph retains whole-section handling.
     // Each returned pair keeps its complete question, answer and heading.
     if (independentFAQPairs && selected.every((passage) => passage.kind === "faq_pair")) {
-      sections.push(...selected);
+      // Authority questions need complete permission/responsibility FAQs. A
+      // separate how/where/when question is procedural context and remains
+      // available through the ordinary, unfocused source path.
+      const focused = faqQuestionFocus === "actor_authority" ? selected.filter((passage) =>
+        !/^(?:how|where|when)\b/i.test(passage.intro?.trim() || "") &&
+        /\b(?:can|may|allowed|authorized|permitted|permissions?|responsibilities|roles?)\b/i.test(passage.intro || "")) : selected;
+      sections.push(...(focused.length ? focused : selected));
       continue;
     }
     sections.push({ index: selected[0].index, kind: "html_section", heading: section, intro: "", text,
@@ -417,11 +423,14 @@ export async function bindResearchWebSupportToOfficialDocuments(webSupport, opti
       const providerContext = (source.attributedClaims || []).map((claim) => claim?.text).join(" ");
       const candidates = fetched.format === "html" && source.sectionHeadings?.length
         ? researchOfficialHTMLSectionPassages(fetched.passages, source.sectionHeadings, fetched.url,
-          { independentFAQPairs: source.independentFAQPairs === true })
+          { independentFAQPairs: source.independentFAQPairs === true, faqQuestionFocus: source.faqQuestionFocus })
+        : fetched.format === "pdf" && source.pdfSectionHeadings?.length
+          ? researchOfficialPDFSectionPassages(fetched.passages, source.pdfSectionHeadings)
         : fetched.passages;
       // Explicitly curated companion steps form one requested source group;
       // a topic-keyword filter must not discard its review/submission steps.
-      const selected = fetched.format === "html" && source.sectionHeadings?.length && source.preserveSections === true
+      const selected = (fetched.format === "html" && source.sectionHeadings?.length && source.preserveSections === true) ||
+        (fetched.format === "pdf" && source.pdfSectionHeadings?.length)
         ? candidates : selectResearchOfficialHTMLPassages(
         candidates,
         `${options.question || ""} ${providerContext}`,
@@ -470,7 +479,7 @@ export async function bindResearchWebSupportToOfficialDocuments(webSupport, opti
     sourceValidation: {
       method: sources.some((source) => source.sourceValidation === "official_pdf")
         ? "official_documents" : "official_html",
-      attemptedSourceCount: originalSources.slice(0, 3).length,
+      attemptedSourceCount: originalSources.slice(0, maximumSources).length,
       validatedSourceCount: sources.length,
       failures: validationFailures
     },

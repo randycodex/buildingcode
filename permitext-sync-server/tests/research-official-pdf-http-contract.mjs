@@ -85,6 +85,11 @@ releaseDocument.addPage().text("Unrelated required documents for NB-GC filing ap
 // Source-derived reflow for transport/ranking checks; actual page 20 and hash
 // remain in the fixture. The current owner-type condition must reach the model.
 releaseDocument.addPage().text(boardUpdate.text);
+for (const pageNumber of [10, 28, 29, 32]) {
+  const page = officialDocuments.documents.find((document) => document.source.id === "dob-build-release-notes")
+    .document.passages.find((passage) => passage.pageNumber === pageNumber);
+  releaseDocument.addPage().text(page.text);
+}
 releaseDocument.end();
 const releaseBytes = await releaseComplete;
 let question = `According to the official service notice at ${sourceURL}, which review type applies to the new application?`;
@@ -116,6 +121,7 @@ let summaryDoubles = 0;
 let verificationDoubles = 0;
 let portalCase = null;
 let missingSafetySources = false;
+let missingADUSections = false;
 let responseDoubleFailure = null;
 const responseDouble = async (url, options) => {
   if (String(url) === "https://api.openai.com/v1/responses") {
@@ -163,7 +169,8 @@ const responseDouble = async (url, options) => {
         const text = input.passages.filter((passage) => passage.sourceID === "dob-stakeholder-faq").map((passage) => passage.text).join(" ");
         assert.match(text, /Filing Representatives can enter and view all filing information/);
         assert.match(text, /cannot upload plans or submit filings\/permits/);
-        assert.match(text, /owner must be logged in with the same email address/);
+        assert.match(text, /Owners can review the filing, complete the Owner’s Attestation/);
+        assert.doesNotMatch(text, /same email address|Preview to File/);
         const update = input.passages.find((passage) => passage.url.startsWith(releaseURL) && /Board added as a Stakeholder/.test(passage.text));
         assert(update, "Current additional-stakeholder guidance must reach both drafting and verification alongside the base role rules.");
         assert.match(update.text, /Condo Unit Owner or Co\s*-\s*Op Tenant\s*-\s*Shareholder/);
@@ -175,6 +182,20 @@ const responseDouble = async (url, options) => {
         assert.match(steps, /other stakeholders must electronically sign the job filing/);
         assert(input.sourceRelationships.some((relationship) => relationship.kind === "conditional_stakeholder"),
           "The source-derived conditional-actor relationship must reach both model stages.");
+      }
+      if (portalCase === "DOBNOW-014") {
+        const text = input.passages.map((passage) => passage.text).join(" ").replace(/\s+/g, " ");
+        assert.match(text, /DHCR/);
+        assert.match(text, /document is required confirming the building contains 0/);
+        assert.match(text, /Otherwise, owners must check Yes to Question 5/);
+      }
+      if (portalCase === "DOBNOW-017") {
+        const text = input.passages.map((passage) => passage.text).join(" ").replace(/\s+/g, " ");
+        assert.match(text, /Prior to TCO \(optional\).*required prior to Final CO/);
+        assert.match(text, /waiver request is allowed.*cannot be deferred/);
+        assert.match(text, /Where does the main entrance of the ADU directly open to/);
+        assert.match(text, /Specify Other/);
+        assert.match(text, /may not be submitted unless and until/);
       }
       if (portalCase === "DOBNOW-008") {
         assert(input.passages.some((passage) => passage.url.startsWith(guideURL) && /gross floor area/.test(passage.text)));
@@ -193,7 +214,7 @@ const responseDouble = async (url, options) => {
     if (body.text.format.name === "permitext_official_guidance_summary") {
       summaryDoubles += 1;
       const wetlands = /wetlands/i.test(input.question);
-      const passages = ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-016", "DOBNOW-023"].includes(portalCase) ? input.passages
+      const passages = ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-014", "DOBNOW-017", "DOBNOW-016", "DOBNOW-023"].includes(portalCase) ? input.passages
         : portalCase ? input.passages.filter((passage) => passage.url.startsWith(guideURL) && passage.page === (portalCase === "DOBNOW-001" ? 1 : portalCase === "DOBNOW-004" ? 4 : 2))
         : wetlands ? input.passages : input.passages.slice(0, 1);
       if (["DOBNOW-001", "DOBNOW-021"].includes(portalCase)) assert.equal(passages.length, 1);
@@ -221,6 +242,10 @@ const responseDouble = async (url, options) => {
               ? "Answer Yes for work in or affecting the IMD unit. After submitting the job filing, request Loft Board Certification and include a Narrative Statement; the DOB approval hold remains until the required certification is issued."
             : portalCase === "DOBNOW-023"
               ? "The filing representative may prepare filing information but cannot submit the filing. The required applicant and owner attestations remain outstanding."
+            : portalCase === "DOBNOW-014"
+              ? "The owner cannot simply answer No without the document confirming zero regulated units and explaining why the DHCR records are inaccurate; otherwise the owner must answer Yes."
+            : portalCase === "DOBNOW-017"
+              ? "Answer Yes and select Basement. The DOHMH Radon and Vapor Level Certificate is required before Final CO, may be uploaded before TCO, allows a waiver request and cannot be deferred."
             : portalCase === "DOBNOW-008"
               ? missingSafetySources
                 ? "Answer Yes to the percentage question: the alteration alters 60 percent of gross floor area. The exception documents could not be retrieved, so final Site Safety Plan applicability remains unresolved."
@@ -265,7 +290,7 @@ const responseDouble = async (url, options) => {
     documentDoubles += 1;
     return new Response(corruptDocument ? Buffer.from("invalid pdf") : bytes, { headers: { "content-type": "application/pdf" } });
   }
-  if (String(url) === releaseURL) return new Response(releaseBytes, { headers: { "content-type": "application/pdf" } });
+  if (String(url) === releaseURL) return new Response(missingADUSections ? codeChangesBytes : releaseBytes, { headers: { "content-type": "application/pdf" } });
   if (String(url) === guideURL) return new Response(guideBytes, { headers: { "content-type": "application/pdf" } });
   if (String(url) === loftNoticeURL) return new Response(loftNoticeBytes, { headers: { "content-type": "application/pdf" } });
   if (portalCase === "DOBNOW-023" && String(url) === stakeholderFixture.url) return new Response(stakeholderFixture.html, { headers: { "content-type": "text/html" } });
@@ -345,7 +370,7 @@ try {
   assert.equal(verificationDoubles, 3);
   const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json", import.meta.url)));
   const companionRetained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json", import.meta.url)));
-  for (const id of ["DOBNOW-001", "DOBNOW-003", "DOBNOW-004", "DOBNOW-012", "DOBNOW-021", "DOBNOW-016", "DOBNOW-023", "DOBNOW-008"]) {
+  for (const id of ["DOBNOW-001", "DOBNOW-003", "DOBNOW-004", "DOBNOW-012", "DOBNOW-014", "DOBNOW-017", "DOBNOW-021", "DOBNOW-016", "DOBNOW-023", "DOBNOW-008"]) {
     portalCase = id;
     question = [...retained.results, ...companionRetained.results].find((item) => item.id === id).question;
     const beforePortal = providerDoubles;
@@ -355,12 +380,21 @@ try {
     assert.equal(answer.retrieval.allowOfficialGuidanceOnly, true);
     assert.equal(answer.citations.length, 0, "Portal guidance must not acquire irrelevant enacted citations.");
     assert.equal(answer.verification.pass, true);
-    assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
-    const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
+    assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-014", "DOBNOW-017", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
+    const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-014": /cannot simply answer No/, "DOBNOW-017": /required before Final CO/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
     assert.match(answer.answerText, expected[id]);
     assert.equal(answer.promptVersion, "20260909-document-summary-v10");
     assert.equal(answer.officialGuidanceSummary.version, "20260909-document-summary-v2",
       "New summaries retain the required qualification receipt; older v1 records remain readable.");
+    if (id === "DOBNOW-017") {
+      missingADUSections = true;
+      const beforeMissing = providerDoubles;
+      const missing = await ask();
+      assert(missing.status >= 400);
+      assert.equal(missing.body.code, "RESEARCH_OFFICIAL_GUIDANCE_UNAVAILABLE");
+      assert.equal(providerDoubles, beforeMissing, "Missing curated PDF sections must stop before any model or search request.");
+      missingADUSections = false;
+    }
   }
   missingSafetySources = true;
   const partialSafety = await ask();

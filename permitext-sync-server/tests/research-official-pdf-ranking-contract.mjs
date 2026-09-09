@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { selectResearchOfficialHTMLPassages } from "../research-official-html-attribution.mjs";
 import { reconciledResearchEvaluationInput } from "../evals/research-answer-key-reconciliation.mjs";
+import { researchOfficialPDFSectionPassages } from "../research-official-pdf-ranking.mjs";
+import { researchDOBWorkflowRoute } from "../research-dob-workflow-routing.mjs";
 
 globalThis.fetch = async () => { throw new Error("No network in PDF page ranking checks."); };
 const fixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-official-document-pages-20260909.json", import.meta.url)));
@@ -69,5 +71,24 @@ const numericNearMisses = ["112 feet", "12 feet"].map((depth, index) => ({
 assert.deepEqual(selectResearchOfficialHTMLPassages(numericNearMisses, "excavation deeper than 12 feet", { maximum: 1 }), [numericNearMisses[1]]);
 assert.deepEqual(selectResearchOfficialHTMLPassages(synthetic, "gross floor area", { requiredPassageTerms: ["wetlands"] }), []);
 assert.deepEqual(selectResearchOfficialHTMLPassages([], "a question"), []);
+
+const aduCase = key.cases.find((item) => item.id === "DOBNOW-017");
+const aduQuestion = [`Context: ${aduCase.questionContext}`, aduCase.scenario, aduCase.question].join("\n\n");
+const headings = researchDOBWorkflowRoute(aduQuestion).sources[0].pdfSectionHeadings;
+const releasePages = fixture.documents.find((document) => document.source.id === "dob-build-release-notes").document.passages;
+const aduGroup = researchOfficialPDFSectionPassages(releasePages, headings);
+assert.deepEqual(aduGroup.map((page) => page.pageNumber), [10, 28, 29, 32],
+  "Keep the certificate conditions, both PW1 pages and the conditional cellar filing restriction.");
+assert.match(aduGroup[0].text, /Prior to TCO \(optional\).*required prior to Final CO/s);
+assert.match(aduGroup.at(-1).text, /may not be submitted unless and until/);
+aduGroup.forEach((page) => assert.strictEqual(page, releasePages.find((original) => original.id === page.id)));
+assert.throws(() => researchOfficialPDFSectionPassages(releasePages.filter((page) => page.pageNumber !== 32), headings),
+  { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_UNAVAILABLE" });
+const renumbered = releasePages.map((page) => ({ ...page, pageNumber: page.pageNumber + 100 }));
+assert.deepEqual(researchOfficialPDFSectionPassages(renumbered, headings).map((page) => page.pageNumber), [110, 128, 129, 132],
+  "Section selection follows source headings, not fixed PDF page numbers.");
+assert.throws(() => researchOfficialPDFSectionPassages(Array.from({ length: 7 }, () => ({ ...aduGroup[0] })), [headings[0]]),
+  { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_TOO_LARGE" });
+assert.throws(() => researchOfficialPDFSectionPassages(releasePages, []), { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_UNAVAILABLE" });
 
 console.log("PDF ranking passed: minimum relevant pages for all 24 authored DOB queries, preserved full passages and references, equivalent threshold wording and topic filters; zero network/API calls. Full source or answer completeness is not asserted.");

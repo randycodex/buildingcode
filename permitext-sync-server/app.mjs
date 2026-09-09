@@ -19516,7 +19516,11 @@ async function handleResearchConversationMessage(request, response) {
           officialDomains: researchSourcePolicyConfiguration().officialDomains,
           signal: progressResponse.signal
         });
-        if (direct.sources.length) return direct;
+        // A declared section group is part of the evidence requirement. A
+        // generic search fallback must not discard that requirement when the
+        // requested sections are unavailable.
+        if (direct.sources.length || workflow.sources.some((source) =>
+          source.pdfSectionHeadings?.length || source.sectionHeadings?.length)) return direct;
       }
       return openAIResearchWebSupport(question, context.userID, {
         retrievalQuery: workflow ? evidencePackage.retrievalQuery || question : question,

@@ -1,0 +1,386 @@
+{
+  "schema": "permitext-owner-focused-source-validation-v1",
+  "checkedAt": "2026-09-09T11:13:15.027Z",
+  "keySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "paidProviderCalls": 0,
+  "publicDocumentGETs": 6,
+  "documentRequests": [
+    "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+    "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+    "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+    "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+    "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+    "https://www.nyc.gov/site/buildings/property-or-business-owner/filing-through-dob-now-build.page"
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-023",
+      "question": "Context: DOB NOW workflow\n\nA filing representative has completed data entry and uploaded the documents. The applicant and owner have not yet completed their attestations.\n\nCan the filing representative attest for them and submit the job filing?",
+      "topic": "filing_stakeholder_roles",
+      "sourceStatistics": [
+        {
+          "sourceID": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "passages": 2,
+          "pages": [
+            16,
+            38
+          ],
+          "verbatimCharacters": 5178,
+          "modelCharacters": 5178
+        },
+        {
+          "sourceID": "dob-stakeholder-faq",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "passages": 3,
+          "pages": [],
+          "verbatimCharacters": 606,
+          "modelCharacters": 1073
+        },
+        {
+          "sourceID": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "passages": 3,
+          "pages": [
+            18,
+            20,
+            42
+          ],
+          "verbatimCharacters": 1751,
+          "modelCharacters": 1751
+        },
+        {
+          "sourceID": "dob-filing-submission-steps",
+          "url": "https://www.nyc.gov/site/buildings/property-or-business-owner/filing-through-dob-now-build.page",
+          "passages": 3,
+          "pages": [],
+          "verbatimCharacters": 437,
+          "modelCharacters": 437
+        }
+      ],
+      "sourceValidation": {
+        "method": "official_documents",
+        "attemptedSourceCount": 4,
+        "validatedSourceCount": 4,
+        "failures": []
+      },
+      "sources": [
+        {
+          "id": "dob-application-guide",
+          "title": "DOB NOW application user guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "attributedClaims": [
+            {
+              "id": "official-passage-ce20f813e92241a7bc12804a",
+              "text": "[PDF page 16](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=16) — Page 16 of 38 Stakeholders All stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with information from the eFiling account. Applicant and Owner: Enter the email address associated with the eFiling account of the Applicant and Owner . In most cases, the Applicant is a Registered Architect or Professional Engineer. For the Applicant, also select the License Type and Business Name. For the owner, select the Owner Type. If the Owner Type selected is Non - Profit Organization, NYC Agency, O ther Government Owned or NYCHA/HHC, then the fees will be removed and an ACRIS report is required to verify the building is tax exempt. Filing Representative and Delegated Associates : An email address can also be entered for Filing Representative Class I/ Preparer and Delegated Associates (Filing Representative Class II or Other Licensee). Filing Review Type, Work Type /Filing Includes The Filing includes – select if the application is for New Work or Legalization . This option cannot be changed once the filing fees are paid. If Legalization is selected and there is no OATH summons on the BIN for work without permit (WWP), then a $600 or $6000 fee, depending on the building type, is added to the filing fees as a legalization fee. If legalization is selected and an OATH summons number for WWP is on the BIN, select Yes to the question Are there any OATH/E CB summonses related to this work? and enter the DOB violation or OATH/ECB Summons number(s). When a WWP violation is entered, there is no legalization fee and only a civil penalty for work without permit cal culated as an L2 fee. An L2 is a request for ove rride, reduction or waiver of civil penalties for work without a permit violations. When the L2 request is created, the civil penalty fee has to be paid before the permit is issued. Once legalization is selected on a filing, it results in a no work pe rmit and Post Approval Amendments are not allowed. See 1 RCNY 102 - 04 (b) (7 ) for more information about legalization and civil penalties. The work is being done to legalize work without a permit listed as a violating condition in a Request for Corrective Action ( RCA) issued by DOB? – if Yes is selected, provide the complaint number of the RCA. See 1 RCNY 102 - 06 and the September 2021 Service Notice for information about the Homeowner Relief Program. Filing Review T ype - auto - populated based on the selection made when creating the application and cannot be changed. The below selections are auto - populated based on the selection made when creating the application but can be changed in this section: Is this Application for a Small Business? Is this Application for an approved project under the M ajor Project Developments Program (MPP) ?",
+              "verbatimText": "Page 16 of 38\nStakeholders\nAll stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with\ninformation from the eFiling account.\nApplicant and Owner: Enter the email address associated with the eFiling account of the Applicant and Owner . In most cases, the Applicant is a\nRegistered Architect or Professional Engineer. For the Applicant, also select the License Type and Business Name. For the owner, select the Owner\nType. If the Owner Type selected is Non - Profit Organization, NYC Agency, O ther Government Owned or NYCHA/HHC, then the fees will be removed\nand an ACRIS report is required to verify the building is tax exempt.\nFiling Representative and Delegated Associates : An email address can also be entered for Filing Representative Class I/ Preparer and Delegated\nAssociates (Filing Representative Class II or Other Licensee).\nFiling Review Type, Work Type /Filing Includes\nThe Filing includes – select if the application is for New Work or Legalization . This option cannot be changed once the filing fees are paid.\nIf Legalization is selected and there is no OATH summons on the BIN for work without permit (WWP), then a $600 or $6000 fee, depending on the\nbuilding type, is added to the filing fees as a legalization fee. If legalization is selected and an OATH summons number for WWP is on the BIN,\nselect Yes to the question Are there any OATH/E CB summonses related to this work? and enter the DOB violation or OATH/ECB Summons\nnumber(s). When a WWP violation is entered, there is no legalization fee and only a civil penalty for work without permit cal culated as an L2 fee.\nAn L2 is a request for ove rride, reduction or waiver of civil penalties for work without a permit violations. When the L2 request is created, the civil\npenalty fee has to be paid before the permit is issued. Once legalization is selected on a filing, it results in a no work pe rmit and Post Approval\nAmendments are not allowed. See 1 RCNY 102 - 04 (b) (7 ) for more information about legalization and civil penalties.\nThe work is being done to legalize work without a permit listed as a violating condition in a Request for Corrective Action ( RCA) issued by DOB?\n– if Yes is selected, provide the complaint number of the RCA. See 1 RCNY 102 - 06 and the September 2021 Service Notice for information about the\nHomeowner Relief Program.\nFiling Review T ype - auto - populated based on the selection made when creating the application and cannot be changed.\nThe below selections are auto - populated based on the selection made when creating the application but can be changed in this section:\nIs this Application for a Small Business?\nIs this Application for an approved project under the M ajor Project Developments Program (MPP) ?",
+              "heading": "PDF page 16",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 16,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=16"
+            },
+            {
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "text": "[PDF page 38](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=38) — Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a Design Professional/Licensee Seal and Signature Form (DPL - 1) as a Required Document. The date on the form cannot be more than one year from the date of submission. Owner’s Attestation All job filings in DOB NOW require confirmation from the Owner authorizing the applicant to submit the filing and acknowledging that the information in the application has been reviewed. An Owner provides confirmation by completing the Owner’s Attestation sectio n of the Statements & Signatures tab . Occupied Dwelling Units (Questions 1 - 4) If the owner selects Yes to Question 1, occupied dwelling units during construction , a Tenant Protection Plan (TPP) is required. A TPP is required if residential units will be occupied any time before the permit is signed off by DOB. Questions 3 - 4 determine compliance requirement s with tenant protection laws based on whether residential units are occupied at the time of application. Rent Controlled or Rent Stabilized Housing (Questions 5 - 6) This information is checked with data provided by NYS Homes and Community Renewal (DHCR) if at least one rent - regulated unit is in the building. If there is at least one rent - regulated unit in the building and the owner checks No to Question 5, a document is required confirming the building contains 0 rent controlled/stabilized units and expla ining why the DHCR records are inaccurate. Otherwise, owners must check Yes to Question 5. Loft Board Notification (Question 7) Owners proposing work to convert their loft buildings into legal residences are required to notify the NYC Loft Board at (212 ) 393 - 2603 and ask for the Public Information Officer. Interior Work (Questions 8 - 10) If the proposed work requires a TPP and the owner checks Yes to Questions 8, 9, or 10, a Tenant Protection Plan Compliance special inspection will not be required. Owner Arrears (Questions 11 - 12) This section appears on New Building, Alteration - CO, and Full Demolition filings to comply with Local Law 160 of 2017 . If the owner answers Yes to either question, a list of exceptions will appear as Question 13. If an exception is not selected, a permit cannot be obtaine d.",
+              "verbatimText": "Page 38 of 38\nSTATEMENTS & SIGNATURES\nApplicant o f Record ’s Attestation\nThe applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a\nDesign Professional/Licensee Seal and Signature Form (DPL - 1) as a Required Document. The date on the form cannot be more than one year from\nthe date of submission.\nOwner’s Attestation\nAll job filings in DOB NOW require confirmation from the Owner authorizing the applicant to submit the filing and acknowledging that the\ninformation in the application has been reviewed. An Owner provides confirmation by completing the Owner’s Attestation sectio n of the\nStatements & Signatures tab .\nOccupied Dwelling Units (Questions 1 - 4)\nIf the owner selects Yes to Question 1, occupied dwelling units during construction , a Tenant Protection Plan (TPP) is required. A TPP is required if\nresidential units will be occupied any time before the permit is signed off by DOB. Questions 3 - 4 determine compliance requirement s with tenant\nprotection laws based on whether residential units are occupied at the time of application.\nRent Controlled or Rent Stabilized Housing (Questions 5 - 6)\nThis information is checked with data provided by NYS Homes and Community Renewal (DHCR) if at least one rent - regulated unit is in the building.\nIf there is at least one rent - regulated unit in the building and the owner checks No to Question 5, a document is required confirming the building\ncontains 0 rent controlled/stabilized units and expla ining why the DHCR records are inaccurate. Otherwise, owners must check Yes to Question 5.\nLoft Board Notification (Question 7)\nOwners proposing work to convert their loft buildings into legal residences are required to notify the NYC Loft Board at (212 ) 393 - 2603 and ask for\nthe Public Information Officer.\nInterior Work (Questions 8 - 10)\nIf the proposed work requires a TPP and the owner checks Yes to Questions 8, 9, or 10, a Tenant Protection Plan Compliance special inspection will\nnot be required.\nOwner Arrears (Questions 11 - 12)\nThis section appears on New Building, Alteration - CO, and Full Demolition filings to comply with Local Law 160 of 2017 . If the owner answers Yes to\neither question, a list of exceptions will appear as Question 13. If an exception is not selected, a permit cannot be obtaine d.",
+              "heading": "PDF page 38",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 38,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=38"
+            }
+          ],
+          "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "sourceValidation": "official_pdf",
+          "pageCount": 38,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        },
+        {
+          "id": "dob-stakeholder-faq",
+          "title": "DOB NOW: Build FAQs — Owner and Professional Responsibilities",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-09",
+          "sectionHeadings": [
+            "Roles & Responsibilities: Owner",
+            "Roles & Responsibilities: Professionals"
+          ],
+          "independentFAQPairs": true,
+          "faqQuestionFocus": "actor_authority",
+          "attributedClaims": [
+            {
+              "id": "official-passage-89da413492dfb6c814deeb8e",
+              "text": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — As an owner, what information can I enter and access in DOB NOW: Build ? — Owners can review the filing, complete the Owner’s Attestation section on the Statements and Signatures tab and make payments on their jobs. They can also view all documents that are part of their job.",
+              "verbatimText": "Owners can review the filing, complete the Owner’s Attestation section on the Statements and Signatures tab and make payments on their jobs. They can also view all documents that are part of their job.",
+              "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner",
+              "intro": "As an owner, what information can I enter and access in DOB NOW: Build ?",
+              "contentHash": "618eac6b372e4c3358438d8eb3419dd11c28bf35ed1f603836924f5e518ab7ea"
+            },
+            {
+              "id": "official-passage-81e6b3b8e6bdabde81de4ada",
+              "text": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Filing Representative, what information can I enter and access in DOB NOW: Build ? — Filing Representatives can enter and view all filing information (PW1, Scope of Work, PW3, Technical Reports and PW2) that are part of the filing. They can make payments on jobs that they are associated with. They cannot upload plans or submit filings/permits.",
+              "verbatimText": "Filing Representatives can enter and view all filing information (PW1, Scope of Work, PW3, Technical Reports and PW2) that are part of the filing. They can make payments on jobs that they are associated with. They cannot upload plans or submit filings/permits.",
+              "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals",
+              "intro": "As a Filing Representative, what information can I enter and access in DOB NOW: Build ?",
+              "contentHash": "618eac6b372e4c3358438d8eb3419dd11c28bf35ed1f603836924f5e518ab7ea"
+            },
+            {
+              "id": "official-passage-33ff41a26c0fddcb8d6262a7",
+              "text": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Can a filing representative submit a work permit? — No, a filing representative can do the data entry of the work permit application but only the applicant of the permit (contractor) can submit it.",
+              "verbatimText": "No, a filing representative can do the data entry of the work permit application but only the applicant of the permit (contractor) can submit it.",
+              "heading": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals",
+              "intro": "Can a filing representative submit a work permit?",
+              "contentHash": "618eac6b372e4c3358438d8eb3419dd11c28bf35ed1f603836924f5e518ab7ea"
+            }
+          ],
+          "sourceContentHash": "618eac6b372e4c3358438d8eb3419dd11c28bf35ed1f603836924f5e518ab7ea",
+          "sourceValidation": "official_html"
+        },
+        {
+          "id": "dob-build-release-notes",
+          "title": "DOB NOW: Build release notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "attributedClaims": [
+            {
+              "id": "official-passage-53a7b00a20a15149e08db0e5",
+              "text": "[PDF page 18](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=18) — March 2026 – Green Roof Tax Abatement in DOB NOW: Build (Continued) The New Tax Abatement tab includes: • Maintenance Plan Author Information section to be completed by a Registered Architect, Professional Engineer, NYS Licensed and Registered Landscape Architect, or a Horticulturist with a degree or certificate from an accredited training institute. • Owner’s Attestation: Owners will need to log in to DOB NOW to attest to the Tax Abatement information in addition to completing the attestation on the Statements & Signatures tab. Select the Save Tax Abatement button at the top or bottom of the screen after completion of each of these sections. The Tax abatement tab can be edited at any point up until LOC Request.",
+              "verbatimText": "March 2026 – Green Roof Tax Abatement in DOB NOW: Build (Continued)\nThe New Tax Abatement tab includes:\n• Maintenance Plan Author Information section to be\ncompleted by a Registered Architect, Professional\nEngineer, NYS Licensed and Registered Landscape\nArchitect, or a Horticulturist with a degree or\ncertificate from an accredited training institute.\n• Owner’s Attestation: Owners will need to log in to\nDOB NOW to attest to the Tax Abatement information\nin addition to completing the attestation on the\nStatements & Signatures tab.\nSelect the Save Tax Abatement button at the top or\nbottom of the screen after completion of each of these\nsections. The Tax abatement tab can be edited at any\npoint up until LOC Request.",
+              "heading": "PDF page 18",
+              "intro": "",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "pageNumber": 18,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=18"
+            },
+            {
+              "id": "official-passage-2e6a1d190b996cb029e2e04a",
+              "text": "[PDF page 20](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=20) — February 2026 - Condo/Co - Op Board added as a Stakeholder in PW1 When Condo Unit Owner or Co - Op Tenant - Shareholder is selected as the Owner Type on a DOB NOW job filing, the Condo/Co - Op Board will be added as a required Stakeholder. ▪ The Board’s representative must log in to DOB NOW using an NYC.ID account and attest that the Board has authorized the applicant to file the application. ▪ Both the owner and the Board representative are required complete their attestations on the Statements & Signatures tab before the filing can proceed.",
+              "verbatimText": "February 2026 - Condo/Co - Op Board added as a Stakeholder in PW1\nWhen Condo Unit Owner or Co - Op Tenant - Shareholder is selected as the Owner Type on a DOB NOW job filing, the Condo/Co - Op\nBoard will be added as a required Stakeholder.\n▪ The Board’s representative must log in to DOB NOW using an NYC.ID account and attest that the Board has authorized the\napplicant to file the application.\n▪ Both the owner and the Board representative are required complete their attestations on the Statements & Signatures tab before\nthe filing can proceed.",
+              "heading": "PDF page 20",
+              "intro": "",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "pageNumber": 20,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=20"
+            },
+            {
+              "id": "official-passage-fb868e89e2df8a94e8ce4331",
+              "text": "[PDF page 42](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=42) — November 2024 – Deleting Paid Filings November 8, 2024 A stakeholder on a filing (Applicant, Owner, Filing Representative, Delegated Associate, Permit Applicant) can delete the following type of filings, even if they are paid for, if they are in Pre - Filing or Objections/QA Failed status: • After Hours Variance Permits (AHV) • Elevator Filings • OP 49 Boiler Removal Notifications • Post Approval Amendments • Supersede Requests • Withdrawal Requests • Work Permit (PW2) Renewals",
+              "verbatimText": "November 2024 – Deleting Paid Filings\nNovember 8, 2024\nA stakeholder on a filing (Applicant, Owner, Filing Representative, Delegated Associate, Permit Applicant) can delete\nthe following type of filings, even if they are paid for, if they are in Pre - Filing or Objections/QA Failed status:\n• After Hours Variance Permits (AHV)\n• Elevator Filings\n• OP 49 Boiler Removal Notifications\n• Post Approval Amendments\n• Supersede Requests\n• Withdrawal Requests\n• Work Permit (PW2) Renewals",
+              "heading": "PDF page 42",
+              "intro": "",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "pageNumber": 42,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=42"
+            }
+          ],
+          "sourceContentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+          "sourceValidation": "official_pdf",
+          "pageCount": 159,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        },
+        {
+          "id": "dob-filing-submission-steps",
+          "title": "Filing through DOB NOW: Build — attestation, preview and submission",
+          "url": "https://www.nyc.gov/site/buildings/property-or-business-owner/filing-through-dob-now-build.page",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-09",
+          "sectionHeadings": [
+            "STEP 4: Obtain Attestation",
+            "STEP 6: Preview Submission",
+            "STEP 7: Submit Job Filing"
+          ],
+          "preserveSections": true,
+          "attributedClaims": [
+            {
+              "id": "official-passage-4c66eb5dc136761f7495ea12",
+              "text": "Filing through DOB NOW: Build > STEP 4: Obtain Attestation — • Applicant (PE/RA), property owners and other stakeholders must electronically sign the job filing.",
+              "verbatimText": "Filing through DOB NOW: Build > STEP 4: Obtain Attestation — • Applicant (PE/RA), property owners and other stakeholders must electronically sign the job filing.",
+              "heading": "STEP 4: Obtain Attestation",
+              "intro": "",
+              "contentHash": "2f8a630cb33102d4d7f9827baf76ae062e2a71d3078cd89e0fd755b1cbbd09e6"
+            },
+            {
+              "id": "official-passage-4cfa7b1dfaa4c70a5f778274",
+              "text": "Filing through DOB NOW: Build > STEP 6: Preview Submission — • Applicant must review the filing and provide a final electronic signature.",
+              "verbatimText": "Filing through DOB NOW: Build > STEP 6: Preview Submission — • Applicant must review the filing and provide a final electronic signature.",
+              "heading": "STEP 6: Preview Submission",
+              "intro": "",
+              "contentHash": "2f8a630cb33102d4d7f9827baf76ae062e2a71d3078cd89e0fd755b1cbbd09e6"
+            },
+            {
+              "id": "official-passage-06964caacb80b94777b5f3c5",
+              "text": "Filing through DOB NOW: Build > STEP 7: Submit Job Filing — • Applicant officially submits the job filing to the Department electronically.",
+              "verbatimText": "Filing through DOB NOW: Build > STEP 7: Submit Job Filing — • Applicant officially submits the job filing to the Department electronically.",
+              "heading": "STEP 7: Submit Job Filing",
+              "intro": "",
+              "contentHash": "2f8a630cb33102d4d7f9827baf76ae062e2a71d3078cd89e0fd755b1cbbd09e6"
+            }
+          ],
+          "sourceContentHash": "2f8a630cb33102d4d7f9827baf76ae062e2a71d3078cd89e0fd755b1cbbd09e6",
+          "sourceValidation": "official_html"
+        }
+      ],
+      "comparison": {
+        "priorResult": "evals/results/research-owner-api-round2-live-decision-scope-2026-09-09.json",
+        "priorFAQModelCharacters": 3166,
+        "focusedFAQModelCharacters": 1073,
+        "allSelectedPassagesUnchangedFromPrior": true
+      }
+    },
+    {
+      "id": "DOBNOW-014",
+      "question": "Context: DOB NOW workflow\n\nThe DOB NOW workflow indicates that DHCR data identifies at least one rent-controlled or rent-stabilized unit. The owner believes the building contains none but has not provided supporting documentation.\n\nMay the filing simply answer No to the rent-regulated-housing question?",
+      "topic": "rent_regulation_attestation",
+      "sourceStatistics": [
+        {
+          "sourceID": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "passages": 1,
+          "pages": [
+            38
+          ],
+          "verbatimCharacters": 2366,
+          "modelCharacters": 2366
+        }
+      ],
+      "sourceValidation": {
+        "method": "official_documents",
+        "attemptedSourceCount": 1,
+        "validatedSourceCount": 1,
+        "failures": []
+      },
+      "sources": [
+        {
+          "id": "dob-application-guide",
+          "title": "DOB NOW application user guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "attributedClaims": [
+            {
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "text": "[PDF page 38](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=38) — Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a Design Professional/Licensee Seal and Signature Form (DPL - 1) as a Required Document. The date on the form cannot be more than one year from the date of submission. Owner’s Attestation All job filings in DOB NOW require confirmation from the Owner authorizing the applicant to submit the filing and acknowledging that the information in the application has been reviewed. An Owner provides confirmation by completing the Owner’s Attestation sectio n of the Statements & Signatures tab . Occupied Dwelling Units (Questions 1 - 4) If the owner selects Yes to Question 1, occupied dwelling units during construction , a Tenant Protection Plan (TPP) is required. A TPP is required if residential units will be occupied any time before the permit is signed off by DOB. Questions 3 - 4 determine compliance requirement s with tenant protection laws based on whether residential units are occupied at the time of application. Rent Controlled or Rent Stabilized Housing (Questions 5 - 6) This information is checked with data provided by NYS Homes and Community Renewal (DHCR) if at least one rent - regulated unit is in the building. If there is at least one rent - regulated unit in the building and the owner checks No to Question 5, a document is required confirming the building contains 0 rent controlled/stabilized units and expla ining why the DHCR records are inaccurate. Otherwise, owners must check Yes to Question 5. Loft Board Notification (Question 7) Owners proposing work to convert their loft buildings into legal residences are required to notify the NYC Loft Board at (212 ) 393 - 2603 and ask for the Public Information Officer. Interior Work (Questions 8 - 10) If the proposed work requires a TPP and the owner checks Yes to Questions 8, 9, or 10, a Tenant Protection Plan Compliance special inspection will not be required. Owner Arrears (Questions 11 - 12) This section appears on New Building, Alteration - CO, and Full Demolition filings to comply with Local Law 160 of 2017 . If the owner answers Yes to either question, a list of exceptions will appear as Question 13. If an exception is not selected, a permit cannot be obtaine d.",
+              "verbatimText": "Page 38 of 38\nSTATEMENTS & SIGNATURES\nApplicant o f Record ’s Attestation\nThe applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a\nDesign Professional/Licensee Seal and Signature Form (DPL - 1) as a Required Document. The date on the form cannot be more than one year from\nthe date of submission.\nOwner’s Attestation\nAll job filings in DOB NOW require confirmation from the Owner authorizing the applicant to submit the filing and acknowledging that the\ninformation in the application has been reviewed. An Owner provides confirmation by completing the Owner’s Attestation sectio n of the\nStatements & Signatures tab .\nOccupied Dwelling Units (Questions 1 - 4)\nIf the owner selects Yes to Question 1, occupied dwelling units during construction , a Tenant Protection Plan (TPP) is required. A TPP is required if\nresidential units will be occupied any time before the permit is signed off by DOB. Questions 3 - 4 determine compliance requirement s with tenant\nprotection laws based on whether residential units are occupied at the time of application.\nRent Controlled or Rent Stabilized Housing (Questions 5 - 6)\nThis information is checked with data provided by NYS Homes and Community Renewal (DHCR) if at least one rent - regulated unit is in the building.\nIf there is at least one rent - regulated unit in the building and the owner checks No to Question 5, a document is required confirming the building\ncontains 0 rent controlled/stabilized units and expla ining why the DHCR records are inaccurate. Otherwise, owners must check Yes to Question 5.\nLoft Board Notification (Question 7)\nOwners proposing work to convert their loft buildings into legal residences are required to notify the NYC Loft Board at (212 ) 393 - 2603 and ask for\nthe Public Information Officer.\nInterior Work (Questions 8 - 10)\nIf the proposed work requires a TPP and the owner checks Yes to Questions 8, 9, or 10, a Tenant Protection Plan Compliance special inspection will\nnot be required.\nOwner Arrears (Questions 11 - 12)\nThis section appears on New Building, Alteration - CO, and Full Demolition filings to comply with Local Law 160 of 2017 . If the owner answers Yes to\neither question, a list of exceptions will appear as Question 13. If an exception is not selected, a permit cannot be obtaine d.",
+              "heading": "PDF page 38",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 38,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=38"
+            }
+          ],
+          "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "sourceValidation": "official_pdf",
+          "pageCount": 38,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-017",
+      "question": "Context: DOB NOW workflow\n\nAn applicable NB or Alteration-CO GC filing for a newly erected single-family residence includes an Ancillary Dwelling Unit in the basement.\n\nWhich DOB NOW responses and document requirement follow?",
+      "topic": "adu_certificate_documents",
+      "sourceStatistics": [
+        {
+          "sourceID": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "passages": 4,
+          "pages": [
+            10,
+            28,
+            29,
+            32
+          ],
+          "verbatimCharacters": 2261,
+          "modelCharacters": 2261
+        }
+      ],
+      "sourceValidation": {
+        "method": "official_documents",
+        "attemptedSourceCount": 1,
+        "validatedSourceCount": 1,
+        "failures": []
+      },
+      "sources": [
+        {
+          "id": "dob-build-release-notes",
+          "title": "DOB NOW: Build release notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "pdfSectionHeadings": [
+            "DOHMH Radon and Vapor Level Certificate for Ancillary Dwelling Units",
+            "Local Law 127 Build PW1 Updates for Ancillary Dwelling Units",
+            "Local Law 127 ADU Filing Restrictions for One Family Dwellings"
+          ],
+          "attributedClaims": [
+            {
+              "id": "official-passage-11be290b8c65ea254e3b1e9a",
+              "text": "[PDF page 10](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=10) — August 2026 - DOHMH Radon and Vapor Level Certificate for Ancillary Dwelling Units A new required document is required for ADUs constructed within newly erected single - family residences. The DOHMH Radon and Vapor Level Certificate is applicable to NB and Alt - CO job types, under GC/PW1 if the applicant answers: 1. Yes to \"Does the scope of work include an Ancillary Dwelling Unit (ADU)?\" 2. And Basement or Cellar to \"Where is the ADU located?\" The document can be uploaded Prior to TCO (optional), and is required prior to Final CO. A waiver request is allowed but the document cannot be deferred.",
+              "verbatimText": "August 2026 - DOHMH Radon and Vapor Level Certificate for Ancillary Dwelling Units\nA new required document is required for ADUs constructed within newly erected single - family residences. The DOHMH Radon and\nVapor Level Certificate is applicable to NB and Alt - CO job types, under GC/PW1 if the applicant answers:\n1. Yes to \"Does the scope of work include an Ancillary Dwelling Unit (ADU)?\"\n2. And Basement or Cellar to \"Where is the ADU located?\"\nThe document can be uploaded Prior to TCO (optional), and is required prior to Final CO. A waiver request is allowed but the\ndocument cannot be deferred.",
+              "heading": "PDF page 10",
+              "intro": "",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "pageNumber": 10,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=10"
+            },
+            {
+              "id": "official-passage-7681d2fae56e5a9b8c56353f",
+              "text": "[PDF page 28](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=28) — September 2025 – Local Law 127 Build PW1 Updates for Ancillary Dwelling Units New Ancillary Dwelling Unit questions have been added to initial Alt - CO - GC or New Building - GC jobs in DOB NOW under the Filing Review Type, Work Type/Filing Includes section. ▪ Only one ADU is allowed per one - or two - family dwelling and must not exceed 800 square feet of zoning floor area. This information is displayed by hovering over the information icon. ▪ A new question, Does the scope of work include an Ancillary Dwelling Unit (ADU)? * Yes or No is displayed and if answered Yes, triggers additional fields: ▪ Provide Pre - Approved ADU Plan Number ▪ Where is the ADU located? * ▪ Where does the main entrance of the ADU directly open to? *",
+              "verbatimText": "September 2025 – Local Law 127 Build PW1 Updates for Ancillary Dwelling Units\nNew Ancillary Dwelling Unit questions have been added to initial Alt - CO - GC or New Building - GC jobs in DOB NOW under the Filing\nReview Type, Work Type/Filing Includes section.\n▪ Only one ADU is allowed per one - or two - family dwelling and must not exceed 800 square feet of zoning floor area. This\ninformation is displayed by hovering over the information icon.\n▪ A new question, Does the scope of work include an Ancillary Dwelling Unit (ADU)? * Yes or No is displayed and if answered Yes,\ntriggers additional fields:\n▪ Provide Pre - Approved ADU Plan Number\n▪ Where is the ADU located? *\n▪ Where does the main entrance of the ADU directly open to? *",
+              "heading": "PDF page 28",
+              "intro": "",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "pageNumber": 28,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=28"
+            },
+            {
+              "id": "official-passage-ee3ff7fb27f59a0ac202453a",
+              "text": "[PDF page 29](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=29) — September 2025 – Local Law 127 Build PW1 updates for Ancillary Dwelling Units ▪ Where is the ADU located ? * ▪ Attic ▪ Basement ▪ Cellar ▪ Attached to the one - or two - family dwelling ▪ Detached from the one - or two - family dwelling ▪ Where does the main entrance of the ADU directly open to? * ▪ Street frontage ▪ Rear yard ▪ Other – if Other is chosen, then a Specify Other * textbox opens which is required to be answered. The following ADU questions are required and have the below options:",
+              "verbatimText": "September 2025 – Local Law 127 Build PW1 updates for Ancillary Dwelling Units\n▪ Where is the ADU located ? *\n▪ Attic\n▪ Basement\n▪ Cellar\n▪ Attached to the one - or two - family dwelling\n▪ Detached from the one - or two - family dwelling\n▪ Where does the main entrance of the ADU directly open to? *\n▪ Street frontage\n▪ Rear yard\n▪ Other – if Other is chosen, then a Specify Other * textbox\nopens which is required to be answered.\nThe following ADU questions are required and have the below options:",
+              "heading": "PDF page 29",
+              "intro": "",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "pageNumber": 29,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=29"
+            },
+            {
+              "id": "official-passage-9b918548c2099f570bdb7ff4",
+              "text": "[PDF page 32](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=32) — September 2025 – Local Law 127 ADU Filing Restrictions for One Family Dwellings The Schedule of Occupancy outlines important information for ADU filings in one - family dwellings. New Building (NB) filing for a one - family dwelling with an ADU in the cellar may not be submitted unless and until Section 27 - 20 87 of the Housing Maintenance Code provides for such occupancy in cellars. See 1 RCNY § 105 - 08(d)(4)(vii)(D).",
+              "verbatimText": "September 2025 – Local Law 127 ADU Filing Restrictions for One Family Dwellings\nThe Schedule of Occupancy outlines important information for ADU filings in one - family dwellings.\nNew Building (NB) filing for a one - family dwelling with an ADU in the cellar may not be submitted unless and until Section 27 - 20 87\nof the Housing Maintenance Code provides for such occupancy in cellars. See 1 RCNY § 105 - 08(d)(4)(vii)(D).",
+              "heading": "PDF page 32",
+              "intro": "",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "pageNumber": 32,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=32"
+            }
+          ],
+          "sourceContentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+          "sourceValidation": "official_pdf",
+          "pageCount": 159,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Fresh public-source retrieval and local source selection only; no AI answer generation or semantic acceptance.",
+    "Authority focus preserves complete selected FAQ pairs plus the guide, Board condition and submission steps. Explicit login or readiness questions retain the unfocused FAQ path.",
+    "ADU sections retain all complete pages with the declared headings; source updates with missing sections fail validation instead of yielding a partial group."
+  ]
+}

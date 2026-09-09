@@ -1,6 +1,31 @@
 // Rank complete PDF pages. Normalization affects search terms only; returned
 // evidence, page references and content hashes always retain the original text.
-export const researchOfficialPDFRankingVersion = "20260909-pdf-question-weighting-v1";
+export const researchOfficialPDFRankingVersion = "20260909-pdf-section-groups-v2";
+
+const headingKey = (value) => String(value || "").trim()
+  .replace(/^[A-Za-z]+\s+\d{4}\s*[-–—]\s*/, "")
+  .toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+// An explicitly curated PDF topic can span several slides/pages with the same
+// heading. Keep every complete matching page; do not rank away a continuation
+// or a separately declared restriction. Source text and IDs stay unchanged.
+export function researchOfficialPDFSectionPassages(passages, sectionHeadings) {
+  const headings = [...new Set((sectionHeadings || []).map(headingKey))];
+  if (!headings.length || headings.length > 3 || headings.some((heading) => !heading)) {
+    throw Object.assign(new Error("Invalid official PDF section selection."), { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_UNAVAILABLE" });
+  }
+  const selected = new Set();
+  for (const heading of headings) {
+    const matches = passages.filter((passage) => passage?.kind === "pdf_page" &&
+      headingKey(passage.text.split("\n").slice(0, 4).join(" ")).startsWith(heading));
+    if (!matches.length) throw Object.assign(new Error("A requested official PDF section is unavailable."),
+      { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_UNAVAILABLE" });
+    matches.forEach((passage) => selected.add(passage));
+  }
+  if (selected.size > 6) throw Object.assign(new Error("The complete official PDF sections exceed their page bound."),
+    { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_TOO_LARGE" });
+  return passages.filter((passage) => selected.has(passage));
+}
 
 const stopWords = new Set((
   "about after also and are current does from have include into official page that the their this those under using " +

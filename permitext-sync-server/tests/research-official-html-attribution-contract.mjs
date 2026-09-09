@@ -142,7 +142,9 @@ assert.match(boundCompanions["DOBNOW-012"], /exclusions and definitions/);
 assert.match(boundCompanions["DOBNOW-023"], /Roles & Responsibilities: Owner/);
 assert.match(boundCompanions["DOBNOW-023"], /Roles & Responsibilities: Professionals/);
 assert.match(boundCompanions["DOBNOW-023"], /cannot upload plans or submit filings\/permits/);
-assert.match(boundCompanions["DOBNOW-023"], /owner must be logged in with the same email address/);
+assert.match(boundCompanions["DOBNOW-023"], /Owners can review the filing, complete the Owner’s Attestation/);
+assert.doesNotMatch(boundCompanions["DOBNOW-023"], /owner must be logged in with the same email address|Preview to File/,
+  "A narrow authority question retains complete permission FAQs without unasked procedural pairs.");
 assert.match(boundCompanions["DOBNOW-023"], /Applicant officially submits the job filing/);
 assert.match(boundCompanions["DOBNOW-023"], /Applicant must review the filing and provide a final electronic signature/);
 const catalogueSources = Array.from({ length: 5 }, (_, index) => ({ id: `catalogue-${index}`, url: `${boilerURL}?source=${index}` }));
@@ -153,8 +155,17 @@ for (const [maximumSources, expected] of [[undefined, 3], [4, 4], [100, 4]]) {
     fetchImpl: async (url) => { fetches++; return responseFor(boilerHTML, String(url)); }
   });
   assert.equal(fetches, expected);
+  assert.equal(scoped.sourceValidation.attemptedSourceCount, expected);
   assert.equal(scoped.sources.length, expected, "Default retrieval stays at three sources; explicit catalogues may use at most four.");
 }
+const loginQuestion = "Can the filing representative attest for the owner in DOB NOW? How should the owner log in?";
+const loginRoute = researchDOBWorkflowRoute(loginQuestion);
+const loginSources = await bindResearchWebSupportToOfficialHTML({ sources: loginRoute.sources.filter((source) => source.id === "dob-stakeholder-faq") }, {
+  question: loginQuestion, officialDomains: ["nyc.gov"], requiredPassageTerms: loginRoute.passageTerms,
+  fetchImpl: async () => responseFor(stakeholderFixture.html, stakeholderFixture.url)
+});
+assert.match(loginSources.sources.flatMap((source) => source.attributedClaims.map((claim) => claim.text)).join(" "), /same email address/,
+  "An explicit login question keeps the owner procedural guidance.");
 assert.doesNotMatch(boundCompanions["DOBNOW-023"], /withdrawal option|Demolition Sub-Contractor/i,
   "Other workflows on the same FAQ must not displace the applicable stakeholder sections.");
 
