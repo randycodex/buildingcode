@@ -1,0 +1,2841 @@
+{
+  "schema": "permitext-owner-api-round2-mapped-review-v1",
+  "sourceCommit": "b8287253e6d05c2e414763de70504f990ae721a6",
+  "authorization": "Owner authorized continued API testing within a fresh $8 round and requested notice before more is needed. Historical spending stays separate. This single-use batch checks the explicit semantic map-scope review, historical-branch coverage and source-binding repairs on ZR-06 once, preserving its authored question and section references. Batch maximum $0.50 within the round's $0.624949 conservative remainder. The turn requires a full $0.50 conservative reservation. No manual retry, extra judge, Project workflow test or deployment.",
+  "preDispatchAbortEvidence": {
+    "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-2026-09-09.json",
+    "sha256": "890f8a447d3a6326c1579d41ddad140a9b64dfdeabe1e43d9d9bf09e0bd68143",
+    "providerCalls": 0,
+    "providerCostUSD": 0,
+    "reason": "Initial request binding guard aborted before recording or sending any provider request; the isolated runtime reservation is not a provider charge."
+  },
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 7.375051,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sha256": "f406901dcca5f06398166f4a08bcfbadf6639bf24755777a0c7a9434d8ca7d8f"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sha256": "f991b5d3ce3757dddbea968291341571817c8cf9f3703101766766047c39ba57"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sha256": "6cacf237b64e02d3b388adafea5f0b48865f3c9778e5d15e77b8fc19b8de03ca"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sha256": "485cba41a9c4a277347fa950f590c2ed25ebb6f48fe35b55f5d3e8fdae3bba12"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sha256": "68f098015f6d49060f62a725dc805f76b6f4692203e30f9de45cd3e8282a6cc9"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-lot-history-2026-09-09.json",
+      "sha256": "102534c93f3b63786d3ac946a3b8af1270def90a7693acae633c8a2d921869bb"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-storage-scope-2026-09-09.json",
+      "sha256": "38d20c59f2b62a81f6f8e5a89855708f53124b390e5b075f48b2cec3bfc74eae"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 0.5,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 1,
+  "maximumProviderRequests": 2,
+  "maximumProviderRequestsPerTurn": 2,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-09",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual unassigned HTTP Research on isolated accounts and storage. Author-specified section references use the explicit section_reference API mode; no highlight, visual review or parcel fact is fabricated. Canonical source retrieval and ordinary verification remain active. Answer keys and review expectations are excluded from planning, drafting and verification. Web support remains configured normally, but these enacted-source questions must not request web tools or external documents. The authored input must pass the zero-API preflight. Earlier failures and all 110 numbered cases remain in the cumulative acceptance scope. No UI, phone, Project workflow or deployment testing.",
+  "requestComparison": "The existing request binding normalizes opaque run-specific identifiers only; authored text, selected sources, runtime instructions and schemas remain bound. Raw request hashes are also recorded.",
+  "repairedCaseIDs": [
+    "ZR-06"
+  ],
+  "newCaseIDs": [],
+  "cases": [
+    "ZR-06"
+  ],
+  "preflightSHA256": "0ceaeeb5dd53a88909745c3574716b6e00d862d0bc689baecbd3eaa129a30e47",
+  "sourceHashes": {
+    "app.mjs": "188187fa9df9ad66a652605dd25b1e6e054f7d8dfbd71674297838dabd5e70eb",
+    "research-answer-presentation.mjs": "f8f3853d4441d4940de0bf222104dce0ee81a1e91e450b3e08dfdb02ff6049ba",
+    "research-official-guidance-summary.mjs": "4e2e14d754f658e06693469be4628873b171a0fdc47ce3b6ec642205a9c38c0e",
+    "evals/research-answer-key-amendments.json": "ddcf7fb5675285991b0a7275749890794c3671a1f7888cc6c5ebee2b5977bc24",
+    "research-answer-quality.mjs": "cad6d658ff2805ee6e56e48b2b135f5dec28863b02020183731b0815b2ecec4f",
+    "research-focused-technical-scope.mjs": "4c7f8ff22bc4bd11bf87a55417b8795b164443e0a704d9e64ebc33f27fc27f49",
+    "research-conversation-topic.mjs": "77baee9c8db51501fca1bfee6ea192869f8e6fd8a7c35b48eb8d5a7f848f7858",
+    "research-technical-topic-routes.mjs": "319075fb7223e387a70ee4038b62cab0c1df839c68de374317277d4548c8ef62",
+    "evidence-discovery.mjs": "47f76c9ba11ea1d5c05edc996eebe110fd4f467bccffe05c4fc1b2e6b6e2d714",
+    "research-conversation-facts.mjs": "67ec6ab2e04908151af796b1a08d2ebd9bdc58bdfb7a748642efb83dd9068ef2",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-source-policy.mjs": "0f569a60606aaace85c6cfde2dd179720717603da47ca7d898b1c66630d63980",
+    "research-official-html-attribution.mjs": "97e0e666a244e6969a9cb690e042fed74fa1a68a8f58351d8f79e0bbb85290c7",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "research-official-pdf-ranking.mjs": "c0d326957b27d2501065ba652f682b911afcffb134a95f74f0b8f1fd2953c6b4",
+    "research-official-pdf-worker.mjs": "39ec76ae01ef399819d5a815f980e2ac52b4fc0844510b7944622d18f4539587",
+    "research-dob-workflow-routing.mjs": "c024a9c6696d3ffbd3c50afffbdc800b93ea4fea3a0952245ffe19dd7682ebab",
+    "evals/research-answer-key-reconciliation.mjs": "3e3a2294a5ea9363e0f242690f8548b5593b77181300c55ecbf6051b47cf4b69",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "77b3f32262862ae5eff1330d941afe8548a9f88c5b5c7ab2417b118df5e8c275",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "f6b4ac11432838d26504bc94aa48059c9383dacf45d77ac6aced42a0c136a90e",
+    "research-evidence-assembly.mjs": "c42d01095e4c77081feedb569488046a0795f7bb33ae1e63d8956f63da9762f4",
+    "research-definition-excerpts.mjs": "2bb1b8191c7e17bea8526f9adc2d4220fa6f10d4df486a1fae7729f01e534c6a",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "research-zoning-metadata.mjs": "4f877fd927b2844b1636eaad971047dbff371292e583f389e9ae7fe63f59303c",
+    "research-zoning-conditional-explanation.mjs": "628c735595bb294606399c3aa88ffe739591d78b98d9791a91de9c9c960a8853",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "180d11108ff7d6cdec8eae0e8a64401981955531a3eb55e9535c19d49516bd24",
+    "evals/research-reconciled-answer-key.json": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "7ed6285b7bb1fae0117cc89e95ad4443b6423884818bf3a729341ffb8fc84500",
+    "research-zoning-lot-history.mjs": "bb31a791175f7a165974123424326e82d47f61fcd84b826ac3cdbc0710fe3dfa",
+    "research-project-fact-coverage.mjs": "7aa3ee319e0fb02c999ea135a627ed8d42dc7e7b17fd2fc904862929bfa311f6",
+    "research-zoning-attribution.mjs": "a4852e5930a2d20db8afc2e921d1991bf539abac1ef358a5e31389c51e2f67f2",
+    "research-zoning-mapped-review.mjs": "e33a470646fe8bb6d770631443806d6be198b6f6608f2188e9d6ce93a9aacbfb",
+    "research-zoning-storage-branches.mjs": "8dc1d6de2a440d4f5b1df872e00a78e509a33c532446517d6b5a6a8642efbd07",
+    "scripts/run-research-owner-api-round2-mapped-review-20260909.mjs": "26a1e048bdc9c7d22d1209e7b3a8f017bf047488364e0e47e45968fb0c17f9cc"
+  },
+  "startedAt": "2026-09-09T08:25:33.841Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "ZR-06",
+      "question": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+      "inputSHA256": "3fa70b15d9febe7d7d05102c8f7db199350747b8e2788f3801538039284b985f",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "967e91b36d9fe4ee46f83de0bf6ee1a8e4975e750287e52273c83c54f7055cca",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": null,
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20022472",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20022473",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20022474",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20019206",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20021237",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        }
+      ],
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "ae2adce3965dbe4cd5492b98aeea0c172fed485da46b4504952ac65defd60aeb",
+      "initialRawRequestSHA256": "f84398c4b603efde53c17f12d1075da53c3252cf91196362578d98505a4a30dc",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 47689,
+      "durationMilliseconds": 37133,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.297565,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "5aec184c-a70e-4b73-a3cc-c53fe5d7ee74",
+          "createdAt": "2026-09-09T08:25:34.072Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 25004,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 24998,
+          "outputTokens": 3363,
+          "totalTokens": 28367,
+          "estimatedCostUSD": 0.052773,
+          "actualProviderCostUSD": 0.052773,
+          "conservativeProviderCostUSD": 0.093747,
+          "durationMilliseconds": 37080,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+        "evidenceVersion": "20260909-pinned-excerpt-precedence-v33:structured-v1",
+        "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "zoning cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: NYC Zoning Resolution",
+          "limitation": null,
+          "resolvedAt": "2026-09-09T08:25:34.084Z"
+        },
+        "answerText": "**No—an as-of-right determination for this specific property cannot be made from the supplied facts.** The proposed use is listed as Use Group IX(A) “Self-service storage facility” with the symbol **♦P** in M1, M2 and M3 districts: ♦ means permitted with limitations and P means additional conditions. (ZR § 42-191.) But no address/BBL or controlling official map evidence establishes whether this lot is in a Manufacturing District, a special district affecting the site, or an Appendix J designated area/subarea.\n\nIf the lot is in an Appendix J **Subarea 1**, the use is subject to the stated as-of-right provisions but must be limited to an establishment providing industrial floor space or the specified “business-sized” storage space. If it is in **Subarea 2**, it requires a City Planning Commission special permit under ZR § 74-192, not as-of-right approval. (ZR § 42-192; Appendix J.) The P notation also makes the use subject to the performance standards in ZR §§ 42-40 through 42-48. (ZR § 42-193.) A facility that existed on December 19, 2017 may follow separate conforming/enlargement rules only if the stated DOB documentation and other conditions are met; without satisfactory DOB documentation, it is non-conforming and subject to Article V. A documented facility that is damaged or destroyed may be reconstructed on the same zoning lot, subject to the ZR § 43-10 floor-area limit. (ZR § 42-192.) None of those historical branches can be applied to this unidentified property.",
+        "conclusion": "**No—an as-of-right determination for this specific property cannot be made from the supplied facts.** The proposed use is listed as Use Group IX(A) “Self-service storage facility” with the symbol **♦P** in M1, M2 and M3 districts: ♦ means permitted with limitations and P means additional conditions. (ZR § 42-191.) But no address/BBL or controlling official map evidence establishes whether this lot is in a Manufacturing District, a special district affecting the site, or an Appendix J designated area/subarea.",
+        "supportedPoints": [
+          {
+            "heading": "General Manufacturing District allowance is conditional",
+            "explanation": "The Use Group IX(A) table marks “Self-service storage facility” ♦P in M1, M2 and M3 districts. Under the table legend, ♦ means “Permitted with limitations” and P means “Additional conditions”; it is not an unqualified general as-of-right allowance.",
+            "sectionID": "20022472",
+            "sourceIDs": [
+              "617e5993-c8b8-4eda-8710-5c7e078fed18"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Appendix J subarea controls the designated-area path",
+            "explanation": "Within a designated Manufacturing District area shown in Appendix J, Subarea 1 is subject to the stated as-of-right provisions and is limited to facilities providing industrial floor space or specified business-sized storage. In Subarea 2, a self-service storage facility requires a City Planning Commission special permit under ZR § 74-192. Appendix J identifies designated areas and distinguishes Subareas 1 and 2; it does not establish this property's location in either subarea.",
+            "sectionID": "20022473",
+            "sourceIDs": [
+              "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Additional condition applies to the P notation",
+            "explanation": "For uses marked P in ZR § 42-191, other than the listed boat-storage and public-parking exceptions, ZR § 42-193 requires conformity with the performance standards in ZR §§ 42-40 through 42-48. The self-service-storage row is marked P.",
+            "sectionID": "20022474",
+            "sourceIDs": [
+              "a74ea333-0ba4-47d2-baee-c57789648661"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Subarea 2 is a special-permit route",
+            "explanation": "For zoning lots in Appendix J Subarea 2 designated Manufacturing District areas, ZR § 74-192 authorizes the City Planning Commission to permit development, certain enlargements, or change of use for a Use Group IX(A) self-service storage facility upon the required finding regarding suitability of the zoning lot and surrounding land-use characteristics. This is not an as-of-right path.",
+            "sectionID": "20019206",
+            "sourceIDs": [
+              "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Appendix J supplies the mapped subarea framework",
+            "explanation": "Appendix J states that its maps show designated Manufacturing District areas, with Subarea 1 for the ZR § 42-19 as-of-right provisions and Subarea 2 for the ZR § 74-192 City Planning Commission special permit. The supplied text lists designated areas and map numbers but does not locate the unidentified property on a map.",
+            "sectionID": "20021237",
+            "sourceIDs": [
+              "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Existing-facility alternatives depend on dated status and documentation",
+            "explanation": "A facility existing on December 19, 2017 in an Appendix J designated area is conforming only if satisfactory documentation of its existence and its qualifying definition was filed with DOB. An enlargement or extension of that documented conforming facility is relieved of the stated industrial-floor-space, business-sized-storage, or special-permit requirement only if there is no increase in the zoning-lot area from that date. A documented building that is damaged or destroyed may be reconstructed on the same zoning lot and continue as self-service storage, but its floor area cannot exceed the amount permitted by ZR § 43-10. A facility existing on that date without satisfactory DOB documentation is non-conforming and subject to Article V.",
+            "sectionID": "20022473",
+            "sourceIDs": [
+              "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "If the lot is in an Appendix J **Subarea 1**, the use is subject to the stated as-of-right provisions but must be limited to an establishment providing industrial floor space or the specified “business-sized” storage space. If it is in **Subarea 2**, it requires a City Planning Commission special permit under ZR § 74-192, not as-of-right approval. (ZR § 42-192; Appendix J.) The P notation also makes the use subject to the performance standards in ZR §§ 42-40 through 42-48. (ZR § 42-193.) A facility that existed on December 19, 2017 may follow separate conforming/enlargement rules only if the stated DOB documentation and other conditions are met; without satisfactory DOB documentation, it is non-conforming and subject to Article V. A documented facility that is damaged or destroyed may be reconstructed on the same zoning lot, subject to the ZR § 43-10 floor-area limit. (ZR § 42-192.) None of those historical branches can be applied to this unidentified property.",
+        "assumptions": [],
+        "missingFacts": [
+          "Property address or BBL, and controlling official zoning-map evidence identifying the property's mapped zoning district and any applicable special-district status.",
+          "Official Appendix J map evidence showing whether the zoning lot is outside a designated area, in Subarea 1, or in Subarea 2.",
+          "Current zoning-lot area; if an existing-facility enlargement or extension is proposed, the December 19, 2017 zoning-lot area and whether it has increased.",
+          "Whether a self-service storage facility existed on December 19, 2017; if so, whether satisfactory documentation was filed with DOB and whether the use then met the ZR § 12-10 definition.",
+          "If the historical reconstruction branch is invoked: whether the documented building was damaged or destroyed, whether reconstruction is on the same zoning lot, and the floor area permitted under ZR § 43-10."
+        ],
+        "followUpQuestions": [
+          "What is the property address or BBL, and can you provide the controlling zoning map and Appendix J map location for the zoning lot?"
+        ],
+        "evidenceLimitations": [
+          "This answer is limited to the supplied, continuously amended NYC Zoning Resolution passages, text through 2026-08-13. The supplied ZR § 42-192 excerpt expressly omits detailed Subarea 1 industrial/business-sized-space, signage, and reporting provisions, and the supplied Appendix J text does not include a map locating this property."
+        ],
+        "additionalEvidenceNeeded": [
+          "Controlling official zoning-map and Appendix J map materials for the address/BBL.",
+          "If relying on preexisting-facility treatment, DOB-filed documentation of December 19, 2017 existence and qualifying self-service-storage status, plus applicable zoning-lot-area and floor-area records."
+        ],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "20022472",
+            "sectionNumber": "42-191",
+            "title": "Use Group IX – general use allowances",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "617e5993-c8b8-4eda-8710-5c7e078fed18"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                "selectedText": "42-191 Use Group IX – general use allowances The following table includes uses classified as Use Group IX and sets forth their allowances by Manufacturing District. Such uses are categorized as general storage, specialized storage, or vehicle storage, as provided in paragraphs A, B and C of this Section. Notations found in the table are further described in Section 42-10 (USE ALLOWANCES). A. General Storage USE GROUP IX(A) – GENERAL STORAGE ● = Permitted ♦ = Permitted with limitations ○ = Special permit required – = Not permitted S = Size restriction P = Additional conditions U = Open use allowances Uses M1 M2 M3 PRC General Storage Building materials or contractors' yard ●P U ●P U ●P U D2 Depositories for storage of office records, microfilm or computer tapes, or for data processing ● ● ● D2 Micro-distribution facilities – – – D2 Moving or storage offices ●P ●P ●P D2 Self-service storage facility ♦P ♦P ♦P D2 Trucking terminals or motor freight stations ●P U ●P U ●P U D2 Warehouses ●P ●P ●P D2 Wholesale establishments ●P ●P ●P A4 B. Specialized Storage USE GROUP IX(B) – SPECIALIZED STORAGE ● = Permitted ♦ = Permitted with limitations ○ = Special permit required – = Not permitted S = Size restriction P = Additional conditions U = Open use all",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "The M1, M2 and M3 Use Group IX(A) row classifies self-service storage as ♦P and supplies the table-symbol meanings."
+          },
+          {
+            "sectionID": "20022473",
+            "sectionNumber": "42-192",
+            "title": "Use Group IX – uses permitted with limited applicability",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                "selectedText": "For uses denoted with “♦” in Section 42-191 (Use Group IX – general use allowances), the provisions of this Section shall apply.\n\nIn designated areas within Manufacturing Districts, as shown on the maps in APPENDIX J (Designated Areas Within Manufacturing Districts) of this Resolution, a self-service storage facility is subject to the provisions of this Section. Designated areas in which self-service storage facilities are subject to the as-of-right provisions of this paragraph are shown on the maps in Subarea 1, and those in which such uses are subject to special permit of the City Planning Commission pursuant to Section 74-192 (Self-service storage facility in designated areas within Manufacturing Districts) are shown on the maps in Subarea 2. A self-service storage facility shall, in Subarea 1 of APPENDIX J of this Resolution, be limited to establishments that provide an industrial floor space as defined in Section 12-10 (DEFINITIONS) or “business-sized” storage space as specified in paragraph (b)(2)(ii) of this Section.\n\nA self-service storage facility shall, in Subarea 2 of APPENDIX J of this Resolution, be permitted by special permit of the City Planning Commission pursuant to Section 74-192 (Self-service storage facility in designated areas within Manufacturing Districts). Any self-service storage facility existing on December 19, 2017, located in a designated area within Manufacturing Districts, as shown on the maps in APPENDIX J, shall be considered a conforming use, provided that the owner of such self-service storage facility has filed documentation satisfactory to the Department of Buildings that it existed on such date and met the definition of self-service storage facility set forth in Section 12-10. Any enlargement or extension to an existing conforming facility need not provide industrial floor space, business-sized storage, or apply for special permit of the City Planning Commission pursuant to Section 74-192, as applicable, provided there is no increase in lot area of the zoning lot as it existed on December 19, 2017. In the event that a building for which satisfactory documentation has been filed with the Department of Buildings is damaged or destroyed by any means, such building may be reconstructed on the same zoning lot and continue as a self-service storage facility without providing industrial floor space or business-sized storage, as applicable, provided that the floor area of such reconstructed self-service storage facility does not exceed the floor area permitted pursuant to the provisions of Section 43-10 (FLOOR AREA REGULATIONS), inclusive. Any self-service storage facility existing on December 19, 2017, that does not file such documentation satisfactory to the Department of Buildings pursuant to the provisions of this Section shall be considered non-conforming and subject to the provisions of Article V (NON-CONFORMING USES AND NON-COMPLYING BUILDINGS) of this Resolution.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes Subarea 1 and Subarea 2 treatment and the dated existing-facility, documentation, enlargement, reconstruction, and nonconforming-use branches."
+          },
+          {
+            "sectionID": "20022474",
+            "sectionNumber": "42-193",
+            "title": "Use Group IX – uses subject to additional conditions",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "a74ea333-0ba4-47d2-baee-c57789648661"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "a74ea333-0ba4-47d2-baee-c57789648661",
+                "selectedText": "42-193 Use Group IX – uses subject to additional conditions For uses denoted with a “P” in Section 42-191 (Use Group IX – general use allowances), the following provisions shall apply: Boat storage shall be restricted to boats less than 100 feet in length. Public parking garages and public parking lots shall be subject to the provisions set forth in Section 44-025 (Applicability of regulations to public parking garages and public parking lots). All uses denoted with a “P” in Section 42-191 (Use Group IX – general use allowances), except boat storage, public parking garages and public parking lots, shall conform to the performance standards set forth in Sections 42-40 (PERFORMANCE STANDARDS) through 42-48 (Performance Standards Regulating Humidity, Heat or Glare), inclusive.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the additional performance-standard condition for the P notation."
+          },
+          {
+            "sectionID": "20019206",
+            "sectionNumber": "74-192",
+            "title": "Self-service storage facility in designated areas within Manufacturing Districts",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                "selectedText": "74-192 Self-service storage facility in designated areas within Manufacturing Districts On zoning lots in designated areas within Manufacturing Districts in Subarea 2, as shown on the maps in Appendix J (Designated Areas Within Manufacturing Districts) of this Resolution, the City Planning Commission may permit the development, enlargement not permitted pursuant to the provisions of Section 42-193 (Use Group IX – uses subject to additional conditions), or change of use of a building for self-service storage facility use listed under Use Group IX(A). To grant such permit, the Commission shall find that the zoning lot is appropriate for such self-service storage facility use, based on the land use characteristics of the proposed zoning lot and the surrounding area. In making this determination, the Commission may consider the following: whether such use is consistent with the economic development objectives of the City for the designated area in which the self-service storage facility seeks to be located, and may, in making this determination, consult with the Department of Small Business Services; whether recent trends for and levels of investment in “qualifying uses”, as defined below, demonstrate that there is minimal demand for space for such uses in the surrounding area; whether the size and configuration of the zoning lot make it better suited for self-service storage facility use than for “qualifying uses”; for changes of use to existing buildings, whether the design and",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the City Planning Commission special-permit route and finding for Subarea 2."
+          },
+          {
+            "sectionID": "20021237",
+            "sectionNumber": "APPENDIX J",
+            "title": "APPENDIX J — Designated Areas Within Manufacturing Districts",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "eaafe2be-c679-41b8-b310-fa1efbfd3f50",
+                "selectedText": "APPENDIX J APPENDIX J — Designated Areas Within Manufacturing Districts (6/6/24) The boundaries of certain designated areas within Manufacturing Districts are shown on the maps in this APPENDIX. Designated areas in which self-service storage facilities are subject to the as-of-right provisions of Section 42-19 (Use Group IX – Storage) are shown on the maps in Subarea 1, and those in which such uses are subject to special permit of the City Planning Commission pursuant to Section 74-192 (Self-service storage facility in designated areas within Manufacturing Districts) are shown on the maps in Subarea 2. SUBAREA 1 Borough Community Districts Name of Designated Area in M District Map No The Bronx 3, 4, 6 Bathgate Map 1 Queens 1 Steinway Maps 1, 2 Queens 9 Richmond Hill Map 1 Staten Island 1, 2 West Shore Maps 1-3 Staten Island 3 Rossville Map 1 SUBAREA 2 Borough Community Districts Name of Designated Area in M District Map No The Bronx 1, 2 Port Morris Maps 1-3 The Bronx 2 Hunts Point Maps 1-3 The Bronx 9, 10 Zerega Maps 1, 2 The Bronx 10, 12 Eastchester Map 1 Brooklyn 2 Brooklyn Navy Yard Map 1 Brooklyn 6, 7 Southwest Brooklyn Maps 1-5 Brooklyn 5, 16, 17, 18 Flatlands/Fairfield Maps 1-4 Brooklyn 5, 16 East New York Maps 1, 2 Brooklyn/Queens BK 4/QN 5 Ridgewood Map 1 Brooklyn 1 Williamsburg/Greenpoint Map 1 Brooklyn/Queens BK 1, 4/QN 2 North Brooklyn/Long Island City/ Maspeth Maps 1-3 Queens/Brooklyn QN 2, 5/BK 1 Maspeth/North Brooklyn Maps 1-4 Queens 1, 2 Long Island City Maps 1-",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes that Appendix J maps distinguish designated-area Subarea 1 and Subarea 2 treatment."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "20022472",
+          "20022473",
+          "20022474",
+          "20019206",
+          "20021237"
+        ],
+        "evidenceSourceIDs": [
+          "617e5993-c8b8-4eda-8710-5c7e078fed18",
+          "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+          "a74ea333-0ba4-47d2-baee-c57789648661",
+          "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+          "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 5,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 5,
+          "governingCitationCount": 5,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 0,
+          "userPinnedCount": 5,
+          "permitextDiscoveredCount": 0,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 5,
+          "requiredClaimCount": 5,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "ZR 42-191",
+              "summary": "ZR 42-191 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "617e5993-c8b8-4eda-8710-5c7e078fed18"
+              ]
+            },
+            {
+              "label": "ZR 42-192",
+              "summary": "ZR 42-192 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+              ]
+            },
+            {
+              "label": "ZR 42-193",
+              "summary": "ZR 42-193 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "a74ea333-0ba4-47d2-baee-c57789648661"
+              ]
+            },
+            {
+              "label": "ZR 74-192",
+              "summary": "ZR 74-192 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+              ]
+            },
+            {
+              "label": "ZR APPENDIX J",
+              "summary": "ZR APPENDIX J is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "ZR 42-191",
+              "summary": "ZR 42-191 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "617e5993-c8b8-4eda-8710-5c7e078fed18"
+              ]
+            },
+            {
+              "label": "ZR 42-193",
+              "summary": "ZR 42-193 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "a74ea333-0ba4-47d2-baee-c57789648661"
+              ]
+            },
+            {
+              "label": "ZR 74-192",
+              "summary": "ZR 74-192 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+              ]
+            },
+            {
+              "label": "ZR APPENDIX J",
+              "summary": "ZR APPENDIX J is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "ZR 42-192",
+              "summary": "ZR 42-192 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [
+            "617e5993-c8b8-4eda-8710-5c7e078fed18",
+            "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+            "a74ea333-0ba4-47d2-baee-c57789648661",
+            "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+            "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+          ],
+          "permitextDiscoveredEvidence": [],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260908-negative-work-premise-v6",
+          "activeRootTopic": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 5,
+          "coveredClaimCount": 5,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "617e5993-c8b8-4eda-8710-5c7e078fed18",
+            "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+            "a74ea333-0ba4-47d2-baee-c57789648661",
+            "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+            "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "617e5993-c8b8-4eda-8710-5c7e078fed18",
+            "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+            "a74ea333-0ba4-47d2-baee-c57789648661",
+            "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+            "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+          ],
+          "citedEvidenceSourceIDs": [
+            "617e5993-c8b8-4eda-8710-5c7e078fed18",
+            "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+            "a74ea333-0ba4-47d2-baee-c57789648661",
+            "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+            "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+          ],
+          "nonRequiredEvidenceSourceIDs": [],
+          "claims": [
+            {
+              "id": "required-passage:617e5993-c8b8-4eda-8710-5c7e078fed18",
+              "label": "ZR 42-191 — Use Group IX – general use allowances",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:ec6d0202-b789-4791-bf0c-c498ac98e38d",
+              "label": "ZR 42-192 — Use Group IX – uses permitted with limited applicability",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:a74ea333-0ba4-47d2-baee-c57789648661",
+              "label": "ZR 42-193 — Use Group IX – uses subject to additional conditions",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "a74ea333-0ba4-47d2-baee-c57789648661"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+              "label": "ZR 74-192 — Self-service storage facility in designated areas within Manufacturing Districts",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:eaafe2be-c679-41b8-b310-fa1efbfd3f50",
+              "label": "ZR APPENDIX J — APPENDIX J — Designated Areas Within Manufacturing Districts",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 5,
+          "coveredClaimCount": 5,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "617e5993-c8b8-4eda-8710-5c7e078fed18",
+            "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+            "a74ea333-0ba4-47d2-baee-c57789648661",
+            "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+            "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:617e5993-c8b8-4eda-8710-5c7e078fed18",
+              "label": "ZR 42-191 — Use Group IX – general use allowances",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:ec6d0202-b789-4791-bf0c-c498ac98e38d",
+              "label": "ZR 42-192 — Use Group IX – uses permitted with limited applicability",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:a74ea333-0ba4-47d2-baee-c57789648661",
+              "label": "ZR 42-193 — Use Group IX – uses subject to additional conditions",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 2,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "a74ea333-0ba4-47d2-baee-c57789648661"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "a74ea333-0ba4-47d2-baee-c57789648661"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 2,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+              "label": "ZR 74-192 — Self-service storage facility in designated areas within Manufacturing Districts",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 3,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 3,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:eaafe2be-c679-41b8-b310-fa1efbfd3f50",
+              "label": "ZR APPENDIX J — APPENDIX J — Designated Areas Within Manufacturing Districts",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 4,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 4,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "a74ea333-0ba4-47d2-baee-c57789648661"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 3,
+                      "sourceIDs": [
+                        "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 4,
+                      "sourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 5,
+                      "sourceIDs": [
+                        "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "schemaVersion": 2,
+          "plannerVersion": "20260909-declared-missing-map-facts-v7",
+          "compilerVersion": "20260909-storage-branch-coverage-v29",
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260909-dining-percentage-domain-v29",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "617e5993-c8b8-4eda-8710-5c7e078fed18",
+            "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+            "a74ea333-0ba4-47d2-baee-c57789648661",
+            "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+            "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+          ],
+          "reviewedOnlySourceIDs": [],
+          "evidenceEconomy": {
+            "citedSourceCount": 5,
+            "citedProvisionCount": 5,
+            "governingCitationCount": 5,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 0,
+            "reviewedOnlyProvisionCount": 0,
+            "assembledSourceCount": 5,
+            "assembledProvisionCount": 5
+          },
+          "sources": [
+            {
+              "sourceID": "617e5993-c8b8-4eda-8710-5c7e078fed18",
+              "sectionID": "20022472",
+              "reference": "ZR 42-191",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "42-191 Use Group IX – general use allowances The following table includes uses classified as Use Group IX and sets forth their allowances by Manufacturing District. Such uses are categorized as general storage, specialized storage, or vehicle storage, as provided in paragraphs A, B and C of this Section. Notations found in the table are further described in Section 42-10 (USE ALLOWANCES). A. General Storage USE GROUP IX(A) – GENERAL STORAGE ● = Permitted ♦ = Permitted with limitations ○ = Special permit required – = Not permitted S = Size restriction P = Additional conditions U = Open use allowances Uses M1 M2 M3 PRC General Storage Building materials or contractors' yard ●P U ●P U ●P U D2 Depositories for storage of office records, microfilm or computer tapes, or for data processing ● ● ● D2 Micro-distribution facilities – – – D2 Moving or storage offices ●P ●P ●P D2 Self-service storage facility ♦P ♦P ♦P D2 Trucking terminals or motor freight stations ●P U ●P U ●P U D2 Warehouses ●P ●P ●P D2 Wholesale establishments ●P ●P ●P A4 B. Specialized Storage USE GROUP IX(B) – SPECIALIZED STORAGE ● = Permitted ♦ = Permitted with limitations ○ = Special permit required – = Not permitted S = Size restriction P = Additional conditions U = Open use all"
+            },
+            {
+              "sourceID": "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+              "sectionID": "20022473",
+              "reference": "ZR 42-192",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "For uses denoted with “♦” in Section 42-191 (Use Group IX – general use allowances), the provisions of this Section shall apply. In designated areas within Manufacturing Districts, as shown on the maps in APPENDIX J (Designated Areas Within Manufacturing Districts) of this Resolution, a self-service storage facility is subject to the provisions of this Section. Designated areas in which self-service storage facilities are subject to the as-of-right provisions of this paragraph are shown on the maps in Subarea 1, and those in which such uses are subject to special permit of the City Planning Commission pursuant to Section 74-192 (Self-service storage facility in designated areas within Manufacturing Districts) are shown on the maps in Subarea 2. A self-service storage facility shall, in Subarea 1 of APPENDIX J of this Resolution, be limited to establishments that provide an industrial floor space as defined in Section 12-10 (DEFINITIONS) or “business-sized” storage space as specified in paragraph (b)(2)(ii) of this Section. A self-service storage facility shall, in Subarea 2 of APPENDIX J of this Resolution, be permitted by special permit of the City Planning Commission pursuant to Section 74-192 (Self-service storage facility in designated areas within Manufacturing Districts). Any self-service storage facility existing on December 19, 2017, located in a designated area within Manufacturing Districts, as shown on the maps in APPENDIX J, shall be considered a conforming use, provided that the owner of such self-service storage facility has filed documentation satisfactory to the Department of Buildings that it existed on such date and met the definition of self-service storage facility set forth in Section 12-10. Any enlargement or extension to an existing conforming facility need not provide industrial floor space, business-sized storage, or apply for special permit of the City Planning Commission pursuant to Section 74-192, as applicable, provided there is no increase in lot area of the zoning lot as it existed on December 19, 2017. In the event that a building for which satisfactory documentation has been filed with the Department of Buildings is damaged or destroyed by any means, such building may be reconstructed on the same zoning lot and continue as a self-service storage facility without providing industrial floor space or business-sized storage, as applicable, provided that the floor area of such reconstructed self-service storage facility does not exceed the floor area permitted pursuant to the provisions of Section 43-10 (FLOOR AREA REGULATIONS), inclusive. Any self-service storage facility existing on December 19, 2017, that does not file such documentation satisfactory to the Department of Buildings pursuant to the provisions of this Section shall be considered non-conforming and subject to the provisions of Article V (NON-CONFORMING USES AND NON-COMPLYING BUILDINGS) of this Resolution."
+            },
+            {
+              "sourceID": "a74ea333-0ba4-47d2-baee-c57789648661",
+              "sectionID": "20022474",
+              "reference": "ZR 42-193",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "42-193 Use Group IX – uses subject to additional conditions For uses denoted with a “P” in Section 42-191 (Use Group IX – general use allowances), the following provisions shall apply: Boat storage shall be restricted to boats less than 100 feet in length. Public parking garages and public parking lots shall be subject to the provisions set forth in Section 44-025 (Applicability of regulations to public parking garages and public parking lots). All uses denoted with a “P” in Section 42-191 (Use Group IX – general use allowances), except boat storage, public parking garages and public parking lots, shall conform to the performance standards set forth in Sections 42-40 (PERFORMANCE STANDARDS) through 42-48 (Performance Standards Regulating Humidity, Heat or Glare), inclusive."
+            },
+            {
+              "sourceID": "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+              "sectionID": "20019206",
+              "reference": "ZR 74-192",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "74-192 Self-service storage facility in designated areas within Manufacturing Districts On zoning lots in designated areas within Manufacturing Districts in Subarea 2, as shown on the maps in Appendix J (Designated Areas Within Manufacturing Districts) of this Resolution, the City Planning Commission may permit the development, enlargement not permitted pursuant to the provisions of Section 42-193 (Use Group IX – uses subject to additional conditions), or change of use of a building for self-service storage facility use listed under Use Group IX(A). To grant such permit, the Commission shall find that the zoning lot is appropriate for such self-service storage facility use, based on the land use characteristics of the proposed zoning lot and the surrounding area. In making this determination, the Commission may consider the following: whether such use is consistent with the economic development objectives of the City for the designated area in which the self-service storage facility seeks to be located, and may, in making this determination, consult with the Department of Small Business Services; whether recent trends for and levels of investment in “qualifying uses”, as defined below, demonstrate that there is minimal demand for space for such uses in the surrounding area; whether the size and configuration of the zoning lot make it better suited for self-service storage facility use than for “qualifying uses”; for changes of use to existing buildings, whether the design and"
+            },
+            {
+              "sourceID": "eaafe2be-c679-41b8-b310-fa1efbfd3f50",
+              "sectionID": "20021237",
+              "reference": "ZR APPENDIX J",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "APPENDIX J APPENDIX J — Designated Areas Within Manufacturing Districts (6/6/24) The boundaries of certain designated areas within Manufacturing Districts are shown on the maps in this APPENDIX. Designated areas in which self-service storage facilities are subject to the as-of-right provisions of Section 42-19 (Use Group IX – Storage) are shown on the maps in Subarea 1, and those in which such uses are subject to special permit of the City Planning Commission pursuant to Section 74-192 (Self-service storage facility in designated areas within Manufacturing Districts) are shown on the maps in Subarea 2. SUBAREA 1 Borough Community Districts Name of Designated Area in M District Map No The Bronx 3, 4, 6 Bathgate Map 1 Queens 1 Steinway Maps 1, 2 Queens 9 Richmond Hill Map 1 Staten Island 1, 2 West Shore Maps 1-3 Staten Island 3 Rossville Map 1 SUBAREA 2 Borough Community Districts Name of Designated Area in M District Map No The Bronx 1, 2 Port Morris Maps 1-3 The Bronx 2 Hunts Point Maps 1-3 The Bronx 9, 10 Zerega Maps 1, 2 The Bronx 10, 12 Eastchester Map 1 Brooklyn 2 Brooklyn Navy Yard Map 1 Brooklyn 6, 7 Southwest Brooklyn Maps 1-5 Brooklyn 5, 16, 17, 18 Flatlands/Fairfield Maps 1-4 Brooklyn 5, 16 East New York Maps 1, 2 Brooklyn/Queens BK 4/QN 5 Ridgewood Map 1 Brooklyn 1 Williamsburg/Greenpoint Map 1 Brooklyn/Queens BK 1, 4/QN 2 North Brooklyn/Long Island City/ Maspeth Maps 1-3 Queens/Brooklyn QN 2, 5/BK 1 Maspeth/North Brooklyn Maps 1-4 Queens 1, 2 Long Island City Maps 1-"
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260909-markdown-determination-boundaries-v25",
+          "pass": true,
+          "applies": true,
+          "categories": [
+            "citation-boundary",
+            "stable-passage",
+            "missing-location",
+            "mapped-applicability",
+            "map",
+            "missing-existing-condition",
+            "amendment"
+          ],
+          "zoningSourceIDs": [
+            "617e5993-c8b8-4eda-8710-5c7e078fed18",
+            "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+            "a74ea333-0ba4-47d2-baee-c57789648661",
+            "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+            "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+          ],
+          "attemptDiagnostic": {
+            "schemaVersion": 1,
+            "kind": "zoning_mapped_location",
+            "sourceBoundaryQuestion": false,
+            "citedAppendixJ": true,
+            "mappedLocationBoundaryPresent": true,
+            "triggeringClauses": [
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "0d3729f232e4258326abb242ba32dfe7989efbcf780acbd5b08d1cdc2623efc9",
+                "clauseLength": 193,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "8a253c0ebf1512b8f1a21d3c21f70bf124a766b07ee2bba51b52c7b4134f6154",
+                "clauseLength": 111,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "3bc02ab2dd5d5d05c3c327bb7941dcc56c9daee85176508ba0dec516bdbbe9e3",
+                "clauseLength": 79,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "fc9ba378f057c37767af188709fe4e0af0427e876ff1a312ecebe3b714dff042",
+                "clauseLength": 97,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "c034806b37dc2d05cef9d6a3abe76c3806fa2b726bf94c60c837318e3a338024",
+                "clauseLength": 116,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "ea92052fc3db55c581916819803237579d08a1418355d6c7f66a1cdce05e13cc",
+                "clauseLength": 99,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "6f248811393e0219adadc1ce0cf9a0976dcb3d85237ecdba69c0b11bb9cf337f",
+                "clauseLength": 159,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "bfa0b31c562d7a7448ab5e331946ee929a49d9f4a5bb889d7a5bfd98152b5314",
+                "clauseLength": 85,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "09a7b538999a39d180d8b43a7c3069765a135acb7a37f99e4db750e2c75a596e",
+                "clauseLength": 138,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "answer_text",
+                "clauseHash": "8f9dd4308648004418588f6c59f9f2dd0209165282e2884bc8f72a22bf6e413c",
+                "clauseLength": 79,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "conclusion",
+                "clauseHash": "0d3729f232e4258326abb242ba32dfe7989efbcf780acbd5b08d1cdc2623efc9",
+                "clauseLength": 193,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "conclusion",
+                "clauseHash": "8a253c0ebf1512b8f1a21d3c21f70bf124a766b07ee2bba51b52c7b4134f6154",
+                "clauseLength": 111,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "conclusion",
+                "clauseHash": "45b3659f874965813ab3d975fb255ccd46ad2dcf9b9a30d6e17fca826e37a4fe",
+                "clauseLength": 80,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "explanation",
+                "clauseHash": "fc9ba378f057c37767af188709fe4e0af0427e876ff1a312ecebe3b714dff042",
+                "clauseLength": 97,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "explanation",
+                "clauseHash": "c034806b37dc2d05cef9d6a3abe76c3806fa2b726bf94c60c837318e3a338024",
+                "clauseLength": 116,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "explanation",
+                "clauseHash": "ea92052fc3db55c581916819803237579d08a1418355d6c7f66a1cdce05e13cc",
+                "clauseLength": 99,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "explanation",
+                "clauseHash": "6f248811393e0219adadc1ce0cf9a0976dcb3d85237ecdba69c0b11bb9cf337f",
+                "clauseLength": 159,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "explanation",
+                "clauseHash": "bfa0b31c562d7a7448ab5e331946ee929a49d9f4a5bb889d7a5bfd98152b5314",
+                "clauseLength": 85,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "explanation",
+                "clauseHash": "09a7b538999a39d180d8b43a7c3069765a135acb7a37f99e4db750e2c75a596e",
+                "clauseLength": 138,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "explanation",
+                "clauseHash": "8f9dd4308648004418588f6c59f9f2dd0209165282e2884bc8f72a22bf6e413c",
+                "clauseLength": 79,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "supported_point_explanation",
+                "clauseHash": "cf113b735b086072139b830d91511a06a47458f90cdfcf11cce3920a4c08dd1f",
+                "clauseLength": 93,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "supported_point_explanation",
+                "clauseHash": "c207e449be0a8fddb63697ff7f69b256d5d5c38b8bbc9c0da27dcdabc65f8f2f",
+                "clauseLength": 96,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "supported_point_explanation",
+                "clauseHash": "fb05f1558e48d1a2a36c4b05ff18deca6c441b301d6d54dff3f106a6428e7714",
+                "clauseLength": 55,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              },
+              {
+                "fieldKind": "supported_point_explanation",
+                "clauseHash": "a76267f16ca9f848598109fdd162416cba3e6a127f1d16f0ba3ebb830cc07711",
+                "clauseLength": 224,
+                "locationBoundary": false,
+                "sourceRule": false,
+                "parcelSpecificConclusion": true,
+                "directConclusion": true
+              }
+            ]
+          },
+          "issues": [],
+          "lexicalMapIssues": [
+            {
+              "type": "zoning_missing_mapped_location",
+              "detail": "Do not make a parcel-specific Zoning conclusion while mapped applicability is unresolved. State the boundary, keep the conclusion conditional, and name the missing address/BBL, mapped district, map area, or special-district fact in missingFacts."
+            }
+          ],
+          "mappedScopeReview": {
+            "version": "20260909-explicit-semantic-map-scope-v1",
+            "packetHash": "f7bae7a7d6bb7cebbf2dfd970a318264ab82fe5bab05b760cd7bbdc71507e981",
+            "pass": true,
+            "units": [
+              {
+                "unitID": "unit_0",
+                "classification": "source_explanation",
+                "sourceIDs": [
+                  "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                  "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                  "a74ea333-0ba4-47d2-baee-c57789648661",
+                  "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                  "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                ],
+                "reason": "States that the parcel-specific determination is unresolved and accurately summarizes conditional rules without assigning a zoning or mapped status to the property."
+              },
+              {
+                "unitID": "unit_1",
+                "classification": "source_explanation",
+                "sourceIDs": [
+                  "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                  "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                  "a74ea333-0ba4-47d2-baee-c57789648661",
+                  "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                  "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                ],
+                "reason": "Provides the direct unresolved conclusion and conditional rule summary without making a property determination."
+              },
+              {
+                "unitID": "unit_2",
+                "classification": "source_explanation",
+                "sourceIDs": [
+                  "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                  "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                  "a74ea333-0ba4-47d2-baee-c57789648661",
+                  "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                  "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                ],
+                "reason": "Explains conditional source rules and historical branches while expressly withholding application to the unidentified property."
+              },
+              {
+                "unitID": "unit_3",
+                "classification": "source_explanation",
+                "sourceIDs": [
+                  "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                ],
+                "reason": "Accurately explains the ♦P symbols and the M1, M2, and M3 table entry from the bound ZR 42-191 passage."
+              },
+              {
+                "unitID": "unit_4",
+                "classification": "unresolved_boundary",
+                "sourceIDs": [
+                  "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                ],
+                "reason": "Describes the Subarea 1 and Subarea 2 branches and expressly withholds any determination that the property lies in either branch."
+              },
+              {
+                "unitID": "unit_5",
+                "classification": "source_explanation",
+                "sourceIDs": [
+                  "a74ea333-0ba4-47d2-baee-c57789648661"
+                ],
+                "reason": "Accurately states the P-notation performance-standard requirement and its exceptions as applied to the self-service-storage row."
+              },
+              {
+                "unitID": "unit_6",
+                "classification": "source_explanation",
+                "sourceIDs": [
+                  "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                ],
+                "reason": "Accurately describes the Subarea 2 special-permit route and required Commission finding without assigning the property to Subarea 2."
+              },
+              {
+                "unitID": "unit_7",
+                "classification": "source_explanation",
+                "sourceIDs": [
+                  "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                ],
+                "reason": "Accurately explains Appendix J's mapped Subarea 1/Subarea 2 framework and states that the supplied text does not locate the unidentified property."
+              },
+              {
+                "unitID": "unit_8",
+                "classification": "source_explanation",
+                "sourceIDs": [
+                  "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                ],
+                "reason": "Accurately preserves the dated existence, DOB documentation, enlargement, reconstruction, floor-area, and nonconforming-use alternatives without assuming their facts."
+              },
+              {
+                "unitID": "unit_9",
+                "classification": "unresolved_boundary",
+                "sourceIDs": [
+                  "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                  "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                  "a74ea333-0ba4-47d2-baee-c57789648661",
+                  "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                  "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                ],
+                "reason": "Identifies material missing project facts and evidence limitations while withholding a parcel-specific determination."
+              }
+            ]
+          }
+        },
+        "zoningArchitecture": {
+          "plannerVersion": "20260909-declared-missing-map-facts-v7",
+          "plan": {
+            "schemaVersion": 2,
+            "plannerVersion": "20260909-declared-missing-map-facts-v7",
+            "path": "property_map_applicability",
+            "pathLabel": "property, BBL, and mapped applicability",
+            "disposition": "conditional_source_explanation",
+            "requirements": [
+              {
+                "id": "special_district_status",
+                "label": "special-district status",
+                "present": false,
+                "reason": "The question explicitly identifies this project fact as unresolved; preserve it before a property determination."
+              },
+              {
+                "id": "zoning_lot_area",
+                "label": "current zoning-lot area",
+                "present": false,
+                "reason": "The question explicitly identifies this project fact as unresolved; preserve it before a property determination."
+              },
+              {
+                "id": "property_identifier",
+                "label": "property address or BBL",
+                "present": false,
+                "reason": "A parcel-specific mapped conclusion needs a usable property identifier."
+              },
+              {
+                "id": "official_mapped_status",
+                "label": "controlling official map or verified mapped-district status",
+                "present": false,
+                "reason": "General geography and third-party descriptions do not establish official mapped status."
+              }
+            ],
+            "missingFacts": [
+              {
+                "id": "special_district_status",
+                "label": "special-district status",
+                "present": false,
+                "reason": "The question explicitly identifies this project fact as unresolved; preserve it before a property determination."
+              },
+              {
+                "id": "zoning_lot_area",
+                "label": "current zoning-lot area",
+                "present": false,
+                "reason": "The question explicitly identifies this project fact as unresolved; preserve it before a property determination."
+              },
+              {
+                "id": "property_identifier",
+                "label": "property address or BBL",
+                "present": false,
+                "reason": "A parcel-specific mapped conclusion needs a usable property identifier."
+              },
+              {
+                "id": "official_mapped_status",
+                "label": "controlling official map or verified mapped-district status",
+                "present": false,
+                "reason": "General geography and third-party descriptions do not establish official mapped status."
+              }
+            ],
+            "clarification": "Before Permitext can make the requested Zoning conclusion, provide special-district status and current zoning-lot area and property address or BBL and controlling official map or verified mapped-district status.",
+            "evidenceLimits": {
+              "maximumCandidates": 6,
+              "maximumDiscovered": 2,
+              "maximumTargetedDefinitions": 1,
+              "maximumCrossReferences": 2,
+              "maximumCharacters": 8000,
+              "maximumSupplementalCharacters": 6000,
+              "maximumCharactersPerSource": 5000
+            },
+            "deterministicControls": {
+              "exactPassageBinding": true,
+              "stableSourceHashes": true,
+              "tableGridAndLegend": false,
+              "effectiveDateEventBinding": false,
+              "arithmeticLedger": false,
+              "propertyAndMapPrerequisites": true
+            },
+            "callPolicy": {
+              "initialTier": "accurate",
+              "initialModelRole": "terra_first_for_complex_path",
+              "subjectiveVerification": true,
+              "verifierTier": "fast",
+              "maximumProviderCalls": 2,
+              "allowFullAnswerRewrite": false,
+              "repairEligible": false,
+              "repairTier": null,
+              "maximumRepairAttempts": 0,
+              "repairMode": null,
+              "terraEscalation": "none_for_conditional_explanation"
+            },
+            "questionSignals": {
+              "sourceBoundaryExplanationOnly": false,
+              "historicalSubstantiveTextRequested": false,
+              "explicitMissingFact": false,
+              "propertyIdentifierPresent": false,
+              "mappedStatusPresent": false
+            },
+            "conditionalExplanation": {
+              "version": "20260909-nominal-unresolved-determination-v5",
+              "determinationStatus": "unresolved",
+              "prerequisitePlanHash": "e2292142b45302e15bebc6970bc3122d704c58363b5fb0e7b5937e1f54f9f909",
+              "prerequisiteDisposition": "deterministic_boundary",
+              "prerequisiteMaximumProviderCalls": 0,
+              "scope": "Explain only the supplied enacted rules and their conditions; withhold the unresolved property determination."
+            },
+            "planHash": "b1a29e3488d4a1d826d660b44ba48cca17ad345b770738e55483ed859f0d2469"
+          },
+          "deterministicContext": {
+            "schemaVersion": 2,
+            "compilerVersion": "20260909-storage-branch-coverage-v29",
+            "plannerVersion": "20260909-declared-missing-map-facts-v7",
+            "planHash": "b1a29e3488d4a1d826d660b44ba48cca17ad345b770738e55483ed859f0d2469",
+            "path": "property_map_applicability",
+            "dates": [
+              "December 19, 2017"
+            ],
+            "arithmetic": {
+              "measurements": [],
+              "calculations": []
+            },
+            "answerObligations": [
+              {
+                "kind": "conditional_branch_coverage",
+                "sourceIDs": [
+                  "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                ],
+                "values": [],
+                "requireAllValues": false,
+                "requireSourceBound": true,
+                "allowAdditionalBoundSources": true,
+                "id": "storage_documented_reconstruction_branch",
+                "detail": "Briefly preserve the supplied reconstruction branch: a damaged or destroyed building with satisfactory DOB documentation may be reconstructed on the same zoning lot, subject to the Section 43-10 floor-area cap. Do not apply it to the unidentified property or invent the cap's numerical value.",
+                "requiredPatterns": [
+                  "\\breconstruct\\w*\\b",
+                  "\\b(?:damag\\w*|destroy\\w*|destruction)\\b",
+                  "\\b(?:same|original)\\s+zoning[- ]lot\\b",
+                  "\\b(?:document\\w*|DOB)\\b",
+                  "\\bfloor[- ]area\\b[^.!?]{0,100}\\b(?:limit|cap|maximum|permitted|43-10)\\b|\\b(?:limit|cap|maximum)\\b[^.!?]{0,50}\\bfloor[- ]area\\b"
+                ]
+              },
+              {
+                "kind": "conditional_branch_coverage",
+                "sourceIDs": [
+                  "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                ],
+                "values": [],
+                "requireAllValues": false,
+                "requireSourceBound": true,
+                "allowAdditionalBoundSources": true,
+                "id": "storage_undocumented_nonconforming_branch",
+                "detail": "Briefly preserve the supplied alternative: a facility existing on December 19, 2017 without the satisfactory DOB documentation is nonconforming and subject to Article V. Do not assume either dated existence or documentation for the unidentified property.",
+                "requiredPatterns": [
+                  "\\bnon[- ]?conforming(?:[- ]use)?\\b",
+                  "\\b(?:document\\w*|DOB)\\b",
+                  "\\bArticle\\s+(?:V|5)\\b"
+                ]
+              }
+            ],
+            "structuredTables": [],
+            "passages": [
+              {
+                "sourceID": "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                "codePrefix": "ZR",
+                "sectionID": "20022472",
+                "sectionNumber": "42-191",
+                "textHash": "127a53f75d14e0d460fec907a6a1d0a5f681b388cff7000e56ce39510a658128",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                "codePrefix": "ZR",
+                "sectionID": "20022473",
+                "sectionNumber": "42-192",
+                "textHash": "80a8e294af1fd95825112c069143268b5bad9dec8a35a3732e355d6df3fd2cc5",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "a74ea333-0ba4-47d2-baee-c57789648661",
+                "codePrefix": "ZR",
+                "sectionID": "20022474",
+                "sectionNumber": "42-193",
+                "textHash": "a3955f6d34a83c357a941e0175082859a2d983fd61c974284d4c0048426f2ce5",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                "codePrefix": "ZR",
+                "sectionID": "20019206",
+                "sectionNumber": "74-192",
+                "textHash": "f17b437192ca2d48d77fd658905a8d2b7f21443d9e0d0a93d3143ce7d463ac71",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "eaafe2be-c679-41b8-b310-fa1efbfd3f50",
+                "codePrefix": "ZR",
+                "sectionID": "20021237",
+                "sectionNumber": "APPENDIX J",
+                "textHash": "a0bae28c193a7f2d722e4d7993bd61e9b3a75208021cbbeb790777ac86f5b22f",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              }
+            ],
+            "contextHash": "e10067569f3a1efccaf0c5aeecec873a9180bbcd763f3404199b296598e1d0e3"
+          },
+          "evidenceSelection": {
+            "pass": true,
+            "sources": [
+              {
+                "sourceID": "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Section referenced by the user; no exact passage or visual was selected",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260909-pinned-excerpt-precedence-v33",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-09T08:25:34.474Z",
+                "sectionID": "20022472",
+                "codePrefix": "ZR",
+                "sectionNumber": "42-191",
+                "title": "Use Group IX – general use allowances",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "42-191 Use Group IX – general use allowances The following table includes uses classified as Use Group IX and sets forth their allowances by Manufacturing District. Such uses are categorized as general storage, specialized storage, or vehicle storage, as provided in paragraphs A, B and C of this Section. Notations found in the table are further described in Section 42-10 (USE ALLOWANCES). A. General Storage USE GROUP IX(A) – GENERAL STORAGE ● = Permitted ♦ = Permitted with limitations ○ = Special permit required – = Not permitted S = Size restriction P = Additional conditions U = Open use allowances Uses M1 M2 M3 PRC General Storage Building materials or contractors' yard ●P U ●P U ●P U D2 Depositories for storage of office records, microfilm or computer tapes, or for data processing ● ● ● D2 Micro-distribution facilities – – – D2 Moving or storage offices ●P ●P ●P D2 Self-service storage facility ♦P ♦P ♦P D2 Trucking terminals or motor freight stations ●P U ●P U ●P U D2 Warehouses ●P ●P ●P D2 Wholesale establishments ●P ●P ●P A4 B. Specialized Storage USE GROUP IX(B) – SPECIALIZED STORAGE ● = Permitted ♦ = Permitted with limitations ○ = Special permit required – = Not permitted S = Size restriction P = Additional conditions U = Open use all",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null,
+                "userSelectedText": ""
+              },
+              {
+                "sourceID": "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Section referenced by the user; no exact passage or visual was selected",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260909-pinned-excerpt-precedence-v33",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule",
+                    "exception"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence",
+                    "exception or permitted reduction"
+                  ]
+                },
+                "retrievedAt": "2026-09-09T08:25:34.474Z",
+                "sectionID": "20022473",
+                "codePrefix": "ZR",
+                "sectionNumber": "42-192",
+                "title": "Use Group IX – uses permitted with limited applicability",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "For uses denoted with “♦” in Section 42-191 (Use Group IX – general use allowances), the provisions of this Section shall apply.\n\nIn designated areas within Manufacturing Districts, as shown on the maps in APPENDIX J (Designated Areas Within Manufacturing Districts) of this Resolution, a self-service storage facility is subject to the provisions of this Section. Designated areas in which self-service storage facilities are subject to the as-of-right provisions of this paragraph are shown on the maps in Subarea 1, and those in which such uses are subject to special permit of the City Planning Commission pursuant to Section 74-192 (Self-service storage facility in designated areas within Manufacturing Districts) are shown on the maps in Subarea 2. A self-service storage facility shall, in Subarea 1 of APPENDIX J of this Resolution, be limited to establishments that provide an industrial floor space as defined in Section 12-10 (DEFINITIONS) or “business-sized” storage space as specified in paragraph (b)(2)(ii) of this Section.\n\nA self-service storage facility shall, in Subarea 2 of APPENDIX J of this Resolution, be permitted by special permit of the City Planning Commission pursuant to Section 74-192 (Self-service storage facility in designated areas within Manufacturing Districts). Any self-service storage facility existing on December 19, 2017, located in a designated area within Manufacturing Districts, as shown on the maps in APPENDIX J, shall be considered a conforming use, provided that the owner of such self-service storage facility has filed documentation satisfactory to the Department of Buildings that it existed on such date and met the definition of self-service storage facility set forth in Section 12-10. Any enlargement or extension to an existing conforming facility need not provide industrial floor space, business-sized storage, or apply for special permit of the City Planning Commission pursuant to Section 74-192, as applicable, provided there is no increase in lot area of the zoning lot as it existed on December 19, 2017. In the event that a building for which satisfactory documentation has been filed with the Department of Buildings is damaged or destroyed by any means, such building may be reconstructed on the same zoning lot and continue as a self-service storage facility without providing industrial floor space or business-sized storage, as applicable, provided that the floor area of such reconstructed self-service storage facility does not exceed the floor area permitted pursuant to the provisions of Section 43-10 (FLOOR AREA REGULATIONS), inclusive. Any self-service storage facility existing on December 19, 2017, that does not file such documentation satisfactory to the Department of Buildings pursuant to the provisions of this Section shall be considered non-conforming and subject to the provisions of Article V (NON-CONFORMING USES AND NON-COMPLYING BUILDINGS) of this Resolution.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": false,
+                "targetedDefinition": null,
+                "targetedZoningContext": {
+                  "version": "20260908-storage-applicability-excerpt-v2",
+                  "purpose": "unresolved_storage_applicability",
+                  "canonicalSectionSHA256": "d96ca3eb94fc03a5cfa86b184b7e42114d3fb6ca7d3fd7e43ea19b750c04213a",
+                  "canonicalSectionCharacterCount": 9153,
+                  "spans": [
+                    {
+                      "start": 64,
+                      "end": 192
+                    },
+                    {
+                      "start": 1346,
+                      "end": 2255
+                    },
+                    {
+                      "start": 7241,
+                      "end": 9153
+                    }
+                  ],
+                  "limitation": "Only the use-allowance introduction, designated-area branch introduction, and existing-facility provisions are included. Detailed Subarea 1 industrial/business-sized-space, signage and reporting provisions are omitted. This excerpt cannot establish a parcel's mapped status, design compliance or satisfaction of those omitted requirements."
+                },
+                "userSelectedText": ""
+              },
+              {
+                "sourceID": "a74ea333-0ba4-47d2-baee-c57789648661",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Section referenced by the user; no exact passage or visual was selected",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260909-pinned-excerpt-precedence-v33",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-09T08:25:34.474Z",
+                "sectionID": "20022474",
+                "codePrefix": "ZR",
+                "sectionNumber": "42-193",
+                "title": "Use Group IX – uses subject to additional conditions",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "42-193 Use Group IX – uses subject to additional conditions For uses denoted with a “P” in Section 42-191 (Use Group IX – general use allowances), the following provisions shall apply: Boat storage shall be restricted to boats less than 100 feet in length. Public parking garages and public parking lots shall be subject to the provisions set forth in Section 44-025 (Applicability of regulations to public parking garages and public parking lots). All uses denoted with a “P” in Section 42-191 (Use Group IX – general use allowances), except boat storage, public parking garages and public parking lots, shall conform to the performance standards set forth in Sections 42-40 (PERFORMANCE STANDARDS) through 42-48 (Performance Standards Regulating Humidity, Heat or Glare), inclusive.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null,
+                "userSelectedText": ""
+              },
+              {
+                "sourceID": "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Section referenced by the user; no exact passage or visual was selected",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260909-pinned-excerpt-precedence-v33",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-09T08:25:34.474Z",
+                "sectionID": "20019206",
+                "codePrefix": "ZR",
+                "sectionNumber": "74-192",
+                "title": "Self-service storage facility in designated areas within Manufacturing Districts",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "74-192 Self-service storage facility in designated areas within Manufacturing Districts On zoning lots in designated areas within Manufacturing Districts in Subarea 2, as shown on the maps in Appendix J (Designated Areas Within Manufacturing Districts) of this Resolution, the City Planning Commission may permit the development, enlargement not permitted pursuant to the provisions of Section 42-193 (Use Group IX – uses subject to additional conditions), or change of use of a building for self-service storage facility use listed under Use Group IX(A). To grant such permit, the Commission shall find that the zoning lot is appropriate for such self-service storage facility use, based on the land use characteristics of the proposed zoning lot and the surrounding area. In making this determination, the Commission may consider the following: whether such use is consistent with the economic development objectives of the City for the designated area in which the self-service storage facility seeks to be located, and may, in making this determination, consult with the Department of Small Business Services; whether recent trends for and levels of investment in “qualifying uses”, as defined below, demonstrate that there is minimal demand for space for such uses in the surrounding area; whether the size and configuration of the zoning lot make it better suited for self-service storage facility use than for “qualifying uses”; for changes of use to existing buildings, whether the design and",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null,
+                "userSelectedText": ""
+              },
+              {
+                "sourceID": "eaafe2be-c679-41b8-b310-fa1efbfd3f50",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Section referenced by the user; no exact passage or visual was selected",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260909-pinned-excerpt-precedence-v33",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence"
+                  ]
+                },
+                "retrievedAt": "2026-09-09T08:25:34.474Z",
+                "sectionID": "20021237",
+                "codePrefix": "ZR",
+                "sectionNumber": "APPENDIX J",
+                "title": "APPENDIX J — Designated Areas Within Manufacturing Districts",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "APPENDIX J APPENDIX J — Designated Areas Within Manufacturing Districts (6/6/24) The boundaries of certain designated areas within Manufacturing Districts are shown on the maps in this APPENDIX. Designated areas in which self-service storage facilities are subject to the as-of-right provisions of Section 42-19 (Use Group IX – Storage) are shown on the maps in Subarea 1, and those in which such uses are subject to special permit of the City Planning Commission pursuant to Section 74-192 (Self-service storage facility in designated areas within Manufacturing Districts) are shown on the maps in Subarea 2. SUBAREA 1 Borough Community Districts Name of Designated Area in M District Map No The Bronx 3, 4, 6 Bathgate Map 1 Queens 1 Steinway Maps 1, 2 Queens 9 Richmond Hill Map 1 Staten Island 1, 2 West Shore Maps 1-3 Staten Island 3 Rossville Map 1 SUBAREA 2 Borough Community Districts Name of Designated Area in M District Map No The Bronx 1, 2 Port Morris Maps 1-3 The Bronx 2 Hunts Point Maps 1-3 The Bronx 9, 10 Zerega Maps 1, 2 The Bronx 10, 12 Eastchester Map 1 Brooklyn 2 Brooklyn Navy Yard Map 1 Brooklyn 6, 7 Southwest Brooklyn Maps 1-5 Brooklyn 5, 16, 17, 18 Flatlands/Fairfield Maps 1-4 Brooklyn 5, 16 East New York Maps 1, 2 Brooklyn/Queens BK 4/QN 5 Ridgewood Map 1 Brooklyn 1 Williamsburg/Greenpoint Map 1 Brooklyn/Queens BK 1, 4/QN 2 North Brooklyn/Long Island City/ Maspeth Maps 1-3 Queens/Brooklyn QN 2, 5/BK 1 Maspeth/North Brooklyn Maps 1-4 Queens 1, 2 Long Island City Maps 1-",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null,
+                "userSelectedText": ""
+              }
+            ],
+            "rejected": [],
+            "gateFailures": [],
+            "usage": {
+              "sourceCount": 5,
+              "characterCount": 7998,
+              "pinnedCharacterCount": 7998,
+              "maximumCharacters": 8000
+            }
+          },
+          "evidenceReadiness": {
+            "schemaVersion": 1,
+            "pass": true,
+            "disposition": "ready",
+            "issues": [],
+            "requiredEvidence": []
+          },
+          "repairVersion": "20260909-atomic-metadata-patch-v3",
+          "sourceBindingVersion": "20260909-explicit-source-binding-v1",
+          "sourceBindingRepairs": [],
+          "sourceBoundedRepairApplied": false,
+          "repairPacketHashes": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260909-pinned-excerpt-precedence-v33",
+          "retrievalQuery": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260908-negative-work-premise-v6",
+          "conversationFactPromptVersion": "20260909-fact-context-v1",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 6,
+            "maximumDiscovered": 2,
+            "maximumTargetedDefinitions": 1,
+            "maximumCrossReferences": 2,
+            "maximumCharacters": 8000,
+            "maximumSupplementalCharacters": 6000,
+            "maximumCharactersPerSource": 5000
+          },
+          "usage": {
+            "pinnedCount": 5,
+            "pinnedCharacterCount": 8000,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 8000,
+            "supplementalCharacterCount": 0,
+            "candidateCount": 6,
+            "discoveredCount": 0,
+            "targetedDefinitionCount": 0,
+            "crossReferenceCount": 0,
+            "topicDependencyCount": 0,
+            "characterCount": 8000,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0,
+            "finalSourceCount": 5,
+            "finalCharacterCount": 7998
+          },
+          "limitations": [
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-zoning-context-excerpt",
+              "sourceID": "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+              "text": "Only the use-allowance introduction, designated-area branch introduction, and existing-facility provisions are included. Detailed Subarea 1 industrial/business-sized-space, signage and reporting provisions are omitted. This excerpt cannot establish a parcel's mapped status, design compliance or satisfaction of those omitted requirements."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "visual-source-review-required",
+              "text": "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. Review and explicitly select the applicable visual source before preparing that candidate."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260909-focused-technical-v30",
+            "searchedSectionCount": 4068,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codePrefixes": [
+                  "ZR"
+                ],
+                "routeReason": "zoning cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260909-supporting-web-v22",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "zoning cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: NYC Zoning Resolution",
+            "limitation": null,
+            "resolvedAt": "2026-09-09T08:25:34.084Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "mappedScopeReview": {
+                "version": "20260909-explicit-semantic-map-scope-v1",
+                "packetHash": "f7bae7a7d6bb7cebbf2dfd970a318264ab82fe5bab05b760cd7bbdc71507e981",
+                "pass": true,
+                "units": [
+                  {
+                    "unitID": "unit_0",
+                    "classification": "source_explanation",
+                    "sourceIDs": [
+                      "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                      "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                      "a74ea333-0ba4-47d2-baee-c57789648661",
+                      "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                      "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                    ],
+                    "reason": "States that the parcel-specific determination is unresolved and accurately summarizes conditional rules without assigning a zoning or mapped status to the property."
+                  },
+                  {
+                    "unitID": "unit_1",
+                    "classification": "source_explanation",
+                    "sourceIDs": [
+                      "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                      "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                      "a74ea333-0ba4-47d2-baee-c57789648661",
+                      "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                      "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                    ],
+                    "reason": "Provides the direct unresolved conclusion and conditional rule summary without making a property determination."
+                  },
+                  {
+                    "unitID": "unit_2",
+                    "classification": "source_explanation",
+                    "sourceIDs": [
+                      "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                      "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                      "a74ea333-0ba4-47d2-baee-c57789648661",
+                      "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                      "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                    ],
+                    "reason": "Explains conditional source rules and historical branches while expressly withholding application to the unidentified property."
+                  },
+                  {
+                    "unitID": "unit_3",
+                    "classification": "source_explanation",
+                    "sourceIDs": [
+                      "617e5993-c8b8-4eda-8710-5c7e078fed18"
+                    ],
+                    "reason": "Accurately explains the ♦P symbols and the M1, M2, and M3 table entry from the bound ZR 42-191 passage."
+                  },
+                  {
+                    "unitID": "unit_4",
+                    "classification": "unresolved_boundary",
+                    "sourceIDs": [
+                      "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                    ],
+                    "reason": "Describes the Subarea 1 and Subarea 2 branches and expressly withholds any determination that the property lies in either branch."
+                  },
+                  {
+                    "unitID": "unit_5",
+                    "classification": "source_explanation",
+                    "sourceIDs": [
+                      "a74ea333-0ba4-47d2-baee-c57789648661"
+                    ],
+                    "reason": "Accurately states the P-notation performance-standard requirement and its exceptions as applied to the self-service-storage row."
+                  },
+                  {
+                    "unitID": "unit_6",
+                    "classification": "source_explanation",
+                    "sourceIDs": [
+                      "f2bbd7a0-e552-45c3-81ba-a4694fe7f729"
+                    ],
+                    "reason": "Accurately describes the Subarea 2 special-permit route and required Commission finding without assigning the property to Subarea 2."
+                  },
+                  {
+                    "unitID": "unit_7",
+                    "classification": "source_explanation",
+                    "sourceIDs": [
+                      "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                    ],
+                    "reason": "Accurately explains Appendix J's mapped Subarea 1/Subarea 2 framework and states that the supplied text does not locate the unidentified property."
+                  },
+                  {
+                    "unitID": "unit_8",
+                    "classification": "source_explanation",
+                    "sourceIDs": [
+                      "ec6d0202-b789-4791-bf0c-c498ac98e38d"
+                    ],
+                    "reason": "Accurately preserves the dated existence, DOB documentation, enlargement, reconstruction, floor-area, and nonconforming-use alternatives without assuming their facts."
+                  },
+                  {
+                    "unitID": "unit_9",
+                    "classification": "unresolved_boundary",
+                    "sourceIDs": [
+                      "617e5993-c8b8-4eda-8710-5c7e078fed18",
+                      "ec6d0202-b789-4791-bf0c-c498ac98e38d",
+                      "a74ea333-0ba4-47d2-baee-c57789648661",
+                      "f2bbd7a0-e552-45c3-81ba-a4694fe7f729",
+                      "eaafe2be-c679-41b8-b310-fa1efbfd3f50"
+                    ],
+                    "reason": "Identifies material missing project facts and evidence limitations while withholding a parcel-specific determination."
+                  }
+                ]
+              },
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "conditional",
+        "authorityLabel": "Conditional on Project facts",
+        "sourceAsOf": "2026-09-09T08:25:34.084Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "zoning_compiler_terra_first:property_map_applicability"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": [],
+          "zoningPlannerVersion": "20260909-declared-missing-map-facts-v7",
+          "maximumProviderCalls": 2,
+          "fullAnswerRewriteAllowed": false,
+          "sourceBoundedRepairApplied": false,
+          "repairVersion": "20260909-atomic-metadata-patch-v3"
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "ZR-06",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-terra",
+      "mappedScopeReviewRequested": false,
+      "requestBytes": 47689,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "ae2adce3965dbe4cd5492b98aeea0c172fed485da46b4504952ac65defd60aeb",
+      "rawRequestSHA256": "f84398c4b603efde53c17f12d1075da53c3252cf91196362578d98505a4a30dc",
+      "startedAt": "2026-09-09T08:25:34.513Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10186,
+        "input_tokens_details": {
+          "cache_write_tokens": 10183,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1812,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 11998
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0e01a2b43ac7d59e016aa1180082ec87d2951071aecb66af15",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No—an as-of-right determination for this specific property cannot be made from the supplied facts.** The proposed use is listed as Use Group IX(A) “Self-service storage facility” with the symbol **♦P** in M1, M2 and M3 districts: ♦ means permitted with limitations and P means additional conditions. (ZR § 42-191.) But no address/BBL or controlling official map evidence establishes whether this lot is in a Manufacturing District, a special district affecting the site, or an Appendix J designated area/subarea.\\n\\nIf the lot is in an Appendix J **Subarea 1**, the use is subject to the stated as-of-right provisions but must be limited to an establishment providing industrial floor space or the specified “business-sized” storage space. If it is in **Subarea 2**, it requires a City Planning Commission special permit under ZR § 74-192, not as-of-right approval. (ZR § 42-192; Appendix J.) The P notation also makes the use subject to the performance standards in ZR §§ 42-40 through 42-48. (ZR § 42-193.) A facility that existed on December 19, 2017 may follow separate conforming/enlargement rules only if the stated DOB documentation and other conditions are met; without satisfactory DOB documentation, it is non-conforming and subject to Article V. A documented facility that is damaged or destroyed may be reconstructed on the same zoning lot, subject to the ZR § 43-10 floor-area limit. (ZR § 42-192.) None of those historical branches can be applied to this unidentified property.\",\"supportedPoints\":[{\"heading\":\"General Manufacturing District allowance is conditional\",\"explanation\":\"The Use Group IX(A) table marks “Self-service storage facility” ♦P in M1, M2 and M3 districts. Under the table legend, ♦ means “Permitted with limitations” and P means “Additional conditions”; it is not an unqualified general as-of-right allowance.\",\"sectionID\":\"20022472\",\"sourceIDs\":[\"617e5993-c8b8-4eda-8710-5c7e078fed18\"]},{\"heading\":\"Appendix J subarea controls the designated-area path\",\"explanation\":\"Within a designated Manufacturing District area shown in Appendix J, Subarea 1 is subject to the stated as-of-right provisions and is limited to facilities providing industrial floor space or specified business-sized storage. In Subarea 2, a self-service storage facility requires a City Planning Commission special permit under ZR § 74-192. Appendix J identifies designated areas and distinguishes Subareas 1 and 2; it does not establish this property's location in either subarea.\",\"sectionID\":\"20022473\",\"sourceIDs\":[\"ec6d0202-b789-4791-bf0c-c498ac98e38d\"]},{\"heading\":\"Additional condition applies to the P notation\",\"explanation\":\"For uses marked P in ZR § 42-191, other than the listed boat-storage and public-parking exceptions, ZR § 42-193 requires conformity with the performance standards in ZR §§ 42-40 through 42-48. The self-service-storage row is marked P.\",\"sectionID\":\"20022474\",\"sourceIDs\":[\"a74ea333-0ba4-47d2-baee-c57789648661\"]},{\"heading\":\"Subarea 2 is a special-permit route\",\"explanation\":\"For zoning lots in Appendix J Subarea 2 designated Manufacturing District areas, ZR § 74-192 authorizes the City Planning Commission to permit development, certain enlargements, or change of use for a Use Group IX(A) self-service storage facility upon the required finding regarding suitability of the zoning lot and surrounding land-use characteristics. This is not an as-of-right path.\",\"sectionID\":\"20019206\",\"sourceIDs\":[\"f2bbd7a0-e552-45c3-81ba-a4694fe7f729\"]},{\"heading\":\"Appendix J supplies the mapped subarea framework\",\"explanation\":\"Appendix J states that its maps show designated Manufacturing District areas, with Subarea 1 for the ZR § 42-19 as-of-right provisions and Subarea 2 for the ZR § 74-192 City Planning Commission special permit. The supplied text lists designated areas and map numbers but does not locate the unidentified property on a map.\",\"sectionID\":\"20021237\",\"sourceIDs\":[\"eaafe2be-c679-41b8-b310-fa1efbfd3f50\"]},{\"heading\":\"Existing-facility alternatives depend on dated status and documentation\",\"explanation\":\"A facility existing on December 19, 2017 in an Appendix J designated area is conforming only if satisfactory documentation of its existence and its qualifying definition was filed with DOB. An enlargement or extension of that documented conforming facility is relieved of the stated industrial-floor-space, business-sized-storage, or special-permit requirement only if there is no increase in the zoning-lot area from that date. A documented building that is damaged or destroyed may be reconstructed on the same zoning lot and continue as self-service storage, but its floor area cannot exceed the amount permitted by ZR § 43-10. A facility existing on that date without satisfactory DOB documentation is non-conforming and subject to Article V.\",\"sectionID\":\"20022473\",\"sourceIDs\":[\"ec6d0202-b789-4791-bf0c-c498ac98e38d\"]}],\"assumptions\":[],\"missingFacts\":[\"Property address or BBL, and controlling official zoning-map evidence identifying the property's mapped zoning district and any applicable special-district status.\",\"Official Appendix J map evidence showing whether the zoning lot is outside a designated area, in Subarea 1, or in Subarea 2.\",\"Current zoning-lot area; if an existing-facility enlargement or extension is proposed, the December 19, 2017 zoning-lot area and whether it has increased.\",\"Whether a self-service storage facility existed on December 19, 2017; if so, whether satisfactory documentation was filed with DOB and whether the use then met the ZR § 12-10 definition.\",\"If the historical reconstruction branch is invoked: whether the documented building was damaged or destroyed, whether reconstruction is on the same zoning lot, and the floor area permitted under ZR § 43-10.\"],\"followUpQuestions\":[\"What is the property address or BBL, and can you provide the controlling zoning map and Appendix J map location for the zoning lot?\"],\"evidenceLimitations\":[\"This answer is limited to the supplied, continuously amended NYC Zoning Resolution passages, text through 2026-08-13. The supplied ZR § 42-192 excerpt expressly omits detailed Subarea 1 industrial/business-sized-space, signage, and reporting provisions, and the supplied Appendix J text does not include a map locating this property.\"],\"additionalEvidenceNeeded\":[\"Controlling official zoning-map and Appendix J map materials for the address/BBL.\",\"If relying on preexisting-facility treatment, DOB-filed documentation of December 19, 2017 existence and qualifying self-service-storage status, plus applicable zoning-lot-area and floor-area records.\"],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"20022472\",\"sourceIDs\":[\"617e5993-c8b8-4eda-8710-5c7e078fed18\"],\"relevance\":\"The M1, M2 and M3 Use Group IX(A) row classifies self-service storage as ♦P and supplies the table-symbol meanings.\"},{\"sectionID\":\"20022473\",\"sourceIDs\":[\"ec6d0202-b789-4791-bf0c-c498ac98e38d\"],\"relevance\":\"Establishes Subarea 1 and Subarea 2 treatment and the dated existing-facility, documentation, enlargement, reconstruction, and nonconforming-use branches.\"},{\"sectionID\":\"20022474\",\"sourceIDs\":[\"a74ea333-0ba4-47d2-baee-c57789648661\"],\"relevance\":\"Establishes the additional performance-standard condition for the P notation.\"},{\"sectionID\":\"20019206\",\"sourceIDs\":[\"f2bbd7a0-e552-45c3-81ba-a4694fe7f729\"],\"relevance\":\"Establishes the City Planning Commission special-permit route and finding for Subarea 2.\"},{\"sectionID\":\"20021237\",\"sourceIDs\":[\"eaafe2be-c679-41b8-b310-fa1efbfd3f50\"],\"relevance\":\"Establishes that Appendix J maps distinguish designated-area Subarea 1 and Subarea 2 treatment.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 22802
+    },
+    {
+      "caseID": "ZR-06",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "mappedScopeReviewRequested": true,
+      "requestBytes": 67060,
+      "maxOutputTokens": 4000,
+      "requestSHA256": "010876a3d6d775ecce284b608d1ba5b27820f93869f389135f878f4a15250c24",
+      "rawRequestSHA256": "163dbacb78313857fb559ebbda1fa8763cb84a0da7e1a775abddbd47458eddc0",
+      "startedAt": "2026-09-09T08:25:57.755Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 14818,
+        "input_tokens_details": {
+          "cache_write_tokens": 14815,
+          "cached_tokens": 0
+        },
+        "output_tokens": 1551,
+        "output_tokens_details": {
+          "reasoning_tokens": 467
+        },
+        "total_tokens": 16369
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_01783a6b098c1a72016aa1181b44ec87d2bb87b6080cba53a5",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[],\"unnecessaryMissingFactIndices\":[],\"mappedScopeReview\":{\"packetHash\":\"f7bae7a7d6bb7cebbf2dfd970a318264ab82fe5bab05b760cd7bbdc71507e981\",\"units\":[{\"unitID\":\"unit_0\",\"classification\":\"source_explanation\",\"sourceIDs\":[\"617e5993-c8b8-4eda-8710-5c7e078fed18\",\"ec6d0202-b789-4791-bf0c-c498ac98e38d\",\"a74ea333-0ba4-47d2-baee-c57789648661\",\"f2bbd7a0-e552-45c3-81ba-a4694fe7f729\",\"eaafe2be-c679-41b8-b310-fa1efbfd3f50\"],\"reason\":\"States that the parcel-specific determination is unresolved and accurately summarizes conditional rules without assigning a zoning or mapped status to the property.\"},{\"unitID\":\"unit_1\",\"classification\":\"source_explanation\",\"sourceIDs\":[\"617e5993-c8b8-4eda-8710-5c7e078fed18\",\"ec6d0202-b789-4791-bf0c-c498ac98e38d\",\"a74ea333-0ba4-47d2-baee-c57789648661\",\"f2bbd7a0-e552-45c3-81ba-a4694fe7f729\",\"eaafe2be-c679-41b8-b310-fa1efbfd3f50\"],\"reason\":\"Provides the direct unresolved conclusion and conditional rule summary without making a property determination.\"},{\"unitID\":\"unit_2\",\"classification\":\"source_explanation\",\"sourceIDs\":[\"617e5993-c8b8-4eda-8710-5c7e078fed18\",\"ec6d0202-b789-4791-bf0c-c498ac98e38d\",\"a74ea333-0ba4-47d2-baee-c57789648661\",\"f2bbd7a0-e552-45c3-81ba-a4694fe7f729\",\"eaafe2be-c679-41b8-b310-fa1efbfd3f50\"],\"reason\":\"Explains conditional source rules and historical branches while expressly withholding application to the unidentified property.\"},{\"unitID\":\"unit_3\",\"classification\":\"source_explanation\",\"sourceIDs\":[\"617e5993-c8b8-4eda-8710-5c7e078fed18\"],\"reason\":\"Accurately explains the ♦P symbols and the M1, M2, and M3 table entry from the bound ZR 42-191 passage.\"},{\"unitID\":\"unit_4\",\"classification\":\"unresolved_boundary\",\"sourceIDs\":[\"ec6d0202-b789-4791-bf0c-c498ac98e38d\"],\"reason\":\"Describes the Subarea 1 and Subarea 2 branches and expressly withholds any determination that the property lies in either branch.\"},{\"unitID\":\"unit_5\",\"classification\":\"source_explanation\",\"sourceIDs\":[\"a74ea333-0ba4-47d2-baee-c57789648661\"],\"reason\":\"Accurately states the P-notation performance-standard requirement and its exceptions as applied to the self-service-storage row.\"},{\"unitID\":\"unit_6\",\"classification\":\"source_explanation\",\"sourceIDs\":[\"f2bbd7a0-e552-45c3-81ba-a4694fe7f729\"],\"reason\":\"Accurately describes the Subarea 2 special-permit route and required Commission finding without assigning the property to Subarea 2.\"},{\"unitID\":\"unit_7\",\"classification\":\"source_explanation\",\"sourceIDs\":[\"eaafe2be-c679-41b8-b310-fa1efbfd3f50\"],\"reason\":\"Accurately explains Appendix J's mapped Subarea 1/Subarea 2 framework and states that the supplied text does not locate the unidentified property.\"},{\"unitID\":\"unit_8\",\"classification\":\"source_explanation\",\"sourceIDs\":[\"ec6d0202-b789-4791-bf0c-c498ac98e38d\"],\"reason\":\"Accurately preserves the dated existence, DOB documentation, enlargement, reconstruction, floor-area, and nonconforming-use alternatives without assuming their facts.\"},{\"unitID\":\"unit_9\",\"classification\":\"unresolved_boundary\",\"sourceIDs\":[\"617e5993-c8b8-4eda-8710-5c7e078fed18\",\"ec6d0202-b789-4791-bf0c-c498ac98e38d\",\"a74ea333-0ba4-47d2-baee-c57789648661\",\"f2bbd7a0-e552-45c3-81ba-a4694fe7f729\",\"eaafe2be-c679-41b8-b310-fa1efbfd3f50\"],\"reason\":\"Identifies material missing project facts and evidence limitations while withholding a parcel-specific determination.\"}]}}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 13331
+    }
+  ],
+  "documentRequests": [],
+  "cumulativeConservativeSpendUSD": 7.468798,
+  "spend": {
+    "active": true,
+    "capUSD": 0.5,
+    "reservedUSD": 0.052773,
+    "actualUSD": 0.052773,
+    "requestCount": 2,
+    "pendingRequestCount": 0
+  },
+  "completedAt": "2026-09-09T08:26:11.241Z"
+}

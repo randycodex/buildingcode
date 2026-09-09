@@ -33,3 +33,23 @@ Logs:
 Maximum: one HTTP turn, two provider requests, $0.50 total, no separate judge or manual retry. The prior conservative $8-round total is $7.375051, leaving $0.624949 before this confirmation. The driver must first pass its zero-provider-call preflight at the committed source revision. No answer key is supplied to planning, drafting or verification. A terminal driver result is not automatically a passed answer.
 
 All 110 numbered cases and the outstanding official-PDF/live-quality work remain in scope. No Project/Notebook/Reports/export workflow, UI, phone, push or deployment work is included. The current objective remains incomplete.
+
+## Recorded live result
+
+The committed-source preflight passed at `b8287253e6d05c2e414763de70504f990ae721a6`, with zero provider calls. The single-use live driver subsequently completed ZR-06 with HTTP 200 in **37.133 seconds**. Drafting took 22.802 seconds and verification took 13.331 seconds. Both provider requests completed; none remain pending. There was no retry, separate judge, web search or document request in this attempt. The successful app turn was charged.
+
+The generated wording triggered explicit map-scope review. The verifier supplied all ten required unit verdicts, with bound sources and the matching packet hash. Scope review and ordinary substantive verification passed; the final answer retains the original lexical map findings and the explicit review record. The other deterministic coverage, citation and quality checks passed. No source-binding repair was needed on this draft.
+
+Review against the reconciled ZR-06 key and retained supplied passages found the requested distinctions in the delivered answer: no determination for the unidentified property; the conditional table allowance; separate Subarea 1 and Subarea 2 paths; the performance-standard condition; missing location/map evidence; and the dated documentation, enlargement, reconstruction and nonconforming-use alternatives. The previously omitted reconstruction and undocumented-facility branches are present. The answer preserves the omitted-detail limitation on the selected excerpt. This is a bounded assistant review of one answer, not professional acceptance or a claim that all 110 cases pass.
+
+Brevity and speed remain open. A whitespace-token count of the draft's main answer is 236 words, with another 410 in supported-point headings and explanations. The prior failed draft had 241 and 387 respectively. Compatibility summaries, citation metadata and uncertainty fields are excluded from those counts. The new answer also has 126 words of missing facts, a 24-word follow-up and 33 words of additional evidence needs; these fields repeat some of the same requests. These are stored-text measurements, not a rendered UI inspection. The prior failed attempt took 25.182 seconds, so this successful delivery is not evidence of a latency improvement.
+
+This attempt's usage-based API estimate is **$0.052773**, with a conservative reservation of **$0.093747**. The retained audit puts the current $8 round at **$7.468798 conservatively**, leaving **$0.531202**. These are ledger calculations, not a live provider-account balance. The audit made zero network or provider calls. Historical attempts span different revisions and include failures; they do not establish typical subscriber cost or the cost per professionally accepted answer.
+
+Retained evidence:
+
+- [Committed-source preflight](../permitext-sync-server/evals/results/research-owner-api-round2-mapped-review-preflight-2026-09-09.json)
+- [Raw live result and delivered answer](../permitext-sync-server/evals/results/research-owner-api-round2-live-mapped-review-2026-09-09.json)
+- [Read-only cumulative cost audit](../permitext-sync-server/evals/results/research-owner-api-round2-mapped-review-cost-audit-2026-09-09.json)
+
+The live driver is consumed and must not be replayed. Next work should first use offline checks to reduce repeated content and address the remaining answer defects, then select bounded live confirmations within the remaining authorization. Official-PDF live quality still needs confirmation. Runtime and evidence remain local; nothing was pushed or deployed.
