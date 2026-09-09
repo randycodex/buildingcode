@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import { applyResearchOutsideAuthorityStartingPoints } from "../research-answer-presentation.mjs";
 import {
   researchOfficialGuidanceSummaryInput,
   researchOfficialGuidanceSummaryInterpretation,
@@ -111,4 +113,41 @@ for (const malformed of [
   { ...draft, missingFacts: [{}] }, { ...draft, evidenceLimitations: Array(7).fill("Gap") },
   { ...draft, paragraphs: [null] }, { ...draft, paragraphs: [{ ...draft.paragraphs[0], text: {} }] }
 ]) assert.throws(() => researchOfficialGuidanceSummaryInterpretation(malformed, webSupport));
-console.log("Official summary source binding, semantic verification integrity, persistence and tamper rejection passed; no external/provider calls.");
+// The retained LPC answer passed the provider verifier, then failed to save
+// because a post-verification starting-point link changed its fingerprint.
+const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json", import.meta.url)));
+const retainedCase = retained.results.find((item) => item.id === "DOBNOW-020");
+const retainedCall = (phase) => retained.providerCalls.find((call) => call.caseID === retainedCase.id && call.phase === phase);
+const output = (call) => JSON.parse(call.output.flatMap((message) => message.content || []).find((part) => part.type === "output_text").text);
+const retainedDraft = output(retainedCall("permitext_official_guidance_summary"));
+const retainedVerification = { ...output(retainedCall("permitext_official_guidance_verification")), model: retainedCall("permitext_official_guidance_verification").model };
+assert.equal(retainedVerification.pass, true);
+assert.equal(retainedCase.httpStatus, 500, "Preserve the live failure as evidence.");
+const fixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-official-document-pages-20260909.json", import.meta.url)));
+const release = fixture.documents.find((item) => item.source.id === "dob-build-release-notes");
+const usedIDs = new Set(retainedDraft.paragraphs.flatMap((paragraph) => paragraph.sourceUses.map((use) => use.claimID)));
+const source = {
+  id: retainedDraft.paragraphs[0].sourceUses[0].sourceID,
+  url: release.source.url, title: release.source.title,
+  authorityClass: "official_guidance", role: "supporting", controlling: false,
+  sourceValidation: "official_pdf", sourceContentHash: release.document.passages[0].contentHash,
+  attributedClaims: release.document.passages.filter((passage) => usedIDs.has(passage.id)).map((passage) => ({
+    id: passage.id, text: passage.claim, verbatimText: passage.text,
+    contentHash: passage.contentHash, pageNumber: passage.pageNumber, sourceURL: passage.sourceURL
+  }))
+};
+assert.equal(source.attributedClaims.length, usedIDs.size);
+const retainedAnswer = { ...savedInput, ...researchOfficialGuidanceSummaryInterpretation(retainedDraft, { sources: [source] }) };
+retainedAnswer.officialGuidanceSummary = researchOfficialGuidanceSummaryProof(retainedCase.question, retainedAnswer,
+  retainedVerification, "Offline reconstruction of retained source bindings; no new semantic judge.");
+assert(hasVerifiedResearchOfficialGuidanceSummary(retainedCase.question, retainedAnswer));
+const presented = applyResearchOutsideAuthorityStartingPoints(retainedAnswer, [{
+  sourceName: "Landmarks Preservation Commission", sourceURL: "https://www.nyc.gov/site/lpc/index.page"
+}], { sourcePolicy: { useWeb: true }, question: retainedCase.question });
+assert.deepEqual(presented, retainedAnswer, "Presentation must preserve verified prose and source bindings.");
+assert(hasVerifiedResearchOfficialGuidanceSummary(retainedCase.question, presented));
+assert.deepEqual(persist(presented, retainedCase.question).answer.answerText, retainedAnswer.answerText);
+const tamperedRetained = structuredClone(presented);
+tamperedRetained.answerText += " Approval is automatic.";
+assert.throws(() => persist(tamperedRetained, retainedCase.question), /require evidence/);
+console.log("Official summary source binding, semantic verification integrity, retained LPC presentation/persistence and tamper rejection passed; no external/provider calls.");

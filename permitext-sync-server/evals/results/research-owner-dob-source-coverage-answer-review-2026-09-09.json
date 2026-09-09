@@ -1,0 +1,158 @@
+{
+  "schema": "permitext-owner-dob-live-answer-review-v1",
+  "checkedAt": "2026-09-09T04:01:28.942Z",
+  "liveSourceCommit": "24d6dfa5f8fa27880f0ad4448724c28598821baa",
+  "live": {
+    "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+    "sha256": "485cba41a9c4a277347fa950f590c2ed25ebb6f48fe35b55f5d3e8fdae3bba12"
+  },
+  "preflight": {
+    "file": "evals/results/research-owner-api-round2-dob-source-coverage-preflight-2026-09-09.json",
+    "sha256": "23ff6770bc03cb655dda8198dc32348720ba050bdfefc80069986d8778b09c47"
+  },
+  "costAudit": {
+    "file": "evals/results/research-owner-api-round2-dob-source-coverage-cost-audit-2026-09-09.json",
+    "sha256": "0a71667580b9e3e5688158eb0195c681f08746d60812944a1667b012e1d4872e"
+  },
+  "sourceVerification": {
+    "recordedFiles": 34,
+    "matchCommit": true,
+    "allInitialRequestsAndAuthoredInputsMatchPreflight": true
+  },
+  "scope": "Retained development answer/source review, not a new paid judge, professional approval, live filing or Project workflow.",
+  "cases": [
+    {
+      "id": "DOBNOW-001",
+      "delivered": false,
+      "milliseconds": 19023,
+      "providerCalls": 3,
+      "review": "undelivered_valid_conditional_core",
+      "findings": [
+        "Draft answers all five routing questions separately and reaches Alteration on the stated facts.",
+        "Verifier rejected the stated-premise wording because fact extraction classified the scenario as qualified."
+      ],
+      "next": "Align summary and verifier treatment of stated conditional premises without promoting owner assertions to independently established facts."
+    },
+    {
+      "id": "DOBNOW-002",
+      "delivered": true,
+      "milliseconds": 12089,
+      "providerCalls": 3,
+      "review": "core_supported_qualification_review_open",
+      "findings": [
+        "Correctly routes a reconstruction retaining foundation elements to Alteration CO with existing elements to remain.",
+        "Opening and statutory/guide authority boundary are clear; the answer does not expressly request Applicant of Record/plans confirmation identified in the development key."
+      ],
+      "next": "Review whether the stated-facts qualification sufficiently preserves that professional confirmation in this bounded filing question."
+    },
+    {
+      "id": "DOBNOW-005",
+      "delivered": true,
+      "milliseconds": 10683,
+      "providerCalls": 3,
+      "review": "development_source_review_pass",
+      "findings": [
+        "Uses the fewer-than-100 threshold for the related business with 42 employees.",
+        "Preserves stakeholder/tab consequences and denies an automatic waiver or permit approval."
+      ]
+    },
+    {
+      "id": "DOBNOW-007",
+      "delivered": true,
+      "milliseconds": 9140,
+      "providerCalls": 3,
+      "review": "development_source_review_pass",
+      "findings": [
+        "Yes is tied to entire roof-deck/assembly replacement.",
+        "Correctly identifies the Sustainable Roof Zone document item and separates it from compliance or permit approval."
+      ]
+    },
+    {
+      "id": "DOBNOW-008",
+      "delivered": false,
+      "milliseconds": 15193,
+      "providerCalls": 3,
+      "review": "undelivered_material_precision_and_source_gap",
+      "findings": [
+        "The relevant guide page 23 now reaches the answer.",
+        "The draft changes alters 60 percent to affects 60 percent and overstates Site Safety Plan applicability.",
+        "Verifier rejects an irrelevant release-note citation but does not independently establish the applicable Construction Superintendent/site-safety exceptions."
+      ],
+      "next": "Preserve the exact measure and separate a generated portal item from a legal obligation; retrieve and reconcile the applicable exception source before another paid confirmation."
+    },
+    {
+      "id": "DOBNOW-009",
+      "delivered": true,
+      "milliseconds": 9668,
+      "providerCalls": 3,
+      "review": "development_source_review_pass",
+      "findings": [
+        "Exactly 12 feet does not satisfy a greater-than-12-feet condition.",
+        "The statement about the Yes-triggered PGL consequence is confined to this depth alone; it does not waive all excavation requirements."
+      ]
+    },
+    {
+      "id": "DOBNOW-020",
+      "delivered": false,
+      "milliseconds": 15508,
+      "providerCalls": 3,
+      "review": "undelivered_post_verification_presentation_bug",
+      "findings": [
+        "The summary preserves the 40-day calendared-property hold and distinguishes calendared from landmarked property.",
+        "The provider verifier passed, but a later discovered-authority link changed the verified answer fingerprint; immutable Research persistence returned HTTP 500.",
+        "The retained-draft offline regression reproduces the mutation and passes after verified summaries are preserved. Tampered answers remain rejected.",
+        "The available text does not establish all document-timing detail in the reference answer; visual/source reconciliation remains open."
+      ],
+      "next": "Confirm the preservation fix through the normal HTTP path and review the unresolved LPC document-timing source."
+    },
+    {
+      "id": "DOBNOW-021",
+      "delivered": false,
+      "milliseconds": 22299,
+      "providerCalls": 3,
+      "review": "undelivered_irrelevant_enacted_evidence_and_retry_reservation",
+      "findings": [
+        "The draft correctly says the address alone cannot select the code year.",
+        "It surrounds that conclusion with irrelevant enacted address/tax-lot citations and unnecessary prerequisites.",
+        "The verifier rejected the draft. A further repair reservation exceeded the per-turn guard before another provider dispatch."
+      ],
+      "next": "Keep the direct insufficient-information result, improve responsive evidence and verification, and avoid an unnecessary expensive repair."
+    }
+  ],
+  "summary": {
+    "providerAttempts": 8,
+    "delivered": 4,
+    "failed": 4,
+    "actualProviderCalls": 24,
+    "runtimeReservationCount": 25,
+    "pendingProviderCalls": 0,
+    "publicDocumentRequests": 10,
+    "batchUsageEstimateUSD": 0.3268239,
+    "batchConservativeUSD": 0.581371,
+    "roundUsageEstimateUSD": 2.77368547,
+    "roundConservativeUSD": 5.417557,
+    "remainingConservativeAuthorizationUSD": 2.582443,
+    "fullCohortProviderAttempted": 91,
+    "fullCohortNotProviderAttempted": 19,
+    "newPaidReviewCalls": 0,
+    "professionalApproval": false,
+    "projectWorkflowTested": false
+  },
+  "postLiveOfflineHashes": {
+    "app.mjs": "c92cbe32ac5ae7ab6ace710afd263a65379f56d58cd2a7795c98a62d2df54d81",
+    "research-answer-presentation.mjs": "f8f3853d4441d4940de0bf222104dce0ee81a1e91e450b3e08dfdb02ff6049ba",
+    "tests/research-official-guidance-summary-contract.mjs": "37a8904f0c9d85c1b634f0b93c5c1db89db8b603fb5dd67ff47a4226faec1e67"
+  },
+  "limitations": [
+    "Costs are reconstructed provider estimates, not an invoice or account-balance check.",
+    "The package stopped after the last selected case hit its per-turn repair-reservation guard; all eight selected questions had already been attempted.",
+    "The runtime reservation count includes a blocked reservation. Only 24 actual provider requests were sent.",
+    "The all-110 source-preparation report retains historical cost/attempt fields; use this latest round cost audit for current counts."
+  ],
+  "offlineValidation": {
+    "command": "env -u OPENAI_API_KEY -u PERMITEXT_RUN_PAID_RESEARCH_EVALS npm run test:research-chat",
+    "result": "passed",
+    "additionalPaidCalls": 0,
+    "retainedLPCRegression": "Reproduced post-verification mutation before the patch; preserved verified text through immutable unassigned Research persistence afterward; altered answers rejected."
+  }
+}

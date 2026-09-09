@@ -1,4 +1,6 @@
-export const researchAnswerPresentationVersion = "20260908-decision-facts-v11";
+import { hasVerifiedResearchOfficialGuidanceSummary } from "./research-official-guidance-summary.mjs";
+
+export const researchAnswerPresentationVersion = "20260909-verified-guidance-preservation-v12";
 
 // Shared by generation and verification, independent of numeric comparisons.
 export const researchDecisionFactInstruction =
@@ -32,9 +34,12 @@ function normalizedStartingPoint(source) {
 export function applyResearchOutsideAuthorityStartingPoints(
   answer,
   outsideCurrentLibrary = [],
-  { sourcePolicy } = {}
+  { sourcePolicy, question } = {}
 ) {
   if (!answer || typeof answer !== "object") return answer;
+  // A verified document summary is immutable. Discovery links belong in
+  // retrieval, not in prose appended after its source verification.
+  if (hasVerifiedResearchOfficialGuidanceSummary(question, answer)) return answer;
   // Discovery suggestions are not a request for another authority. Apply the
   // same boundary used for retrieval, including after a verifier-directed
   // revision, so presentation cannot reinsert rejected outside-library text.

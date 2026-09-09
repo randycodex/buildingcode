@@ -19627,7 +19627,7 @@ async function handleResearchConversationMessage(request, response) {
         interpretation: applyResearchOutsideAuthorityStartingPoints(
           repairedInterpretation,
           evidencePackage.discovery?.outsideCurrentLibrary,
-          { sourcePolicy: webSupportPolicyDecision }
+          { sourcePolicy: webSupportPolicyDecision, question }
         )
       };
     };
