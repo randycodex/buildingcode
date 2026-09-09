@@ -1,0 +1,118 @@
+{
+  "schema": "permitext-owner-guidance-precision-live-review-v1",
+  "reviewedOn": "2026-09-09T09:17:27.157Z",
+  "liveSourceCommit": "9c37e169f622cb053ab17c64518f6ead6a586be2",
+  "liveResult": {
+    "file": "evals/results/research-owner-api-round2-live-guidance-precision-2026-09-09.json",
+    "sha256": "150a16789728f63b6520ceca8102eb9f1ced85bb20af0f3a9d826b433be8fc31"
+  },
+  "costAudit": {
+    "file": "evals/results/research-owner-api-round2-guidance-precision-cost-audit-2026-09-09.json",
+    "sha256": "93f12fd3463494edcde4bba0dc3066156f0fc2a41c474706555d81cef0192f88"
+  },
+  "referenceKey": {
+    "file": "evals/research-reconciled-answer-key.json",
+    "sha256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455"
+  },
+  "precedingResult": {
+    "file": "evals/results/research-owner-api-round2-live-loft-pdf-2026-09-09.json",
+    "sha256": "f89cce9d535794630a575361d9ad86ec5795b1c6eba825294628af0f4d503042"
+  },
+  "newProfessionalApproval": false,
+  "strictQualityAcceptedCostPerAnswerUSD": null,
+  "reviewMethod": "Assistant comparison of the full delivered answer with the unchanged authored scenario, expected answer and required concepts, the actual preflight-bound source passages, and the current official service notice. Runtime verifier success is not a complete answer-key grade.",
+  "benchmarkDecision": "Retain the reviewed Yes/No clearance distinction. It protects against the material mistake of treating Certification and LNO as interchangeable; a brief contrast is relevant to the requested approval boundary. Do not change the question or downgrade the rubric merely because the generated answer omitted it.",
+  "sourceBasis": {
+    "url": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf",
+    "page": 1,
+    "checkedOn": "2026-09-09",
+    "contentHash": "3f59cec0e8946db320a73934029ba31b14e0216b277916dee24cd5e5a941dfe5"
+  },
+  "case": {
+    "id": "DOBNOW-016",
+    "inputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+    "expectedAnswerSHA256": "4bb8204a87532f1b66a3993ef014ebb33ece7f59c69c2f78f1ccbdf0c3a73059",
+    "deliveredAnswerSHA256": "1694718b23eb2f39d925df30f779525284765b27daec11f2bf070a1f7997a789",
+    "liveStatus": "completed",
+    "verificationPass": true,
+    "reviewStatus": "core-supported-sequence-repaired-with-remaining-completeness-and-economy-gaps",
+    "criteria": [
+      {
+        "concept": "Require both the property flag and scope relationship stated in the scenario.",
+        "result": "supported",
+        "evidence": "The first paragraph applies the stated IMD-impact scope; the second uses the stated Loft Law flag for the approval hold."
+      },
+      {
+        "concept": "Distinguish submitting the request from obtaining the Certification.",
+        "result": "supported",
+        "evidence": "The answer requires submission for review and issued Certification, applying this clearance directly rather than presenting a general either-clearance menu."
+      },
+      {
+        "concept": "Map the Yes and No responses to their distinct Loft Board submission types.",
+        "result": "partial",
+        "evidence": "Yes maps explicitly to Certification. The distinct No/commercial-unit/non-IMD-impact route and its LNO are absent."
+      },
+      {
+        "concept": "Include the Narrative Statement in the Yes/Certification path.",
+        "result": "supported",
+        "evidence": "The first paragraph explicitly requires the Narrative Statement."
+      }
+    ],
+    "improvements": [
+      "Restores the expected source-supported sequence: submit the job filing, then add the Loft Board request.",
+      "States Certification directly in the approval hold for this scenario.",
+      "Replaces the generic compliance disclaimer in the draft with a narrower description of the stated approval boundary; the server authority label remains."
+    ],
+    "remainingFindings": [
+      "The key requires a brief distinction from the No/commercial-unit LNO route; that distinction is still absent.",
+      "The answer adds Scope of Work, Documents and Signatures tab instructions beyond the narrow decision and approval question.",
+      "It repeats the IMD question and Yes condition; the substantive draft is longer than the previous answer."
+    ],
+    "attributionReview": "The service notice supports the selected response, required submission type, narrative, filing sequence and approval hold. The release note supports the general approval hold, with the service notice supporting the applied branch. Source links and identities remain bound.",
+    "metrics": {
+      "durationMilliseconds": 14751,
+      "providerCalls": 2,
+      "paidSearchCalls": 0,
+      "publicPDFRequests": 3,
+      "usageEstimateUSD": 0.0152357,
+      "conservativeUSD": 0.027449,
+      "draftParagraphWords": 155,
+      "stageMilliseconds": [
+        {
+          "phase": "permitext_official_guidance_summary",
+          "duration": 7292,
+          "headers": 7253,
+          "bodyRead": 39
+        },
+        {
+          "phase": "permitext_official_guidance_verification",
+          "duration": 4448,
+          "headers": 4448,
+          "bodyRead": 1
+        }
+      ],
+      "previous": {
+        "status": "completed",
+        "durationMilliseconds": 35556,
+        "draftParagraphWords": 127,
+        "usageEstimateUSD": 0.01280125,
+        "conservativeUSD": 0.023742
+      }
+    }
+  },
+  "budget": {
+    "authorizationUSD": 8,
+    "maximumThisComparisonUSD": 0.2,
+    "conservativeUSD": 7.519989,
+    "remainingUSD": 0.480011,
+    "usageEstimateUSD": 3.96761562,
+    "providerAccountBalanceChecked": false
+  },
+  "limitations": [
+    "One comparison does not establish reliability or latency improvement across the 110 cases.",
+    "The preceding 29.821-second draft was a slow outlier; faster completion here is not proof that prompt v6 caused the reduction.",
+    "Most measured provider-call time preceded response headers; non-streaming headers do not isolate provider queue or generation time.",
+    "Transport timings are measured before the harness reads its retained-output response clone; internal wrapper header timing would include that clone read.",
+    "No key amendment, automatic quality acceptance, Project workflow, UI, phone, push or deployment occurred."
+  ]
+}

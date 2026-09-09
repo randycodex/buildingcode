@@ -1,0 +1,1235 @@
+{
+  "promptVersion": "20260909-document-summary-v6",
+  "schema": "permitext-owner-api-round2-guidance-precision-v1",
+  "sourceCommit": "9c37e169f622cb053ab17c64518f6ead6a586be2",
+  "authorization": "Owner authorized continued API tests within a fresh $8 round, with notice before more is needed. Historical costs remain separate. This single-use confirmation tests clearer application, explicit prerequisites and approval boundaries under guidance prompt v6 on the unchanged authored DOBNOW-016 scenario and question, once. The preceding conservative round total is $7.492540, leaving $0.507460. Maximum $0.20 for one unassigned Research HTTP turn, at most two provider requests, no paid search, manual retry, separate judge, Project workflow or deployment.",
+  "preDispatchAbortEvidence": {
+    "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-2026-09-09.json",
+    "sha256": "890f8a447d3a6326c1579d41ddad140a9b64dfdeabe1e43d9d9bf09e0bd68143",
+    "providerCalls": 0,
+    "providerCostUSD": 0,
+    "reason": "Initial request binding guard aborted before recording or sending any provider request; the isolated runtime reservation is not a provider charge."
+  },
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 7.49254,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sha256": "f406901dcca5f06398166f4a08bcfbadf6639bf24755777a0c7a9434d8ca7d8f"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sha256": "f991b5d3ce3757dddbea968291341571817c8cf9f3703101766766047c39ba57"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sha256": "6cacf237b64e02d3b388adafea5f0b48865f3c9778e5d15e77b8fc19b8de03ca"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sha256": "485cba41a9c4a277347fa950f590c2ed25ebb6f48fe35b55f5d3e8fdae3bba12"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sha256": "68f098015f6d49060f62a725dc805f76b6f4692203e30f9de45cd3e8282a6cc9"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-lot-history-2026-09-09.json",
+      "sha256": "102534c93f3b63786d3ac946a3b8af1270def90a7693acae633c8a2d921869bb"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-storage-scope-2026-09-09.json",
+      "sha256": "38d20c59f2b62a81f6f8e5a89855708f53124b390e5b075f48b2cec3bfc74eae"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-mapped-review-2026-09-09.json",
+      "sha256": "5aa60daf1e734b9f4ff386d71abff2f4c20b80db96a3c968343c3b873881b7b5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-loft-pdf-2026-09-09.json",
+      "sha256": "f89cce9d535794630a575361d9ad86ec5795b1c6eba825294628af0f4d503042"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 0.2,
+  "maximumTurnSpendUSD": 0.2,
+  "maximumTurns": 1,
+  "maximumProviderRequests": 2,
+  "maximumProviderRequestsPerTurn": 2,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-09",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual unassigned HTTP Research on isolated local accounts and storage. No Project is created or exercised. Each question includes the source packet's explicit DOB NOW workflow context plus its unchanged scenario and question. No answer key, rubric, required-citation hint or professional-review expectation is supplied to drafting or verification. The existing direct official-document route retrieves its declared public NYC sources; paid search is forbidden. Existing generation and verification models are retained. The no-API preflight intercepts every provider dispatch and permits only public NYC document GETs, needed to bind direct-document summary requests for the repaired companion-source paths. Earlier no-context attempts and all 110 numbered cases remain in the cumulative scope; this single-case confirmation does not narrow acceptance. No live filing, saved-project workflow, phone, UI or deployment changes.",
+  "requestComparison": "Opt-in HTML opaque-identifier normalization preserves every supplied passage, its source identity and schema binding. Runtime hashes and outgoing provider bodies remain unchanged. Raw request fingerprints are also recorded.",
+  "repairedCaseIDs": [
+    "DOBNOW-016"
+  ],
+  "newCaseIDs": [],
+  "cases": [
+    "DOBNOW-016"
+  ],
+  "preflightSHA256": "a2da64a4ff343e0747062906bcfa36147f7bdc752f6d6d4d5c3c806f9687a200",
+  "sourceHashes": {
+    "app.mjs": "188187fa9df9ad66a652605dd25b1e6e054f7d8dfbd71674297838dabd5e70eb",
+    "research-answer-presentation.mjs": "f8f3853d4441d4940de0bf222104dce0ee81a1e91e450b3e08dfdb02ff6049ba",
+    "research-official-guidance-summary.mjs": "a1caed747fd74f82f28583d155ad736a3e7843c74bc6dcb3369b5572decdc501",
+    "evals/research-answer-key-amendments.json": "ddcf7fb5675285991b0a7275749890794c3671a1f7888cc6c5ebee2b5977bc24",
+    "research-answer-quality.mjs": "cad6d658ff2805ee6e56e48b2b135f5dec28863b02020183731b0815b2ecec4f",
+    "research-focused-technical-scope.mjs": "4c7f8ff22bc4bd11bf87a55417b8795b164443e0a704d9e64ebc33f27fc27f49",
+    "research-conversation-topic.mjs": "77baee9c8db51501fca1bfee6ea192869f8e6fd8a7c35b48eb8d5a7f848f7858",
+    "research-technical-topic-routes.mjs": "319075fb7223e387a70ee4038b62cab0c1df839c68de374317277d4548c8ef62",
+    "evidence-discovery.mjs": "47f76c9ba11ea1d5c05edc996eebe110fd4f467bccffe05c4fc1b2e6b6e2d714",
+    "research-conversation-facts.mjs": "67ec6ab2e04908151af796b1a08d2ebd9bdc58bdfb7a748642efb83dd9068ef2",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-source-policy.mjs": "0f569a60606aaace85c6cfde2dd179720717603da47ca7d898b1c66630d63980",
+    "research-official-html-attribution.mjs": "97e0e666a244e6969a9cb690e042fed74fa1a68a8f58351d8f79e0bbb85290c7",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "research-official-pdf-ranking.mjs": "c0d326957b27d2501065ba652f682b911afcffb134a95f74f0b8f1fd2953c6b4",
+    "research-official-pdf-worker.mjs": "39ec76ae01ef399819d5a815f980e2ac52b4fc0844510b7944622d18f4539587",
+    "research-dob-workflow-routing.mjs": "c024a9c6696d3ffbd3c50afffbdc800b93ea4fea3a0952245ffe19dd7682ebab",
+    "evals/research-answer-key-reconciliation.mjs": "3e3a2294a5ea9363e0f242690f8548b5593b77181300c55ecbf6051b47cf4b69",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "d18671f901c0d7eb6f518f9974b7fafe0383630534eddc1225f84d54a6a40ab1",
+    "research-zoning-planner.mjs": "77b3f32262862ae5eff1330d941afe8548a9f88c5b5c7ab2417b118df5e8c275",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "f6b4ac11432838d26504bc94aa48059c9383dacf45d77ac6aced42a0c136a90e",
+    "research-evidence-assembly.mjs": "a79b90be6c7ebee41e1ecb5156fddd47bfe41f00067640cddde625aec228967b",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "research-zoning-metadata.mjs": "4f877fd927b2844b1636eaad971047dbff371292e583f389e9ae7fe63f59303c",
+    "research-zoning-conditional-explanation.mjs": "628c735595bb294606399c3aa88ffe739591d78b98d9791a91de9c9c960a8853",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "03a5cce96d6434fe33ffd9ec120cca2f53be56317b31486d3ce35452eddce78e",
+    "package.json": "f0737993c5d717802403602ebf598ce93ddcc703cfdd2d768ba424ee7d2fab05",
+    "package-lock.json": "6ae8d89d23b69e1e44402b5ded9b0876a6bd97a4291135d76648ebaf64aa48a9",
+    "evals/research-reconciled-answer-key.json": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "7ed6285b7bb1fae0117cc89e95ad4443b6423884818bf3a729341ffb8fc84500",
+    "scripts/run-research-owner-api-round2-guidance-precision-20260909.mjs": "ab1f0db298e8e9a9628cb00cff0be91b3625b731e33f6eb38a1ed4c35b2dc0e6"
+  },
+  "startedAt": "2026-09-09T09:14:52.360Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "DOBNOW-016",
+      "question": "Context: DOB NOW workflow\n\nThe DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit.\n\nHow should the IMD-impact question be answered, and what approval boundary follows?",
+      "inputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+      "requestedCodeVersion": "Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": "DOB NOW workflow",
+      "selectionCharacterCounts": [],
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.2,
+      "initialPhase": "permitext_official_guidance_summary",
+      "initialRequestSHA256": "b4a3dba14a8c8dd376ea0a7605e7460e2f1edbbc522dbe9daf1811b60ea8c780",
+      "initialRawRequestSHA256": "419e05d5a1f1b28021f2098171970321a4efd34611268e3cd32a552de4ee16d2",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 15504,
+      "durationMilliseconds": 14751,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.12224,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "603337be-2550-4881-aa96-af827810ae01",
+          "createdAt": "2026-09-09T09:14:52.531Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 7187,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 7181,
+          "outputTokens": 732,
+          "totalTokens": 7919,
+          "estimatedCostUSD": 0.015236,
+          "actualProviderCostUSD": 0.015236,
+          "conservativeProviderCostUSD": 0.027449,
+          "durationMilliseconds": 14706,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": true,
+          "webSupportSearched": true,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260909-document-summary-v6",
+        "evidenceVersion": "20260909-pinned-table-dependencies-v34:official-documents",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-09T09:14:52.602Z"
+        },
+        "answerText": "Answer “Yes” to the question whether the proposed work will take place in, or affect, an interim multiple dwelling (IMD) unit. For a “Yes” answer—work in or affecting an IMD unit—the DOB NOW: Build guidance directs the filer to file for Loft Board Certification and include a Narrative Statement. [Loft Board Requests in DOB NOW: Build service notice, p. 1](https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1)\n\nBecause the Property Profile has a Loft Law flag, the job filing will not be approved until a Loft Board Request has been submitted for review and a Loft Board Certification has been issued. The request is submitted in conjunction with the job filing: after submitting the job filing, add the Loft Board Request to that filing, answer the IMD or commercial-unit questions on the Scope of Work tab, complete required sections including Documents and Signatures & Statement, and submit the request for review. The stated approval boundary is job-filing approval; the guidance does not say that the Loft Board Certification itself authorizes the proposed work. [Loft Board Requests in DOB NOW: Build service notice, p. 1](https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1) [DOB NOW: Build release notes, p. 19](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=19)\n\nOfficial supporting guidance — noncontrolling and not an enacted-code conclusion.",
+        "conclusion": "Answer “Yes” to the question whether the proposed work will take place in, or affect, an interim multiple dwelling (IMD) unit. For a “Yes” answer—work in or affecting an IMD unit—the DOB NOW: Build guidance directs the filer to file for Loft Board Certification and include a Narrative Statement. [Loft Board Requests in DOB NOW: Build service notice, p. 1](https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1)",
+        "supportedPoints": [],
+        "explanation": "Because the Property Profile has a Loft Law flag, the job filing will not be approved until a Loft Board Request has been submitted for review and a Loft Board Certification has been issued. The request is submitted in conjunction with the job filing: after submitting the job filing, add the Loft Board Request to that filing, answer the IMD or commercial-unit questions on the Scope of Work tab, complete required sections including Documents and Signatures & Statement, and submit the request for review. The stated approval boundary is job-filing approval; the guidance does not say that the Loft Board Certification itself authorizes the proposed work. [Loft Board Requests in DOB NOW: Build service notice, p. 1](https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1) [DOB NOW: Build release notes, p. 19](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=19)\n\nOfficial supporting guidance — noncontrolling and not an enacted-code conclusion.",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This answer summarizes retrieved official supporting guidance; it does not establish an enacted-code conclusion.",
+          "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [
+          {
+            "sourceID": "dob-loft-board-service-notice",
+            "claimID": "official-passage-ffd509d49c4ae45b17b8ff3d",
+            "claim": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1) — Yegal Shamash, PE, Acting Commissioner nyc.gov/buildings build safe | live safe January 8, 20 2 6 SERVICE NOTICE June 2010 Loft Board Requests in DOB NOW: Build Starting on February 2, 2026, Loft Board requests will be submitted in DOB NOW: Build. Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certification has been issued. The Loft Board will also review Certificate of Occupancy request. Submit a Loft Board Request Loft Board requests are always submitted in conjunction with a job filing (including Elevator applications). Once the job filing is submitted, a Loft Board request is required to be added to the filing for review. • Go to the Loft Board tab and select +Add to create a new Loft Board request. • The request is auto populated with the information entered on the job filing. • The type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an interim multiple dwelling (IMD) unit? Answer Work Location Process Yes In or affecting an IMD unit File for Loft Board Certification and include a Narrative Statement No In a commercial unit and does not affect an IMD Unit Request a Letter of No Objection from the Loft Board • Answer the questions about the IMD or Commercial units on the Scope of Work tab. • Complete all required sections, including the Documents and S ignatures & Statement tabs. Select Save and Submit the request for review. DOB NOW Training The NYC Department of Buildings is conducting free training sessions to explain the new process and demonstrate how to navigate Loft Board requests in DOB NOW: Build. Visit the DOB NOW Training Page at nyc.gov/dobnowtraining to regist er for training and to access user manuals and training videos. For additional assistance, submit an inquiry nyc.gov/dobnowhelp."
+          },
+          {
+            "sourceID": "dob-build-release-notes",
+            "claimID": "official-passage-fec304803330bcf0cafe2f48",
+            "claim": "[PDF page 19](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=19) — February 2026 - Loft Board Requests in DOB NOW: Build Loft Board Request are to be submitted in DOB NOW: Build. Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certi fic ation has been issued. The Loft Board will also review Certificate of Occupancy request. The type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an interim multiple dwelling (IMD) unit? Visit the DOB NOW Training Page at https://nyc.gov/dobnowtraining for training manuals and step - by - step guides."
+          }
+        ],
+        "supportingSources": [
+          {
+            "id": "dob-loft-board-service-notice",
+            "title": "Loft Board Requests in DOB NOW: Build service notice",
+            "url": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf",
+            "publisher": "NYC Department of Buildings",
+            "catalogReviewedOn": "2026-09-09",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "controlling": false,
+            "attributedClaims": [
+              {
+                "id": "official-passage-ffd509d49c4ae45b17b8ff3d",
+                "text": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1) — Yegal Shamash, PE, Acting Commissioner nyc.gov/buildings build safe | live safe January 8, 20 2 6 SERVICE NOTICE June 2010 Loft Board Requests in DOB NOW: Build Starting on February 2, 2026, Loft Board requests will be submitted in DOB NOW: Build. Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certification has been issued. The Loft Board will also review Certificate of Occupancy request. Submit a Loft Board Request Loft Board requests are always submitted in conjunction with a job filing (including Elevator applications). Once the job filing is submitted, a Loft Board request is required to be added to the filing for review. • Go to the Loft Board tab and select +Add to create a new Loft Board request. • The request is auto populated with the information entered on the job filing. • The type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an interim multiple dwelling (IMD) unit? Answer Work Location Process Yes In or affecting an IMD unit File for Loft Board Certification and include a Narrative Statement No In a commercial unit and does not affect an IMD Unit Request a Letter of No Objection from the Loft Board • Answer the questions about the IMD or Commercial units on the Scope of Work tab. • Complete all required sections, including the Documents and S ignatures & Statement tabs. Select Save and Submit the request for review. DOB NOW Training The NYC Department of Buildings is conducting free training sessions to explain the new process and demonstrate how to navigate Loft Board requests in DOB NOW: Build. Visit the DOB NOW Training Page at nyc.gov/dobnowtraining to regist er for training and to access user manuals and training videos. For additional assistance, submit an inquiry nyc.gov/dobnowhelp.",
+                "verbatimText": "Yegal Shamash , PE, Acting Commissioner nyc.gov/buildings\nbuild safe | live safe\nJanuary 8 , 20 2 6\nSERVICE NOTICE\nJune 2010 Loft Board Requests in DOB NOW : Build\nStarting on February 2 , 2026, Loft Board requests will be submitted in\nDOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property\nProfile will not be approved until a Loft Board Request has been submitted\nfor review and a Letter of No Objection (LNO) or a Loft Board Certification has\nbeen issued. The Loft Board will also review Certificate of Occupancy request .\nSubmit a Loft Board Request\nLoft Board requests are always submitted in conjunction with a job filing (including Elevator\napplications). Once the job filing is submitted, a Loft Board request is required to be added to the\nfiling for review .\n• Go to the Loft Board tab and select +Add to create a new Loft Board request.\n• The request is auto populated with the information entered on the job filing.\n• The type of Loft Board submission will depend on the answer to the new question, Will the\nproposed work take place in, or affect, an interim multiple dwelling (IMD) unit?\nAnswer Work Location Process\nYes In or affecting an IMD unit File for Loft Board Certification and include a\nNarrative Statement\nNo\nIn a commercial unit and\ndoes not affect an IMD\nUnit\nRequest a Letter of No Objection from the Loft\nBoard\n• Answer the questions about the IMD or Commercial units on the Scope of Work tab.\n• Complete all required sections, including the Documents and S ignatures & Statement tabs.\nSelect Save and Submit the request for review .\nDOB NOW Training\nThe NYC Department of Buildings is conducting free training sessions to explain the new process\nand demonstrate how to navigate Loft Board requests in DOB NOW: Build . Visit the DOB NOW\nTraining Page at nyc.gov/dobnowtraining to regist er for training and to access user manuals\nand training videos.\nFor additional assistance, submit an inquiry nyc.gov/dobnowhelp .",
+                "heading": "PDF page 1",
+                "intro": "",
+                "contentHash": "3f59cec0e8946db320a73934029ba31b14e0216b277916dee24cd5e5a941dfe5",
+                "pageNumber": 1,
+                "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1"
+              }
+            ],
+            "sourceContentHash": "3f59cec0e8946db320a73934029ba31b14e0216b277916dee24cd5e5a941dfe5",
+            "sourceValidation": "official_pdf",
+            "pageCount": 1,
+            "textlessPages": [],
+            "extractionLimitations": [
+              "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+            ],
+            "claim": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1) — Yegal Shamash, PE, Acting Commissioner nyc.gov/buildings build safe | live safe January 8, 20 2 6 SERVICE NOTICE June 2010 Loft Board Requests in DOB NOW: Build Starting on February 2, 2026, Loft Board requests will be submitted in DOB NOW: Build. Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certification has been issued. The Loft Board will also review Certificate of Occupancy request. Submit a Loft Board Request Loft Board requests are always submitted in conjunction with a job filing (including Elevator applications). Once the job filing is submitted, a Loft Board request is required to be added to the filing for review. • Go to the Loft Board tab and select +Add to create a new Loft Board request. • The request is auto populated with the information entered on the job filing. • The type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an interim multiple dwelling (IMD) unit? Answer Work Location Process Yes In or affecting an IMD unit File for Loft Board Certification and include a Narrative Statement No In a commercial unit and does not affect an IMD Unit Request a Letter of No Objection from the Loft Board • Answer the questions about the IMD or Commercial units on the Scope of Work tab. • Complete all required sections, including the Documents and S ignatures & Statement tabs. Select Save and Submit the request for review. DOB NOW Training The NYC Department of Buildings is conducting free training sessions to explain the new process and demonstrate how to navigate Loft Board requests in DOB NOW: Build. Visit the DOB NOW Training Page at nyc.gov/dobnowtraining to regist er for training and to access user manuals and training videos. For additional assistance, submit an inquiry nyc.gov/dobnowhelp."
+          },
+          {
+            "id": "dob-build-release-notes",
+            "title": "DOB NOW: Build release notes",
+            "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+            "publisher": "NYC Department of Buildings",
+            "catalogReviewedOn": "2026-09-08",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "controlling": false,
+            "attributedClaims": [
+              {
+                "id": "official-passage-fec304803330bcf0cafe2f48",
+                "text": "[PDF page 19](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=19) — February 2026 - Loft Board Requests in DOB NOW: Build Loft Board Request are to be submitted in DOB NOW: Build. Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certi fic ation has been issued. The Loft Board will also review Certificate of Occupancy request. The type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an interim multiple dwelling (IMD) unit? Visit the DOB NOW Training Page at https://nyc.gov/dobnowtraining for training manuals and step - by - step guides.",
+                "verbatimText": "February 2026 - Loft Board Requests in DOB NOW: Build\nLoft Board Request are to be submitted in DOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property Profile will not\nbe approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certi fic ation\nhas been issued. The Loft Board will also review Certificate of Occupancy request.\nThe type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an\ninterim multiple dwelling (IMD) unit?\nVisit the DOB NOW Training Page at https://nyc.gov/dobnowtraining for training manuals and step - by - step guides.",
+                "heading": "PDF page 19",
+                "intro": "",
+                "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+                "pageNumber": 19,
+                "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=19"
+              }
+            ],
+            "sourceContentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+            "sourceValidation": "official_pdf",
+            "pageCount": 159,
+            "textlessPages": [],
+            "extractionLimitations": [
+              "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+            ],
+            "claim": "[PDF page 19](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=19) — February 2026 - Loft Board Requests in DOB NOW: Build Loft Board Request are to be submitted in DOB NOW: Build. Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certi fic ation has been issued. The Loft Board will also review Certificate of Occupancy request. The type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an interim multiple dwelling (IMD) unit? Visit the DOB NOW Training Page at https://nyc.gov/dobnowtraining for training manuals and step - by - step guides."
+          }
+        ],
+        "citations": [],
+        "officialGuidanceSummary": {
+          "version": "20260908-document-summary-v1",
+          "answerSHA256": "58abeae72dc99b61d000d4304eb164fcb24d072e3e45784c39f9c5635e0b24b7",
+          "verificationInputSHA256": "17333f44090849afb8f3a462918ca0e78c43d139541319208c701262920b4629",
+          "verification": {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        },
+        "evidenceSectionIDs": [
+          "8961",
+          "7870",
+          "9364",
+          "179",
+          "9307",
+          "1776",
+          "176",
+          "9046",
+          "8983",
+          "178",
+          "113",
+          "8925",
+          "7922",
+          "9361"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:8961-1",
+          "research-permitext_discovered-id:7870-2",
+          "research-permitext_discovered-id:9364-3",
+          "research-permitext_discovered-id:179-4",
+          "research-permitext_discovered-id:9307-5",
+          "research-permitext_discovered-id:1776-6",
+          "research-permitext_discovered-id:176-7",
+          "research-permitext_discovered-id:9046-8",
+          "research-permitext_discovered-id:8983-9",
+          "research-permitext_discovered-id:178-10",
+          "research-permitext_discovered-id:113-13",
+          "research-permitext_cross_reference-id:8925-1",
+          "research-permitext_cross_reference-id:7922-3",
+          "research-permitext_cross_reference-id:9361-12"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 14,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 0,
+          "governingCitationCount": 0,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 14,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 11,
+          "crossReferenceCount": 3,
+          "supportingWebSourceCount": 2,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 0,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 0
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [],
+          "generalRules": [],
+          "exceptions": [],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [],
+          "crossReferences": [],
+          "tables": [],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260908-negative-work-premise-v6",
+          "activeRootTopic": "Context: DOB NOW workflow The DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit. How should the IMD-impact question be answered, and what approval boundary follows?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Context: DOB NOW workflow The DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit. How should the IMD-impact question be answered, and what approval boundary follows?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [],
+          "supportedPointEvidenceSourceIDs": [],
+          "citedEvidenceSourceIDs": [],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8961-1",
+            "research-permitext_discovered-id:7870-2",
+            "research-permitext_discovered-id:9364-3",
+            "research-permitext_discovered-id:179-4",
+            "research-permitext_discovered-id:9307-5",
+            "research-permitext_discovered-id:1776-6",
+            "research-permitext_discovered-id:176-7",
+            "research-permitext_discovered-id:9046-8",
+            "research-permitext_discovered-id:8983-9",
+            "research-permitext_discovered-id:178-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:8925-1",
+            "research-permitext_cross_reference-id:7922-3",
+            "research-permitext_cross_reference-id:9361-12"
+          ],
+          "claims": []
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 0,
+          "coveredClaimCount": 0,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [],
+          "claims": []
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260909-dining-percentage-domain-v29",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:8961-1",
+            "research-permitext_discovered-id:7870-2",
+            "research-permitext_discovered-id:9364-3",
+            "research-permitext_discovered-id:179-4",
+            "research-permitext_discovered-id:9307-5",
+            "research-permitext_discovered-id:1776-6",
+            "research-permitext_discovered-id:176-7",
+            "research-permitext_discovered-id:9046-8",
+            "research-permitext_discovered-id:8983-9",
+            "research-permitext_discovered-id:178-10",
+            "research-permitext_discovered-id:113-13",
+            "research-permitext_cross_reference-id:8925-1",
+            "research-permitext_cross_reference-id:7922-3",
+            "research-permitext_cross_reference-id:9361-12"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 0,
+            "citedProvisionCount": 0,
+            "governingCitationCount": 0,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 14,
+            "reviewedOnlyProvisionCount": 14,
+            "assembledSourceCount": 14,
+            "assembledProvisionCount": 14
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:8961-1",
+              "sectionID": "8961",
+              "reference": "AC 28-104.8.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.8.2 § 28-104.8.2 Owner statements. The application shall contain a signed statement by the owner, and, in the case of cooperative or condominium forms of ownership, the application shall also contain a statement by the cooperative or condominium board, affirming that the applicant is authorized to make the application and, if applicable, acknowledging that construction and related documents will be accepted with less than full examination by the department based on the professional certification of the applicant. Such statement shall list the owner's full name and address, as well as the names of the principal officers, partners or other principals if a corporation, partnership or other entity. Principal officers of a corporation shall be deemed to include the president, vice presidents, secretary and treasurer. Where a current deed holder with a valid property interest or a court appointed entity or equivalent in charge of the property, or in the case of a cooperative or condominium unit, the cooperative or condominium board, notifies the department in writing that the applicant does not have authority to make the application, the department is authorized pursuant to section 28-104.2.10 to revoke approval of construction documents. In addition, the application shall contain the following: 1. A signed statement certifying whether the building to be altered, constructed or demolished contains one or more occupied dwelling units; 2. A signed statement indicating whether the building to be altered, constructed or demolished contains housing accommodations subject to rent control or rent stabilization under chapters 3 and 4 of title 26 of the administrative code or rent regulation under article 7-C of the New York state multiple dwelling law; and 3. If the building to be altered, constructed or demolished contains occupied housing accommodations subject to rent control under chapter 3 of title 26 of the administrative code, the application shall contain a signed statement indicating that the owner has notified the New York state division of homes and community renewal that the owner has complied with all requirements imposed by the regulations of such agency as preconditions for such filing; or that the owner has not notified such agency because the nature and scope of the work proposed, pursuant to such regulations, does not require notification; or, if the building is subject to article 7-C of the New York state multiple dwelling law, the application shall contain a signed statement indicating that the owner will notify the loft board of the filing of the construction documents and will comply with all requirements imposed by New York state multiple dwelling law article 7-C and the loft board's rules. (Am. L.L. 2019/106, 6/8/2019, eff. 3/8/2020; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:7870-2",
+              "sectionID": "7870",
+              "reference": "BC U101.1.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "calculation_table",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "U101.1.1 U101.1.1 Multiple dwelling law. Where the ADU is located within the same building as the primary dwelling, and the total number of dwelling units of such building exceeds 2, the entire building shall be classified as Group R-2 occupancy and comply with all applicable requirements of Group R-2 occupancy in this code and the New York State Multiple Dwelling Law as applicable, except for basement and cellar units in the program area pursuant to Section U202.12. Buildings constructed as Type V construction may not be converted or altered to a three-family dwelling, except for eligible conversions made habitable pursuant to U202.12."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9364-3",
+              "sectionID": "9364",
+              "reference": "AC 28-210.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-210.3 § 28-210.3 Illegal conversions of dwelling units from permanent residences. Except as otherwise provided in subdivision 16 of section 67 of the New York state multiple dwelling law and section 120 of the New York state multiple dwelling law, dwelling units within (i) a class A multiple dwelling as defined in section 27-2004 of the administrative code, (ii) occupancy group J-2 as described in section 27-265 of the administrative code or (iii) occupancy group R-2 as described in section 310.4 of the New York city building code shall be used only for permanent residence purposes as required pursuant to subparagraph a of paragraph 8 of subdivision a of section 27-2004 of the administrative code. It shall be unlawful for any person or entity who owns or occupies a multiple dwelling or dwelling unit classified for permanent residence purposes to use or occupy, offer or permit the use or occupancy or to convert for use or occupancy such multiple dwelling or dwelling unit for other than permanent residence purposes. For the purposes of this section a conversion in use of a dwelling unit may occur irrespective of whether physical changes have been made to such dwelling unit. The provisions of this section shall not be construed to prohibit lawful accessory uses permitted pursuant to the zoning resolution or the lawful conversion of dwellings in accordance with applicable law. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2012/045 and L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:179-4",
+              "sectionID": "179",
+              "reference": "BC 310.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "310.4 310.4 Residential Group R-2. Residential Group R-2 occupancies shall include buildings or portions thereof containing sleeping units or more than two dwelling units that are occupied for permanent residence purposes as defined in subparagraph (a) of paragraph 8 of subdivision a of Section 27-2004 of the New York City Housing Maintenance Code . Such occupancy shall be subject to the New York State Multiple Dwelling Law . This group shall include, but not be limited to, the following: Adult homes or enriched housing with 16 or fewer occupants requiring supervised care on a 24-hour basis in the same building, provided that the number of occupants per dwelling unit does not exceed the definition of a family Apartment houses Apartment hotels (nontransient) Class A multiple dwellings as defined in Section 27-2004 of the New York City Housing Maintenance Code and Section 4 of the New York State Multiple Dwelling Law , where not classified in Group I, including the following: 1. Dwelling units where the resident of the unit provides custodial care to no more than four persons on less than a 24-hour basis and not overnight, where not classified in Group I. 2. Dwelling units where the resident of the unit provides child custodial care as a family day care home registered with the New York City Department of Health and Mental Hygiene in accordance with the New York State Social Services Law , with no more than six children between the ages of 2 and 13, or with no more than five children if any are under the age of 2, receiving supervised care on less than a 24-hour basis and not overnight, where not classified in Group I. Convents and monasteries with more than 20 occupants in the building Student apartments (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9307-5",
+              "sectionID": "9307",
+              "reference": "AC 28-204.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-204.6 § 28-204.6 Enforcement of environmental control board judgments as a tax lien. Notwithstanding any provision of law to the contrary, environmental control board judgments for certain building code violations shall be entered against the owner and enforced as a tax lien against the property, as provided below. An environmental control board judgment against an owner for a building code violation with respect to (i) a private dwelling, a wooden-framed single room occupancy multiple dwelling, or a dwelling with a legal occupancy of three or fewer dwelling units,(ii) a violation of section 28-210.1 involving the illegal conversion, maintenance or occupancy of three or more dwelling units than are legally authorized by the certificate of occupancy or if no certificate of occupancy is required as evidenced by official records, (iii) a building that contains twenty or more dwelling units, or that contains any space classified in an occupancy group other than occupancy group R, where the total value of all such judgments against such building is $60,000 or more, or (iv) a building that contains only space classified in occupancy group R and no fewer than six and no more than nineteen dwelling units, where the total value of all such judgments against such building is $30,000 or more, shall result in a tax lien being entered against the property named in the violation for which such judgment was rendered, as hereinafter provided. Exception: Notwithstanding any provision of law to the contrary, an environmental control board judgment shall not constitute a tax lien on the property named in the violation with respect to which such judgment was rendered where: 1. Such property was the subject of an in rem foreclosures judgment in favor of the city and was transferred by the city to a third party pursuant to section 11-412.1 of the administrative code within five years of such judgment. 2. Such property is the subject of a court order appointing an administrator pursuant to article 7-A of the New York state real property actions and proceedings law in a case brought by the department of housing preservation and development. 3. Such property is the subject of a loan provided by or through the department of housing preservation and development or the New York city housing development corporation for the purpose of rehabilitation that had closed within five years before such judgment. (Am. L.L. 2017/094, 5/30/2017, eff. 9/27/2017; Am. L.L. 2017/153, 8/30/2017, eff. 12/28/2017; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:1776-6",
+              "sectionID": "1776",
+              "reference": "BC 907.2.9",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "907.2.9 907.2.9 Group R-2. A fire alarm system without alarm notification appliances and smoke alarms shall be installed in accordance with this section in Group R-2 occupancies, other than student apartments, where such occupancy satisfies any one of the following conditions: 1. Any dwelling unit is located three or more stories above the lowest level of exit discharge, including dwelling units in penthouses of any area; 2. Any dwelling unit is located more than one story below the highest level of exit discharge of exits serving the dwelling unit; or 3. The building contains more than 16 dwelling units. Actuation of smoke detectors shall not initiate a signal to alarm notification appliances. The activation of any detector required by this section shall initiate a signal at a central supervising station or a constantly attended location. Smoke detectors shall be located as follows: 1. In each mechanical equipment, electrical, transformer, telephone equipment or similar room. 2. In air distribution systems in accordance with Section 606 of the New York City Mechanical Code. 3. In elevator machine rooms and in elevator lobbies."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:176-7",
+              "sectionID": "176",
+              "reference": "BC 310.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "310.1 310.1 Residential Group R. Residential Group R includes, among others, the use of a building or structure, or a portion thereof, for dwelling or sleeping purposes when not classified as an Institutional Group I. Buildings containing 3 or more dwelling units shall be subject to the New York State Multiple Dwelling Law. Residential occupancies shall be classified as Groups R-1, R-2, or R-3."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9046-8",
+              "sectionID": "9046",
+              "reference": "AC 28-107.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-107.3 § 28-107.3 Covered categories of work. Applications for the approval of construction documents for the following categories of work are covered by this article: 1. Demolition of a single room occupancy multiple dwelling; 2. Alteration of a single room occupancy multiple dwelling to a class A multiple dwelling to be used in whole or in part for other than single room occupancy purposes; 3. Alteration of a single room occupancy multiple dwelling resulting in the removal or addition of kitchen or bathroom facilities; and 4. Such other types of alteration work to a single room occupancy multiple dwelling as shall be prescribed by rule of the commissioner of housing preservation and development, in consultation with the commissioner. Exceptions: 1. Work solely for the purpose of either (i) making the public areas of a multiple dwelling accessible to persons with disabilities without altering the configuration of any dwelling unit or rooming unit or (ii) making the interior or the entrance to a dwelling unit or a rooming unit accessible to persons with disabilities shall not be covered by this article. 2. Repairs, demolition or any other work performed by a city agency or by a contractor pursuant to a contract with a city agency shall not be covered by this article."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8983-9",
+              "sectionID": "8983",
+              "reference": "AC 28-105.1.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.1.4 § 28-105.1.4 Denial of permits for false statements on applications for construction document approval. The commissioner shall not issue a permit for an occupied building for at least one year following the date of a determination by the commissioner that a false statement about the occupancy status of such building has been made in an application for construction document approval. Such denial shall not apply where a dwelling unit within such multiple dwelling is owned as a condominium or held by a shareholder of a cooperative corporation under a proprietary lease. Exceptions: 1. Where the issuance of such permit is necessary to correct an outstanding violation of this code, the New York city housing maintenance code or any other applicable provisions of law or rule. 2. Where the issuance of such permit is necessary to perform work to protect public health and safety. 3. For a portion of a property occupied by a tenant who is not an owner of such property or responsible for any existing violations in such property. 4. Where a property was the subject of an in rem foreclosure judgment in favor of the city and was transferred by the city to a third party pursuant to section 11-412.1 of the administrative code. 5. Where a property is the subject of a court order appointing an administrator pursuant to article 7-A of the New York state real property actions and proceedings law in a case brought by the department of housing preservation and development. 6. Where a property is the subject of a loan provided by or through the department of housing preservation and development or the New York city housing development corporation for the purpose of rehabilitation that has closed within the five years preceding the application for such permit. 7. For a property where the department of housing preservation and development or the New York city housing development corporation notifies the commissioner that the permit is required in connection with the implementation of a program of such department or corporation. (L.L. 2019/114, 6/8/2019, eff. 12/5/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:178-10",
+              "sectionID": "178",
+              "reference": "BC 310.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "310.3 310.3 Residential Group R-1. Residential Group R-1 occupancies shall include: 1. Residential buildings or spaces occupied, as a rule, transiently, for a period less than 30 days, as the more or less temporary abode of individuals or families who are lodged with or without meals, including, but not limited to, the following: Class B multiple dwellings as defined in Section 27-2004 of the New York City Housing Maintenance Code and Section 4 of the New York State Multiple Dwelling Law , where not classified in Group I-1. Club houses Hotels (transient) Motels (transient) Rooming houses (boarding houses – transient) Settlement houses Vacation timeshares 2. College or school student dormitories, except for student apartments classified as an R-2 occupancy 3. Congregate living units owned and operated by a government agency or not-for-profit organization, where the number of occupants in the dwelling unit exceeds the limitations of a family as defined, including, but not limited to, the following: Adult homes or enriched housing with 16 or fewer occupants requiring supervised care within the same building on a 24-hour basis Fraternity and sorority houses Homeless shelters (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-13",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ALARM NOTIFICATION APPLIANCE. A fire alarm system component such as a bell, horn, speaker, light or text display that provides audible, tactile or visible outputs, or any combination thereof. CONGREGATE LIVING UNIT. A dwelling unit, comprised of one or more habitable rooms separated by nonrated partitions, occupied or arranged to be occupied by more than one family or by persons who are not maintaining a common household. Creation of or conversion to such unit shall be subject to Section 27-2077 of the New York City Housing Maintenance Code. CONSTANTLY ATTENDED LOCATION. A designated location at a facility staffed by trained personnel on a continuous basis where alarm or supervisory signals are monitored and facilities are provided for notification of the Fire Department of other emergency services. DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling. EXIT DISCHARGE. That portion of a means of egress system between the termination of an exit and a public way. SLEEPING UNIT. A dwelling unit, which may contain either toilet or kitchen facilities but not both. Any sleeping unit housing more than one family shall also be classified as a congregate living unit. The creation of or conversion to sleeping units shall be limited by Section 27-2077 of the New York City Housing Maintenance Code . SMOKE ALARM. A single- or multiple-station alarm responsive to smoke and not connected to a fire alarm system. See \"Multiple-station smoke alarm\" and \"Single-station smoke alarm.\" SMOKE DETECTOR . A listed device that senses visible or invisible particles of combustion or smoke ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8925-1",
+              "sectionID": "8925",
+              "reference": "AC 28-104.2.10",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.2.10 § 28-104.2.10 Revocation of approval. The commissioner may, on notice to the applicant, revoke the approval of construction documents for failure to comply with the provisions of this code or other applicable laws or rules; or whenever there has been any false statement or any misrepresentation as to a material fact in the submittal documents upon the basis of which such approval was issued; or whenever an approval has been issued in error and conditions are such that approval should not have been issued. Such notice shall inform the applicant of the reasons for the proposed revocation and that the applicant has the right to present to the commissioner or his or her representative within 10 business days of personal service or electronic delivery or 15 business days of the posting of service by mail, information as to why the approval should not be revoked. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:7922-3",
+              "sectionID": "7922",
+              "reference": "BC U202.12",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "U202.12 U202.12 Special requirements for certain basement or cellar ADUs. The department may issue an authorization for temporary residence in accordance with Article 507 of Chapter 5 of Title 28 of the Administrative Code. An eligible basement or cellar residence in the program area shall comply with the provisions of such article and the rules of the department. (L.L. 2024/127, 12/18/2024, eff. 6/16/2025) Section BC U203: ADU Separated by a Fire Wall from a Two-Family Primary Dwelling"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9361-12",
+              "sectionID": "9361",
+              "reference": "AC 28-210.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-210.1 § 28-210.1 Illegal residential conversions. It shall be unlawful, except in accordance with all requirements of this code, to convert any dwelling for occupancy by more than the legally authorized number of families or to assist, take part in, maintain or permit the maintenance of such conversion. Upon the finding of such violation and the imposition of punishment for such violation as set forth in this code the department or if applicable the environmental control board shall forward to the internal revenue service, the New York state department of taxation and finance and the New York city department of finance the name and address of the respondent or defendant, the address of the building or structure with respect to which the violation occurred and the time period during which the violation was found to have existed."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260909-markdown-determination-boundaries-v25",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260909-pinned-table-dependencies-v34",
+          "retrievalQuery": "Context: DOB NOW workflow The DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit. How should the IMD-impact question be answered, and what approval boundary follows?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Context: DOB NOW workflow The DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit. How should the IMD-impact question be answered, and what approval boundary follows?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Context: DOB NOW workflow The DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit. How should the IMD-impact question be answered, and what approval boundary follows?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "Context: DOB NOW workflow The DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit. How should the IMD-impact question be answered, and what approval boundary follows?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": true,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260908-negative-work-premise-v6",
+          "conversationFactPromptVersion": "20260909-fact-context-v1",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 20082,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 3,
+            "topicDependencyCount": 0,
+            "characterCount": 20082,
+            "resolverFailureCount": 9,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 9,
+              "text": "9 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260909-focused-technical-v30",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260909-supporting-web-v22",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-09T09:14:52.602Z"
+          },
+          "webSupportRequested": true,
+          "webSupportReasons": [
+            "dob_workflow_requested"
+          ],
+          "allowOfficialGuidanceOnly": true,
+          "officialWorkflow": {
+            "version": "20260909-loft-stakeholder-sources-v7",
+            "topic": "loft_board_documents",
+            "retrievalMethod": "official_workflow_catalog"
+          },
+          "webSupportSearched": true,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "official_supporting_guidance",
+        "authorityLabel": "Official supporting guidance — noncontrolling",
+        "sourceAsOf": "2026-09-09T09:14:52.602Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "outside_library_support",
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "DOBNOW-016",
+      "phase": "permitext_official_guidance_summary",
+      "model": "gpt-5.6-terra",
+      "requestBytes": 15504,
+      "maxOutputTokens": 2200,
+      "requestSHA256": "b4a3dba14a8c8dd376ea0a7605e7460e2f1edbbc522dbe9daf1811b60ea8c780",
+      "rawRequestSHA256": "419e05d5a1f1b28021f2098171970321a4efd34611268e3cd32a552de4ee16d2",
+      "startedAt": "2026-09-09T09:14:55.436Z",
+      "responseHeadersMilliseconds": 7253,
+      "responseBodyReadMilliseconds": 39,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3284,
+        "input_tokens_details": {
+          "cache_write_tokens": 3281,
+          "cached_tokens": 0
+        },
+        "output_tokens": 479,
+        "output_tokens_details": {
+          "reasoning_tokens": 149
+        },
+        "total_tokens": 3763
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0c972aff358ab212016aa123934cac87d2af25fca66ecf42bf",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"paragraphs\":[{\"text\":\"Answer “Yes” to the question whether the proposed work will take place in, or affect, an interim multiple dwelling (IMD) unit. For a “Yes” answer—work in or affecting an IMD unit—the DOB NOW: Build guidance directs the filer to file for Loft Board Certification and include a Narrative Statement.\",\"sourceUses\":[{\"sourceID\":\"dob-loft-board-service-notice\",\"claimID\":\"official-passage-ffd509d49c4ae45b17b8ff3d\"}]},{\"text\":\"Because the Property Profile has a Loft Law flag, the job filing will not be approved until a Loft Board Request has been submitted for review and a Loft Board Certification has been issued. The request is submitted in conjunction with the job filing: after submitting the job filing, add the Loft Board Request to that filing, answer the IMD or commercial-unit questions on the Scope of Work tab, complete required sections including Documents and Signatures & Statement, and submit the request for review. The stated approval boundary is job-filing approval; the guidance does not say that the Loft Board Certification itself authorizes the proposed work.\",\"sourceUses\":[{\"sourceID\":\"dob-loft-board-service-notice\",\"claimID\":\"official-passage-ffd509d49c4ae45b17b8ff3d\"},{\"sourceID\":\"dob-build-release-notes\",\"claimID\":\"official-passage-fec304803330bcf0cafe2f48\"}]}],\"missingFacts\":[],\"evidenceLimitations\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 7292
+    },
+    {
+      "caseID": "DOBNOW-016",
+      "phase": "permitext_official_guidance_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 18341,
+      "maxOutputTokens": 1800,
+      "requestSHA256": "2153838aef5a9b2f1c9b85ee095ba8b5e901a4446aea5f825e3cbd6bdc46585f",
+      "rawRequestSHA256": "4304fac80d96a50da5888d3c90fc3fde8fc2c9f587d9566cce18ab5e64113c12",
+      "startedAt": "2026-09-09T09:15:02.747Z",
+      "responseHeadersMilliseconds": 4448,
+      "responseBodyReadMilliseconds": 1,
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 3903,
+        "input_tokens_details": {
+          "cache_write_tokens": 3900,
+          "cached_tokens": 0
+        },
+        "output_tokens": 253,
+        "output_tokens_details": {
+          "reasoning_tokens": 229
+        },
+        "total_tokens": 4156
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0e4eb622138af319016aa1239aed3887d289695a84bbb9bf13",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 4448
+    }
+  ],
+  "documentRequests": [
+    {
+      "caseID": "DOBNOW-016",
+      "preflight": false,
+      "url": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf",
+      "startedAt": "2026-09-09T09:14:54.230Z",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "finalURL": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf",
+      "durationMilliseconds": 75
+    },
+    {
+      "caseID": "DOBNOW-016",
+      "preflight": false,
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+      "startedAt": "2026-09-09T09:14:54.574Z",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "finalURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+      "durationMilliseconds": 17
+    },
+    {
+      "caseID": "DOBNOW-016",
+      "preflight": false,
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "startedAt": "2026-09-09T09:14:55.135Z",
+      "httpStatus": 200,
+      "contentType": "application/pdf",
+      "finalURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "durationMilliseconds": 31
+    }
+  ],
+  "cumulativeConservativeSpendUSD": 7.519989,
+  "spend": {
+    "active": true,
+    "capUSD": 0.2,
+    "reservedUSD": 0.015236,
+    "actualUSD": 0.015236,
+    "requestCount": 2,
+    "pendingRequestCount": 0
+  },
+  "completedAt": "2026-09-09T09:15:07.566Z"
+}
