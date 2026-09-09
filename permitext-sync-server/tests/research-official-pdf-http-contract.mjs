@@ -37,6 +37,14 @@ Object.assign(process.env, {
 });
 const sourceURL = "https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf";
 const releaseURL = "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf";
+const guideURL = "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf";
+const guideDocument = new PDFDocument();
+const guideChunks = [];
+const guideComplete = new Promise((resolve) => { guideDocument.on("data", (chunk) => guideChunks.push(chunk)); guideDocument.on("end", () => resolve(Buffer.concat(guideChunks))); });
+guideDocument.text("Synthetic routing regression source. DOB NOW Alteration routing asks whether the work must meet New Building requirements, is inconsistent with the Certificate of Occupancy, changes occupancy or use, makes a major change to exits, or changes the number of stories. All five No responses result in the Alteration job type. This is portal guidance, not a compliance determination.");
+guideDocument.addPage().text("Synthetic review-field regression source. The DOB NOW Building Code review year selection depends on job type, filing date and work type. The address identifies the property; an address alone does not select a review year. This describes the portal field, not enacted code applicability.");
+guideDocument.end();
+const guideBytes = await guideComplete;
 const releaseDocument = new PDFDocument();
 const releaseChunks = [];
 const releaseComplete = new Promise((resolve) => { releaseDocument.on("data", (chunk) => releaseChunks.push(chunk)); releaseDocument.on("end", () => resolve(Buffer.concat(releaseChunks))); });
@@ -71,20 +79,42 @@ let corruptDocument = false;
 let rejectSummary = false;
 let summaryDoubles = 0;
 let verificationDoubles = 0;
-globalThis.fetch = async (url, options) => {
+let portalCase = null;
+let responseDoubleFailure = null;
+const responseDouble = async (url, options) => {
   if (String(url) === "https://api.openai.com/v1/responses") {
     providerDoubles += 1;
     const body = JSON.parse(options.body);
-    if (body.tools?.some((tool) => tool.type === "web_search")) return Response.json(payload);
+    if (body.tools?.some((tool) => tool.type === "web_search")) {
+      if (!portalCase) return Response.json(payload);
+      const text = "The DOB NOW application guide describes Alteration routing and the Building Code review year field.";
+      return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 50 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text, annotations: [{ type: "url_citation", start_index: 0, end_index: text.length, url: guideURL, title: "Synthetic application guide" }] }] }] });
+    }
+    if (portalCase) assert(["permitext_official_guidance_summary", "permitext_official_guidance_verification"].includes(body.text.format.name),
+      "The field-selection question must not enter general enacted-code interpretation.");
     const input = JSON.parse(body.input);
+    if (portalCase) {
+      assert.equal(input.question, question.replace(/\s+/g, " ").trim(), "Retain the complete authored question through normal HTTP whitespace normalization.");
+      if (portalCase === "DOBNOW-001") {
+        assert.equal(input.conversationFacts.unknown.length, 0);
+        assert.equal(input.conversationFacts.qualified.length, 2);
+        assert.match(body.instructions, /on the stated facts/);
+      }
+    }
     let value;
     if (body.text.format.name === "permitext_official_guidance_summary") {
       summaryDoubles += 1;
       const wetlands = /wetlands/i.test(input.question);
-      const passages = wetlands ? input.passages : input.passages.slice(0, 1);
+      const passages = portalCase ? input.passages.filter((passage) => passage.url.startsWith(guideURL) && passage.page === (portalCase === "DOBNOW-001" ? 1 : 2))
+        : wetlands ? input.passages : input.passages.slice(0, 1);
+      if (portalCase) assert.equal(passages.length, 1);
       value = {
         paragraphs: [{
           text: rejectSummary ? "The filing automatically grants the construction permit."
+            : portalCase === "DOBNOW-001"
+              ? "On the stated facts, answer No to all five routing questions; the resulting job type is Alteration."
+            : portalCase === "DOBNOW-021"
+              ? "An address alone is insufficient to select the review year. Provide the job type, filing date and work type."
             : wetlands
               ? "Submit the DEC Jurisdictional Determination. If it requires a DEC Permit, submit that permit before approval; otherwise request a waiver for the permit document."
               : replayPath
@@ -112,7 +142,12 @@ globalThis.fetch = async (url, options) => {
     return new Response(corruptDocument ? Buffer.from("invalid pdf") : bytes, { headers: { "content-type": "application/pdf" } });
   }
   if (String(url) === releaseURL) return new Response(releaseBytes, { headers: { "content-type": "application/pdf" } });
+  if (String(url) === guideURL) return new Response(guideBytes, { headers: { "content-type": "application/pdf" } });
   throw new Error(`Unexpected external request in offline contract: ${String(url)}`);
+};
+globalThis.fetch = async (...args) => {
+  try { return await responseDouble(...args); }
+  catch (error) { responseDoubleFailure = error; throw error; }
 };
 let server;
 try {
@@ -175,6 +210,24 @@ try {
   assert.equal(providerDoubles, beforeWorkflow + 4, "The wetlands workflow bypasses search but verifies its summary.");
   assert.equal(summaryDoubles, 3);
   assert.equal(verificationDoubles, 3);
+  const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json", import.meta.url)));
+  for (const id of ["DOBNOW-001", "DOBNOW-021"]) {
+    portalCase = id;
+    question = retained.results.find((item) => item.id === id).question;
+    const beforePortal = providerDoubles;
+    const response = await ask();
+    assert.equal(response.status, 200, `${JSON.stringify(response.body)}\n${responseDoubleFailure?.stack || ""}`);
+    const answer = response.body.conversation.messages.at(-1).answer;
+    assert.equal(answer.retrieval.allowOfficialGuidanceOnly, true);
+    assert.equal(answer.citations.length, 0, "Portal guidance must not acquire irrelevant enacted citations.");
+    assert.equal(answer.verification.pass, true);
+    assert.equal(providerDoubles - beforePortal, 3, "One search, one summary, one verifier; no repair calls.");
+    assert.match(answer.answerText, id === "DOBNOW-001" ? /On the stated facts/ : /address alone is insufficient/);
+    assert.equal(answer.promptVersion, "20260909-document-summary-v2");
+    assert.equal(answer.officialGuidanceSummary.version, "20260908-document-summary-v1",
+      "A prompt update must preserve the saved integrity-proof contract.");
+  }
+  portalCase = null;
   rejectSummary = true;
   question = "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?";
   const unsupported = await ask();

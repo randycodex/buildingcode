@@ -129,6 +129,7 @@ function combinedFactText({ question, projectFacts = [], conversationFactContext
     ...(Array.isArray(projectFacts) ? projectFacts : []),
     ...(Array.isArray(conversationFactContext?.established) ? conversationFactContext.established : []),
     ...(Array.isArray(conversationFactContext?.hypothetical) ? conversationFactContext.hypothetical : []),
+    ...(Array.isArray(conversationFactContext?.qualified) ? conversationFactContext.qualified : []),
     ...(Array.isArray(conversationFactContext?.unknown) ? conversationFactContext.unknown : [])
   ].filter(Boolean).join(" "));
 }
@@ -1476,6 +1477,7 @@ export function zoningResearchDeterministicContext({
   }).concat(tableLegendObligations(question, evidence), zoningTemporalApplicationObligations({
     question, evidence, facts: resolvedFactText({ question, projectFacts, conversationFactContext }),
     uncertainty: [question, ...(Array.isArray(projectFacts) ? projectFacts : []),
+      ...(Array.isArray(conversationFactContext?.qualified) ? conversationFactContext.qualified : []),
       ...(Array.isArray(conversationFactContext?.unknown) ? conversationFactContext.unknown : []).map((fact) => `Unresolved: ${fact}`)]
   }));
   const context = {

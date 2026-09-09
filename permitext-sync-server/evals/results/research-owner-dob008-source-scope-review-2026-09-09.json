@@ -1,0 +1,41 @@
+{
+  "schema": "permitext-dob008-source-scope-review-v1",
+  "checkedAt": "2026-09-09T04:29:38.802Z",
+  "caseID": "DOBNOW-008",
+  "source": {
+    "url": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf",
+    "documentUpdated": "2022-11-23",
+    "sha256": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+    "bytes": 433578,
+    "pages": 19
+  },
+  "visualReview": {
+    "pages": [
+      16,
+      17
+    ],
+    "method": "Locally rendered with pdftoppm and both full pages visually inspected.",
+    "findings": [
+      "The page 17 SSP/CS statement is a bullet within the 1-, 2-, or 3-family building discussion, below the registered General Contractor condition.",
+      "The page 16 major-building table has separate work-scope rows and role requirements; it points to Chapter 33 and Article 110 for full requirements."
+    ],
+    "notReviewed": "Other pages were not visually inspected; no complete code-applicability determination."
+  },
+  "corroboratingSources": [
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "section": "Site Safety Plans: Construction Superintendent for 1-, 2-, or 3-family buildings",
+      "finding": "The FAQ gives cumulative building-type, job-type and registered permit-holder criteria."
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf",
+      "date": "2022-10-27",
+      "finding": "The notice describes the bounded workflow change and its application to the named 2014-code jobs."
+    }
+  ],
+  "next": "Bind the applicable source scope alongside the user-guide percentage question; preserve the altered gross floor area measure and separate the form response from final SSP applicability. Reconcile the reference wording in that scope before a new live test.",
+  "answerKeyModified": false,
+  "sourceAddedToRuntimeCatalog": false,
+  "additionalPaidProviderCalls": 0,
+  "professionalApproval": false
+}

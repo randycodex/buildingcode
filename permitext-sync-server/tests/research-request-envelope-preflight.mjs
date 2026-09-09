@@ -13,6 +13,7 @@ import {
 } from "../research-config.mjs";
 import { researchEvidenceAssemblyVersion } from "../research-evidence-assembly.mjs";
 import { researchAnswerPresentationContract, researchDecisionFactInstruction } from "../research-answer-presentation.mjs";
+import { researchQualifiedFactInstruction } from "../research-conversation-facts.mjs";
 import { zoningResearchSafetyInstruction, zoningResearchSafetyPromptContext } from "../research-zoning-safety.mjs";
 import { zoningResearchPromptContext } from "../research-zoning-planner.mjs";
 import { zoningContextExcerptPrompt } from "../research-zoning-context-excerpts.mjs";
@@ -56,7 +57,7 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
     researchModelConfiguration: () => researchModelConfiguration(environment),
     researchEvidenceAssemblyVersion,
     defaultSyncCodeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
-    createHash, zoningResearchSafetyInstruction, researchAnswerPresentationContract, researchDecisionFactInstruction,
+    createHash, zoningResearchSafetyInstruction, researchAnswerPresentationContract, researchDecisionFactInstruction, researchQualifiedFactInstruction,
     researchInputForEvidence, researchInterpretationSchemaForEvidence
   };
   const buildAnswerRequest = new Function(...Object.keys(dependencies),

@@ -161,6 +161,7 @@ function materialFactText({ question, projectFacts, conversationFactContext } = 
     ...(Array.isArray(projectFacts) ? projectFacts : []),
     ...(Array.isArray(conversationFactContext?.established) ? conversationFactContext.established : []),
     ...(Array.isArray(conversationFactContext?.hypothetical) ? conversationFactContext.hypothetical : []),
+    ...(Array.isArray(conversationFactContext?.qualified) ? conversationFactContext.qualified : []),
     ...(Array.isArray(conversationFactContext?.unknown) ? conversationFactContext.unknown : [])
   ].filter(Boolean).join(" "));
 }

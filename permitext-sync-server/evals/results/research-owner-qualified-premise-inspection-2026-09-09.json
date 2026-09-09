@@ -1,0 +1,1217 @@
+{
+  "schema": "permitext-owner-qualified-premise-inspection-v1",
+  "checkedAt": "2026-09-09T04:23:02.443Z",
+  "baselineCommit": "8fb342f94",
+  "sourceHashes": [
+    {
+      "file": "app.mjs",
+      "sha256": "49199afdf9eaf2f02df3f28ae7b1d3e34f66ca468c8d62091a6c5be5d75b313b"
+    },
+    {
+      "file": "research-conversation-facts.mjs",
+      "sha256": "67ec6ab2e04908151af796b1a08d2ebd9bdc58bdfb7a748642efb83dd9068ef2"
+    },
+    {
+      "file": "research-dob-workflow-routing.mjs",
+      "sha256": "93c5cd96cf02b6f23db14e9aafded3508570d5e6b777e2b4b0205835e2cbc296"
+    },
+    {
+      "file": "research-source-policy.mjs",
+      "sha256": "2b199954c651176736a709e5d869fcb96e0ec8310fda268fb878f41cc3a11872"
+    },
+    {
+      "file": "research-official-guidance-summary.mjs",
+      "sha256": "b48d26f0f5d9cd1558304e47c9d88c95147ae0a10e2cf9a7eb32ecbd9afdea81"
+    },
+    {
+      "file": "research-answer-presentation.mjs",
+      "sha256": "f8f3853d4441d4940de0bf222104dce0ee81a1e91e450b3e08dfdb02ff6049ba"
+    },
+    {
+      "file": "research-zoning-planner.mjs",
+      "sha256": "d074655085581a9f6dd443f258c597da7f2da1d35e34c437758eb5473883b7e5"
+    },
+    {
+      "file": "research-zoning-safety.mjs",
+      "sha256": "23bada6715261d6c9e33beb23f8f53987cc16e33c9e31094454421354bb8a9f2"
+    },
+    {
+      "file": "evals/research-reconciled-answer-key.json",
+      "sha256": "6d35f43026bf02c3588498fb5f6d7e041a763d90a5ea4675ffd9fbc48888ba12"
+    },
+    {
+      "file": "evals/results/research-owner-code-source-review-2026-09-08.json",
+      "sha256": "5008eac9f2adc2a4de7b98d08567e515055a3ad59ebf243451b010ec697c5f7f"
+    }
+  ],
+  "priorCostAudit": {
+    "file": "evals/results/research-owner-api-round2-dob-source-coverage-cost-audit-2026-09-09.json",
+    "sha256": "0a71667580b9e3e5688158eb0195c681f08746d60812944a1667b012e1d4872e"
+  },
+  "scope": "Offline representation and routing comparison over all 110 authored questions; no new answer-quality or live-latency finding.",
+  "summary": {
+    "cases": 110,
+    "pins": 47,
+    "exactSelections": 8,
+    "storedStatesChanged": 0,
+    "sourceQuestionsOrReferencesChanged": 0,
+    "casesWithQualifiedStatements": 10,
+    "routingChanges": [
+      "DOBNOW-021"
+    ],
+    "networkAttempts": 0,
+    "newProviderCalls": 0,
+    "liveProviderAttemptedCases": 91,
+    "remainingUnattemptedCases": [
+      "ZR-03",
+      "ZR-06",
+      "ZR-09",
+      "ZR-19",
+      "ZR-20",
+      "DOBNOW-003",
+      "DOBNOW-004",
+      "DOBNOW-006",
+      "DOBNOW-010",
+      "DOBNOW-011",
+      "DOBNOW-012",
+      "DOBNOW-013",
+      "DOBNOW-014",
+      "DOBNOW-015",
+      "DOBNOW-016",
+      "DOBNOW-017",
+      "DOBNOW-022",
+      "DOBNOW-023",
+      "DOBNOW-024"
+    ],
+    "remainingConservativeAuthorizationUSD": 2.582443
+  },
+  "results": [
+    {
+      "id": "CC-01",
+      "inputSHA256": "220d84923d58c28bd18005504837ac52fd9e204052f24af2a21083a49ad2c5dd",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "CC-02",
+      "inputSHA256": "a906f35bfafb4eeff9f65dba51df3d12e8aca111b47c237a5db9f3b12e9fcbb7",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "We are designing a six-story residential building with approximately 1,950 square feet on each story."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 2,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "CC-03",
+      "inputSHA256": "b0ef28ca4d868c69103960ecc3055839fef48b557f395125909a0d396f3f866c",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "CC-04",
+      "inputSHA256": "494083aa1cc30eed1414873b901704cea4706d830eb7fd4c414acf7a203cdc01",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "CC-05",
+      "inputSHA256": "fde91613c682799238433de4b23b245cbe60231337591bbc5ef634581a4bc28b",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-01",
+      "inputSHA256": "493cfa89342b223eac2eda1047388956fd667452ddad193abbbce9e1c865fcb0",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-02",
+      "inputSHA256": "3e3869b33fdfbc7593abb68ed8cc0abe24493bf6db0d34c467385d0c240fe9a7",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [
+        "Qualified user statement; do not infer an unqualified fact: Using only the selected table, summarize how Use Group I allowances differ across M1, M2, and M3 districts and explain the table symbols."
+      ],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-03",
+      "inputSHA256": "98b25e17083b1ec7beca9a5d94072cc89db6409f3be51c6ae5612952f8f1770c",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-04",
+      "inputSHA256": "fcac143a86f5cd072ca2a9dcf935e3593360d9539f33cd10597986f068c1a2bc",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-05",
+      "inputSHA256": "f4cb3b9f53534ff845962746c7eade46a3cab446c240106138dc3c447c8d9861",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-06",
+      "inputSHA256": "3fa70b15d9febe7d7d05102c8f7db199350747b8e2788f3801538039284b985f",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-07",
+      "inputSHA256": "5fcc4f363aa30b6b3ee1d496c834ee9271eedaff47b3eecc5ef00f92155e3cdf",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-08",
+      "inputSHA256": "822dbb7b3da8e20d299e63c292de981153eb48bbc04a805861f3894b1b0589c7",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-09",
+      "inputSHA256": "2a988abd132792a81e4104ea4ce3d9c61ea56b1df51c66079d5c317c599a60c4",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-10",
+      "inputSHA256": "8777b3d4e1d6da63f697ae1cd06bdf9bbe589a9e854809d1f5083fe446da5dd6",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-11",
+      "inputSHA256": "5e3bcf4cc7e2e99244b95de2ed4cd101b7798d182f5586cd39e60f39899d08db",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-12",
+      "inputSHA256": "7492e120892a71f4528120959248a148d45755c00bae85ab984aed75d42251d1",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-13",
+      "inputSHA256": "a17cbe13280fa26ce9a3a717d4f32374b528835058fb32f5de58c24194f7b3d3",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-14",
+      "inputSHA256": "f0bed626422e13a0bf8870cf20d35e9afdb94b6a37d5c986506f61869568f9ff",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "Two separate apartment buildings containing more than three dwelling units each are proposed on the same zoning lot, do not connect at any level, are below 125 feet, and are 30 feet apart."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-15",
+      "inputSHA256": "db55f664247fb1caf7a12d7d7cf1d845a4bda7a2e6cd97e102e4569a399e49d8",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-16",
+      "inputSHA256": "c5278db259385dc8b5aede97d363f05daa1e9d805b635e9d2de56be9b1212351",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-17",
+      "inputSHA256": "d36cee85c04c7abb76a6addb287a2fe5087e46d8b11847635f7e9305e81f33af",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-18",
+      "inputSHA256": "69c3e87b7fbed165b6850c1134ce1cd1c30ec5588a55d561f567c9aa3cd1d737",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-19",
+      "inputSHA256": "cbe137fe86be80a9f03d4eb2bf95f04e45e0eac5b49d3fd27ba7a6a7e1632ce0",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-20",
+      "inputSHA256": "88fcfb02683d0a05b4450b076d775d94bed04a1e54ff18addcb29afb40add985",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "ZR-21",
+      "inputSHA256": "78c1e6d1c6f1fcbd7a5079fc859c00763978859108d85f3166cfa830626afe45",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "DOBNOW-001",
+      "inputSHA256": "4cd643ac879632820aa66d55ba8afcd692c2d67d9e9aea087e5d723623515879",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "Context: DOB NOW workflow The proposed interior renovation does not require the alteration to meet New Building requirements.",
+        "It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 4,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-002",
+      "inputSHA256": "a234fa9933a8cda1d2ea3a5390f170840160a9068abc2eb501e3a6eb74f64acd",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "Context: DOB NOW workflow A reconstruction otherwise resembles a new building, but a portion of the existing foundation will remain in place and become part of the completed building."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-003",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-004",
+      "inputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": false,
+      "guidanceOnlyAfter": false
+    },
+    {
+      "id": "DOBNOW-005",
+      "inputSHA256": "6ec0e535ece5afc5a256b75f978ebfe24016aa17a99fce990cf6c070e12a17fa",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-006",
+      "inputSHA256": "30f752164ffaa6cd9862b763c580bf220adafd21651ea9d20f1680ea6aff8698",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-007",
+      "inputSHA256": "fcb231ddb4605d3975d20cc3c4f1d20684a5b6f42eb0da6cf1d41f93628a8b4b",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-008",
+      "inputSHA256": "d33c19c69ab1f6fb5981386eadcf5c1cd65c58f7f5b67258492f365ffe884815",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-009",
+      "inputSHA256": "37fc2427c29161fc419702e0d0b81cc516986f46dc4c1409eae68c29d8837690",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-010",
+      "inputSHA256": "00c7df7639cf812e7df4c94ae0006a28b21175b965d5317863a9d16ad96faeb3",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "Context: DOB NOW workflow The plumbing work will interrupt or otherwise affect the water supply serving the building's sprinkler or standpipe system."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 2,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-011",
+      "inputSHA256": "13fc63df66732233b28a7e0781ca0e5dc12c2a5529145016571469f60491952d",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-012",
+      "inputSHA256": "fdce0b3e6b5040b5b8daca22240582b5e3f0713f736c68505845d230cb6206af",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-013",
+      "inputSHA256": "dd2377f7a8a14f78b23aafbf7037ec97a7adc04efea80db4407e1c462460dd04",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-014",
+      "inputSHA256": "6310c53162c9a125c10cb37bf94a6545c4ca249c69a750a577f9b8b1203df9c9",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-015",
+      "inputSHA256": "1b938d5b2bd20b415df3c20ef1fb533793e471ff46c050f42fcadcc540396385",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-016",
+      "inputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-017",
+      "inputSHA256": "50c015af7367d48909a1f3cda737096511939d4737f658984c4f3c77d6afe347",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-018",
+      "inputSHA256": "d735219b9bb802ca0c7021eaacd1fad207065e59cddaa6f4082fe75b6ffd8243",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-019",
+      "inputSHA256": "208c7d06f30d27f971b1410c69d19a1360efe193ab90fd480f53f3f22a79968e",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-020",
+      "inputSHA256": "bcf9e23c1414c2f06aff5870151d2f1f716074e011da2778eb0d48da75fa7611",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-021",
+      "inputSHA256": "5522267061751e82aef377a93ef8b6b8f5eab50a57a9ed9739e46e010c65c70c",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": false,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-022",
+      "inputSHA256": "4052ee13f21021b968d32c00a08095d1114c5a5d8ec780c3b85c9bcaa0fd22fc",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [
+        "Qualified user statement; do not infer an unqualified fact: Context: DOB NOW workflow The user provides a brief work description but no property restrictions, filing type, complete scope, agency approvals, or Applicant of Record certification basis."
+      ],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-023",
+      "inputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "DOBNOW-024",
+      "inputSHA256": "02ff4cc071196baa769bc8583ff0b6e4337926e237b2657883525f86014deb8c",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "Context: DOB NOW workflow The filing does not require an initial or amended Certificate of Occupancy."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": true,
+      "guidanceOnlyAfter": true
+    },
+    {
+      "id": "FGC-01",
+      "inputSHA256": "cdca6f41c1a51204276c695e8ca1eb836532b3c4c361ddd77e176e7e691f6e3a",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-02",
+      "inputSHA256": "ea13d1011d30bef9965f1d4c86403310628d5e65d59e84af0dfc506a8e36bbca",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-03",
+      "inputSHA256": "1a795ca445422c512b7418dcfa9a85cace3409d8c987cfb7c009f0026856b42d",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-04",
+      "inputSHA256": "3f6c95861926cfd121b351dacbf64656ee02414f4c7c94391e245e01dcbfab1f",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-05",
+      "inputSHA256": "f3f205b156798ed6f8ff923698de8e5b5b8db367d979ede3728c932cd69fae77",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-06",
+      "inputSHA256": "3c9343a346c3e8bbb2b9b7b4188c29967de1e1c4666deccab644e8b3b6de35be",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-07",
+      "inputSHA256": "c3ed522f6d3aeb2d370cb7f87500862f18109d9248469e8a5735e36bb97cd0b3",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-08",
+      "inputSHA256": "fd956466eb2d9069675160d6bc409b6576b0ca9508bc8e006d4dfdf39146f70d",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-09",
+      "inputSHA256": "4361de1b510c71284a6c768433d2962e4db44cc542e561595ac184569f0796ff",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-10",
+      "inputSHA256": "fdb1f5c00cda0092da8cdcbe882d2b179b1fb33239d060b916504bcd8caa2e00",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-11",
+      "inputSHA256": "038f8307710b6b0324ec6d3e441eb7b4940fa67a097e3a9b4ba8eb17bcef57e5",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-12",
+      "inputSHA256": "cc7180250aa68bf2e29dc8d410d42451b51c2817202e21e6b3f7fe8861b9bbd1",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-13",
+      "inputSHA256": "f1227c268613c1a040060a32480fca3ec7e04823766f4cf49442f34ee5040b0e",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-14",
+      "inputSHA256": "41f5c41f2adb057d5e5c0c8f747a425c9d5fde053a978ca59391de26e5e94092",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "FGC-15",
+      "inputSHA256": "333ec0d5602bc81292fd3be1a40ec1db59a9de95acecdbce63fefb767745bfe6",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-01",
+      "inputSHA256": "d60effb81376608e59a1463704885b1990bec1462d39b39323480702faac7364",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-02",
+      "inputSHA256": "cf5b1458517fda6e7dd7489734e76ce42ad92a549922fa09e7365bc45f327212",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-03",
+      "inputSHA256": "5d00ce658daba0b279fa59590639f3480ce8b60b7656165d4206f77997344dfa",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "A central system serving two dwelling units is designed to use return air from Apartment A as part of the ventilation air supplied to Apartment B."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-04",
+      "inputSHA256": "ea95bb57abc34302382b92bbad81e4884f8b2ae9ffe6a24a3e39d9cec2a2f7a4",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-05",
+      "inputSHA256": "1649561bdf0a9ce39f4c13ba07038abfd2ca62fedf7fed0a05c085dbe248e978",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-06",
+      "inputSHA256": "b9a951cb0fc5bfc249a51131502f8f43b57369f8cc38a671b82e01bf105fc299",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-07",
+      "inputSHA256": "bb718cdd38e1392c6b97eaccc4b5008a0cf934d65efd1ee6b3a7910f543bdffd",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-08",
+      "inputSHA256": "0639df82464201ad460b59d1f78f437cbdeeffc22bb642d2688fc36f6a1a6c0b",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-09",
+      "inputSHA256": "507fe315d964a751d4b9e66008989180582ca797e191a4cd21e4cabbfc54127a",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-10",
+      "inputSHA256": "3e38c1bd791f407bd2e5e6881c0e6c9709b76a215b53a64b43494f9ba9db2381",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-11",
+      "inputSHA256": "3afd0ac4549c292303046c389ca59715d8dd8cfe011ec11d17c3afcb2eafacc7",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-12",
+      "inputSHA256": "f62d445e3e6e037d7e9db8ed19b821f07f497e5cf01a2103c0164cf87f082743",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-13",
+      "inputSHA256": "be185cd980afb23f2dbf1fca8b1268a6a28c96864b9d9848a8943e59100bd1a2",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-14",
+      "inputSHA256": "260d0f2efe9d8933dd20977015891390e013b9c36bdd738d3ca0fa0e9fe24baf",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "MC-15",
+      "inputSHA256": "db058bab439a31cc71a91b6b9fcf8c9936af0ae7b3a952ad11569eca577867b8",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-01",
+      "inputSHA256": "b0550366be3c5cb3cbb61f3175144f6cc4964178a08e516174e05c37230c8477",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-02",
+      "inputSHA256": "eab94c541bdc47c4c56f91ccfbfcaf5b20626c6bd3fc95048fd38e2cfc02c9f5",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-03",
+      "inputSHA256": "786f4d5e5b5fe8d48f636d4e0536511ad7ad67b65769c33e1e48f948f9218497",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-04",
+      "inputSHA256": "7689499faef837d8f2d46436c63c0c6447252309f41a97000774d9b2d78e7cbd",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": false,
+      "guidanceOnlyAfter": false
+    },
+    {
+      "id": "GAP-05",
+      "inputSHA256": "7f09f11c062f1f19f77415fe2cfc6e46931bc35d446070a26ac7cbf4caa566e8",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [
+        "Qualified user statement; do not infer an unqualified fact: The application does not state how many units are occupied at filing or how many will remain occupied during the work."
+      ],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-06",
+      "inputSHA256": "0abe1174604be439e088918b89beef2ba039554791e0e3d142f3d01ac41d8ef8",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-07",
+      "inputSHA256": "2e1b755405a232eef0fa33a242e40f3b3c8bfc47bd0c123eff8085f9e5e45b63",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-08",
+      "inputSHA256": "d24e447e97c5d5bc2ff29275dfae6aaad12f7ad75cf073aa48e57a4c50a0da13",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": false,
+      "guidanceOnlyAfter": false
+    },
+    {
+      "id": "GAP-09",
+      "inputSHA256": "ad6040cb9e0410b4b68980584c0f53a4c2b5d39e5ddf5b4c991a3f70db092c54",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-10",
+      "inputSHA256": "a639f54c09818ffcf49aa53be263e0fdd157a08a8c812e5b53d63c1c4854ce3b",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-11",
+      "inputSHA256": "369bcfe72531397105c16efe03e5f03952d6a45251310bb0c39e3c164a7bd405",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-12",
+      "inputSHA256": "29d4a2885c2353a960a2562f6a698cc2639f45fa42edd795493c1531d9d346c2",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-13",
+      "inputSHA256": "9f7f8dd5f35938934986e1f842ceda8530ac9fa5740e263ba86390bf2f375913",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-14",
+      "inputSHA256": "701f84751f8f8fb9c4bc7bcf1eed180e1e6f706c19574d67ee4dc53a70eb3d05",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "Construction is complete and the project has passed its inspections, but the required Certificate of Occupancy has not yet been issued."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "GAP-15",
+      "inputSHA256": "9bd1ba44113017fe6fd6c553d295c26a12fbec24a9b6febf8de1f21d6701c272",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [
+        "DOB issues a stop-work order that does not identify any portion of the project as permitted to continue."
+      ],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 1,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-01",
+      "inputSHA256": "f875268eea2e4f073a1c02db0aa01ba1cc02342b1fe4610fbb2b4f48f464151a",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-02",
+      "inputSHA256": "2153718362110e26172d5d3c18ce43160308afd827e83788145df0d5498f89a5",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-03",
+      "inputSHA256": "09c3a6affdb0e5ebb6b0d9d693a0ba75fca0eebb6d8aa285a65b4d1aaea7a783",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-04",
+      "inputSHA256": "9d41ecca4caac0adb046438eafb997bf18f96dedc05f406de96f0b943a7f5e90",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-05",
+      "inputSHA256": "5784d46da5e710f6f9d81ccd3338e3161df26b8831e15c83f9b6a7419c888283",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-06",
+      "inputSHA256": "7ee33157a4fb0c10de807ca2896e47ca76fba736c6b9a1ba001db384f32dc7dd",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-07",
+      "inputSHA256": "0090d9ad56c87640cb8e7ece2d35cfa2b5f5250beb727401744499c0a702e70a",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-08",
+      "inputSHA256": "bb16b2b207c6364df58909c20aabc0a4e8bb10ee09ea9999e52015c774b9932b",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-09",
+      "inputSHA256": "3ee120d8f136881adb3f336a6a12f5b510c67389f9226577225b733e7a7ecebc",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-10",
+      "inputSHA256": "6f54cb02dc567786e865e76a29259f515079ded9d04eef43139cce8ae3b88e0a",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-11",
+      "inputSHA256": "518dda98b208a75a15cb479b02f8e3cc6ade40306c15b612493ff17fba04b595",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-12",
+      "inputSHA256": "8f78216a421ecca46d52ec5b77ac63fdd397dd178e8e748e7fec6267e4f31e6e",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-13",
+      "inputSHA256": "c3c6c16cdd26891ca3c966057480f193eb315aab3c0a5ec8b61256f8d3fa94cf",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-14",
+      "inputSHA256": "1911cae004a21de5487cc2d3f7f5573d4267d1829b07008a9c9d83159e4e6e23",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    },
+    {
+      "id": "PC-15",
+      "inputSHA256": "09402bbd1356819ce0f340f937d4595c28b0cfe39e9a2360338ad3130ea02c9f",
+      "storedStateUnchanged": true,
+      "qualifiedStatements": [],
+      "remainingUnknowns": [],
+      "previousUnknownCount": 0,
+      "guidanceOnlyBefore": null,
+      "guidanceOnlyAfter": null
+    }
+  ]
+}

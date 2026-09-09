@@ -65,7 +65,7 @@ for (const statement of [
 ]) {
   missingHistoricalText(`${historicalQuestion}, ${statement}.`);
   missingHistoricalText(`${historicalQuestion}.`, { projectFacts: [statement] });
-  for (const category of ["established", "hypothetical", "unknown"]) {
+  for (const category of ["established", "hypothetical", "qualified", "unknown"]) {
     missingHistoricalText(`${historicalQuestion}.`, { conversationFactContext: { [category]: [statement] } });
   }
 }

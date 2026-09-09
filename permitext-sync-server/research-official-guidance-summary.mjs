@@ -1,7 +1,10 @@
 import { createHash } from "node:crypto";
 import { researchOfficialGuidanceAuthorityStatement } from "./research-source-policy.mjs";
+import { researchQualifiedFactInstruction } from "./research-conversation-facts.mjs";
 
 export const researchOfficialGuidanceSummaryVersion = "20260908-document-summary-v1";
+// Prompt revisions do not invalidate integrity records for saved summaries.
+export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v2";
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 const stringList = { type: "array", maxItems: 6, items: { type: "string" } };
 const bindingKey = (sourceID, claimID) => `${sourceID}\u0000${claimID}`;
@@ -63,6 +66,7 @@ export function researchOfficialGuidanceSummaryRequest({ question, webSupport, c
       "This is official supporting guidance, not an enacted-code determination. Explain the workflow or guidance accurately without claiming that it establishes legal compliance or permit approval.",
       "Respect stated dates, new-versus-existing filing scope, cumulative conditions, exceptions, waivers, authority names, and what each approval actually authorizes. Never infer a missing table-cell relationship from flattened PDF text.",
       "Use supplied user facts as premises. Ask for a missing fact only if it changes the answer. Earlier assistant text is context, never source authority. If the passages cannot resolve the question, say exactly what remains unresolved and give the responsive guidance they do establish.",
+      ...(input.conversationFacts.qualified?.length ? [researchQualifiedFactInstruction] : []),
       verification
         ? "Independently verify every substantive sentence and its cited source/claim pair against the complete passages. A valid ID alone does not establish support. Reject an unsupported detail, changed condition, omitted material exception, wrong date or source, ungrounded Yes/No, or a claim of enacted authority. Also reject an answer that omits a requested step supplied by the document. Do not require unrelated fees, legacy filing rules, document boilerplate or other unasked topics. Return the verification schema; use existing issue types such as unsupported_requirement, missed_material_conclusion, misstated_provision or wrong_attribution."
         : "Answer the actual question directly in the opening sentence. Follow with the needed rule or workflow step, its application, and only material conditions. Use concise paragraphs or compact lists as useful. Summarize; do not paste the page or repeat its headings, footer, contact information or unrelated sections. Do not pad a narrow question with a general project checklist.",

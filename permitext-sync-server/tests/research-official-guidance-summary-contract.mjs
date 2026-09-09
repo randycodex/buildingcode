@@ -60,6 +60,18 @@ const verification = researchOfficialGuidanceSummaryRequest({ question: "Is the 
 assert.equal(JSON.parse(verification.input).proposedAnswer.paragraphs[0].text, "The permit is automatically approved.");
 assert(JSON.parse(verification.input).passages.some((passage) => /does not itself grant/.test(passage.text)));
 assert.equal(verification.text.format.name, "permitext_official_guidance_verification");
+for (const proposedAnswer of [undefined, draft]) {
+  const request = researchOfficialGuidanceSummaryRequest({
+    question: "How should the routing questions be answered?", webSupport,
+    context: { conversationFactContext: { qualified: ["The work does not change occupancy."], unknown: ["The filing date is unknown."] } },
+    model: "test-model", userID: "synthetic-user", verificationSchema: { type: "object" }, proposedAnswer
+  });
+  const facts = JSON.parse(request.input).conversationFacts;
+  assert.deepEqual(facts.qualified, ["The work does not change occupancy."]);
+  assert.deepEqual(facts.unknown, ["The filing date is unknown."]);
+  assert.match(request.instructions, /on the stated facts/);
+  assert.match(request.instructions, /Keep actual uncertainty unresolved/);
+}
 
 // A successful semantic check binds the saved prose, source passages and gaps.
 // Merely labeling an arbitrary summary as verified must not make it saveable.

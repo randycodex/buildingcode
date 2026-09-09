@@ -2,6 +2,9 @@ import { researchFactQualification } from "./research-fact-qualification.mjs";
 
 export const researchConversationFactsVersion =
   "20260908-negative-work-premise-v6";
+export const researchConversationFactPromptVersion = "20260909-fact-context-v1";
+export const researchQualifiedFactInstruction =
+  "Qualified user statements retain negation, limited scope or approximate quantities. Apply them as premises only as worded, without promoting them to broader categorical facts. They are not missing merely because they are qualified; 'on the stated facts' is a valid conditional basis. Do not infer existing from not new, or full sprinkler coverage from partial coverage. Keep actual uncertainty unresolved and request clarification only when it can change the requested decision.";
 
 export const researchConversationFactKinds = Object.freeze({
   established: "established",
@@ -506,9 +509,22 @@ export function researchConversationFactPromptContext(result) {
   const wording = (item) => item.sourceText && !item.statement.includes(item.sourceText)
     ? `${item.statement} Original user wording: ${item.sourceText}`
     : item.statement;
+  // Storage keeps these categories unresolved: "not new" cannot establish
+  // "existing", for example. The prompt must still distinguish a supplied
+  // negative/scoped assertion from an actually missing or uncertain fact.
+  // Legacy reconfirmation records and statements without original wording
+  // remain unknown; this does not reclassify or strengthen any stored fact.
+  const isQualifiedPremise = (item) =>
+    item.statement.startsWith("Qualified user statement; do not infer an unqualified fact:") &&
+    item.sourceText && !researchFactQualification(item.sourceText).hypothetical &&
+    !/^(?:using\b|based on\b|please\b|summari[sz]e\b|explain\b|quote\b|compare\b|find\b)/i.test(item.sourceText) &&
+    !/\b(?:does|do|did)\s+not\s+(?:state|provide|specify|say|establish|confirm|describe|indicate|include|give|list|show)\b|\b(?:user|owner|applicant|client)\b[^.;?]{0,60}\b(?:provides?|supplies?|gives?)\b[^.;?]{0,160}\b(?:only|no|without)\b/i.test(item.sourceText) &&
+    !/\b(?:unknown|uncertain|unsure|unconfirmed|unverified|undetermined|unresolved|unavailable|missing|tbd|may|might|possibly|probably|reportedly|apparently|seems?|appears?|claims?|asserts?|alleges?|believes?|thinks?|says?|said|reports?)\b|\bnot\s+(?:yet\s+)?(?:been\s+)?(?:known|determined|verified|confirmed|provided|supplied|established|available|sure)\b|\bto be\s+(?:determined|confirmed|verified)\b|[?"“”]/i.test(item.sourceText);
+  const unresolved = result?.unknownFacts || [];
   return {
     established: (result?.establishedFacts || []).map(wording),
     hypothetical: (result?.hypotheticalFacts || []).map(wording),
-    unknown: (result?.unknownFacts || []).map(wording)
+    qualified: [...new Set(unresolved.filter(isQualifiedPremise).map((item) => item.sourceText))],
+    unknown: unresolved.filter((item) => !isQualifiedPremise(item)).map(wording)
   };
 }

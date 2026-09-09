@@ -1,6 +1,6 @@
 // Source locations are discovery hints, never an answer key. Each document is
 // fetched and validated again before its contents may support an answer.
-export const researchDOBWorkflowRoutingVersion = "20260908-dob-form-question-sources-v2";
+export const researchDOBWorkflowRoutingVersion = "20260909-dob-review-field-sources-v3";
 const source = (id, title, filename) => Object.freeze({
   id, title, url: `https://www.nyc.gov/assets/buildings/pdf/${filename}`,
   publisher: "NYC Department of Buildings", catalogReviewedOn: "2026-09-08"
@@ -21,7 +21,14 @@ export function researchDOBWorkflowRoute(question) {
     /\b(?:answer(?:ed)?|respond|response|select)\b/i.test(text);
   if (!(bpp || dob) || !(workflow || formQuestion)) return null;
   const wetlands = /\bwetlands?\b|\bcoastal erosion\b|\bCEHA\b/i.test(text);
-  const requiresEnactedAnswer = /\b(?:FAR|floor area ratio|zoning|as[- ]of[- ]right|legal(?:ly)?|compli(?:ance|ant|es)|comply|violat(?:ion|e)|permit[- ]exempt|exempt(?:ion)? from|(?:building|plumbing|mechanical|fuel gas|construction) code|code (?:requirement|compliance)|(?:BC|PC|AC|ZR|MC|FGC)\s*(?:§|Section)?\s*\d)/i.test(text);
+  // Naming the portal's Building Code review-year field is not itself a
+  // request to determine enacted applicability. Mask only that field name;
+  // any separate legal/technical request still requires enacted evidence.
+  const reviewField = /\bBuilding Code(?:[ -]+review)?[ -]+(?:year|edition|version)\b/gi;
+  const fieldSelection = namedPortal && /\b(?:select|choose|pick|selection|field|dropdown|drop-down|option|which|what)\b/i.test(text);
+  const legalQuestion = fieldSelection ? text.replace(reviewField, "portal review field") : text;
+  const requiresEnactedAnswer = /\b(?:FAR|floor area ratio|zoning|as[- ]of[- ]right|legal(?:ly)?|compli(?:ance|ant|es)|comply|violat(?:ion|e)|permit[- ]exempt|exempt(?:ion)? from|(?:building|plumbing|mechanical|fuel gas|construction) code|code (?:requirement|compliance)|(?:BC|PC|AC|ZR|MC|FGC)\s*(?:§|Section)?\s*\d)/i.test(legalQuestion) ||
+    (legalQuestion !== text && /\b(?:govern(?:s|ing)?|appl(?:y|ies|icable|icability)|controll?ing|requires?|required|requirements?|must|mandatory|allowed|permitted|eligib(?:le|ility))\b/i.test(legalQuestion));
   const topic = bpp ? "builders_pavement" : wetlands ? "wetland_documents" : "dob_now_workflow";
   const guidanceOnly = (bpp || namedPortal) && !requiresEnactedAnswer;
   const sources = bpp ? [researchDOBWorkflowSources.buildersPavement]

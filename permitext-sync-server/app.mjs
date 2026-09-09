@@ -274,7 +274,7 @@ import {
 } from "./research-source-policy.mjs";
 import { bindResearchWebSupportToOfficialDocuments } from "./research-official-html-attribution.mjs";
 import {
-  researchOfficialGuidanceSummaryVersion,
+  researchOfficialGuidanceSummaryPromptVersion,
   researchOfficialGuidanceSummaryRequest,
   researchOfficialGuidanceSummaryInterpretation,
   researchOfficialGuidanceSummaryProof
@@ -345,7 +345,9 @@ import {
 import {
   resolveResearchConversationFacts,
   researchConversationFactPromptContext,
-  researchConversationFactsVersion
+  researchConversationFactsVersion,
+  researchConversationFactPromptVersion,
+  researchQualifiedFactInstruction
 } from "./research-conversation-facts.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
@@ -8353,6 +8355,9 @@ function researchPrompt(question, evidence, options = {}) {
   const unknownConversationFacts = (conversationFacts.unknown || [])
     .map((fact, index) => `${index + 1}. ${fact}`)
     .join("\n");
+  const qualifiedConversationFacts = (conversationFacts.qualified || [])
+    .map((fact, index) => `${index + 1}. ${fact}`)
+    .join("\n");
   const supportingWebContext = (
     options.webSupport?.sources?.length ||
     options.webSupport?.limitation
@@ -8447,6 +8452,9 @@ function researchPrompt(question, evidence, options = {}) {
           "Apply these only to the current hypothetical question. Do not overwrite the established facts.",
           hypotheticalConversationFacts
         ].join("\n")
+      : "",
+    qualifiedConversationFacts
+      ? ["QUALIFIED USER STATEMENTS — APPLY ONLY AS WORDED", researchQualifiedFactInstruction, qualifiedConversationFacts].join("\n")
       : "",
     unknownConversationFacts
       ? [
@@ -10076,7 +10084,7 @@ async function openAIResearchOfficialGuidanceSummary(question, userID, options) 
   if (!apiKey) throw Object.assign(new Error("Research AI is not configured."), { code: "RESEARCH_NOT_CONFIGURED" });
   const configuration = {
     ...researchModelConfiguration(), model: options.model,
-    promptVersion: researchOfficialGuidanceSummaryVersion,
+    promptVersion: researchOfficialGuidanceSummaryPromptVersion,
     evidenceVersion: `${researchEvidenceAssemblyVersion}:official-documents`
   };
   let usage = combinedResearchUsage();
@@ -10617,6 +10625,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
         : "",
       options.conversationFactContext?.unknown?.length
         ? `USER-STATED UNKNOWNS\n${options.conversationFactContext.unknown.join("\n")}`
+        : "",
+      options.conversationFactContext?.qualified?.length
+        ? `QUALIFIED USER STATEMENTS — APPLY ONLY AS WORDED\n${researchQualifiedFactInstruction}\n${options.conversationFactContext.qualified.join("\n")}`
         : "",
       options.structuredEvidenceAnalysis?.unresolvedProjectFacts?.length
         ? `STRUCTURED UNRESOLVED PROJECT FACTS\n${options.structuredEvidenceAnalysis.unresolvedProjectFacts.join("\n")}`
@@ -20325,6 +20336,7 @@ async function handleResearchConversationMessage(request, response) {
           projectFactsApplied: evidencePackage.projectFactsApplied,
           topicDecision: evidencePackage.topicDecision,
           conversationFactsVersion: researchConversationFactsVersion,
+          conversationFactPromptVersion: researchConversationFactPromptVersion,
           sourceMode: evidencePackage.sourceMode,
           sourceScope: evidencePackage.sourceScope,
           strategy: evidencePackage.strategy,
@@ -20400,7 +20412,7 @@ async function handleResearchConversationMessage(request, response) {
           researchSourcePolicyVersion,
           researchRequiredClaimCoverageVersion,
           researchClaimMaterialityVersion,
-          researchConversationFactsVersion
+          researchConversationFactPromptVersion
         ].filter(Boolean).join(":"),
         createdAt: now
       }),

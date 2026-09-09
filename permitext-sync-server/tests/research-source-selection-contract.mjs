@@ -37,6 +37,26 @@ assert.equal(researchDOBWorkflowRoute("How should the roof question be answered?
   "A form question without an identified portal must not be assumed to concern DOB NOW.");
 assert.equal(researchDOBWorkflowRoute("How should the DOB NOW roof question be answered, and does the work comply with BC 1507.1? ").guidanceOnly, false);
 assert.equal(researchWebSupportTrigger({ question: "Using only the selected code text, how should the DOB NOW roof question be answered?" }, {}).useWeb, false);
+const reviewCase = originalCases.cases.find((item) => item.id === "DOBNOW-021");
+const reviewQuestion = [`Context: ${reviewCase.questionContext}`, reviewCase.scenario, reviewCase.question].join("\n\n");
+for (const question of [reviewQuestion,
+  "I have only the address. Which Building Code review year should I select in DOB NOW?",
+  "What information is needed for the Building Code review edition field in DOB NOW?",
+  "Explain the Building Code version dropdown in my DOB NOW application."
+]) {
+  assert.equal(researchDOBWorkflowRoute(question).guidanceOnly, true, question);
+  assert.equal(researchDOBWorkflowRoute(question).directDocumentRetrieval, false);
+  assert.equal(researchWebSupportTrigger({ question: `Do not use the internet. ${question}` }, {}).useWeb, false);
+}
+for (const question of [
+  "Which Building Code review year legally applies to my DOB NOW alteration?",
+  "Which Building Code edition governs the required stair width in my DOB NOW filing?",
+  "Which Building Code review year is permitted for my DOB NOW alteration?",
+  `${reviewQuestion} Does the stair comply with BC 1007.1.1?`,
+  `${reviewQuestion} Which Building Code applies to the alteration?`,
+  `${reviewQuestion} Is this alteration exempt from the required upgrades?`,
+  "Which Building Code edition applies to this building?"
+]) assert.notEqual(researchDOBWorkflowRoute(question)?.guidanceOnly, true, question);
 const intake = JSON.parse(await readFile(new URL("../evals/research-owner-code-candidates.json", import.meta.url)));
 assert.equal(intake.cases.length, 60);
 assert.equal(new Set(intake.cases.map((item) => item.id)).size, 60);

@@ -32,7 +32,7 @@ const evidence = [source("BC", "1007.1.1")];
 evidence[0].visualSources = [{ id: "fixture-visual", assetName: "fixture.png", mediaType: "image/png", dataBase64: "AA==", byteLength: 1, contentHash: "synthetic-hash" }];
 const options = { responseStyle: "conversational", projectContextFacts: ["Owner representation: prior-code status is unverified."],
   messages: [{ role: "user", question: "Earlier active-topic user fact sentinel." }],
-  conversationFactContext: { established: ["Established fact sentinel."], hypothetical: ["Hypothetical sentinel."], unknown: ["Unknown sentinel."] },
+  conversationFactContext: { established: ["Established fact sentinel."], hypothetical: ["Hypothetical sentinel."], qualified: ["No change of occupancy sentinel."], unknown: ["Unknown sentinel."] },
   webSupport: { sources: [{ id: "synthetic-web-source", authorityClass: "official_guidance", title: "Synthetic guidance fixture",
     publisher: "Synthetic publisher", url: "https://www.nyc.gov/synthetic-fixture",
     attributedClaims: [{ id: "synthetic-web-claim", text: "Guidance claim sentinel." }] }],
@@ -44,9 +44,17 @@ assert.equal(body.store, false);
 assert.equal(body.text.format.strict, true);
 const serializedInput = JSON.stringify(body.input);
 for (const sentinel of ["Current question sentinel.", evidence[0].text, "fixture-prior-edition", "Earlier active-topic user fact sentinel.",
-  "Established fact sentinel.", "Hypothetical sentinel.", "Unknown sentinel.", "Owner representation: prior-code status is unverified.", "Official document unavailable sentinel.",
+  "Established fact sentinel.", "Hypothetical sentinel.", "Unknown sentinel.", "No change of occupancy sentinel.", "Owner representation: prior-code status is unverified.", "Official document unavailable sentinel.",
   "WEB_SOURCE_ID: synthetic-web-source", "WEB_CLAIM_ID: synthetic-web-claim", "Guidance claim sentinel."])
   assert(serializedInput.includes(sentinel), `Lost input: ${sentinel}`);
+for (const request of [body, buildVerifierRequest("Current question sentinel.", evidence, { answerText: "Synthetic answer." }, "offline-contract", options)]) {
+  const input = typeof request.input === "string" ? request.input : JSON.stringify(request.input);
+  assert.match(input, /QUALIFIED USER STATEMENTS/);
+  assert.match(input, /No change of occupancy sentinel/);
+  assert.match(input, /on the stated facts/);
+  assert.match(input, /USER-STATED UNKNOWNS/);
+  assert.match(input, /Unknown sentinel/);
+}
 assert.deepEqual(body.input[0].content.at(-1), { type: "input_image", image_url: "data:image/png;base64,AA==", detail: "original" });
 for (const policy of [/exact supplied identifiers/, /not independently verified facts/, /Label illustrations hypothetical; never use them to introduce unsupported law/,
   /Never promote an earlier assistant conclusion/, /REQUIRED_CLAIM_COVERAGE/, /USER_SELECTED_TEXT/, /Never cite irrelevant/,

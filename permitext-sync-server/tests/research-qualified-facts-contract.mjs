@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { resolveResearchConversationFacts, researchConversationFactPromptContext } from "../research-conversation-facts.mjs";
 
 const rootTopic = "Synthetic building facts";
@@ -30,7 +31,9 @@ for (const statement of [
   assert.equal(value(result, "sprinkler_status"), undefined, statement);
   assert.equal(value(result, "story_count"), "6", "A sprinkler qualification must not erase an unrelated prior fact.");
   assert.equal(result.unknownFacts.find((item) => item.key === "sprinkler_status")?.sourceText, statement);
-  assert.ok(researchConversationFactPromptContext(result).unknown.some((line) => line.includes(statement)));
+  const prompt = researchConversationFactPromptContext(result);
+  assert.ok(prompt.qualified.includes(statement), "Scoped coverage is supplied, without establishing full coverage.");
+  assert.equal(prompt.unknown.some((line) => line.includes(statement)), false);
   const followUp = resolve("Explain the applicable requirements.", result);
   assert.equal(value(followUp, "sprinkler_status"), undefined, "A follow-up must not revive full coverage.");
 }
@@ -67,6 +70,42 @@ assert.equal(value(unknownThenKnown, "sprinkler_status"), "fully_sprinklered");
 assert.equal(unknownThenKnown.unknownFacts.some((item) => item.key === "sprinkler_status"), false);
 const knownThenUnknown = resolve("The building is fully sprinklered. The sprinkler status is unknown.");
 assert.equal(value(knownThenUnknown, "sprinkler_status"), undefined);
+assert.equal(researchConversationFactPromptContext(knownThenUnknown).qualified.length, 0);
+assert(researchConversationFactPromptContext(knownThenUnknown).unknown.length);
+
+for (const statement of [
+  "The building is not fully sprinklered, reportedly.",
+  "The owner claims the building is partially sprinklered.",
+  "The building is not fully sprinklered, but this is unverified.",
+  "The sprinkler coverage is not yet known.",
+  "The occupancy classification is not supplied.",
+  "The construction type has not been established.",
+  "The application does not state how many units are occupied at filing or how many will remain occupied during the work.",
+  "The user provides a brief work description but no property restrictions, filing type, complete scope, agency approvals, or Applicant of Record certification basis."
+]) {
+  const result = resolve(statement);
+  const prompt = researchConversationFactPromptContext(result);
+  assert.equal(prompt.qualified.length, 0, statement);
+  assert(prompt.unknown.some((line) => line.includes(statement)), statement);
+}
+assert.equal(researchConversationFactPromptContext(resolve("Using only the selected table, summarize how Use Group I allowances differ across M1, M2, and M3 districts and explain the table symbols.")).qualified.length, 0,
+  "A research instruction must not become a supplied project premise.");
+
+// Reproduce the actual routing failure without changing the saved response or
+// treating conservative canonical categories as proven positive facts.
+const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json", import.meta.url)));
+const routingQuestion = retained.results.find((item) => item.id === "DOBNOW-001").question;
+const routingFacts = resolve(routingQuestion);
+const beforePrompt = structuredClone(routingFacts);
+const routingPrompt = researchConversationFactPromptContext(routingFacts);
+assert.equal(routingPrompt.unknown.length, 0, "The scenario does not state an unknown routing condition.");
+assert.equal(routingPrompt.qualified.length, 2, "Preserve both distinct supplied assertions without duplicated canonical categories.");
+assert(routingPrompt.qualified.some((line) => line.includes("does not require the alteration to meet New Building requirements")));
+assert(routingPrompt.qualified.some((line) => line.includes("does not change occupancy, use, exits, or number of stories")));
+assert.equal(value(routingFacts, "building_status"), undefined);
+assert.equal(value(routingFacts, "occupancy_group"), undefined);
+assert.deepEqual(routingFacts, beforePrompt, "Prompt formatting must not promote or mutate saved facts.");
+assert.deepEqual(researchConversationFactPromptContext(resolve("Explain those routing responses.", routingFacts)).qualified, routingPrompt.qualified);
 
 for (const sourceText of [
   "The building is sprinklered on the ground floor only.",
@@ -80,6 +119,8 @@ for (const sourceText of [
   });
   assert.equal(value(legacy, "sprinkler_status"), undefined, "Legacy inferred facts need revalidation against their wording.");
   assert.ok(legacy.unknownFacts.some((item) => item.sourceText === sourceText));
+  assert.equal(researchConversationFactPromptContext(legacy).qualified.length, 0,
+    "Legacy reconfirmation records must remain unresolved.");
 }
 
 for (const question of ["Is the building not fully sprinklered?", "Could it be an existing building?", "BC 903 requires a fully sprinklered building."]) {
