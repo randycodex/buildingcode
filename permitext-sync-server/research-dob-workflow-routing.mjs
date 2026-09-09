@@ -1,6 +1,6 @@
 // Source locations are discovery hints, never an answer key. Each document is
 // fetched and validated again before its contents may support an answer.
-export const researchDOBWorkflowRoutingVersion = "20260909-loft-stakeholder-sources-v7";
+export const researchDOBWorkflowRoutingVersion = "20260909-stakeholder-update-sources-v8";
 const source = (id, title, filename, catalogReviewedOn = "2026-09-08") => Object.freeze({
   id, title, url: `https://www.nyc.gov/assets/buildings/pdf/${filename}`,
   publisher: "NYC Department of Buildings", catalogReviewedOn
@@ -60,7 +60,7 @@ export function researchDOBWorkflowRoute(question) {
     : subsequent ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.subsequentFAQ, researchDOBWorkflowSources.nbFAQ]
     : stormwater ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stormwater]
     : loft ? [researchDOBWorkflowSources.loftNotice, researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.applicationGuide]
-    : filingRepresentative ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stakeholderFAQ]
+    : filingRepresentative ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stakeholderFAQ, researchDOBWorkflowSources.releaseNotes]
     : [researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.applicationGuide];
   const requestedURLs = text.match(/https:\/\/[^\s<>"\])]+/gi) || [];
   // An explicit source request takes priority over a catalog shortcut.

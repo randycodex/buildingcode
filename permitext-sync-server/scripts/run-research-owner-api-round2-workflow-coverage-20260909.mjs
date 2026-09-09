@@ -95,8 +95,8 @@ const profile = { promptVersion: "20260909-document-summary-v6", schema: "permit
   repairedCaseIDs, newCaseIDs, cases: caseIDs };
 assert(roundPreviousConservativeUSD + profile.maximumCumulativeSpendUSD <= profile.authorizationUSD);
 assert(profile.maximumTurnSpendUSD <= profile.maximumCumulativeSpendUSD);
-const preflightURL = new URL("evals/results/research-owner-api-round2-workflow-coverage-preflight-2026-09-09.json", root);
-const resultURL = new URL("evals/results/research-owner-api-round2-live-workflow-coverage-2026-09-09.json", root);
+const preflightURL = new URL("evals/results/research-owner-api-round2-workflow-coverage-preflight-v2-2026-09-09.json", root);
+const resultURL = new URL("evals/results/research-owner-api-round2-live-workflow-coverage-v2-2026-09-09.json", root);
 const sourceFiles = ["app.mjs", "research-answer-presentation.mjs", "research-official-guidance-summary.mjs", "evals/research-answer-key-amendments.json", "research-answer-quality.mjs", "research-focused-technical-scope.mjs", "research-conversation-topic.mjs", "research-technical-topic-routes.mjs", "evidence-discovery.mjs", "research-conversation-facts.mjs", "research-fact-qualification.mjs", "research-source-policy.mjs", "research-official-html-attribution.mjs", "research-official-pdf-attribution.mjs", "research-official-pdf-ranking.mjs", "research-official-pdf-worker.mjs", "research-dob-workflow-routing.mjs", "evals/research-answer-key-reconciliation.mjs", "research-config.mjs", "research-cost-usage.mjs", "research-provider-client.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-safety.mjs",
   "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs", "research-zoning-metadata.mjs", "research-zoning-conditional-explanation.mjs", "project-foundation-contract.mjs", "research-corpus-registry.mjs", "research-model-routing.mjs", "evals/research-owner-scope-input.mjs",
   "package.json", "package-lock.json", "evals/research-reconciled-answer-key.json", "evals/research-owner-code-candidates.json", "evals/research-owner-code-review.mjs", "evals/research-owner-http-request-binding.mjs", "scripts/run-research-owner-api-round2-workflow-coverage-20260909.mjs"];
@@ -193,6 +193,10 @@ globalThis.fetch = async (url, options) => {
         assert.match(roles, /Filing Representatives can enter and view all filing information/);
         assert.match(roles, /cannot upload plans or submit filings\/permits/);
         assert.match(roles, /owner must be logged in with the same email address/);
+        const update = input.passages.find((passage) => passage.url.includes("dob_now_build_release_notes.pdf") && /Board added as a Stakeholder/.test(passage.text));
+        assert(update, "The current conditional board-stakeholder requirement must reach the initial summary.");
+        assert.match(update.text, /Condo Unit Owner or Co\s*-\s*Op Tenant\s*-\s*Shareholder/);
+        assert.match(update.text, /Both the owner and the Board representative/);
       } else {
         assert.equal(active.id, "DOBNOW-003");
         assert(input.passages.some((passage) => /subsequent filing of an NB or Alteration-CO filing.*remain Permit Entire/s.test(passage.text)),

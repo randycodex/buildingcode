@@ -44,6 +44,10 @@ const loftNoticeURL = "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf"
 const companionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-companion-source-fragments-20260909.json", import.meta.url)));
 const stakeholderFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-stakeholder-source-fragments-20260909.json", import.meta.url)));
 const loftFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-loft-service-document-20260909.json", import.meta.url)));
+const officialDocuments = JSON.parse(await readFile(new URL("../evals/fixtures/dob-official-document-pages-20260909.json", import.meta.url)));
+const boardUpdate = officialDocuments.documents.find((document) => document.source.id === "dob-build-release-notes")
+  .document.passages.find((passage) => passage.pageNumber === 20);
+assert.match(boardUpdate.text, /Board added as a Stakeholder/);
 const guideDocument = new PDFDocument();
 const guideChunks = [];
 const guideComplete = new Promise((resolve) => { guideDocument.on("data", (chunk) => guideChunks.push(chunk)); guideDocument.on("end", () => resolve(Buffer.concat(guideChunks))); });
@@ -73,6 +77,9 @@ const releaseComplete = new Promise((resolve) => { releaseDocument.on("data", (c
 releaseDocument.text("Synthetic regression source: August 2026 Wetlands documents. An initial NB-GC filing flagged as wetlands requires a DEC Jurisdictional Determination.");
 releaseDocument.addPage().text("Wetlands documents continued. If the determination requires a DEC Permit, submit it before approval. Otherwise submit a waiver request for the DEC Permit document.");
 releaseDocument.addPage().text("Unrelated required documents for NB-GC filing applications flagged in the DOB NOW Property Profile as Mandatory Inclusionary Housing. August 2026 workflow documents and conditional responses.");
+// Source-derived reflow for transport/ranking checks; actual page 20 and hash
+// remain in the fixture. The current owner-type condition must reach the model.
+releaseDocument.addPage().text(boardUpdate.text);
 releaseDocument.end();
 const releaseBytes = await releaseComplete;
 let question = `According to the official service notice at ${sourceURL}, which review type applies to the new application?`;
@@ -148,6 +155,11 @@ const responseDouble = async (url, options) => {
         assert.match(text, /Filing Representatives can enter and view all filing information/);
         assert.match(text, /cannot upload plans or submit filings\/permits/);
         assert.match(text, /owner must be logged in with the same email address/);
+        const update = input.passages.find((passage) => passage.url.startsWith(releaseURL) && /Board added as a Stakeholder/.test(passage.text));
+        assert(update, "Current additional-stakeholder guidance must reach both drafting and verification alongside the base role rules.");
+        assert.match(update.text, /Condo Unit Owner or Co\s*-\s*Op Tenant\s*-\s*Shareholder/);
+        assert.match(update.text, /NYC\.ID/);
+        assert.match(update.text, /Both the owner and the Board representative/);
       }
       if (portalCase === "DOBNOW-008") {
         assert(input.passages.some((passage) => passage.url.startsWith(guideURL) && /gross floor area/.test(passage.text)));
