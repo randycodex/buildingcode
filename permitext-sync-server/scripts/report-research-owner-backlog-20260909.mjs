@@ -16,7 +16,7 @@ async function read(file, expectedHash) {
   files.set(file, sha256);
   return JSON.parse(bytes);
 }
-const auditFile = "evals/results/research-owner-api-round2-decision-scope-cost-audit-2026-09-09.json";
+const auditFile = "evals/results/research-owner-api-round2-claim-scope-cost-audit-2026-09-09.json";
 const audit = await read(auditFile);
 const originals = await read("evals/research-reconciled-answer-key.json",
   "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455");
@@ -26,16 +26,24 @@ const cohort = [...originals.cases, ...added.cases];
 assert.equal(cohort.length, 110);
 const ids = new Set(cohort.map((item) => item.id));
 assert.equal(ids.size, 110);
-const priorInventoryFile = "evals/results/research-owner-backlog-2026-09-09.json";
+const firstInventoryFile = "evals/results/research-owner-backlog-2026-09-09.json";
+const firstInventory = await read(firstInventoryFile);
+const priorInventoryFile = "evals/results/research-owner-backlog-v2-2026-09-09.json";
 const priorInventory = await read(priorInventoryFile);
 const supplementalReviewFile = "evals/results/research-owner-unmatched-answer-review-2026-09-09.json";
 const supplementalReview = await read(supplementalReviewFile,
   "324f63ea67b8366c0b16ccf6ad3d413d585f6340cc194c21065ba5ed34282ab2");
 assert.deepEqual(new Set(supplementalReview.cases.map((item) => item.id)),
-  new Set(priorInventory.cases.filter((item) => item.status === "latest_answer_review_not_located").map((item) => item.id)));
+  new Set(firstInventory.cases.filter((item) => item.status === "latest_answer_review_not_located").map((item) => item.id)));
 assert.equal(supplementalReview.cases.length, 24);
 assert.equal(supplementalReview.summary.newProviderCalls, 0);
 assert.equal(supplementalReview.summary.newNetworkCalls, 0);
+const claimScopeReviewFile = "evals/results/research-owner-claim-scope-answer-assessment-2026-09-09.json";
+const claimScopeReview = await read(claimScopeReviewFile,
+  "74bac12c39f4c835afd1821a633dfe30974b27fab4368bf7766cf4c10fd46ba6");
+assert.deepEqual(claimScopeReview.cases.map((item) => item.id), ["DOBNOW-003", "DOBNOW-004"]);
+assert.equal(claimScopeReview.summary.reviewProviderCalls, 0);
+assert.equal(claimScopeReview.summary.reviewNetworkCalls, 0);
 
 const attempts = [];
 const runRefs = [...audit.historicalLedgerHashes, ...audit.ledgers];
@@ -154,7 +162,7 @@ const cases = cohort.map((item) => {
   let status;
   if (!attempt.delivered) status = "latest_attempt_undelivered";
   else if (!matched.length) status = "latest_answer_review_not_located";
-  else if (matched[0].file === supplementalReviewFile) {
+  else if ([supplementalReviewFile, claimScopeReviewFile].includes(matched[0].file)) {
     status = matched[0].findings.backlogDisposition;
     assert(["historical_whole_answer_review_pass", "delivered_with_substance_or_scope_gap", "delivered_with_presentation_gap"].includes(status));
     if (status === "historical_whole_answer_review_pass") {
@@ -177,7 +185,7 @@ const cases = cohort.map((item) => {
     status, latestAttempt: attempt, latestReview: matched[0] || null,
     fullCurrentBaselineAcceptance: "unproven", workItemIDs: [] };
 });
-for (const review of supplementalReview.cases) for (const id of review.workItemIDs) {
+for (const review of [...supplementalReview.cases, ...claimScopeReview.cases]) for (const id of review.workItemIDs) {
   const item = workItems.find((item) => item.id === id);
   assert(item && id.startsWith("R"), "Supplemental triage must use an existing repair work item.");
   item.cases = [...new Set([...item.cases.split(" ").filter(Boolean), review.id])].join(" ");

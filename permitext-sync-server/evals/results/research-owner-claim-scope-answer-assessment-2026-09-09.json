@@ -1,0 +1,606 @@
+{
+  "schema": "permitext-owner-claim-scope-answer-assessment-v1",
+  "reviewedAt": "2026-09-09T22:19:14.739Z",
+  "liveSourceCommit": "ae14449ac4a14a941e99cc0b2b5669a732a93bc7",
+  "runFile": "evals/results/research-owner-api-round2-live-claim-scope-2026-09-09.json",
+  "runSHA256": "96bf0051c296cc9f7a07b35093b6159093de6b968f2204e649d058369bd14978",
+  "referenceFile": "evals/research-reconciled-answer-key.json",
+  "referenceSHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "costAuditFile": "evals/results/research-owner-api-round2-claim-scope-cost-audit-2026-09-09.json",
+  "costAuditSHA256": "3614dac460e94451f1bd82042ac4182012ef19e70c4acfe4f95b00063500d325",
+  "summary": {
+    "newLiveHTTPTurns": 2,
+    "newLiveProviderCalls": 4,
+    "delivered": 1,
+    "undelivered": 1,
+    "strictWholeAnswerPasses": 0,
+    "reviewProviderCalls": 0,
+    "reviewNetworkCalls": 0,
+    "batchConservativeUSD": 0.086951,
+    "batchUsageEstimateUSD": 0.0472011,
+    "cumulativeConservativeUSD": 8.00865,
+    "remainingConservativeAuthorizationUSD": 0.49135
+  },
+  "limitations": [
+    "Development review, not professional approval. Neither case is a complete accepted answer.",
+    "The source conflicts improved in these two samples; this does not prove reliable behavior across all 110 questions.",
+    "No retries, separate judges or Project workflow were used. The consumed driver must not be replayed.",
+    "Full HTTP times are 20.311 seconds for the delivered timing answer and 19.767 seconds for the undelivered PAA answer; this small comparison does not establish p50/p90 or a speed improvement.",
+    "Budget figures are retained conservative accounting and usage estimates, not an account-balance or invoice check."
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-003",
+      "sourceCommit": "ae14449ac4a14a941e99cc0b2b5669a732a93bc7",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-claim-scope-2026-09-09.json",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "resultSHA256": "65aa181edd918e8b2060e1a7ea34149de5ec370f2b945d62d991cf37ec0cc004",
+      "expectedAnswerSHA256": "53bf3d5275364916c22ce10e93a49e67045ac92efd0406ade504570b578ea6bc",
+      "delivered": true,
+      "httpStatus": 200,
+      "durationMilliseconds": 20311,
+      "mainWordCount": 244,
+      "allAuthoredWordCount": 304,
+      "retainedDraft": {
+        "paragraphs": [
+          {
+            "text": "The plumbing scope should be filed as a subsequent (S) filing under the existing GC job number, rather than as a new unrelated job number, if it is part of the same construction project and property. DOB guidance says all filings for the same construction project should use the same job number with an extension; a subsequent filing adds new scope of work and work types, and it may use a new/different applicant. It is separately processed and may be permitted before the initial GC filing.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              }
+            ]
+          },
+          {
+            "text": "For submission, the initial GC filing must first be submitted—not remain in pre-filing status. The FAQ says a subsequent filing can then be initiated and submitted until an LOC has been issued for the initial filing. The guide directs users to select “Subsequent Filing” from the Filing Action column beside I1. The materials acknowledge that a subsequent can be created before I1 is submitted, but its populated fields will not update until I1 is submitted; they do not fully resolve any broader rule on creation timing before I1 submission.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-5b682c1399f57019c03eda89"
+              },
+              {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-f5c55ab1d498dfaa4daaf786"
+              }
+            ]
+          },
+          {
+            "text": "Completion handling depends on the initial job type. The general guidance says an LOC is requested separately for each initial and subsequent filing. But for NB or Alteration-CO filings, the specialized FAQ says not to request an LOC for the subsequent filing: its status remains Permit Entire, while only I1 changes to CO issued. The initial job type was not supplied, so this completion branch cannot be selected here.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-nb-altco-faq",
+                "claimID": "official-passage-b70287cbc2f3310a30d3b9b1"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [
+          "Whether the initial GC job is an NB or Alteration-CO filing, which determines the stated completion/LOC treatment for the plumbing subsequent filing."
+        ],
+        "evidenceLimitations": [
+          "The supplied guidance distinguishes subsequent-filing submission timing from creation timing. It confirms that fields may not update until I1 is submitted, but does not fully establish a universal rule for creating a subsequent filing before I1 is submitted."
+        ]
+      },
+      "retainedVerifier": {
+        "pass": true,
+        "issues": [],
+        "qualificationReview": {
+          "packetSHA256": "b84da6d10d0615522764c2a473fd449fbc0c7f347b8364208879a9290fedb3fe",
+          "passages": [
+            {
+              "passageIndex": 0,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                6,
+                7,
+                9,
+                10,
+                14,
+                15,
+                16
+              ],
+              "answerReferences": [
+                "paragraph:0",
+                "paragraph:2"
+              ],
+              "reason": "The answer preserves the same-job-number rule, subsequent-filing scope, different-applicant option, separate-application treatment, and completion qualification."
+            },
+            {
+              "passageIndex": 1,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer identifies the supplied creation path through the initial filing's Filing Action column and preserves the submission-timing qualification."
+            },
+            {
+              "passageIndex": 2,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                12,
+                13,
+                14,
+                15,
+                16
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer's recommendation to use a subsequent filing rather than an unrelated job number is consistent with this same-BIN filing guidance."
+            },
+            {
+              "passageIndex": 3,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0,
+                1,
+                2,
+                4,
+                8,
+                20,
+                21,
+                22
+              ],
+              "answerReferences": [
+                "paragraph:0",
+                "paragraph:1",
+                "paragraph:2"
+              ],
+              "reason": "The answer preserves submission timing, the different-applicant condition, separate LOC treatment subject to the specialized branch, and the pre-submission field-update limitation."
+            },
+            {
+              "passageIndex": 4,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "This passage concerns FO and ST work types for NB filings and does not materially qualify the plumbing filing-choice question."
+            },
+            {
+              "passageIndex": 5,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0,
+                1,
+                2
+              ],
+              "answerReferences": [
+                "paragraph:2"
+              ],
+              "reason": "The answer expressly preserves the NB or Alteration-CO exception to the general LOC treatment and identifies the missing initial job type."
+            }
+          ]
+        }
+      },
+      "reviewedDeliveredProjection": {
+        "answerText": "The plumbing scope should be filed as a subsequent (S) filing under the existing GC job number, rather than as a new unrelated job number, if it is part of the same construction project and property. DOB guidance says all filings for the same construction project should use the same job number with an extension; a subsequent filing adds new scope of work and work types, and it may use a new/different applicant. It is separately processed and may be permitted before the initial GC filing. [DOB NOW application user guide, p. 5](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5)\n\nFor submission, the initial GC filing must first be submitted—not remain in pre-filing status. The FAQ says a subsequent filing can then be initiated and submitted until an LOC has been issued for the initial filing. The guide directs users to select “Subsequent Filing” from the Filing Action column beside I1. The materials acknowledge that a subsequent can be created before I1 is submitted, but its populated fields will not update until I1 is submitted; they do not fully resolve any broader rule on creation timing before I1 submission. [DOB NOW application user guide, p. 6](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6) [DOB NOW: Build FAQs — Subsequent Filings](https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page)\n\nCompletion handling depends on the initial job type. The general guidance says an LOC is requested separately for each initial and subsequent filing. But for NB or Alteration-CO filings, the specialized FAQ says not to request an LOC for the subsequent filing: its status remains Permit Entire, while only I1 changes to CO issued. The initial job type was not supplied, so this completion branch cannot be selected here. [DOB NOW application user guide, p. 5](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5) [DOB NOW: New Building and Alteration-CO FAQs](https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page)\n\nOfficial supporting guidance — noncontrolling and not an enacted-code conclusion.",
+        "conclusion": "The plumbing scope should be filed as a subsequent (S) filing under the existing GC job number, rather than as a new unrelated job number, if it is part of the same construction project and property. DOB guidance says all filings for the same construction project should use the same job number with an extension; a subsequent filing adds new scope of work and work types, and it may use a new/different applicant. It is separately processed and may be permitted before the initial GC filing. [DOB NOW application user guide, p. 5](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5)",
+        "explanation": "For submission, the initial GC filing must first be submitted—not remain in pre-filing status. The FAQ says a subsequent filing can then be initiated and submitted until an LOC has been issued for the initial filing. The guide directs users to select “Subsequent Filing” from the Filing Action column beside I1. The materials acknowledge that a subsequent can be created before I1 is submitted, but its populated fields will not update until I1 is submitted; they do not fully resolve any broader rule on creation timing before I1 submission. [DOB NOW application user guide, p. 6](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6) [DOB NOW: Build FAQs — Subsequent Filings](https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page)\n\nCompletion handling depends on the initial job type. The general guidance says an LOC is requested separately for each initial and subsequent filing. But for NB or Alteration-CO filings, the specialized FAQ says not to request an LOC for the subsequent filing: its status remains Permit Entire, while only I1 changes to CO issued. The initial job type was not supplied, so this completion branch cannot be selected here. [DOB NOW application user guide, p. 5](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5) [DOB NOW: New Building and Alteration-CO FAQs](https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page)\n\nOfficial supporting guidance — noncontrolling and not an enacted-code conclusion.",
+        "supportedPoints": [],
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the initial GC job is an NB or Alteration-CO filing, which determines the stated completion/LOC treatment for the plumbing subsequent filing."
+        ],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This answer summarizes retrieved official supporting guidance; it does not establish an enacted-code conclusion.",
+          "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified.",
+          "The supplied guidance distinguishes subsequent-filing submission timing from creation timing. It confirms that fields may not update until I1 is submitted, but does not fully establish a universal rule for creating a subsequent filing before I1 is submitted."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [
+          {
+            "sourceID": "dob-application-guide",
+            "claimID": "official-passage-789cc7ccd439eb8374132031",
+            "claim": "[PDF page 5](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5) — Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to perform a specific type of construction. All filings related to the same construction project should have the same job number and then an alphabetic and numeric extension that indicates the filing type and sequence: I - Initial, S - Subsequent, and P - Post Approval Amendment (PAA). • Initial Filings (I1) – The first or initial job filing created for a construction project. • Subsequent (S) - A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one on the initial or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing can have a different review type (standard plan examination/professional certification) than the initial filing. Once submitt ed, a subsequent filing functions as a separate appli cation. It can be permitted before the initial is permitted and a Letter of Completion (LOC) is requested separately on each filing. • Post Approval Amendment s (PAA) - A Post Approval Amendment or PAA is for making changes to a filing after it has been approved. To create a job fi ling, log into DOB NOW: Build and from the dashboard select +Job Filing. Then select the Job Type, Work Type (s), and Filing Review Typ e. Subsequent applications are strongly encouraged. All filings with the same job number will go to the same plan examiner or team and the Records Management Fees are paid on the initial filin g only. It is also beneficial to have one job number to connect all of the work on a project."
+          },
+          {
+            "sourceID": "dob-application-guide",
+            "claimID": "official-passage-5b682c1399f57019c03eda89",
+            "claim": "[PDF page 6](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6) — Page 6 of 38 To create a subsequent filing, select Search from the dashboard. Select BIN Search to find filings on the BIN or select Job Number Search if the job number is alr eady known. From the Filing Action column next to the initial (I1) filing, select action Subsequent Filing. J ob T ypes Alteration – Questions about the scope of work are provided to determine if the filing is an Alteration CO or an Alteration CO – New Building with Existing Elements to Remain. If No is the answer for all the questions, then the filing is an Alteration (does not require an amended CO). • Alteration required to meet New Building requirements? (Yes = Alteration CO – New Building with Existing Elements to Remain) • Alteration is inconsistent with the current Certificate of Occupancy? (Yes = Alteration CO) • Alteration in occupancy or use? (Yes = Alteration CO) • Alteration is a major chan ge to exits? (Yes = Alteration CO) • Alteration in number of stories? (Yes = Alteration CO if Building Type is 3 Family or Other) Full Demolition - The dismantling, razing, or removal of all of a building or structure, including all related incidental opera tions. The Full Demolition Types are: New Work, Emergency Declaration, Immediate Emergency Declaration, Emergency Work Order, and Precept. A registered design professional (PE/RA) is required as the applicant on a full demolition filing when one or more of the f ollowing conditions are met: • Building is greater than 3 stories in height • Building is greater than 5,000 square feet per floor • Building is not detached • Demolition Is using mechanical equipment • Foundation is not being removed"
+          },
+          {
+            "sourceID": "dob-subsequent-faq",
+            "claimID": "official-passage-f5c55ab1d498dfaa4daaf786",
+            "claim": "DOB NOW: Build Frequently Asked Questions > Subsequent Filings — When can I submit a subsequent job filing? — Subsequent filings can be initiated and submitted after the initial job filing is submitted (not in pre-filing status). Users no longer have to wait until the initial filing is approved. A subsequent filing can be submitted anytime until an LOC has been issued for the initial filing.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to request a Letter of Completion (LOC) for a subsequent job filing? — Yes, an LOC needs to be requested for each filing, initial and subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — If an initial job application is filed as professional certification can the subsequent application be filed as a standard plan filing type? — Yes, initial and subsequent jobs can have different filing types.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can a subsequent filing have a different design applicant than the initial filing? — Yes, the applicant on an initial filing and a subsequent filing can be different. If the applicant is the same, one application can be submitted if the work types are eligible to be combine filed.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to pay the record management fee on a subsequent filing? — No, the $165 record management fee is now charged only once on the initial filing and is no longer a fee on subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can I have an open PAA for the initial filing and a subsequent filing at the same time? — Yes.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — How can I make a minor change to a legalization filing? — Post-Approval Amendments (PAA) are not allowed on filings that include legalization work. If a change needs to be made, a subsequent filing will be required or the job must be withdrawn and refiled. For Boiler Equipment filings the only option is to withdraw and refile the job. In addition, permits cannot be renewed if the job includes legalization work.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — I have a subsequent filing in pre-filing status and some of the fields are grayed out? How do I complete these fields? — Fields from the subsequent filing are populated from the initial filing (I1). The fields will not update on the subsequent filing until the I1 is submitted. To prevent this issue, we recommend completing as much of the I1 as possible before creating the subsequent filing."
+          },
+          {
+            "sourceID": "dob-nb-altco-faq",
+            "claimID": "official-passage-b70287cbc2f3310a30d3b9b1",
+            "claim": "DOB NOW: Build Frequently Asked Questions > New Building and Alteration-CO — Do I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing? — No, the status of the subsequent filings will remain Permit Entire. Only the status of the initial (I1) filing will change to CO issued. If a Temporary CO is issued, the status of the initial job will remain Permit Entire until the Final CO is issued."
+          }
+        ],
+        "supportingSources": [
+          {
+            "id": "dob-application-guide",
+            "title": "DOB NOW application user guide",
+            "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+            "publisher": "NYC Department of Buildings",
+            "catalogReviewedOn": "2026-09-08",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "controlling": false,
+            "attributedClaims": [
+              {
+                "id": "official-passage-789cc7ccd439eb8374132031",
+                "text": "[PDF page 5](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5) — Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to perform a specific type of construction. All filings related to the same construction project should have the same job number and then an alphabetic and numeric extension that indicates the filing type and sequence: I - Initial, S - Subsequent, and P - Post Approval Amendment (PAA). • Initial Filings (I1) – The first or initial job filing created for a construction project. • Subsequent (S) - A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one on the initial or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing can have a different review type (standard plan examination/professional certification) than the initial filing. Once submitt ed, a subsequent filing functions as a separate appli cation. It can be permitted before the initial is permitted and a Letter of Completion (LOC) is requested separately on each filing. • Post Approval Amendment s (PAA) - A Post Approval Amendment or PAA is for making changes to a filing after it has been approved. To create a job fi ling, log into DOB NOW: Build and from the dashboard select +Job Filing. Then select the Job Type, Work Type (s), and Filing Review Typ e. Subsequent applications are strongly encouraged. All filings with the same job number will go to the same plan examiner or team and the Records Management Fees are paid on the initial filin g only. It is also beneficial to have one job number to connect all of the work on a project.",
+                "verbatimText": "Page 5 of 38\nJOB FILING /APPLICATION\nA job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an\nexisting building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to\nperform a specific type of construction.\nAll filings related to the same construction project should have the same job number and then an alphabetic and numeric extension that\nindicates the filing type and sequence: I - Initial, S - Subsequent, and P - Post Approval Amendment (PAA).\n• Initial Filings (I1) – The first or initial job filing created for a construction project .\n• Subsequent (S) - A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one\non the initial or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing\ncan have a different review type (standard plan examination/professional certification) than the initial filing. Once submitt ed, a\nsubsequent filing functions as a separate appli cation. It can be permitted before the initial is permitted and a Letter of Completion\n(LOC) is requested separately on each filing.\n• Post Approval Amendment s (PAA) - A Post Approval Amendment or PAA is for making changes to a filing after it has been approved.\nTo create a job fi ling , log into DOB NOW: Build and from the dashboard select +Job Filing . Then select the Job Type , Work Type (s) , and\nFiling Review Typ e .\nSubsequent applications are strongly encouraged. All filings with the same job number will go to the same plan examiner or team and the\nRecords Management Fees are paid on the initial filin g only. It is also beneficial to have one job number to connect all of the work on a\nproject.",
+                "heading": "PDF page 5",
+                "intro": "",
+                "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+                "pageNumber": 5,
+                "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5"
+              }
+            ],
+            "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+            "sourceValidation": "official_pdf",
+            "pageCount": 38,
+            "textlessPages": [],
+            "extractionLimitations": [
+              "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+            ],
+            "claim": "[PDF page 5](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5) — Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to perform a specific type of construction. All filings related to the same construction project should have the same job number and then an alphabetic and numeric extension that indicates the filing type and sequence: I - Initial, S - Subsequent, and P - Post Approval Amendment (PAA). • Initial Filings (I1) – The first or initial job filing created for a construction project. • Subsequent (S) - A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one on the initial or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing can have a different review type (standard plan examination/professional certification) than the initial filing. Once submitt ed, a subsequent filing functions as a separate appli cation. It can be permitted before the initial is permitted and a Letter of Completion (LOC) is requested separately on each filing. • Post Approval Amendment s (PAA) - A Post Approval Amendment or PAA is for making changes to a filing after it has been approved. To create a job fi ling, log into DOB NOW: Build and from the dashboard select +Job Filing. Then select the Job Type, Work Type (s), and Filing Review Typ e. Subsequent applications are strongly encouraged. All filings with the same job number will go to the same plan examiner or team and the Records Management Fees are paid on the initial filin g only. It is also beneficial to have one job number to connect all of the work on a project."
+          },
+          {
+            "id": "dob-application-guide",
+            "title": "DOB NOW application user guide",
+            "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+            "publisher": "NYC Department of Buildings",
+            "catalogReviewedOn": "2026-09-08",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "controlling": false,
+            "attributedClaims": [
+              {
+                "id": "official-passage-5b682c1399f57019c03eda89",
+                "text": "[PDF page 6](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6) — Page 6 of 38 To create a subsequent filing, select Search from the dashboard. Select BIN Search to find filings on the BIN or select Job Number Search if the job number is alr eady known. From the Filing Action column next to the initial (I1) filing, select action Subsequent Filing. J ob T ypes Alteration – Questions about the scope of work are provided to determine if the filing is an Alteration CO or an Alteration CO – New Building with Existing Elements to Remain. If No is the answer for all the questions, then the filing is an Alteration (does not require an amended CO). • Alteration required to meet New Building requirements? (Yes = Alteration CO – New Building with Existing Elements to Remain) • Alteration is inconsistent with the current Certificate of Occupancy? (Yes = Alteration CO) • Alteration in occupancy or use? (Yes = Alteration CO) • Alteration is a major chan ge to exits? (Yes = Alteration CO) • Alteration in number of stories? (Yes = Alteration CO if Building Type is 3 Family or Other) Full Demolition - The dismantling, razing, or removal of all of a building or structure, including all related incidental opera tions. The Full Demolition Types are: New Work, Emergency Declaration, Immediate Emergency Declaration, Emergency Work Order, and Precept. A registered design professional (PE/RA) is required as the applicant on a full demolition filing when one or more of the f ollowing conditions are met: • Building is greater than 3 stories in height • Building is greater than 5,000 square feet per floor • Building is not detached • Demolition Is using mechanical equipment • Foundation is not being removed",
+                "verbatimText": "Page 6 of 38\nTo create a subsequent filing, select Search from the dashboard . Select BIN Search to find filings on the BIN or select Job Number Search\nif the job number is alr eady known. From the Filing Action column next to the initial (I1) filing, select action Subsequent Filing .\nJ ob T ypes\nAlteration – Questions about the scope of work are provided to determine if the filing is an Alteration CO or an Alteration CO – New Building with\nExisting Elements to Remain. If No is the answer for all the questions, then the filing is an Alteration (does not require an amended CO) .\n• Alteration required to meet New Building requirements? (Yes = Alteration CO – New Building with Existing Elements to Remain)\n• Alteration is inconsistent with the current Certificate of Occupancy? (Yes = Alteration CO)\n• Alteration in occupancy or use? (Yes = Alteration CO)\n• Alteration is a major chan ge to exits? (Yes = Alteration CO)\n• Alteration in number of stories? (Yes = Alteration CO if Building Type is 3 Family or Other)\nFull Demolition - The dismantling, razing, or removal of all of a building or structure, including all related incidental opera tions . The Full\nDemolition Types are: New Work, Emergency Declaration, Immediate Emergency Declaration, Emergency Work Order, and Precept. A\nregistered design professional (PE/RA) is required as the applicant on a full demolition filing when one or more of the f ollowing\nconditions are met:\n• Building is greater than 3 stories in height\n• Building is greater than 5,000 square feet per floor\n• Building is not detached\n• Demolition Is using mechanical equipment\n• Foundation is not being removed",
+                "heading": "PDF page 6",
+                "intro": "",
+                "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+                "pageNumber": 6,
+                "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6"
+              }
+            ],
+            "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+            "sourceValidation": "official_pdf",
+            "pageCount": 38,
+            "textlessPages": [],
+            "extractionLimitations": [
+              "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+            ],
+            "claim": "[PDF page 6](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6) — Page 6 of 38 To create a subsequent filing, select Search from the dashboard. Select BIN Search to find filings on the BIN or select Job Number Search if the job number is alr eady known. From the Filing Action column next to the initial (I1) filing, select action Subsequent Filing. J ob T ypes Alteration – Questions about the scope of work are provided to determine if the filing is an Alteration CO or an Alteration CO – New Building with Existing Elements to Remain. If No is the answer for all the questions, then the filing is an Alteration (does not require an amended CO). • Alteration required to meet New Building requirements? (Yes = Alteration CO – New Building with Existing Elements to Remain) • Alteration is inconsistent with the current Certificate of Occupancy? (Yes = Alteration CO) • Alteration in occupancy or use? (Yes = Alteration CO) • Alteration is a major chan ge to exits? (Yes = Alteration CO) • Alteration in number of stories? (Yes = Alteration CO if Building Type is 3 Family or Other) Full Demolition - The dismantling, razing, or removal of all of a building or structure, including all related incidental opera tions. The Full Demolition Types are: New Work, Emergency Declaration, Immediate Emergency Declaration, Emergency Work Order, and Precept. A registered design professional (PE/RA) is required as the applicant on a full demolition filing when one or more of the f ollowing conditions are met: • Building is greater than 3 stories in height • Building is greater than 5,000 square feet per floor • Building is not detached • Demolition Is using mechanical equipment • Foundation is not being removed"
+          },
+          {
+            "id": "dob-subsequent-faq",
+            "title": "DOB NOW: Build FAQs — Subsequent Filings",
+            "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+            "publisher": "NYC Department of Buildings",
+            "catalogReviewedOn": "2026-09-09",
+            "sectionHeadings": [
+              "Subsequent Filings"
+            ],
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "controlling": false,
+            "attributedClaims": [
+              {
+                "id": "official-passage-f5c55ab1d498dfaa4daaf786",
+                "text": "DOB NOW: Build Frequently Asked Questions > Subsequent Filings — When can I submit a subsequent job filing? — Subsequent filings can be initiated and submitted after the initial job filing is submitted (not in pre-filing status). Users no longer have to wait until the initial filing is approved. A subsequent filing can be submitted anytime until an LOC has been issued for the initial filing.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to request a Letter of Completion (LOC) for a subsequent job filing? — Yes, an LOC needs to be requested for each filing, initial and subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — If an initial job application is filed as professional certification can the subsequent application be filed as a standard plan filing type? — Yes, initial and subsequent jobs can have different filing types.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can a subsequent filing have a different design applicant than the initial filing? — Yes, the applicant on an initial filing and a subsequent filing can be different. If the applicant is the same, one application can be submitted if the work types are eligible to be combine filed.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to pay the record management fee on a subsequent filing? — No, the $165 record management fee is now charged only once on the initial filing and is no longer a fee on subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can I have an open PAA for the initial filing and a subsequent filing at the same time? — Yes.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — How can I make a minor change to a legalization filing? — Post-Approval Amendments (PAA) are not allowed on filings that include legalization work. If a change needs to be made, a subsequent filing will be required or the job must be withdrawn and refiled. For Boiler Equipment filings the only option is to withdraw and refile the job. In addition, permits cannot be renewed if the job includes legalization work.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — I have a subsequent filing in pre-filing status and some of the fields are grayed out? How do I complete these fields? — Fields from the subsequent filing are populated from the initial filing (I1). The fields will not update on the subsequent filing until the I1 is submitted. To prevent this issue, we recommend completing as much of the I1 as possible before creating the subsequent filing.",
+                "verbatimText": "DOB NOW: Build Frequently Asked Questions > Subsequent Filings — When can I submit a subsequent job filing? — Subsequent filings can be initiated and submitted after the initial job filing is submitted (not in pre-filing status). Users no longer have to wait until the initial filing is approved. A subsequent filing can be submitted anytime until an LOC has been issued for the initial filing.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to request a Letter of Completion (LOC) for a subsequent job filing? — Yes, an LOC needs to be requested for each filing, initial and subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — If an initial job application is filed as professional certification can the subsequent application be filed as a standard plan filing type? — Yes, initial and subsequent jobs can have different filing types.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can a subsequent filing have a different design applicant than the initial filing? — Yes, the applicant on an initial filing and a subsequent filing can be different. If the applicant is the same, one application can be submitted if the work types are eligible to be combine filed.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to pay the record management fee on a subsequent filing? — No, the $165 record management fee is now charged only once on the initial filing and is no longer a fee on subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can I have an open PAA for the initial filing and a subsequent filing at the same time? — Yes.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — How can I make a minor change to a legalization filing? — Post-Approval Amendments (PAA) are not allowed on filings that include legalization work. If a change needs to be made, a subsequent filing will be required or the job must be withdrawn and refiled. For Boiler Equipment filings the only option is to withdraw and refile the job. In addition, permits cannot be renewed if the job includes legalization work.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — I have a subsequent filing in pre-filing status and some of the fields are grayed out? How do I complete these fields? — Fields from the subsequent filing are populated from the initial filing (I1). The fields will not update on the subsequent filing until the I1 is submitted. To prevent this issue, we recommend completing as much of the I1 as possible before creating the subsequent filing.",
+                "heading": "Subsequent Filings",
+                "intro": "",
+                "contentHash": "8be9234c0d00371f135ab3be0a012c6d01b24c319d828e2ea2c34e7d73343537"
+              }
+            ],
+            "sourceContentHash": "8be9234c0d00371f135ab3be0a012c6d01b24c319d828e2ea2c34e7d73343537",
+            "sourceValidation": "official_html",
+            "claim": "DOB NOW: Build Frequently Asked Questions > Subsequent Filings — When can I submit a subsequent job filing? — Subsequent filings can be initiated and submitted after the initial job filing is submitted (not in pre-filing status). Users no longer have to wait until the initial filing is approved. A subsequent filing can be submitted anytime until an LOC has been issued for the initial filing.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to request a Letter of Completion (LOC) for a subsequent job filing? — Yes, an LOC needs to be requested for each filing, initial and subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — If an initial job application is filed as professional certification can the subsequent application be filed as a standard plan filing type? — Yes, initial and subsequent jobs can have different filing types.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can a subsequent filing have a different design applicant than the initial filing? — Yes, the applicant on an initial filing and a subsequent filing can be different. If the applicant is the same, one application can be submitted if the work types are eligible to be combine filed.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to pay the record management fee on a subsequent filing? — No, the $165 record management fee is now charged only once on the initial filing and is no longer a fee on subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can I have an open PAA for the initial filing and a subsequent filing at the same time? — Yes.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — How can I make a minor change to a legalization filing? — Post-Approval Amendments (PAA) are not allowed on filings that include legalization work. If a change needs to be made, a subsequent filing will be required or the job must be withdrawn and refiled. For Boiler Equipment filings the only option is to withdraw and refile the job. In addition, permits cannot be renewed if the job includes legalization work.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — I have a subsequent filing in pre-filing status and some of the fields are grayed out? How do I complete these fields? — Fields from the subsequent filing are populated from the initial filing (I1). The fields will not update on the subsequent filing until the I1 is submitted. To prevent this issue, we recommend completing as much of the I1 as possible before creating the subsequent filing."
+          },
+          {
+            "id": "dob-nb-altco-faq",
+            "title": "DOB NOW: New Building and Alteration-CO FAQs",
+            "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+            "publisher": "NYC Department of Buildings",
+            "catalogReviewedOn": "2026-09-09",
+            "authorityClass": "official_guidance",
+            "role": "supporting",
+            "controlling": false,
+            "attributedClaims": [
+              {
+                "id": "official-passage-b70287cbc2f3310a30d3b9b1",
+                "text": "DOB NOW: Build Frequently Asked Questions > New Building and Alteration-CO — Do I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing? — No, the status of the subsequent filings will remain Permit Entire. Only the status of the initial (I1) filing will change to CO issued. If a Temporary CO is issued, the status of the initial job will remain Permit Entire until the Final CO is issued.",
+                "verbatimText": "No, the status of the subsequent filings will remain Permit Entire. Only the status of the initial (I1) filing will change to CO issued. If a Temporary CO is issued, the status of the initial job will remain Permit Entire until the Final CO is issued.",
+                "heading": "DOB NOW: Build Frequently Asked Questions > New Building and Alteration-CO",
+                "intro": "Do I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing?",
+                "contentHash": "42b047a26065b930ca6bc7ffc51c225c9bb68c8caafc505078f2bcba6625be32"
+              }
+            ],
+            "sourceContentHash": "42b047a26065b930ca6bc7ffc51c225c9bb68c8caafc505078f2bcba6625be32",
+            "sourceValidation": "official_html",
+            "claim": "DOB NOW: Build Frequently Asked Questions > New Building and Alteration-CO — Do I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing? — No, the status of the subsequent filings will remain Permit Entire. Only the status of the initial (I1) filing will change to CO issued. If a Temporary CO is issued, the status of the initial job will remain Permit Entire until the Final CO is issued."
+          }
+        ],
+        "citations": []
+      },
+      "sourcePacketSHA256": "bce50e6afdcf8c2b73ef61129b218be605582f5f9536ee05533f79b074d43a79",
+      "sourceBindings": [
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-789cc7ccd439eb8374132031",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5",
+          "page": 5
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-5b682c1399f57019c03eda89",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6",
+          "page": 6
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-5bdd162d6e75ae930ee42abc",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=19",
+          "page": 19
+        },
+        {
+          "sourceID": "dob-subsequent-faq",
+          "claimID": "official-passage-f5c55ab1d498dfaa4daaf786",
+          "contentHash": "8be9234c0d00371f135ab3be0a012c6d01b24c319d828e2ea2c34e7d73343537",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "page": null
+        },
+        {
+          "sourceID": "dob-nb-altco-faq",
+          "claimID": "official-passage-74599221c3821651d9543394",
+          "contentHash": "42b047a26065b930ca6bc7ffc51c225c9bb68c8caafc505078f2bcba6625be32",
+          "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+          "page": null
+        },
+        {
+          "sourceID": "dob-nb-altco-faq",
+          "claimID": "official-passage-b70287cbc2f3310a30d3b9b1",
+          "contentHash": "42b047a26065b930ca6bc7ffc51c225c9bb68c8caafc505078f2bcba6625be32",
+          "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+          "page": null
+        }
+      ],
+      "requiredConcepts": [
+        "Preserve one job number for related construction work on the same property.",
+        "Distinguish the job number from the filing extension.",
+        "State that each filing still requires separate processing and completion.",
+        "Preserve the public-source conflicts about creation timing and completion path.",
+        "Obtain the initial job type before stating whether the subsequent filing closes through an LOC or the initial filing's CO process."
+      ],
+      "backlogDisposition": "delivered_with_substance_or_scope_gap",
+      "workItemIDs": [
+        "R2",
+        "R7"
+      ],
+      "reviewStatus": "delivered-targeted-conflict-repair-confirmed-reference-and-presentation-gaps",
+      "confirmed": [
+        "The same-job-number subsequent-filing recommendation, filing extension, different-applicant option and separate processing are supported.",
+        "The submission prerequisite is separated from acknowledged earlier creation and unresolved broader creation timing in the main paragraph. The old categorical before-initiation restriction is no longer stated as the universal rule.",
+        "Both general LOC and specialized NB/Alteration-CO initial-CO branches are present, with the missing initial job type identified.",
+        "All three paragraphs select the supporting source/claim pairs; the timing paragraph includes the complete FAQ that contains both directions."
+      ],
+      "missingExpected": [
+        "The reference also states that a subsequent filing may use a different review type; this previously covered permission is omitted. This is a reference-completeness gap, not a wrong core filing recommendation."
+      ],
+      "presentationGaps": [
+        "The first paragraph restates the same-project/property premise rather than applying it directly.",
+        "The second paragraph adds an unasked Filing Action/menu instruction.",
+        "The timing uncertainty and job-type gap are repeated across main text and secondary fields; the main answer is 244 words."
+      ],
+      "checkerFindings": "The verifier passes the answer and its source-qualification receipt. That supports the targeted timing repair, but does not establish complete reference/presentation acceptance.",
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "needs-refinement"
+    },
+    {
+      "id": "DOBNOW-004",
+      "sourceCommit": "ae14449ac4a14a941e99cc0b2b5669a732a93bc7",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-claim-scope-2026-09-09.json",
+      "inputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "resultSHA256": "94c8fc9f3cefb3d9101ea1e3b77f2fb8ee9e5798075bddcb655cd6ae38807eb2",
+      "expectedAnswerSHA256": "fb0fbdf6d2cfec2d84bede1764713e9567a24bc7f5b4fc41b146dd785c111eff",
+      "delivered": false,
+      "httpStatus": 502,
+      "durationMilliseconds": 19767,
+      "mainWordCount": 247,
+      "allAuthoredWordCount": 273,
+      "retainedDraft": {
+        "paragraphs": [
+          {
+            "text": "Because the initial filing is approved, the appropriate action is a Post Approval Amendment (PAA) in DOB NOW: Build to revise the approved scope and drawings. The Applicant of Record who filed the original filing must file it; only one PAA may be in progress. A PAA is unavailable if the filing includes legalization, but the supplied fact says it was not submitted for legalization. Revised PDF plan sets and a DPL1 must be uploaded, and the change description must be entered in the Plans/Work (PW1) Comments field. The Department reviews the PAA, and approval is not established until that review results in approval.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-paa-process",
+                "claimID": "official-passage-5e16dcc949255222d2d98342"
+              },
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-ce20f813e92241a7bc12804a"
+              }
+            ]
+          },
+          {
+            "text": "The filing must disclose the revised scope and plan changes in PW1 Comments. If approved plans are being changed, upload a complete plan set: new unapproved sheets without an approved stamp and previously approved DOB-stamped sheets; after PAA approval, that uploaded plan set replaces the prior set. The PAA fee is a flat $100 when filed, and an estimated job-cost increase or decrease triggers fee recalculation; any increase difference must be paid. Filing Review Type, application/location address, Applicant of Record information, owner information, and building type are not editable. The supplied guidance gives incompatible directions about the specific Work on Floors field: the process page lists it as noneditable, while the FAQ says it can be changed with a PAA when adding or removing a floor, with PW3 updated for the changed estimated work cost. That field’s editability remains unresolved in these passages.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-paa-process",
+                "claimID": "official-passage-5e16dcc949255222d2d98342"
+              },
+              {
+                "sourceID": "dob-paa-faq",
+                "claimID": "official-passage-5e5d4a688cb4babee9ee7ea5"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [],
+        "evidenceLimitations": [
+          "The supplied passages conflict on whether the Work on Floors field is editable in a PAA; they do not resolve which instruction governs for this filing."
+        ]
+      },
+      "retainedVerifier": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "missed_material_conclusion",
+            "detail": "The answer states that a job-cost decrease triggers fee recalculation but omits the supplied guidance that a decrease produces an adjustment and that the Applicant may request a refund."
+          }
+        ],
+        "qualificationReview": {
+          "packetSHA256": "08f64538b6682e6a5db9f66d887bbcbc8eae796d441450d49325cebd7bac4c5a",
+          "passages": [
+            {
+              "passageIndex": 0,
+              "finding": "missing_or_misstated",
+              "conditionSpanIDs": [
+                13,
+                15,
+                16
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer mentions fee recalculation for decreases but does not preserve the stated adjustment and possible refund."
+            },
+            {
+              "passageIndex": 1,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12
+              ],
+              "answerReferences": [
+                "paragraph:0",
+                "paragraph:1"
+              ],
+              "reason": "The answer preserves the PAA action, complete-plan-set requirements for changed plans, comments disclosure, replacement effect and the Work on Floors conflict."
+            },
+            {
+              "passageIndex": 2,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                17
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer identifies a PAA for changes after approval."
+            },
+            {
+              "passageIndex": 3,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                7
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer preserves that Filing Review Type is not editable."
+            },
+            {
+              "passageIndex": 4,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                17,
+                29,
+                30
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer preserves the legalization limitation and applies the supplied fact that the filing was not submitted for legalization."
+            }
+          ]
+        }
+      },
+      "reviewedDeliveredProjection": null,
+      "sourcePacketSHA256": "1644983b49ac7995d67f208c35da65bd016c19aef3189b907e1080d8ed298d85",
+      "sourceBindings": [
+        {
+          "sourceID": "dob-paa-process",
+          "claimID": "official-passage-5e16dcc949255222d2d98342",
+          "contentHash": "fa06851a9efb8fc2eb5b39e46528e63817e92bd9c727a1df6280acc9a6748de7",
+          "url": "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page",
+          "page": null
+        },
+        {
+          "sourceID": "dob-paa-faq",
+          "claimID": "official-passage-5e5d4a688cb4babee9ee7ea5",
+          "contentHash": "78e3cc8137cd48f54ee74a3610619c8537f0ed0931523642b4e4b2bfb0403bfb",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "page": null
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-789cc7ccd439eb8374132031",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5",
+          "page": 5
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-99e3ff631d01ad61590ccecf",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=13",
+          "page": 13
+        },
+        {
+          "sourceID": "dob-application-guide",
+          "claimID": "official-passage-ce20f813e92241a7bc12804a",
+          "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=16",
+          "page": 16
+        }
+      ],
+      "requiredConcepts": [
+        "Confirm that the original filing is approved.",
+        "Confirm that the requested change is within the PAA route.",
+        "Identify immutable fields before promising that a PAA can accomplish the requested change.",
+        "Disclose the official-source conflict concerning Work on Floors."
+      ],
+      "backlogDisposition": "latest_attempt_undelivered",
+      "workItemIDs": [
+        "R5",
+        "R7"
+      ],
+      "reviewStatus": "undelivered-field-conflict-repair-confirmed-in-draft-collateral-fee-rejection",
+      "confirmed": [
+        "The draft correctly applies the approved-filing and non-legalization facts, identifies the original Applicant of Record and one-open-PAA limit.",
+        "The locked-field list excludes Work on Floors from its unconditional conclusion. The main paragraph explicitly compares the contrary process-page and FAQ directions, including the add/remove-floor context and PW3 condition.",
+        "The verifier recognizes the Work on Floors conflict disclosure and the changed-plan-set context; the prior source-conflict error is not its rejection reason."
+      ],
+      "missingExpected": [],
+      "presentationGaps": [
+        "The draft volunteers DPL1, Comments-field instructions, a fee amount and fee recalculation even though the question asks for the filing action and limits.",
+        "The change-description instruction appears twice, and the review/approval sentence is tautological.",
+        "The main draft is 247 words, with a further repeated field-conflict limitation."
+      ],
+      "checkerFindings": "The sole rejection concerns omitted adjustment/refund detail after the draft volunteers job-cost decrease and fee recalculation. Recalculation already conveys an adjustment, and an optional refund request does not change the asked filing decision; the materiality of blocking on that omission is questionable. Preserve the failed verdict and remove the unasked fee detour rather than treating the entire fee workflow as required or overriding verification.",
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "undelivered-no-full-answer-acceptance"
+    }
+  ]
+}

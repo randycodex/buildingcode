@@ -1,12 +1,14 @@
 # Permitext Research: counted backlog
 
-Inventory revision 2: September 9, 2026. Runtime baseline: `79686cee4513d8d487bec2d187ed6324f77bb0ec`.
+Inventory revision 3: September 9, 2026. Latest two-case live comparison runtime: `ae14449ac4a14a941e99cc0b2b5669a732a93bc7`. The full cohort has not been rerun on this baseline.
 
 **Seven scoped repair work items remain, along with two pending validation items. The review of all 24 previously unmatched answers is complete.** These are groups of known findings, not a proven count of independent software defects. One repair can affect several questions.
 
-All **110 numbered questions** remain included. Their latest recorded attempts delivered 96 answers and failed to deliver 14. Of the delivered answers, 30 have recorded substance or scope gaps and 22 have presentation gaps. Another 33 have positive core reviews and 11 have explicit whole-answer development passes. Every latest answer now has a matched development review.
+All **110 numbered questions** remain included. Their latest recorded attempts delivered 97 answers and failed to deliver 13. Of the delivered answers, 31 have recorded substance or scope gaps and 22 have presentation gaps. Another 33 have positive core reviews and 11 have explicit whole-answer development passes. Every latest answer now has a matched development review.
 
 ## Change since the first inventory
+
+The latest [two-case claim-scope comparison and full answer review](../evals/results/research-owner-claim-scope-answer-assessment-2026-09-09.json) delivered DOBNOW-003 with its creation-timing uncertainty in the main text. It still omits the reference's different-review-type permission and includes unasked navigation and repetition. DOBNOW-004's raw draft now explains the Work on Floors source conflict, but the verifier blocked delivery over an incomplete fee explanation that the draft volunteered. Neither is a whole-answer pass. The [revision 2 inventory](../evals/results/research-owner-backlog-v2-2026-09-09.json) and all earlier results remain unchanged.
 
 The 24 previously unmatched saved answers were reviewed without provider or network calls: **8 meet the reference in their saved sample, 9 have substance/scope/citation gaps, and 7 need presentation cleanup**. These classifications resolve missing review evidence; they are not 16 newly failing live tests. The findings fit the seven existing repair items. The [first inventory](../evals/results/research-owner-backlog-2026-09-09.json) remains unchanged.
 
@@ -16,8 +18,8 @@ The latest storage-use answer includes the formerly missing reconstruction and n
 
 | Latest retained evidence | Questions |
 | --- | ---: |
-| No delivered answer in latest attempt | 14 |
-| Delivered; substance or scope gap | 30 |
+| No delivered answer in latest attempt | 13 |
+| Delivered; substance or scope gap | 31 |
 | Delivered; presentation gap | 22 |
 | Prior core review only | 33 |
 | Whole-answer development pass on saved sample | 11 |
@@ -40,17 +42,19 @@ Affected questions: CC-04, FGC-02, MC-09, ZR-18, ZR-19, DOBNOW-003, DOBNOW-004, 
 
 Closure: The delivered main conclusion and every supporting claim preserve the applicable condition; a caveat elsewhere cannot contradict or repair an unconditional claim.
 
-Local preparation, September 9: the shared [claim-scope instruction](../research-claim-scope.mjs) now reaches code drafting and semantic verification, as well as official-guidance drafting and verification. It requires claim-adjacent conditions, consistent main text and secondary fields, and distinguishes a conditional document requirement from an unsupported sequence. Secondary claims remain subject to complete conditions and citations; unasked claims should be omitted. This directly addresses the retained timing contradiction, added before-selection/before-response requirements and collateral claims with missing conditions. It is a prompt change awaiting live confirmation, not proof those answers now pass.
+Local preparation, September 9: the shared [claim-scope instruction](../research-claim-scope.mjs) now reaches code drafting and semantic verification, as well as official-guidance drafting and verification. It requires claim-adjacent conditions, consistent main text and secondary fields, and distinguishes a conditional document requirement from an unsupported sequence. Secondary claims remain subject to complete conditions and citations; unasked claims should be omitted. This directly addresses the retained timing contradiction, added before-selection/before-response requirements and collateral claims with missing conditions. The latest two samples provide limited confirmation of the source-conflict repair, but neither establishes complete answer acceptance or reliable behavior across the cohort.
 
 The source-relationship detector also compares the PAA locked-field list with an editing permission for the same field. The field name comes from fetched source text; no case ID or expected answer enters runtime. Both complete paragraph/FAQ contexts and their source/claim/hash bindings remain available. The comparison disappears for unrelated questions, missing sources, removed restrictions or removed permissions. The ordinary semantic verifier still decides whether scope resolves the apparent conflict; no failed verdict is overridden.
 
 Validation: `npm run test:research-chat` passed. The [claim-scope contract](../tests/research-claim-scope-contract.mjs) checks 220 code request envelopes using all 110 question texts and synthetic source sentinels, plus both official-guidance stages with the retained PAA sources. These are request/coverage checks, not 110 generated-answer evaluations. The [fixed-source request comparison](../evals/results/research-claim-scope-request-comparison-2026-09-09.json) preserves all source passages, facts, candidate prose, schemas, models, reasoning settings and output budgets between old and new requests. It records an additional 987 bytes per timing-case request and 3,290 bytes per PAA-case request. No live latency or answer-quality improvement is established. The full local suite log is `/tmp/permitext-claim-scope-research-suite-20260909.log`.
 
+Live comparison: DOBNOW-003 returned HTTP 200 in 20.311 seconds; DOBNOW-004 returned HTTP 502 in 19.767 seconds. The first received a valid qualification receipt and the second retained its negative semantic verdict. The second verifier explicitly recognized the repaired field conflict and accepted the plan-set requirement under the supplied changed-plan premise; its sole rejection concerned the volunteered fee-decrease explanation. The review questions the materiality of blocking the filing decision over an optional refund process, but does not override that rejection. The next repair should remove the unasked fee detour. These two observations do not establish a speed improvement or p50/p90 performance. See the [unaltered live results](../evals/results/research-owner-api-round2-live-claim-scope-2026-09-09.json) and [cost audit](../evals/results/research-owner-api-round2-claim-scope-cost-audit-2026-09-09.json).
+
 ### R2 — Retain the material source scope and required answer branches
 
 Status: open. Area: Complete sources and answers.
 
-Affected questions: ZR-04, ZR-09, ZR-13, ZR-16, DOBNOW-002, DOBNOW-013, DOBNOW-015, DOBNOW-016, DOBNOW-020, DOBNOW-021, DOBNOW-024, MC-04, MC-10.
+Affected questions: ZR-04, ZR-09, ZR-13, ZR-16, DOBNOW-002, DOBNOW-003, DOBNOW-013, DOBNOW-015, DOBNOW-016, DOBNOW-020, DOBNOW-021, DOBNOW-024, MC-04, MC-10.
 
 Closure: Complete source passages reach drafting and verification, and each material benchmark concept is present without inventing missing project facts. Any proposed reference correction is documented separately.
 
@@ -68,7 +72,7 @@ The MC-03 diagnosis is now more precise: the word **part**, not **designed**, tr
 
 The [110-question parser audit](../evals/results/research-fact-subject-scope-audit-2026-09-09.json) records changes only for FGC-01 and MC-03; the other 108 question projections are unchanged. The [subject-scope regression](../tests/research-fact-subject-scope-contract.mjs) covers equipment/building wording, system-versus-total counts, qualified quantities, follow-ups and legacy revalidation. These are local parser repairs, not new generated-answer passes. R3 and the full-answer acceptance counts remain open and unchanged.
 
-Validation: `npm run test:research-chat` passed on the final parser source, including the new subject-scope contract and the existing qualified-facts contract. The audit's source hashes and 110 case rows were verified; live execution and result overwrite were rejected. No paid calls were made and the $0.578301 remaining conservative allowance is unchanged. The full local suite log is `/tmp/permitext-fact-subject-research-suite-final-20260909.log`.
+Validation: `npm run test:research-chat` passed on the final parser source, including the new subject-scope contract and the existing qualified-facts contract. The audit's source hashes and 110 case rows were verified; live execution and result overwrite were rejected. These parser checks made no paid calls. The full local suite log is `/tmp/permitext-fact-subject-research-suite-final-20260909.log`.
 
 ### R4 — Confirm mapped-location and definition checks accept supported uncertainty
 
@@ -102,7 +106,7 @@ Closure: Mixed-source points and additional narrative claims retain every needed
 
 Status: open. Area: Answer format.
 
-Affected questions: CC-03, DOBNOW-018, FGC-03, FGC-04, MC-15, GAP-05, PC-05, GAP-11, PC-12, MC-01, MC-12, PC-13, DOBNOW-001, DOBNOW-006, DOBNOW-015, ZR-06, FGC-01, FGC-06, FGC-07, FGC-08, FGC-09, FGC-10, MC-05, MC-10, GAP-01, GAP-02, GAP-04, PC-01, PC-03.
+Affected questions: CC-03, DOBNOW-018, FGC-03, FGC-04, MC-15, GAP-05, PC-05, GAP-11, PC-12, MC-01, MC-12, PC-13, DOBNOW-001, DOBNOW-003, DOBNOW-004, DOBNOW-006, DOBNOW-015, ZR-06, FGC-01, FGC-06, FGC-07, FGC-08, FGC-09, FGC-10, MC-05, MC-10, GAP-01, GAP-02, GAP-04, PC-01, PC-03.
 
 Closure: The complete delivered answer follows direct answer, rule/citation, application and material qualifications without repeated generated fields or unasked instructions. Substantive fixes retain their own closure requirements.
 
@@ -131,14 +135,14 @@ Closure: A prepriced, authorized sample measures full-turn p50/p90 latency and c
 ## Execution order and stopping rules
 
 1. The two demonstrated parser scope defects under R3 are locally repaired with negative controls and a 110-question parser comparison. Continue the remaining R3 answer-level findings; preserve the distinction between supplied qualified premises and actual missing facts.
-2. Confirm the new R1 claim-scope instructions and PAA source comparison using a freshly priced, committed-source API package within the remaining authorized allowance. Include the PAA conflict alongside the timing case; preserve R5 actor-authority confirmation and all other repair groups rather than treating two cases as the complete scope.
+2. The two-case R1 live comparison is complete. Next remove unasked fee/menu detours, retain the relevant review-type permission, and examine verifier materiality without overriding failed results. Preserve R5 actor-authority confirmation and all other repair groups rather than treating two cases as the complete scope.
 3. Complete local regressions before a newly priced, single-use live comparison. Do not replay consumed drivers or infer that the remaining allowance covers the complete cohort.
 4. A case closes only with a delivered answer meeting its unchanged substantive reference, material qualifications, point-specific citations and presentation requirements. An automatic verifier pass alone is insufficient. Proposed reference corrections remain separate from scoring.
 5. Report changes against this backlog. Current-baseline validation and representative speed/cost acceptance remain open for all 110 questions.
 
 ## Budget and scope
 
-This inventory and the 24-answer review made **zero paid provider calls and zero network calls**. The current authorization is $8.50; retained conservative spending is $7.921699, leaving **$0.578301**. Recorded usage estimates total $4.18561632. These are ledger figures; the API account balance and invoice were not checked. The older historical campaign remains separate.
+The new claim-scope comparison made **four paid provider calls across two HTTP Research turns**, with no paid search, retries or separate judge. Its conservative charge is **$0.086951** and usage estimate is $0.04720110. The unchanged aggregate authorization is $8.50; retained conservative spending is **$8.008650**, leaving **$0.491350**. Recorded usage estimates total $4.23281742. These are ledger figures; the API account balance and invoice were not checked. The older historical campaign remains separate. Inventory generation and manual answer review themselves made zero provider or network calls. The consumed live driver must not be replayed.
 
 No Project, Notebook, Reports, export, UI or phone workflow was exercised. Nothing was pushed or deployed. Original questions, answer keys, source evidence and failed results were preserved.
 
@@ -176,8 +180,8 @@ Each row links its latest saved result and matched review. Every row still requi
 | ZR-21 | Discontinuance of a non-conforming use | Whole-answer development pass on saved sample |  | [result](../evals/results/research-owner-live-zoning-expansion-2026-09-08.json) · [review](../evals/results/research-owner-zoning-expansion-answer-review-2026-09-08.json) |
 | DOBNOW-001 | Alteration without a CO-triggering change | Delivered; presentation gap | R7 | [result](../evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json) · [review](../evals/results/research-owner-dob-safety-confirmation-answer-review-2026-09-09.json) |
 | DOBNOW-002 | Existing element retained in reconstruction | Delivered; substance or scope gap | R2 | [result](../evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json) · [review](../evals/results/research-owner-dob-source-coverage-answer-review-2026-09-09.json) |
-| DOBNOW-003 | Subsequent plumbing filing | No delivered answer in latest attempt | R1 | [result](../evals/results/research-owner-api-round2-live-decision-scope-2026-09-09.json) · [review](../evals/results/research-owner-decision-scope-answer-assessment-2026-09-09.json) |
-| DOBNOW-004 | PAA for an approved-scope change | No delivered answer in latest attempt | R1, R5 | [result](../evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json) · [review](../evals/results/research-owner-dob-companion-confirmation-answer-review-2026-09-09.json) |
+| DOBNOW-003 | Subsequent plumbing filing | Delivered; substance or scope gap | R1, R2, R7 | [result](../evals/results/research-owner-api-round2-live-claim-scope-2026-09-09.json) · [review](../evals/results/research-owner-claim-scope-answer-assessment-2026-09-09.json) |
+| DOBNOW-004 | PAA for an approved-scope change | No delivered answer in latest attempt | R1, R5, R7 | [result](../evals/results/research-owner-api-round2-live-claim-scope-2026-09-09.json) · [review](../evals/results/research-owner-claim-scope-answer-assessment-2026-09-09.json) |
 | DOBNOW-005 | Small-business response | Prior core review only |  | [result](../evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json) · [review](../evals/results/research-owner-dob-source-coverage-answer-review-2026-09-09.json) |
 | DOBNOW-006 | MPP enrollment boundary | Delivered; presentation gap | R7 | [result](../evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json) · [review](../evals/results/research-owner-dob-companion-confirmation-answer-review-2026-09-09.json) |
 | DOBNOW-007 | Complete roof replacement | Prior core review only |  | [result](../evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json) · [review](../evals/results/research-owner-dob-source-coverage-answer-review-2026-09-09.json) |
@@ -261,11 +265,13 @@ Each row links its latest saved result and matched review. Every row still requi
 
 ## Reproduction and audit
 
-The [revision 2 inventory](../evals/results/research-owner-backlog-v2-2026-09-09.json) retains all 110 case definitions, latest-attempt bindings, reviewed findings and input hashes. The [report script](../scripts/report-research-owner-backlog-20260909.mjs) checks retained ledger hashes, rejects ambiguous review bindings and refuses live execution. The supplemental review is pinned by its hash and contains explicit manual dispositions; untriaged reviews are not automatically accepted. These evaluation-only findings never enter model prompts.
+The [revision 3 inventory](../evals/results/research-owner-backlog-v3-2026-09-09.json) retains all 110 case definitions, latest-attempt bindings, reviewed findings and input hashes. The [report script](../scripts/report-research-owner-backlog-20260909.mjs) checks retained ledger hashes, rejects ambiguous review bindings and refuses live execution. The supplemental and latest two-case reviews are pinned by their hashes and contain explicit manual dispositions; untriaged reviews are not automatically accepted. These evaluation-only findings never enter model prompts.
 
 Run `node scripts/report-research-owner-backlog-20260909.mjs` from `permitext-sync-server` to inspect the current inventory without writing artifacts or calling providers. `--output` requires a new output path. Historical snapshots are not overwritten.
 
 Revision 2 validation passed: all 24 reviewed answer projections, source/result identities and expected-answer hashes match retained evidence; all 110 case definitions and latest attempts are unchanged from revision 1; all 110 document rows have matching reviews and remain assigned to current-baseline and speed/cost validation. The seven repair items are preserved, V1 is complete, the budget is unchanged, and live execution of the inventory remains rejected. The 60-case source-review contract and `git diff --check` also passed. No Research-generation test was run for this review.
+
+Revision 3 validation passed: committed runtime hashes and normalized initial requests match the live preflight; both verifier requests retain the complete draft source packet and original candidate prose. All four paid calls are terminal with zero pending operations. The new review matches the complete retained outputs, result identities and unchanged expected-answer hashes. All 110 case definitions and document rows are consistent; only DOBNOW-003/004 have new latest attempts. Existing work memberships remain, with R2 added for DOBNOW-003 and R7 for both. All 47 historical/fresh ledger hashes are retained, and the cumulative conservative budget is $8.008650. Inventory generation cannot dispatch Research. No runtime was changed during this result review.
 
 - The seven repair items are a scoped grouping of known findings, not a proven total of independent bugs. Case overlap is intentional; do not sum work-item case counts.
 - Latest-attempt results span different code and prompt versions. Failed old attempts can have subsequent local repairs; those repairs need separate confirmation.
