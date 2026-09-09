@@ -12,13 +12,15 @@ globalThis.fetch = async () => { throw new Error("No network in retained origina
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1" });
 const retainedRuns = await Promise.all([
   "research-owner-api-round2-live-original-code-2026-09-09.json",
-  "research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json"
+  "research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+  "research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json"
 ].map(async (file) => JSON.parse(await readFile(new URL(`../evals/results/${file}`, import.meta.url)))));
 const key = JSON.parse(await readFile(new URL("../evals/research-reconciled-answer-key.json", import.meta.url)));
 const compact = (text) => text.replace(/\s+/g, " ").trim();
-for (const [retained, id] of [[retainedRuns[0], "ZR-07"], [retainedRuns[0], "ZR-11"], [retainedRuns[1], "ZR-07"], [retainedRuns[1], "ZR-11"]]) {
+for (const [retained, id] of [[retainedRuns[0], "ZR-07"], [retainedRuns[0], "ZR-11"], [retainedRuns[1], "ZR-07"], [retainedRuns[1], "ZR-11"], [retainedRuns[2], "ZR-07"], [retainedRuns[2], "ZR-11"]]) {
   const call = retained.providerCalls.find((call) => call.caseID === id && call.phase === "permitext_code_interpretation");
   let answer = JSON.parse(call.output.flatMap((message) => message.content || []).find((part) => part.type === "output_text").text);
+  if (retained === retainedRuns[2] && id === "ZR-11") answer = retained.results.find((item) => item.id === id).answer;
   const input = await ownerResearchScopeInput(key.cases.find((item) => item.id === id), { original: true, zoningSummary: zoningSectionSummary });
   // Recreate the actual full-section reader selections and their source IDs;
   // expected answers and grading concepts never become retrieval input.
@@ -68,6 +70,26 @@ for (const [retained, id] of [[retainedRuns[0], "ZR-07"], [retainedRuns[0], "ZR-
       const candidate = { ...answer, answerText: answer.answerText.replace("maximum permitted residential FAR", selection) };
       assert(controls(candidate).pass, selection);
       assert(safety(candidate).pass, selection);
+    }
+    const lead = "The maximum permitted residential FAR cannot be determined from the supplied facts.";
+    for (const unresolved of ["cannot be determined", "can't be established", "cannot be selected", "cannot be identified"]) {
+      const withheld = `The maximum permitted residential FAR ${unresolved} from the supplied facts`;
+      assert(safety({ ...answer, answerText: `${withheld}.` }).pass, withheld);
+      for (const delimiter of [". ", "; ", ", and ", ", but ", " — "]) {
+        for (const approval of ["the owner may proceed", "the property is approved", "the applicant has the green light"]) {
+          assert(!safety({ ...answer, answerText: `${withheld}${delimiter}${approval}.` }).pass, `${withheld}${delimiter}${approval}`);
+        }
+      }
+    }
+    for (const qualifier of ["", " alone", " by itself"]) {
+      for (const inference of ["does not establish that", "does not establish whether", "cannot show if", "doesn't prove whether"]) {
+        const candidate = { ...answer, answerText: `${lead} The proposal ratio is 4.0 FAR. That calculation${qualifier} ${inference} 4.0 FAR is permitted.` };
+        assert(controls(candidate).pass);
+        assert(safety(candidate).pass, candidate.answerText);
+        for (const suffix of [" The owner may proceed.", "; the property is approved.", ", but 4.0 FAR is permitted for this site."]) {
+          assert(!safety({ ...candidate, answerText: candidate.answerText.replace(/\.$/, "") + suffix }).pass, suffix);
+        }
+      }
     }
     for (const extension of ["The owner may proceed.", "The proposed 4.0 FAR is permitted.", "The property is approved.", "The site is in an R7A district."]) {
       for (const delimiter of ["\n\n", "; ", ", and ", ", but "]) {

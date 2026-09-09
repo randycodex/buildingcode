@@ -1,0 +1,98 @@
+{
+  "schema": "permitext-owner-retained-answer-review-v1",
+  "checkedAt": "2026-09-09T03:31:44.189Z",
+  "sourceCommit": "8aee45526ce540ec36262bce071036b6084e6ea0",
+  "scope": "Manual development review against retained canonical source passages and the reconciled question scope; no separate model judge, new provider call, professional approval or deployment.",
+  "live": {
+    "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+    "sha256": "6cacf237b64e02d3b388adafea5f0b48865f3c9778e5d15e77b8fc19b8de03ca"
+  },
+  "preflight": {
+    "file": "evals/results/research-owner-api-round2-zoning-repair-preservation-preflight-2026-09-09.json",
+    "sha256": "5969d9519ed0deeb792b5c203b4fbfd6b4f8afcb28b0771480dfcc470020e2f6"
+  },
+  "costAudit": {
+    "file": "evals/results/research-owner-api-round2-zoning-repair-preservation-cost-audit-2026-09-09.json",
+    "sha256": "9b88d53fe495a903d171a2ce199c2a3ac87174f050a5aebff4ad2469fb6611ac"
+  },
+  "sourceHashVerification": {
+    "files": 30,
+    "allMatchRecordedCommit": true,
+    "allInitialRequestsAndAuthoredInputsMatchPreflight": true
+  },
+  "postLiveOfflineSourceHashes": {
+    "research-zoning-safety.mjs": "840b103c3fa80ca99fba22c5094c4cef33e885d392123b1580e1e75768abfa2a",
+    "tests/research-zoning-original-code-regressions.mjs": "483bc88cf4f0956619556e44bd991b28663ca4a5e7f6537b483ce75d0a87a8b9"
+  },
+  "cases": [
+    {
+      "id": "ZR-05",
+      "delivered": true,
+      "milliseconds": 17598,
+      "phases": [
+        "permitext_code_interpretation",
+        "permitext_research_verification"
+      ],
+      "status": "development_source_review_pass",
+      "findings": [
+        "All 12 canonical amendment events and corresponding report IDs are present, including N240010ZRY and N240011ZRY.",
+        "Mixed enacted-text and official-metadata authority label is supplied; source snapshot is explicit.",
+        "Recommendations for historical reconstruction are distinguished from claims about the enacted rule."
+      ],
+      "limitations": [
+        "Live online completeness and historical enacted versions remain unverified."
+      ]
+    },
+    {
+      "id": "ZR-07",
+      "delivered": false,
+      "milliseconds": 7871,
+      "phases": [
+        "permitext_code_interpretation"
+      ],
+      "status": "undelivered_valid_uncertainty_draft",
+      "findings": [
+        "The retained draft withholds permitted residential FAR while computing only the proposed 4.0 ratio.",
+        "The live local safety classifier rejected passive uncertainty and an equivalent complete negative inference.",
+        "Subsequent offline regression now accepts the retained draft and equivalent uncertainty while rejecting appended approvals."
+      ],
+      "limitations": [
+        "The post-live safety change has not been confirmed by a new paid end-to-end answer."
+      ]
+    },
+    {
+      "id": "ZR-11",
+      "delivered": true,
+      "milliseconds": 23518,
+      "phases": [
+        "permitext_code_interpretation",
+        "permitext_zoning_source_bounded_repair",
+        "permitext_research_verification"
+      ],
+      "status": "development_source_review_pass",
+      "findings": [
+        "Basic cap, proposed ratio and 500-square-foot difference are stated correctly.",
+        "Shallow-lot, near-corner and short-block modifications are qualified by their unestablished conditions.",
+        "Rear-yard qualifications correspond to the cited supplied passage; other bulk/open-area requirements are left outside the review."
+      ],
+      "limitations": [
+        "The supplied facts do not establish a final permissible building footprint."
+      ]
+    }
+  ],
+  "summary": {
+    "providerCalls": 6,
+    "pendingProviderCalls": 0,
+    "batchUsageEstimateUSD": 0.14810335,
+    "batchConservativeUSD": 0.276254,
+    "roundUsageEstimateUSD": 2.44686157,
+    "roundConservativeUSD": 4.836186,
+    "remainingConservativeAuthorizationUSD": 3.163814,
+    "fullNumberedCohort": 110,
+    "providerAttempted": 83,
+    "notProviderAttempted": 27,
+    "professionalApproval": false,
+    "newPaidCallsForReview": 0,
+    "projectWorkflowTested": false
+  }
+}

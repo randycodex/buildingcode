@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { unresolvedZoningFARSelectionPattern } from "./research-zoning-conditional-explanation.mjs";
 
 export const zoningResearchSafetyVersion =
-  "20260909-zoning-asserted-predicate-v20";
+  "20260909-zoning-unresolved-inference-v21";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -330,8 +330,10 @@ function hasAffirmativeMappedResult(value) {
 }
 
 function statesUnprovenFARAllowance(value) {
-  return /^(?:this|that|the)\s+(?:calculation|ratio|figure|result)\s+(?:does\s+not|cannot)\s+(?:establish|prove|confirm|show)\s+that\s+\d+(?:\.\d+)?\s+FAR\s+is\s+(?:permitted|allowed|authorized)[.!?]?$/i.test(compactText(value).replace(/\*\*/g, ""));
+  return /^(?:this|that|the)\s+(?:calculation|ratio|figure|result|arithmetic)(?:\s+(?:alone|by\s+itself))?\s+(?:does\s+not|doesn['’]t|cannot|can['’]t)\s+(?:establish|prove|confirm|show)\s+(?:that|whether|if)\s+\d+(?:\.\d+)?\s+(?:FAR|floor[- ]area ratio)\s+(?:is|would\s+be|can\s+be)\s+(?:permitted|allowed|authorized)[.!?]?$/i.test(compactText(value).replace(/\*\*|__/g, ""));
 }
+
+const unresolvedMappedDecisionPattern = /\b(?:cannot|can['’]t|could not|does not|do not|not enough|insufficient|unable to)\b[^.]{0,180}\b(?:determine[ds]?|establish(?:ed)?|conclude[ds]?|confirm(?:ed)?|place[ds]?|locate[ds]?|map(?:ped)?|apply|applied|select(?:ed)?|identify|identified)\b/i;
 
 function hasAppendedMappedActorConclusion(value) {
   // Decimal FAR values must not split a withheld inference away from a later
@@ -358,7 +360,7 @@ function hasAppendedMappedActorConclusion(value) {
   };
   return clauses.some((clause) => {
     if (unresolvedWhetherBoundary(clause) || statesUnprovenFARAllowance(clause)) return false;
-    const boundaryMatch = clause.match(boundaryMarker) || clause.match(unresolvedZoningFARSelectionPattern);
+    const boundaryMatch = clause.match(boundaryMarker) || clause.match(unresolvedMappedDecisionPattern) || clause.match(unresolvedZoningFARSelectionPattern);
     const explicitInputBoundary = statesExplicitMappedInputBoundary(clause);
     if (!boundaryMatch && !explicitInputBoundary) return false;
     if (!/\b(?:mapped|map|location|site|property|parcel|address|BBL|Subarea|district|designated\s+area|zoning\s+district|FAR|floor[- ]area ratio)\b/i.test(clause)) {
@@ -372,11 +374,12 @@ function hasAppendedMappedActorConclusion(value) {
     if (boundaryConnector.test(clause)) {
       const segments = clause.split(boundaryConnector).map(compactText).filter(Boolean);
       const boundarySegments = segments.filter((segment) =>
-        boundaryMarker.test(segment) || unresolvedZoningFARSelectionPattern.test(segment) || statesExplicitMappedInputBoundary(segment)
+        boundaryMarker.test(segment) || unresolvedMappedDecisionPattern.test(segment) || unresolvedZoningFARSelectionPattern.test(segment) || statesExplicitMappedInputBoundary(segment)
       );
       if (boundarySegments.length > 0) {
         return segments.some((segment) =>
           !boundaryMarker.test(segment) &&
+          !unresolvedMappedDecisionPattern.test(segment) &&
           !unresolvedZoningFARSelectionPattern.test(segment) &&
           !statesExplicitMappedInputBoundary(segment) &&
           !safeEvidenceOnlyContinuation(segment)
@@ -388,9 +391,10 @@ function hasAppendedMappedActorConclusion(value) {
 }
 
 function statesLocationBoundary(value) {
-  if (unresolvedWhetherBoundary(value)) return true;
+  value = compactText(value).replace(/\*\*|__/g, "");
+  if (unresolvedWhetherBoundary(value) || statesUnprovenFARAllowance(value)) return true;
   const boundaryPresent = unresolvedZoningFARSelectionPattern.test(value) ||
-    /\b(?:cannot|could not|does not|do not|not enough|insufficient|unable to)\b[^.]{0,180}\b(?:determine|establish|conclude|confirm|place|locate|map|apply)\b/i.test(value) ||
+    unresolvedMappedDecisionPattern.test(value) ||
     /\bno\s+(?:site-specific|property-specific|parcel-specific)\s+(?:conclusion|determination)\s+(?:can|may)\s+be\s+(?:made|reached|given)\b/i.test(value) ||
     /\b(?:site-specific|property-specific|parcel-specific)\b[^.]{0,140}\b(?:cannot|not|unknown|unresolved|requires?)\b/i.test(value) ||
     /\b(?:address|BBL|block(?: and |\/)lot|property location|mapped district|zoning district|official map|mapped status)\b[^.]{0,140}\b(?:is|are)\s+(?:required|needed)\b[^.]{0,120}\bbefore\b[^.]{0,100}\b(?:determin|calculat|conclud|confirm|apply)\w*/i.test(value) ||
