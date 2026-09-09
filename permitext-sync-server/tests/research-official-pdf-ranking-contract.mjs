@@ -76,6 +76,19 @@ const aduCase = key.cases.find((item) => item.id === "DOBNOW-017");
 const aduQuestion = [`Context: ${aduCase.questionContext}`, aduCase.scenario, aduCase.question].join("\n\n");
 const headings = researchDOBWorkflowRoute(aduQuestion).sources[0].pdfSectionHeadings;
 const releasePages = fixture.documents.find((document) => document.source.id === "dob-build-release-notes").document.passages;
+const subsequentHeadings = researchDOBWorkflowRoute("Explain subsequent filings in DOB NOW.").sources
+  .find((source) => source.id === "dob-build-release-notes").pdfSectionHeadings;
+const subsequentGroup = researchOfficialPDFSectionPassages(releasePages, subsequentHeadings);
+assert.deepEqual(subsequentGroup.map((page) => page.pageNumber), [108, 109]);
+assert.match(subsequentGroup[0].text, /Create a subsequent filing when an initial filing is in pre\s*-\s*filing status/);
+assert.match(subsequentGroup[0].text, /submitted only after the initial filing is submitted/);
+assert.match(subsequentGroup[1].text, /differen\s*t\s+r\s*eview type/);
+subsequentGroup.forEach((page) => assert.strictEqual(page, releasePages.find((original) => original.id === page.id)));
+for (const missingPage of [108, 109]) assert.throws(() => researchOfficialPDFSectionPassages(
+  releasePages.filter((page) => page.pageNumber !== missingPage), subsequentHeadings),
+  { code: "RESEARCH_OFFICIAL_SOURCE_SECTION_UNAVAILABLE" }, "Neither numbered release section can be silently omitted.");
+assert.deepEqual(researchOfficialPDFSectionPassages(releasePages.map((page) => ({ ...page, pageNumber: page.pageNumber + 5 })),
+  subsequentHeadings).map((page) => page.pageNumber), [113, 114]);
 const aduGroup = researchOfficialPDFSectionPassages(releasePages, headings);
 assert.deepEqual(aduGroup.map((page) => page.pageNumber), [10, 28, 29, 32],
   "Keep the certificate conditions, both PW1 pages and the conditional cellar filing restriction.");

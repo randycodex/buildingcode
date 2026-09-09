@@ -63,4 +63,27 @@ assert.equal(guidanceSourceRelationships(actorInput)[0].kind, "conditional_stake
 assert.match(guidanceSourceRelationships(actorInput)[0].evidence.excerpts.join(" "), /Association/);
 assert.equal(guidanceSourceRelationships({ ...actorInput, question: "Can the representative sign for the owner?" })[0].kind, "conditional_stakeholder");
 assert.deepEqual(guidanceSourceRelationships({ question: actorInput.question + " When X is the Owner Type, Y is a required Stakeholder. Both must attest before filing.", passages: [] }), []);
+const documents = JSON.parse(await readFile(new URL("../evals/fixtures/dob-official-document-pages-20260909.json", import.meta.url)));
+const releaseDocument = documents.documents.find((document) => document.source.id === "dob-build-release-notes");
+const releasePage = releaseDocument.document.passages.find((page) => page.pageNumber === 108);
+const timingInput = structuredClone(inputs.find(({ id }) => id === "DOBNOW-003").input);
+timingInput.passages.push({ sourceID: releaseDocument.source.id, claimID: releasePage.id, contentHash: releasePage.contentHash,
+  text: releasePage.text, url: releasePage.sourceURL, page: releasePage.pageNumber });
+const timing = guidanceSourceRelationships(timingInput).find((relationship) => relationship.kind === "creation_and_submission_timing");
+assert.equal(timing.relatedEvidence.length, 1);
+assert.equal(timing.relatedEvidence[0].claimID, releasePage.id);
+assert(timing.relatedEvidence[0].excerpts.every((excerpt) => releasePage.text.replace(/\s+/g, " ").includes(excerpt)));
+assert(timing.evidence.excerpts.some((excerpt) => /until an LOC has been issued/.test(excerpt)));
+const withoutGrayFields = { ...timingInput, passages: timingInput.passages.map((passage) => ({ ...passage,
+  text: passage.text.replace(/before creating the subsequent filing/gi, "after initial submission") })) };
+assert(guidanceSourceRelationships(withoutGrayFields).some((relationship) =>
+  relationship.kind === "creation_and_submission_timing" && relationship.relatedEvidence?.length === 1),
+  "The actual release passage independently raises the timing relationship even without the grayed-field FAQ.");
+const changedRelease = { ...timingInput, passages: timingInput.passages.map((passage) => ({ ...passage,
+  text: passage.text.replace(/Create a subsequent filing when an initial filing is in pre\s*-\s*filing status/i,
+    "Create a subsequent filing after initial submission") })) };
+assert.equal(guidanceSourceRelationships(changedRelease).find((relationship) =>
+  relationship.kind === "creation_and_submission_timing").relatedEvidence, undefined,
+  "Do not keep a release relationship after the source stops supporting its triggering text.");
+assert.deepEqual(guidanceSourceRelationships({ ...timingInput, question: "Where is the payment menu?" }), []);
 console.log("Source-derived attestation, filing-timing and cross-source completion relationships preserve fetched evidence, reach both model stages and disappear when source conditions or question scope change. No API calls or model-quality acceptance claimed.");

@@ -2,7 +2,7 @@
 // These DOB workflow relationships are emitted only while both their question
 // context and the fetched source wording are present. Full passages remain in
 // the request and the ordinary semantic verifier remains mandatory.
-export const guidanceSourceRelationshipsVersion = "20260909-field-editability-relationships-v3";
+export const guidanceSourceRelationshipsVersion = "20260909-release-timing-relationships-v4";
 const compact = (value) => typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
 const evidenceFor = (passage, excerpts) => ({ sourceID: passage.sourceID, claimID: passage.claimID, contentHash: passage.contentHash, excerpts });
 
@@ -19,12 +19,14 @@ export function guidanceSourceRelationships(input) {
     const text = compact(passage.text);
     const add = (kind, excerpts, questionToResolve) => {
       const key = `${kind}:${passage.sourceID}:${passage.claimID}`;
-      if (seen.has(key)) return;
+      if (seen.has(key)) return null;
       seen.add(key);
-      relationships.push({
+      const relationship = {
         kind, questionToResolve,
         evidence: evidenceFor(passage, excerpts)
-      });
+      };
+      relationships.push(relationship);
+      return relationship;
     };
     if (actorQuestion) {
       const scope = text.match(/\bWhen\b[^.!?]{0,600}\bOwner Type\b[^.!?]{0,300}\brequired Stakeholder\b[^.!?]*[.!?]?/i)?.[0];
@@ -35,8 +37,15 @@ export function guidanceSourceRelationships(input) {
     if (subsequentQuestion) {
       const initiation = text.match(/\bSubsequent filings can be initiated and submitted after\b[^.!?]{0,300}\binitial\b[^.!?]{0,160}\bsubmitted\b[^.!?]*[.!?]?/i)?.[0];
       const creation = text.match(/\bFields from the subsequent filing\b[^.!?]*[.!?]\s*The fields will not update\b[^.!?]*\bI1\b[^.!?]*\bsubmitted\b[.!?]\s*To prevent\b[^.!?]*\bbefore creating the subsequent filing\b[^.!?]*[.!?]?/i)?.[0];
-      if (initiation && creation) add("creation_and_submission_timing", [initiation, creation],
-        "Reconcile the after-initial-submission initiation statement with the passage acknowledging a subsequent filing before initial submission. Distinguish creation from submission and identify any unresolved creation-timing question instead of presenting one statement as universal.");
+      const release = validPassages.map((candidate) => ({ passage: candidate,
+        excerpt: compact(candidate.text).match(/\bCreate a subsequent filing when an initial filing is in pre\s*[-–—]\s*filing status\s*\.\s*Subsequent filings can be submitted only after the initial filing is submitted\./i)?.[0]
+      })).find((candidate) => candidate.excerpt);
+      if (initiation && (creation || release)) {
+        const cutoff = text.match(/\bA subsequent filing can be submitted anytime until an LOC has been issued for the initial filing\./i)?.[0];
+        const relationship = add("creation_and_submission_timing", [initiation, creation, cutoff].filter(Boolean),
+          "Reconcile the after-initial-submission initiation statement with the supplied evidence about creation before initial submission. Distinguish creation from submission; explain whether the sources actually reconcile or leave a creation-timing question unresolved. Retain a source-stated submission limit in its applicable scope. A dated release is evidence of that release's behavior, not proof that current conflicting guidance is superseded.");
+        if (relationship && release) relationship.relatedEvidence = [evidenceFor(release.passage, [release.excerpt])];
+      }
     }
   }
   if (subsequentQuestion) {

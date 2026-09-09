@@ -91,6 +91,11 @@ for (const pageNumber of [10, 28, 29, 32]) {
     .document.passages.find((passage) => passage.pageNumber === pageNumber);
   releaseDocument.addPage().text(page.text);
 }
+for (const pageNumber of [108, 109]) {
+  const page = officialDocuments.documents.find((document) => document.source.id === "dob-build-release-notes")
+    .document.passages.find((passage) => passage.pageNumber === pageNumber);
+  releaseDocument.addPage().text(page.text);
+}
 releaseDocument.end();
 const releaseBytes = await releaseComplete;
 let question = `According to the official service notice at ${sourceURL}, which review type applies to the new application?`;
@@ -145,6 +150,12 @@ const responseDouble = async (url, options) => {
         assert.match(body.instructions, /on the stated facts/);
       }
       if (portalCase === "DOBNOW-003") {
+        const release = input.passages.filter((passage) => passage.sourceID === "dob-build-release-notes");
+        assert.equal(release.length, 2, "Both complete release sections must reach drafting and verification.");
+        assert.match(release[0].text, /Create a subsequent filing when an initial filing is in pre\s*-\s*filing status/);
+        assert.match(release[1].text, /Subsequent Filings \(2\)/);
+        const timing = input.sourceRelationships.find((relationship) => relationship.kind === "creation_and_submission_timing");
+        assert(timing.relatedEvidence.some((evidence) => evidence.sourceID === "dob-build-release-notes"));
         assert(input.passages.some((passage) => /subsequent filing of an NB or Alteration-CO filing/.test(passage.intro) && /remain Permit Entire/.test(passage.text)));
         assert(input.passages.some((passage) => /subsequent filing of an NB or Alteration-CO filing.*remain Permit Entire/s.test(passage.text)),
           "The FAQ question that scopes the exception must be in the primary passage text.");
@@ -168,6 +179,9 @@ const responseDouble = async (url, options) => {
         assert.match(text, /No In a commercial unit and does not affect an IMD Unit Request a Letter of No Objection/);
       }
       if (portalCase === "DOBNOW-023") {
+        assert.match(body.instructions, /state the relevant permitted preparation and the authority boundary briefly/);
+        if (body.text.format.name === "permitext_official_guidance_verification")
+          assert.match(body.instructions, /A statement found only in the source or your review reason is not present in the answer/);
         const text = input.passages.filter((passage) => passage.sourceID === "dob-stakeholder-faq").map((passage) => passage.text).join(" ");
         assert.match(text, /Filing Representatives can enter and view all filing information/);
         assert.match(text, /cannot upload plans or submit filings\/permits/);
@@ -415,7 +429,7 @@ try {
     assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-014", "DOBNOW-017", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
     const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-014": /cannot simply answer No/, "DOBNOW-017": /required before Final CO/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
     assert.match(answer.answerText, expected[id]);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v14");
+    assert.equal(answer.promptVersion, "20260909-document-summary-v15");
     assert.equal(answer.officialGuidanceSummary.version, "20260909-document-summary-v2",
       "New summaries retain the required qualification receipt; older v1 records remain readable.");
     assert.doesNotMatch(answer.answerText, /sourceResolutions|relationshipIndex|packetSHA256/);

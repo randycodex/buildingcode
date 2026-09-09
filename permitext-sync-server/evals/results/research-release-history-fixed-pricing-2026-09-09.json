@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-09-09T23:29:52.110Z",
+  "providerCalls": 0,
+  "networkCalls": 0,
+  "method": "Production byte-bound pricing on synthetic text-only envelopes matching constructed request byte sizes, including the runtime 64-character safety identifier. This prices fixed snapshots, not a fresh HTTP preflight or a provider bill.",
+  "remainingConservativeAuthorizationUSD": 0.195583,
+  "prices": [
+    {
+      "id": "DOBNOW-003",
+      "phase": "draft",
+      "syntheticTextEnvelopeBytes": 30782,
+      "maximumUSD": 0.19863
+    },
+    {
+      "id": "DOBNOW-003",
+      "phase": "verification",
+      "syntheticTextEnvelopeBytes": 55215,
+      "maximumUSD": 0.03136
+    },
+    {
+      "id": "DOBNOW-023",
+      "phase": "draft",
+      "syntheticTextEnvelopeBytes": 27437,
+      "maximumUSD": 0.181905
+    },
+    {
+      "id": "DOBNOW-023",
+      "phase": "verification",
+      "syntheticTextEnvelopeBytes": 46402,
+      "maximumUSD": 0.026953
+    }
+  ]
+}

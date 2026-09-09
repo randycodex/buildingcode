@@ -1,6 +1,6 @@
 // Source locations are discovery hints, never an answer key. Each document is
 // fetched and validated again before its contents may support an answer.
-export const researchDOBWorkflowRoutingVersion = "20260909-focused-roles-and-document-groups-v11";
+export const researchDOBWorkflowRoutingVersion = "20260909-subsequent-release-group-v12";
 const source = (id, title, filename, catalogReviewedOn = "2026-09-08") => Object.freeze({
   id, title, url: `https://www.nyc.gov/assets/buildings/pdf/${filename}`,
   publisher: "NYC Department of Buildings", catalogReviewedOn
@@ -32,6 +32,12 @@ const aduDocumentSource = Object.freeze({
     "Local Law 127 Build PW1 Updates for Ancillary Dwelling Units",
     "Local Law 127 ADU Filing Restrictions for One Family Dwellings"
   ])
+});
+const subsequentReleaseSource = Object.freeze({
+  ...researchDOBWorkflowSources.releaseNotes,
+  // Both numbered sections are required. Selecting only the definition page
+  // would lose the creation/submission distinction in the release history.
+  pdfSectionHeadings: Object.freeze(["Subsequent Filings (1)", "Subsequent Filings (2)"])
 });
 
 export function researchDOBWorkflowRoute(question) {
@@ -74,7 +80,7 @@ export function researchDOBWorkflowRoute(question) {
     : wetlands ? [researchDOBWorkflowSources.releaseNotes]
     : siteSafety ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.codeChanges2022, researchDOBWorkflowSources.familySiteSafety]
     : paa ? [researchDOBWorkflowSources.paaPage, researchDOBWorkflowSources.paaFAQ, researchDOBWorkflowSources.applicationGuide]
-    : subsequent ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.subsequentFAQ, researchDOBWorkflowSources.nbFAQ]
+    : subsequent ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.subsequentFAQ, researchDOBWorkflowSources.nbFAQ, subsequentReleaseSource]
     : stormwater ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stormwater]
     : loft ? [researchDOBWorkflowSources.loftNotice, researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.applicationGuide]
     : filingRepresentative ? [researchDOBWorkflowSources.applicationGuide,

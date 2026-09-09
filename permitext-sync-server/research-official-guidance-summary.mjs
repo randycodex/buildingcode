@@ -16,7 +16,7 @@ import {
 export const researchOfficialGuidanceSummaryVersion = "20260908-document-summary-v1";
 const qualifiedSummaryVersion = "20260909-document-summary-v2";
 // Prompt revisions do not invalidate integrity records for saved summaries.
-export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v14";
+export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v15";
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 const stringList = { type: "array", maxItems: 6, items: { type: "string" } };
 const bindingKey = (sourceID, claimID) => `${sourceID}\u0000${claimID}`;
@@ -93,6 +93,7 @@ export function researchOfficialGuidanceSummaryRequest({ question, webSupport, c
       researchClaimScopeInstruction,
       "Use supplied user facts as premises. Ask for a missing fact only if it changes the answer. Earlier assistant text is context, never source authority. If the passages cannot resolve the question, say exactly what remains unresolved and give the responsive guidance they do establish.",
       "Match completeness to the requested decision. An actor-authority question requires who may prepare, attest or submit and any conditional additional actors. A negative permission answer or a statement of necessary conditions does not assert that every submission requirement has been met. Require a complete document, fee or readiness checklist only when the user asks for it or the answer claims the filing is ready or its listed steps are sufficient; continue checking every volunteered claim and material actor condition. A filing-choice question also needs the source-stated separate processing and conditional completion consequences of the chosen path.",
+      "When the question distinguishes preparation from another actor's attestation or submission authority, state the relevant permitted preparation and the authority boundary briefly. Do not treat a prohibition alone as explaining both sides. Preserve any source-specific limits on preparation or uploads; do not infer unrestricted access from the user's description of work already completed.",
       "Apply known facts to select the source-supported branch, then state its action and approval condition directly. Retain an explicit prerequisite or sequence needed for that action; page layout alone is not a sequence. Direct logical application and faithful paraphrase are allowed, but may not add a condition, actor, deadline or process order. Distinguish an unresolved recommendation from a prohibition. Use acronyms as written unless the evidence supplies their expansion; do not invent document chronology.",
       ...(input.conversationFacts.qualified?.length ? [researchQualifiedFactInstruction] : []),
       ...(relationships.length ? [guidanceSourceRelationshipInstruction] : []),

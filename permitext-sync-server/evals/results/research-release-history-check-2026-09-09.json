@@ -1,0 +1,1069 @@
+{
+  "schema": "permitext.research-release-history-check.v1",
+  "checkedAt": "2026-09-09T23:27:55.373Z",
+  "baselineCommit": "d81a7c73195ee814cb0af0967d2cba58c4af04f5",
+  "baselineRouterSHA256": "ccb5f0d4373159a37b8e051091133b91d1671f401ef361313cb125f89b4bfca2",
+  "sourceHashes": {
+    "app.mjs": "013fe2d98bd456d88aebee1251550da03ad043c3f5ded26a18d8714f307b5bcf",
+    "research-dob-workflow-routing.mjs": "ce8c4f4d5a1bd329c2425806e5c7e2631c9b9fdcd8a68747e46d83e6db818022",
+    "research-official-guidance-summary.mjs": "7316cffb069e2958908815527858109fac886ec33e674641ef1686e515e13c22",
+    "research-guidance-source-resolutions.mjs": "d80cb9c62475f40d118bd3e6951b9fff88975a9cc8afe941e0ed89a08e640379",
+    "research-guidance-source-relationships.mjs": "ac24fac72ff4b1d80d936d824d57a6af61acf20173ac02d2f88ac88a5396578c",
+    "research-guidance-qualification-review.mjs": "078b33463be298a81607edc2764f4bdc27c022a5b24d257b85cf13c302cffc5e",
+    "research-official-pdf-ranking.mjs": "52abb4ff71c8a8e34b940141c4f212ee96ae09b22ef48fb57de4c5a33bd5947b",
+    "tests/research-guidance-source-relationships-contract.mjs": "9f668ff7718dc630d6ce0fa27e708e26a2e9952c0588b3fb3d91f6f41bd128a2",
+    "tests/research-official-pdf-ranking-contract.mjs": "b89e15c562ecdb54646bb6281cc4ba28805b5441d14cd38c5af15bb8f4db7a49",
+    "tests/research-official-pdf-http-contract.mjs": "45eb9f034741f74df0a4436301ba883bbf7db47164202cab3ed5ef4e8129673a",
+    "scripts/check-research-release-history-20260909.mjs": "b795c7949840a1beb972dbba6f057e4cfce3bca5616e01079538892c42aee6af"
+  },
+  "inputs": [
+    {
+      "file": "evals/research-reconciled-answer-key.json",
+      "sha256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455"
+    },
+    {
+      "file": "evals/research-owner-code-candidates.json",
+      "sha256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-resolution-parts-2026-09-09.json",
+      "sha256": "7cc352badc9e6ed4ac022784ff022ccedbf7d508cc66bac7ef2820302a9a9d7a"
+    },
+    {
+      "file": "evals/fixtures/dob-official-document-pages-20260909.json",
+      "sha256": "0a84c4d509d8ede618192ba7568719c9e3e357347896b86bea1126c64f19d94c"
+    }
+  ],
+  "summary": {
+    "numberedRouteChecks": 110,
+    "routesWithChangedSources": [
+      "DOBNOW-003"
+    ],
+    "requestComparisons": 4,
+    "addedCompleteReleasePages": 2,
+    "originalPassagesRemovedOrRewritten": 0,
+    "providerCalls": 0,
+    "networkCalls": 0,
+    "generatedAnswersTested": 0,
+    "liveQualityConfirmed": false,
+    "liveLatencyMeasured": false
+  },
+  "limitations": [
+    "This checks all 110 question routes and four constructed requests; it does not generate or approve 110 answers.",
+    "The fixed release snapshot is not a fresh public-source fetch. A future live request must retrieve and validate the complete sections again.",
+    "The diagnostic verifier candidate preserves the prior flawed wording; its new packet hash is an explicit local binding derivative, not a new provider output. The timing candidate lacks the newly required release citation and is not dispatchable.",
+    "Instruction presence does not prove that the model will resolve the timing issue, include preparation permission, or ground its verification reason correctly."
+  ],
+  "routes": [
+    {
+      "id": "CC-01",
+      "questionSHA256": "79795b69cf7eb53a2b4f88ffd7bf14acdda1aa67eec1dfdd8663e222fdcb1120",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "CC-02",
+      "questionSHA256": "2d0c75dc1257e176d48256617bf5270bea18b3244efb6f97e38477bed8e41d47",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "CC-03",
+      "questionSHA256": "057f4e5a8b43017907a1a003ff8c76db153eda13ccb7c12266ee0b8937fcf2da",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "CC-04",
+      "questionSHA256": "578b55216835df63c14ef602eb6272bcc9f1e9d8657ef36fc9a7efa26a34940d",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "CC-05",
+      "questionSHA256": "b0a9cdc3e1279a258a4fabe6f7edea698855ab9329d610bfba5c71fc4cafcb9b",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-01",
+      "questionSHA256": "64fa49502959753dd41d6220bf852bfe4317e097638f182514838b7a88f0ad01",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-02",
+      "questionSHA256": "f7e84f9b6d8f9dbea6bb0e875c6921098edc14c9785b079c8cf4e47cce70c865",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-03",
+      "questionSHA256": "01fbf95651be6dfda5ef215bdbaf3df162f1fee14b89c40dcc1e7dabaf3ecf4d",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-04",
+      "questionSHA256": "a8afe07c4ab8b3cf254161f69e40665b39548686891cf8a749e1aedcf86a5706",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-05",
+      "questionSHA256": "809ae27ec86c6a9863e15a0dfbf839a78fa7029ef8d4b3d0503d6d4d7193c4a9",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-06",
+      "questionSHA256": "7da186ed733eeaad0accb62082b5e18d2b5c6e89d0f1228fe681dfcf9f34e4b2",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-07",
+      "questionSHA256": "d5fe388edd5598e57404f1d7bd8f205c83e383b9dbe387d3ae48685a8d5a6852",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-08",
+      "questionSHA256": "d940f8b3306fbae2293779ef18c358a3170d52aac8432ae884d3026055137427",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-09",
+      "questionSHA256": "96c3d247c242193091172ffcf0634e853648c590a325446953d89fb2f8b760b2",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-10",
+      "questionSHA256": "9d711d7607944e155653012845f8b88e4b7c3e56045dc7641ca7b74919c17817",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-11",
+      "questionSHA256": "fd013dd512650650228a554083f832e211969341ca5aec90c2428c6707728805",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-12",
+      "questionSHA256": "a33848c330b047da9844f44e714387bcbbf8c2c7cccd4c649121224bcd10f5a5",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-13",
+      "questionSHA256": "83e48cde85c3ea8c50b06b7575b3f38daed9d02f33d893de79b6dcbc98d4bcbe",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-14",
+      "questionSHA256": "d63c80d4af5315378866c18636c046a148f0540819bb5e1982b8a18d90009717",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-15",
+      "questionSHA256": "ccd85be2604fe4676b4d242f67792c3732d79e01b50a3a2f93e97b60650edf4c",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-16",
+      "questionSHA256": "00d4ec66f75e643aa3868eaacd04eee3389b1ef29a0bf95f3dd9acf23a40cb81",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-17",
+      "questionSHA256": "7bf7a844b5685c7922e0a54a876a13465e02f57084a5abf5cd3f5b9797909ad8",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-18",
+      "questionSHA256": "e9057c8ed15c463d00e24ba09fcbe1dfc4a5e6559ee9798b35ec42fb9d17410f",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-19",
+      "questionSHA256": "40db4e86d9c63132493ff61aa844a241029f3a1a1e093452ba0ab8543a42ccb4",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-20",
+      "questionSHA256": "a652e50723b2ad06e7edaa30a0d33aaf37df931acf78d9e2fc2b7a64f3d3ac40",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "ZR-21",
+      "questionSHA256": "81f7104844a880be81f96f839fa32d390c4b7a65d5c04c2bc110d19fe18f18b0",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "DOBNOW-001",
+      "questionSHA256": "526584257f2c7ebc3493a0ede941bc26f8e8ab586aefb960eeeaed929d60bc0f",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-002",
+      "questionSHA256": "6c69f40db86b310b31dbf3fa57563aebe637eb990b211935ff07db0f23a2e2f9",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-003",
+      "questionSHA256": "14131b0272ae01bf208f7a27c9a02c59232383ae8cf394a866dac2e0887c8c35",
+      "topic": "subsequent_filings",
+      "changed": true,
+      "beforeSourceCount": 3,
+      "afterSourceCount": 4
+    },
+    {
+      "id": "DOBNOW-004",
+      "questionSHA256": "9511046dd4d9347eefd270522ffbfa144836f5d2ca39daf5d4518f29036929c9",
+      "topic": "post_approval_amendments",
+      "changed": false,
+      "beforeSourceCount": 3,
+      "afterSourceCount": 3
+    },
+    {
+      "id": "DOBNOW-005",
+      "questionSHA256": "c87a8c7da4ad40438306e5535162d288fb60bb1c7639c71fcabb4640e8d4f242",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-006",
+      "questionSHA256": "f7c3b049edc3bd59816be3c46ddca7d2b2e241500fb78f18db365c326a840f1a",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-007",
+      "questionSHA256": "423551439e5e4a0ffa6232d3e8f1351af78f5dff7d334043072fb62ccba274d1",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-008",
+      "questionSHA256": "55d1e947b0742905e792eb6cd79f0b1753ea21e30e35f91fbb124bd9d071da49",
+      "topic": "site_safety_documents",
+      "changed": false,
+      "beforeSourceCount": 3,
+      "afterSourceCount": 3
+    },
+    {
+      "id": "DOBNOW-009",
+      "questionSHA256": "999f2d70180cff2a96fe8361e5fc3da2619a954bb1205dd3a280c6fcbb283328",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-010",
+      "questionSHA256": "363b7acdceb7b7f55b7ca0753d4f445c9b8fbbe9a3efcd656d877e8aee9b5315",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-011",
+      "questionSHA256": "cf9237d1b6bec93a32b2aba195e8d3671dca119123ef950c815c9037792fff81",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-012",
+      "questionSHA256": "a72eb3a12cc6679660043414bb7db65c81f8ba7785e17995c409210a70e06581",
+      "topic": "stormwater_documents",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-013",
+      "questionSHA256": "bd257d208bac168756d6fdb25df1de123f7da40389599cfb97654ad29bf280ee",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-014",
+      "questionSHA256": "b99c34ad95ba32aa6e8ec269022b1cbd58c43b67e14c4acaa2fe1de96f45e968",
+      "topic": "rent_regulation_attestation",
+      "changed": false,
+      "beforeSourceCount": 1,
+      "afterSourceCount": 1
+    },
+    {
+      "id": "DOBNOW-015",
+      "questionSHA256": "e5bfe230a4f50a2d639547373966c7b1eceb31b93e578c4434effdea81d9cb3a",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-016",
+      "questionSHA256": "3d5e25ecbed58d4040b5c137365147661ecf08478622361f83541eac097f89b2",
+      "topic": "loft_board_documents",
+      "changed": false,
+      "beforeSourceCount": 3,
+      "afterSourceCount": 3
+    },
+    {
+      "id": "DOBNOW-017",
+      "questionSHA256": "3c51d4c4442dc7894772ff507410b87ed332c5cf34a96035f654899ca753f7cc",
+      "topic": "adu_certificate_documents",
+      "changed": false,
+      "beforeSourceCount": 1,
+      "afterSourceCount": 1
+    },
+    {
+      "id": "DOBNOW-018",
+      "questionSHA256": "44f549c68eb53263abe27ccc09a3bc8e490c1cf9796bdd5b34b1e36c1e0410c3",
+      "topic": "wetland_documents",
+      "changed": false,
+      "beforeSourceCount": 1,
+      "afterSourceCount": 1
+    },
+    {
+      "id": "DOBNOW-019",
+      "questionSHA256": "455d307bbb9e6dee504c4438d3d35233707f491cfe8d1493b0c6b6985693f1b9",
+      "topic": "builders_pavement",
+      "changed": false,
+      "beforeSourceCount": 1,
+      "afterSourceCount": 1
+    },
+    {
+      "id": "DOBNOW-020",
+      "questionSHA256": "374150c89650ae1f2a3e11fc25e4e94b0cd09c37380d53f5102c4b1a8cc9d9fe",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-021",
+      "questionSHA256": "b2a67a2e8522ba6b4562c3cf0a9bed324a59f759bdf905a84e396737202148d8",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-022",
+      "questionSHA256": "d13edba06f499beaf9943bff3b8f6ba8d1e944ea4846731b2de1e9e9c51b3ea2",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "DOBNOW-023",
+      "questionSHA256": "2c6ae9cd7e38dbbab90c08788a7dc3643f4a7d92b2471e0961562bb10028c468",
+      "topic": "filing_stakeholder_roles",
+      "changed": false,
+      "beforeSourceCount": 4,
+      "afterSourceCount": 4
+    },
+    {
+      "id": "DOBNOW-024",
+      "questionSHA256": "ef5c847c15b150aa1016cc8c26609b300254abfad33c6ddaa7194f980598e048",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "FGC-01",
+      "questionSHA256": "b6c41653be865b7359f3aa4afbdb81e93e5311b807b0cb9c17ddc342ee8d56d8",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-02",
+      "questionSHA256": "326433ad8a1d037f920f6b856007f8da11167eac7781bcbb90bcb869cb21b03c",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-03",
+      "questionSHA256": "253e633b9df0dc6233d0b3881644eb71b631b86620558bf91e3f691147a28d84",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-04",
+      "questionSHA256": "7ad4ccefe32dc9ce107a3398d869b75bf23a4a73a74bb30001ae12dd11d9ba51",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-05",
+      "questionSHA256": "acea33930aba2d1ea78a8631421c98f875ba36857e90a64f6d06409fbb4db370",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-06",
+      "questionSHA256": "61ae6deed0593ad8f6a6dc2541c558d2475df9ac9ab4fbf8d9df3561b7ba2e27",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-07",
+      "questionSHA256": "8b9e552b3c22aecd5bf0b1939399662b4042bc32991783c34ffc285e0a1a7aa4",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-08",
+      "questionSHA256": "bdee9bb2bfa1b75a1753b459c35f69a51eb4b3b32f126aa12dbea3b69b68c5c1",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-09",
+      "questionSHA256": "e7bbf628f64b6db2e32af2a70567c5950cf21e4bbe0b67acb44873236fcc5816",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-10",
+      "questionSHA256": "b1b8e45d6edd644baa596c49637c7535c3afaa8d0d189aeed904ddd28e539d1b",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-11",
+      "questionSHA256": "e014355957ea5e2cf92de0795ca014df8d54003efa18f310ec8de35ecafbd52a",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-12",
+      "questionSHA256": "ecc061e929c5b953aef7560c45e8d7d967b2d3c4e72b522f45748c073bae0a13",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-13",
+      "questionSHA256": "7478a3b86c3300edb5faef8d220616342bc1ffbf5f5cf01b1e1f97145c10f9b5",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-14",
+      "questionSHA256": "8b7389a54382006e20b5d24a8696e3d67ada3709a6671c1363de74a64ddf6234",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "FGC-15",
+      "questionSHA256": "cb23c3551997276372b127190aec33643e607e71ffd7b51edb9c8d6c77970871",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-01",
+      "questionSHA256": "9e38eeba06cb1919bfdaee8a1e42882cce81b8030218db171ec4dd52c9c8f3b4",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-02",
+      "questionSHA256": "d725e8ec7279000bbc98217a89822215c550d0b1d2ada57e5855854c1797a1d5",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-03",
+      "questionSHA256": "8e8a360667e36e66f0e4555d850014964965a964bbaeacf7a6102cd6c55a74c4",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-04",
+      "questionSHA256": "e73cde9c9fa86d858f915da9f681f5422334c6b269aefb95bb0766545e2eff89",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-05",
+      "questionSHA256": "0ec9cc4364d9c9a3f09e6c23e798f84b654bf45c28776ff8ce8086e54f81fc47",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-06",
+      "questionSHA256": "9f2ca6acf1133c1e5594db66d3df759fc75a4715c2daee912daa01256481ef9e",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-07",
+      "questionSHA256": "6b6d0039fd55227453021c8fca12b7212c5f611693a8cf5856966960832c80d3",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-08",
+      "questionSHA256": "61ad74dd11016970e9e7e3c3b1e925d19367bf16941191791fe8b2f455b42a29",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-09",
+      "questionSHA256": "21663b26fa0d3167765dc5fc3c2ccd96b90594705459393f924498ae28333cbc",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-10",
+      "questionSHA256": "45aae086206a107c9836b384694837d4e6d9005e0b93ec8d894c1a9f5c268a65",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-11",
+      "questionSHA256": "47da0f43d0e6e319f696b7ac78405d96b4df1598d1929862bf90c7d448693dfe",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-12",
+      "questionSHA256": "9f123ea88bf401b5b8adb1f2c8d007b5d223c8ac8a77b6ccefc49f1fcde3072b",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-13",
+      "questionSHA256": "ae4750c94e145f94c8934e46ce62e45dcf4c0858d7d625e86c92103fd73abaf4",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-14",
+      "questionSHA256": "ed2162991b5ca1d1dbb8a294a2db2c85050c7bcf205f5cb2f9b03fa944130559",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "MC-15",
+      "questionSHA256": "fe58a26644f87ca516f242b82f3dc9fa4c575b2031cd33f9cb3fcfcedfde94f2",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-01",
+      "questionSHA256": "009cf9fad103ead1e86133de0afdc8f396e643438e250220a4b23cfa15e84b6a",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-02",
+      "questionSHA256": "27d8309986f07f71da2dacb982797c0d1cbeec1cbdccf36403befcf4a2669db1",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-03",
+      "questionSHA256": "41e5fbecd3715793002717f6c4739c724766842b4106dbb25472a3b7243053ce",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-04",
+      "questionSHA256": "d7aa09b8da2c0c8c6db9aab112fe962baa5c6b286f2964c828eb1373fadc144f",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "GAP-05",
+      "questionSHA256": "fd4df15a3c82eaf2c1904f3bc0cc7bcb9b88f2d719414dc1a68ec25e6a4d6bd6",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-06",
+      "questionSHA256": "7200531c5cd8bdc36754dc5586f07a7629c3eddc71d1c062083f77d78bc74829",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-07",
+      "questionSHA256": "10e7986452e8e6def1e3ca49f5836ab89cdfc2fb8193ae9cf0079ac678bfd80b",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-08",
+      "questionSHA256": "1f6360c8932c2bf3b56d0374a9796cf824c151e22d18a13295705d69447e7513",
+      "topic": "dob_now_workflow",
+      "changed": false,
+      "beforeSourceCount": 2,
+      "afterSourceCount": 2
+    },
+    {
+      "id": "GAP-09",
+      "questionSHA256": "d638e681ec3a65575380de638573b7e0229ae21860e144feeb0cb1448a05825d",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-10",
+      "questionSHA256": "5124951acc8518980c7e08355ed090a15d428db7865a84ee6a6c70c7ce8ff519",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-11",
+      "questionSHA256": "3cf1fc3b35e25b433bda32d2727a0a8089a6bc23dfab2045f6b06d003e98ea2f",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-12",
+      "questionSHA256": "59686ddbbff484d699277e30ed391e46e64af4e8c1f24be7c1632977e54a69b5",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-13",
+      "questionSHA256": "93bd17fe1c940993224af748df1c05e44809cc15fbaf66ba9ec01d8cba9a51b4",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-14",
+      "questionSHA256": "b9b51009e8b1fdd8b57bb9f3ed557a557af89a69d9dcc0987903cc82914288dc",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "GAP-15",
+      "questionSHA256": "b1ffc221853f84807843858db0babf4a9eb09afebd408f5ddd2153ffa72753cf",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-01",
+      "questionSHA256": "9d5f66a5aed42f62efcd53640578061268c2ffad38a377fcb5d160167a2495a6",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-02",
+      "questionSHA256": "3706c5318c04bda053624ca746f246e357b043e6233a6c6ebc0d04808f5c1b45",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-03",
+      "questionSHA256": "ebdd51b73db5bb4d4de56517aa17459dfd23d74619604c36268b3a41d6c0d660",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-04",
+      "questionSHA256": "e17bdfa267c6bd219ae22592fa5e82267aeb324eb2b995db27f473ada5303ff0",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-05",
+      "questionSHA256": "a484d3dd2e19dbfd18142dc0e4c94766d4a79e23e11b096d36d3a5ed144b3db3",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-06",
+      "questionSHA256": "2282135e1f26f0f2d16a978f16b89c55130ec8438fa899ff54211d366cbdf891",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-07",
+      "questionSHA256": "e3df6d383addef2e90d9ad1522cb97486006a41d0ddd8a059ebaf684181010d0",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-08",
+      "questionSHA256": "5d060326a3efcea51a83c57da443a70f7423e7d98e2457a55b0d8358484d78fd",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-09",
+      "questionSHA256": "2ef23552e0cc1a3a7f60f8a41e64c5fa7fcb0f5457deba3aff0936570fab8e38",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-10",
+      "questionSHA256": "09bebcc887e69588318ba4c9b7eddbbab02582d8e36c31e3612dca84dbcfd249",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-11",
+      "questionSHA256": "620772d51e245786f7142426928638cc965ca62148564a03480c3895c1c8384c",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-12",
+      "questionSHA256": "0b837075091ad353a39c6c650dfe8882e48a91a6c6df38c8077a3343f5c9fe9d",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-13",
+      "questionSHA256": "3c4835eaa360fb0c976e50134c87551447ecafe621207407846441742888b6e3",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-14",
+      "questionSHA256": "e7eb2ca2766f08f2a67e38bd19c30653a1c7bbf241848cddd4aafaf625e0d5cb",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    },
+    {
+      "id": "PC-15",
+      "questionSHA256": "086db7c7c563ee1203c05aaed5093ccc357790079c5c24ea2a9edd0ebfec9bba",
+      "topic": null,
+      "changed": false,
+      "beforeSourceCount": 0,
+      "afterSourceCount": 0
+    }
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-003",
+      "originalPassages": 6,
+      "currentPassages": 8,
+      "originalSourcesPreserved": true,
+      "addedReleasePages": [
+        108,
+        109
+      ],
+      "missingReleaseCitationRejected": true,
+      "diagnosticDraftProseAndCitationsUnchanged": true,
+      "sourceRelationships": [
+        {
+          "kind": "creation_and_submission_timing",
+          "questionToResolve": "Reconcile the after-initial-submission initiation statement with the supplied evidence about creation before initial submission. Distinguish creation from submission; explain whether the sources actually reconcile or leave a creation-timing question unresolved. Retain a source-stated submission limit in its applicable scope. A dated release is evidence of that release's behavior, not proof that current conflicting guidance is superseded.",
+          "evidence": {
+            "sourceID": "dob-subsequent-faq",
+            "claimID": "official-passage-77183aa15dad687a6565894d",
+            "contentHash": "ce6d0104578e5fbf53f716249cd0047ba2c135a78bff42ede2ef273eddae44fe",
+            "excerpts": [
+              "Subsequent filings can be initiated and submitted after the initial job filing is submitted (not in pre-filing status).",
+              "Fields from the subsequent filing are populated from the initial filing (I1). The fields will not update on the subsequent filing until the I1 is submitted. To prevent this issue, we recommend completing as much of the I1 as possible before creating the subsequent filing.",
+              "A subsequent filing can be submitted anytime until an LOC has been issued for the initial filing."
+            ]
+          },
+          "relatedEvidence": [
+            {
+              "sourceID": "dob-build-release-notes",
+              "claimID": "official-passage-da970df54086b0ddac95a601",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "excerpts": [
+                "Create a subsequent filing when an initial filing is in pre - filing status . Subsequent filings can be submitted only after the initial filing is submitted."
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "filing_completion_scope",
+          "questionToResolve": "The chosen filing path has separate processing and a job-type-dependent completion consequence. Reconcile the general separate-LOC direction with the specialized NB/Alteration-CO initial-CO path. State the branches briefly and identify the initial job type if unknown; do not drop the completion consequence while explaining which filing to use.",
+          "evidence": {
+            "sourceID": "dob-application-guide",
+            "claimID": "official-passage-789cc7ccd439eb8374132031",
+            "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+            "excerpts": [
+              "a Letter of Completion (LOC) is requested separately on each filing."
+            ]
+          },
+          "relatedEvidence": [
+            {
+              "sourceID": "dob-nb-altco-faq",
+              "claimID": "official-passage-42b3262068b7a32078d4c986",
+              "contentHash": "b5d4f1834964f64fb25bb7a5c31746d2131ccf70f9f7885b5003d54e07d9e92e",
+              "excerpts": [
+                "Do I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing? — No, the status of the subsequent filings will remain Permit Entire. Only the status of the initial (I1) filing will change to CO issued."
+              ]
+            }
+          ]
+        }
+      ],
+      "comparisons": [
+        {
+          "phase": "draft",
+          "beforeBytes": 26194,
+          "afterBytes": 30734,
+          "additionalBytes": 4540,
+          "beforeRequestSHA256": "82be2c0c292ee0c98cbd72cb65b72098d5c1570557e35fe5795de749850b66f9",
+          "afterRequestSHA256": "0afe18b244f86ff79c7a2c309461256b4222f91758f09c33385b094c54772833",
+          "model": "gpt-5.6-terra",
+          "maxOutputTokens": 2200
+        },
+        {
+          "phase": "verification",
+          "beforeBytes": 46899,
+          "afterBytes": 55167,
+          "additionalBytes": 8268,
+          "beforeRequestSHA256": "754726cf23cca02e42df842312d226aa8ce27e09505f04ead318ea7fac2ecc21",
+          "afterRequestSHA256": "4446bc2df0e39b57f83832509331c553bd2c482622f927aba5a2b6e42c1e49c7",
+          "model": "gpt-5.6-luna",
+          "maxOutputTokens": 1800
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-023",
+      "originalPassages": 11,
+      "currentPassages": 11,
+      "originalSourcesPreserved": true,
+      "addedReleasePages": [],
+      "missingReleaseCitationRejected": null,
+      "diagnosticDraftProseAndCitationsUnchanged": true,
+      "sourceRelationships": [
+        {
+          "kind": "conditional_stakeholder",
+          "questionToResolve": "Does the source's Owner Type condition require an additional stakeholder attestation before this filing can proceed? Apply known facts or retain the condition briefly; do not treat the named applicant and owner as an exhaustive list without resolving this condition.",
+          "evidence": {
+            "sourceID": "dob-build-release-notes",
+            "claimID": "official-passage-2e6a1d190b996cb029e2e04a",
+            "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+            "excerpts": [
+              "When Condo Unit Owner or Co - Op Tenant - Shareholder is selected as the Owner Type on a DOB NOW job filing, the Condo/Co - Op Board will be added as a required Stakeholder.",
+              "Both the owner and the Board representative are required complete their attestations on the Statements & Signatures tab before the filing can proceed."
+            ]
+          }
+        }
+      ],
+      "comparisons": [
+        {
+          "phase": "draft",
+          "beforeBytes": 26706,
+          "afterBytes": 27389,
+          "additionalBytes": 683,
+          "beforeRequestSHA256": "84c22117a01dc29963055c7b3ec422c1784e8f4f40c5f3123297b0ff88b46cbe",
+          "afterRequestSHA256": "1f7b9329aaa8cec5b8e0b18fe7b17e4fdb61c4a66612b8443c4743b620c69474",
+          "model": "gpt-5.6-terra",
+          "maxOutputTokens": 2200
+        },
+        {
+          "phase": "verification",
+          "beforeBytes": 45580,
+          "afterBytes": 46354,
+          "additionalBytes": 774,
+          "beforeRequestSHA256": "94d37d7b8435758498ec9149d007fd497f512111d3c25453fc00533719f1e6e7",
+          "afterRequestSHA256": "4fcdcde9f192fbf8e2d0e48b4eb0cef858ef4314f1972238c18c8a91bc07221c",
+          "model": "gpt-5.6-luna",
+          "maxOutputTokens": 1800
+        }
+      ]
+    }
+  ]
+}
