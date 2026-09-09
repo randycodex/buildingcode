@@ -10184,7 +10184,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           : "",
         "Make governing code conclusions only from the authorized enacted evidence supplied in the request.",
         evidence.some((source) => source.richSourceKind === "amendment-history")
-          ? "Official amendment-history metadata may substantiate only the events and report links it lists. Bind those observations to its own PASSAGE_ID, label them as supplied snapshot metadata, and do not claim a live refresh or use them as historical enacted requirements."
+          ? "Official amendment-history metadata may substantiate only the events and report links it lists. Bind those observations to its own PASSAGE_ID, label them as supplied snapshot metadata, and do not claim a live refresh or use them as historical enacted requirements. Describe historical-source verification steps as research needed to resolve the stated evidence gap, not as requirements imposed by the Zoning Resolution."
           : "",
         "Evidence marked user_pinned must be considered, but Permitext-discovered enacted evidence may identify a different controlling provision.",
         "Supporting web context may explain or contextualize an answer but is noncontrolling and must never create or override an enacted requirement.",
@@ -10495,10 +10495,17 @@ export async function openAIResearchVerification(question, evidence, interpretat
     ...researchModelConfiguration(),
     ...(options.model ? { model: options.model } : {})
   };
+  const hasAmendmentMetadata = evidence.some((source) => source.richSourceKind === "amendment-history");
+  const hasNumericComparison = options.zoningDeterministicContext?.answerObligations?.some((item) => item.numericComparison);
   const evidenceText = evidence.map((source) => [
     `PASSAGE_ID: ${source.sourceID}`,
     `SECTION_ID: ${source.sectionID}`,
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
+    ...(hasAmendmentMetadata ? [
+      source.codeEdition ? `CODE_EDITION: ${source.codeEdition}` : "",
+      source.codeVersion ? `CODE_VERSION: ${source.codeVersion}` : "",
+      source.applicabilityStatus ? `APPLICABILITY_STATUS: ${source.applicabilityStatus}` : ""
+    ] : []),
     source.richSourceKind === "amendment-history"
       ? "SOURCE_CLASS: official_metadata; supplied corpus snapshot; not refreshed in this turn; not historical enacted text" : "",
     `EVIDENCE_ROLE: ${source.evidencePriority?.evidenceRole || "supporting"}`,
@@ -10532,8 +10539,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
     instructions: [
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
       evidence.some((source) => source.richSourceKind === "amendment-history")
-        ? "For an official amendment-history metadata passage, verify only observations about its listed events and report links against that PASSAGE_ID. Reject claims that the snapshot was refreshed live or that its event listing establishes historical enacted requirements."
+        ? "For an official amendment-history metadata passage, verify observations about its listed events and report links against that PASSAGE_ID. Recommended research steps to obtain historical enacted text, effective dates or official reports may explain the evidence gap without a separate enacted mandate. Reject invented legal requirements, claims that the snapshot was refreshed live, or claims that its event listing establishes historical enacted requirements."
         : "",
+      ...(hasAmendmentMetadata ? ["The server-supplied CODE_EDITION, CODE_VERSION and APPLICABILITY_STATUS identify the bound passage's source basis. They may support an accurate disclosure of that basis even when the enacted sentence does not repeat the edition label; they do not establish a live source refresh or the rule in force on a different date."] : []),
       "For each supported point, evaluate every passage in its sourceIDs array. Its sectionID identifies the primary section, not the exclusive source. The supported-point binding lookup resolves these IDs but does not establish substantive support. Fail with incorrect_citation if a claim lacks support in that point's bound passages, even when a supporting passage appears elsewhere in the answer's citations or supplied evidence. Never infer a missing binding from a shared topic or section number.",
       "Distinguish an enacted rule from its application to supplied facts. Accept a conclusion strictly deduced from the bound rule and those facts without requiring the code to repeat the question's wording. In particular, an additional stated feature does not itself create an exception to an unqualified applicable mandatory requirement; a separate sentence naming the user's proposed omission is not needed to conclude that omission fails that requirement. Keep the conclusion within that rule's scope. Reject deductions that depend on an unstated factual premise, classification, equivalence, exception or external legal rule.",
       zoningResearchSafetyInstruction(evidence),
@@ -10563,6 +10571,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "When the user has established that a building is fully sprinklered, treat installed throughout as established factual context. The answer may request documentation of compliance with a named installation standard when material, but must not return fully sprinklered or installed throughout as a missing fact or follow-up question.",
       "For a numeric limit or table comparison, fail with weakest_supported_conclusion when the stated value satisfies a stricter directly applicable supplied limit but the answer makes compliance conditional on qualifying for a more generous allowance.",
       "For every numeric comparison, check the opening result, arithmetic and closing scope statement together. Fail with overstated_compliance if any sentence says or implies that a failed applicable limit is satisfied, even if the opening correctly says No. A statement limiting the review to one requirement must preserve whether that requirement passed or failed.",
+      ...(hasNumericComparison ? ["Check numeric relationships and units, not just the presence of correct numbers. A proposed quantity, its percentage of the total, and its excess over a maximum are different quantities. Reject a sentence that equates unequal quantities even if another sentence gives the correct calculation."] : []),
       "Fail with misstated_provision when enacted text applies 10 percent to the overall total seating and standing spaces but the answer applies 10 percent to each dining-surface type. The separate per-type condition is a minimum of one accessible space, not a separate 10-percent calculation.",
       "Fail with misstated_provision when the answer changes a cumulative enacted condition into an alternative or an enacted alternative into a cumulative condition. In particular, A and B must not be restated as A or B.",
       "Fail with overstated_compliance when the answer treats alternative applicability paths as exhaustive without evidence: an unresolved accessory relationship does not establish that a room is a nonaccessory tenant space, and a rule expressly limited to a building or nonaccessory tenant space must not be generalized to every room. Each path needs its own supplied factual basis or an explicit condition.",
@@ -10776,7 +10785,7 @@ async function openAIResearchZoningRepair(
     answer: interpretation,
     deterministicContext: options.zoningDeterministicContext
   });
-  if (!repairPacket.sources.length) {
+  if (!repairPacket.sources.length || repairPacket.incompleteAtomicSources.length) {
     const error = new Error("Permitext could not bind the Zoning repair to a controlling source passage.");
     error.code = "RESEARCH_VERIFICATION_FAILED";
     throw error;
@@ -10795,6 +10804,8 @@ async function openAIResearchZoningRepair(
       "Replace answerText with the corrected complete user-facing narrative while retaining unaffected wording where possible.",
       "Use an upsert only for a supported point or citation that must be added or corrected. Use removals only for an identified defective record.",
       "Every mandatory answer obligation must be explicit. Preserve dates, table categories and symbols, arithmetic, applicability branches, and unresolved property facts.",
+      "Treat official_metadata passages as the supplied amendment-event snapshot, not enacted requirements or a live refresh. Preserve every unaffected event and report/date relationship. Historical-source research recommendations may explain an evidence gap without claiming that the law mandates those research steps.",
+      "Keep each numeric relationship explicit: the proposed quantity, the maximum, the percentage and the amount over or under that maximum are distinct values. Do not change an unaffected calculation while repairing an unrelated citation or qualification.",
       "A numerical table ceiling is not entitlement to use that table column. A mapped or historical conclusion remains conditional unless the controlling official facts are supplied.",
       "Do not include commentary outside the structured patch."
     ].join(" "),
@@ -11816,29 +11827,42 @@ export function researchAuthorityClassification({
   evidenceBoundaryFallback = false,
   citations = [],
   supportingSources = [],
-  missingFacts = []
+  missingFacts = [],
+  evidence = []
 } = {}) {
-  const hasEnactedCitation = (Array.isArray(citations) ? citations : []).some((citation) =>
+  const metadataIDs = new Set((Array.isArray(evidence) ? evidence : [])
+    .filter((source) => source.richSourceKind === "amendment-history")
+    .map((source) => source.sourceID));
+  const materialCitations = (Array.isArray(citations) ? citations : []).filter((citation) =>
     !["contextual", "irrelevant"].includes(String(citation?.evidenceRole || "supporting"))
   );
+  const hasMetadataCitation = materialCitations.some((citation) => (citation.sourceIDs || []).some((id) => metadataIDs.has(id)));
+  const hasEnactedCitation = materialCitations.some((citation) =>
+    !(citation.sourceIDs || []).length || citation.sourceIDs.some((id) => !metadataIDs.has(id)));
   const hasOfficialSupportingGuidance =
-    !hasEnactedCitation &&
+    !hasEnactedCitation && !hasMetadataCitation &&
     (Array.isArray(supportingSources) ? supportingSources : []).length > 0;
   const status = evidenceBoundaryFallback
     ? "insufficient_evidence"
     : hasOfficialSupportingGuidance
       ? "official_supporting_guidance"
+      : hasMetadataCitation && !hasEnactedCitation
+        ? "official_amendment_metadata"
       : !hasEnactedCitation
         ? "insufficient_evidence"
         : (Array.isArray(missingFacts) ? missingFacts : []).length > 0
           ? "conditional"
-          : "supported_by_enacted_text";
+          : hasMetadataCitation ? "enacted_text_with_official_metadata" : "supported_by_enacted_text";
   const label = status === "insufficient_evidence"
     ? "Insufficient enacted evidence"
     : status === "official_supporting_guidance"
       ? "Official supporting guidance — noncontrolling"
+      : status === "official_amendment_metadata"
+        ? "Official amendment metadata — source snapshot"
+        : status === "enacted_text_with_official_metadata"
+          ? "Enacted text and official amendment metadata"
       : status === "conditional"
-        ? "Conditional on Project facts"
+        ? `Conditional on Project facts${hasMetadataCitation ? "; includes official amendment metadata" : ""}`
         : "Supported by enacted text";
   return { status, label };
 }
@@ -20192,7 +20216,8 @@ async function handleResearchConversationMessage(request, response) {
       evidenceBoundaryFallback,
       citations: result.interpretation.citations,
       supportingSources: result.interpretation.supportingSources,
-      missingFacts: result.interpretation.missingFacts
+      missingFacts: result.interpretation.missingFacts,
+      evidence: assembledEvidence
     });
     const authorityStatus = authority.status;
     const authorityLabel = authority.label;
@@ -20240,7 +20265,9 @@ async function handleResearchConversationMessage(request, response) {
         evidenceSectionIDs: Array.from(new Set(assembledEvidence.map((section) => section.sectionID))),
         evidenceSourceIDs: assembledEvidence.map((section) => section.sourceID),
         sourceSummary: {
-          enactedProvisionCount: new Set(materialAssembledEvidence.map((section) => section.sectionID)).size,
+          enactedProvisionCount: new Set(materialAssembledEvidence.filter((section) => section.richSourceKind !== "amendment-history").map((section) => section.sectionID)).size,
+          ...(materialAssembledEvidence.some((section) => section.richSourceKind === "amendment-history")
+            ? { officialMetadataSourceCount: materialAssembledEvidence.filter((section) => section.richSourceKind === "amendment-history").length } : {}),
           contextualProvisionCount: new Set(contextualAssembledEvidence.map((section) => section.sectionID)).size,
           citedProvisionCount: answerQuality.evidenceEconomy.citedProvisionCount,
           governingCitationCount: answerQuality.evidenceEconomy.governingCitationCount,

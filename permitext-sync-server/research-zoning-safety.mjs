@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { unresolvedZoningFARSelectionPattern } from "./research-zoning-conditional-explanation.mjs";
 
 export const zoningResearchSafetyVersion =
-  "20260909-zoning-unresolved-selection-v19";
+  "20260909-zoning-asserted-predicate-v20";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -460,12 +460,19 @@ function statesMappedEvidenceGatheringInstruction(value) {
 }
 
 function hasMappedSpecificExample(value) {
-  const text = compactText(value)
+  const clauses = compactText(value)
     .split(/(?<!\d)\.|\.(?!\d)|[!?;]+|\b(?:but|however)\b[\s,]*/i)
     .map(compactText)
-    .filter((clause) => !unresolvedWhetherBoundary(clause) && !statesUnprovenFARAllowance(clause))
-    .join(". ");
-  if (!text || !hasMappedOrRegulatoryPredicate(text)) return false;
+    .filter((clause) => !unresolvedWhetherBoundary(clause) && !statesUnprovenFARAllowance(clause));
+  const text = clauses.join(". ");
+  // A deferred FAR selection can contain words such as "permitted" without
+  // asserting permission. Require an assertion outside the bounded clauses
+  // before propagating an example or actor reference across the whole field.
+  // Keep the original clauses below so antecedents and appended approvals are
+  // still checked together once an actual regulatory predicate is present.
+  const assertedText = clauses.filter((clause) => !statesLocationBoundary(clause) &&
+    !statesMappedEvidenceGatheringInstruction(clause)).join(". ");
+  if (!text || (!hasMappedOrRegulatoryPredicate(assertedText) && !hasAffirmativeMappedResult(assertedText))) return false;
   const normalized = withoutReviewedGenericParentheticals(text);
   if (/\b(?:including|such\s+as|namely)\b|\bthis\s+includes\b/i.test(normalized)) {
     return true;
@@ -505,12 +512,12 @@ function hasMappedSpecificExample(value) {
     /^(?:(?:however|nevertheless|nonetheless|but|yet|still|then|therefore|thus|accordingly|consequently|hence|afterwards?|so)\b[\s,]*)+/i,
     ""
   );
-  const clauses = normalized
+  const contextualClauses = normalized
     .split(/(?:[;.!?—]+\s*)/)
     .map(compactText)
     .filter(Boolean);
   let specificAntecedentEstablished = false;
-  for (const clause of clauses) {
+  for (const clause of contextualClauses) {
     const evidenceInstruction = statesMappedEvidenceGatheringInstruction(clause);
     const boundaryClause = statesLocationBoundary(clause);
     const sourceClause = statesReviewedV11GenericSourceTreatment(clause) ||

@@ -5,8 +5,8 @@ import { zoningTemporalApplicationObligations, zoningTemporalApplicationIssues }
 
 export const zoningResearchPlannerVersion = "20260908-historical-source-intent-v5";
 
-export const zoningResearchCompilerVersion = "20260909-word-hyphen-obligations-v24";
-export const zoningResearchRepairVersion = "20260901-source-bounded-patch-v2";
+export const zoningResearchCompilerVersion = "20260909-numeric-comparison-relations-v25";
+export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
 
 export const zoningResearchPaths = Object.freeze({
   directRule: "direct_rule",
@@ -694,6 +694,7 @@ function obligation(id, kind, detail, values = [], sourceIDs = [], options = {})
     record.requiredPatterns = options.requiredPatterns.map(String);
   }
   if (options.affirmativeRequiredPatterns === true) record.affirmativeRequiredPatterns = true;
+  if (options.numericComparison) record.numericComparison = structuredClone(options.numericComparison);
   if (options.qualifiedClaims?.length) record.qualifiedClaims = options.qualifiedClaims.map((claim) => ({
     claimPattern: String(claim.claimPattern), qualifierPattern: String(claim.qualifierPattern)
   }));
@@ -759,11 +760,14 @@ function observedFailureObligations({ question, evidence = [], plan, facts = que
   }
   if (lotArea && proposedCoverage && basicCoveragePercent !== null && /basic lot[- ]coverage/i.test(question)) {
     const basicCap = Number((lotArea * basicCoveragePercent / 100).toFixed(4));
+    const difference = Number((proposedCoverage - basicCap).toFixed(4));
+    const proposedPercent = Number((proposedCoverage / lotArea * 100).toFixed(4));
+    const comparison = difference > 0 ? "exceeds" : difference < 0 ? "is below" : "equals";
     const sourceIDs = sourceIDsForSections(evidence, ["23-362", "23-363", "23-342"]);
     obligations.push(obligation(
       "basic_lot_coverage_numerical_cap",
       "numerical_boundary",
-      `State the ${basicCoveragePercent}-percent basic cap (${basicCap} square feet), compare the proposed ${proposedCoverage} square feet, and preserve that it exceeds the basic cap.`,
+      `State the ${basicCoveragePercent}-percent basic cap (${basicCap} square feet). The proposed ${proposedCoverage} square feet is ${proposedPercent} percent of the ${lotArea}-square-foot lot and ${comparison} the basic cap${difference ? ` by ${Math.abs(difference)} square feet` : ""}. Keep the proposed area, its percentage and the difference from the cap distinct.`,
       [],
       sourceIDs,
       {
@@ -771,8 +775,10 @@ function observedFailureObligations({ question, evidence = [], plan, facts = que
           [`${basicCoveragePercent} percent`, `${basicCoveragePercent}%`],
           numberTextAlternatives(basicCap),
           numberTextAlternatives(proposedCoverage),
-          ["exceeds", "over the basic", "above the basic"]
-        ]
+          difference > 0 ? ["exceeds", "over the basic", "above the basic"]
+            : difference < 0 ? ["below", "less than", "under", "within"] : ["equals", "equal to", "at the basic", "at the cap"]
+        ],
+        numericComparison: { proposedQuantity: proposedCoverage, maximumQuantity: basicCap, difference, proposedPercent, unit: "square feet" }
       }
     ));
     obligations.push(obligation(
@@ -792,7 +798,7 @@ function observedFailureObligations({ question, evidence = [], plan, facts = que
     obligations.push(obligation(
       "basic_lot_coverage_independent_bulk_boundary",
       "regulatory_boundary",
-      "State that the numerical lot-coverage cap is not a footprint entitlement because yard, open-area, and other bulk rules remain independently applicable.",
+      "State that the numerical lot-coverage cap is not a footprint entitlement. Apply the independently applicable yard rules established by the bound passages. Describe open-area or other bulk constraints as outside this review when their governing provisions are not supplied; do not invent additional requirements.",
       [],
       sourceIDs,
       {
@@ -1646,15 +1652,26 @@ export function zoningResearchRepairPacket({
     if (citedIDs.has(sourceID)) score += 100;
     if (sourceRole(source) === "governing") score += 50;
     if (source?.evidencePriority?.claimCoverageRequired === true) score += 25;
+    // A requested amendment index is an atomic evidence record. Reserve it
+    // before excerpting ordinary passages, so a repair cannot lose unaffected
+    // events merely because their descriptions scored below other sentences.
+    if (source.richSourceKind === "amendment-history") score += 10_000;
     return { source, sourceID, index, score };
   }).sort((left, right) => right.score - left.score || left.index - right.index);
   const sources = [];
+  const incompleteAtomicSources = [];
   let characters = 0;
   for (const entry of scored) {
     if (sources.length >= maximumSources) break;
     const remaining = maximumCharacters - characters;
     if (remaining <= 0) break;
-    const text = excerptForRepair(entry.source, terms, Math.min(2_400, remaining));
+    const atomicMetadata = entry.source.richSourceKind === "amendment-history";
+    const suppliedText = String(entry.source.text || entry.source.selectedText || entry.source.userSelectedText || "").trim();
+    if (atomicMetadata && suppliedText.length > remaining) {
+      incompleteAtomicSources.push({ sourceID: entry.sourceID, requiredCharacters: suppliedText.length });
+      continue;
+    }
+    const text = atomicMetadata ? suppliedText : excerptForRepair(entry.source, terms, Math.min(2_400, remaining));
     if (!text) continue;
     sources.push({
       sourceID: entry.sourceID,
@@ -1662,10 +1679,23 @@ export function zoningResearchRepairPacket({
       codePrefix: compactText(entry.source?.codePrefix),
       sectionNumber: compactText(entry.source?.sectionNumber),
       evidenceRole: sourceRole(entry.source),
+      authorityClass: atomicMetadata ? "official_metadata" : entry.source.authorityClass || "enacted",
+      codeEdition: compactText(entry.source.codeEdition),
+      codeVersion: compactText(entry.source.codeVersion),
+      applicabilityStatus: compactText(entry.source.applicabilityStatus),
+      ...(atomicMetadata ? { richSourceKind: "amendment-history",
+        metadataCurrentness: entry.source.metadataCurrentness || "not_refreshed_in_this_turn" } : {}),
+      completeSuppliedPassage: compactText(text) === sourceText(entry.source),
       text,
       textHash: stableHash(text)
     });
     characters += text.length;
+  }
+  for (const source of values.filter((source) => source.richSourceKind === "amendment-history")) {
+    if (!sources.some((item) => item.sourceID === source.sourceID) &&
+      !incompleteAtomicSources.some((item) => item.sourceID === source.sourceID)) {
+      incompleteAtomicSources.push({ sourceID: source.sourceID, requiredCharacters: String(source.text || "").trim().length });
+    }
   }
   const packet = {
     schemaVersion: 1,
@@ -1676,6 +1706,7 @@ export function zoningResearchRepairPacket({
       detail: compactText(issue?.detail)
     })),
     answerObligations: deterministicContext?.answerObligations || [],
+    incompleteAtomicSources,
     sources,
     usage: { sourceCount: sources.length, characterCount: characters, maximumCharacters }
   };
@@ -1832,6 +1863,33 @@ function proposedCitationIDs(answer) {
     .flatMap((citation) => citation?.sourceIDs || []));
 }
 
+function numericComparisonIssues(answerObligation, text) {
+  const comparison = answerObligation.numericComparison;
+  if (!comparison || comparison.unit !== "square feet") return [];
+  const normalized = text.replace(/\*\*/g, "");
+  const number = String.raw`(\d[\d,]*(?:\.\d+)?)`;
+  const area = String.raw`(?:square\s+(?:feet|foot)|sq\.?\s*ft\.?|ft²)`;
+  const equality = new RegExp(String.raw`\b(?:the\s+)?proposed\s+${number}\s*${area}\s+(?:is|equals|is\s+equal\s+to)\s+${number}\s*${area}(?=\s|[),.;:!?]|$)`, "gi");
+  for (const match of normalized.matchAll(equality)) {
+    const proposed = numericValue(match[1]), described = numericValue(match[2]);
+    if (proposed !== comparison.proposedQuantity) continue;
+    // Do not mistake a quantity inside a subtraction expression for its whole
+    // left-hand side. Other arithmetic remains subject to semantic review.
+    const prefix = normalized.slice(0, match.index).split(/[;.!?]\s+/).at(-1);
+    if (/\b(?:minus|subtract(?:ing|ed)?)\b|[\d)]\s*[-−+×÷]\s*$/i.test(prefix)) continue;
+    const tail = normalized.slice(match.index + match[0].length);
+    const relative = tail.match(/^\s*(?:\([^)]*\)\s*)?(over|above|below|under|short\s+of|more\s+than|greater\s+than|less\s+than)\b/i)?.[1];
+    const relationshipMatches = relative &&
+      described === Math.abs(comparison.difference) &&
+      (comparison.difference > 0 ? /^(?:over|above|more|greater)/i.test(relative) : /^(?:below|under|short|less)/i.test(relative));
+    if ((!relative && proposed === described) || relationshipMatches) continue;
+    return [{ code: "NUMERIC_QUANTITIES_CONFLATED", obligationID: answerObligation.id,
+      sourceIDs: answerObligation.sourceIDs || [],
+      detail: `Keep the proposed ${comparison.proposedQuantity} square feet (${comparison.proposedPercent} percent) separate from the ${Math.abs(comparison.difference)}-square-foot difference from the ${comparison.maximumQuantity}-square-foot cap. Do not equate unequal quantities or give the difference the wrong direction.` }];
+  }
+  return [];
+}
+
 export function evaluateZoningDeterministicControls({
   plan,
   deterministicContext,
@@ -1901,6 +1959,7 @@ export function evaluateZoningDeterministicControls({
     }
   }
   for (const answerObligation of deterministicContext?.answerObligations || []) {
+    issues.push(...numericComparisonIssues(answerObligation, text));
     const scopeText = answerObligation?.coverageScope === "uncertainty"
       ? compactText(`${primaryText} ${uncertaintyText}`)
       : answerObligation?.coverageScope === "answer"

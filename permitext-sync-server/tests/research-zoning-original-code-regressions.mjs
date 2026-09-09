@@ -10,12 +10,15 @@ import { evaluateZoningResearchSafety } from "../research-zoning-safety.mjs";
 
 globalThis.fetch = async () => { throw new Error("No network in retained original-code regressions."); };
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1" });
-const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-original-code-2026-09-09.json", import.meta.url)));
+const retainedRuns = await Promise.all([
+  "research-owner-api-round2-live-original-code-2026-09-09.json",
+  "research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json"
+].map(async (file) => JSON.parse(await readFile(new URL(`../evals/results/${file}`, import.meta.url)))));
 const key = JSON.parse(await readFile(new URL("../evals/research-reconciled-answer-key.json", import.meta.url)));
 const compact = (text) => text.replace(/\s+/g, " ").trim();
-for (const id of ["ZR-07", "ZR-11"]) {
+for (const [retained, id] of [[retainedRuns[0], "ZR-07"], [retainedRuns[0], "ZR-11"], [retainedRuns[1], "ZR-07"], [retainedRuns[1], "ZR-11"]]) {
   const call = retained.providerCalls.find((call) => call.caseID === id && call.phase === "permitext_code_interpretation");
-  const answer = JSON.parse(call.output.flatMap((message) => message.content || []).find((part) => part.type === "output_text").text);
+  let answer = JSON.parse(call.output.flatMap((message) => message.content || []).find((part) => part.type === "output_text").text);
   const input = await ownerResearchScopeInput(key.cases.find((item) => item.id === id), { original: true, zoningSummary: zoningSectionSummary });
   // Recreate the actual full-section reader selections and their source IDs;
   // expected answers and grading concepts never become retrieval input.
@@ -32,6 +35,31 @@ for (const id of ["ZR-07", "ZR-11"]) {
     evidenceSelection: assembled.zoningSelection });
   const controls = (candidate) => evaluateZoningDeterministicControls({ plan, deterministicContext, answer: candidate, providerRequestCount: 1 });
   const safety = (candidate) => evaluateZoningResearchSafety({ ...input, evidence: assembled.sources, answer: candidate, questionPlan: plan });
+  if (id === "ZR-11" && retained === retainedRuns[1]) {
+    assert(controls(answer).issues.some((issue) => issue.code === "NUMERIC_QUANTITIES_CONFLATED"),
+      "The actually delivered malformed area equality must fail before another verifier call.");
+    const bad = "the proposed **8,500 sq ft** is 500 sq ft (85%) and exceeds that basic cap";
+    assert(answer.answerText.includes(bad));
+    const replaceCalculation = (sentence) => ({ ...answer, answerText: answer.answerText.replace(bad, sentence) });
+    for (const sentence of [
+      "the proposed 8,500 square feet is 500 square feet below the basic cap and exceeds it",
+      "the proposed 8,500 ft² is 500 ft² (85%) and exceeds the basic cap",
+      "the proposed 8,500 sq ft is 600 sq ft over the basic cap and exceeds it"
+    ]) assert(controls(replaceCalculation(sentence)).issues.some((issue) => issue.code === "NUMERIC_QUANTITIES_CONFLATED"), sentence);
+    for (const sentence of [
+      "the proposed 8,500 sq ft is 500 sq ft over the basic cap and therefore exceeds it",
+      "the proposed 8,500 square feet is 85% of the lot and exceeds the cap by 500 square feet"
+    ]) assert(controls(replaceCalculation(sentence)).pass, sentence);
+    answer = replaceCalculation("the proposed 8,500 square feet is 85% of the lot and exceeds the cap by 500 square feet");
+    for (const [quantity, difference, percent, relation] of [[7500, -500, 75, "below"], [8000, 0, 80, "equals"], [8500, 500, 85, "exceeds"]]) {
+      const question = input.question.replace("8,500", quantity.toLocaleString("en-US"));
+      const variantInput = { ...input, question };
+      const context = zoningResearchDeterministicContext({ ...variantInput, evidence: assembled.sources, plan: planZoningResearchQuestion(variantInput) });
+      const obligation = context.answerObligations.find((item) => item.id === "basic_lot_coverage_numerical_cap");
+      assert.deepEqual(obligation.numericComparison, { proposedQuantity: quantity, maximumQuantity: 8000, difference, proposedPercent: percent, unit: "square feet" });
+      assert(obligation.detail.includes(relation));
+    }
+  }
   const checked = controls(answer);
   assert(checked.pass, `${id}: ${JSON.stringify(checked.issues)}`);
   assert(safety(answer).pass, `${id}: ${JSON.stringify(safety(answer).issues)}`);
