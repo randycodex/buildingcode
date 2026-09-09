@@ -1,11 +1,13 @@
 import { createHash } from "node:crypto";
 import { guidanceSourceRelationships } from "./research-guidance-source-relationships.mjs";
 
-export const guidanceSourceResolutionVersion = "20260909-source-resolutions-v1";
+export const guidanceSourceResolutionVersion = "20260909-source-resolutions-v2";
 const compact = value => typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
 const digest = value => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const key = use => `${use?.sourceID}\u0000${use?.claimID}`;
 const outcomes = ["resolved", "conditional", "unresolved", "not_material"];
+const exactKeys = (value, keys) => value && typeof value === "object" && !Array.isArray(value) &&
+  Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key));
 const invalid = () => Object.assign(new Error("The source relationship resolutions are incomplete or not carried into the cited main answer."), {
   code: "INVALID_RESEARCH_RESPONSE"
 });
@@ -39,18 +41,28 @@ export function guidanceSourceResolutionSchema(packet) {
           properties: {
             relationshipIndex: { type: "integer", enum: packet.relationships.map(item => item.relationshipIndex) },
             outcome: { type: "string", enum: outcomes },
-            statement: { type: "string", minLength: 1, maxLength: 600 },
-            paragraphIndex: { type: ["integer", "null"], minimum: 0, maximum: 5 }
-          }, required: ["relationshipIndex", "outcome", "statement", "paragraphIndex"] }
+            statement: { type: "string", minLength: 1, maxLength: 600 }
+          }, required: ["relationshipIndex", "outcome", "statement"] }
       }
     }, required: ["packetSHA256", "relationships"]
   };
 }
 
+export function guidanceSourceResolutionPartsSchema(packet) {
+  return { type: "array", minItems: 1, maxItems: 8, items: {
+    type: "object", additionalProperties: false,
+    properties: {
+      kind: { type: "string", enum: ["text", "source_resolution"] },
+      text: { type: ["string", "null"] },
+      relationshipIndex: { type: ["integer", "null"], enum: [null, ...packet.relationships.map(item => item.relationshipIndex)] }
+    }, required: ["kind", "text", "relationshipIndex"]
+  } };
+}
+
 export const guidanceSourceResolutionDraftInstruction = [
   "Complete sourceResolutions before drafting the paragraphs. For each indexed source relationship, use the full passages and supplied facts to select resolved, conditional, unresolved or not_material.",
-  "Write statement as one concise, source-supported finding, including its material condition or precise unresolved issue, not an analysis transcript. Place that exact statement in the main paragraph identified by paragraphIndex, with every requiredSourceUses citation from the packet. Other answer text must not contradict or overgeneralize that finding.",
-  "Use not_material only when the relationship cannot change or qualify the requested decision under the supplied facts; give the specific reason in statement and set paragraphIndex to null. Unknown facts alone do not make a conditional requirement irrelevant. Do not add unrelated filing instructions to explain a source relationship.",
+  "Write statement as one concise, source-supported finding, including its material condition or precise unresolved issue, not an analysis transcript. In the main paragraph, insert one part with kind source_resolution, its relationshipIndex and null text. The server inserts the statement there verbatim. Cite every requiredSourceUses source in that paragraph. Do not copy or paraphrase the statement again in a text part; other text must not contradict or overgeneralize it.",
+  "Use text parts for the direct answer and other necessary guidance; set their relationshipIndex to null. Use not_material only when the relationship cannot change or qualify the requested decision under the supplied facts; give the specific reason in statement and do not reference it in a paragraph. Unknown facts alone do not make a conditional requirement irrelevant. Do not add unrelated filing instructions to explain a source relationship.",
   "This structure does not supply the answer or establish correctness. Do not invent a resolution to complete it; unresolved is an appropriate outcome when the complete sources and facts do not reconcile the directions."
 ].join(" ");
 
@@ -90,4 +102,43 @@ export function validateGuidanceSourceResolutions(input, draft) {
         expected.requiredSourceUses.some(use => !paragraph.sourceUses.some(citation => key(citation) === key(use)))) throw invalid();
   }
   return { version: packet.version, packetSHA256: packet.packetSHA256, complete: true };
+}
+
+// Compose only model-authored text and explicit references, before attribution
+// and semantic verification. No free-text claim is removed or rewritten. This
+// avoids asking the model to write the same finding twice with identical words.
+export function materializeGuidanceSourceResolutions(input, rawDraft) {
+  const packet = guidanceSourceResolutionPacket(input);
+  if (!packet) {
+    validateGuidanceSourceResolutions(input, rawDraft);
+    return rawDraft;
+  }
+  const records = rawDraft?.sourceResolutions?.relationships;
+  if (!exactKeys(rawDraft, ["sourceResolutions", "paragraphs", "missingFacts", "evidenceLimitations"]) ||
+      !exactKeys(rawDraft.sourceResolutions, ["packetSHA256", "relationships"]) ||
+      !Array.isArray(records) || records.some(record => !exactKeys(record, ["relationshipIndex", "outcome", "statement"])) ||
+      !Array.isArray(rawDraft.paragraphs) || !rawDraft.paragraphs.length || rawDraft.paragraphs.length > 6) throw invalid();
+  const uses = new Map();
+  const paragraphs = rawDraft.paragraphs.map((paragraph, paragraphIndex) => {
+    if (!exactKeys(paragraph, ["parts", "sourceUses"]) || !Array.isArray(paragraph.parts) || !paragraph.parts.length || paragraph.parts.length > 8) throw invalid();
+    const text = paragraph.parts.map(part => {
+      if (!exactKeys(part, ["kind", "text", "relationshipIndex"])) throw invalid();
+      if (part?.kind === "text") {
+        if (part.relationshipIndex !== null || !compact(part.text)) throw invalid();
+        return part.text.trim();
+      }
+      if (part?.kind !== "source_resolution" || part.text !== null || !Number.isSafeInteger(part.relationshipIndex)) throw invalid();
+      const record = records.find(item => item?.relationshipIndex === part.relationshipIndex);
+      if (!record || record.outcome === "not_material" || uses.has(part.relationshipIndex) || !compact(record.statement)) throw invalid();
+      uses.set(part.relationshipIndex, paragraphIndex);
+      return record.statement.trim();
+    }).join(" ");
+    return { text, sourceUses: paragraph.sourceUses };
+  });
+  const normalized = { sourceResolutions: {
+    packetSHA256: rawDraft.sourceResolutions.packetSHA256,
+    relationships: records.map(record => ({ ...record, paragraphIndex: uses.get(record?.relationshipIndex) ?? null }))
+  }, paragraphs, missingFacts: rawDraft.missingFacts, evidenceLimitations: rawDraft.evidenceLimitations };
+  validateGuidanceSourceResolutions(input, normalized);
+  return normalized;
 }

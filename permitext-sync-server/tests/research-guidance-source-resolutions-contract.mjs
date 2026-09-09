@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { researchOfficialGuidanceSummaryRequest } from "../research-official-guidance-summary.mjs";
-import { guidanceSourceResolutionPacket, validateGuidanceSourceResolutions } from "../research-guidance-source-resolutions.mjs";
+import { guidanceSourceResolutionPacket, validateGuidanceSourceResolutions, materializeGuidanceSourceResolutions } from "../research-guidance-source-resolutions.mjs";
 
 globalThis.fetch = () => { throw new Error("Source-resolution contract forbids provider/network calls."); };
 const read = async file => JSON.parse(await readFile(new URL(`../evals/results/${file}`, import.meta.url)));
@@ -42,6 +42,27 @@ for (const call of calls) {
   const original = structuredClone({ input, draft });
   assert.equal(validateGuidanceSourceResolutions(input, draft).complete, true);
   assert.deepEqual({ input, draft }, original, "Structural validation must not rewrite model prose or evidence.");
+  const raw = { sourceResolutions: { ...draft.sourceResolutions, relationships: draft.sourceResolutions.relationships.map(({ paragraphIndex, ...record }) => record) },
+    paragraphs: draft.paragraphs.map((paragraph, relationshipIndex) => ({ parts: [{ kind: "source_resolution", text: null, relationshipIndex }], sourceUses: paragraph.sourceUses })),
+    missingFacts: [], evidenceLimitations: [] };
+  const rawBefore = structuredClone(raw);
+  assert.deepEqual(materializeGuidanceSourceResolutions(input, raw), draft, "Each referenced finding is inserted once without requiring the model to repeat it.");
+  assert.deepEqual(raw, rawBefore);
+  const withText = structuredClone(raw);
+  withText.paragraphs[0].parts.unshift({ kind: "text", text: "Synthetic direct answer.", relationshipIndex: null });
+  assert.equal(materializeGuidanceSourceResolutions(input, withText).paragraphs[0].text, `Synthetic direct answer. ${draft.paragraphs[0].text}`);
+  for (const mutate of [
+    value => { value.paragraphs[0].parts.push(value.paragraphs[0].parts[0]); },
+    value => { value.paragraphs[0].parts[0].relationshipIndex = 99; },
+    value => { value.paragraphs[0].parts[0].text = "An alternate finding must not replace the referenced statement."; },
+    value => { value.paragraphs[0].parts = [{ kind: "text", text: "A paraphrase without a required reference.", relationshipIndex: null }]; },
+    value => { value.paragraphs[0].text = "An extra free-text claim must not be silently discarded."; },
+    value => { value.sourceResolutions.relationships[0].outcome = "not_material"; },
+    value => { value.paragraphs[0].parts[0] = null; }
+  ]) {
+    const changed = structuredClone(raw); mutate(changed);
+    assert.throws(() => materializeGuidanceSourceResolutions(input, changed), { code: "INVALID_RESEARCH_RESPONSE" });
+  }
   const reject = (value, candidateInput = input) => assert.throws(() => validateGuidanceSourceResolutions(candidateInput, value), { code: "INVALID_RESEARCH_RESPONSE" });
   for (const mutate of [
     v => { delete v.sourceResolutions; }, v => { v.sourceResolutions.packetSHA256 = "a".repeat(64); },
@@ -72,6 +93,12 @@ for (const call of calls) {
   assert.equal(validateGuidanceSourceResolutions(input, notMaterial).complete, true,
     "Scope exclusions require semantic review; structural validity does not prove them true.");
   notMaterial.sourceResolutions.relationships[0].paragraphIndex = 0; reject(notMaterial);
+  const rawNotMaterial = structuredClone(raw);
+  rawNotMaterial.sourceResolutions.relationships[0] = { relationshipIndex: 0, outcome: "not_material", statement: "Synthetic asserted scope exclusion requiring semantic review." };
+  rawNotMaterial.paragraphs[0].parts = [{ kind: "text", text: "Synthetic direct answer.", relationshipIndex: null }];
+  const renderedNotMaterial = materializeGuidanceSourceResolutions(input, rawNotMaterial);
+  assert.equal(renderedNotMaterial.sourceResolutions.relationships[0].paragraphIndex, null);
+  assert(!renderedNotMaterial.paragraphs.some(p => p.text.includes(rawNotMaterial.sourceResolutions.relationships[0].statement)));
   const verification = researchOfficialGuidanceSummaryRequest({ ...options, proposedAnswer: draft,
     verificationSchema: { type: "object", properties: { pass: { type: "boolean" } }, required: ["pass"] } });
   const vi = JSON.parse(verification.input);

@@ -1,0 +1,72 @@
+{
+  "schema": "permitext.research-source-resolution-parts-replay.v1",
+  "checkedAt": "2026-09-09T23:04:55.461Z",
+  "runFile": "evals/results/research-owner-api-round2-live-source-resolutions-2026-09-09.json",
+  "runSHA256": "c673e5257eae56cb23587ca69d7be660f12c0eb77de5923a84e7e95e9e2494ed",
+  "sourceHashes": {
+    "app.mjs": "013fe2d98bd456d88aebee1251550da03ad043c3f5ded26a18d8714f307b5bcf",
+    "research-official-guidance-summary.mjs": "8004e6dac49d0e6325726c386ca616da600ee3388e51f0be7748c2584df5ad92",
+    "research-guidance-source-resolutions.mjs": "b085b78109848dc084eb9c3eaaa825233918ef368ed136fb8aae5415e7b16840",
+    "research-guidance-source-relationships.mjs": "d8e4c0531afc863d77476067128f226bf4624d56655f4faef4ecc7e74af61bd4",
+    "research-guidance-qualification-review.mjs": "5844b5e1913e04a501e4c2bbbce184f95ccfbd088ff7e34d6de5492b141be0d1",
+    "tests/research-guidance-source-resolutions-contract.mjs": "c48850706e830ab351af6ea445f2404ec3a03fe8c80f6616db644e69cc8a0e0b",
+    "tests/research-official-pdf-http-contract.mjs": "46dd263dbea9ef39aaa2c6fc6d2b4b413eb2e98ab6ed4589a25edde5fffa4878",
+    "evals/research-owner-http-request-binding.mjs": "3cc8d2eb1c7f5d0a85d9d362da08f29a194e3cc68855fa881a4915b311de51e9",
+    "tests/research-owner-http-request-binding-contract.mjs": "e61602dcf6ac2b625251bf0052bedac4d3deb51c1396a80380a71cf607e2c676",
+    "scripts/check-research-source-resolution-parts-20260909.mjs": "1830c5c76bcf45e3fe2068f1e69aaa83dd8425ba55dadff60a17b4e89b05b293",
+    "package.json": "3ded50019677aaac40cd3f298fb70e23974698db4e989c5bde7ba472694f90e8"
+  },
+  "summary": {
+    "syntheticFixtures": 3,
+    "relationshipsRendered": 4,
+    "providerCalls": 0,
+    "networkCalls": 0,
+    "originalPaidResultsChanged": 0,
+    "freeTextClaimsRemovedOrRewritten": 0,
+    "liveQualityConfirmed": false,
+    "liveSpeedMeasured": false
+  },
+  "limitations": [
+    "The script mechanically adds references to retained model-authored statements. It does not claim the model generated these v14 parts.",
+    "It deliberately preserves the original paragraphs as well, including repetitions and substantive errors; the resulting fixture is not an accepted user answer.",
+    "The new renderer inserts statements by reference and preserves citations, but semantic correctness and real model format compliance remain unproven."
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-003",
+      "retainedDraftSHA256": "28ec776c91a46fd8f5276842ba2b03de10d52300a9eca8770570622de6dae5d5",
+      "sourcePacketSHA256": "b683e5c6013a29d64502aa42705f3c537f8fb08f7b40ebc08bf8ab64aa356d51",
+      "fixtureSHA256": "56c1f4df0c79ee679c0b4e3f0c318f3b883a9336d9ccab2bdede315bd435d6df",
+      "renderedSHA256": "1fdf60a542f0e87acd5b2ba48e2edf6cf62070b6e3cca68d4f5891ee5abd615a",
+      "relationshipsRendered": 2,
+      "allOriginalParagraphsAndFindingsPreserved": true,
+      "sourcesUnchanged": true,
+      "missingReferenceRejected": true,
+      "semanticAcceptance": "not-tested"
+    },
+    {
+      "id": "DOBNOW-004",
+      "retainedDraftSHA256": "f791fc8e15fc40279f18d8fe72ff5a0e91ce37a39e7833195a13461f96e7cea5",
+      "sourcePacketSHA256": "b07cd6a228edfb1092a15f640e2f0a75f586bcf27dc050392b64f76f64b140b6",
+      "fixtureSHA256": "206847eb9dc49042fd96b929763a91fafce62b7d17e6bee826385a1b9a0b22b0",
+      "renderedSHA256": "ec6b20a25d3251419da04b06078d3bcadd82dcbdbbe35ef4d2a62101670f5340",
+      "relationshipsRendered": 1,
+      "allOriginalParagraphsAndFindingsPreserved": true,
+      "sourcesUnchanged": true,
+      "missingReferenceRejected": true,
+      "semanticAcceptance": "not-tested"
+    },
+    {
+      "id": "DOBNOW-023",
+      "retainedDraftSHA256": "e6f4f5d4a4d090ddc11ad5a50608e49b4b756d0f36afe3b30e766e41949de486",
+      "sourcePacketSHA256": "85750bd311e95f81ccfb11433e6089931d3ebfcfc072fb240f71dd4bc2058686",
+      "fixtureSHA256": "c9269e5e6045da78d8236bb0f1b6be095a258256f0f2311f79aaee1c9e6fb6eb",
+      "renderedSHA256": "4aff911737c78c68526f2ba26297d43190316cc635e658d3ea85c7c9fb2f5031",
+      "relationshipsRendered": 1,
+      "allOriginalParagraphsAndFindingsPreserved": true,
+      "sourcesUnchanged": true,
+      "missingReferenceRejected": true,
+      "semanticAcceptance": "not-tested"
+    }
+  ]
+}

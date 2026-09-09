@@ -261,6 +261,7 @@ const responseDouble = async (url, options) => {
         }], missingFacts: [], evidenceLimitations: []
       };
       if (input.sourceResolutionPacket) {
+        const ordinaryText = value.paragraphs[0].text;
         assert.equal(Object.keys(body.text.format.schema.properties)[0], "sourceResolutions");
         // Explicit synthetic findings exercise transport and structural gates;
         // they are not generated-answer or professional-acceptance evidence.
@@ -275,12 +276,14 @@ const responseDouble = async (url, options) => {
             const relationship = input.sourceRelationships[relationshipIndex];
             const statement = statements[relationship.kind];
             assert(statement, `Missing explicit fixture for ${relationship.kind}`);
-            value.paragraphs[0].text += ` ${statement}`;
             for (const use of requiredSourceUses) if (!value.paragraphs[0].sourceUses.some(item => item.sourceID === use.sourceID && item.claimID === use.claimID)) value.paragraphs[0].sourceUses.push(use);
-            return { relationshipIndex, outcome: relationship.kind.includes("timing") || relationship.kind === "field_editability" ? "unresolved" : "conditional", statement, paragraphIndex: 0 };
+            return { relationshipIndex, outcome: relationship.kind.includes("timing") || relationship.kind === "field_editability" ? "unresolved" : "conditional", statement };
           }) };
+        value.paragraphs[0] = { parts: [{ kind: "text", text: ordinaryText, relationshipIndex: null },
+          ...value.sourceResolutions.relationships.map(record => ({ kind: "source_resolution", text: null, relationshipIndex: record.relationshipIndex }))],
+        sourceUses: value.paragraphs[0].sourceUses };
         if (resolutionFailure === "missing_plan") delete value.sourceResolutions;
-        if (resolutionFailure === "uncarried_statement") value.paragraphs[0].text = value.paragraphs[0].text.replace(value.sourceResolutions.relationships[0].statement, "");
+        if (resolutionFailure === "uncarried_statement") value.paragraphs[0].parts.splice(1, 1);
         if (resolutionFailure === "missing_source") {
           const required = input.sourceResolutionPacket.relationships[0].requiredSourceUses[0];
           value.paragraphs[0].sourceUses = value.paragraphs[0].sourceUses.filter(use => use.sourceID !== required.sourceID || use.claimID !== required.claimID);
@@ -412,7 +415,7 @@ try {
     assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-014", "DOBNOW-017", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
     const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-014": /cannot simply answer No/, "DOBNOW-017": /required before Final CO/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
     assert.match(answer.answerText, expected[id]);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v13");
+    assert.equal(answer.promptVersion, "20260909-document-summary-v14");
     assert.equal(answer.officialGuidanceSummary.version, "20260909-document-summary-v2",
       "New summaries retain the required qualification receipt; older v1 records remain readable.");
     assert.doesNotMatch(answer.answerText, /sourceResolutions|relationshipIndex|packetSHA256/);

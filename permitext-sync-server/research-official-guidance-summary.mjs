@@ -9,14 +9,14 @@ import {
 } from "./research-guidance-qualification-review.mjs";
 import { guidanceSourceRelationships, guidanceSourceRelationshipInstruction } from "./research-guidance-source-relationships.mjs";
 import {
-  guidanceSourceResolutionPacket, guidanceSourceResolutionSchema,
+  guidanceSourceResolutionPacket, guidanceSourceResolutionSchema, guidanceSourceResolutionPartsSchema,
   guidanceSourceResolutionDraftInstruction, guidanceSourceResolutionVerificationInstruction
 } from "./research-guidance-source-resolutions.mjs";
 
 export const researchOfficialGuidanceSummaryVersion = "20260908-document-summary-v1";
 const qualifiedSummaryVersion = "20260909-document-summary-v2";
 // Prompt revisions do not invalidate integrity records for saved summaries.
-export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v13";
+export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v14";
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 const stringList = { type: "array", maxItems: 6, items: { type: "string" } };
 const bindingKey = (sourceID, claimID) => `${sourceID}\u0000${claimID}`;
@@ -115,11 +115,11 @@ export function researchOfficialGuidanceSummaryRequest({ question, webSupport, c
           ...(resolutionPacket ? { sourceResolutions: guidanceSourceResolutionSchema(resolutionPacket) } : {}),
           paragraphs: { type: "array", minItems: 1, maxItems: 6, items: {
             type: "object", additionalProperties: false,
-            properties: { text: { type: "string" }, sourceUses: { type: "array", minItems: 1, maxItems: 8, items: {
+              properties: { ...(resolutionPacket ? { parts: guidanceSourceResolutionPartsSchema(resolutionPacket) } : { text: { type: "string" } }), sourceUses: { type: "array", minItems: 1, maxItems: 8, items: {
               type: "object", additionalProperties: false,
               properties: { sourceID: { type: "string", enum: sourceIDs }, claimID: { type: "string", enum: claimIDs } },
               required: ["sourceID", "claimID"]
-            } } }, required: ["text", "sourceUses"]
+            } } }, required: [resolutionPacket ? "parts" : "text", "sourceUses"]
           } }, missingFacts: stringList, evidenceLimitations: stringList
         }, required: [...(resolutionPacket ? ["sourceResolutions"] : []), "paragraphs", "missingFacts", "evidenceLimitations"]
       }

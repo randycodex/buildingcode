@@ -1,0 +1,327 @@
+{
+  "schema": "permitext-owner-source-resolutions-answer-assessment-v1",
+  "reviewedAt": "2026-09-09T23:02:20.167Z",
+  "liveSourceCommit": "0d6d9918e358943cfba657c8abd1fee7cfa46514",
+  "runFile": "evals/results/research-owner-api-round2-live-source-resolutions-2026-09-09.json",
+  "runSHA256": "c673e5257eae56cb23587ca69d7be660f12c0eb77de5923a84e7e95e9e2494ed",
+  "referenceFile": "evals/research-reconciled-answer-key.json",
+  "referenceSHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "costAuditFile": "evals/results/research-owner-api-round2-source-resolutions-cost-audit-2026-09-09.json",
+  "costAuditSHA256": "98c1af6eecc8f913669124f48daaae141e6f46ac24ff9fec9d50131ce20cdf5f",
+  "summary": {
+    "newLiveHTTPTurns": 3,
+    "newLiveProviderCalls": 3,
+    "semanticVerifierCalls": 0,
+    "delivered": 0,
+    "undelivered": 3,
+    "strictWholeAnswerPasses": 0,
+    "reviewProviderCalls": 0,
+    "reviewNetworkCalls": 0,
+    "batchConservativeUSD": 0.120439,
+    "batchUsageEstimateUSD": 0.065819,
+    "cumulativeConservativeUSD": 8.214661,
+    "remainingConservativeAuthorizationUSD": 0.285339
+  },
+  "limitations": [
+    "All three attempts stopped on the newly introduced exact-copy requirement; this is a structural format failure, not three semantic verifier verdicts.",
+    "Retained raw drafts were read against the unchanged references, but none is delivered or independently verified. No source or answer key was changed.",
+    "Shorter failed HTTP durations do not establish useful-answer speed.",
+    "No replay, retry, separate judge or Project workflow. Budget totals are conservative ledger figures and usage estimates; account balance and invoice were not checked."
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-003",
+      "sourceCommit": "0d6d9918e358943cfba657c8abd1fee7cfa46514",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-source-resolutions-2026-09-09.json",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "resultSHA256": "f06e43ee4ee3ea1ab5dfaa0d12c18046d900703154f8f30b7e80b3681fe7ba79",
+      "expectedAnswerSHA256": "53bf3d5275364916c22ce10e93a49e67045ac92efd0406ade504570b578ea6bc",
+      "delivered": false,
+      "httpStatus": 502,
+      "durationMilliseconds": 11325,
+      "mainWordCount": 184,
+      "allAuthoredWordCount": 304,
+      "retainedDraft": {
+        "sourceResolutions": {
+          "packetSHA256": "3517f15b439eb751917a98ea0f60b2b16d1552d2fbb3e7de6fef4a2316263c0a",
+          "relationships": [
+            {
+              "relationshipIndex": 0,
+              "outcome": "resolved",
+              "statement": "A subsequent filing may be created before the I1 is submitted, but I1-populated fields will not update until submission; the guidance states that a subsequent filing may be initiated and submitted once the I1 is submitted and is no longer in pre-filing status.",
+              "paragraphIndex": 1
+            },
+            {
+              "relationshipIndex": 1,
+              "outcome": "conditional",
+              "statement": "A subsequent filing is separately processed; the general guidance calls for an LOC request for each filing, but for an NB or Alteration-CO filing the subsequent remains Permit Entire and only the I1 changes to CO issued. The initial job type is not supplied.",
+              "paragraphIndex": 1
+            }
+          ]
+        },
+        "paragraphs": [
+          {
+            "text": "Use a subsequent filing under the existing job number—not a new unrelated job number—for the later plumbing scope, assuming it is part of the same construction project and property. A subsequent filing permits a new or different applicant to add scope of work and work types under the same job number, and it functions as a separate application after submission. The guidance also says filings for the same construction project should share the job number with the applicable initial/subsequent extension.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              }
+            ]
+          },
+          {
+            "text": "Because the initial GC filing has been created but its submission status is not stated, timing depends on that status: a subsequent may be created before I1 submission, although I1-populated fields will not update until I1 is submitted; the FAQ states it may be initiated and submitted after the I1 is submitted rather than in pre-filing status. The subsequent is separately processed. General guidance calls for an LOC request for each filing, but if the initial job is NB or Alteration-CO, the specialized FAQ instead says no LOC is requested for the subsequent; it remains Permit Entire while only I1 changes to CO issued.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-6fc4b44aa8d8ecd83aa2f985"
+              },
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-nb-altco-faq",
+                "claimID": "official-passage-1aa79efe633b169404aae5c7"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [
+          "Whether the initial GC filing has been submitted or remains in pre-filing status.",
+          "Whether the initial job is an NB or Alteration-CO filing, which changes the stated completion treatment for the subsequent filing."
+        ],
+        "evidenceLimitations": []
+      },
+      "retainedVerifier": null,
+      "reviewedDeliveredProjection": null,
+      "sourcePacketSHA256": "b683e5c6013a29d64502aa42705f3c537f8fb08f7b40ebc08bf8ab64aa356d51",
+      "structuralChecks": [
+        {
+          "relationshipIndex": 0,
+          "outcome": "resolved",
+          "paragraphIndex": 1,
+          "allRequiredSourcesPresent": true,
+          "statementCarriedVerbatim": false
+        },
+        {
+          "relationshipIndex": 1,
+          "outcome": "conditional",
+          "paragraphIndex": 1,
+          "allRequiredSourcesPresent": true,
+          "statementCarriedVerbatim": false
+        }
+      ],
+      "backlogDisposition": "latest_attempt_undelivered",
+      "reviewStatus": "structural-copy-requirement-rejected-paraphrase-before-verification",
+      "checkerFindings": "The v13 exact-copy check rejected the draft because it paraphrased its source-resolution statements in main text. Packet hashes, relationship coverage and required citations match. No semantic verifier ran, so none of the draft can be credited as a verified answer. Replace duplicated prose with explicit renderer references; preserve every original attempt and claim.",
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "undelivered-no-semantic-verification",
+      "workItemIDs": [
+        "R1",
+        "R2",
+        "R7"
+      ],
+      "confirmed": [
+        "The same-job subsequent-filing recommendation, different-applicant permission and separate processing remain supported.",
+        "General LOC and NB/Alteration-CO completion branches remain conditional on the initial job type."
+      ],
+      "missingExpected": [
+        "The draft labels creation timing resolved and says a subsequent may be created before I1 submission without preserving the unresolved public-source relationship required by the reference.",
+        "The different-review-type permission is omitted again."
+      ],
+      "presentationGaps": [
+        "The supplied same-project/property premise is unnecessarily restated as an assumption.",
+        "Timing and completion statements are repeated between the internal plan and prose, with a lengthy main explanation."
+      ],
+      "coreReview": "Unverified draft retains core filing choice but has reference and scope gaps."
+    },
+    {
+      "id": "DOBNOW-004",
+      "sourceCommit": "0d6d9918e358943cfba657c8abd1fee7cfa46514",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-source-resolutions-2026-09-09.json",
+      "inputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "resultSHA256": "2e7a7bbd5da2989f63502cc04413963756ab4a3a508e8ff4e499131630bbf788",
+      "expectedAnswerSHA256": "fb0fbdf6d2cfec2d84bede1764713e9567a24bc7f5b4fc41b146dd785c111eff",
+      "delivered": false,
+      "httpStatus": 502,
+      "durationMilliseconds": 8858,
+      "mainWordCount": 185,
+      "allAuthoredWordCount": 257,
+      "retainedDraft": {
+        "sourceResolutions": {
+          "packetSHA256": "ddb5adff1e040ccdbdc4827826f46b70cb1ed4c1757871f4c2433c9accd8b94b",
+          "relationships": [
+            {
+              "relationshipIndex": 0,
+              "outcome": "unresolved",
+              "statement": "For the Work on Floors field, the PAA process lists it as not editable, while the PAA FAQ states that floors can be added or removed with a PAA and requires PW3 to reflect the related estimated-work-cost increase or decrease; the supplied guidance does not reconcile these incompatible directions.",
+              "paragraphIndex": 1
+            }
+          ]
+        },
+        "paragraphs": [
+          {
+            "text": "A Post Approval Amendment (PAA) in DOB NOW: Build is the appropriate filing action because the approved scope and drawings need revision and the initial filing was not submitted for legalization. The Applicant of Record—the same Applicant of Record as on the original filing—must file the PAA; only one PAA may be in progress. The revised plan submission requires a complete plan set when approved plans are being changed, including new unapproved sheets and previously approved DOB-stamped sheets, plus a description of the changes in the PW1 Plans/Work Comments field.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-paa-process",
+                "claimID": "official-passage-8c237a512cc925f1b746ae4e"
+              },
+              {
+                "sourceID": "dob-paa-faq",
+                "claimID": "official-passage-6d0aada975713046b8514a93"
+              }
+            ]
+          },
+          {
+            "text": "Disclose that a PAA cannot change the Filing Review Type, application/location address, Applicant of Record information, owner information, or building type. The supplied guidance is unresolved as to Work on Floors: the PAA process calls that field non-editable, but the FAQ says floors may be added or removed through a PAA and that PW3 must be updated for the associated increase or decrease in estimated work cost. If job cost changes, fees are recalculated; an increase requires payment of the difference, while a decrease produces an adjustment for which the applicant may request a refund.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-paa-process",
+                "claimID": "official-passage-8c237a512cc925f1b746ae4e"
+              },
+              {
+                "sourceID": "dob-paa-faq",
+                "claimID": "official-passage-6d0aada975713046b8514a93"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [],
+        "evidenceLimitations": [
+          "The supplied official passages give incompatible directions on whether Work on Floors is editable in a PAA and do not reconcile that issue."
+        ]
+      },
+      "retainedVerifier": null,
+      "reviewedDeliveredProjection": null,
+      "sourcePacketSHA256": "b07cd6a228edfb1092a15f640e2f0a75f586bcf27dc050392b64f76f64b140b6",
+      "structuralChecks": [
+        {
+          "relationshipIndex": 0,
+          "outcome": "unresolved",
+          "paragraphIndex": 1,
+          "allRequiredSourcesPresent": true,
+          "statementCarriedVerbatim": false
+        }
+      ],
+      "backlogDisposition": "latest_attempt_undelivered",
+      "reviewStatus": "structural-copy-requirement-rejected-paraphrase-before-verification",
+      "checkerFindings": "The v13 exact-copy check rejected the draft because it paraphrased its source-resolution statements in main text. Packet hashes, relationship coverage and required citations match. No semantic verifier ran, so none of the draft can be credited as a verified answer. Replace duplicated prose with explicit renderer references; preserve every original attempt and claim.",
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "undelivered-no-semantic-verification",
+      "workItemIDs": [
+        "R1",
+        "R5",
+        "R7"
+      ],
+      "confirmed": [
+        "The PAA route, same Applicant of Record, one-open-PAA limit and supplied nonlegalization premise are present.",
+        "The main answer separates Work on Floors from the locked-field list and preserves both directions plus the FAQ PW3 cost condition."
+      ],
+      "missingExpected": [],
+      "presentationGaps": [
+        "The draft still adds a plan-upload and PW1 Comments procedure plus fee-adjustment/refund details.",
+        "The same Applicant of Record point and field-conflict limitation are repeated."
+      ],
+      "coreReview": "Main reference concepts appear in the unverified draft; full semantic/citation and presentation acceptance remain unproven."
+    },
+    {
+      "id": "DOBNOW-023",
+      "sourceCommit": "0d6d9918e358943cfba657c8abd1fee7cfa46514",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-source-resolutions-2026-09-09.json",
+      "inputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "resultSHA256": "a54094039f62d3b687ca597726d1da9767adca02eebfd812b913a131ec19b137",
+      "expectedAnswerSHA256": "e86124c25bcf3bda49f5a5a11bfcca6aa4ac1834c1df639ada5e323e3f4b595e",
+      "delivered": false,
+      "httpStatus": 502,
+      "durationMilliseconds": 7610,
+      "mainWordCount": 121,
+      "allAuthoredWordCount": 172,
+      "retainedDraft": {
+        "sourceResolutions": {
+          "packetSHA256": "d7ec006ddff593320dbc53de263e0f9b3afc73cb0f284ac699ba4847111048de",
+          "relationships": [
+            {
+              "relationshipIndex": 0,
+              "outcome": "conditional",
+              "statement": "If the Owner Type is Condo Unit Owner or Co-Op Tenant-Shareholder, the Board representative must also log in and attest, and both the owner and Board representative must complete their attestations before the filing can proceed.",
+              "paragraphIndex": 1
+            }
+          ]
+        },
+        "paragraphs": [
+          {
+            "text": "No. The filing representative may enter filing information, but the guidance says filing representatives cannot submit filings. The Applicant of Record must complete the applicant attestation and electronic signature before submission, while the owner must complete the Owner’s Attestation to confirm authorization and acknowledge review. The Applicant must review, provide the final electronic signature, and officially submit the job filing electronically.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-stakeholder-faq",
+                "claimID": "official-passage-b5601c2eee87ee4f4d5ccab8"
+              },
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-14224abff07118e8caab44b5"
+              },
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-d380324b6db34f98c94693b5"
+              },
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-c59d4c7ea9559cdcb44d304b"
+              }
+            ]
+          },
+          {
+            "text": "Accordingly, after the representative’s data entry and document upload, the Applicant and owner need to complete their own required attestations before the Applicant submits. If the Owner Type is Condo Unit Owner or Co-Op Tenant-Shareholder, the Condo/Co-Op Board representative must also log in and attest; both that representative and the owner must complete their attestations before the filing can proceed.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-eab48367598b3fc41aa84444"
+              },
+              {
+                "sourceID": "dob-build-release-notes",
+                "claimID": "official-passage-2e6a1d190b996cb029e2e04a"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [
+          "The Owner Type is unknown; it determines whether a Condo/Co-Op Board representative must also attest."
+        ],
+        "evidenceLimitations": []
+      },
+      "retainedVerifier": null,
+      "reviewedDeliveredProjection": null,
+      "sourcePacketSHA256": "85750bd311e95f81ccfb11433e6089931d3ebfcfc072fb240f71dd4bc2058686",
+      "structuralChecks": [
+        {
+          "relationshipIndex": 0,
+          "outcome": "conditional",
+          "paragraphIndex": 1,
+          "allRequiredSourcesPresent": true,
+          "statementCarriedVerbatim": false
+        }
+      ],
+      "backlogDisposition": "latest_attempt_undelivered",
+      "reviewStatus": "structural-copy-requirement-rejected-paraphrase-before-verification",
+      "checkerFindings": "The v13 exact-copy check rejected the draft because it paraphrased its source-resolution statements in main text. Packet hashes, relationship coverage and required citations match. No semantic verifier ran, so none of the draft can be credited as a verified answer. Replace duplicated prose with explicit renderer references; preserve every original attempt and claim.",
+      "strictExpectedAnswerAlignment": false,
+      "wholeAnswerDevelopmentReview": "undelivered-no-semantic-verification",
+      "workItemIDs": [
+        "R5",
+        "R7"
+      ],
+      "confirmed": [
+        "The answer separates preparation from personal applicant/owner attestations and applicant submission.",
+        "The conditional Condo Unit Owner/Co-Op Tenant-Shareholder board-attestation requirement is present with the retained release-note citation."
+      ],
+      "missingExpected": [],
+      "presentationGaps": [
+        "The applicant/owner attestation and submission sequence is restated in the second paragraph.",
+        "The Owner Type missing-fact field repeats the conditional rule rather than simply naming the unresolved fact."
+      ],
+      "coreReview": "Current reference concepts appear in the unverified draft. The prior overbroad verifier demand was not retested because this draft stopped before verification."
+    }
+  ]
+}
