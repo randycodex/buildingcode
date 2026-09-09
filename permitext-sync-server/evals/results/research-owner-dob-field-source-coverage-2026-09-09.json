@@ -1,0 +1,55 @@
+{
+  "schema": "permitext-owner-dob-field-source-coverage-v1",
+  "checkedAt": "2026-09-09T10:53:51.058Z",
+  "paidProviderCalls": 0,
+  "publicDocumentGETs": 2,
+  "sourceFixture": "evals/fixtures/dob-official-document-pages-20260909.json",
+  "sourceFixtureSHA256": "0a84c4d509d8ede618192ba7568719c9e3e357347896b86bea1126c64f19d94c",
+  "freshExtractionEqualsRetained": true,
+  "rows": [
+    {
+      "id": "DOBNOW-014",
+      "variant": "authored",
+      "question": "Context: DOB NOW workflow\n\nThe DOB NOW workflow indicates that DHCR data identifies at least one rent-controlled or rent-stabilized unit. The owner believes the building contains none but has not provided supporting documentation.\n\nMay the filing simply answer No to the rent-regulated-housing question?",
+      "sourceID": "dob-application-guide",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+      "selectedPages": [
+        38
+      ],
+      "selectedCharacters": 2366,
+      "finding": "The complete owner-attestation page is retrieved directly. A narrowly scoped known-source route could avoid paid source discovery; live correctness remains unconfirmed."
+    },
+    {
+      "id": "DOBNOW-017",
+      "variant": "authored",
+      "question": "Context: DOB NOW workflow\n\nAn applicable NB or Alteration-CO GC filing for a newly erected single-family residence includes an Ancillary Dwelling Unit in the basement.\n\nWhich DOB NOW responses and document requirement follow?",
+      "sourceID": "dob-build-release-notes",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+      "sourceContentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+      "selectedPages": [
+        10,
+        28,
+        30
+      ],
+      "selectedCharacters": 1928,
+      "finding": "The generic three-page ranking selects pages 10, 28 and 30 and omits the field-options page 29. The cellar probe also omits the conditional filing restriction on page 32. Do not enable a broad ADU shortcut without preserving related page coverage."
+    },
+    {
+      "id": "DOBNOW-017",
+      "variant": "cellar-coverage-probe",
+      "question": "Context: DOB NOW workflow\n\nAn applicable NB or Alteration-CO GC filing for a newly erected single-family residence includes an Ancillary Dwelling Unit in the cellar.\n\nWhich DOB NOW responses and document requirement follow?",
+      "sourceID": "dob-build-release-notes",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+      "sourceContentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+      "selectedPages": [
+        10,
+        28,
+        30
+      ],
+      "selectedCharacters": 1928,
+      "finding": "The generic three-page ranking selects pages 10, 28 and 30 and omits the field-options page 29. The cellar probe also omits the conditional filing restriction on page 32. Do not enable a broad ADU shortcut without preserving related page coverage."
+    }
+  ],
+  "nextAction": "Keep existing routes while completing the already-authorized v10 paired comparison. Then test a narrowly scoped rent-regulation route and repair ADU source-group coverage before proposing a direct ADU route. No speed or semantic acceptance is inferred from source retrieval alone."
+}

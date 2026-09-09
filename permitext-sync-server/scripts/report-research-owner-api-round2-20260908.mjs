@@ -22,6 +22,18 @@ const terminal = JSON.parse(terminalBytes);
 const ledgers = [...terminal.priorRoundResults, { file: terminalFile, sha256: hash(terminalBytes) }];
 assert.equal(terminal.roundID, "owner-api-round2-20260908");
 assert.equal(new Set(ledgers.map((entry) => entry.file)).size, ledgers.length);
+let authorizationAmendment = null;
+if (terminal.authorizationUSD !== 8) {
+  const file = "evals/research-owner-api-round2-authorization-20260909.json", bytes = await read(file);
+  const amendment = JSON.parse(bytes);
+  assert.equal(amendment.roundID, terminal.roundID);
+  assert.equal(amendment.previousAuthorizationUSD, 8);
+  assert.equal(amendment.additionalAuthorizationUSD, 0.5);
+  assert.equal(amendment.authorizationUSD, 8.5);
+  assert.equal(terminal.authorizationUSD, amendment.authorizationUSD);
+  assert.equal(terminal.authorizationAmendmentSHA256, hash(bytes));
+  authorizationAmendment = { file, sha256: hash(bytes), ...amendment };
+}
 const prices = {
   "gpt-5.6-terra": { input: 2, cacheRead: .2, cacheWrite: 2.5, output: 12 },
   "gpt-5.6-luna": { input: .2, cacheRead: .02, cacheWrite: .25, output: 1.2 }
@@ -42,7 +54,8 @@ for (const ledger of ledgers) {
   assert.equal(run.spend.pendingRequestCount, 0);
   assert.equal(new Set(run.results.map((item) => item.id)).size, run.results.length);
   assert.equal(run.roundID, terminal.roundID);
-  assert.equal(run.authorizationUSD, 8);
+  assert([8, terminal.authorizationUSD].includes(run.authorizationUSD));
+  if (run.authorizationUSD !== 8) assert.equal(run.authorizationAmendmentSHA256, authorizationAmendment.sha256);
   const currentCalls = run.providerCalls.map((call, index) => {
     const rate = prices[call.model], usage = call.usage;
     assert(rate && usage && ["default", "standard"].includes(call.serviceTier));
@@ -157,14 +170,15 @@ const report = {
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim(),
   pricing: { checkedOn: "2026-09-08", source: "https://developers.openai.com/api/docs/pricing", tier: "standard short context",
     perMillionUSD: prices, webSearchCallUSD: .01, providerInvoiceVerified: false },
-  sourceHashes, ledgers, historicalLedgerHashes: terminal.previousResultHashes, roundID: terminal.roundID, summary, byPhase: group("phase"), byModel: group("model"),
+  sourceHashes, ledgers, historicalLedgerHashes: terminal.previousResultHashes, roundID: terminal.roundID,
+  ...(authorizationAmendment ? { authorizationAmendment } : {}), summary, byPhase: group("phase"), byModel: group("model"),
   highestCostAttempts: full.slice().sort((a, b) => b.usageEstimateUSD - a.usageEstimateUSD).slice(0, 10), attempts, notDispatched,
   limitations: ["Mixed development versions, repeated cases and synthetic evaluation accounts; not a representative customer-month forecast.",
     "Delivered answers include known quality defects. A consistent strict review of all answers is absent, so no cost per quality-accepted answer is claimed.",
     "Additional answering requests and failed-attempt costs overlap; do not add them as independent savings.",
     "Web tool fees and cache writes are included. Hosting, payment fees, support and refunds are outside these provider-only figures.",
     "Runtime verification and repairs, failed calls and web-search fees remain part of Research cost. No separate paid judges were added in this round.",
-    "The new $8 authorization and its conservative ledger are separate from the historical $7.887898 ledger. No current account balance or invoice was read. Project workflow testing, deployment, pricing and routing changes remain outside this round."]
+    `This round's $${terminal.authorizationUSD.toFixed(2)} authorization and conservative ledger are separate from the historical $7.887898 ledger. No current account balance or invoice was read. Project workflow testing, deployment, pricing and routing changes remain outside this round.`]
 };
 const output = process.argv.indexOf("--output");
 if (output !== -1) {

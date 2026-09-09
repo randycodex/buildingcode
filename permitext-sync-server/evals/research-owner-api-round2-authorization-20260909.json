@@ -1,0 +1,11 @@
+{
+  "schema": "permitext-owner-api-authorization-amendment-v1",
+  "recordedAt": "2026-09-09T10:56:18.961Z",
+  "approvedOn": "2026-09-09",
+  "roundID": "owner-api-round2-20260908",
+  "previousAuthorizationUSD": 8,
+  "additionalAuthorizationUSD": 0.5,
+  "authorizationUSD": 8.5,
+  "approvalBasis": "The owner replied yes to: May I increase the API testing allowance by $0.50 for the next capped comparison?",
+  "scope": "The next capped comparison of DOBNOW-023 and DOBNOW-003 after the local v10 repair. Historical spending remains recorded. No Project workflow, UI, phone, deployment or price change is authorized by this amendment."
+}
