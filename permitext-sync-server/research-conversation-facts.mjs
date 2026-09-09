@@ -1,7 +1,7 @@
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 
 export const researchConversationFactsVersion =
-  "20260904-qualified-user-facts-v5";
+  "20260908-negative-work-premise-v6";
 
 export const researchConversationFactKinds = Object.freeze({
   established: "established",
@@ -308,6 +308,7 @@ const qualifiedFactMentions = [
   ["dwelling_unit_count", /\bdwelling units?\b/i],
   ["area_square_feet", /\b(?:sf|sq\.?\s*ft\.?|square feet)\b/i],
   ["work_scope", /\b(?:work|scope|alteration|new construction|change of (?:use|occupancy))\b/i],
+  ["work_commencement", /\bcommencement\b|\bwork\b[^.;?]{0,65}\b(?:begun|started|commenced)\b/i],
   ["floor_location", /\b(?:work|alteration|space|room)\b[^.;?]{0,60}\bfloor\b/i],
   ["use", /\b(?:space|room|building)\b[^.;?]{0,40}\b(?:used|designed|arranged|intended)\b/i],
   ["filing_date", /\bfiled\b/i],
@@ -329,6 +330,19 @@ function qualifiedFacts(question, topicDecision) {
     const kind = hypotheticalScope ? researchConversationFactKinds.hypothetical : turnKind(clause, topicDecision);
     // A question about a fact does not correct that fact, even when negated.
     if (!assertionLike(clause, kind, topicDecision)) continue;
+    // A clear negative commencement assertion is a supplied fact. The generic
+    // qualification guard protects positive canonical categories from negation;
+    // it must not turn this explicitly representable negative into uncertainty.
+    const noCommencement = clause.match(/\b(?:no\s+(?:(?:permitted|authorized|construction)\s+)?work\s+(?:has|had)\s+(?:yet\s+)?(?:begun|started|commenced)|(?:(?:permitted|authorized|construction)\s+)?work\s+(?:has|had)\s+(?:not|never)\s+(?:yet\s+)?(?:begun|started|commenced))\b/i);
+    const commencement = noCommencement || clause.match(/\b(?:(?:permitted|authorized|construction)\s+)?work\s+(?:(?:has|had)\s+)?(?:begun|started|commenced)\b/i);
+    const remainder = commencement ? clause.replace(commencement[0], "") : "";
+    if (commencement && kind === researchConversationFactKinds.established && !hypotheticalScope &&
+        !/[?"“”]/.test(clause) && !researchFactQualification(remainder).qualified &&
+        !/\b(?:claims?|asserts?|alleges?|reports?|reportedly|believes?|thinks?|says?|said|apparently|seems?|appears?|unverified)\b/i.test(remainder)) {
+      result.push(...structuredFacts(remainder, kind, topicDecision));
+      result.push(fact({ key: "work_commencement", value: noCommencement ? "not_commenced" : "commenced", statement: clause, kind, sourceText: clause }));
+      continue;
+    }
     const extracted = structuredFacts(clause, kind, topicDecision);
     const sprinklerMention = /\bsprinkler(?:ed|s|ing| status| system| protection)?\b/i.test(clause);
     const limitedSprinklerScope = sprinklerMention && (

@@ -197,4 +197,25 @@ assert.equal(
   "A construction type mentioned in enacted text was incorrectly promoted into a project fact."
 );
 
+const permitQuestion = "DOB issued a construction permit fourteen months ago, but no work has begun. The permit was not otherwise renewed or preserved by a special provision. Is it still valid merely because the printed permit has not been physically surrendered?";
+for (const question of [permitQuestion, "No construction work has yet commenced.", "The permitted work has not started.", "Work has never begun."]) {
+  const result = resolve(question).facts;
+  assert.equal(result.establishedFacts.find((item) => item.key === "work_commencement")?.value, "not_commenced", question);
+  const prompt = researchConversationFactPromptContext(result);
+  assert(prompt.established.some((statement) => /(?:no.*work|work.*(?:not|never))/i.test(statement)));
+  assert(!prompt.unknown.some((statement) => /work.*(?:begun|started|commenced)/i.test(statement)), question);
+}
+for (const question of ["The owner claims no work has begun.", "No work has begun, reportedly.", "No work has begun, but this is unverified.",
+  "Suppose no work has begun.", "If work has not started, is the permit valid?", "Has no work begun?", "The contractor said ‘no work has begun.’"]) {
+  assert(!resolve(question).facts.establishedFacts.some((item) => item.key === "work_commencement"), question);
+}
+const mixedCommencement = resolve("No work has begun on the six-story Group R-2 building.").facts;
+assert.equal(mixedCommencement.establishedFacts.find((item) => item.key === "story_count")?.value, "6");
+assert.equal(mixedCommencement.establishedFacts.find((item) => item.key === "occupancy_group")?.value, "R-2");
+const notStarted = resolve(permitQuestion);
+const started = resolve("Actually, work has begun.", notStarted.topicContext, [{ role: "user", question: permitQuestion }]);
+assert.equal(started.facts.establishedFacts.find((item) => item.key === "work_commencement")?.value, "commenced");
+const commencementUnknown = resolve("Work commencement is unknown.", started.topicContext);
+assert(!commencementUnknown.facts.establishedFacts.some((item) => item.key === "work_commencement"));
+assert(commencementUnknown.facts.unknownFacts.some((item) => item.key === "work_commencement"));
 console.log("Permitext topic-scoped conversation facts contract passed.");
