@@ -55,6 +55,26 @@ for (const changed of [
 const input = researchOfficialGuidanceSummaryInput("Question", webSupport, { conversationFactContext: { established: ["A new filing."] } });
 assert.equal(input.passages.length, 3, "The verifier receives all retrieved passages, including qualifications outside the selected prose.");
 assert.deepEqual(input.conversationFacts.established, ["A new filing."]);
+const scopedHTML = structuredClone(webSupport);
+scopedHTML.sources[1].attributedClaims[0] = {
+  id: "other-claim", contentHash: hash,
+  heading: "Specialized filings", intro: "Does the general completion process apply to this filing type?",
+  text: "Specialized filings — Does the general completion process apply to this filing type? — No, use the parent filing's completion process.",
+  verbatimText: "No, use the parent filing's completion process."
+};
+const scopedSnapshot = structuredClone(scopedHTML);
+for (const proposedAnswer of [undefined, draft]) {
+  const request = researchOfficialGuidanceSummaryRequest({ question: "How does this filing close?", webSupport: scopedHTML,
+    model: "test-model", userID: "synthetic-user", verificationSchema: { type: "object" }, proposedAnswer });
+  const passages = JSON.parse(request.input).passages;
+  const html = passages.find((passage) => passage.sourceID === "other");
+  assert.equal(html.text, scopedHTML.sources[1].attributedClaims[0].text,
+    "The primary passage text must carry the complete FAQ scope, even when the draft did not cite it.");
+  assert.equal(html.intro, scopedHTML.sources[1].attributedClaims[0].intro);
+  assert.equal(passages[0].text, scopedHTML.sources[0].attributedClaims[0].verbatimText,
+    "Do not rewrite extracted PDF page text.");
+}
+assert.deepEqual(scopedHTML, scopedSnapshot, "Request formatting must not mutate the source or its citation proof.");
 const proposedAnswer = { ...draft, paragraphs: [{ ...draft.paragraphs[0], text: "The permit is automatically approved." }] };
 const verification = researchOfficialGuidanceSummaryRequest({ question: "Is the permit approved?", webSupport, model: "test-model", userID: "synthetic-user", verificationSchema: { type: "object" }, proposedAnswer });
 assert.equal(JSON.parse(verification.input).proposedAnswer.paragraphs[0].text, "The permit is automatically approved.");

@@ -40,7 +40,10 @@ const releaseURL = "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_relea
 const guideURL = "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf";
 const codeChangesURL = "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf";
 const familyNoticeURL = "https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf";
+const loftNoticeURL = "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf";
 const companionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-companion-source-fragments-20260909.json", import.meta.url)));
+const stakeholderFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-stakeholder-source-fragments-20260909.json", import.meta.url)));
+const loftFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-loft-service-document-20260909.json", import.meta.url)));
 const guideDocument = new PDFDocument();
 const guideChunks = [];
 const guideComplete = new Promise((resolve) => { guideDocument.on("data", (chunk) => guideChunks.push(chunk)); guideDocument.on("end", () => resolve(Buffer.concat(guideChunks))); });
@@ -61,6 +64,9 @@ async function syntheticPDF(text) {
 }
 const codeChangesBytes = await syntheticPDF("Synthetic source: Site Safety Highlights. Construction Superintendent for 1-, 2-, or 3-family buildings. The permit holder must be registered as a General Contractor. In this limited family-building context, a Site Safety Plan is required only when a Construction Superintendent is required. Other building scopes have separate criteria.");
 const familyNoticeBytes = await syntheticPDF("Synthetic service notice: Construction Superintendent exception for qualifying New Building, AltCO, Enlargement or Demolition jobs on 1-, 2-, or 3-family buildings with a registered General Contractor as permit holder. This is a limited exception, not a rule for all jobs.");
+// Reflow source-derived text into a local PDF double; this tests transport and
+// binding, while the fixture separately retains the actual PDF's page/hash.
+const loftNoticeBytes = await syntheticPDF(loftFixture.document.passages[0].text);
 const releaseDocument = new PDFDocument();
 const releaseChunks = [];
 const releaseComplete = new Promise((resolve) => { releaseDocument.on("data", (chunk) => releaseChunks.push(chunk)); releaseDocument.on("end", () => resolve(Buffer.concat(releaseChunks))); });
@@ -119,6 +125,8 @@ const responseDouble = async (url, options) => {
       }
       if (portalCase === "DOBNOW-003") {
         assert(input.passages.some((passage) => /subsequent filing of an NB or Alteration-CO filing/.test(passage.intro) && /remain Permit Entire/.test(passage.text)));
+        assert(input.passages.some((passage) => /subsequent filing of an NB or Alteration-CO filing.*remain Permit Entire/s.test(passage.text)),
+          "The FAQ question that scopes the exception must be in the primary passage text.");
         assert(input.passages.some((passage) => /subsequent filing in pre-filing status/.test(passage.text)));
       }
       if (portalCase === "DOBNOW-004") {
@@ -128,6 +136,18 @@ const responseDouble = async (url, options) => {
       if (portalCase === "DOBNOW-012") {
         assert(input.passages.some((passage) => /City-owned sewer system/.test(passage.text) && /exclusions and definitions/.test(passage.text)));
         assert(input.passages.some((passage) => /Question two separately/.test(passage.text)));
+      }
+      if (portalCase === "DOBNOW-016") {
+        const text = input.passages.filter((passage) => passage.url.startsWith(loftNoticeURL)).map((passage) => passage.text).join(" ").replace(/\s+/g, " ");
+        assert.match(text, /Yes In or affecting an IMD unit File for Loft Board Certification and include a Narrative Statement/);
+        assert.match(text, /Once the job filing is submitted/);
+        assert.match(text, /No In a commercial unit and does not affect an IMD Unit Request a Letter of No Objection/);
+      }
+      if (portalCase === "DOBNOW-023") {
+        const text = input.passages.filter((passage) => passage.sourceID === "dob-stakeholder-faq").map((passage) => passage.text).join(" ");
+        assert.match(text, /Filing Representatives can enter and view all filing information/);
+        assert.match(text, /cannot upload plans or submit filings\/permits/);
+        assert.match(text, /owner must be logged in with the same email address/);
       }
       if (portalCase === "DOBNOW-008") {
         assert(input.passages.some((passage) => passage.url.startsWith(guideURL) && /gross floor area/.test(passage.text)));
@@ -146,7 +166,7 @@ const responseDouble = async (url, options) => {
     if (body.text.format.name === "permitext_official_guidance_summary") {
       summaryDoubles += 1;
       const wetlands = /wetlands/i.test(input.question);
-      const passages = ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012"].includes(portalCase) ? input.passages
+      const passages = ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-016", "DOBNOW-023"].includes(portalCase) ? input.passages
         : portalCase ? input.passages.filter((passage) => passage.url.startsWith(guideURL) && passage.page === (portalCase === "DOBNOW-001" ? 1 : portalCase === "DOBNOW-004" ? 4 : 2))
         : wetlands ? input.passages : input.passages.slice(0, 1);
       if (["DOBNOW-001", "DOBNOW-021"].includes(portalCase)) assert.equal(passages.length, 1);
@@ -163,6 +183,10 @@ const responseDouble = async (url, options) => {
               ? "Use a subsequent filing under the same job number. Confirm the job type before stating the completion path; an NB or Alteration-CO subsequent filing remains Permit Entire and closes through the initial CO process."
             : portalCase === "DOBNOW-012"
               ? "Answer Yes to the first project-specific threshold question because exactly 5,000 square feet satisfies it. The larger-common-plan question remains separate. Final DEP applicability also depends on City-owned-sewer drainage and current exclusions."
+            : portalCase === "DOBNOW-016"
+              ? "Answer Yes for work in or affecting the IMD unit. After submitting the job filing, request Loft Board Certification and include a Narrative Statement; the DOB approval hold remains until the required certification is issued."
+            : portalCase === "DOBNOW-023"
+              ? "The filing representative may prepare filing information but cannot submit the filing. The required applicant and owner attestations remain outstanding."
             : portalCase === "DOBNOW-008"
               ? missingSafetySources
                 ? "Answer Yes to the percentage question: the alteration alters 60 percent of gross floor area. The exception documents could not be retrieved, so final Site Safety Plan applicability remains unresolved."
@@ -195,6 +219,8 @@ const responseDouble = async (url, options) => {
   }
   if (String(url) === releaseURL) return new Response(releaseBytes, { headers: { "content-type": "application/pdf" } });
   if (String(url) === guideURL) return new Response(guideBytes, { headers: { "content-type": "application/pdf" } });
+  if (String(url) === loftNoticeURL) return new Response(loftNoticeBytes, { headers: { "content-type": "application/pdf" } });
+  if (portalCase === "DOBNOW-023" && String(url) === stakeholderFixture.url) return new Response(stakeholderFixture.html, { headers: { "content-type": "text/html" } });
   const companion = companionFixture.documents.find((document) => document.url === String(url));
   if (companion) return new Response(companion.html, { headers: { "content-type": "text/html" } });
   if (String(url) === codeChangesURL || String(url) === familyNoticeURL) return missingSafetySources
@@ -268,9 +294,10 @@ try {
   assert.equal(summaryDoubles, 3);
   assert.equal(verificationDoubles, 3);
   const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json", import.meta.url)));
-  for (const id of ["DOBNOW-001", "DOBNOW-003", "DOBNOW-004", "DOBNOW-012", "DOBNOW-021", "DOBNOW-008"]) {
+  const companionRetained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json", import.meta.url)));
+  for (const id of ["DOBNOW-001", "DOBNOW-003", "DOBNOW-004", "DOBNOW-012", "DOBNOW-021", "DOBNOW-016", "DOBNOW-023", "DOBNOW-008"]) {
     portalCase = id;
-    question = retained.results.find((item) => item.id === id).question;
+    question = [...retained.results, ...companionRetained.results].find((item) => item.id === id).question;
     const beforePortal = providerDoubles;
     const response = await ask();
     assert.equal(response.status, 200, `${JSON.stringify(response.body)}\n${responseDoubleFailure?.stack || ""}`);
@@ -278,10 +305,10 @@ try {
     assert.equal(answer.retrieval.allowOfficialGuidanceOnly, true);
     assert.equal(answer.citations.length, 0, "Portal guidance must not acquire irrelevant enacted citations.");
     assert.equal(answer.verification.pass, true);
-    assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
-    const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/ };
+    assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
+    const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
     assert.match(answer.answerText, expected[id]);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v4");
+    assert.equal(answer.promptVersion, "20260909-document-summary-v5");
     assert.equal(answer.officialGuidanceSummary.version, "20260908-document-summary-v1",
       "A prompt update must preserve the saved integrity-proof contract.");
   }

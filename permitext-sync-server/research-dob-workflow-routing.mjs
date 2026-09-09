@@ -1,6 +1,6 @@
 // Source locations are discovery hints, never an answer key. Each document is
 // fetched and validated again before its contents may support an answer.
-export const researchDOBWorkflowRoutingVersion = "20260909-companion-workflow-sources-v6";
+export const researchDOBWorkflowRoutingVersion = "20260909-loft-stakeholder-sources-v7";
 const source = (id, title, filename, catalogReviewedOn = "2026-09-08") => Object.freeze({
   id, title, url: `https://www.nyc.gov/assets/buildings/pdf/${filename}`,
   publisher: "NYC Department of Buildings", catalogReviewedOn
@@ -16,6 +16,8 @@ export const researchDOBWorkflowSources = Object.freeze({
   applicationGuide: source("dob-application-guide", "DOB NOW application user guide", "dob_now_application_user_guide.pdf"),
   codeChanges2022: source("dob-2022-code-changes", "2022 Construction Codes updates to DOB NOW", "2022_code_changes_dobnow.pdf", "2026-09-09"),
   familySiteSafety: source("dob-family-site-safety-notice", "2022 Construction Codes: Construction Superintendent on 1-, 2- or 3-family buildings", "code_site_safety_1-3_family_sn.pdf", "2026-09-09"),
+  loftNotice: source("dob-loft-board-service-notice", "Loft Board Requests in DOB NOW: Build service notice", "26_lb_dn-sn.pdf", "2026-09-09"),
+  stakeholderFAQ: htmlSource("dob-stakeholder-faq", "DOB NOW: Build FAQs — Owner and Professional Responsibilities", buildFAQ, ["Roles & Responsibilities: Owner", "Roles & Responsibilities: Professionals"]),
   subsequentFAQ: htmlSource("dob-subsequent-faq", "DOB NOW: Build FAQs — Subsequent Filings", buildFAQ, ["Subsequent Filings"]),
   nbFAQ: htmlSource("dob-nb-altco-faq", "DOB NOW: New Building and Alteration-CO FAQs", "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page"),
   paaPage: htmlSource("dob-paa-process", "DOB NOW: Post Approval Amendment process", "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page", ["The PAA Process – DOB NOW: Build Job Filings"]),
@@ -37,6 +39,8 @@ export function researchDOBWorkflowRoute(question) {
   const paa = /\b(?:PAA|post[ -]approval amendments?)\b|\bapproved\b[^.?]{0,100}\b(?:scope|drawings)\b[^.?]{0,100}\b(?:revis(?:e|ed|ion)|amend(?:ed|ment)?|chang(?:e|ed))\b/i.test(text);
   const subsequent = /\bsubsequent\s+filings?\b/i.test(text);
   const stormwater = /\bstormwater\b|\bimpervious\s+(?:area|surface)\b/i.test(text);
+  const loft = /\b(?:Loft (?:Law|Board)|interim multiple dwelling|IMD)\b/i.test(text);
+  const filingRepresentative = /\bfiling representatives?\b/i.test(text) && /\b(?:attest(?:ation|ations)?|sign(?:ature)?|submit|submission)\b/i.test(text);
   // Naming the portal's Building Code review-year field is not itself a
   // request to determine enacted applicability. Mask only that field name;
   // any separate legal/technical request still requires enacted evidence.
@@ -46,7 +50,8 @@ export function researchDOBWorkflowRoute(question) {
   const requiresEnactedAnswer = /\b(?:FAR|floor area ratio|zoning|as[- ]of[- ]right|legal(?:ly)?\b|compli(?:ance|ant|es)|comply|violat(?:ion|e)|permit[- ]exempt|exempt(?:ion)? from|(?:building|plumbing|mechanical|fuel gas|construction) code|code (?:requirement|compliance)|(?:BC|PC|AC|ZR|MC|FGC)\s*(?:§|Section)?\s*\d)/i.test(legalQuestion) ||
     (legalQuestion !== text && /\b(?:govern(?:s|ing)?|appl(?:y|ies|icable|icability)|controll?ing|requires?|required|requirements?|must|mandatory|allowed|permitted|eligib(?:le|ility))\b/i.test(legalQuestion));
   const topic = bpp ? "builders_pavement" : wetlands ? "wetland_documents" : siteSafety ? "site_safety_documents"
-    : paa ? "post_approval_amendments" : subsequent ? "subsequent_filings" : stormwater ? "stormwater_documents" : "dob_now_workflow";
+    : paa ? "post_approval_amendments" : subsequent ? "subsequent_filings" : stormwater ? "stormwater_documents"
+    : loft ? "loft_board_documents" : filingRepresentative ? "filing_stakeholder_roles" : "dob_now_workflow";
   const guidanceOnly = (bpp || namedPortal) && !requiresEnactedAnswer;
   const sources = bpp ? [researchDOBWorkflowSources.buildersPavement]
     : wetlands ? [researchDOBWorkflowSources.releaseNotes]
@@ -54,6 +59,8 @@ export function researchDOBWorkflowRoute(question) {
     : paa ? [researchDOBWorkflowSources.paaPage, researchDOBWorkflowSources.paaFAQ, researchDOBWorkflowSources.applicationGuide]
     : subsequent ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.subsequentFAQ, researchDOBWorkflowSources.nbFAQ]
     : stormwater ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stormwater]
+    : loft ? [researchDOBWorkflowSources.loftNotice, researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.applicationGuide]
+    : filingRepresentative ? [researchDOBWorkflowSources.applicationGuide, researchDOBWorkflowSources.stakeholderFAQ]
     : [researchDOBWorkflowSources.releaseNotes, researchDOBWorkflowSources.applicationGuide];
   const requestedURLs = text.match(/https:\/\/[^\s<>"\])]+/gi) || [];
   // An explicit source request takes priority over a catalog shortcut.
@@ -64,9 +71,10 @@ export function researchDOBWorkflowRoute(question) {
     version: researchDOBWorkflowRoutingVersion,
     topic,
     guidanceOnly,
-    directDocumentRetrieval: (bpp || wetlands || siteSafety || paa || subsequent || stormwater) && guidanceOnly && catalogMatchesRequest,
+    directDocumentRetrieval: (bpp || wetlands || siteSafety || paa || subsequent || stormwater || loft || filingRepresentative) && guidanceOnly && catalogMatchesRequest,
     passageTerms: bpp ? ["bpp", "bpp5", "pavement"] : wetlands ? ["wetland", "wetlands", "ceha"] : siteSafety ? ["safety", "superintendent"]
-      : paa ? ["paa", "amendment", "amendments"] : subsequent ? ["subsequent"] : stormwater ? ["stormwater", "impervious"] : [],
+      : paa ? ["paa", "amendment", "amendments"] : subsequent ? ["subsequent"] : stormwater ? ["stormwater", "impervious"]
+      : loft ? ["loft", "imd"] : filingRepresentative ? ["attestation", "attestations", "attest", "representative", "representatives"] : [],
     sources
   };
 }

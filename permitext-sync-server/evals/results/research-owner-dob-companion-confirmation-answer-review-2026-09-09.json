@@ -1,0 +1,157 @@
+{
+  "schema": "permitext-owner-dob-companion-confirmation-review-v1",
+  "reviewedOn": "2026-09-09",
+  "liveSourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+  "referenceKeySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "liveResult": {
+    "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+    "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+  },
+  "costAudit": {
+    "file": "evals/results/research-owner-api-round2-dob-companion-confirmation-cost-audit-2026-09-09.json",
+    "sha256": "0e9d25bce41825b152fa71f425818412829a6b4e96a039b451a4fc616dfafb17"
+  },
+  "newProfessionalApproval": false,
+  "strictQualityAcceptedCostPerAnswerUSD": null,
+  "reviewMethod": "Manual development review of all retained answers and draft/verifier responses against the reconciled reference and source passages. Includes fresh public-source inspection and visual PDF comparison for the missing Loft Board table. No paid judge; delivery and core confirmation are not complete acceptance.",
+  "summary": {
+    "attempted": 11,
+    "delivered": 5,
+    "failed": 6,
+    "providerCalls": 30,
+    "pendingProviderRequests": 0,
+    "publicDocumentGETs": 22,
+    "usageEstimateUSD": 0.3784408,
+    "conservativeUSD": 0.650016,
+    "durationP50Milliseconds": 13631,
+    "durationP90Milliseconds": 24728,
+    "totalRoundUsageEstimateUSD": 3.58712487,
+    "totalRoundConservativeUSD": 6.838767,
+    "remainingConservativeAuthorizationUSD": 1.161233,
+    "fullCohortAttempted": 105,
+    "fullCohortUnattempted": [
+      "ZR-03",
+      "ZR-06",
+      "ZR-09",
+      "ZR-19",
+      "ZR-20"
+    ]
+  },
+  "sourceReviewLinks": [
+    "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf",
+    "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+    "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page"
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-003",
+      "liveStatus": "completed",
+      "reviewStatus": "delivered-quality-failure",
+      "durationMilliseconds": 13631,
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "expectedAnswerSHA256": "53bf3d5275364916c22ce10e93a49e67045ac92efd0406ade504570b578ea6bc",
+      "deliveredAnswerSHA256": "ac7e094b3ad1a17870ebc6babd0a43a853777cfbca99d2a24c75987ddba547a0",
+      "notes": "Same-job subsequent filing and different applicant are supported, but the delivered answer again gives universal LOC and initiation timing conclusions. The NB/Alteration-CO completion exception and the general FAQ pre-filing ambiguity reached both drafting and verification yet were omitted. Passing verification did not establish professional acceptance."
+    },
+    {
+      "id": "DOBNOW-004",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-source-conflict",
+      "durationMilliseconds": 15190,
+      "inputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "expectedAnswerSHA256": "fb0fbdf6d2cfec2d84bede1764713e9567a24bc7f5b4fc41b146dd785c111eff",
+      "deliveredAnswerSHA256": null,
+      "notes": "PAA, same Applicant of Record, one open PAA and the legalization qualification are now retrieved. The draft still presents Work on Floors as unchangeable despite the supplied contrary FAQ; verification correctly blocks that conclusion. Its additional plan-set objection overlooks the stipulated revision of approved drawings, and its unnecessary-qualification issue references a status sentence absent from the draft. Keep the material conflict failure; improve semantic precision."
+    },
+    {
+      "id": "DOBNOW-006",
+      "liveStatus": "completed",
+      "reviewStatus": "development-core-confirmed-with-verbosity-gap",
+      "durationMilliseconds": 13224,
+      "inputSHA256": "30f752164ffaa6cd9862b763c580bf220adafd21651ea9d20f1680ea6aff8698",
+      "expectedAnswerSHA256": "7f045586581a2a2c7ceb4de55489d521126f6d6253dd13b98ae0e705aace8144",
+      "deliveredAnswerSHA256": "0e23c1ffdc7fe4cd97213f28173dccd76791fdf6aa24b042ea60fa501d02072b",
+      "notes": "No MPP identification without acceptance/enrollment is supported and delivered. The previous unsupported statement about what MPP does not authorize is absent. Unrequested program thresholds and consultation instructions remain longer than the desired focused answer."
+    },
+    {
+      "id": "DOBNOW-012",
+      "liveStatus": "completed",
+      "reviewStatus": "development-core-confirmed",
+      "durationMilliseconds": 9801,
+      "inputSHA256": "fdce0b3e6b5040b5b8daca22240582b5e3f0713f736c68505845d230cb6206af",
+      "expectedAnswerSHA256": "76b2ff9e0af3d3e7edfe672927026a200449402667aaa9e7d4cf61200a25baad",
+      "deliveredAnswerSHA256": "25ce41845f1b36eb8ed6552cfeda2f14670e82a5157da634f12e94bd425d2b83",
+      "notes": "The delivered answer applies the inclusive 5,000-square-foot alternative threshold to the specific DOB NOW question, preserves document deadlines and distinguishes DEP drainage/exclusions from the portal field. The missing companion-source conditions are now available and stated. No new professional approval."
+    },
+    {
+      "id": "DOBNOW-014",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-draft-timing-overstatement",
+      "durationMilliseconds": 12924,
+      "inputSHA256": "6310c53162c9a125c10cb37bf94a6545c4ca249c69a750a577f9b8b1203df9c9",
+      "expectedAnswerSHA256": "f95e0217311774be712debb4228cd86773d9aebe09411481f35be198f5e993a1",
+      "deliveredAnswerSHA256": null,
+      "notes": "The main No-without-support conclusion and owner Yes-or-document alternative match the reference. The second paragraph adds a before-using-No sequence beyond the source formulation if-No-document-required; verification blocks it. Remove unasked timing elaboration while retaining the record-conflict requirement."
+    },
+    {
+      "id": "DOBNOW-015",
+      "liveStatus": "completed",
+      "reviewStatus": "development-core-confirmed",
+      "durationMilliseconds": 15046,
+      "inputSHA256": "1b938d5b2bd20b415df3c20ef1fb533793e471ff46c050f42fcadcc540396385",
+      "expectedAnswerSHA256": "ed53948def1c7034c63b9d6bf7f45b9e54638c9879b873c9aa5b98038b05a059",
+      "deliveredAnswerSHA256": "f7ecaef617975aab87efed60fc624569eee588a9e8bb800eb589a4b36158855d",
+      "notes": "The delivered answer requires both the owner and Board representative attestations, cites release page 20 and describes the separate Board authorization. Source timing is retained in the passage but could be stated explicitly instead of a generic Q&A Session citation title."
+    },
+    {
+      "id": "DOBNOW-016",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-incomplete-source-extraction",
+      "durationMilliseconds": 25498,
+      "inputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+      "expectedAnswerSHA256": "4bb8204a87532f1b66a3993ef014ebb33ece7f59c69c2f78f1ccbdf0c3a73059",
+      "deliveredAnswerSHA256": null,
+      "notes": "The draft answers the IMD-impact field Yes but cannot map it to certification/Narrative Statement because the release page 19 table is an image missing from extracted text. It offers an overbroad LNO-or-certification boundary and asks an unnecessary alteration-scope question. Verification only flags unsupported source chronology. Visually checked release page 19 and service notice page 1 confirm the missing table; the service-notice text extraction retains the rows."
+    },
+    {
+      "id": "DOBNOW-017",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-wording-verification",
+      "durationMilliseconds": 19136,
+      "inputSHA256": "50c015af7367d48909a1f3cda737096511939d4737f658984c4f3c77d6afe347",
+      "expectedAnswerSHA256": "6321a926d5e98d24e0b25e9388644a8e2aec0c9595d033fa9324bdcdf3730b7b",
+      "deliveredAnswerSHA256": null,
+      "notes": "The draft gives Yes, Basement, the DOHMH certificate before Final CO, optional pre-TCO upload, waiver allowed and no deferral. Verification blocks only expansion of TCO; the supplied certificate passage uses the acronym. Use source wording when an expansion is not in the supplied passages. The draft also adds unrelated ADU entry and size details and authority boilerplate."
+    },
+    {
+      "id": "DOBNOW-022",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-qualification-and-scope",
+      "durationMilliseconds": 24728,
+      "inputSHA256": "4052ee13f21021b968d32c00a08095d1114c5a5d8ec780c3b85c9bcaa0fd22fc",
+      "expectedAnswerSHA256": "06aae59c4802d39ddbab5e0e9fc6969df02d5cf22fa3a209ac10dc27ba7e605f",
+      "deliveredAnswerSHA256": null,
+      "notes": "The core inability to recommend on missing facts is appropriate, but the draft adds a universal before-selection approval workflow and unrelated subsequent-filing advice. Verification partly conflates the explicit on-stated-facts recommendation limitation with a categorical prohibition and asks for an unneeded comparison statement. Preserve factual eligibility limitations without inventing process deadlines."
+    },
+    {
+      "id": "DOBNOW-023",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-role-source-gap",
+      "durationMilliseconds": 13033,
+      "inputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "expectedAnswerSHA256": "e86124c25bcf3bda49f5a5a11bfcca6aa4ac1834c1df639ada5e323e3f4b595e",
+      "deliveredAnswerSHA256": null,
+      "notes": "The draft preserves required applicant/owner attestations, but the retrieved guide alone does not explicitly address representative submission powers. The current FAQ supplies that restriction and should be retrieved. Unasked DPL-1 wording adds before-submission timing not expressed that way in the cited passage."
+    },
+    {
+      "id": "DOBNOW-024",
+      "liveStatus": "completed",
+      "reviewStatus": "development-core-confirmed-with-qualification-gap",
+      "durationMilliseconds": 13525,
+      "inputSHA256": "02ff4cc071196baa769bc8583ff0b6e4337926e237b2657883525f86014deb8c",
+      "expectedAnswerSHA256": "bd766fd1e6bee78bf5a29e0f4f4a96a6e7c6b399b72c21487f3f7b9727bffbf5",
+      "deliveredAnswerSHA256": "58bb8bf43fd98d02256fcc5e080aaeb8541c5b64a9bd5e3d583928a2f0294683",
+      "notes": "Yes on the supplied listed prerequisites and owner/AOR Request LOC action are delivered. The answer distinguishes request readiness from approval but could explicitly qualify it on the current live record and unresolved items. Repeats the final PW3 detail unnecessarily."
+    }
+  ]
+}

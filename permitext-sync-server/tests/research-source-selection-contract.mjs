@@ -28,7 +28,9 @@ for (const [question, topic] of [
   [paaQuestion, "post_approval_amendments"],
   ["Explain post approval amendments in DOB NOW.", "post_approval_amendments"],
   ["Explain subsequent filings in DOB NOW.", "subsequent_filings"],
-  ["How should the DOB NOW stormwater question be answered?", "stormwater_documents"]
+  ["How should the DOB NOW stormwater question be answered?", "stormwater_documents"],
+  ["How should I submit the Loft Board request in DOB NOW for work affecting an IMD unit?", "loft_board_documents"],
+  ["Can a filing representative attest for the owner and submit a DOB NOW filing?", "filing_stakeholder_roles"]
 ]) {
   const route = researchDOBWorkflowRoute(question);
   assert.equal(route.topic, topic);
@@ -57,9 +59,9 @@ for (const id of ["DOBNOW-007", "DOBNOW-016"]) {
   const route = researchWebSupportTrigger({ question }, {});
   assert.equal(route.useWeb, true, `${id}: an explicit portal form question needs official workflow material.`);
   assert.equal(route.workflow.guidanceOnly, true);
-  assert.equal(route.workflow.topic, "dob_now_workflow");
-  assert.equal(route.workflow.directDocumentRetrieval, false,
-    "Recognizing a form question does not preselect a page or manufacture an answer.");
+  assert.equal(route.workflow.topic, id === "DOBNOW-016" ? "loft_board_documents" : "dob_now_workflow");
+  assert.equal(route.workflow.directDocumentRetrieval, id === "DOBNOW-016",
+    "Only a known workflow catalog bypasses source discovery.");
   assert.equal(researchWebSupportTrigger({ question: `Do not use the web. ${question}` }, {}).useWeb, false);
 }
 assert.equal(researchDOBWorkflowRoute("How should the roof question be answered?"), null,

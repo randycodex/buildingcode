@@ -1,0 +1,1414 @@
+{
+  "schema": "permitext-dob-source-conditions-inspection-v1",
+  "checkedAt": "2026-09-09T05:38:56.063Z",
+  "baselineCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+  "sourceHashes": {
+    "research-dob-workflow-routing.mjs": "c024a9c6696d3ffbd3c50afffbdc800b93ea4fea3a0952245ffe19dd7682ebab",
+    "research-official-guidance-summary.mjs": "4e2e14d754f658e06693469be4628873b171a0fdc47ce3b6ec642205a9c38c0e",
+    "research-source-policy.mjs": "0f569a60606aaace85c6cfde2dd179720717603da47ca7d898b1c66630d63980",
+    "research-official-html-attribution.mjs": "97e0e666a244e6969a9cb690e042fed74fa1a68a8f58351d8f79e0bbb85290c7",
+    "scripts/inspect-research-dob-source-conditions-20260909.mjs": "8e0fb0116ca645c1a677858747b1d2135b811bf22e60843a3033cf36ed66c55d",
+    "evals/research-reconciled-answer-key.json": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+    "evals/results/research-owner-code-source-review-2026-09-08.json": "5008eac9f2adc2a4de7b98d08567e515055a3ad59ebf243451b010ec697c5f7f"
+  },
+  "summary": {
+    "authoredCases": 110,
+    "references": 47,
+    "exactSelections": 8,
+    "routingChanges": [
+      "DOBNOW-016",
+      "DOBNOW-023"
+    ],
+    "guidanceOnlyChanges": 0,
+    "fetchedCases": 5,
+    "publicDocumentGETs": 13,
+    "providerCalls": 0,
+    "paidAPICostUSD": 0
+  },
+  "inputs": [
+    {
+      "id": "CC-01",
+      "inputSHA256": "220d84923d58c28bd18005504837ac52fd9e204052f24af2a21083a49ad2c5dd",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "CC-02",
+      "inputSHA256": "a906f35bfafb4eeff9f65dba51df3d12e8aca111b47c237a5db9f3b12e9fcbb7",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "CC-03",
+      "inputSHA256": "b0ef28ca4d868c69103960ecc3055839fef48b557f395125909a0d396f3f866c",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "CC-04",
+      "inputSHA256": "494083aa1cc30eed1414873b901704cea4706d830eb7fd4c414acf7a203cdc01",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "CC-05",
+      "inputSHA256": "fde91613c682799238433de4b23b245cbe60231337591bbc5ef634581a4bc28b",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-01",
+      "inputSHA256": "493cfa89342b223eac2eda1047388956fd667452ddad193abbbce9e1c865fcb0",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-02",
+      "inputSHA256": "3e3869b33fdfbc7593abb68ed8cc0abe24493bf6db0d34c467385d0c240fe9a7",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-03",
+      "inputSHA256": "98b25e17083b1ec7beca9a5d94072cc89db6409f3be51c6ae5612952f8f1770c",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-04",
+      "inputSHA256": "fcac143a86f5cd072ca2a9dcf935e3593360d9539f33cd10597986f068c1a2bc",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-05",
+      "inputSHA256": "f4cb3b9f53534ff845962746c7eade46a3cab446c240106138dc3c447c8d9861",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-06",
+      "inputSHA256": "3fa70b15d9febe7d7d05102c8f7db199350747b8e2788f3801538039284b985f",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-07",
+      "inputSHA256": "5fcc4f363aa30b6b3ee1d496c834ee9271eedaff47b3eecc5ef00f92155e3cdf",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-08",
+      "inputSHA256": "822dbb7b3da8e20d299e63c292de981153eb48bbc04a805861f3894b1b0589c7",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-09",
+      "inputSHA256": "2a988abd132792a81e4104ea4ce3d9c61ea56b1df51c66079d5c317c599a60c4",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-10",
+      "inputSHA256": "8777b3d4e1d6da63f697ae1cd06bdf9bbe589a9e854809d1f5083fe446da5dd6",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-11",
+      "inputSHA256": "5e3bcf4cc7e2e99244b95de2ed4cd101b7798d182f5586cd39e60f39899d08db",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-12",
+      "inputSHA256": "7492e120892a71f4528120959248a148d45755c00bae85ab984aed75d42251d1",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-13",
+      "inputSHA256": "a17cbe13280fa26ce9a3a717d4f32374b528835058fb32f5de58c24194f7b3d3",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-14",
+      "inputSHA256": "f0bed626422e13a0bf8870cf20d35e9afdb94b6a37d5c986506f61869568f9ff",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-15",
+      "inputSHA256": "db55f664247fb1caf7a12d7d7cf1d845a4bda7a2e6cd97e102e4569a399e49d8",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-16",
+      "inputSHA256": "c5278db259385dc8b5aede97d363f05daa1e9d805b635e9d2de56be9b1212351",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-17",
+      "inputSHA256": "d36cee85c04c7abb76a6addb287a2fe5087e46d8b11847635f7e9305e81f33af",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-18",
+      "inputSHA256": "69c3e87b7fbed165b6850c1134ce1cd1c30ec5588a55d561f567c9aa3cd1d737",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-19",
+      "inputSHA256": "cbe137fe86be80a9f03d4eb2bf95f04e45e0eac5b49d3fd27ba7a6a7e1632ce0",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-20",
+      "inputSHA256": "88fcfb02683d0a05b4450b076d775d94bed04a1e54ff18addcb29afb40add985",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "ZR-21",
+      "inputSHA256": "78c1e6d1c6f1fcbd7a5079fc859c00763978859108d85f3166cfa830626afe45",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-001",
+      "inputSHA256": "4cd643ac879632820aa66d55ba8afcd692c2d67d9e9aea087e5d723623515879",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-002",
+      "inputSHA256": "a234fa9933a8cda1d2ea3a5390f170840160a9068abc2eb501e3a6eb74f64acd",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-003",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "topicBefore": "subsequent_filings",
+      "topicAfter": "subsequent_filings",
+      "directBefore": true,
+      "directAfter": true
+    },
+    {
+      "id": "DOBNOW-004",
+      "inputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "topicBefore": "post_approval_amendments",
+      "topicAfter": "post_approval_amendments",
+      "directBefore": true,
+      "directAfter": true
+    },
+    {
+      "id": "DOBNOW-005",
+      "inputSHA256": "6ec0e535ece5afc5a256b75f978ebfe24016aa17a99fce990cf6c070e12a17fa",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-006",
+      "inputSHA256": "30f752164ffaa6cd9862b763c580bf220adafd21651ea9d20f1680ea6aff8698",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-007",
+      "inputSHA256": "fcb231ddb4605d3975d20cc3c4f1d20684a5b6f42eb0da6cf1d41f93628a8b4b",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-008",
+      "inputSHA256": "d33c19c69ab1f6fb5981386eadcf5c1cd65c58f7f5b67258492f365ffe884815",
+      "topicBefore": "site_safety_documents",
+      "topicAfter": "site_safety_documents",
+      "directBefore": true,
+      "directAfter": true
+    },
+    {
+      "id": "DOBNOW-009",
+      "inputSHA256": "37fc2427c29161fc419702e0d0b81cc516986f46dc4c1409eae68c29d8837690",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-010",
+      "inputSHA256": "00c7df7639cf812e7df4c94ae0006a28b21175b965d5317863a9d16ad96faeb3",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-011",
+      "inputSHA256": "13fc63df66732233b28a7e0781ca0e5dc12c2a5529145016571469f60491952d",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-012",
+      "inputSHA256": "fdce0b3e6b5040b5b8daca22240582b5e3f0713f736c68505845d230cb6206af",
+      "topicBefore": "stormwater_documents",
+      "topicAfter": "stormwater_documents",
+      "directBefore": true,
+      "directAfter": true
+    },
+    {
+      "id": "DOBNOW-013",
+      "inputSHA256": "dd2377f7a8a14f78b23aafbf7037ec97a7adc04efea80db4407e1c462460dd04",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-014",
+      "inputSHA256": "6310c53162c9a125c10cb37bf94a6545c4ca249c69a750a577f9b8b1203df9c9",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-015",
+      "inputSHA256": "1b938d5b2bd20b415df3c20ef1fb533793e471ff46c050f42fcadcc540396385",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-016",
+      "inputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "loft_board_documents",
+      "directBefore": false,
+      "directAfter": true
+    },
+    {
+      "id": "DOBNOW-017",
+      "inputSHA256": "50c015af7367d48909a1f3cda737096511939d4737f658984c4f3c77d6afe347",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-018",
+      "inputSHA256": "d735219b9bb802ca0c7021eaacd1fad207065e59cddaa6f4082fe75b6ffd8243",
+      "topicBefore": "wetland_documents",
+      "topicAfter": "wetland_documents",
+      "directBefore": true,
+      "directAfter": true
+    },
+    {
+      "id": "DOBNOW-019",
+      "inputSHA256": "208c7d06f30d27f971b1410c69d19a1360efe193ab90fd480f53f3f22a79968e",
+      "topicBefore": "builders_pavement",
+      "topicAfter": "builders_pavement",
+      "directBefore": true,
+      "directAfter": true
+    },
+    {
+      "id": "DOBNOW-020",
+      "inputSHA256": "bcf9e23c1414c2f06aff5870151d2f1f716074e011da2778eb0d48da75fa7611",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-021",
+      "inputSHA256": "5522267061751e82aef377a93ef8b6b8f5eab50a57a9ed9739e46e010c65c70c",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-022",
+      "inputSHA256": "4052ee13f21021b968d32c00a08095d1114c5a5d8ec780c3b85c9bcaa0fd22fc",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "DOBNOW-023",
+      "inputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "filing_stakeholder_roles",
+      "directBefore": false,
+      "directAfter": true
+    },
+    {
+      "id": "DOBNOW-024",
+      "inputSHA256": "02ff4cc071196baa769bc8583ff0b6e4337926e237b2657883525f86014deb8c",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-01",
+      "inputSHA256": "cdca6f41c1a51204276c695e8ca1eb836532b3c4c361ddd77e176e7e691f6e3a",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-02",
+      "inputSHA256": "ea13d1011d30bef9965f1d4c86403310628d5e65d59e84af0dfc506a8e36bbca",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-03",
+      "inputSHA256": "1a795ca445422c512b7418dcfa9a85cace3409d8c987cfb7c009f0026856b42d",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-04",
+      "inputSHA256": "3f6c95861926cfd121b351dacbf64656ee02414f4c7c94391e245e01dcbfab1f",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-05",
+      "inputSHA256": "f3f205b156798ed6f8ff923698de8e5b5b8db367d979ede3728c932cd69fae77",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-06",
+      "inputSHA256": "3c9343a346c3e8bbb2b9b7b4188c29967de1e1c4666deccab644e8b3b6de35be",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-07",
+      "inputSHA256": "c3ed522f6d3aeb2d370cb7f87500862f18109d9248469e8a5735e36bb97cd0b3",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-08",
+      "inputSHA256": "fd956466eb2d9069675160d6bc409b6576b0ca9508bc8e006d4dfdf39146f70d",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-09",
+      "inputSHA256": "4361de1b510c71284a6c768433d2962e4db44cc542e561595ac184569f0796ff",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-10",
+      "inputSHA256": "fdb1f5c00cda0092da8cdcbe882d2b179b1fb33239d060b916504bcd8caa2e00",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-11",
+      "inputSHA256": "038f8307710b6b0324ec6d3e441eb7b4940fa67a097e3a9b4ba8eb17bcef57e5",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-12",
+      "inputSHA256": "cc7180250aa68bf2e29dc8d410d42451b51c2817202e21e6b3f7fe8861b9bbd1",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-13",
+      "inputSHA256": "f1227c268613c1a040060a32480fca3ec7e04823766f4cf49442f34ee5040b0e",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-14",
+      "inputSHA256": "41f5c41f2adb057d5e5c0c8f747a425c9d5fde053a978ca59391de26e5e94092",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "FGC-15",
+      "inputSHA256": "333ec0d5602bc81292fd3be1a40ec1db59a9de95acecdbce63fefb767745bfe6",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-01",
+      "inputSHA256": "d60effb81376608e59a1463704885b1990bec1462d39b39323480702faac7364",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-02",
+      "inputSHA256": "cf5b1458517fda6e7dd7489734e76ce42ad92a549922fa09e7365bc45f327212",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-03",
+      "inputSHA256": "5d00ce658daba0b279fa59590639f3480ce8b60b7656165d4206f77997344dfa",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-04",
+      "inputSHA256": "ea95bb57abc34302382b92bbad81e4884f8b2ae9ffe6a24a3e39d9cec2a2f7a4",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-05",
+      "inputSHA256": "1649561bdf0a9ce39f4c13ba07038abfd2ca62fedf7fed0a05c085dbe248e978",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-06",
+      "inputSHA256": "b9a951cb0fc5bfc249a51131502f8f43b57369f8cc38a671b82e01bf105fc299",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-07",
+      "inputSHA256": "bb718cdd38e1392c6b97eaccc4b5008a0cf934d65efd1ee6b3a7910f543bdffd",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-08",
+      "inputSHA256": "0639df82464201ad460b59d1f78f437cbdeeffc22bb642d2688fc36f6a1a6c0b",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-09",
+      "inputSHA256": "507fe315d964a751d4b9e66008989180582ca797e191a4cd21e4cabbfc54127a",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-10",
+      "inputSHA256": "3e38c1bd791f407bd2e5e6881c0e6c9709b76a215b53a64b43494f9ba9db2381",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-11",
+      "inputSHA256": "3afd0ac4549c292303046c389ca59715d8dd8cfe011ec11d17c3afcb2eafacc7",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-12",
+      "inputSHA256": "f62d445e3e6e037d7e9db8ed19b821f07f497e5cf01a2103c0164cf87f082743",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-13",
+      "inputSHA256": "be185cd980afb23f2dbf1fca8b1268a6a28c96864b9d9848a8943e59100bd1a2",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-14",
+      "inputSHA256": "260d0f2efe9d8933dd20977015891390e013b9c36bdd738d3ca0fa0e9fe24baf",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "MC-15",
+      "inputSHA256": "db058bab439a31cc71a91b6b9fcf8c9936af0ae7b3a952ad11569eca577867b8",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-01",
+      "inputSHA256": "b0550366be3c5cb3cbb61f3175144f6cc4964178a08e516174e05c37230c8477",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-02",
+      "inputSHA256": "eab94c541bdc47c4c56f91ccfbfcaf5b20626c6bd3fc95048fd38e2cfc02c9f5",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-03",
+      "inputSHA256": "786f4d5e5b5fe8d48f636d4e0536511ad7ad67b65769c33e1e48f948f9218497",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-04",
+      "inputSHA256": "7689499faef837d8f2d46436c63c0c6447252309f41a97000774d9b2d78e7cbd",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-05",
+      "inputSHA256": "7f09f11c062f1f19f77415fe2cfc6e46931bc35d446070a26ac7cbf4caa566e8",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-06",
+      "inputSHA256": "0abe1174604be439e088918b89beef2ba039554791e0e3d142f3d01ac41d8ef8",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-07",
+      "inputSHA256": "2e1b755405a232eef0fa33a242e40f3b3c8bfc47bd0c123eff8085f9e5e45b63",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-08",
+      "inputSHA256": "d24e447e97c5d5bc2ff29275dfae6aaad12f7ad75cf073aa48e57a4c50a0da13",
+      "topicBefore": "dob_now_workflow",
+      "topicAfter": "dob_now_workflow",
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-09",
+      "inputSHA256": "ad6040cb9e0410b4b68980584c0f53a4c2b5d39e5ddf5b4c991a3f70db092c54",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-10",
+      "inputSHA256": "a639f54c09818ffcf49aa53be263e0fdd157a08a8c812e5b53d63c1c4854ce3b",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-11",
+      "inputSHA256": "369bcfe72531397105c16efe03e5f03952d6a45251310bb0c39e3c164a7bd405",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-12",
+      "inputSHA256": "29d4a2885c2353a960a2562f6a698cc2639f45fa42edd795493c1531d9d346c2",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-13",
+      "inputSHA256": "9f7f8dd5f35938934986e1f842ceda8530ac9fa5740e263ba86390bf2f375913",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-14",
+      "inputSHA256": "701f84751f8f8fb9c4bc7bcf1eed180e1e6f706c19574d67ee4dc53a70eb3d05",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "GAP-15",
+      "inputSHA256": "9bd1ba44113017fe6fd6c553d295c26a12fbec24a9b6febf8de1f21d6701c272",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-01",
+      "inputSHA256": "f875268eea2e4f073a1c02db0aa01ba1cc02342b1fe4610fbb2b4f48f464151a",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-02",
+      "inputSHA256": "2153718362110e26172d5d3c18ce43160308afd827e83788145df0d5498f89a5",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-03",
+      "inputSHA256": "09c3a6affdb0e5ebb6b0d9d693a0ba75fca0eebb6d8aa285a65b4d1aaea7a783",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-04",
+      "inputSHA256": "9d41ecca4caac0adb046438eafb997bf18f96dedc05f406de96f0b943a7f5e90",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-05",
+      "inputSHA256": "5784d46da5e710f6f9d81ccd3338e3161df26b8831e15c83f9b6a7419c888283",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-06",
+      "inputSHA256": "7ee33157a4fb0c10de807ca2896e47ca76fba736c6b9a1ba001db384f32dc7dd",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-07",
+      "inputSHA256": "0090d9ad56c87640cb8e7ece2d35cfa2b5f5250beb727401744499c0a702e70a",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-08",
+      "inputSHA256": "bb16b2b207c6364df58909c20aabc0a4e8bb10ee09ea9999e52015c774b9932b",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-09",
+      "inputSHA256": "3ee120d8f136881adb3f336a6a12f5b510c67389f9226577225b733e7a7ecebc",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-10",
+      "inputSHA256": "6f54cb02dc567786e865e76a29259f515079ded9d04eef43139cce8ae3b88e0a",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-11",
+      "inputSHA256": "518dda98b208a75a15cb479b02f8e3cc6ade40306c15b612493ff17fba04b595",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-12",
+      "inputSHA256": "8f78216a421ecca46d52ec5b77ac63fdd397dd178e8e748e7fec6267e4f31e6e",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-13",
+      "inputSHA256": "c3c6c16cdd26891ca3c966057480f193eb315aab3c0a5ec8b61256f8d3fa94cf",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-14",
+      "inputSHA256": "1911cae004a21de5487cc2d3f7f5573d4267d1829b07008a9c9d83159e4e6e23",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    },
+    {
+      "id": "PC-15",
+      "inputSHA256": "09402bbd1356819ce0f340f937d4595c28b0cfe39e9a2360338ad3130ea02c9f",
+      "topicBefore": null,
+      "topicAfter": null,
+      "directBefore": false,
+      "directAfter": false
+    }
+  ],
+  "requests": [
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/dep/water/stormwater-permits.page",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+      "status": 200
+    }
+  ],
+  "results": [
+    {
+      "id": "DOBNOW-003",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "question": "Context: DOB NOW workflow\n\nAn initial GC filing has been created for a project. Plumbing work for the same construction project and property will be filed later, potentially by a different applicant.\n\nShould the plumbing scope receive a new unrelated job number or a subsequent filing under the existing job?",
+      "sourceCount": 3,
+      "passageCount": 6,
+      "passageCharacters": 9371,
+      "requestSHA256": "1971a3c2bbce4b186d0d2e6420c5bc29c87dcc94abd79240a15e79c2f62c28a7",
+      "sources": [
+        {
+          "id": "dob-application-guide",
+          "title": "DOB NOW application user guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "attributedClaims": [
+            {
+              "id": "official-passage-789cc7ccd439eb8374132031",
+              "text": "[PDF page 5](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5) — Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to perform a specific type of construction. All filings related to the same construction project should have the same job number and then an alphabetic and numeric extension that indicates the filing type and sequence: I - Initial, S - Subsequent, and P - Post Approval Amendment (PAA). • Initial Filings (I1) – The first or initial job filing created for a construction project . • Subsequent (S) - A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one on the initial or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing can have a different review type (standard plan examination/professional certification) than the initial filing. Once submitt ed, a subsequent filing functions as a separate appli cation. It can be permitted before the initial is permitted and a Letter of Completion (LOC) is requested separately on each filing. • Post Approval Amendment s (PAA) - A Post Approval Amendment or PAA is for making changes to a filing after it has been approved. To create a job fi ling , log into DOB NOW: Build and from the dashboard select +Job Filing . Then select the Job Type , Work Type (s) , and Filing Review Typ e . Subsequent applications are strongly encouraged. All filings with the same job number will go to the same plan examiner or team and the Records Management Fees are paid on the initial filin g only. It is also beneficial to have one job number to connect all of the work on a project.",
+              "verbatimText": "Page 5 of 38\nJOB FILING /APPLICATION\nA job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an\nexisting building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to\nperform a specific type of construction.\nAll filings related to the same construction project should have the same job number and then an alphabetic and numeric extension that\nindicates the filing type and sequence: I - Initial, S - Subsequent, and P - Post Approval Amendment (PAA).\n• Initial Filings (I1) – The first or initial job filing created for a construction project .\n• Subsequent (S) - A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one\non the initial or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing\ncan have a different review type (standard plan examination/professional certification) than the initial filing. Once submitt ed, a\nsubsequent filing functions as a separate appli cation. It can be permitted before the initial is permitted and a Letter of Completion\n(LOC) is requested separately on each filing.\n• Post Approval Amendment s (PAA) - A Post Approval Amendment or PAA is for making changes to a filing after it has been approved.\nTo create a job fi ling , log into DOB NOW: Build and from the dashboard select +Job Filing . Then select the Job Type , Work Type (s) , and\nFiling Review Typ e .\nSubsequent applications are strongly encouraged. All filings with the same job number will go to the same plan examiner or team and the\nRecords Management Fees are paid on the initial filin g only. It is also beneficial to have one job number to connect all of the work on a\nproject.",
+              "heading": "PDF page 5",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 5,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5"
+            },
+            {
+              "id": "official-passage-5b682c1399f57019c03eda89",
+              "text": "[PDF page 6](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6) — Page 6 of 38 To create a subsequent filing, select Search from the dashboard . Select BIN Search to find filings on the BIN or select Job Number Search if the job number is alr eady known. From the Filing Action column next to the initial (I1) filing, select action Subsequent Filing . J ob T ypes Alteration – Questions about the scope of work are provided to determine if the filing is an Alteration CO or an Alteration CO – New Building with Existing Elements to Remain. If No is the answer for all the questions, then the filing is an Alteration (does not require an amended CO) . • Alteration required to meet New Building requirements? (Yes = Alteration CO – New Building with Existing Elements to Remain) • Alteration is inconsistent with the current Certificate of Occupancy? (Yes = Alteration CO) • Alteration in occupancy or use? (Yes = Alteration CO) • Alteration is a major chan ge to exits? (Yes = Alteration CO) • Alteration in number of stories? (Yes = Alteration CO if Building Type is 3 Family or Other) Full Demolition - The dismantling, razing, or removal of all of a building or structure, including all related incidental opera tions . The Full Demolition Types are: New Work, Emergency Declaration, Immediate Emergency Declaration, Emergency Work Order, and Precept. A registered design professional (PE/RA) is required as the applicant on a full demolition filing when one or more of the f ollowing conditions are met: • Building is greater than 3 stories in height • Building is greater than 5,000 square feet per floor • Building is not detached • Demolition Is using mechanical equipment • Foundation is not being removed",
+              "verbatimText": "Page 6 of 38\nTo create a subsequent filing, select Search from the dashboard . Select BIN Search to find filings on the BIN or select Job Number Search\nif the job number is alr eady known. From the Filing Action column next to the initial (I1) filing, select action Subsequent Filing .\nJ ob T ypes\nAlteration – Questions about the scope of work are provided to determine if the filing is an Alteration CO or an Alteration CO – New Building with\nExisting Elements to Remain. If No is the answer for all the questions, then the filing is an Alteration (does not require an amended CO) .\n• Alteration required to meet New Building requirements? (Yes = Alteration CO – New Building with Existing Elements to Remain)\n• Alteration is inconsistent with the current Certificate of Occupancy? (Yes = Alteration CO)\n• Alteration in occupancy or use? (Yes = Alteration CO)\n• Alteration is a major chan ge to exits? (Yes = Alteration CO)\n• Alteration in number of stories? (Yes = Alteration CO if Building Type is 3 Family or Other)\nFull Demolition - The dismantling, razing, or removal of all of a building or structure, including all related incidental opera tions . The Full\nDemolition Types are: New Work, Emergency Declaration, Immediate Emergency Declaration, Emergency Work Order, and Precept. A\nregistered design professional (PE/RA) is required as the applicant on a full demolition filing when one or more of the f ollowing\nconditions are met:\n• Building is greater than 3 stories in height\n• Building is greater than 5,000 square feet per floor\n• Building is not detached\n• Demolition Is using mechanical equipment\n• Foundation is not being removed",
+              "heading": "PDF page 6",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 6,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=6"
+            },
+            {
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "text": "[PDF page 19](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=19) — Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST, SE and EA work types) If yes is selected, enter a related New Building, Alteration CO or Alteration with enlargement job filing number. DOB NOW wil l check if there is an approved ZD1 and site safety plan on the related job when the permit is created. In Conjunction New Building BIS Job Numbers Provide any existing New Building BIS job number that is on the same BIN. Related DOB NOW/BIS Job Numbers P rovide any existing job filing numbers that relate to this application and are on the same BIN. Do not inc lude any filings with the same job number (subsequent filings). It always preferred to create subsequent filings rather than adding job filing numbers to this field. Additional Considerations, Limitations or Restrictions Landmark . Approval from the Landmarks Preservation Commission (LPC) is required to ensure that work proposed under the application does not affect the property’s designation, including buildings, structures or places located with in a historic district designated by the LPC or designated as an individual landmark. LPC approved drawings must be submitted prior to filing. This selection is auto - populated if the BIS property profile indicates it is a Landmark. Review is requested under which Building Code. Indicate under which building code the review is being requested — 2022, 2014, 2008, 1968, or prior to 1968. See the 2022 Construction Codes Updates to DOB NOW guide , pages 4 - 6, for code review selection options based on job type, filing date and work type . The below job types are selected when creating the job and cannot be changed in this section. - Alteration required to meet New Building requirements - Alteration is a major change in exits - Alteration in occupancy or use - Alteration is inconsistent with current certificate of occupancy - Alteration in number of stories Loft Board: A Loft Board C ertificate is a R equired Document for alteration of a registered Interim Multiple Dwelling (IMD) building. If the BIS property p rofile indicates t he LOFT designation , ‘Yes’ is auto - populated.",
+              "verbatimText": "Page 19 of 38\nDoes this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type)\nIf yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section.\nIs this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,\nSE and EA work types)\nIf yes is selected, enter a related New Building, Alteration CO or Alteration with enlargement job filing number. DOB NOW wil l check if there is an\napproved ZD1 and site safety plan on the related job when the permit is created.\nIn Conjunction New Building BIS Job Numbers\nProvide any existing New Building BIS job number that is on the same BIN.\nRelated DOB NOW/BIS Job Numbers\nP rovide any existing job filing numbers that relate to this application and are on the same BIN. Do not inc lude any filings with the same job number\n(subsequent filings). It always preferred to create subsequent filings rather than adding job filing numbers to this field.\nAdditional Considerations, Limitations or Restrictions\nLandmark . Approval from the Landmarks Preservation Commission (LPC) is required to ensure that work proposed under the application\ndoes not affect the property’s designation, including buildings, structures or places located with in a historic district designated by the\nLPC or designated as an individual landmark. LPC approved drawings must be submitted prior to filing. This selection is auto - populated\nif the BIS property profile indicates it is a Landmark.\nReview is requested under which Building Code. Indicate under which building code the review is being requested — 2022, 2014, 2008,\n1968, or prior to 1968. See the 2022 Construction Codes Updates to DOB NOW guide , pages 4 - 6, for code review selection options based\non job type, filing date and work type .\nThe below job types are selected when creating the job and cannot be changed in this section.\n- Alteration required to meet New Building requirements\n- Alteration is a major change in exits\n- Alteration in occupancy or use\n- Alteration is inconsistent with current certificate of occupancy\n- Alteration in number of stories\nLoft Board: A Loft Board C ertificate is a R equired Document for alteration of a registered Interim Multiple Dwelling (IMD) building. If the\nBIS property p rofile indicates t he LOFT designation , ‘Yes’ is auto - populated.",
+              "heading": "PDF page 19",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 19,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=19"
+            }
+          ],
+          "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "sourceValidation": "official_pdf",
+          "pageCount": 38,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        },
+        {
+          "id": "dob-subsequent-faq",
+          "title": "DOB NOW: Build FAQs — Subsequent Filings",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-09",
+          "sectionHeadings": [
+            "Subsequent Filings"
+          ],
+          "attributedClaims": [
+            {
+              "id": "official-passage-1063e94f13c3228f90c31eb2",
+              "text": "DOB NOW: Build Frequently Asked Questions > Subsequent Filings — When can I submit a subsequent job filing? — Subsequent filings can be initiated and submitted after the initial job filing is submitted (not in pre-filing status). Users no longer have to wait until the initial filing is approved. A subsequent filing can be submitted anytime until an LOC has been issued for the initial filing.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to request a Letter of Completion (LOC) for a subsequent job filing? — Yes, an LOC needs to be requested for each filing, initial and subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — If an initial job application is filed as professional certification can the subsequent application be filed as a standard plan filing type? — Yes, initial and subsequent jobs can have different filing types.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can a subsequent filing have a different design applicant than the initial filing? — Yes, the applicant on an initial filing and a subsequent filing can be different. If the applicant is the same, one application can be submitted if the work types are eligible to be combine filed.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to pay the record management fee on a subsequent filing? — No, the $165 record management fee is now charged only once on the initial filing and is no longer a fee on subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can I have an open PAA for the initial filing and a subsequent filing at the same time? — Yes.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — How can I make a minor change to a legalization filing? — Post-Approval Amendments (PAA) are not allowed on filings that include legalization work. If a change needs to be made, a subsequent filing will be required or the job must be withdrawn and refiled. For Boiler Equipment filings the only option is to withdraw and refile the job. In addition, permits cannot be renewed if the job includes legalization work.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — I have a subsequent filing in pre-filing status and some of the fields are grayed out? How do I complete these fields? — Fields from the subsequent filing are populated from the initial filing (I1). The fields will not update on the subsequent filing until the I1 is submitted. To prevent this issue, we recommend completing as much of the I1 as possible before creating the subsequent filing.",
+              "verbatimText": "DOB NOW: Build Frequently Asked Questions > Subsequent Filings — When can I submit a subsequent job filing? — Subsequent filings can be initiated and submitted after the initial job filing is submitted (not in pre-filing status). Users no longer have to wait until the initial filing is approved. A subsequent filing can be submitted anytime until an LOC has been issued for the initial filing.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to request a Letter of Completion (LOC) for a subsequent job filing? — Yes, an LOC needs to be requested for each filing, initial and subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — If an initial job application is filed as professional certification can the subsequent application be filed as a standard plan filing type? — Yes, initial and subsequent jobs can have different filing types.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can a subsequent filing have a different design applicant than the initial filing? — Yes, the applicant on an initial filing and a subsequent filing can be different. If the applicant is the same, one application can be submitted if the work types are eligible to be combine filed.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Do I have to pay the record management fee on a subsequent filing? — No, the $165 record management fee is now charged only once on the initial filing and is no longer a fee on subsequent filings.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — Can I have an open PAA for the initial filing and a subsequent filing at the same time? — Yes.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — How can I make a minor change to a legalization filing? — Post-Approval Amendments (PAA) are not allowed on filings that include legalization work. If a change needs to be made, a subsequent filing will be required or the job must be withdrawn and refiled. For Boiler Equipment filings the only option is to withdraw and refile the job. In addition, permits cannot be renewed if the job includes legalization work.\n\nDOB NOW: Build Frequently Asked Questions > Subsequent Filings — I have a subsequent filing in pre-filing status and some of the fields are grayed out? How do I complete these fields? — Fields from the subsequent filing are populated from the initial filing (I1). The fields will not update on the subsequent filing until the I1 is submitted. To prevent this issue, we recommend completing as much of the I1 as possible before creating the subsequent filing.",
+              "heading": "Subsequent Filings",
+              "intro": "",
+              "contentHash": "dab207980b1e10379c55e8aaf44f1fb879e4bd972d02dba5c14e57722e65be67"
+            }
+          ],
+          "sourceContentHash": "dab207980b1e10379c55e8aaf44f1fb879e4bd972d02dba5c14e57722e65be67",
+          "sourceValidation": "official_html"
+        },
+        {
+          "id": "dob-nb-altco-faq",
+          "title": "DOB NOW: New Building and Alteration-CO FAQs",
+          "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-09",
+          "attributedClaims": [
+            {
+              "id": "official-passage-b10db861ad2f00e03113f46c",
+              "text": "DOB NOW: Build Frequently Asked Questions > New Building and Alteration-CO — Are Structural (ST) and Foundation (FO) work types required for New Building (NB) filings? — Each NB should have FO and ST work types that may be combine filed with the General Construction (GC) in the initial application if the applicant is the same or filed as subsequent filings to the GC work type.",
+              "verbatimText": "Each NB should have FO and ST work types that may be combine filed with the General Construction (GC) in the initial application if the applicant is the same or filed as subsequent filings to the GC work type.",
+              "heading": "DOB NOW: Build Frequently Asked Questions > New Building and Alteration-CO",
+              "intro": "Are Structural (ST) and Foundation (FO) work types required for New Building (NB) filings?",
+              "contentHash": "acaed01262d04162a36fa44166544c690f1ffab717651b2d295b8f5d11e33620"
+            },
+            {
+              "id": "official-passage-64b43fbb85e879d5982496bc",
+              "text": "DOB NOW: Build Frequently Asked Questions > New Building and Alteration-CO — Do I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing? — No, the status of the subsequent filings will remain Permit Entire. Only the status of the initial (I1) filing will change to CO issued. If a Temporary CO is issued, the status of the initial job will remain Permit Entire until the Final CO is issued.",
+              "verbatimText": "No, the status of the subsequent filings will remain Permit Entire. Only the status of the initial (I1) filing will change to CO issued. If a Temporary CO is issued, the status of the initial job will remain Permit Entire until the Final CO is issued.",
+              "heading": "DOB NOW: Build Frequently Asked Questions > New Building and Alteration-CO",
+              "intro": "Do I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing?",
+              "contentHash": "acaed01262d04162a36fa44166544c690f1ffab717651b2d295b8f5d11e33620"
+            }
+          ],
+          "sourceContentHash": "acaed01262d04162a36fa44166544c690f1ffab717651b2d295b8f5d11e33620",
+          "sourceValidation": "official_html"
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-004",
+      "inputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "question": "Context: DOB NOW workflow\n\nThe initial filing is approved, and the approved scope and drawings must now be revised. The filing was not submitted for legalization.\n\nWhat filing action is appropriate, and what limits must be disclosed?",
+      "sourceCount": 3,
+      "passageCount": 5,
+      "passageCharacters": 14265,
+      "requestSHA256": "528401f897ab2a0b9654a4322a0c21488ad34825e72e93ec2a331a3cf621cd43",
+      "sources": [
+        {
+          "id": "dob-paa-process",
+          "title": "DOB NOW: Post Approval Amendment process",
+          "url": "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-09",
+          "sectionHeadings": [
+            "The PAA Process – DOB NOW: Build Job Filings"
+          ],
+          "attributedClaims": [
+            {
+              "id": "official-passage-f6267c241da8f46e42c70947",
+              "text": "Post Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — DOB NOW is an interactive, web-based portal that enables building owners, design professionals, filing representatives, and licensees to do all business with DOB online. One of the benefits of filing online is that you can file from your computer and do not have to come to DOB.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — The Applicant of Record can file a Post Approval Amendment (PAA) when the approved Scope of Work needs to be updated.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — The following rules apply to PAA filings in DOB NOW: Build :\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — The following rules apply to PAA filings in DOB NOW: Build : — • Only one PAA can be in progress at a time. • A PAA can only be filed by an Applicant of Record . • A PAA must be filed by the same Applicant of Record as the original filing. • A PAA cannot be submitted if the filing includes legalization. • The description of the changes must be entered in Plans/Work (PW1) tab – Comments. • A flat, one-time fee of $100 is charged when a new PAA is filed. • An increase or decrease in the estimated job cost results in a recalculation of fees. For increases in the job cost, the Applicant must pay the price difference (from the initial fee on the initial Job Filing) online. For decreases in the job cost, an adjustment is made (from the initial fee on the initial Job Filing). Applicant can request a refund.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — When a PAA is filed, the following fields are NOT editable:\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — When a PAA is filed, the following fields are NOT editable: — • Filing Review Type (e.g. Standard Plan Examination to Professional Certification) • Application/Location Address • Work on Floors (e.g. Location details) • Applicant of Record Information • Owner Information • Building Type\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 1: Log In to DOB NOW: Build — • Use the log in information that is registered in eFiling to log into DOB NOW: Build.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 2: Locate Job Filing — • Locate the approved initial job filing on your dashboard in DOB NOW: Build . • Initiate the PAA. System generates filing number for the PAA. • Amend the necessary information.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 3: Upload Required Documents — • Upload revised PDF of the plan sets. • Upload DPL1 document. • The system will determine if additional documents are required based on the information that is data entered on the PAA job filing.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 4: Obtain Attestation — • Applicant, owners and other stakeholders must electronically sign the job filing.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 5: Submit payment — • Payments will be made online using a credit card, debit card or e-check. • Anyone associated to a job filing can submit a payment.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 6: Preview to File — • Applicant must review the filing and provide a final electronic signature.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 7: Submit Job Filing — • Applicant must officially electronically submit the job filing to the Department.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 8: Department Review and Approval — • Department staff will review the job filing. • If objections are issued, the applicant will be able to make corrections in the system and resubmit. • If a meeting is required to resolve objections, meetings will be conducted online. • The system will send email notification to all associated stakeholder listed on the job filing once the Department has approved the job filing.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 8: Department Review and Approval — © City of New York. 2025 All Rights Reserved. NYC is a trademark and service mark of the City of New York.",
+              "verbatimText": "Post Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — DOB NOW is an interactive, web-based portal that enables building owners, design professionals, filing representatives, and licensees to do all business with DOB online. One of the benefits of filing online is that you can file from your computer and do not have to come to DOB.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — The Applicant of Record can file a Post Approval Amendment (PAA) when the approved Scope of Work needs to be updated.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — The following rules apply to PAA filings in DOB NOW: Build :\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — The following rules apply to PAA filings in DOB NOW: Build : — • Only one PAA can be in progress at a time. • A PAA can only be filed by an Applicant of Record . • A PAA must be filed by the same Applicant of Record as the original filing. • A PAA cannot be submitted if the filing includes legalization. • The description of the changes must be entered in Plans/Work (PW1) tab – Comments. • A flat, one-time fee of $100 is charged when a new PAA is filed. • An increase or decrease in the estimated job cost results in a recalculation of fees. For increases in the job cost, the Applicant must pay the price difference (from the initial fee on the initial Job Filing) online. For decreases in the job cost, an adjustment is made (from the initial fee on the initial Job Filing). Applicant can request a refund.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — When a PAA is filed, the following fields are NOT editable:\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings — When a PAA is filed, the following fields are NOT editable: — • Filing Review Type (e.g. Standard Plan Examination to Professional Certification) • Application/Location Address • Work on Floors (e.g. Location details) • Applicant of Record Information • Owner Information • Building Type\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 1: Log In to DOB NOW: Build — • Use the log in information that is registered in eFiling to log into DOB NOW: Build.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 2: Locate Job Filing — • Locate the approved initial job filing on your dashboard in DOB NOW: Build . • Initiate the PAA. System generates filing number for the PAA. • Amend the necessary information.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 3: Upload Required Documents — • Upload revised PDF of the plan sets. • Upload DPL1 document. • The system will determine if additional documents are required based on the information that is data entered on the PAA job filing.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 4: Obtain Attestation — • Applicant, owners and other stakeholders must electronically sign the job filing.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 5: Submit payment — • Payments will be made online using a credit card, debit card or e-check. • Anyone associated to a job filing can submit a payment.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 6: Preview to File — • Applicant must review the filing and provide a final electronic signature.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 7: Submit Job Filing — • Applicant must officially electronically submit the job filing to the Department.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 8: Department Review and Approval — • Department staff will review the job filing. • If objections are issued, the applicant will be able to make corrections in the system and resubmit. • If a meeting is required to resolve objections, meetings will be conducted online. • The system will send email notification to all associated stakeholder listed on the job filing once the Department has approved the job filing.\n\nPost Approval Amendment (PAA) > The PAA Process – DOB NOW: Build Job Filings > Step 8: Department Review and Approval — © City of New York. 2025 All Rights Reserved. NYC is a trademark and service mark of the City of New York.",
+              "heading": "The PAA Process – DOB NOW: Build Job Filings",
+              "intro": "",
+              "contentHash": "95fc900d48f59f4a6e01a88366aeeae87c01343fb14fb4ef6b06c10afe958ce0"
+            }
+          ],
+          "sourceContentHash": "95fc900d48f59f4a6e01a88366aeeae87c01343fb14fb4ef6b06c10afe958ce0",
+          "sourceValidation": "official_html"
+        },
+        {
+          "id": "dob-paa-faq",
+          "title": "DOB NOW: Build FAQs — Post Approval Amendments",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-09",
+          "sectionHeadings": [
+            "Post Approval Amendments"
+          ],
+          "attributedClaims": [
+            {
+              "id": "official-passage-8d5a37f609f3a00200f390c0",
+              "text": "DOB NOW: Build Frequently Asked Questions > Post Approval Amendments — My filing is approved. How do I add or remove a floor from an application? — Work on floors can be changed with a PAA. The PW3 must also be updated to include the increase or decrease in the estimated work cost.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — How can I make a minor plan change to my approved job? — For minor plan changes for jobs after approval, submit a Post Approval Amendment (PAA) in DOB NOW. Upload a complete plan set with the new, unapproved sheets and the already approved sheets with the approved stamp. Include a description of the changes in the Comments field (Section 24) of the Plans/Work tab (PW1).\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — For a PAA, if I am only revising one sheet, do I need to upload a complete set or just the one sheet? — For Professional Certification filings a complete plan set is always required. For Standard Plan Examination filings, a complete plan set needs to be uploaded if changes are being made to the approved plans. Submit the new unapproved sheets with no approved stamp and include the previously approved plans with a DOB stamp. The new unapproved sheets should indicate the P1 suffix on the filing extension, however, the approved plans with a DOB stamp should not be changed. Once the PAA is approved, the new plan set uploaded will replace the previous plan set for the filing. If no changes are being made to the plans, then a new plan set is not required with the PAA; select No to the question, Are you submitting updated plans?\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Is fee estimation for additional filing fees associated with PAAs done automatically in DOB NOW? — Yes. If the cost/scope of the job changes resulting in additional fees, the PAA will collect those automatically and payment must be made online before submitting the PAA.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Can I change the owner on a PAA? — No. Owner changes are done through a supersede request. The new owner can log into DOB NOW: Build , Search by Job Number, and from the Filing Action select Supersede and then Owner. Select the Owner Type and then Save the request. If the owner type is not fee exempt, select the Pay Now button to pay the $130 fee. Then the Applicant of the job needs to log into DOB NOW and complete the Statements & Signature section. Then the new owner can also complete the Statements & Signature section and submit the request.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Is owner’s signature required on a PAA? — Yes, in DOB NOW the questions on the Owner’s Attestation section can be changed with a PAA so the owner must provide a signature again in this section to submit the PAA.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Where do I file a post approval amendment (PAA) on an existing BIS OT/GC, Alt-1 or NB job? — OT/GC filings in D status or later by December 23, 2020 and Alt-1 or NB jobs in D status or later by February 26, 2021 will continue to be processed in BIS. PAAs on existing BIS filings will continue to be filed in BIS.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Do I need to upload an AI1 form with the plans to explain the changes in the PAA? — Do not upload an AI1 form with the plans when doing a PAA. Use the Comments field (Section 24) in the PAA filing to provide a description of the changes.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Can I request a sign-off for a PAA? — No. PAAs are filed to update the information on an initial filing. The filing status of a PAA will always remain Approved.",
+              "verbatimText": "DOB NOW: Build Frequently Asked Questions > Post Approval Amendments — My filing is approved. How do I add or remove a floor from an application? — Work on floors can be changed with a PAA. The PW3 must also be updated to include the increase or decrease in the estimated work cost.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — How can I make a minor plan change to my approved job? — For minor plan changes for jobs after approval, submit a Post Approval Amendment (PAA) in DOB NOW. Upload a complete plan set with the new, unapproved sheets and the already approved sheets with the approved stamp. Include a description of the changes in the Comments field (Section 24) of the Plans/Work tab (PW1).\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — For a PAA, if I am only revising one sheet, do I need to upload a complete set or just the one sheet? — For Professional Certification filings a complete plan set is always required. For Standard Plan Examination filings, a complete plan set needs to be uploaded if changes are being made to the approved plans. Submit the new unapproved sheets with no approved stamp and include the previously approved plans with a DOB stamp. The new unapproved sheets should indicate the P1 suffix on the filing extension, however, the approved plans with a DOB stamp should not be changed. Once the PAA is approved, the new plan set uploaded will replace the previous plan set for the filing. If no changes are being made to the plans, then a new plan set is not required with the PAA; select No to the question, Are you submitting updated plans?\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Is fee estimation for additional filing fees associated with PAAs done automatically in DOB NOW? — Yes. If the cost/scope of the job changes resulting in additional fees, the PAA will collect those automatically and payment must be made online before submitting the PAA.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Can I change the owner on a PAA? — No. Owner changes are done through a supersede request. The new owner can log into DOB NOW: Build , Search by Job Number, and from the Filing Action select Supersede and then Owner. Select the Owner Type and then Save the request. If the owner type is not fee exempt, select the Pay Now button to pay the $130 fee. Then the Applicant of the job needs to log into DOB NOW and complete the Statements & Signature section. Then the new owner can also complete the Statements & Signature section and submit the request.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Is owner’s signature required on a PAA? — Yes, in DOB NOW the questions on the Owner’s Attestation section can be changed with a PAA so the owner must provide a signature again in this section to submit the PAA.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Where do I file a post approval amendment (PAA) on an existing BIS OT/GC, Alt-1 or NB job? — OT/GC filings in D status or later by December 23, 2020 and Alt-1 or NB jobs in D status or later by February 26, 2021 will continue to be processed in BIS. PAAs on existing BIS filings will continue to be filed in BIS.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Do I need to upload an AI1 form with the plans to explain the changes in the PAA? — Do not upload an AI1 form with the plans when doing a PAA. Use the Comments field (Section 24) in the PAA filing to provide a description of the changes.\n\nDOB NOW: Build Frequently Asked Questions > Post Approval Amendments — Can I request a sign-off for a PAA? — No. PAAs are filed to update the information on an initial filing. The filing status of a PAA will always remain Approved.",
+              "heading": "Post Approval Amendments",
+              "intro": "",
+              "contentHash": "3cb0a3c6fd77242f8f8a98db69419289c6c66e61b3a6e2c221547f57150207ce"
+            }
+          ],
+          "sourceContentHash": "3cb0a3c6fd77242f8f8a98db69419289c6c66e61b3a6e2c221547f57150207ce",
+          "sourceValidation": "official_html"
+        },
+        {
+          "id": "dob-application-guide",
+          "title": "DOB NOW application user guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "attributedClaims": [
+            {
+              "id": "official-passage-789cc7ccd439eb8374132031",
+              "text": "[PDF page 5](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5) — Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to perform a specific type of construction. All filings related to the same construction project should have the same job number and then an alphabetic and numeric extension that indicates the filing type and sequence: I - Initial, S - Subsequent, and P - Post Approval Amendment (PAA). • Initial Filings (I1) – The first or initial job filing created for a construction project . • Subsequent (S) - A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one on the initial or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing can have a different review type (standard plan examination/professional certification) than the initial filing. Once submitt ed, a subsequent filing functions as a separate appli cation. It can be permitted before the initial is permitted and a Letter of Completion (LOC) is requested separately on each filing. • Post Approval Amendment s (PAA) - A Post Approval Amendment or PAA is for making changes to a filing after it has been approved. To create a job fi ling , log into DOB NOW: Build and from the dashboard select +Job Filing . Then select the Job Type , Work Type (s) , and Filing Review Typ e . Subsequent applications are strongly encouraged. All filings with the same job number will go to the same plan examiner or team and the Records Management Fees are paid on the initial filin g only. It is also beneficial to have one job number to connect all of the work on a project.",
+              "verbatimText": "Page 5 of 38\nJOB FILING /APPLICATION\nA job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an\nexisting building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to\nperform a specific type of construction.\nAll filings related to the same construction project should have the same job number and then an alphabetic and numeric extension that\nindicates the filing type and sequence: I - Initial, S - Subsequent, and P - Post Approval Amendment (PAA).\n• Initial Filings (I1) – The first or initial job filing created for a construction project .\n• Subsequent (S) - A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one\non the initial or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing\ncan have a different review type (standard plan examination/professional certification) than the initial filing. Once submitt ed, a\nsubsequent filing functions as a separate appli cation. It can be permitted before the initial is permitted and a Letter of Completion\n(LOC) is requested separately on each filing.\n• Post Approval Amendment s (PAA) - A Post Approval Amendment or PAA is for making changes to a filing after it has been approved.\nTo create a job fi ling , log into DOB NOW: Build and from the dashboard select +Job Filing . Then select the Job Type , Work Type (s) , and\nFiling Review Typ e .\nSubsequent applications are strongly encouraged. All filings with the same job number will go to the same plan examiner or team and the\nRecords Management Fees are paid on the initial filin g only. It is also beneficial to have one job number to connect all of the work on a\nproject.",
+              "heading": "PDF page 5",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 5,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=5"
+            },
+            {
+              "id": "official-passage-99e3ff631d01ad61590ccecf",
+              "text": "[PDF page 13](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=13) — Page 13 of 38 Filing Review Type Standard Plan Examination or Review – submission of an application subject to t he Department’s standard examination process for plan review and approval . Professional Certification – s ubmission of application s, which are a ccepted with no Department examination , based on the professional certification of an applicant who is a Registered Design Professional (RDP) stating that the filing is in compliance with all applicable laws. Professional ly c ertified p lans are subject to an audit by the Department of Buildings. The Job Type, Work Type and Filing Review Type cannot be changed once it is selected and submitted. See the Filing Statuses Guide for a complete list of review statuses for both DOB NOW and BIS jobs. The status bar on a filing indicates the pr ogress of the filing with a blue circle. A white check mark will appear in the circle once the stage has been completed by DO B and the filing has moved on to the next step in the filing process. A red exclamation point will appear to indicate that the fili ng is waiting for action by the applicant because DOB has issued Objections or the filing is in QA Failed status. Once the filing is complete, white check marks will appear in all the circles on the status bar. If the filing is a PAA, an approval is indica ted by a solid blue circle without a check mark.",
+              "verbatimText": "Page 13 of 38\nFiling Review Type\nStandard Plan Examination or Review – submission of an application subject to t he Department’s standard examination process for plan\nreview and approval .\nProfessional Certification – s ubmission of application s, which are a ccepted with no Department examination , based on the professional\ncertification of an applicant who is a Registered Design Professional (RDP) stating that the filing is in compliance with all applicable laws.\nProfessional ly c ertified p lans are subject to an audit by the Department of Buildings.\nThe Job Type, Work Type and Filing Review Type cannot be changed once it is selected and submitted.\nSee the Filing Statuses Guide for a complete list of review statuses for both DOB NOW and BIS jobs. The status bar on a filing indicates\nthe pr ogress of the filing with a blue circle. A white check mark will appear in the circle once the stage has been completed by DO B and\nthe filing has moved on to the next step in the filing process. A red exclamation point will appear to indicate that the fili ng is waiting for\naction by the applicant because DOB has issued Objections or the filing is in QA Failed status. Once the filing is complete, white check\nmarks will appear in all the circles on the status bar. If the filing is a PAA, an approval is indica ted by a solid blue circle without a check\nmark.",
+              "heading": "PDF page 13",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 13,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=13"
+            },
+            {
+              "id": "official-passage-ce20f813e92241a7bc12804a",
+              "text": "[PDF page 16](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=16) — Page 16 of 38 Stakeholders All stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with information from the eFiling account. Applicant and Owner: Enter the email address associated with the eFiling account of the Applicant and Owner . In most cases, the Applicant is a Registered Architect or Professional Engineer. For the Applicant, also select the License Type and Business Name. For the owner, select the Owner Type. If the Owner Type selected is Non - Profit Organization, NYC Agency, O ther Government Owned or NYCHA/HHC, then the fees will be removed and an ACRIS report is required to verify the building is tax exempt. Filing Representative and Delegated Associates : An email address can also be entered for Filing Representative Class I/ Preparer and Delegated Associates (Filing Representative Class II or Other Licensee). Filing Review Type, Work Type /Filing Includes The Filing includes – select if the application is for New Work or Legalization . This option cannot be changed once the filing fees are paid. If Legalization is selected and there is no OATH summons on the BIN for work without permit (WWP), then a $600 or $6000 fee, depending on the building type, is added to the filing fees as a legalization fee. If legalization is selected and an OATH summons number for WWP is on the BIN, select Yes to the question Are there any OATH/E CB summonses related to this work? and enter the DOB violation or OATH/ECB Summons number(s). When a WWP violation is entered, there is no legalization fee and only a civil penalty for work without permit cal culated as an L2 fee. An L2 is a request for ove rride, reduction or waiver of civil penalties for work without a permit violations. When the L2 request is created, the civil penalty fee has to be paid before the permit is issued. Once legalization is selected on a filing, it results in a no work pe rmit and Post Approval Amendments are not allowed. See 1 RCNY 102 - 04 (b) (7 ) for more information about legalization and civil penalties. The work is being done to legalize work without a permit listed as a violating condition in a Request for Corrective Action ( RCA) issued by DOB? – if Yes is selected, provide the complaint number of the RCA. See 1 RCNY 102 - 06 and the September 2021 Service Notice for information about the Homeowner Relief Program. Filing Review T ype - auto - populated based on the selection made when creating the application and cannot be changed. The below selections are auto - populated based on the selection made when creating the application but can be changed in this section: Is this Application for a Small Business? Is this Application for an approved project under the M ajor Project Developments Program (MPP) ?",
+              "verbatimText": "Page 16 of 38\nStakeholders\nAll stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with\ninformation from the eFiling account.\nApplicant and Owner: Enter the email address associated with the eFiling account of the Applicant and Owner . In most cases, the Applicant is a\nRegistered Architect or Professional Engineer. For the Applicant, also select the License Type and Business Name. For the owner, select the Owner\nType. If the Owner Type selected is Non - Profit Organization, NYC Agency, O ther Government Owned or NYCHA/HHC, then the fees will be removed\nand an ACRIS report is required to verify the building is tax exempt.\nFiling Representative and Delegated Associates : An email address can also be entered for Filing Representative Class I/ Preparer and Delegated\nAssociates (Filing Representative Class II or Other Licensee).\nFiling Review Type, Work Type /Filing Includes\nThe Filing includes – select if the application is for New Work or Legalization . This option cannot be changed once the filing fees are paid.\nIf Legalization is selected and there is no OATH summons on the BIN for work without permit (WWP), then a $600 or $6000 fee, depending on the\nbuilding type, is added to the filing fees as a legalization fee. If legalization is selected and an OATH summons number for WWP is on the BIN,\nselect Yes to the question Are there any OATH/E CB summonses related to this work? and enter the DOB violation or OATH/ECB Summons\nnumber(s). When a WWP violation is entered, there is no legalization fee and only a civil penalty for work without permit cal culated as an L2 fee.\nAn L2 is a request for ove rride, reduction or waiver of civil penalties for work without a permit violations. When the L2 request is created, the civil\npenalty fee has to be paid before the permit is issued. Once legalization is selected on a filing, it results in a no work pe rmit and Post Approval\nAmendments are not allowed. See 1 RCNY 102 - 04 (b) (7 ) for more information about legalization and civil penalties.\nThe work is being done to legalize work without a permit listed as a violating condition in a Request for Corrective Action ( RCA) issued by DOB?\n– if Yes is selected, provide the complaint number of the RCA. See 1 RCNY 102 - 06 and the September 2021 Service Notice for information about the\nHomeowner Relief Program.\nFiling Review T ype - auto - populated based on the selection made when creating the application and cannot be changed.\nThe below selections are auto - populated based on the selection made when creating the application but can be changed in this section:\nIs this Application for a Small Business?\nIs this Application for an approved project under the M ajor Project Developments Program (MPP) ?",
+              "heading": "PDF page 16",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 16,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=16"
+            }
+          ],
+          "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "sourceValidation": "official_pdf",
+          "pageCount": 38,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-012",
+      "inputSHA256": "fdce0b3e6b5040b5b8daca22240582b5e3f0713f736c68505845d230cb6206af",
+      "question": "Context: DOB NOW workflow\n\nThe project will disturb 19,000 square feet of soil and create exactly 5,000 square feet of impervious surface. It is an otherwise applicable NB, Alteration-CO, or Alteration-with-enlargement filing.\n\nDoes the stated DOB NOW stormwater condition apply?",
+      "sourceCount": 2,
+      "passageCount": 2,
+      "passageCharacters": 7472,
+      "requestSHA256": "ff368d0fa8c9aa0ea12dd56b885d3bcdb6c62e4f20ffca35bb2b892040d26e37",
+      "sources": [
+        {
+          "id": "dob-application-guide",
+          "title": "DOB NOW application user guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "attributedClaims": [
+            {
+              "id": "official-passage-1210bde4d89b706fb02695dc",
+              "text": "[PDF page 23](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=23) — Page 23 of 38 Work on exterior of building: Indicate if work is on the exterior of the building. Are you altering more than 50% of the gross floor area of the building?: If ‘ Yes ’ is selected, a Site Safety Plan is required . Are you altering 10% of more of the existing floor surface area?: Local Law 188 of 2017 requires identify ing if a job on occupied multiple dwellings will alter 10% or more of the existing floor surface area. Are you performing a vertical o r horizontal enlargement adding more than 25% of the area of the building?: This question is only asked on General Construction filings that include Enlargement. Are you removing one or more floors?: If ‘Yes’ is selected, a Site Safety Plan is required. Are you demolishing more than 50% of the gross floor area of the building?: If ‘Yes’ is selected, a Site Safety Plan is required. Are you using alternative materials that require an OTCR review and approval?: If ‘Yes’ is selected, provide the B uildings Bulletin No. Partial Demolition work is limited to the interior components of the building and no mechanical demolition equipment, other t han handheld devices, is used?: If ‘Yes’ is selected, a Site Safety Plan is required. Does the work require excavation that is greater than 12 feet deep?: If ‘ Yes ’ is selected, this will determine if or how much PGL insurance is required. Soil Disturbance: Local Law 91 of 2020 requires construction sites obtain DEP permits before disturbing 20,000 square feet or more in soil. The following questions only apply if N ew B uilding , Alt eration CO, and Alterations with Enlargement are selected. Work involves or will result in: 1) an amount of soil disturbance greater than or equal to 20,000 square feet; or 2) the creation of 5,000 square feet or more of impervious surface: Work is part of a larger common plan or development or sale that involves or will result in: 1) an amount of soil disturba nce greater than or equal to 20,000 square feet; or 2) the creation of 5,000 square feet or more of impervious surface: If ‘Y es ’ is selected to either question, DEP Stormwater Construction Permit is a Required Document prior to approval and DEP Stormwater Maintenance Permit/Notice of Termination is a Required Document prior to sign off.",
+              "verbatimText": "Page 23 of 38\nWork on exterior of building: Indicate if work is on the exterior of the building.\nAre you altering more than 50% of the gross floor area of the building?: If ‘ Yes ’ is selected, a Site Safety Plan is required .\nAre you altering 10% of more of the existing floor surface area?: Local Law 188 of 2017 requires identify ing if a job on occupied multiple dwellings\nwill alter 10% or more of the existing floor surface area.\nAre you performing a vertical o r horizontal enlargement adding more than 25% of the area of the building?: This question is only asked on\nGeneral Construction filings that include Enlargement.\nAre you removing one or more floors?: If ‘Yes’ is selected, a Site Safety Plan is required.\nAre you demolishing more than 50% of the gross floor area of the building?: If ‘Yes’ is selected, a Site Safety Plan is required.\nAre you using alternative materials that require an OTCR review and approval?: If ‘Yes’ is selected, provide the B uildings Bulletin No.\nPartial Demolition work is limited to the interior components of the building and no mechanical demolition equipment, other t han handheld\ndevices, is used?: If ‘Yes’ is selected, a Site Safety Plan is required.\nDoes the work require excavation that is greater than 12 feet deep?: If ‘ Yes ’ is selected, this will determine if or how much PGL insurance is\nrequired.\nSoil Disturbance: Local Law 91 of 2020 requires construction sites obtain DEP permits before disturbing 20,000 square feet or more in soil. The\nfollowing questions only apply if N ew B uilding , Alt eration CO, and Alterations with Enlargement are selected.\nWork involves or will result in: 1) an amount of soil disturbance greater than or equal to 20,000 square feet; or 2) the creation of 5,000 square\nfeet or more of impervious surface:\nWork is part of a larger common plan or development or sale that involves or will result in: 1) an amount of soil disturba nce greater than or\nequal to 20,000 square feet; or 2) the creation of 5,000 square feet or more of impervious surface:\nIf ‘Y es ’ is selected to either question, DEP Stormwater Construction Permit is a Required Document prior to approval and DEP Stormwater\nMaintenance Permit/Notice of Termination is a Required Document prior to sign off.",
+              "heading": "PDF page 23",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 23,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=23"
+            }
+          ],
+          "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "sourceValidation": "official_pdf",
+          "pageCount": 38,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        },
+        {
+          "id": "dep-stormwater-permits",
+          "title": "DEP Stormwater Permits",
+          "url": "https://www.nyc.gov/site/dep/water/stormwater-permits.page",
+          "publisher": "NYC Department of Environmental Protection",
+          "catalogReviewedOn": "2026-09-09",
+          "sectionHeadings": [
+            "Stormwater Permits"
+          ],
+          "attributedClaims": [
+            {
+              "id": "official-passage-b342db303886dcdfcc2cb997",
+              "text": "Stormwater Permits — Any development or redevelopment project (public or private) will require a Stormwater Permit if:\n\nStormwater Permits — Any development or redevelopment project (public or private) will require a Stormwater Permit if: — 1. It can drain to a City-owned sewer system 2. It disturbs 20,000 sf or more of soil, or adds 5,000sf or more of new impervious area\n\nStormwater Permits — View Chapter 19.1 of Title 15 of the Rules of the City of New York for the most up-to-date list of project exclusions and definitions.\n\nStormwater Permits > Stormwater Permitting & Tracking System — To apply for Stormwater Permits you must submit an application using our Stormwater Permitting and Tracking System or “SWPTS.”\n\nStormwater Permits > Stormwater Permitting & Tracking System — Access SWPTS\n\nStormwater Permits > Stormwater Permitting & Tracking System — Once you login to SWPTS, the system will walk you through the various steps of the permitting process. Download the SWPTS User Manual .\n\nStormwater Permits > Stormwater Permit Process > Stormwater Pollution Prevention Plan Application (Phase I) — Please refer to the NYC Stormwater Manual and the following support materials:\n\nStormwater Permits > Stormwater Permit Process > Stormwater Pollution Prevention Plan Application (Phase I) — Please refer to the NYC Stormwater Manual and the following support materials: — • Download the SWPPP Template • Download the SWPPP Appendix E & F Templates • Download the SWPPP Submission Checklist • Download the No Net Increase Calculator • Download the Determination Meeting Request\n\nStormwater Permits > Stormwater Permit Process > Pre-Construction (Phase II) — • Download the Construction Permit Initiation Submission Checklist • Download the Construction Permit Pulling Request Submission Checklist\n\nStormwater Permits > Stormwater Permit Process > Active Construction (Phase III) — • Download the Amendment Cover Letter • Download the Temporary Shutdown Request Submission Guidance\n\nStormwater Permits > Stormwater Permit Process > Construction Close-Out (Phase IV) — Watch the SWPTS Close Out Video Series for step by step instructions on the construction close out process.\n\nStormwater Permits > Stormwater Permit Process > Construction Close-Out (Phase IV) — Watch the SWPTS Close Out Video Series for step by step instructions on the construction close out process. — • Download the Stormwater Maintenance Easement Instructions and Pre-Approved Maintenance Easement Template • Download the Stormwater Maintenance Permit Submission Checklist and Cover Letter • Download the Operations and Maintenance Manual Template • Download the SWPTS Close-Out Module Guidance\n\nStormwater Permits > Stormwater Permit Process > Post-Construction (Phase V) — • Download the SWPTS Maintenance Permit Certifications, Renewals, and Stakeholder Change Guidance\n\nStormwater Permits > Contact — To request a meeting, respond to a summons or Commissioner’s Order, or ask technical questions, please fill in the Stormwater Permit Inquiry Form . Before you submit an inquiry, be sure to have a look at the Stormwater Permit FAQs .\n\nStormwater Permits > Contact > Workshops — We host monthly stormwater permit workshops on the last Tuesday of each month at 12pm to explain eligibility requirements and guide users through the permit process. Registration for each workshop webinar opens one month prior to the workshop date. Register here .\n\nStormwater Permits > Contact > Workshops — We’d love to hear your thoughts on future workshops! Please fill out this survey to let us know what topics you’d like to learn more about.\n\nStormwater Permits > Contact > Workshops > Past Presentations > Design Guidance — • Download Green Roof Design for NYC Stormwater Permitting • Download SWPPP Design Guidance: Case Study A for a Commercial Building Addition in CSS Area • Download SWPPP Design Guidance: Case Study B for a Recreational Park in CSS Area • Download SWPPP Design Guidance: Case Study C for a Residential Development in MS4 Area w/ NNI • Download SWPPP Design Guidance: Case Study D for a Recreational Development in MS4 Area w/CPv, Qp, and Qf • Download Detention Design Objectives and Scenarios\n\nStormwater Permits > Contact > Workshops > Past Presentations > SWPTS Guidance — • Download Stormwater Permitting and Tracking System (SWPTS) Demo • Download Stormwater Permitting and Tracking System (SWPTS) Demo: Close-Out Request\n\nStormwater Permits > Contact > Workshops > Past Presentations > Process Guidance — • Download Pain Points During Construction for Stormwater Construction Permits • Download Guidance on Geotechnical Investigations for SMP Selection and Design • Download Qualified Inspector Guidance for Compliance with the NYC Stormwater Permit • Download Guidance on Construction Close-Out Process • Download Construction Close-Out Process Pain Points\n\nStormwater Permits > Contact > Newsletter Signup — To receive the latest information about our stormwater events and activities, visit Newsletters and subscribe to the “DEP Stormwater” email list.\n\nStormwater Permits > Contact > Newsletter Signup — © City of New York. 2025 All Rights Reserved. NYC is a trademark and service mark of the City of New York.",
+              "verbatimText": "Stormwater Permits — Any development or redevelopment project (public or private) will require a Stormwater Permit if:\n\nStormwater Permits — Any development or redevelopment project (public or private) will require a Stormwater Permit if: — 1. It can drain to a City-owned sewer system 2. It disturbs 20,000 sf or more of soil, or adds 5,000sf or more of new impervious area\n\nStormwater Permits — View Chapter 19.1 of Title 15 of the Rules of the City of New York for the most up-to-date list of project exclusions and definitions.\n\nStormwater Permits > Stormwater Permitting & Tracking System — To apply for Stormwater Permits you must submit an application using our Stormwater Permitting and Tracking System or “SWPTS.”\n\nStormwater Permits > Stormwater Permitting & Tracking System — Access SWPTS\n\nStormwater Permits > Stormwater Permitting & Tracking System — Once you login to SWPTS, the system will walk you through the various steps of the permitting process. Download the SWPTS User Manual .\n\nStormwater Permits > Stormwater Permit Process > Stormwater Pollution Prevention Plan Application (Phase I) — Please refer to the NYC Stormwater Manual and the following support materials:\n\nStormwater Permits > Stormwater Permit Process > Stormwater Pollution Prevention Plan Application (Phase I) — Please refer to the NYC Stormwater Manual and the following support materials: — • Download the SWPPP Template • Download the SWPPP Appendix E & F Templates • Download the SWPPP Submission Checklist • Download the No Net Increase Calculator • Download the Determination Meeting Request\n\nStormwater Permits > Stormwater Permit Process > Pre-Construction (Phase II) — • Download the Construction Permit Initiation Submission Checklist • Download the Construction Permit Pulling Request Submission Checklist\n\nStormwater Permits > Stormwater Permit Process > Active Construction (Phase III) — • Download the Amendment Cover Letter • Download the Temporary Shutdown Request Submission Guidance\n\nStormwater Permits > Stormwater Permit Process > Construction Close-Out (Phase IV) — Watch the SWPTS Close Out Video Series for step by step instructions on the construction close out process.\n\nStormwater Permits > Stormwater Permit Process > Construction Close-Out (Phase IV) — Watch the SWPTS Close Out Video Series for step by step instructions on the construction close out process. — • Download the Stormwater Maintenance Easement Instructions and Pre-Approved Maintenance Easement Template • Download the Stormwater Maintenance Permit Submission Checklist and Cover Letter • Download the Operations and Maintenance Manual Template • Download the SWPTS Close-Out Module Guidance\n\nStormwater Permits > Stormwater Permit Process > Post-Construction (Phase V) — • Download the SWPTS Maintenance Permit Certifications, Renewals, and Stakeholder Change Guidance\n\nStormwater Permits > Contact — To request a meeting, respond to a summons or Commissioner’s Order, or ask technical questions, please fill in the Stormwater Permit Inquiry Form . Before you submit an inquiry, be sure to have a look at the Stormwater Permit FAQs .\n\nStormwater Permits > Contact > Workshops — We host monthly stormwater permit workshops on the last Tuesday of each month at 12pm to explain eligibility requirements and guide users through the permit process. Registration for each workshop webinar opens one month prior to the workshop date. Register here .\n\nStormwater Permits > Contact > Workshops — We’d love to hear your thoughts on future workshops! Please fill out this survey to let us know what topics you’d like to learn more about.\n\nStormwater Permits > Contact > Workshops > Past Presentations > Design Guidance — • Download Green Roof Design for NYC Stormwater Permitting • Download SWPPP Design Guidance: Case Study A for a Commercial Building Addition in CSS Area • Download SWPPP Design Guidance: Case Study B for a Recreational Park in CSS Area • Download SWPPP Design Guidance: Case Study C for a Residential Development in MS4 Area w/ NNI • Download SWPPP Design Guidance: Case Study D for a Recreational Development in MS4 Area w/CPv, Qp, and Qf • Download Detention Design Objectives and Scenarios\n\nStormwater Permits > Contact > Workshops > Past Presentations > SWPTS Guidance — • Download Stormwater Permitting and Tracking System (SWPTS) Demo • Download Stormwater Permitting and Tracking System (SWPTS) Demo: Close-Out Request\n\nStormwater Permits > Contact > Workshops > Past Presentations > Process Guidance — • Download Pain Points During Construction for Stormwater Construction Permits • Download Guidance on Geotechnical Investigations for SMP Selection and Design • Download Qualified Inspector Guidance for Compliance with the NYC Stormwater Permit • Download Guidance on Construction Close-Out Process • Download Construction Close-Out Process Pain Points\n\nStormwater Permits > Contact > Newsletter Signup — To receive the latest information about our stormwater events and activities, visit Newsletters and subscribe to the “DEP Stormwater” email list.\n\nStormwater Permits > Contact > Newsletter Signup — © City of New York. 2025 All Rights Reserved. NYC is a trademark and service mark of the City of New York.",
+              "heading": "Stormwater Permits",
+              "intro": "",
+              "contentHash": "a1761c6b89268d4b6f1f9187490c804cecabf95ba5ab4054e9377b4626a5128a"
+            }
+          ],
+          "sourceContentHash": "a1761c6b89268d4b6f1f9187490c804cecabf95ba5ab4054e9377b4626a5128a",
+          "sourceValidation": "official_html"
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-016",
+      "inputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+      "question": "Context: DOB NOW workflow\n\nThe DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit.\n\nHow should the IMD-impact question be answered, and what approval boundary follows?",
+      "sourceCount": 3,
+      "passageCount": 4,
+      "passageCharacters": 7488,
+      "requestSHA256": "00ad999aea6eacc7155bc2f6e468298f399fc03358d854f7ceb2d3e3d4e9a813",
+      "sources": [
+        {
+          "id": "dob-loft-board-service-notice",
+          "title": "Loft Board Requests in DOB NOW: Build service notice",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-09",
+          "attributedClaims": [
+            {
+              "id": "official-passage-ffd509d49c4ae45b17b8ff3d",
+              "text": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1) — Yegal Shamash , PE, Acting Commissioner nyc.gov/buildings build safe | live safe January 8 , 20 2 6 SERVICE NOTICE June 2010 Loft Board Requests in DOB NOW : Build Starting on February 2 , 2026, Loft Board requests will be submitted in DOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certification has been issued. The Loft Board will also review Certificate of Occupancy request . Submit a Loft Board Request Loft Board requests are always submitted in conjunction with a job filing (including Elevator applications). Once the job filing is submitted, a Loft Board request is required to be added to the filing for review . • Go to the Loft Board tab and select +Add to create a new Loft Board request. • The request is auto populated with the information entered on the job filing. • The type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an interim multiple dwelling (IMD) unit? Answer Work Location Process Yes In or affecting an IMD unit File for Loft Board Certification and include a Narrative Statement No In a commercial unit and does not affect an IMD Unit Request a Letter of No Objection from the Loft Board • Answer the questions about the IMD or Commercial units on the Scope of Work tab. • Complete all required sections, including the Documents and S ignatures & Statement tabs. Select Save and Submit the request for review . DOB NOW Training The NYC Department of Buildings is conducting free training sessions to explain the new process and demonstrate how to navigate Loft Board requests in DOB NOW: Build . Visit the DOB NOW Training Page at nyc.gov/dobnowtraining to regist er for training and to access user manuals and training videos. For additional assistance, submit an inquiry nyc.gov/dobnowhelp .",
+              "verbatimText": "Yegal Shamash , PE, Acting Commissioner nyc.gov/buildings\nbuild safe | live safe\nJanuary 8 , 20 2 6\nSERVICE NOTICE\nJune 2010 Loft Board Requests in DOB NOW : Build\nStarting on February 2 , 2026, Loft Board requests will be submitted in\nDOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property\nProfile will not be approved until a Loft Board Request has been submitted\nfor review and a Letter of No Objection (LNO) or a Loft Board Certification has\nbeen issued. The Loft Board will also review Certificate of Occupancy request .\nSubmit a Loft Board Request\nLoft Board requests are always submitted in conjunction with a job filing (including Elevator\napplications). Once the job filing is submitted, a Loft Board request is required to be added to the\nfiling for review .\n• Go to the Loft Board tab and select +Add to create a new Loft Board request.\n• The request is auto populated with the information entered on the job filing.\n• The type of Loft Board submission will depend on the answer to the new question, Will the\nproposed work take place in, or affect, an interim multiple dwelling (IMD) unit?\nAnswer Work Location Process\nYes In or affecting an IMD unit File for Loft Board Certification and include a\nNarrative Statement\nNo\nIn a commercial unit and\ndoes not affect an IMD\nUnit\nRequest a Letter of No Objection from the Loft\nBoard\n• Answer the questions about the IMD or Commercial units on the Scope of Work tab.\n• Complete all required sections, including the Documents and S ignatures & Statement tabs.\nSelect Save and Submit the request for review .\nDOB NOW Training\nThe NYC Department of Buildings is conducting free training sessions to explain the new process\nand demonstrate how to navigate Loft Board requests in DOB NOW: Build . Visit the DOB NOW\nTraining Page at nyc.gov/dobnowtraining to regist er for training and to access user manuals\nand training videos.\nFor additional assistance, submit an inquiry nyc.gov/dobnowhelp .",
+              "heading": "PDF page 1",
+              "intro": "",
+              "contentHash": "3f59cec0e8946db320a73934029ba31b14e0216b277916dee24cd5e5a941dfe5",
+              "pageNumber": 1,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1"
+            }
+          ],
+          "sourceContentHash": "3f59cec0e8946db320a73934029ba31b14e0216b277916dee24cd5e5a941dfe5",
+          "sourceValidation": "official_pdf",
+          "pageCount": 1,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        },
+        {
+          "id": "dob-build-release-notes",
+          "title": "DOB NOW: Build release notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "attributedClaims": [
+            {
+              "id": "official-passage-fec304803330bcf0cafe2f48",
+              "text": "[PDF page 19](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=19) — February 2026 - Loft Board Requests in DOB NOW: Build Loft Board Request are to be submitted in DOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certi fic ation has been issued. The Loft Board will also review Certificate of Occupancy request. The type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an interim multiple dwelling (IMD) unit? Visit the DOB NOW Training Page at https://nyc.gov/dobnowtraining for training manuals and step - by - step guides.",
+              "verbatimText": "February 2026 - Loft Board Requests in DOB NOW: Build\nLoft Board Request are to be submitted in DOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property Profile will not\nbe approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certi fic ation\nhas been issued. The Loft Board will also review Certificate of Occupancy request.\nThe type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an\ninterim multiple dwelling (IMD) unit?\nVisit the DOB NOW Training Page at https://nyc.gov/dobnowtraining for training manuals and step - by - step guides.",
+              "heading": "PDF page 19",
+              "intro": "",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "pageNumber": 19,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf#page=19"
+            }
+          ],
+          "sourceContentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+          "sourceValidation": "official_pdf",
+          "pageCount": 159,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        },
+        {
+          "id": "dob-application-guide",
+          "title": "DOB NOW application user guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "attributedClaims": [
+            {
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "text": "[PDF page 19](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=19) — Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST, SE and EA work types) If yes is selected, enter a related New Building, Alteration CO or Alteration with enlargement job filing number. DOB NOW wil l check if there is an approved ZD1 and site safety plan on the related job when the permit is created. In Conjunction New Building BIS Job Numbers Provide any existing New Building BIS job number that is on the same BIN. Related DOB NOW/BIS Job Numbers P rovide any existing job filing numbers that relate to this application and are on the same BIN. Do not inc lude any filings with the same job number (subsequent filings). It always preferred to create subsequent filings rather than adding job filing numbers to this field. Additional Considerations, Limitations or Restrictions Landmark . Approval from the Landmarks Preservation Commission (LPC) is required to ensure that work proposed under the application does not affect the property’s designation, including buildings, structures or places located with in a historic district designated by the LPC or designated as an individual landmark. LPC approved drawings must be submitted prior to filing. This selection is auto - populated if the BIS property profile indicates it is a Landmark. Review is requested under which Building Code. Indicate under which building code the review is being requested — 2022, 2014, 2008, 1968, or prior to 1968. See the 2022 Construction Codes Updates to DOB NOW guide , pages 4 - 6, for code review selection options based on job type, filing date and work type . The below job types are selected when creating the job and cannot be changed in this section. - Alteration required to meet New Building requirements - Alteration is a major change in exits - Alteration in occupancy or use - Alteration is inconsistent with current certificate of occupancy - Alteration in number of stories Loft Board: A Loft Board C ertificate is a R equired Document for alteration of a registered Interim Multiple Dwelling (IMD) building. If the BIS property p rofile indicates t he LOFT designation , ‘Yes’ is auto - populated.",
+              "verbatimText": "Page 19 of 38\nDoes this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type)\nIf yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section.\nIs this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,\nSE and EA work types)\nIf yes is selected, enter a related New Building, Alteration CO or Alteration with enlargement job filing number. DOB NOW wil l check if there is an\napproved ZD1 and site safety plan on the related job when the permit is created.\nIn Conjunction New Building BIS Job Numbers\nProvide any existing New Building BIS job number that is on the same BIN.\nRelated DOB NOW/BIS Job Numbers\nP rovide any existing job filing numbers that relate to this application and are on the same BIN. Do not inc lude any filings with the same job number\n(subsequent filings). It always preferred to create subsequent filings rather than adding job filing numbers to this field.\nAdditional Considerations, Limitations or Restrictions\nLandmark . Approval from the Landmarks Preservation Commission (LPC) is required to ensure that work proposed under the application\ndoes not affect the property’s designation, including buildings, structures or places located with in a historic district designated by the\nLPC or designated as an individual landmark. LPC approved drawings must be submitted prior to filing. This selection is auto - populated\nif the BIS property profile indicates it is a Landmark.\nReview is requested under which Building Code. Indicate under which building code the review is being requested — 2022, 2014, 2008,\n1968, or prior to 1968. See the 2022 Construction Codes Updates to DOB NOW guide , pages 4 - 6, for code review selection options based\non job type, filing date and work type .\nThe below job types are selected when creating the job and cannot be changed in this section.\n- Alteration required to meet New Building requirements\n- Alteration is a major change in exits\n- Alteration in occupancy or use\n- Alteration is inconsistent with current certificate of occupancy\n- Alteration in number of stories\nLoft Board: A Loft Board C ertificate is a R equired Document for alteration of a registered Interim Multiple Dwelling (IMD) building. If the\nBIS property p rofile indicates t he LOFT designation , ‘Yes’ is auto - populated.",
+              "heading": "PDF page 19",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 19,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=19"
+            },
+            {
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "text": "[PDF page 38](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=38) — Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a Design Professional/Licensee Seal and Signature Form (DPL - 1) as a Required Document. The date on the form cannot be more than one year from the date of submission. Owner’s Attestation All job filings in DOB NOW require confirmation from the Owner authorizing the applicant to submit the filing and acknowledging that the information in the application has been reviewed. An Owner provides confirmation by completing the Owner’s Attestation sectio n of the Statements & Signatures tab . Occupied Dwelling Units (Questions 1 - 4) If the owner selects Yes to Question 1, occupied dwelling units during construction , a Tenant Protection Plan (TPP) is required. A TPP is required if residential units will be occupied any time before the permit is signed off by DOB. Questions 3 - 4 determine compliance requirement s with tenant protection laws based on whether residential units are occupied at the time of application. Rent Controlled or Rent Stabilized Housing (Questions 5 - 6) This information is checked with data provided by NYS Homes and Community Renewal (DHCR) if at least one rent - regulated unit is in the building. If there is at least one rent - regulated unit in the building and the owner checks No to Question 5, a document is required confirming the building contains 0 rent controlled/stabilized units and expla ining why the DHCR records are inaccurate. Otherwise, owners must check Yes to Question 5. Loft Board Notification (Question 7) Owners proposing work to convert their loft buildings into legal residences are required to notify the NYC Loft Board at (212 ) 393 - 2603 and ask for the Public Information Officer. Interior Work (Questions 8 - 10) If the proposed work requires a TPP and the owner checks Yes to Questions 8, 9, or 10, a Tenant Protection Plan Compliance special inspection will not be required. Owner Arrears (Questions 11 - 12) This section appears on New Building, Alteration - CO, and Full Demolition filings to comply with Local Law 160 of 2017 . If the owner answers Yes to either question, a list of exceptions will appear as Question 13. If an exception is not selected, a permit cannot be obtaine d.",
+              "verbatimText": "Page 38 of 38\nSTATEMENTS & SIGNATURES\nApplicant o f Record ’s Attestation\nThe applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a\nDesign Professional/Licensee Seal and Signature Form (DPL - 1) as a Required Document. The date on the form cannot be more than one year from\nthe date of submission.\nOwner’s Attestation\nAll job filings in DOB NOW require confirmation from the Owner authorizing the applicant to submit the filing and acknowledging that the\ninformation in the application has been reviewed. An Owner provides confirmation by completing the Owner’s Attestation sectio n of the\nStatements & Signatures tab .\nOccupied Dwelling Units (Questions 1 - 4)\nIf the owner selects Yes to Question 1, occupied dwelling units during construction , a Tenant Protection Plan (TPP) is required. A TPP is required if\nresidential units will be occupied any time before the permit is signed off by DOB. Questions 3 - 4 determine compliance requirement s with tenant\nprotection laws based on whether residential units are occupied at the time of application.\nRent Controlled or Rent Stabilized Housing (Questions 5 - 6)\nThis information is checked with data provided by NYS Homes and Community Renewal (DHCR) if at least one rent - regulated unit is in the building.\nIf there is at least one rent - regulated unit in the building and the owner checks No to Question 5, a document is required confirming the building\ncontains 0 rent controlled/stabilized units and expla ining why the DHCR records are inaccurate. Otherwise, owners must check Yes to Question 5.\nLoft Board Notification (Question 7)\nOwners proposing work to convert their loft buildings into legal residences are required to notify the NYC Loft Board at (212 ) 393 - 2603 and ask for\nthe Public Information Officer.\nInterior Work (Questions 8 - 10)\nIf the proposed work requires a TPP and the owner checks Yes to Questions 8, 9, or 10, a Tenant Protection Plan Compliance special inspection will\nnot be required.\nOwner Arrears (Questions 11 - 12)\nThis section appears on New Building, Alteration - CO, and Full Demolition filings to comply with Local Law 160 of 2017 . If the owner answers Yes to\neither question, a list of exceptions will appear as Question 13. If an exception is not selected, a permit cannot be obtaine d.",
+              "heading": "PDF page 38",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 38,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=38"
+            }
+          ],
+          "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "sourceValidation": "official_pdf",
+          "pageCount": 38,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-023",
+      "inputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "question": "Context: DOB NOW workflow\n\nA filing representative has completed data entry and uploaded the documents. The applicant and owner have not yet completed their attestations.\n\nCan the filing representative attest for them and submit the job filing?",
+      "sourceCount": 2,
+      "passageCount": 4,
+      "passageCharacters": 17718,
+      "requestSHA256": "e7be4d9baa48bcc540b96aaa1503855867262b7e7b62f1b857a1f0ceb0de212f",
+      "sources": [
+        {
+          "id": "dob-application-guide",
+          "title": "DOB NOW application user guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-08",
+          "attributedClaims": [
+            {
+              "id": "official-passage-ce20f813e92241a7bc12804a",
+              "text": "[PDF page 16](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=16) — Page 16 of 38 Stakeholders All stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with information from the eFiling account. Applicant and Owner: Enter the email address associated with the eFiling account of the Applicant and Owner . In most cases, the Applicant is a Registered Architect or Professional Engineer. For the Applicant, also select the License Type and Business Name. For the owner, select the Owner Type. If the Owner Type selected is Non - Profit Organization, NYC Agency, O ther Government Owned or NYCHA/HHC, then the fees will be removed and an ACRIS report is required to verify the building is tax exempt. Filing Representative and Delegated Associates : An email address can also be entered for Filing Representative Class I/ Preparer and Delegated Associates (Filing Representative Class II or Other Licensee). Filing Review Type, Work Type /Filing Includes The Filing includes – select if the application is for New Work or Legalization . This option cannot be changed once the filing fees are paid. If Legalization is selected and there is no OATH summons on the BIN for work without permit (WWP), then a $600 or $6000 fee, depending on the building type, is added to the filing fees as a legalization fee. If legalization is selected and an OATH summons number for WWP is on the BIN, select Yes to the question Are there any OATH/E CB summonses related to this work? and enter the DOB violation or OATH/ECB Summons number(s). When a WWP violation is entered, there is no legalization fee and only a civil penalty for work without permit cal culated as an L2 fee. An L2 is a request for ove rride, reduction or waiver of civil penalties for work without a permit violations. When the L2 request is created, the civil penalty fee has to be paid before the permit is issued. Once legalization is selected on a filing, it results in a no work pe rmit and Post Approval Amendments are not allowed. See 1 RCNY 102 - 04 (b) (7 ) for more information about legalization and civil penalties. The work is being done to legalize work without a permit listed as a violating condition in a Request for Corrective Action ( RCA) issued by DOB? – if Yes is selected, provide the complaint number of the RCA. See 1 RCNY 102 - 06 and the September 2021 Service Notice for information about the Homeowner Relief Program. Filing Review T ype - auto - populated based on the selection made when creating the application and cannot be changed. The below selections are auto - populated based on the selection made when creating the application but can be changed in this section: Is this Application for a Small Business? Is this Application for an approved project under the M ajor Project Developments Program (MPP) ?",
+              "verbatimText": "Page 16 of 38\nStakeholders\nAll stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with\ninformation from the eFiling account.\nApplicant and Owner: Enter the email address associated with the eFiling account of the Applicant and Owner . In most cases, the Applicant is a\nRegistered Architect or Professional Engineer. For the Applicant, also select the License Type and Business Name. For the owner, select the Owner\nType. If the Owner Type selected is Non - Profit Organization, NYC Agency, O ther Government Owned or NYCHA/HHC, then the fees will be removed\nand an ACRIS report is required to verify the building is tax exempt.\nFiling Representative and Delegated Associates : An email address can also be entered for Filing Representative Class I/ Preparer and Delegated\nAssociates (Filing Representative Class II or Other Licensee).\nFiling Review Type, Work Type /Filing Includes\nThe Filing includes – select if the application is for New Work or Legalization . This option cannot be changed once the filing fees are paid.\nIf Legalization is selected and there is no OATH summons on the BIN for work without permit (WWP), then a $600 or $6000 fee, depending on the\nbuilding type, is added to the filing fees as a legalization fee. If legalization is selected and an OATH summons number for WWP is on the BIN,\nselect Yes to the question Are there any OATH/E CB summonses related to this work? and enter the DOB violation or OATH/ECB Summons\nnumber(s). When a WWP violation is entered, there is no legalization fee and only a civil penalty for work without permit cal culated as an L2 fee.\nAn L2 is a request for ove rride, reduction or waiver of civil penalties for work without a permit violations. When the L2 request is created, the civil\npenalty fee has to be paid before the permit is issued. Once legalization is selected on a filing, it results in a no work pe rmit and Post Approval\nAmendments are not allowed. See 1 RCNY 102 - 04 (b) (7 ) for more information about legalization and civil penalties.\nThe work is being done to legalize work without a permit listed as a violating condition in a Request for Corrective Action ( RCA) issued by DOB?\n– if Yes is selected, provide the complaint number of the RCA. See 1 RCNY 102 - 06 and the September 2021 Service Notice for information about the\nHomeowner Relief Program.\nFiling Review T ype - auto - populated based on the selection made when creating the application and cannot be changed.\nThe below selections are auto - populated based on the selection made when creating the application but can be changed in this section:\nIs this Application for a Small Business?\nIs this Application for an approved project under the M ajor Project Developments Program (MPP) ?",
+              "heading": "PDF page 16",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 16,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=16"
+            },
+            {
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "text": "[PDF page 38](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=38) — Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a Design Professional/Licensee Seal and Signature Form (DPL - 1) as a Required Document. The date on the form cannot be more than one year from the date of submission. Owner’s Attestation All job filings in DOB NOW require confirmation from the Owner authorizing the applicant to submit the filing and acknowledging that the information in the application has been reviewed. An Owner provides confirmation by completing the Owner’s Attestation sectio n of the Statements & Signatures tab . Occupied Dwelling Units (Questions 1 - 4) If the owner selects Yes to Question 1, occupied dwelling units during construction , a Tenant Protection Plan (TPP) is required. A TPP is required if residential units will be occupied any time before the permit is signed off by DOB. Questions 3 - 4 determine compliance requirement s with tenant protection laws based on whether residential units are occupied at the time of application. Rent Controlled or Rent Stabilized Housing (Questions 5 - 6) This information is checked with data provided by NYS Homes and Community Renewal (DHCR) if at least one rent - regulated unit is in the building. If there is at least one rent - regulated unit in the building and the owner checks No to Question 5, a document is required confirming the building contains 0 rent controlled/stabilized units and expla ining why the DHCR records are inaccurate. Otherwise, owners must check Yes to Question 5. Loft Board Notification (Question 7) Owners proposing work to convert their loft buildings into legal residences are required to notify the NYC Loft Board at (212 ) 393 - 2603 and ask for the Public Information Officer. Interior Work (Questions 8 - 10) If the proposed work requires a TPP and the owner checks Yes to Questions 8, 9, or 10, a Tenant Protection Plan Compliance special inspection will not be required. Owner Arrears (Questions 11 - 12) This section appears on New Building, Alteration - CO, and Full Demolition filings to comply with Local Law 160 of 2017 . If the owner answers Yes to either question, a list of exceptions will appear as Question 13. If an exception is not selected, a permit cannot be obtaine d.",
+              "verbatimText": "Page 38 of 38\nSTATEMENTS & SIGNATURES\nApplicant o f Record ’s Attestation\nThe applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a\nDesign Professional/Licensee Seal and Signature Form (DPL - 1) as a Required Document. The date on the form cannot be more than one year from\nthe date of submission.\nOwner’s Attestation\nAll job filings in DOB NOW require confirmation from the Owner authorizing the applicant to submit the filing and acknowledging that the\ninformation in the application has been reviewed. An Owner provides confirmation by completing the Owner’s Attestation sectio n of the\nStatements & Signatures tab .\nOccupied Dwelling Units (Questions 1 - 4)\nIf the owner selects Yes to Question 1, occupied dwelling units during construction , a Tenant Protection Plan (TPP) is required. A TPP is required if\nresidential units will be occupied any time before the permit is signed off by DOB. Questions 3 - 4 determine compliance requirement s with tenant\nprotection laws based on whether residential units are occupied at the time of application.\nRent Controlled or Rent Stabilized Housing (Questions 5 - 6)\nThis information is checked with data provided by NYS Homes and Community Renewal (DHCR) if at least one rent - regulated unit is in the building.\nIf there is at least one rent - regulated unit in the building and the owner checks No to Question 5, a document is required confirming the building\ncontains 0 rent controlled/stabilized units and expla ining why the DHCR records are inaccurate. Otherwise, owners must check Yes to Question 5.\nLoft Board Notification (Question 7)\nOwners proposing work to convert their loft buildings into legal residences are required to notify the NYC Loft Board at (212 ) 393 - 2603 and ask for\nthe Public Information Officer.\nInterior Work (Questions 8 - 10)\nIf the proposed work requires a TPP and the owner checks Yes to Questions 8, 9, or 10, a Tenant Protection Plan Compliance special inspection will\nnot be required.\nOwner Arrears (Questions 11 - 12)\nThis section appears on New Building, Alteration - CO, and Full Demolition filings to comply with Local Law 160 of 2017 . If the owner answers Yes to\neither question, a list of exceptions will appear as Question 13. If an exception is not selected, a permit cannot be obtaine d.",
+              "heading": "PDF page 38",
+              "intro": "",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "pageNumber": 38,
+              "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=38"
+            }
+          ],
+          "sourceContentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+          "sourceValidation": "official_pdf",
+          "pageCount": 38,
+          "textlessPages": [],
+          "extractionLimitations": [
+            "PDF text extraction preserves whole pages; diagrams, scanned content, and complex table geometry are not independently verified."
+          ]
+        },
+        {
+          "id": "dob-stakeholder-faq",
+          "title": "DOB NOW: Build FAQs — Owner and Professional Responsibilities",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page",
+          "publisher": "NYC Department of Buildings",
+          "catalogReviewedOn": "2026-09-09",
+          "sectionHeadings": [
+            "Roles & Responsibilities: Owner",
+            "Roles & Responsibilities: Professionals"
+          ],
+          "attributedClaims": [
+            {
+              "id": "official-passage-52cd53d0444cd7a97b11f16e",
+              "text": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — How do I get associated to a job as the owner? — The person who creates the filing (registered design professional, filing representative or owner) enters your email address in the Stakeholders section of the job. Jobs that you are associated with will appear on your dashboard when you log into DOB NOW: Build . An NYC.ID account Is required to access DOB NOW. Go to nyc.gov/dobnow and select create account. You will be redirected to the NYC.ID registration page. Use the email address and password you want associated with all your filings in DOB NOW. After an NYC.ID account is created, login to DOB NOW and create a profile as a non-licensee or licensee. See nyc.gov/dobnowtips for more resources and the NYC.ID New Users Guide (Non-Licensees) for step-by-step instructions\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — I entered my address in my DOB NOW profile but when I login to DOB NOW I do not see all of the filings associated with my address. — The filings listed on your DOB NOW dashboard are associated to your email address, not the property address. When a filing is created in DOB NOW, the licensed professional manually enters the email address provided by the owner in the stakeholder section to associate that person to the filing. When you log into DOB NOW, you are only seeing filings where you have been manually entered as a stakeholder on the filing. The address information that is entered when a DOB NOW profile is created populates in a filing, but the system does not use that information to associate you to filings.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — I already created an NYC.ID account but when my email address is entered into a DOB NOW filing in the owner’s section, my email address is not recognized. — The owner needs to start at the DOB NOW page at www.nyc.gov/dobnow and enter the email address. This will take you (on June 3 or later) to the NYC.ID login page. Log into NYC.ID and then it will take you to the DOB NOW Create Profile Page. Select No, I do not have a DOB issued license, complete the contact information, and select Submit. The account is not authenticated for use in DOB NOW until the profile information is submitted. Once this step is completed, the owner information will populate when an email address is entered into a DOB NOW filing.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — As an owner, what information can I enter and access in DOB NOW: Build ? — Owners can review the filing, complete the Owner’s Attestation section on the Statements and Signatures tab and make payments on their jobs. They can also view all documents that are part of their job.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — As an owner, how do I sign the required documents and when should I do this? — After you review the filing, you must complete the Owner’s Attestation section on the Statements and Signatures tab. The owner must be logged in with the same email address that was entered in the filing under the Owner Information in the Stakeholders section. Open the job from the dashboard and then select the Statements & Signatures tab. Check the box to attest the filing and then select the Save button at the top of the screen.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — Can there be more than one owner listed on the job filing? — Currently, in DOB NOW: Build , a job filing may only have one owner associated.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — How do I change the owner on a job filing? — The new owner will need to log in to DOB NOW: Build and submit a supersede request. From the job filings dashboard, select the Supersede option under the Filing Action column and then select Owner . The owner cannot be changed if a Letter of Completion has been issued for the job or if a Certificate of Occupancy has been issued.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — Can an owner submit a work permit? — On a General Construction (GC) permit only, the owner can be the applicant.",
+              "verbatimText": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — How do I get associated to a job as the owner? — The person who creates the filing (registered design professional, filing representative or owner) enters your email address in the Stakeholders section of the job. Jobs that you are associated with will appear on your dashboard when you log into DOB NOW: Build . An NYC.ID account Is required to access DOB NOW. Go to nyc.gov/dobnow and select create account. You will be redirected to the NYC.ID registration page. Use the email address and password you want associated with all your filings in DOB NOW. After an NYC.ID account is created, login to DOB NOW and create a profile as a non-licensee or licensee. See nyc.gov/dobnowtips for more resources and the NYC.ID New Users Guide (Non-Licensees) for step-by-step instructions\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — I entered my address in my DOB NOW profile but when I login to DOB NOW I do not see all of the filings associated with my address. — The filings listed on your DOB NOW dashboard are associated to your email address, not the property address. When a filing is created in DOB NOW, the licensed professional manually enters the email address provided by the owner in the stakeholder section to associate that person to the filing. When you log into DOB NOW, you are only seeing filings where you have been manually entered as a stakeholder on the filing. The address information that is entered when a DOB NOW profile is created populates in a filing, but the system does not use that information to associate you to filings.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — I already created an NYC.ID account but when my email address is entered into a DOB NOW filing in the owner’s section, my email address is not recognized. — The owner needs to start at the DOB NOW page at www.nyc.gov/dobnow and enter the email address. This will take you (on June 3 or later) to the NYC.ID login page. Log into NYC.ID and then it will take you to the DOB NOW Create Profile Page. Select No, I do not have a DOB issued license, complete the contact information, and select Submit. The account is not authenticated for use in DOB NOW until the profile information is submitted. Once this step is completed, the owner information will populate when an email address is entered into a DOB NOW filing.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — As an owner, what information can I enter and access in DOB NOW: Build ? — Owners can review the filing, complete the Owner’s Attestation section on the Statements and Signatures tab and make payments on their jobs. They can also view all documents that are part of their job.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — As an owner, how do I sign the required documents and when should I do this? — After you review the filing, you must complete the Owner’s Attestation section on the Statements and Signatures tab. The owner must be logged in with the same email address that was entered in the filing under the Owner Information in the Stakeholders section. Open the job from the dashboard and then select the Statements & Signatures tab. Check the box to attest the filing and then select the Save button at the top of the screen.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — Can there be more than one owner listed on the job filing? — Currently, in DOB NOW: Build , a job filing may only have one owner associated.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — How do I change the owner on a job filing? — The new owner will need to log in to DOB NOW: Build and submit a supersede request. From the job filings dashboard, select the Supersede option under the Filing Action column and then select Owner . The owner cannot be changed if a Letter of Completion has been issued for the job or if a Certificate of Occupancy has been issued.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Owner — Can an owner submit a work permit? — On a General Construction (GC) permit only, the owner can be the applicant.",
+              "heading": "Roles & Responsibilities: Owner",
+              "intro": "",
+              "contentHash": "1abbe5ec6d42a930f1d8b703dce593b7fddebb6b75df742e2083bb38dd9083cf"
+            },
+            {
+              "id": "official-passage-936f54eb8adc1d1db98aa991",
+              "text": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Design Professional, what information can I enter and access in DOB NOW: Build ? — Design Professionals can enter, update and view all filing information that they are associated with, and submit completed filings. They can also make payments on jobs that they are associated with. Design Professionals can also overwrite any data entry in the application that was entered by a Licensed Professional except information in the Statements and Signatures tab.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Can a Registered Design Professional submit a work permit? — Registered Architects (RA) or Professional Engineers (PE) can submit a work permit. They are required to enter insurance information and upload a certificate of insurance in the Documents section of the permit application.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I see the Plan Examiner’s comments? — Plan Examiners will enter comments on the drawings and upload the marked-up plans. When Design Professionals log into the portal, they can download the marked-up plans. The Plan Examiner will also create Objections on the filing if applicable that can be viewed on the Objections/Appointments tab of the filing.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — When do I need to identify the progress/special inspector for Technical Reports? — The Technical Reports do not need to be identified until the permit is created. A job filing can be submitted and approved without identifying the progress/special inspector.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — For a Technical Report, I entered the Special Inspector’s agency number and email address but got a message that the license is invalid. The agency is valid, what is the problem? — The Special Inspection Agency has to be approved for that specific Special Inspection type. For a list of the approved Special Inspections for the Special Inspector, look up the SIA using the Skilled Trades Licensees Search in the Buildings Information System .\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Where do the Design Professional and Owner provide their authorized electronic signature on the PW2 form? — The Design Professional and Owner attest on the Plans/Work (PW1) section of the filing, not the permit (PW2).\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Licensed Contractor, what information can I enter and access in DOB NOW: Build ? — Licensed Contractors can enter and submit information for work permits (PW2) and After Hour Variance (AHV) permits. They can view all data (PW1, Scope of Work, PW3 and Technical Reports) that is part of the filing. They can also make payments on jobs that they are associated with.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Licensed Contractor, will I be able to edit a PW1? — No. The Licensed Contractor cannot enter data into the PW1, Scope of Work, PW3 or Technical Reports.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Licensed Contractor, will I be able to pull a permit if my insurance or license is expired? — No, you will receive a notification that the insurance or license has expired and you will be unable to submit the PW2.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I sign and seal my filing in DOB NOW: Build ? — Design Professionals and Licensed Contractors must electronically sign in DOB NOW: Build . Electronic signatures are completed in the Statements and Signatures tab. In addition, Design Professional and Licensed Contractors must physically sign and seal the Statements and Signatures form and upload the completed document for the associated required item.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I provide my signature and seal electronically in DOB NOW: Build ? — Design Professionals and Licensed Contractors must upload the completed Design Professional/Licensee Seal and Signature form (DPL-1 Form) with their signature and seal in the required documents section of DOB NOW: Build .\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — What are the safeguards against someone using my seal and signature in DOB NOW: Build ? — Only the Design Professional or Licensed Contractor may upload the completed Design Professional/Licensee Seal and Signature form. This submitted form is then validated to the licensee registration information.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Filing Representative, what information can I enter and access in DOB NOW: Build ? — Filing Representatives can enter and view all filing information (PW1, Scope of Work, PW3, Technical Reports and PW2) that are part of the filing. They can make payments on jobs that they are associated with. They cannot upload plans or submit filings/permits.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How can a filing representative see what needs to be completed on an application before it is submitted by the applicant? — Filing representatives now have the capability to select the Preview to File button to see what is needed to proceed with the filing.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Can a filing representative submit a work permit? — No, a filing representative can do the data entry of the work permit application but only the applicant of the permit (contractor) can submit it.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — When can a Registered Landscape Architect (RLA) be the applicant on a job filing? — An RLA can only file Builders Pavement Plan (BPP), Curb Cut (CC), and Earthwork (EA) jobs. BPP is still filed in BIS/eFiling. Curb Cut and Earthwork are filed in DOB NOW: Build. Earthwork includes a Landscape subcategory, which replaces the prior OT/LAN work type in BIS/eFiling. For other work types, DOB NOW limits the license type to only Registered Architect (RA) and Professional Engineer (PE). If RLAs needs to be associated to other work types, they can be added under the Preparer or Delegated Associates sections.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I know if the final inspection on a job is to be performed by a Registered Design Professional or the Department of Buildings? — The final inspection requirements for alteration filings are determined by the work type. A registered design professional performs the final inspection (Technical Report-Final) for the individual work types below: Antenna Earthwork Foundation Green Roof Mechanical Systems Solar Structural The final inspection for the General Construction (Alteration) work types may be performed by either the Department of Buildings or a registered design professional. The PW1 includes a question in the Filing Includes section to select the final inspection options. See the February 2020 Service Notice for a list of the final inspection requirements by work type and Buildings Bulletin 2020-011 for more information.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Where can I find information on Technical Reports for Special/Progress Inspections and Energy Code Progress Inspections? — See the Technical Reports Guide for a list of inspections and the applicable work types.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I remove the certification on a Technical Report-Final to continue work or file a PAA? — The Progress Inspector can remove certification from the Technical Report Final by logging in, editing the Technical Report and selecting the “Remove Certification” option. This option changes the permit status from Signed Off to Permit Issued and allows a PAA to be created.",
+              "verbatimText": "DOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Design Professional, what information can I enter and access in DOB NOW: Build ? — Design Professionals can enter, update and view all filing information that they are associated with, and submit completed filings. They can also make payments on jobs that they are associated with. Design Professionals can also overwrite any data entry in the application that was entered by a Licensed Professional except information in the Statements and Signatures tab.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Can a Registered Design Professional submit a work permit? — Registered Architects (RA) or Professional Engineers (PE) can submit a work permit. They are required to enter insurance information and upload a certificate of insurance in the Documents section of the permit application.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I see the Plan Examiner’s comments? — Plan Examiners will enter comments on the drawings and upload the marked-up plans. When Design Professionals log into the portal, they can download the marked-up plans. The Plan Examiner will also create Objections on the filing if applicable that can be viewed on the Objections/Appointments tab of the filing.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — When do I need to identify the progress/special inspector for Technical Reports? — The Technical Reports do not need to be identified until the permit is created. A job filing can be submitted and approved without identifying the progress/special inspector.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — For a Technical Report, I entered the Special Inspector’s agency number and email address but got a message that the license is invalid. The agency is valid, what is the problem? — The Special Inspection Agency has to be approved for that specific Special Inspection type. For a list of the approved Special Inspections for the Special Inspector, look up the SIA using the Skilled Trades Licensees Search in the Buildings Information System .\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Where do the Design Professional and Owner provide their authorized electronic signature on the PW2 form? — The Design Professional and Owner attest on the Plans/Work (PW1) section of the filing, not the permit (PW2).\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Licensed Contractor, what information can I enter and access in DOB NOW: Build ? — Licensed Contractors can enter and submit information for work permits (PW2) and After Hour Variance (AHV) permits. They can view all data (PW1, Scope of Work, PW3 and Technical Reports) that is part of the filing. They can also make payments on jobs that they are associated with.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Licensed Contractor, will I be able to edit a PW1? — No. The Licensed Contractor cannot enter data into the PW1, Scope of Work, PW3 or Technical Reports.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Licensed Contractor, will I be able to pull a permit if my insurance or license is expired? — No, you will receive a notification that the insurance or license has expired and you will be unable to submit the PW2.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I sign and seal my filing in DOB NOW: Build ? — Design Professionals and Licensed Contractors must electronically sign in DOB NOW: Build . Electronic signatures are completed in the Statements and Signatures tab. In addition, Design Professional and Licensed Contractors must physically sign and seal the Statements and Signatures form and upload the completed document for the associated required item.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I provide my signature and seal electronically in DOB NOW: Build ? — Design Professionals and Licensed Contractors must upload the completed Design Professional/Licensee Seal and Signature form (DPL-1 Form) with their signature and seal in the required documents section of DOB NOW: Build .\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — What are the safeguards against someone using my seal and signature in DOB NOW: Build ? — Only the Design Professional or Licensed Contractor may upload the completed Design Professional/Licensee Seal and Signature form. This submitted form is then validated to the licensee registration information.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — As a Filing Representative, what information can I enter and access in DOB NOW: Build ? — Filing Representatives can enter and view all filing information (PW1, Scope of Work, PW3, Technical Reports and PW2) that are part of the filing. They can make payments on jobs that they are associated with. They cannot upload plans or submit filings/permits.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How can a filing representative see what needs to be completed on an application before it is submitted by the applicant? — Filing representatives now have the capability to select the Preview to File button to see what is needed to proceed with the filing.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Can a filing representative submit a work permit? — No, a filing representative can do the data entry of the work permit application but only the applicant of the permit (contractor) can submit it.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — When can a Registered Landscape Architect (RLA) be the applicant on a job filing? — An RLA can only file Builders Pavement Plan (BPP), Curb Cut (CC), and Earthwork (EA) jobs. BPP is still filed in BIS/eFiling. Curb Cut and Earthwork are filed in DOB NOW: Build. Earthwork includes a Landscape subcategory, which replaces the prior OT/LAN work type in BIS/eFiling. For other work types, DOB NOW limits the license type to only Registered Architect (RA) and Professional Engineer (PE). If RLAs needs to be associated to other work types, they can be added under the Preparer or Delegated Associates sections.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I know if the final inspection on a job is to be performed by a Registered Design Professional or the Department of Buildings? — The final inspection requirements for alteration filings are determined by the work type. A registered design professional performs the final inspection (Technical Report-Final) for the individual work types below: Antenna Earthwork Foundation Green Roof Mechanical Systems Solar Structural The final inspection for the General Construction (Alteration) work types may be performed by either the Department of Buildings or a registered design professional. The PW1 includes a question in the Filing Includes section to select the final inspection options. See the February 2020 Service Notice for a list of the final inspection requirements by work type and Buildings Bulletin 2020-011 for more information.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — Where can I find information on Technical Reports for Special/Progress Inspections and Energy Code Progress Inspections? — See the Technical Reports Guide for a list of inspections and the applicable work types.\n\nDOB NOW: Build Frequently Asked Questions > Roles & Responsibilities: Professionals — How do I remove the certification on a Technical Report-Final to continue work or file a PAA? — The Progress Inspector can remove certification from the Technical Report Final by logging in, editing the Technical Report and selecting the “Remove Certification” option. This option changes the permit status from Signed Off to Permit Issued and allows a PAA to be created.",
+              "heading": "Roles & Responsibilities: Professionals",
+              "intro": "",
+              "contentHash": "1abbe5ec6d42a930f1d8b703dce593b7fddebb6b75df742e2083bb38dd9083cf"
+            }
+          ],
+          "sourceContentHash": "1abbe5ec6d42a930f1d8b703dce593b7fddebb6b75df742e2083bb38dd9083cf",
+          "sourceValidation": "official_html"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Fetched-source and request-factory checks do not establish live semantic quality or latency.",
+    "The Loft Board service notice supplies text missing from the release-note image table. This is not general OCR support.",
+    "All 110 cases and their existing acceptance gaps remain in scope. This inspection does not approve any answer."
+  ]
+}

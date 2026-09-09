@@ -1,0 +1,46 @@
+{
+  "schema": "permitext-dob-loft-service-document-v1",
+  "retrievedAt": "2026-09-09",
+  "purpose": "Fetched source text for offline retrieval tests, with development visual comparison of the two source tables. Runtime still fetches and validates source bytes; this fixture confers no visual verification on future source versions.",
+  "source": {
+    "id": "dob-loft-board-service-notice",
+    "title": "Loft Board Requests in DOB NOW: Build service notice",
+    "url": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf",
+    "publisher": "NYC Department of Buildings",
+    "catalogReviewedOn": "2026-09-09"
+  },
+  "document": {
+    "url": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf",
+    "format": "pdf",
+    "pageCount": 1,
+    "textlessPages": [],
+    "passages": [
+      {
+        "index": 0,
+        "kind": "pdf_page",
+        "heading": "PDF page 1",
+        "intro": "",
+        "text": "Yegal Shamash , PE, Acting Commissioner nyc.gov/buildings\nbuild safe | live safe\nJanuary 8 , 20 2 6\nSERVICE NOTICE\nJune 2010 Loft Board Requests in DOB NOW : Build\nStarting on February 2 , 2026, Loft Board requests will be submitted in\nDOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property\nProfile will not be approved until a Loft Board Request has been submitted\nfor review and a Letter of No Objection (LNO) or a Loft Board Certification has\nbeen issued. The Loft Board will also review Certificate of Occupancy request .\nSubmit a Loft Board Request\nLoft Board requests are always submitted in conjunction with a job filing (including Elevator\napplications). Once the job filing is submitted, a Loft Board request is required to be added to the\nfiling for review .\n• Go to the Loft Board tab and select +Add to create a new Loft Board request.\n• The request is auto populated with the information entered on the job filing.\n• The type of Loft Board submission will depend on the answer to the new question, Will the\nproposed work take place in, or affect, an interim multiple dwelling (IMD) unit?\nAnswer Work Location Process\nYes In or affecting an IMD unit File for Loft Board Certification and include a\nNarrative Statement\nNo\nIn a commercial unit and\ndoes not affect an IMD\nUnit\nRequest a Letter of No Objection from the Loft\nBoard\n• Answer the questions about the IMD or Commercial units on the Scope of Work tab.\n• Complete all required sections, including the Documents and S ignatures & Statement tabs.\nSelect Save and Submit the request for review .\nDOB NOW Training\nThe NYC Department of Buildings is conducting free training sessions to explain the new process\nand demonstrate how to navigate Loft Board requests in DOB NOW: Build . Visit the DOB NOW\nTraining Page at nyc.gov/dobnowtraining to regist er for training and to access user manuals\nand training videos.\nFor additional assistance, submit an inquiry nyc.gov/dobnowhelp .",
+        "claim": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1) — Yegal Shamash , PE, Acting Commissioner nyc.gov/buildings build safe | live safe January 8 , 20 2 6 SERVICE NOTICE June 2010 Loft Board Requests in DOB NOW : Build Starting on February 2 , 2026, Loft Board requests will be submitted in DOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certification has been issued. The Loft Board will also review Certificate of Occupancy request . Submit a Loft Board Request Loft Board requests are always submitted in conjunction with a job filing (including Elevator applications). Once the job filing is submitted, a Loft Board request is required to be added to the filing for review . • Go to the Loft Board tab and select +Add to create a new Loft Board request. • The request is auto populated with the information entered on the job filing. • The type of Loft Board submission will depend on the answer to the new question, Will the proposed work take place in, or affect, an interim multiple dwelling (IMD) unit? Answer Work Location Process Yes In or affecting an IMD unit File for Loft Board Certification and include a Narrative Statement No In a commercial unit and does not affect an IMD Unit Request a Letter of No Objection from the Loft Board • Answer the questions about the IMD or Commercial units on the Scope of Work tab. • Complete all required sections, including the Documents and S ignatures & Statement tabs. Select Save and Submit the request for review . DOB NOW Training The NYC Department of Buildings is conducting free training sessions to explain the new process and demonstrate how to navigate Loft Board requests in DOB NOW: Build . Visit the DOB NOW Training Page at nyc.gov/dobnowtraining to regist er for training and to access user manuals and training videos. For additional assistance, submit an inquiry nyc.gov/dobnowhelp .",
+        "pageNumber": 1,
+        "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf#page=1",
+        "contentHash": "3f59cec0e8946db320a73934029ba31b14e0216b277916dee24cd5e5a941dfe5",
+        "id": "official-passage-ffd509d49c4ae45b17b8ff3d"
+      }
+    ]
+  },
+  "visualReview": {
+    "reviewedOn": "2026-09-09",
+    "serviceNotice": {
+      "page": 1,
+      "sha256": "3f59cec0e8946db320a73934029ba31b14e0216b277916dee24cd5e5a941dfe5",
+      "imageSHA256": "81280207b078ef3c05c07a4823773a5e96d26dad70709543d4214fadd3004543"
+    },
+    "releaseNotes": {
+      "page": 19,
+      "sha256": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+      "imageSHA256": "2fce09eb97a652863618cbed9540f61c68974c7c7f5af41f9860fa8f6c756f81"
+    },
+    "finding": "Both rendered tables map Yes / In or affecting an IMD unit to Loft Board Certification and Narrative Statement. No / commercial unit not affecting an IMD unit maps to Letter of No Objection. The release-note extraction omits the image table; the service-notice extraction retains its text. Hidden June 2010 text in service notice extraction is not its visible January 8, 2026 issue date."
+  }
+}
