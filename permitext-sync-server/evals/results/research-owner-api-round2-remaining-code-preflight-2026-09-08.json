@@ -1,0 +1,413 @@
+{
+  "schema": "permitext-owner-api-round2-remaining-code-v1",
+  "sourceCommit": "3dd14d266ba31d4df51306946e7448bb1c115c2f",
+  "authorization": "Owner explicitly authorized fresh API tests with $8 currently available and requested notice if more is needed. This is a new $8 round; historical costs stay separate. This single-use batch checks the four remaining owner code cases and dispatches only turns that fit the offline preflight. Maximum $2.00 for the batch within the remaining $8 round allowance. Each next turn requires a full $0.50 remaining conservative allowance. No Project workflow tests or deployment.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 2.687125,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 2,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 4,
+  "maximumProviderRequests": 20,
+  "maximumProviderRequestsPerTurn": 5,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual automatic-retrieval HTTP Research flow on isolated local accounts and storage. Expected answers are not supplied to drafting or verification. Existing automatic web support and official-document validation remain enabled. Offline preflight intercepts every provider call and forbids document network access. Live document reads are limited to HTTPS GETs on the configured official domains. Preflight-blocked turns are skipped without spending. No public eligibility, deployment, Project workflow or phone changes.",
+  "cases": [
+    "GAP-03",
+    "GAP-08",
+    "MC-09",
+    "MC-13"
+  ],
+  "sourceHashes": {
+    "app.mjs": "076d78638b821139282aba9f8bf01e2159f72f4966a92d614dd9cb0e27ee7d76",
+    "research-conversation-facts.mjs": "a8ae9fe2815d17f1cbd61d1995f4ad311bdf3267904ed52bdc070b73b7e57213",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-source-policy.mjs": "5f500df2a6970b558d1089bad08b7e7bec2dad87e5f4f45d79e4f07f6364f804",
+    "research-official-html-attribution.mjs": "1df895ea6b221335f4e1daebf2d7d881d5a3a93e0a3910f43a9146b9cc3491ee",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "525ed1ae6faa3640926462d9dd423bc3ea17b1261cde3d94d3a3a26b37039104",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "d61971dfb9c6295e2ddf38d0298645c0a59f788e2fbf119feb352e5ae33ac744",
+    "research-evidence-assembly.mjs": "365c5f7fc87041479ef2bc373e76fbc365e841f5532acc63b6528a6da2be7663",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "15e7dc17bd9ff1fa69938ba13b35686d56ee2cf5178a9350f1f5b5199e0ee97f",
+    "evals/research-reconciled-answer-key.json": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "eef06bb4d0acf230929cb355f15427d197f7f20c961651feaa8f2003d57dea54",
+    "scripts/run-research-owner-api-round2-remaining-code-20260908.mjs": "d3d00c4fda3660ae61609414367beef0576b215b8a027600c9fb575ed42b095d"
+  },
+  "startedAt": "2026-09-09T00:52:50.400Z",
+  "status": "preflight-passed",
+  "results": [
+    {
+      "id": "GAP-03",
+      "question": "A minor alteration qualifies for an exemption from the DOB permit requirement. Does that exemption also mean the work may disregard an otherwise applicable zoning or Construction Code requirement?",
+      "inputSHA256": "786f4d5e5b5fe8d48f636d4e0536511ad7ad67b65769c33e1e48f948f9218497",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-blocked",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "d9bddf063c31c12dc6fb6489d0890cbc2b5866fc9edfadc742f7514d620b9f47",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 2169,
+      "interceptCount": 2,
+      "durationMilliseconds": 4623,
+      "httpStatus": 503,
+      "initialMaximumUSD": 0.289397,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "0141b64c-8d53-4cd8-850e-5ed2e227aaff",
+          "createdAt": "2026-09-09T00:52:51.421Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0.06,
+          "durationMilliseconds": 4543,
+          "failureCode": "RESEARCH_SPEND_CAP",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": true,
+          "webSupportSearched": true,
+          "pricingVersion": null
+        }
+      ],
+      "error": {
+        "error": "Research is temporarily unavailable. Your question is still here.",
+        "code": "RESEARCH_SPEND_CAP",
+        "status": 503,
+        "message": "Research is temporarily unavailable. Your question is still here."
+      }
+    },
+    {
+      "id": "GAP-08",
+      "question": "DOB later discovers that a permit application contained a material false statement that affected issuance of the permit. Can the permit be revoked even though construction has already started?",
+      "inputSHA256": "d24e447e97c5d5bc2ff29275dfae6aaad12f7ad75cf073aa48e57a4c50a0da13",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "97dc2c2a9df7b684765af937cc95d2476cd69846c409d8118cf5128319de4d2a",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 2288,
+      "interceptCount": 3,
+      "durationMilliseconds": 822,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.289457,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "f6c959f1-6ffa-42e3-b79b-089ca66ee2e6",
+          "createdAt": "2026-09-09T00:52:56.562Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 3,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0.06,
+          "durationMilliseconds": 779,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": true,
+          "webSupportSearched": true,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "MC-09",
+      "question": "An environmental exhaust outlet is located four feet horizontally from a mechanical outdoor-air intake. No special exception or engineered re-entrainment analysis is identified. Is four feet enough?",
+      "inputSHA256": "507fe315d964a751d4b9e66008989180582ca797e191a4cd21e4cabbfc54127a",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-blocked",
+      "maximumTurnSpendUSD": 0.5,
+      "durationMilliseconds": 1689,
+      "httpStatus": 503,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "f96c18e2-1a6d-4933-bdbe-7e6d2a5abda2",
+          "createdAt": "2026-09-09T00:52:57.466Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 0,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 1651,
+          "failureCode": "RESEARCH_SPEND_CAP",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ],
+      "error": {
+        "error": "Research is temporarily unavailable. Your question is still here.",
+        "code": "RESEARCH_SPEND_CAP",
+        "status": 503,
+        "message": "Research is temporarily unavailable. Your question is still here."
+      }
+    },
+    {
+      "id": "MC-13",
+      "question": "A commercial kitchen appliance is classified as medium-duty cooking equipment and produces grease-laden vapors. Can it be installed under a Type II hood because the kitchen has only one appliance?",
+      "inputSHA256": "be185cd980afb23f2dbf1fca8b1268a6a28c96864b9d9848a8943e59100bd1a2",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "preflight-blocked",
+      "maximumTurnSpendUSD": 0.5,
+      "durationMilliseconds": 1384,
+      "httpStatus": 503,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "d0801371-da9d-4a60-8997-1382e0e196da",
+          "createdAt": "2026-09-09T00:52:59.267Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 0,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 1347,
+          "failureCode": "RESEARCH_SPEND_CAP",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ],
+      "error": {
+        "error": "Research is temporarily unavailable. Your question is still here.",
+        "code": "RESEARCH_SPEND_CAP",
+        "status": 503,
+        "message": "Research is temporarily unavailable. Your question is still here."
+      }
+    }
+  ],
+  "providerCalls": [],
+  "documentRequests": [],
+  "completedAt": "2026-09-09T00:53:00.701Z",
+  "spend": {
+    "active": true,
+    "capUSD": 2,
+    "reservedUSD": 0,
+    "actualUSD": 0,
+    "requestCount": 8,
+    "pendingRequestCount": 0
+  }
+}

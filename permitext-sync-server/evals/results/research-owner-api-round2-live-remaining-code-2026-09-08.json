@@ -1,0 +1,1568 @@
+{
+  "schema": "permitext-owner-api-round2-remaining-code-v1",
+  "sourceCommit": "3dd14d266ba31d4df51306946e7448bb1c115c2f",
+  "authorization": "Owner explicitly authorized fresh API tests with $8 currently available and requested notice if more is needed. This is a new $8 round; historical costs stay separate. This single-use batch checks the four remaining owner code cases and dispatches only turns that fit the offline preflight. Maximum $2.00 for the batch within the remaining $8 round allowance. Each next turn requires a full $0.50 remaining conservative allowance. No Project workflow tests or deployment.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 2.687125,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 2,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 4,
+  "maximumProviderRequests": 20,
+  "maximumProviderRequestsPerTurn": 5,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual automatic-retrieval HTTP Research flow on isolated local accounts and storage. Expected answers are not supplied to drafting or verification. Existing automatic web support and official-document validation remain enabled. Offline preflight intercepts every provider call and forbids document network access. Live document reads are limited to HTTPS GETs on the configured official domains. Preflight-blocked turns are skipped without spending. No public eligibility, deployment, Project workflow or phone changes.",
+  "cases": [
+    "GAP-03",
+    "GAP-08",
+    "MC-09",
+    "MC-13"
+  ],
+  "preflightSHA256": "d916db5cd685714a6a483fe15f2fa58e7f5a98e71e31bdaccc99da461e325483",
+  "sourceHashes": {
+    "app.mjs": "076d78638b821139282aba9f8bf01e2159f72f4966a92d614dd9cb0e27ee7d76",
+    "research-conversation-facts.mjs": "a8ae9fe2815d17f1cbd61d1995f4ad311bdf3267904ed52bdc070b73b7e57213",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-source-policy.mjs": "5f500df2a6970b558d1089bad08b7e7bec2dad87e5f4f45d79e4f07f6364f804",
+    "research-official-html-attribution.mjs": "1df895ea6b221335f4e1daebf2d7d881d5a3a93e0a3910f43a9146b9cc3491ee",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "525ed1ae6faa3640926462d9dd423bc3ea17b1261cde3d94d3a3a26b37039104",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "d61971dfb9c6295e2ddf38d0298645c0a59f788e2fbf119feb352e5ae33ac744",
+    "research-evidence-assembly.mjs": "365c5f7fc87041479ef2bc373e76fbc365e841f5532acc63b6528a6da2be7663",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "15e7dc17bd9ff1fa69938ba13b35686d56ee2cf5178a9350f1f5b5199e0ee97f",
+    "evals/research-reconciled-answer-key.json": "086ec1d59f481f06113516dced9eda4d435f621737aa2047fa60b73c569b9740",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "eef06bb4d0acf230929cb355f15427d197f7f20c961651feaa8f2003d57dea54",
+    "scripts/run-research-owner-api-round2-remaining-code-20260908.mjs": "d3d00c4fda3660ae61609414367beef0576b215b8a027600c9fb575ed42b095d"
+  },
+  "startedAt": "2026-09-09T00:53:21.218Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "GAP-08",
+      "question": "DOB later discovers that a permit application contained a material false statement that affected issuance of the permit. Can the permit be revoked even though construction has already started?",
+      "inputSHA256": "d24e447e97c5d5bc2ff29275dfae6aaad12f7ad75cf073aa48e57a4c50a0da13",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "97dc2c2a9df7b684765af937cc95d2476cd69846c409d8118cf5128319de4d2a",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 2288,
+      "durationMilliseconds": 22863,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.289457,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "3e304aef-5a4d-483f-a2ab-6aabcb5ea226",
+          "createdAt": "2026-09-09T00:53:21.741Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-luna",
+            "gpt-5.6-terra"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 3,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 47870,
+          "cachedInputTokens": 3011,
+          "cacheWriteInputTokens": 25450,
+          "outputTokens": 1514,
+          "totalTokens": 49384,
+          "estimatedCostUSD": 0.077616,
+          "actualProviderCostUSD": 0.077615,
+          "conservativeProviderCostUSD": 0.12384,
+          "durationMilliseconds": 22800,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": true,
+          "webSupportSearched": true,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+        "evidenceVersion": "20260908-focused-ventilation-v30:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-09T00:53:21.931Z"
+        },
+        "answerText": "**Yes—construction having started does not bar revocation.** The commissioner is authorized to suspend or revoke a permit, and may revoke it when there was a false statement or misrepresentation of a material fact in the application or submittal documents on which the approval was issued (AC §§ 28-105.10, 28-105.10.1).\n\nBefore revocation, DOB must give the permit holder written notice stating the reasons for the proposed revocation and the applicant’s right to submit information opposing revocation within **10 business days** after hand or electronic delivery, or **15 business days** after mailed notice. The notice may be accompanied by a stop-work order; separately, a stop-work order may be issued when a proposed-revocation notice has been issued (AC §§ 28-105.10.1, 28-207.2). The supplied enacted text contains no exception that prevents revocation because work has begun.",
+        "conclusion": "**Yes—construction having started does not bar revocation.** The commissioner is authorized to suspend or revoke a permit, and may revoke it when there was a false statement or misrepresentation of a material fact in the application or submittal documents on which the approval was issued (AC §§ 28-105.10, 28-105.10.1).",
+        "supportedPoints": [
+          {
+            "heading": "Authority to revoke an issued permit",
+            "explanation": "The commissioner is expressly authorized to suspend or revoke a permit issued under the Construction Code. The authorization applies to an issued permit and is not limited by whether construction has commenced.",
+            "sectionID": "9015",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9015-2"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Material false statement is a revocation ground",
+            "explanation": "The commissioner may revoke a permit when an application or submittal document contained a false statement or misrepresentation as to a material fact upon which the approval was issued. The provision supplies no construction-started exception.",
+            "sectionID": "9016",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9016-1"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Notice, response opportunity, and potential stop-work order",
+            "explanation": "The proposed-revocation notice must state the reasons and advise of the opportunity to provide information against revocation within 10 business days after hand or electronic delivery, or 15 business days after notice is posted by mail. The notice may be accompanied by a stop-work order, and a stop-work order may be issued once a notice of proposed revocation has been issued.",
+            "sectionID": "9016",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9016-1",
+              "research-permitext_cross_reference-id:9335-3"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "Before revocation, DOB must give the permit holder written notice stating the reasons for the proposed revocation and the applicant’s right to submit information opposing revocation within **10 business days** after hand or electronic delivery, or **15 business days** after mailed notice. The notice may be accompanied by a stop-work order; separately, a stop-work order may be issued when a proposed-revocation notice has been issued (AC §§ 28-105.10.1, 28-207.2). The supplied enacted text contains no exception that prevents revocation because work has begun.",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This answer is limited to the supplied 2022 NYC Administrative Code provisions and addresses revocation authority and the stated notice/response procedure; it does not determine whether a particular statement was false, material, or a basis for the issued approval."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "9015",
+            "sectionNumber": "28-105.10",
+            "title": "§ 28-105.10 Suspension or revocation of permit.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9015-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:9015-2",
+                "selectedText": "28-105.10 § 28-105.10 Suspension or revocation of permit. The commissioner is authorized to suspend or revoke a permit issued under the provisions of this code.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the commissioner’s authority to suspend or revoke an issued permit."
+          },
+          {
+            "sectionID": "9016",
+            "sectionNumber": "28-105.10.1",
+            "title": "§ 28-105.10.1 Notice of proposed revocation.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:9016-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:9016-1",
+                "selectedText": "28-105.10.1 § 28-105.10.1 Notice of proposed revocation. The commissioner may, on written notice to the permit holder, revoke any permit for failure to comply with the provisions of this code or other applicable laws or rules; or whenever there has been any false statement or any misrepresentation as to a material fact in the application or submittal documents upon the basis of which such approval was issued; or whenever a permit has been issued in error and conditions are such that the permit should not have been issued. Such notice may be accompanied by a stop work order pursuant to section 28-207.2 and shall inform the permit holder of the reasons for the proposed revocation and that the applicant has the right to present to the commissioner or his or her representative within 10 business days of delivery of the notice by hand or electronic delivery or 15 business days of the posting of notice by mail, information as to why the permit should not be revoked. (Am. L.L. 2019/062, 3/31/2019, eff. 9/27/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 .",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the material-false-statement revocation ground and notice/response procedure."
+          },
+          {
+            "sectionID": "9335",
+            "sectionNumber": "28-207.2",
+            "title": "§ 28-207.2 Stop work orders.",
+            "codePrefix": "AC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_cross_reference-id:9335-3"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_cross_reference-id:9335-3",
+                "selectedText": "28-207.2 § 28-207.2 Stop work orders. Whenever the commissioner has issued a notice of proposed revocation pursuant to section 28-105.10.1 of this code or finds that any building work is being executed in violation of the provisions of this code, the 1968 building code, the zoning resolution or of any laws or rules enforced by the department, or in a dangerous or unsafe manner, or, if the department of health and mental hygiene makes a referral to the department regarding unsafe lead work practices, the commissioner or his or her authorized representative may issue a stop work order. (Am. L.L. 2019/062, 3/31/2019, eff. 9/27/2019; Am. L.L. 2021/040, 4/18/2021, eff. 4/18/2022)",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "supporting",
+            "relevance": "Establishes that a stop-work order may be issued after a notice of proposed revocation."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "9016",
+          "9015",
+          "8983",
+          "9373",
+          "9306",
+          "9752",
+          "9375",
+          "8969",
+          "9483",
+          "9001",
+          "8796",
+          "9298",
+          "9335",
+          "8920"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:9016-1",
+          "research-permitext_discovered-id:9015-2",
+          "research-permitext_discovered-id:8983-3",
+          "research-permitext_discovered-id:9373-4",
+          "research-permitext_discovered-id:9306-5",
+          "research-permitext_discovered-id:9752-6",
+          "research-permitext_discovered-id:9375-7",
+          "research-permitext_discovered-id:8969-8",
+          "research-permitext_discovered-id:9483-9",
+          "research-permitext_discovered-id:9001-10",
+          "research-permitext_discovered-id:8796-13",
+          "research-permitext_cross_reference-id:9298-1",
+          "research-permitext_cross_reference-id:9335-3",
+          "research-permitext_cross_reference-id:8920-10"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 14,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 3,
+          "governingCitationCount": 2,
+          "supportingCitationCount": 1,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 11,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 11,
+          "crossReferenceCount": 3,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 2,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "AC 28-105.10.1",
+              "summary": "AC 28-105.10.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9016-1"
+              ]
+            },
+            {
+              "label": "AC 28-105.10",
+              "summary": "AC 28-105.10 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9015-2"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "AC 28-105.10.1",
+              "summary": "AC 28-105.10.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9016-1"
+              ]
+            },
+            {
+              "label": "AC 28-105.10",
+              "summary": "AC 28-105.10 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:9015-2"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "AC 28-105.1.4",
+              "summary": "AC 28-105.1.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8983-3"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "AC 28-101.5",
+              "summary": "AC 28-101.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:8796-13"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "AC 28-204.2",
+              "summary": "AC 28-204.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:9298-1"
+              ]
+            },
+            {
+              "label": "AC 28-207.2",
+              "summary": "AC 28-207.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:9335-3"
+              ]
+            },
+            {
+              "label": "AC 28-104.2.6",
+              "summary": "AC 28-104.2.6 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:8920-10"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:9016-1",
+            "research-permitext_discovered-id:9015-2",
+            "research-permitext_discovered-id:8983-3",
+            "research-permitext_discovered-id:9373-4",
+            "research-permitext_discovered-id:9306-5",
+            "research-permitext_discovered-id:9752-6",
+            "research-permitext_discovered-id:9375-7",
+            "research-permitext_discovered-id:8969-8",
+            "research-permitext_discovered-id:9483-9",
+            "research-permitext_discovered-id:9001-10",
+            "research-permitext_discovered-id:8796-13",
+            "research-permitext_cross_reference-id:9298-1",
+            "research-permitext_cross_reference-id:9335-3",
+            "research-permitext_cross_reference-id:8920-10"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260908-negative-work-premise-v6",
+          "activeRootTopic": "DOB later discovers that a permit application contained a material false statement that affected issuance of the permit. Can the permit be revoked even though construction has already started?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "DOB later discovers that a permit application contained a material false statement that affected issuance of the permit. Can the permit be revoked even though construction has already started?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9016-1",
+            "research-permitext_discovered-id:9015-2"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9015-2",
+            "research-permitext_discovered-id:9016-1",
+            "research-permitext_cross_reference-id:9335-3"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9015-2",
+            "research-permitext_discovered-id:9016-1",
+            "research-permitext_cross_reference-id:9335-3"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:8983-3",
+            "research-permitext_discovered-id:9373-4",
+            "research-permitext_discovered-id:9306-5",
+            "research-permitext_discovered-id:9752-6",
+            "research-permitext_discovered-id:9375-7",
+            "research-permitext_discovered-id:8969-8",
+            "research-permitext_discovered-id:9483-9",
+            "research-permitext_discovered-id:9001-10",
+            "research-permitext_discovered-id:8796-13",
+            "research-permitext_cross_reference-id:9298-1",
+            "research-permitext_cross_reference-id:9335-3",
+            "research-permitext_cross_reference-id:8920-10"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:9016-1",
+              "label": "AC 28-105.10.1 — § 28-105.10.1 Notice of proposed revocation.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9016-1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:9015-2",
+              "label": "AC 28-105.10 — § 28-105.10 Suspension or revocation of permit.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9015-2"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:9015-2",
+            "research-permitext_discovered-id:9016-1",
+            "research-permitext_cross_reference-id:9335-3"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:9016-1",
+              "label": "AC 28-105.10.1 — § 28-105.10.1 Notice of proposed revocation.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9016-1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:9016-1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9015-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9016-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9016-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9016-1",
+                        "research-permitext_cross_reference-id:9335-3"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:9015-2",
+              "label": "AC 28-105.10 — § 28-105.10 Suspension or revocation of permit.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:9015-2"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:9015-2"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9015-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9016-1"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9015-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:9016-1",
+                        "research-permitext_cross_reference-id:9335-3"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:9015-2"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260908-fixture-permission-scope-v28",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:9015-2",
+            "research-permitext_discovered-id:9016-1",
+            "research-permitext_cross_reference-id:9335-3"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:8983-3",
+            "research-permitext_discovered-id:9373-4",
+            "research-permitext_discovered-id:9306-5",
+            "research-permitext_discovered-id:9752-6",
+            "research-permitext_discovered-id:9375-7",
+            "research-permitext_discovered-id:8969-8",
+            "research-permitext_discovered-id:9483-9",
+            "research-permitext_discovered-id:9001-10",
+            "research-permitext_discovered-id:8796-13",
+            "research-permitext_cross_reference-id:9298-1",
+            "research-permitext_cross_reference-id:8920-10"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 3,
+            "citedProvisionCount": 3,
+            "governingCitationCount": 2,
+            "supportingCitationCount": 1,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 11,
+            "reviewedOnlyProvisionCount": 11,
+            "assembledSourceCount": 14,
+            "assembledProvisionCount": 14
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:9016-1",
+              "sectionID": "9016",
+              "reference": "AC 28-105.10.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.10.1 § 28-105.10.1 Notice of proposed revocation. The commissioner may, on written notice to the permit holder, revoke any permit for failure to comply with the provisions of this code or other applicable laws or rules; or whenever there has been any false statement or any misrepresentation as to a material fact in the application or submittal documents upon the basis of which such approval was issued; or whenever a permit has been issued in error and conditions are such that the permit should not have been issued. Such notice may be accompanied by a stop work order pursuant to section 28-207.2 and shall inform the permit holder of the reasons for the proposed revocation and that the applicant has the right to present to the commissioner or his or her representative within 10 business days of delivery of the notice by hand or electronic delivery or 15 business days of the posting of notice by mail, information as to why the permit should not be revoked. (Am. L.L. 2019/062, 3/31/2019, eff. 9/27/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9015-2",
+              "sectionID": "9015",
+              "reference": "AC 28-105.10",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.10 § 28-105.10 Suspension or revocation of permit. The commissioner is authorized to suspend or revoke a permit issued under the provisions of this code."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8983-3",
+              "sectionID": "8983",
+              "reference": "AC 28-105.1.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.1.4 § 28-105.1.4 Denial of permits for false statements on applications for construction document approval. The commissioner shall not issue a permit for an occupied building for at least one year following the date of a determination by the commissioner that a false statement about the occupancy status of such building has been made in an application for construction document approval. Such denial shall not apply where a dwelling unit within such multiple dwelling is owned as a condominium or held by a shareholder of a cooperative corporation under a proprietary lease. Exceptions: 1. Where the issuance of such permit is necessary to correct an outstanding violation of this code, the New York city housing maintenance code or any other applicable provisions of law or rule. 2. Where the issuance of such permit is necessary to perform work to protect public health and safety. 3. For a portion of a property occupied by a tenant who is not an owner of such property or responsible for any existing violations in such property. 4. Where a property was the subject of an in rem foreclosure judgment in favor of the city and was transferred by the city to a third party pursuant to section 11-412.1 of the administrative code. 5. Where a property is the subject of a court order appointing an administrator pursuant to article 7-A of the New York state real property actions and proceedings law in a case brought by the department of housing preservation and development. 6. Where a property is the subject of a loan provided by or through the department of housing preservation and development or the New York city housing development corporation for the purpose of rehabilitation that has closed within the five years preceding the application for such permit. 7. For a property where the department of housing preservation and development or the New York city housing development corporation notifies the commissioner that the permit is required in connection with the implementation of a program of such department or corporation. (L.L. 2019/114, 6/8/2019, eff. 12/5/2019; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9373-4",
+              "sectionID": "9373",
+              "reference": "AC 28-211.1",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-211.1 § 28-211.1 False statements in certificates, forms, written statements, applications, reports, or certificates of correction. It shall be unlawful for any person to knowingly or negligently make or allow to be made a material false statement in any certificate, professional certification, form, signed statement, application, report or certification of the correction of a violation that is either submitted directly to the department or that is generated with the intent that the department rely on its assertions."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9306-5",
+              "sectionID": "9306",
+              "reference": "AC 28-204.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-204.5 § 28-204.5 False statements in certification of correction. For the purposes of this section, if the environmental control board finds that a certification of correction filed pursuant to section 28-204.2 contained material false statements relating to the correction of a violation, such certification of correction shall be null and void and the penalties set forth in this code for the violation may be imposed as if such false certification had not been filed with and accepted by the department. It shall be an affirmative defense that the respondent neither knew nor should have known that such statements were false. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9752-6",
+              "sectionID": "9752",
+              "reference": "AC 28-320.6.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-320.6.3 § 28-320.6.3 False statement. It shall be unlawful to knowingly make a material false statement in a report or other submission filed with the department, pursuant to this article. A violation of this section shall be a misdemeanor and subject to a fine of not more than $500,000 or imprisonment of not more than 30 days or both such fine and imprisonment. A person who violates this section shall also be liable for a civil penalty of not more than $500,000. (L.L. 2019/097, 5/19/2019, eff. 11/15/2019)"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9375-7",
+              "sectionID": "9375",
+              "reference": "AC 28-211.1.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-211.1.2 § 28-211.1.2 Additional penalty for false statements. In addition to any other penalty provided by law, the commissioner may refuse to accept an application or other document submitted pursuant to or in satisfaction of a requirement of this code or of a rule of any agency promulgated thereunder that bears the signature of a person who has been found, after a hearing at the office of administrative trials and hearings pursuant to the department's rules, to have knowingly or negligently made a false statement or to have knowingly or negligently falsified or allowed to be falsified any certificate, form, signed statement, application, report or certification of the correction of a violation required under the provisions of this code or of a rule of any agency promulgated thereunder. Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2008/008 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8969-8",
+              "sectionID": "8969",
+              "reference": "AC 28-104.9.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.9.5 § 28-104.9.5 False statement or omission. No person shall submit an application for construction document approval for any structure within a coastal zone or water-sensitive inland zone that falsely avers or by omission causes the department to determine that the subject property is not located within such zone or that the New York state department of environmental conservation and other appropriate agencies have issued the appropriate permits or approvals when they did not. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2009/021 and L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9483-9",
+              "sectionID": "9483",
+              "reference": "AC 28-219.3",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-219.3 § 28-219.3 False certifications of correction. It shall be unlawful to prepare, file or offer for filing a certification of correction of an immediately hazardous condition, knowing that such certification contains a false statement or false information. Any person who prepares such a certificate shall be subject to prosecution under section 175.05 or 175.10 of the New York state penal law. Any person who files such a certificate or offers such a certificate for filing shall be subject to prosecution under section 175.30 or 175.35 of the New York state penal law. Nothing in this section shall be construed to limit, alter or affect the authority conferred by any other provision of this chapter or other law to bring criminal, civil or administrative actions or proceedings or other remedies for the preparation, filing or offering for filing of a certification of correction of an immediately hazardous condition containing a false statement or false information. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2014/051 and L.L. 2021/126 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:9001-10",
+              "sectionID": "9001",
+              "reference": "AC 28-105.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-105.5 § 28-105.5 Application for permit. All applications for permits shall be submitted on forms furnished by the department. Applications shall include all information required by this code, other applicable law or the rules of the department. The applicant shall list any portions of the design that have been approved for deferred submittal in accordance with section 28-104.2.6 . The application shall set forth an inspection program for the project. An application for a permit shall be submitted no later than 12 months after the approval of all required construction documents (other than those documents approved for deferred submittal). The department shall provide written notification to owners of adjoining property at the time such application is submitted. (2018 N.Y. Laws Ch. 217, 8/24/2018, eff. 8/24/2018)"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:8796-13",
+              "sectionID": "8796",
+              "reference": "AC 28-101.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "ADMINISTRATIVE CODE. The administrative code of the city of New York. CITY. The city of New York. CONSTRUCTION DOCUMENTS. Plans and specifications and other written, graphic and pictorial documents, prepared or assembled for describing the design, location, physical characteristics, and other elements of the project necessary for obtaining a building permit. DEFERRED SUBMITTAL. Those portions of the design that are not submitted at the time of the application for construction document approval and that are to be submitted to the department within a specified period of time after the issuance of a permit. PROFESSIONAL CERTIFICATION. A personal verification of a registered design professional made under such professional's signature and seal that accompanies construction documents and other related documents filed with the department and that attests that such documents do not contain false information and are in compliance with all applicable provisions of law. REQUIRED. Shall mean required by the provisions of this code. SUBMITTAL DOCUMENTS. Completed application forms, construction documents, reports and any other documents submitted in compliance with this code or other applicable laws and rules including but not limited to special inspection reports, certifications or approvals from other governmental agencies and other data required by this code or by the department. WRITTEN NOTICE. A notification in writing delivered by hand to the person or parties intended, or delivered at or sent by mail or in the discretion of the commissioner by electronic media to the last address known to the party giving such notice."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9298-1",
+              "sectionID": "9298",
+              "reference": "AC 28-204.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-204.2 § 28-204.2 Order to certify correction. Each such notice of violation shall contain an order of the commissioner directing the respondent to correct the condition constituting the violation and to file with the department electronically or in such other manner as the department may authorize by rule a certification that the condition has been corrected. Unless otherwise provided by rule, such order shall require that violations classified as major or lesser be corrected within 30 days from the date of the order, that violations classified as immediately hazardous be corrected forthwith. Such order shall also require that certification of the correction of the violation shall be filed with the department in a manner and form and within such period of time as shall be established by the department. In any proceeding before the environmental control board, no civil penalty shall be imposed for a lesser violation or for a first-time violation of the major violations listed in items 1.1 through 1.7 of this section if the respondent complies with the commissioner's order to correct and to certify correction of the violation within the applicable time period. However, such violation may serve as a predicate for purposes of assessing aggravating factors attributable to multiple offenses. 1. As described in this section, no civil penalty shall be imposed upon correction of the following first-time major violations: 1.1. Failure to post, or post in accordance with the restrictions and prohibitions set forth in section 28-105.11 , a building permit or a copy thereof for work at a work site in violation of section 28-105.11 , or violation of a corresponding rule promulgated by the department; 1.2. Failure to maintain a sign in accordance with the requirements of title 27 , title 28 , the zoning resolution of the city of New York, or the rules of the city of New York in violation of section 28-301.1 , or violation of a corresponding rule promulgated by the department; 1.3. Failure by an owner of a boiler to file a complete boiler inspection report in violation of section 28-303.7 , or violation of a corresponding rule promulgated by the department; 1.4. A sign in a commercial, or C, district exceeds surface area restrictions in violation of section 32-64 of the zoning resolution of the city of New York, or violation of a corresponding rule promulgated by the department; 1.5. A sign in a specified commercial, or C, district projects across the street line limitation in violation of section 32-652 of the zoning resolution of the city of New York, or violation of a corresponding rule promulgated by the department; 1.6. A sign displayed on an awning, canopy or marquee in a commercial, or C, district in violation of the restrictions set forth in section 32-653 of the zoning resolution of the city of New York, or violation of a corresponding rule promulgated by the department; and 1.7. Miscellaneous sign violation under the zoning resolution of the city of New York, or violation of a corresponding rule promulgated by the department. (Am. L.L. 2021/080, 7/18/2021, eff. 11/15/2021) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/080 ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:9335-3",
+              "sectionID": "9335",
+              "reference": "AC 28-207.2",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-207.2 § 28-207.2 Stop work orders. Whenever the commissioner has issued a notice of proposed revocation pursuant to section 28-105.10.1 of this code or finds that any building work is being executed in violation of the provisions of this code, the 1968 building code, the zoning resolution or of any laws or rules enforced by the department, or in a dangerous or unsafe manner, or, if the department of health and mental hygiene makes a referral to the department regarding unsafe lead work practices, the commissioner or his or her authorized representative may issue a stop work order. (Am. L.L. 2019/062, 3/31/2019, eff. 9/27/2019; Am. L.L. 2021/040, 4/18/2021, eff. 4/18/2022)"
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:8920-10",
+              "sectionID": "8920",
+              "reference": "AC 28-104.2.6",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "28-104.2.6 § 28-104.2.6 Deferred submittal. With the prior approval of the department, the applicant may defer submittal of portions of the design until a specified period of time after the issuance of a permit. The applicant shall list the deferred submittal items on the initial application for construction document approval. The deferred submittal items shall not be constructed or installed until the design and submittal documents for the item have been approved by the department. The owner and permit holder shall proceed at their own risk with the construction operation and without assurance that a permit for the entire structure will be granted and the approval of all construction documents shall be conditioned upon and subject to compliance with the requirements of this code and other applicable laws and rules in effect at the time of issuance of the associated permit or place of assembly certificate of operation. (Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 ."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260908-zoning-unresolved-predicate-v18",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260908-focused-ventilation-v30",
+          "retrievalQuery": "DOB later discovers that a permit application contained a material false statement that affected issuance of the permit. Can the permit be revoked even though construction has already started?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "DOB later discovers that a permit application contained a material false statement that affected issuance of the permit. Can the permit be revoked even though construction has already started?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "DOB later discovers that a permit application contained a material false statement that affected issuance of the permit. Can the permit be revoked even though construction has already started?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "DOB later discovers that a permit application contained a material false statement that affected issuance of the permit. Can the permit be revoked even though construction has already started?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260908-negative-work-premise-v6",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 15446,
+            "candidateCount": 12,
+            "discoveredCount": 10,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 3,
+            "topicDependencyCount": 0,
+            "characterCount": 15446,
+            "resolverFailureCount": 5,
+            "nonMaterialCandidateCount": 0
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 5,
+              "text": "5 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260908-fountain-premise-scope-v29",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260908-supporting-web-v16",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-09T00:53:21.931Z"
+          },
+          "webSupportRequested": true,
+          "webSupportReasons": [
+            "dob_workflow_requested"
+          ],
+          "allowOfficialGuidanceOnly": false,
+          "officialWorkflow": {
+            "version": "20260908-dob-form-question-sources-v2",
+            "topic": "dob_now_workflow",
+            "retrievalMethod": "official_web_search"
+          },
+          "webSupportSearched": true,
+          "webQuery": "DOB later discovers that a permit application contained a material false statement that affected issuance of the permit. Can the permit be revoked even though construction has already started?",
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-09T00:53:21.931Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "outside_library_support",
+            "large_evidence_package",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "GAP-08",
+      "phase": "web_support",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 2288,
+      "maxOutputTokens": 1000,
+      "requestSHA256": "97dc2c2a9df7b684765af937cc95d2476cd69846c409d8118cf5128319de4d2a",
+      "startedAt": "2026-09-09T00:53:25.232Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 24001,
+        "input_tokens_details": {
+          "cache_write_tokens": 4598,
+          "cached_tokens": 0
+        },
+        "output_tokens": 506,
+        "output_tokens_details": {
+          "reasoning_tokens": 263
+        },
+        "total_tokens": 24507
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "ws_09276aac9193891e016aa0ae06785087d29dc961a2787d5b7c",
+          "type": "web_search_call",
+          "status": "completed",
+          "action": {
+            "type": "open_page",
+            "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+          }
+        },
+        {
+          "id": "ws_09276aac9193891e016aa0ae07fb1487d28538d505d0787570",
+          "type": "web_search_call",
+          "status": "completed",
+          "action": {
+            "type": "search",
+            "queries": [
+              "site:nyc.gov/buildings permit revoked false statement construction commenced revocation permit",
+              "site:rules.cityofnewyork.us false statement permit revoke construction started buildings"
+            ],
+            "query": "site:nyc.gov/buildings permit revoked false statement construction commenced revocation permit",
+            "sources": [
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/pdf/ll141of2013.pdf"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/codes/oppn0204.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/property-or-business-owner/resolving-issues.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/ppn/oppn02-04_form3.pdf"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/property-or-business-owner/what-is-a-dob-violation.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/property-or-business-owner/permits-by-type.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/industry/permit-type-and-job-status-codes.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/industry/inspections-violations.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-resources-gc.page"
+              },
+              {
+                "type": "url",
+                "url": "https://legistar.council.nyc.gov/View.ashx?GUID=7AFF8FE7-D2A6-4EBA-A799-6D134D85E99D&ID=7570942&M=F"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/dob/forms.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/dob/project-requirements-project-withdrawals.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/buildings/pdf/ll114of19_sn.pdf"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/site/buildings/safety/types-of-dob-violations.page"
+              },
+              {
+                "type": "url",
+                "url": "https://www.nyc.gov/assets/loftboard/downloads/pdf/12-8LoftBoardComments.pdf"
+              }
+            ]
+          }
+        },
+        {
+          "id": "ws_09276aac9193891e016aa0ae0afe9487d2b1beb2e08c36d283",
+          "type": "web_search_call",
+          "status": "completed",
+          "action": {
+            "type": "open_page",
+            "url": "https://www.nyc.gov/assets/buildings/pdf/ll141of2013.pdf"
+          }
+        },
+        {
+          "id": "msg_09276aac9193891e016aa0ae0bcc0087d28e422e1ca1a43c9d",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [
+                {
+                  "type": "url_citation",
+                  "end_index": 372,
+                  "start_index": 285,
+                  "title": "A LOCAL LAW 141 of 2013",
+                  "url": "https://www.nyc.gov/assets/buildings/pdf/ll141of2013.pdf?utm_source=openai"
+                },
+                {
+                  "type": "url_citation",
+                  "end_index": 703,
+                  "start_index": 636,
+                  "title": "Operations Policy And Procedure Notices #02/04",
+                  "url": "https://www.nyc.gov/site/buildings/codes/oppn0204.page"
+                },
+                {
+                  "type": "url_citation",
+                  "end_index": 918,
+                  "start_index": 845,
+                  "title": "[FORM NO",
+                  "url": "https://www.nyc.gov/assets/buildings/ppn/oppn02-04_form3.pdf"
+                },
+                {
+                  "type": "url_citation",
+                  "end_index": 1238,
+                  "start_index": 1153,
+                  "title": "Q&A Session",
+                  "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+                }
+              ],
+              "logprobs": [],
+              "text": "- **Yes.** NYC Administrative Code § 28-105.10.1 authorizes DOB to revoke a permit when the application or supporting documents contain a false statement or material misrepresentation on which the approval was based. The provision does not make construction commencement an exception. ([nyc.gov](https://www.nyc.gov/assets/buildings/pdf/ll141of2013.pdf?utm_source=openai))\n\n- DOB’s revocation procedure requires notice stating the proposed-revocation reasons and an opportunity to respond; the official procedure states that an intent-to-revoke notice is followed by revocation if no adequate response or corrective action is provided. ([nyc.gov](https://www.nyc.gov/site/buildings/codes/oppn0204.page))\n\n- Upon revocation, DOB’s official revocation form directs that **all work stop immediately** if a stop-work order is not already in effect. ([nyc.gov](https://www.nyc.gov/assets/buildings/ppn/oppn02-04_form3.pdf))\n\n- The supplied **DOB NOW: Build Release Notes** and **DOB NOW Application User Guide** describe filing-system procedures but do not establish the substantive revocation authority or an exception based on construction having started. ([nyc.gov](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf))"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 8730
+    },
+    {
+      "caseID": "GAP-08",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-terra",
+      "requestBytes": 57306,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "30255dfb165a5549347e5eb90c32733d09c9a0213d97e07d6e18ade7c24cbe82",
+      "startedAt": "2026-09-09T00:53:33.983Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 12387,
+        "input_tokens_details": {
+          "cache_write_tokens": 12384,
+          "cached_tokens": 0
+        },
+        "output_tokens": 706,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 13093
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0ec494b778ed79ca016aa0ae0ef33c87d2b17521efbced8f26",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**Yes—construction having started does not bar revocation.** The commissioner is authorized to suspend or revoke a permit, and may revoke it when there was a false statement or misrepresentation of a material fact in the application or submittal documents on which the approval was issued (AC §§ 28-105.10, 28-105.10.1).\\n\\nBefore revocation, DOB must give the permit holder written notice stating the reasons for the proposed revocation and the applicant’s right to submit information opposing revocation within **10 business days** after hand or electronic delivery, or **15 business days** after mailed notice. The notice may be accompanied by a stop-work order; separately, a stop-work order may be issued when a proposed-revocation notice has been issued (AC §§ 28-105.10.1, 28-207.2). The supplied enacted text contains no exception that prevents revocation because work has begun.\",\"supportedPoints\":[{\"heading\":\"Authority to revoke an issued permit\",\"explanation\":\"The commissioner is expressly authorized to suspend or revoke a permit issued under the Construction Code. The authorization applies to an issued permit and is not limited by whether construction has commenced.\",\"sectionID\":\"9015\",\"sourceIDs\":[\"research-permitext_discovered-id:9015-2\"]},{\"heading\":\"Material false statement is a revocation ground\",\"explanation\":\"The commissioner may revoke a permit when an application or submittal document contained a false statement or misrepresentation as to a material fact upon which the approval was issued. The provision supplies no construction-started exception.\",\"sectionID\":\"9016\",\"sourceIDs\":[\"research-permitext_discovered-id:9016-1\"]},{\"heading\":\"Notice, response opportunity, and potential stop-work order\",\"explanation\":\"The proposed-revocation notice must state the reasons and advise of the opportunity to provide information against revocation within 10 business days after hand or electronic delivery, or 15 business days after notice is posted by mail. The notice may be accompanied by a stop-work order, and a stop-work order may be issued once a notice of proposed revocation has been issued.\",\"sectionID\":\"9016\",\"sourceIDs\":[\"research-permitext_discovered-id:9016-1\",\"research-permitext_cross_reference-id:9335-3\"]}],\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"This answer is limited to the supplied 2022 NYC Administrative Code provisions and addresses revocation authority and the stated notice/response procedure; it does not determine whether a particular statement was false, material, or a basis for the issued approval.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"9015\",\"sourceIDs\":[\"research-permitext_discovered-id:9015-2\"],\"relevance\":\"Establishes the commissioner’s authority to suspend or revoke an issued permit.\"},{\"sectionID\":\"9016\",\"sourceIDs\":[\"research-permitext_discovered-id:9016-1\"],\"relevance\":\"Establishes the material-false-statement revocation ground and notice/response procedure.\"},{\"sectionID\":\"9335\",\"sourceIDs\":[\"research-permitext_cross_reference-id:9335-3\"],\"relevance\":\"Establishes that a stop-work order may be issued after a notice of proposed revocation.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 7069
+    },
+    {
+      "caseID": "GAP-08",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 54741,
+      "maxOutputTokens": 4000,
+      "requestSHA256": "ce585a315e12a26512c5edb270bdb84f31469ac26dbddb2c0992163578f2874b",
+      "startedAt": "2026-09-09T00:53:41.097Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 11482,
+        "input_tokens_details": {
+          "cache_write_tokens": 8468,
+          "cached_tokens": 3011
+        },
+        "output_tokens": 302,
+        "output_tokens_details": {
+          "reasoning_tokens": 273
+        },
+        "total_tokens": 11784
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0daf2a1f390b8516016aa0ae184c0887d2bc37cffbd1c7e547",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 3397
+    }
+  ],
+  "documentRequests": [],
+  "cumulativeConservativeSpendUSD": 2.810965,
+  "spend": {
+    "active": true,
+    "capUSD": 2,
+    "reservedUSD": 0.077615,
+    "actualUSD": 0.077615,
+    "requestCount": 3,
+    "pendingRequestCount": 0
+  },
+  "completedAt": "2026-09-09T00:53:45.903Z"
+}

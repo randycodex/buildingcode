@@ -202,6 +202,61 @@
         ]
       },
       "evaluationInputSHA256": "4c8720ddc0f46cf01121c50cf57c473603e948ed0223de3a15a0ba1989e3dd92"
+    },
+    {
+      "id": "zr18-applicable-date-and-conditions-20260908",
+      "caseID": "ZR-18",
+      "sourceDataset": "zoning-cases.json",
+      "sourceCaseID": "zr-new-divided-zoning-lot",
+      "sourceCaseSHA256": "2d07555001bc7c9a7be54f1cfa2bdcb08372d69591ff93377a1a1c89c5130296",
+      "evaluationInputSHA256": "3da1babb52c8626890499e8a185eab482eec39c611fa6f7681dc184ee549b02e",
+      "status": "development-correction-pending-professional-review",
+      "reviewedOn": "2026-09-08",
+      "rationale": "The former reference inferred an applicable-date result from the formation year without establishing the amendment date. Current official source review confirms the conditional rule and additional qualifications. Development acceptance must not reward the same inference the runtime now rejects.",
+      "sourceReferences": [
+        {
+          "reference": "ZR 77-02",
+          "url": "https://zr.planning.nyc.gov/article-vii/chapter-7/77-02",
+          "checkedOn": "2026-09-08",
+          "basis": "Conditional date premise for portion regulation; separate FAR scope."
+        },
+        {
+          "reference": "ZR 77-11",
+          "url": "https://zr.planning.nyc.gov/article-vii/chapter-7/77-11",
+          "checkedOn": "2026-09-08",
+          "basis": "Eligibility conditions and exceptions."
+        },
+        {
+          "reference": "ZR 77-22",
+          "url": "https://zr.planning.nyc.gov/article-vii/chapter-7/77-22",
+          "checkedOn": "2026-09-08",
+          "basis": "Adjusted FAR calculation subject to other controls."
+        }
+      ],
+      "replacement": {
+        "expectedAnswer": "No. Majority area alone does not establish eligibility under ZR 77-11. The lot must have existed on December 15, 1961 or the applicable subsequent amendment date, and satisfy the 25-foot maximum minority-side depth measured perpendicular to the mapped boundary. A 2026 assembly year does not determine whether the lot existed on an unidentified applicable amendment date. Establish that date and the lot's status then. If the lot did not exist on the applicable date, ZR 77-02 regulates each portion under its own district.\n\nIdentify the actual districts and any special-purpose-district override before applying 77-11; its residential-district proviso can also change the result. ZR 77-02 makes the separate adjusted-FAR mechanism in 77-22 available to divided lots created at any time where different bulk rules apply. That calculation does not by itself transfer use regulations or resolve other applicable controls. (ZR 77-02, 77-11, 77-22)",
+        "requiredConcepts": [
+          "Reject automatic majority-area treatment without conclusively rejecting eligibility from the assembly year alone.",
+          "Retain the December 15, 1961 or applicable subsequent amendment date condition and 25-foot perpendicular-depth limit under 77-11.",
+          "Apply 77-02 portion-by-portion regulation only when its applicable-date premise is established.",
+          "The separate adjusted-FAR mechanism applies to divided lots created at any time where different bulk rules apply; it does not establish use permission.",
+          "Preserve relevant special-district overrides. If explaining expanded bulk or other consequences, include the residential-district proviso rather than claiming every majority-district rule applies without qualification."
+        ],
+        "forbiddenClaims": [
+          "Whichever district contains 51 percent of a newly assembled zoning lot automatically controls the entire lot.",
+          "The Section 77-22 FAR mechanism is represented as transferring the majority district's use regulations to the entire lot.",
+          "A 2026 assembly year alone proves that the lot postdates every applicable amendment or is ineligible under 77-11.",
+          "Unqualified extension of all majority-district regulations while omitting the residential-district proviso."
+        ],
+        "missingFacts": [
+          "If deciding eligibility: applicable amendment date and whether the lot existed then.",
+          "Minority-side perpendicular depth, actual districts and applicable special-district provisions, if deciding eligibility."
+        ],
+        "reconciliationNotes": [
+          "Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current.",
+          "Development amendment zr18-applicable-date-and-conditions-20260908 corrects a temporal inference in the prior reference and preserves material source qualifications. The original reviewed source case, question, selected evidence and approval history remain unchanged; this revised development rubric awaits professional review."
+        ]
+      }
     }
   ]
 }

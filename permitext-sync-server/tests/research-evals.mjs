@@ -4915,8 +4915,9 @@ async function main() {
     );
   }
   assert(selectedCases.length > 0, "No approved evaluation cases match the requested filters.");
-  if (liveMode && !zoningMode) {
-    await assertResearchEvaluationReferencesCurrent(selectedCases.map((testCase) => testCase.id));
+  if (liveMode && (!zoningMode || (!zoningExpandedMode && !zoningSuccessorFamilyMode))) {
+    await assertResearchEvaluationReferencesCurrent(selectedCases.map((testCase) => testCase.id),
+      zoningMode ? "zoning-cases.json" : "research-cases.json");
   }
   const filtered = Boolean(excludedCaseID || requestedTopic || requestedDifficulty || requestedCodeEdition);
   const suiteScope = zoningMode

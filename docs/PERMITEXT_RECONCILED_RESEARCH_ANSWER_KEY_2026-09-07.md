@@ -29,7 +29,7 @@ Intake: `Permitext_Consolidated_Evaluation_Questions_Answer_Key.md`; SHA-256 `40
 - [research-cases.json](../permitext-sync-server/evals/research-cases.json) — SHA-256 `da3a0e1061b94d9707abc713d0827a8c1df46b9d8a873e9544b35ac9d90eeefb`.
 - [zoning-cases.json](../permitext-sync-server/evals/zoning-cases.json) — SHA-256 `90b9cf4c5c3ea40522103d42a9b8ec052b044cf42be019cae53eed61cfa008a6`.
 - [review-packets/dob-now-expediter-draft-review.md](../permitext-sync-server/evals/review-packets/dob-now-expediter-draft-review.md) — SHA-256 `715301e11a99f50ea320402102bb5376e627a41fce0510f7d8705f05929be975`.
-- [research-answer-key-amendments.json](../permitext-sync-server/evals/research-answer-key-amendments.json) — SHA-256 `4468eaa3f3b6d03dbef1cab2bd47733fe8bb1a4c52db10f52225d12746b89e94`.
+- [research-answer-key-amendments.json](../permitext-sync-server/evals/research-answer-key-amendments.json) — SHA-256 `aaa414e7d011656407cc4f79327c45c9f76d748779fb09c94cbf199b965564c7`.
 
 DOB workflow material remains dated to its review snapshot. Consult current [DOB FAQs](https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page), [NB/Alteration-CO FAQs](https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page), [PAA guidance](https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page), [Application User Guide](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf), [release notes](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf), and [service updates](https://www.nyc.gov/site/buildings/dob/service-updates.page) for live guidance. A source URL is not a claim that all 50 answers were newly verified online.
 
@@ -1015,25 +1015,32 @@ Source basis: NYC Zoning Resolution — text through 2026-08-13
 
 Source case: `zr-new-divided-zoning-lot`; recorded status: approved; reviewed: 2026-08-17T21:17:41.000Z. Scope: Terra answer-key testing only
 
+**Development correction:** `zr18-applicable-date-and-conditions-20260908`. Status: development-correction-pending-professional-review. The original approval above is historical; it does not approve this corrected wording or rubric.
+
 **Evaluation question:**
 
 A zoning lot assembled in 2026 straddles two zoning districts, with more than 50 percent of its area in the less restrictive district. Can that majority district's use regulations automatically apply to the entire zoning lot under Section 77-11?
 
 **Expected answer:**
 
-No. ZR 77-11's majority-district use treatment is limited to qualifying zoning lots that existed on December 15, 1961 or on the date of an applicable subsequent amendment. For a zoning lot assembled in 2026, ZR 77-02 generally requires each portion to be regulated by the district in which that portion is located. ZR 77-22 separately provides an adjusted maximum-FAR calculation for divided zoning lots; that FAR mechanism does not transfer the majority district's use regulations to the entire lot.
+No. Majority area alone does not establish eligibility under ZR 77-11. The lot must have existed on December 15, 1961 or the applicable subsequent amendment date, and satisfy the 25-foot maximum minority-side depth measured perpendicular to the mapped boundary. A 2026 assembly year does not determine whether the lot existed on an unidentified applicable amendment date. Establish that date and the lot's status then. If the lot did not exist on the applicable date, ZR 77-02 regulates each portion under its own district.
+
+Identify the actual districts and any special-purpose-district override before applying 77-11; its residential-district proviso can also change the result. ZR 77-02 makes the separate adjusted-FAR mechanism in 77-22 available to divided lots created at any time where different bulk rules apply. That calculation does not by itself transfer use regulations or resolve other applicable controls. (ZR 77-02, 77-11, 77-22)
 
 **Required concepts:**
 
-- Section 77-11's majority-district use treatment applies only to qualifying zoning lots existing on December 15, 1961 or on the date of an applicable subsequent amendment.
-- For the stated lot created in 2026, Section 77-02 generally regulates each portion under the district in which it is located.
-- Section 77-22 separately applies an adjusted maximum FAR calculation to divided zoning lots created at any time.
-- The answer distinguishes use-regulation treatment from the separate adjusted-FAR mechanism.
+- Reject automatic majority-area treatment without conclusively rejecting eligibility from the assembly year alone.
+- Retain the December 15, 1961 or applicable subsequent amendment date condition and 25-foot perpendicular-depth limit under 77-11.
+- Apply 77-02 portion-by-portion regulation only when its applicable-date premise is established.
+- The separate adjusted-FAR mechanism applies to divided lots created at any time where different bulk rules apply; it does not establish use permission.
+- Preserve relevant special-district overrides. If explaining expanded bulk or other consequences, include the residential-district proviso rather than claiming every majority-district rule applies without qualification.
 
 **Forbidden conclusions:**
 
 - Whichever district contains 51 percent of a newly assembled zoning lot automatically controls the entire lot.
 - The Section 77-22 FAR mechanism is represented as transferring the majority district's use regulations to the entire lot.
+- A 2026 assembly year alone proves that the lot postdates every applicable amendment or is ineligible under 77-11.
+- Unqualified extension of all majority-district regulations while omitting the residential-district proviso.
 
 **Authority / evidence to verify:**
 
@@ -1043,9 +1050,15 @@ No. ZR 77-11's majority-district use treatment is limited to qualifying zoning l
 
 Selected canonical Zoning section IDs: 20018891, 20018894, 20018899.
 
+**Missing facts:**
+
+- If deciding eligibility: applicable amendment date and whether the lot existed then.
+- Minority-side perpendicular depth, actual districts and applicable special-district provisions, if deciding eligibility.
+
 **Reconciliation notes:**
 
 - Align with the reviewed August 13 corpus snapshot; the uploaded July 16 snapshot is retained in intake metadata, not relabeled as current.
+- Development amendment zr18-applicable-date-and-conditions-20260908 corrects a temporal inference in the prior reference and preserves material source qualifications. The original reviewed source case, question, selected evidence and approval history remain unchanged; this revised development rubric awaits professional review.
 
 ## ZR-19 — Zoning-lot contiguity definition
 

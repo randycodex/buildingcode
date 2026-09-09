@@ -132,9 +132,12 @@ const allCases = [...JSON.parse(await read("evals/research-reconciled-answer-key
   ...JSON.parse(await read("evals/research-owner-code-candidates.json")).cases];
 assert.equal(allCases.length, 110);
 assert.equal(new Set(allCases.map((item) => item.id)).size, 110);
-const attempted = new Set([...historicallyAttempted, ...full.map((item) => item.id)]);
+const cohortIDs = new Set(allCases.map((item) => item.id));
+const attempted = new Set([...historicallyAttempted, ...full.map((item) => item.id)].filter((id) => cohortIDs.has(id)));
+summary.historicalSupplementalCaseIDs = [...historicallyAttempted].filter((id) => !cohortIDs.has(id));
 summary.fullCohortProviderAttempted = attempted.size;
 summary.fullCohortNotProviderAttempted = allCases.filter((item) => !attempted.has(item.id)).map((item) => item.id);
+assert.equal(summary.fullCohortProviderAttempted + summary.fullCohortNotProviderAttempted.length, 110);
 summary.newlyProviderAttemptedCases = [...attempted].filter((id) => !historicallyAttempted.has(id));
 const sourceHashes = Object.fromEntries(await Promise.all([
   "research-cost-usage.mjs", "research-config.mjs", "research-provider-client.mjs",

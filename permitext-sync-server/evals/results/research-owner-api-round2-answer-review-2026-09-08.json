@@ -1,0 +1,1535 @@
+{
+  "schema": "permitext-owner-api-round2-answer-review-v1",
+  "reviewedAt": "2026-09-09T00:57:50.237Z",
+  "method": "Development review of each latest retained answer, its point bindings and material fact handling against the retained source-reviewed references. ZR-18 uses the separately amended development reference checked on official NYC Planning pages. Core matches do not establish that every optional statement is complete or confer professional approval.",
+  "paidJudgeCalls": 0,
+  "providerCallsFromReview": 0,
+  "costAudit": {
+    "file": "evals/results/research-owner-api-round2-cost-audit-2026-09-08.json",
+    "sha256": "e17221897a4e3629b5eeacc89e5a942e5f2ef6d1a80cc20b5cf7d933912df681"
+  },
+  "ledgers": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    }
+  ],
+  "sourceReferences": [
+    {
+      "file": "evals/research-reconciled-answer-key.json",
+      "sha256": "6953d0c784e839e7724b7b8641b6e24b97ed1f8989c5a01ab649b848de362cf8"
+    },
+    {
+      "file": "evals/research-answer-key-amendments.json",
+      "sha256": "aaa414e7d011656407cc4f79327c45c9f76d748779fb09c94cbf199b965564c7"
+    },
+    {
+      "file": "evals/results/research-owner-code-source-review-2026-09-08.json",
+      "sha256": "5008eac9f2adc2a4de7b98d08567e515055a3ad59ebf243451b010ec697c5f7f"
+    },
+    {
+      "file": "evals/results/research-owner-mc15-source-comparison-2026-09-08.json",
+      "sha256": "59bc8c9296eea6bb6b11d59c7a40c52212e89f86fd6d2810d7a44f0d61c13733"
+    }
+  ],
+  "latestUniqueCases": 27,
+  "coreMatches": 21,
+  "coreWithQualityGap": 4,
+  "noDeliverable": 2,
+  "limitations": [
+    "Mixed runtime revisions and one observation per case version; no controlled speed comparison or representative subscriber-month forecast.",
+    "No full Project/Notebook/Report/export workflow, phone test or deployment was performed.",
+    "All 110 numbered cases remain in scope. The cost audit separates numbered coverage from the supplemental historical PDF-BPP case.",
+    "A passed model/deterministic verifier is recorded separately from manual findings; four delivered latest answers still have explicit quality gaps."
+  ],
+  "results": [
+    {
+      "id": "ZR-18",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "delivered": true,
+      "coreReview": "core-with-quality-gap",
+      "note": "The date application is now conditional, but the answer extends bulk and other district rules without the residential-district proviso. Deterministic verification passed; that is insufficient for whole-answer acceptance. The revised development key records the correct condition and exception boundary.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "09ca5c39df8f6944b3dda0daf8c0c7db2d9275cb1949026ed778cffba5bd78cd",
+      "durationMilliseconds": 12235,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "permitext-deterministic-zoning-compiler"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No—not automatically.** Section 77-11 permits the majority district’s use regulations to apply to the entire zoning lot only if the zoning lot existed on December 15, 1961, or on an applicable subsequent amendment date, and the greatest perpendicular distance from the mapped district boundary to any lot line in the minority-district portion is no more than 25 feet. The supplied fact that the lot was assembled in 2026 does not by itself establish whether the required existence-date condition is satisfied. (ZR § 77-11)\n\nIf that condition and the 25-foot test are satisfied, the majority district’s use regulations may apply to the entire lot; the district boundary may then be assumed relocated, with the expanded district’s bulk, parking, loading, and other regulations applying as stated in § 77-11. If the lot did not exist on the applicable effective or amendment date, § 77-02 instead provides that each portion is regulated by the district in which it is located. (ZR §§ 77-02, 77-11) Section 77-22 separately governs floor-area-ratio treatment for qualifying zoning lots and does not establish automatic application of use regulations. (ZR § 77-22)",
+      "supportedPoints": [
+        {
+          "heading": "Majority-district use regulations are conditional",
+          "explanation": "For a zoning lot existing on December 15, 1961, or on an applicable subsequent amendment date, and divided by districts allowing different uses, the use regulations of the district containing more than 50 percent of the lot area may apply to the entire zoning lot only when the greatest distance from the mapped district boundary to any lot line in the minority-district portion does not exceed 25 feet, measured perpendicular to the boundary. The text says those regulations “may apply,” not that they apply automatically.",
+          "sectionID": "20018894",
+          "sourceIDs": [
+            "bdca150b-927f-4d34-9cc0-86b87b519246"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Newer lots may be regulated by each district separately",
+          "explanation": "Whenever a zoning lot is divided by a district boundary and did not exist on December 15, 1961, or on an applicable subsequent amendment date, each portion is regulated by all provisions applicable to the district in which that portion is located. The 2026 assembly date alone does not identify the applicable amendment date or establish this condition.",
+          "sectionID": "20018891",
+          "sourceIDs": [
+            "0a874d8e-5169-4d87-a52d-1ff71ce7607f"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "FAR is treated separately",
+          "explanation": "Section 77-02 expressly preserves a separate rule for Section 77-22, and § 77-22 calculates an adjusted maximum floor area ratio by weighting the applicable FAR for each zoning-lot portion by that portion’s percentage of the lot area. That FAR rule does not convert the majority district’s use regulations into automatic whole-lot applicability.",
+          "sectionID": "20018899",
+          "sourceIDs": [
+            "efa1c4ea-4b86-40cb-8f87-fdcde02c0bc3",
+            "0a874d8e-5169-4d87-a52d-1ff71ce7607f"
+          ],
+          "evidenceRole": "governing"
+        }
+      ],
+      "missingFacts": [
+        "Whether the assembled zoning lot existed on December 15, 1961, or on an applicable subsequent amendment date for purposes of Section 77-11.",
+        "The greatest perpendicular distance from the mapped district boundary to any lot line in the portion containing less than 50 percent of the zoning-lot area.",
+        "Whether the two districts are districts in which different uses are permitted, as required by Section 77-11."
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "MC-01",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Mechanical ventilation is required for the stated air-conditioned office. The corrected draft binds the habitable-space definition and omits the unsupported assertion that windows may remain. Optional airflow rates make the narrow answer longer than necessary.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "522c3c30bc5cabf4694ce6efe4a59dc4744e9b381e8bacea481a3c089daefef8",
+      "durationMilliseconds": 13123,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** Because the office will be air-conditioned, it must be mechanically ventilated in accordance with MC § 403; operable windows—even if adequate for natural ventilation—cannot be the sole basis for the required ventilation. MC § 403.1 requires mechanical ventilation by supply air and return or exhaust air, with supply approximately equal to return and exhaust, and requires the ventilation-air conveyance method to be designed and installed under Chapter 6. (MC §§ 401.2(2), 403.1)\n\nFor an ordinary office space, the supplied table lists a breathing-zone outdoor-air rate of **5 cfm/person plus 0.06 cfm/ft²**, based on net occupiable floor area. The mechanical design must establish the applicable people and area inputs and comply with the other applicable § 403/Chapter 6 provisions; those design inputs are not needed to answer whether windows alone suffice. (MC Table 403.3.1.1)",
+      "supportedPoints": [
+        {
+          "heading": "Air-conditioned occupiable spaces require mechanical ventilation",
+          "explanation": "An office is an occupiable space because it is a room or enclosed space designed for human employment or similar use. All occupiable spaces provided with air conditioning must be mechanically ventilated in accordance with MC Section 403. Therefore, natural ventilation through operable windows cannot alone satisfy the ventilation requirement for the described air-conditioned office.",
+          "sectionID": "10402",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10402-2",
+            "research-permitext_discovered-id:113-5"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Required mechanical system configuration",
+          "explanation": "Mechanical ventilation must be provided by a method of supply air and return or exhaust air. Supply air must be approximately equal to return and exhaust air, subject to permitted pressure relationships that do not exceed Building Code door-opening-force limits or prevent required door closing. The ventilation-air conveyance method must be designed and installed in accordance with Chapter 6.",
+          "sectionID": "10415",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10415-1"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Office outdoor-air design rate",
+          "explanation": "For the table category “Office spaces,” the minimum breathing-zone outdoor-air inputs are 5 cfm per person and 0.06 cfm per square foot, with net occupiable floor area as the area basis. The supplied table shows no separate exhaust-air rate for that office-space row.",
+          "sectionID": "10421",
+          "sourceIDs": [
+            "research-permitext_cross_reference-id:10421-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "PC-04",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Central multiple-family laundry floor drain requirement is applied; standpipes do not substitute. Drainage of the entire floor, 3-inch outlet and lint strainer are retained.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "522ccd1c64ba0417ec04f3e21c68efb2ace111eef95fa2cfa621c4086ca32895",
+      "durationMilliseconds": 9529,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** For a common laundry room serving a multiple-family dwelling, the floor drain is not optional merely because each automatic washer discharges to a trapped standpipe. PC § 412.4 requires the room containing the washers to have floor drains located to readily drain the *entire* floor area. Each required floor drain must have at least a 3-inch outlet and a lint strainer (PC §§ 412.4, 412.3). A trapped standpipe serves washer discharge; it does not satisfy this separate floor-drain requirement.",
+      "supportedPoints": [
+        {
+          "heading": "Floor drains required in central multiple-family laundry rooms",
+          "explanation": "In the central washing facilities of multiple-family dwellings, rooms containing automatic clothes washers shall be provided with floor drains located so that the entire floor area readily drains. The stated common laundry room with several automatic clothes washers fits that described condition.",
+          "sectionID": "11968",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11968-1"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Minimum floor-drain outlet size and strainer",
+          "explanation": "The required drains in these laundry rooms must have outlets at least 3 inches (76 mm) in diameter and lint strainers. The general floor-drain provision likewise sets a 3-inch minimum outlet.",
+          "sectionID": "11967",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11967-2",
+            "research-permitext_discovered-id:11968-1"
+          ],
+          "evidenceRole": "governing"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "PC-10",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Damage-risk tank heater requires a pan. Material, depth and drain dimensions are preserved. Replacement exception is limited to the drain with a leak detector; it does not remove the pan requirement.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "399bce4366c1669e3a0ebf5319a0648cc42d9c698886937da1dce56bd6580475",
+      "durationMilliseconds": 9158,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**Yes.** Because this is a storage tank-type water heater and the stated leakage would damage the finished ceiling and occupied office below, it must be installed in a pan. The required pan is galvanized steel at least 0.0236 inch (No. 24 gage) thick, unless another pan is approved for that use (PC § 504.7).\n\nThe pan must be at least 1½ inches deep, sized and shaped to receive all dripping or condensate from the heater, and drained by an indirect waste pipe at least ¾ inch in diameter. The limited no-drain exception applies only to a *replacement* heater where no pan drain was previously installed and a leak detector is installed within the pan; it does not eliminate the pan requirement (PC § 504.7.1).",
+      "supportedPoints": [
+        {
+          "heading": "Pan required where leakage can cause damage",
+          "explanation": "A storage tank-type water heater installed where leakage from the tank will cause damage must be installed in a galvanized steel pan at least 0.0236 inch (0.6010 mm), No. 24 gage, unless another pan is approved for that use. The stated potential damage to the finished ceiling and occupied space satisfies the supplied damage condition.",
+          "sectionID": "12087",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12087-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Pan depth, coverage, and drainage",
+          "explanation": "The pan must be at least 1½ inches (38 mm) deep and large and shaped to receive all dripping or condensate from the tank or heater. It must drain through an indirect waste pipe at least ¾ inch (19 mm) in diameter. The stated exception removes the pan-drain requirement only for a replacement heater with no previously installed pan drain, provided a leak detector is installed within the pan.",
+          "sectionID": "12088",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12088-2"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "MC-15",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "delivered": false,
+      "coreReview": "no-deliverable",
+      "note": "Correct central simultaneous-control conclusion, but the verifier rejected an unnecessary statement about approved design documents without bound authority. Existing per-turn reservation blocked a complete rewrite.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": null,
+      "durationMilliseconds": 10924,
+      "verifier": null,
+      "failureCode": "RESEARCH_SPEND_CAP",
+      "answerText": null,
+      "supportedPoints": [],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "FGC-11",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "A 72-inch valve distance exceeds the 60-inch rule and the stated 30-inch connection does not qualify for the high-connection exception.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "5003d0979db0392370c2cd433523217df6d52db0e8df1ccd487924074a2e7ceb",
+      "durationMilliseconds": 8908,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** Under the ordinary rule, the valve may not be more than 60 inches above the finished floor; a valve at 72 inches is 12 inches over that limit. The sole stated height exception applies only where the appliance gas connection itself is more than 60 inches above the finished floor. Because the stated connection is 30 inches above the floor, that exception does not apply. (FGC § 409.5.1)\n\nThis conclusion addresses the ordinary valve-height rule only. The same provision also requires the valve to be in the same room, within 6 feet of the appliance, upstream of the union, connector, or quick-disconnect device served, and provided with access. (FGC § 409.5.1)",
+      "supportedPoints": [
+        {
+          "heading": "Ordinary shutoff-valve height limit",
+          "explanation": "The shutoff valve must be accessible and located not more than 60 inches above the finished floor. A 72-inch mounting height exceeds that limit by 12 inches.",
+          "sectionID": "8336",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8336-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Exception does not fit the stated connection height",
+          "explanation": "The exception permits a shutoff valve above 60 inches only where the gas connection to the appliance is itself more than 60 inches above the finished floor. The stated 30-inch connection height does not meet that condition.",
+          "sectionID": "8336",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8336-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Other ordinary valve-location conditions",
+          "explanation": "The valve must also be in the same room as the appliance, within 6 feet of it, upstream of the union, connector, or quick-disconnect device served, and provided with access.",
+          "sectionID": "8336",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8336-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "FGC-12",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-with-quality-gap",
+      "note": "The line-pressure-regulator conclusion is correct after a rewrite. The missing-facts list still requests manufacturer pressure/instructions for a separate overpressure path that the answer says is not needed for the asked decision.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "fe2f40c9572ff8d47bb2351aa7cc46a691507b28939912a9dfa019b89e27af0c",
+      "durationMilliseconds": 30125,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "unnecessary_qualification",
+                "detail": "The answer correctly establishes the requested result from FGC § 410.1, but its missingFacts list treats appliance ratings, supply pressure, regulator details, and overpressure-device details as needed to decide whether direct connection is permitted. Those facts affect downstream overpressure-protection design, not the already established requirement for a line regulator under the stated premise."
+              },
+              {
+                "type": "missed_material_conclusion",
+                "detail": "FGC § 416.1 also states that piping serving appliances designed to operate at inlet pressures greater than 14 inches w.c. must have overpressure protection as required by the appliance manufacturer's instructions. Because the appliance's pressure category is not established, the answer should identify this alternative applicability path conditionally rather than discussing only the greater-than-2-psi/14-in.-w.c.-or-less path."
+              }
+            ],
+            "unnecessaryMissingFactIndices": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "model": "gpt-5.6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** A higher-pressure rating for the connecting pipe does not eliminate the required pressure reduction: where an appliance is designed to operate at a lower pressure than the supply pressure, a **line pressure regulator shall be installed** (FGC § 410.1). The regulator must be listed to ANSI Z21.80/CSA 6.22, accessible, and protected from physical damage; an exterior regulator must be approved for outdoor installation.\n\nOverpressure protection may also be required. It is required where the supplier delivers more than 2 psi to piping serving an appliance designed for 14 inches water column or less; if required under that path, protection must limit appliance pressure to 2 psi or less if the line regulator fails (FGC §§ 416.1, 416.2.1). Separately, piping serving an appliance designed for inlet pressure greater than 14 inches water column must have overpressure protection as required by the appliance manufacturer’s instructions (FGC § 416.1). The appliance’s pressure category and manufacturer instructions are therefore needed only to determine the applicable overpressure-protection provisions—not whether a regulator is required under the stated premise.",
+      "supportedPoints": [
+        {
+          "heading": "A lower-pressure appliance requires a line regulator",
+          "explanation": "A line pressure regulator shall be installed where the appliance is designed to operate at a lower pressure than the supply pressure. The regulator must be listed as complying with ANSI Z21.80/CSA 6.22, accessible, and protected from physical damage; if exterior, it must be approved for outdoor installation. The pipe’s pressure rating is not an alternative to this appliance-pressure requirement.",
+          "sectionID": "8342",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8342-5"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Overpressure protection has two appliance-pressure paths",
+          "explanation": "Overpressure protection devices are required when the serving supplier delivers gas above 2 psi to piping serving appliances designed for 14 inches w.c. or less. Where that protection is required, each device must limit pressure to each connected appliance to 2 psi or less upon failure of the line pressure regulator. Separately, piping serving appliances designed for inlet pressures greater than 14 inches w.c. must have overpressure protection as required by the appliance manufacturer’s instructions.",
+          "sectionID": "8378",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8378-4",
+            "research-permitext_discovered-id:8380-3"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [
+        "The appliance manufacturer’s specified operating/inlet-pressure range and installation instructions, which determine the applicable FGC § 416.1 overpressure-protection path and any manufacturer-required protection."
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "FGC-14",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Listed connector for the movable appliance and a separate movement restraint are required.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "612688cfca417d036b4210dba4b89e6a577868babee9ffb0bad71eab791acaf1",
+      "durationMilliseconds": 5628,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** For a commercial cooking appliance on casters, the listed connector does not substitute for a restraint. FGC § 411.1.1 requires both: (1) a connector listed to ANSI Z21.69/CSA 6.16 and NSF/ANSI 169 (or the Section 411.1 Item 1 alternative), configured under the manufacturer’s instructions; and (2) movement limited by a restraining device installed under the connector and appliance manufacturers’ instructions. Thus, the described installation lacks the required restraining device. (FGC § 411.1.1)\n\nThe supplied evidence does not establish the required restraint’s type, attachment points, or configuration; those must follow the connector and appliance manufacturers’ instructions.",
+      "supportedPoints": [
+        {
+          "heading": "Caster-mounted commercial cooking appliances require a restraint",
+          "explanation": "Commercial cooking appliances installed on casters must use the specified listed connector (or the stated rigid-piping alternative), and their movement must also be limited by a restraining device installed in accordance with the connector and appliance manufacturers’ instructions. A listed connector alone therefore does not satisfy the complete rule.",
+          "sectionID": "8349",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8349-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "FGC-15",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "The final revised answer correctly separates dryer exhaust from the combustion-product venting chapter and requires outdoor discharge under MC 504.4. The rejected initial draft remains recorded.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "97aadd15d392a84bd87641dcac9ae8bf0fd6830dcd877fbf0149c0356bc103e7",
+      "durationMilliseconds": 27079,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "unsupported_requirement",
+                "detail": "The statement that “not required to be vented” concerns venting of the appliance’s combustion gases is not established by the supplied FGC 501.8 text. The passage distinguishes “vented” from the separately required dryer exhaust, but does not define or characterize the former as combustion-gas venting."
+              },
+              {
+                "type": "misstated_provision",
+                "detail": "MC 504.4 states that clothes-dryer exhaust ducts must not be connected to a vent connector, vent, or chimney and must not extend into or through ducts or plenums. The answer broadens this into a prohibition on connecting to “other duct/plenum,” which is not the enacted wording."
+              },
+              {
+                "type": "unnecessary_qualification",
+                "detail": "The answer says the evidence does not establish whether the particular dryer is Type 1, but the requested result does not depend on that classification: MC 504.4 applies to clothes-dryer exhaust ducts generally, and FGC 501.8 expressly requires Type 1 dryers to be exhausted under MC Section 504."
+              }
+            ],
+            "model": "gpt-5.6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** FGC § 501.8 does not permit a gas clothes dryer to discharge its dryer exhaust into the room. Although Item 4 lists Type 1 clothes dryers as not required to be vented, that same item expressly says: “Type 1 clothes dryers shall be exhausted in accordance with the requirements of Section 504 of the New York City Mechanical Code.” (FGC § 501.8)\n\nMC § 504.4 requires clothes-dryer exhaust ducts to terminate **outside the building**. It also prohibits connecting them to a vent connector, vent, or chimney, and prohibits extending them into or through ducts or plenums. Dryer exhaust must be independent of all other systems. (MC §§ 504.4, 501.2) Therefore, room discharge is not an allowed dryer-exhaust termination under the supplied 2022 NYC Code provisions.",
+      "supportedPoints": [
+        {
+          "heading": "Type 1 dryers remain subject to dryer-exhaust rules",
+          "explanation": "FGC 501.8 lists Type 1 clothes dryers as appliances not required to be vented, but Item 4 expressly provides: “Type 1 clothes dryers shall be exhausted in accordance with the requirements of Section 504 of the New York City Mechanical Code.” The provision therefore does not eliminate the separately stated dryer-exhaust requirement.",
+          "sectionID": "8421",
+          "sourceIDs": [
+            "research-permitext_discovered-id:8421-1"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Dryer exhaust must terminate outdoors",
+          "explanation": "MC 504.4 requires dryer exhaust ducts for clothes dryers to terminate on the outside of the building. It further states that clothes-dryer exhaust ducts shall not be connected to a vent connector, vent, or chimney, and shall not extend into or through ducts or plenums.",
+          "sectionID": "10587",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10587-2"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Dryer exhaust must be independent",
+          "explanation": "MC 501.2 requires dryer exhaust to be independent of all other systems. This is a separate requirement from the required outdoor termination.",
+          "sectionID": "10453",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10453-3"
+          ],
+          "evidenceRole": "governing"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "MC-11",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Dryer exhaust outlet screen is prohibited.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "d43b797dfea1328e59815eaf28f5d5d271fcbc6df1da3d6e5d22d6ec71d23083",
+      "durationMilliseconds": 7251,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** A screen over a clothes-dryer exhaust termination is not permitted, even if intended to keep pests out. MC § 504.4 expressly states: “Screens shall not be installed at the duct termination.” The dryer exhaust must also remain independent of other exhaust systems (MC § 501.2).",
+      "supportedPoints": [
+        {
+          "heading": "Screens are prohibited at dryer duct terminations",
+          "explanation": "MC § 504.4 expressly prohibits installation of screens at a clothes-dryer exhaust duct termination. Therefore, the proposed insect screen cannot be used at that termination.",
+          "sectionID": "10587",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10587-1"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Dryer exhaust is an independent system",
+          "explanation": "Dryer exhaust is required to be independent of all other systems. This confirms that the termination is part of a dedicated dryer-exhaust system, although it does not create an exception to the screen prohibition.",
+          "sectionID": "10453",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10453-2"
+          ],
+          "evidenceRole": "governing"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "MC-12",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Final revised answer correctly prohibits the fire/smoke damper and preserves rated-penetration protection. It contains unnecessary discussion of an unseen earlier duct-connection error.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "29f899c1b0666060871bb04463e5079db7b708aebdd9dc7d6105166f4beba34c",
+      "durationMilliseconds": 29154,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "misstated_provision",
+                "detail": "The answer states that MC § 504.4 prohibits clothes-dryer ducts from being “connected to ... [a] duct.” The supplied text prohibits connection to a vent connector, vent, or chimney, and separately prohibits ducts from extending into or through ducts or plenums. It does not state a general prohibition on being connected to a duct."
+              }
+            ],
+            "model": "gpt-5.6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** A listed fire damper cannot be installed in a clothes-dryer exhaust duct to protect this penetration. MC § 504.2 expressly prohibits fire dampers, combination fire/smoke dampers, and similar devices that obstruct dryer-exhaust flow; being listed does not create an exception.\n\nA dryer duct may penetrate a required fire-resistance-rated assembly only if it is galvanized steel or aluminum at the thickness specified in MC § 603.4 and the assembly rating is maintained under the NYC Building Code (MC § 504.2). The duct must remain independent of other systems and terminate outdoors (MC §§ 501.2, 504.4). MC § 504.4 prohibits connection to a vent connector, vent, or chimney, and prohibits extending the dryer duct into or through ducts or plenums; it does not state a general prohibition on connection to a duct. The supplied evidence does not include the applicable NYC Building Code penetration-protection detail for the particular rated assembly.",
+      "supportedPoints": [
+        {
+          "heading": "Fire dampers are prohibited in dryer exhaust ducts",
+          "explanation": "MC § 504.2 prohibits fire dampers, combination fire/smoke dampers, and any similar device that obstructs exhaust flow in clothes-dryer exhaust ducts. Therefore, a listed fire damper is not an allowed means of protecting the proposed penetration.",
+          "sectionID": "10585",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10585-3"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Penetrating a required rated assembly has separate conditions",
+          "explanation": "A clothes-dryer exhaust duct cannot penetrate or be located within a required fire-resistance-rated wall, floor/ceiling, fireblocking, or draftstopping assembly unless the duct is galvanized steel or aluminum at the MC § 603.4 thickness and the assembly fire-resistance rating is maintained in accordance with the NYC Building Code. At a wall or ceiling membrane penetration, the annular space must be sealed with noncombustible material, approved fire caulking, or a noncombustible dryer-exhaust-duct wall receptacle.",
+          "sectionID": "10585",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10585-3"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Dryer exhaust must remain independent and terminate outdoors",
+          "explanation": "Dryer exhaust must be independent of all other systems. Dryer exhaust ducts must terminate outside. They cannot connect to a vent connector, vent, or chimney, and cannot extend into or through ducts or plenums.",
+          "sectionID": "10453",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10453-2",
+            "research-permitext_discovered-id:10587-1"
+          ],
+          "evidenceRole": "governing"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "MC-14",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "When any appliance under a single hood requires Type I, the entire hood must be Type I. Applicable listed recirculating-system qualification remains conditional.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "bfda893a54428bdf150c62ae6ebe8e0925f8d5de6e61526d668251aec34a1ec5",
+      "durationMilliseconds": 31741,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "unsupported_requirement",
+                "detail": "The answer states that the appliance-specific basis for the Type I trigger “should be documented.” MC 507.2 requires documentation only for the stated electric-appliance exception; the supplied evidence does not establish a general documentation requirement for the Type I classification basis."
+              }
+            ],
+            "model": "gpt-5.6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** Where any cooking appliance under a single hood requires Type I, the entire single hood must be Type I; the balance of that hood cannot be treated as Type II. Appliances that would otherwise require Type II may be served by the Type I hood. (MC § 507.1)\n\nOnce a Type I hood is installed, the entire system—including the hood, ducts, exhaust equipment, and makeup-air system—must comply with the referenced requirements of MC §§ 506, 507, 508, and 509. Type I is required for cooking that produces grease or smoke and over medium-, heavy-, and extra-heavy-duty appliances. The supplied electric-appliance exception applies only where an approved testing agency provides the specified UL 710B grease-effluent documentation. (MC §§ 507.1, 507.2)",
+      "supportedPoints": [
+        {
+          "heading": "A single hood cannot be divided into Type I and Type II portions",
+          "explanation": "MC 507.1 states that where any cooking appliance under a single hood requires a Type I hood, “a Type I hood shall be installed.” It also expressly allows either a Type I or Type II hood where Type II is required. Thus, the appliances that would ordinarily call for Type II may be under the Type I hood, but the same single hood is not classified partly Type II.",
+          "sectionID": "10658",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10658-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Type I classification applies to the entire exhaust system",
+          "explanation": "Where a Type I hood is installed, MC 507.1 applies the referenced requirements to the entire system, including the hood, ducts, exhaust equipment, and makeup-air system.",
+          "sectionID": "10658",
+          "sourceIDs": [
+            "research-permitext_discovered-id:10658-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Type I triggers and the limited electric-appliance exception",
+          "explanation": "MC 507.2 requires Type I hoods where cooking produces grease or smoke and over medium-, heavy-, and extra-heavy-duty cooking appliances. Its stated exception for an electric appliance requires approved-testing-agency documentation that the appliance effluent contains 5 mg/m³ or less of grease when tested at 500 cfm in accordance with UL 710B.",
+          "sectionID": "10665",
+          "sourceIDs": [
+            "research-permitext_cross_reference-id:10665-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "PC-06",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Public customer lavatory requires tempered water with the cited temperature-limiting provision. Point-of-use-heater exception does not make cold-only service sufficient.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "ea43f1326862bd9cadc6f173a7f1780a7323b08f7797f3d1e63b5162decd9ae5",
+      "durationMilliseconds": 8800,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** A public restroom provided for customers cannot have cold water only at its hand-washing lavatories. Tempered water must be delivered from lavatories and group wash fixtures in public toilet facilities for customers, patrons, and visitors. It must be delivered through an approved ASSE 1070–conforming water-temperature limiting device. (PC § 416.5)\n\nIf point-of-use heaters are used instead, their outlet water temperature must be regulated to provide tempered water; they do not allow cold-only service. This answer addresses the stated water-temperature issue only.",
+      "supportedPoints": [
+        {
+          "heading": "Tempered water is required at customer restroom lavatories",
+          "explanation": "For lavatories and group wash fixtures in public toilet facilities provided for customers, patrons and visitors, tempered water shall be delivered. Therefore, a cold-water-only hand-washing lavatory arrangement does not comply with this requirement.",
+          "sectionID": "11981",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11981-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Required temperature-control method",
+          "explanation": "Tempered water must be delivered through an approved water-temperature limiting device conforming to ASSE 1070. The stated exception permits point-of-use heaters only where their outlet water temperature is regulated to provide tempered water.",
+          "sectionID": "11981",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11981-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "PC-07",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "A 30-by-30-inch ordinary compartment meets the 900-square-inch minimum; a 20-inch opening fails the 22-inch requirement. Finished dimensions, height and accessible-shower scope remain distinct.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "1ecfb6f3e0ad8849b49f7911dcf55dad687ba037e35fbf0077ce97124648e82b",
+      "durationMilliseconds": 10393,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** Although 30 in. × 30 in. provides the required **900 sq. in.** interior area and 30-in. least interior dimension, the ordinary shower-compartment access/egress opening must have a clear, unobstructed finished width of at least **22 in.** A 20-in. clear opening is 2 in. short. (PC §§ 417.4, 417.4.2)\n\nThe area and least-dimension measurements are taken from finished interior dimensions at the threshold-centerline elevation and must continue at least 70 in. above the shower drain outlet; the stated 30-by-30 dimensions satisfy those size minima if measured that way. This answer addresses the ordinary Plumbing Code dimensional provisions only; a shower required to conform to accessibility provisions must comply with PC § 404.1.",
+      "supportedPoints": [
+        {
+          "heading": "Interior area and least dimension meet the stated minima",
+          "explanation": "A shower compartment must have at least 900 square inches of interior cross-sectional area and a least finished interior dimension of at least 30 inches. The stated 30-inch by 30-inch compartment has 900 square inches and a 30-inch least dimension. The rule specifies its measurement elevation and vertical continuation.",
+          "sectionID": "11985",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11985-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "The 20-inch clear opening fails the access minimum",
+          "explanation": "The shower-compartment access and egress opening must have a clear, unobstructed finished width of at least 22 inches. The stated 20-inch opening is therefore 2 inches below the minimum.",
+          "sectionID": "11987",
+          "sourceIDs": [
+            "research-permitext_discovered-id:11987-2"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "PC-09",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "125 degrees F exceeds the 120-degree shower delivery limit by 5 degrees.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "65f7a8127c73a38641a743ffe55578e3adcc9e4a0176cb0cbefb85e4c7ba703c",
+      "durationMilliseconds": 8272,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** For an individual shower or tub-shower valve, the maximum setting must be limited to **120°F (49°C)** and field-adjusted according to the manufacturer’s instructions. A 125°F maximum setting exceeds that limit by 5°F. (PC § 424.3)\n\nFor a multiple (gang) shower arrangement using individually controlled qualifying valves, the same 120°F maximum applies. (PC § 424.4)",
+      "supportedPoints": [
+        {
+          "heading": "Individual shower-valve maximum setting",
+          "explanation": "Individual shower and tub-shower combination valves must be balanced-pressure, thermostatic, or combination balanced-pressure/thermostatic valves conforming to one of the listed standards and installed at the point of use. They must have a means to limit the maximum valve setting to 120°F (49°C), field-adjusted under the manufacturer’s instructions. Therefore, 125°F is not a permitted maximum setting for this valve type.",
+          "sectionID": "12038",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12038-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Gang-shower valve maximum setting",
+          "explanation": "For multiple (gang) showers, where each shower head is individually controlled by a qualifying balanced-pressure, thermostatic, or combination valve, those valves must likewise limit the maximum setting to 120°F (49°C) and be field-adjusted under the manufacturers’ instructions.",
+          "sectionID": "12039",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12039-2"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "PC-11",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "A 3-inch pipe requires 1/8 inch per foot; 1/16 is insufficient. Larger-pipe alternative is distinguished.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "fe9e1c68f3f1b0f2530d1f1e805204a6b71dbddeee8196ace35a8ab825fbe35d",
+      "durationMilliseconds": 8681,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** A 3-inch horizontal sanitary drainage pipe must slope at least **1/8 inch per foot**, so the proposed **1/16 inch per foot** slope is below the minimum (PC § 704.1). The pipe must also be installed with uniform alignment and a uniform slope.\n\nThe 1/16-inch-per-foot minimum applies only to horizontal drainage pipe **8 inches or larger**. The supplied fixture-unit table likewise shows no 1/16-inch-per-foot capacity for a 3-inch building drain or sewer; its 3-inch row begins at 1/8 inch per foot (PC Table 710.1(1)).",
+      "supportedPoints": [
+        {
+          "heading": "Minimum slope for 3-inch horizontal drainage pipe",
+          "explanation": "PC § 704.1 requires horizontal drainage piping to have uniform alignment and uniform slopes not less than Table 704.1. The table assigns a minimum slope of 1/8 inch per foot to pipe 3 through 6 inches in diameter. A 3-inch pipe at 1/16 inch per foot therefore does not meet that minimum.",
+          "sectionID": "12334",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12334-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Fixture-unit table does not rate a 3-inch pipe at 1/16 inch per foot",
+          "explanation": "For building drains and sewers, PC Table 710.1(1) shows a dash—not an allowable drainage-fixture-unit value—for a 3-inch pipe at 1/16 inch per foot. The table provides 36 drainage fixture units for a 3-inch pipe at 1/8 inch per foot.",
+          "sectionID": "12420",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12420-3"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "PC-13",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Double trapping is prohibited. Additional single-trap arrangement exceptions are unnecessary to this decision but do not reverse it.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "f453e03a3f2924d90c1d76b206fcc171cbf6466df8e9591c0d2eb9cb769cf9a0",
+      "durationMilliseconds": 9126,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** Two traps in series on a sink waste line constitute double trapping, which is expressly prohibited: “A fixture shall not be double trapped.” (PC § 1002.1). The stated purpose of extra sewer-gas protection does not create an exception for a sink.\n\nPC § 1002.1 generally requires each plumbing fixture to be separately trapped by a liquid-seal trap, but its listed exceptions do not permit two fixture traps in series for a sink. This answers only the double-trap proposal; other sink-drain, venting, and alteration requirements were not evaluated.",
+      "supportedPoints": [
+        {
+          "heading": "Double trapping of a sink is prohibited",
+          "explanation": "PC § 1002.1 requires each plumbing fixture to be separately trapped by a liquid-seal trap and expressly states: “A fixture shall not be double trapped.” Two traps in series serving the stated sink are therefore not permitted. The enumerated exceptions address integral traps, qualifying combination fixtures, certain grease-interceptor installations, specified parking-structure floor drains, outdoor drinking fountains to drywells, and qualifying acid-neutralizing systems; none authorizes double trapping of the sink described.",
+          "sectionID": "12605",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12605-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "PC-14",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "A 10-foot trap arm exceeds the stated 8-foot allowance for the 2-inch case. The self-siphoning-fixture exception is not assumed.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "6bf0779b9f1a29355bbfac2927b0e04e5fc5b25518b8485c9b7de898833c539f",
+      "durationMilliseconds": 10812,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** For a 2-inch trap, the maximum developed length from the trap weir to the vent fitting is **8 feet** at the table’s specified 1/4-inch-per-foot slope. A 10-foot trap arm exceeds that limit by 2 feet and is not permitted under the ordinary rule (PC § 909.1). The stated facts do not identify the self-siphoning-fixture exception, for which the developed length is not limited.",
+      "supportedPoints": [
+        {
+          "heading": "2-inch trap-arm distance limit",
+          "explanation": "PC § 909.1 requires the slope and developed length from the trap weir to the vent fitting to comply with Table 909.1. The table allows 8 feet for a 2-inch trap at a 1/4-inch-per-foot slope. Therefore, 10 feet exceeds the listed maximum by 2 feet.",
+          "sectionID": "12565",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12565-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Limited exception for self-siphoning fixtures",
+          "explanation": "The section exempts the developed length from the trap weir to the vent fitting for self-siphoning fixtures, such as water closets. No such fixture or exception is identified in the stated facts.",
+          "sectionID": "12565",
+          "sourceIDs": [
+            "research-permitext_discovered-id:12565-1"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-06",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sourceCommit": "53685fb3e3adad62084abd17de974db9d471107d",
+      "delivered": true,
+      "coreReview": "core-with-quality-gap",
+      "note": "The explicit no-work premise is now accepted and the 14-versus-12-month expiration result is correct on the stated assumptions, without a rewrite. The answer still lists flood-hazard status as missing even though the scenario excludes special preservation. Keep that qualification from reopening the assumed scope.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "4f05d2619f69394b340789e53e18493d6836910a9f4084c7a143127ddc86a418",
+      "durationMilliseconds": 13179,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** On the facts given, the permit expired by limitation and became invalid once the permitted work had not commenced within 12 months of issuance; keeping the printed permit does not preserve it. Fourteen months with no work begun is two months beyond that commencement deadline. (AC § 28-105.9)\n\nThis conclusion assumes the stated absence of a renewal or special preservation provision. The supplied rule separately provides a flood-hazard-area exception governed by Appendix G § G104; that exception’s timeframe is not included in the evidence, so it could matter if the work is in a flood hazard area. (AC § 28-105.9)",
+      "supportedPoints": [
+        {
+          "heading": "Uncommenced permits expire after 12 months",
+          "explanation": "All permits issued by the commissioner expire by limitation and become invalid when the permitted work is not commenced within 12 months after issuance. With no work commenced for 14 months, the stated permit is beyond that deadline.",
+          "sectionID": "9013",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9013-2"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Flood-hazard-area exception",
+          "explanation": "Permits for work in a flood hazard area expire under the timeframes established by Appendix G, Section G104, rather than the stated general expiration rule. The supplied evidence does not include that section’s timeframes.",
+          "sectionID": "9013",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9013-2"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [
+        "Whether the permitted work is in a flood hazard area, which would invoke the Appendix G § G104 exception; the supplied evidence does not provide that section’s timeframe."
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-07",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-with-quality-gap",
+      "note": "Ongoing maintenance duty is correctly stated after a rewrite. Final wording still reopens whether the stated required safeguard is in fact required. The scenario already supplies that premise.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "28411199b1076d251b92fc343456befc47cf93ba1e21f913b1ccae61e1946560",
+      "durationMilliseconds": 28393,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": false,
+        "decisionFactRepairApplied": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "unnecessary_qualification",
+                "detail": "The answer correctly reaches a direct No conclusion, but it lists facts as missing that cannot change the requested result because the question stipulates that the deteriorated item is a required building safeguard. The item's identity, original legal basis, design records, and current condition are relevant only to determining the corrective work, not whether building age eliminates the maintenance obligation."
+              }
+            ],
+            "unnecessaryMissingFactIndices": [
+              0,
+              1,
+              2
+            ],
+            "model": "gpt-5.6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** A building’s age does not eliminate the owner’s maintenance obligation. The owner must keep the building and its facilities safe and code-compliant, and must maintain in good working condition safeguards required by the current code, the 1968 Building Code, other applicable laws or rules, **or by the law in effect when the building was erected, altered, or repaired** (AC § 28-301.1). Thus, lawful original construction does not permit a required safeguard to deteriorate without maintenance.\n\nFor a gas, plumbing, or mechanical installation specifically, the applicable 2022 code likewise requires both existing and new installations to be maintained in proper operating condition according to their original design; required devices and safeguards must remain compliant with the provisions under which installed (FGC § 102.3; PC § 102.3; MC § 102.3). Whether the particular item is in fact a required safeguard, and what condition or repair is necessary, depends on the item’s original legal basis, design, and present condition.",
+      "supportedPoints": [
+        {
+          "heading": "Owner must maintain required safeguards regardless of building age",
+          "explanation": "All buildings and their parts must be maintained in a safe condition. Required safeguards—including those required under the current code, the 1968 Building Code, other applicable laws or rules, or the law in effect when the building was erected, altered, or repaired—must be kept in good working condition. The owner is responsible at all times for maintaining the building and its facilities safely and in a code-compliant manner. This expressly reaches historically required safeguards; it does not create an age-based exemption.",
+          "sectionID": "9493",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9493-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Existing building-service installations remain subject to maintenance rules",
+          "explanation": "For the respective gas, plumbing, and mechanical scopes, the 2022 codes require both existing and new installations and their parts to be maintained in proper operating condition according to original design. Required devices or safeguards must be maintained under the provisions pursuant to which they were installed. Plumbing and mechanical installations must also remain safe and sanitary.",
+          "sectionID": "7956",
+          "sourceIDs": [
+            "research-permitext_discovered-id:7956-3",
+            "research-permitext_discovered-id:11737-4",
+            "research-permitext_discovered-id:10217-5"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-09",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Alternative method/material requires prior commissioner approval and the specified scope/equivalence conditions.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "5c9fb18757e88815b2e1b26dd5b64d68f35fa574cb582b1895629e375e9a7f18",
+      "durationMilliseconds": 10229,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** The design team’s belief that the material is stronger or more durable does not authorize immediate use. An alternative material may be used only after the commissioner has **previously approved** it, and only within the scope of that approval (AC § 28-113.2.2).\n\nApproval is required when the commissioner finds that the proposal is satisfactory, complies with the code’s intent, and is, for its intended purpose, at least equivalent to the prescribed material in **quality, strength, effectiveness, fire resistance, durability, and safety**. The supplied evidence does not establish that a manufacturer’s submittal or the design team’s opinion alone constitutes that approval.",
+      "supportedPoints": [
+        {
+          "heading": "Prior commissioner approval is required",
+          "explanation": "Alternative materials not specifically prescribed by the code are permitted unless otherwise specifically limited, but their use must be previously approved by the commissioner and is limited to the extent of that approval.",
+          "sectionID": "9125",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9125-1"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Equivalence is broader than strength and durability",
+          "explanation": "The commissioner’s approval finding must establish that the proposed design is satisfactory, complies with the code’s intent, and that the material, for its intended purpose, is at least equivalent to the prescribed material in quality, strength, effectiveness, fire resistance, durability, and safety.",
+          "sectionID": "9125",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9125-1"
+          ],
+          "evidenceRole": "governing"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-10",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Work must remain accessible and exposed until the required inspection; photographs are not an automatic substitute.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "fed945a95f7fd7155c8e011f56b8f99c8a8e7f388dc10e80d98f415ad74f0f5e",
+      "durationMilliseconds": 12591,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** For permit-required work, the work must remain **accessible and exposed until the required inspection is completed**; photographs of concealed work do not substitute for that inspection-access duty. The permit holder must ensure access and is liable for the cost to remove and replace material needed to allow the inspection. (AC § 28-116.1)\n\nIf an approved agency is conducting the inspection, it must report defective work or discrepancies with the approved construction documents to the contractor (and, where applicable, the superintendent) for correction. (AC § 28-116.1.1)",
+      "supportedPoints": [
+        {
+          "heading": "Concealed work must remain exposed through the required inspection",
+          "explanation": "Construction or work requiring a permit is subject to inspection and must remain accessible and exposed for inspection purposes until the required inspection is completed. The permit holder has the duty to keep it accessible and exposed and is liable for removal or replacement expense needed to permit inspection. The supplied enacted text provides no photographs-based substitution for this duty.",
+          "sectionID": "9158",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9158-1"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Approved-agency inspection findings must be reported for correction",
+          "explanation": "An approved agency conducting inspections must report defective work and discrepancies with approved construction documents to the contractor and, when applicable, the superintendent of construction for correction; uncorrected items must be reported in writing to the registered design professional of record and owner.",
+          "sectionID": "9159",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9159-2"
+          ],
+          "evidenceRole": "governing"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-12",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Final inspection follows completion of all permitted work and precedes the required certificate of occupancy. Extra address/amended-certificate survey context is explicitly conditional.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "e5e270fb6dce01a875b9234e8c0e1c2b9953105c940535d03d21c358bd666ea9",
+      "durationMilliseconds": 15111,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** For permitted work requiring a new or amended Certificate of Occupancy, DOB’s final inspection is to occur **after all work authorized by the building permit is complete** and before the Certificate of Occupancy is issued (AC § 28-116.2.4.1). The final report must confirm correction of noted defects, substantial compliance with approved construction documents and applicable law, and completion of all required inspections. A satisfactory final report and required submittals then support DOB’s project sign-off and, where applicable, issuance of the Certificate of Occupancy (AC § 28-116.4).\n\nThus, an early final inspection while permitted items remain incomplete is not the ordinary code sequence. The supplied special rule for an amended CO limited to a post-CO change in address, block/lot numbers, or zoning-lot metes and bounds does not authorize unfinished permitted construction; it changes what counts as construction documents for that narrow category (AC §§ 28-116.2.4.1, 28-118.16.2). No building or open lot may be used or occupied without a CO issued by the commissioner (AC § 28-118.1).",
+      "supportedPoints": [
+        {
+          "heading": "Final inspection follows completion of permitted work",
+          "explanation": "Where permitted work requires a new or amended Certificate of Occupancy, the Department must perform the final inspection after all work authorized by the building permit is completed and before CO issuance. The report must confirm correction of noted defects, substantial compliance with approved construction documents, the code and other applicable laws and rules, and completion of all required inspections.",
+          "sectionID": "9169",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9169-4"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Sign-off and CO follow a satisfactory final report",
+          "explanation": "Upon submission of a satisfactory final-inspection report and all required submittal documents, the Department documents project sign-off and issues a letter of completion or, where applicable, a Certificate of Occupancy.",
+          "sectionID": "9175",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9175-10"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Occupancy requires a Certificate of Occupancy",
+          "explanation": "A building or open lot may not be used or occupied without a Certificate of Occupancy issued by the commissioner. Issuance does not approve a code violation or violation of other applicable laws and rules.",
+          "sectionID": "9195",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9195-1"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Narrow amended-CO document rule",
+          "explanation": "For an amended CO where no change inconsistent with the last-issued CO has been made and the amendment only reflects a subsequent address, block/lot, or zoning-lot metes-and-bounds change, the applicable final-inspection provision treats the construction documents as a final lot survey and floor and roof plans showing at least exit compliance. This narrow rule does not alter the stated completion-before-final-inspection sequence for authorized permitted work.",
+          "sectionID": "9229",
+          "sourceIDs": [
+            "research-permitext_cross_reference-id:9229-16",
+            "research-permitext_discovered-id:9169-4"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-13",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Certificate of occupancy does not replace the place-of-assembly certificate. Indoor/outdoor thresholds and the distinct temporary certificate remain bounded.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "5912f405bf1d01994aa95c6f5a83a62ac57a88ee362ff3ebb0b05148bd3daaa6",
+      "durationMilliseconds": 18797,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** A Certificate of Occupancy that authorizes assembly use does not itself authorize operation as a place of assembly; the Commissioner must thereafter issue a Place of Assembly Certificate of Operation. Using or occupying the space as a place of assembly without that certificate is unlawful. (AC §§ 28-118.12, 28-117.1.)\n\nFor an indoor assembly occupancy, the Certificate of Operation requirement applies when the space is used or intended for use by **75 or more persons**; for an outdoor assembly occupancy, the threshold is **200 or more persons**. (BC § 303.7.) A temporary Certificate of Operation may be issued only at the Commissioner’s discretion, upon applicant request, and only if public safety is not jeopardized; it is still a certificate, not permission to operate without one. (AC § 28-117.2.)",
+      "supportedPoints": [
+        {
+          "heading": "A Certificate of Occupancy does not substitute for a Certificate of Operation",
+          "explanation": "The Administrative Code expressly provides that issuance of a Certificate of Occupancy does not authorize use of a space as a place of assembly unless and until the Commissioner subsequently issues a Place of Assembly Certificate of Operation. It is also unlawful to use or occupy a building or space as a place of assembly without a certificate issued by the Commissioner.",
+          "sectionID": "9219",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9219-2",
+            "research-permitext_discovered-id:9182-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Assembly-occupancy thresholds for the certificate requirement",
+          "explanation": "The Building Code requires a Certificate of Operation under AC § 28-117.1 for indoor assembly occupancies used or intended for use by 75 or more persons, including specified elevated or below-grade open spaces, and for outdoor assembly occupancies used or intended for use by 200 or more persons.",
+          "sectionID": "138",
+          "sourceIDs": [
+            "research-permitext_cross_reference-id:138-3",
+            "research-permitext_discovered-id:9182-1"
+          ],
+          "evidenceRole": "supporting"
+        },
+        {
+          "heading": "Temporary certificate is a limited alternative certificate",
+          "explanation": "At the Commissioner’s discretion, a temporary Certificate of Operation may be issued on an applicant’s request if public safety is not jeopardized. This provision does not authorize operation without a certificate.",
+          "sectionID": "9186",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9186-4"
+          ],
+          "evidenceRole": "supporting"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-14",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "delivered": false,
+      "coreReview": "no-deliverable",
+      "note": "Correct central requirement for an issued occupancy certificate, but the exception discussion was bound only to AC 28-118.1. The verifier required the separate temporary/interim/partial authorities; the per-turn reservation blocked a complete rewrite.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": null,
+      "durationMilliseconds": 12941,
+      "verifier": null,
+      "failureCode": "RESEARCH_SPEND_CAP",
+      "answerText": null,
+      "supportedPoints": [],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-15",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sourceCommit": "53685fb3e3adad62084abd17de974db9d471107d",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Correct all-work-stop conclusion with the commissioner danger-removal exception. Revision binds both the scope and continuation provisions to the contractor-belief point. Additional rescission rules are conditional.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "823127ca03b7a943de6fe7873f2cbe22e4fb31754cf56be7d01e787002eb78ce",
+      "durationMilliseconds": 30181,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 2,
+        "regenerated": true,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": false,
+            "issues": [
+              {
+                "type": "incorrect_citation",
+                "detail": "The supported point titled “An unrelated-work belief is not an exception” cites only AC 28-207.2.2 (sourceID research-permitext_discovered-id:9337-4), but its explanation relies on the separate AC 28-207.2.1 rule that all work must stop unless otherwise specified to establish that the interior work is covered by the order. Under the binding rule, support from AC 28-207.2.1 cannot be imported from another supported point or citation. Add sourceID research-permitext_discovered-id:9336-2 to that supported point, or narrow the point to what AC 28-207.2.2 alone establishes."
+              }
+            ],
+            "model": "gpt-5.6-luna"
+          },
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**No.** On the stated facts, interior work in the other area may not continue unless the stop-work order itself otherwise specifies that work may proceed, or the Commissioner orders work necessary to remove danger. Upon issuance, “all work shall immediately stop unless otherwise specified.” A person with knowledge or notice may not continue—or allow, authorize, promote, or cause continuation of—work covered by the order, except work required by the Commissioner. The contractor’s view that a separate area is unrelated does not create an exception. (AC §§ 28-207.2.1, 28-207.2.2)\n\nThe order can be rescinded upon application when the underlying condition is corrected and the stated penalty/fine or security conditions are met, or where it was issued in error or should not have been issued. If this is a mandatory stop-work order, work also may not resume until DOB rescinds it, and rescission cannot occur fewer than two business days after issuance. (AC §§ 28-207.2.3, 28-207.2.4)",
+      "supportedPoints": [
+        {
+          "heading": "Stop-work order halts all work unless it says otherwise",
+          "explanation": "Upon issuance of a stop-work order, all work must immediately stop unless the order otherwise specifies. The Commissioner may also order work necessary to remove danger.",
+          "sectionID": "9336",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9336-2"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Contractor belief does not authorize continuation",
+          "explanation": "A person with knowledge or notice may not allow, authorize, promote, continue, or cause continuation of work covered by a stop-work order, except work required by order of the Commissioner. Read with the rule that all work must stop unless otherwise specified, the stated order’s failure to identify permitted work does not allow the contractor to continue interior work based on its own view that the area is unrelated.",
+          "sectionID": "9337",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9337-4",
+            "research-permitext_discovered-id:9336-2"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Issuance authority and mandatory-order resumption",
+          "explanation": "The Commissioner may issue a stop-work order for the enumerated violations, unsafe or dangerous work, notice-of-proposed-revocation, or specified unsafe-lead-work referral circumstances. For a mandatory stop-work order, work must immediately stop and cannot resume until the Department rescinds the order; rescission cannot occur less than two business days after issuance.",
+          "sectionID": "9339",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9339-3",
+            "research-permitext_discovered-id:9335-1"
+          ],
+          "evidenceRole": "governing"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-08",
+      "latestResultFile": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sourceCommit": "3dd14d266ba31d4df51306946e7448bb1c115c2f",
+      "delivered": true,
+      "coreReview": "core-matches-reference",
+      "note": "Material false statement permits revocation despite construction having started. Required notice, response periods and possible stop-work order are preserved. Automatic web search completed, but the final answer relies on enacted evidence and cites no web source.",
+      "wholeAnswerProfessionalApproval": false,
+      "strictQualityScore": null,
+      "answerSHA256": "ff45e6bab4f0bf8e545853b822f1327b47ef0cd2c1f717e1a154cdbcfff3a2a6",
+      "durationMilliseconds": 22863,
+      "verifier": {
+        "status": "passed",
+        "pass": true,
+        "attempts": 1,
+        "regenerated": false,
+        "sourceBoundedRepairApplied": false,
+        "history": [
+          {
+            "pass": true,
+            "issues": [],
+            "model": "gpt-5.6-luna"
+          }
+        ]
+      },
+      "failureCode": null,
+      "answerText": "**Yes—construction having started does not bar revocation.** The commissioner is authorized to suspend or revoke a permit, and may revoke it when there was a false statement or misrepresentation of a material fact in the application or submittal documents on which the approval was issued (AC §§ 28-105.10, 28-105.10.1).\n\nBefore revocation, DOB must give the permit holder written notice stating the reasons for the proposed revocation and the applicant’s right to submit information opposing revocation within **10 business days** after hand or electronic delivery, or **15 business days** after mailed notice. The notice may be accompanied by a stop-work order; separately, a stop-work order may be issued when a proposed-revocation notice has been issued (AC §§ 28-105.10.1, 28-207.2). The supplied enacted text contains no exception that prevents revocation because work has begun.",
+      "supportedPoints": [
+        {
+          "heading": "Authority to revoke an issued permit",
+          "explanation": "The commissioner is expressly authorized to suspend or revoke a permit issued under the Construction Code. The authorization applies to an issued permit and is not limited by whether construction has commenced.",
+          "sectionID": "9015",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9015-2"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Material false statement is a revocation ground",
+          "explanation": "The commissioner may revoke a permit when an application or submittal document contained a false statement or misrepresentation as to a material fact upon which the approval was issued. The provision supplies no construction-started exception.",
+          "sectionID": "9016",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9016-1"
+          ],
+          "evidenceRole": "governing"
+        },
+        {
+          "heading": "Notice, response opportunity, and potential stop-work order",
+          "explanation": "The proposed-revocation notice must state the reasons and advise of the opportunity to provide information against revocation within 10 business days after hand or electronic delivery, or 15 business days after notice is posted by mail. The notice may be accompanied by a stop-work order, and a stop-work order may be issued once a notice of proposed revocation has been issued.",
+          "sectionID": "9016",
+          "sourceIDs": [
+            "research-permitext_discovered-id:9016-1",
+            "research-permitext_cross_reference-id:9335-3"
+          ],
+          "evidenceRole": "governing"
+        }
+      ],
+      "missingFacts": [],
+      "assumptions": []
+    }
+  ]
+}
