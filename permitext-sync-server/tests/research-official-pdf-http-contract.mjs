@@ -5,6 +5,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import PDFDocument from "pdfkit";
+import { validateGuidanceSourceResolutions } from "../research-guidance-source-resolutions.mjs";
 
 const replayPath = process.argv[2];
 const scratch = await mkdtemp(join(tmpdir(), "permitext-official-pdf-http-"));
@@ -93,6 +94,7 @@ for (const pageNumber of [10, 28, 29, 32]) {
 releaseDocument.end();
 const releaseBytes = await releaseComplete;
 let question = `According to the official service notice at ${sourceURL}, which review type applies to the new application?`;
+let resolutionFailure = null;
 let payload;
 let bytes;
 if (replayPath) {
@@ -258,8 +260,35 @@ const responseDouble = async (url, options) => {
           sourceUses: citedPassages.map((passage) => ({ sourceID: passage.sourceID, claimID: passage.claimID }))
         }], missingFacts: [], evidenceLimitations: []
       };
+      if (input.sourceResolutionPacket) {
+        assert.equal(Object.keys(body.text.format.schema.properties)[0], "sourceResolutions");
+        // Explicit synthetic findings exercise transport and structural gates;
+        // they are not generated-answer or professional-acceptance evidence.
+        const statements = {
+          creation_and_submission_timing: "The supplied creation-timing directions remain unresolved; submission requires I1 submission.",
+          filing_completion_scope: "The general separate-LOC direction depends on job type; NB/Alteration-CO subsequent filings remain Permit Entire and close through the initial CO process.",
+          field_editability: "Work on Floors remains unresolved because the process page prohibits editing while the FAQ permits floor changes subject to a PW3 cost update.",
+          conditional_stakeholder: "If the source's ownership condition applies, the additional board stakeholder must attest before submission."
+        };
+        value.sourceResolutions = { packetSHA256: input.sourceResolutionPacket.packetSHA256,
+          relationships: input.sourceResolutionPacket.relationships.map(({ relationshipIndex, requiredSourceUses }) => {
+            const relationship = input.sourceRelationships[relationshipIndex];
+            const statement = statements[relationship.kind];
+            assert(statement, `Missing explicit fixture for ${relationship.kind}`);
+            value.paragraphs[0].text += ` ${statement}`;
+            for (const use of requiredSourceUses) if (!value.paragraphs[0].sourceUses.some(item => item.sourceID === use.sourceID && item.claimID === use.claimID)) value.paragraphs[0].sourceUses.push(use);
+            return { relationshipIndex, outcome: relationship.kind.includes("timing") || relationship.kind === "field_editability" ? "unresolved" : "conditional", statement, paragraphIndex: 0 };
+          }) };
+        if (resolutionFailure === "missing_plan") delete value.sourceResolutions;
+        if (resolutionFailure === "uncarried_statement") value.paragraphs[0].text = value.paragraphs[0].text.replace(value.sourceResolutions.relationships[0].statement, "");
+        if (resolutionFailure === "missing_source") {
+          const required = input.sourceResolutionPacket.relationships[0].requiredSourceUses[0];
+          value.paragraphs[0].sourceUses = value.paragraphs[0].sourceUses.filter(use => use.sourceID !== required.sourceID || use.claimID !== required.claimID);
+        }
+      }
     } else {
       assert.equal(body.text.format.name, "permitext_official_guidance_verification");
+      validateGuidanceSourceResolutions(input, input.proposedAnswer);
       verificationDoubles += 1;
       assert(input.passages.every((passage) => passage.contentHash?.length === 64));
       if (rejectSummary) {
@@ -383,9 +412,27 @@ try {
     assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-014", "DOBNOW-017", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
     const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-014": /cannot simply answer No/, "DOBNOW-017": /required before Final CO/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
     assert.match(answer.answerText, expected[id]);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v11");
+    assert.equal(answer.promptVersion, "20260909-document-summary-v13");
     assert.equal(answer.officialGuidanceSummary.version, "20260909-document-summary-v2",
       "New summaries retain the required qualification receipt; older v1 records remain readable.");
+    assert.doesNotMatch(answer.answerText, /sourceResolutions|relationshipIndex|packetSHA256/);
+    if (id === "DOBNOW-003") {
+      for (const failure of ["missing_plan", "uncarried_statement", "missing_source"]) {
+        resolutionFailure = failure;
+        const beforeRejected = providerDoubles;
+        const rejected = await ask();
+        assert(rejected.status >= 400);
+        assert.equal(rejected.body.code, "INVALID_RESEARCH_RESPONSE");
+        assert.equal(providerDoubles - beforeRejected, 1, "An invalid source resolution stops after the draft without a verifier or retry.");
+      }
+      resolutionFailure = null;
+      qualificationFailure = "omitted_condition";
+      const beforeSemantic = providerDoubles;
+      const semanticRejection = await ask();
+      assert.equal(semanticRejection.body.code, "RESEARCH_VERIFICATION_FAILED");
+      assert.equal(providerDoubles - beforeSemantic, 2, "A structurally valid plan cannot override semantic rejection or trigger an extra call.");
+      qualificationFailure = null;
+    }
     if (id === "DOBNOW-017") {
       missingADUSections = true;
       const beforeMissing = providerDoubles;

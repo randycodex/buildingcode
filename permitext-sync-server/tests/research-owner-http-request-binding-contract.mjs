@@ -109,4 +109,32 @@ for (const mutate of [
   const body = withRelatedEvidence(htmlA), input = JSON.parse(body.input); mutate(input); body.input = JSON.stringify(input);
   assert.throws(() => htmlHash(body));
 }
-console.log("Owner HTTP request binding passed: isolated account/passage IDs normalize; source text, section identity, citation binding, instructions, model, tier and token ceilings remain bound.");
+const resolutionRequest = (claimID, contentHash, question = "Can the applicant submit before the owner and board attest?") => researchOfficialGuidanceSummaryRequest({
+  question, userID: first, model: "test-model",
+  webSupport: { sources: [{ id: "roles", url: "https://www.nyc.gov/roles", title: "Stakeholder conditions", sourceValidation: "official_html",
+    sourceContentHash: contentHash, attributedClaims: [{ id: claimID, contentHash,
+      text: "When Board is the Owner Type, the Board representative is a required Stakeholder. Both owner and Board must complete attestations before filing." }] }] }
+});
+const resolutionA = resolutionRequest("resolution-a", "a".repeat(64)), resolutionB = resolutionRequest("resolution-b", "b".repeat(64));
+const beforeResolution = structuredClone(resolutionA);
+assert(JSON.parse(resolutionA.input).sourceResolutionPacket);
+assert.equal(htmlHash(resolutionA), htmlHash(resolutionB), "Derived resolution hashes and required citations normalize only after checking the complete original packet.");
+assert.deepEqual(resolutionA, beforeResolution, "Diagnostic normalization must not mutate outgoing requests.");
+assert.notEqual(htmlHash(resolutionRequest("resolution-b", "b".repeat(64), "Can the applicant submit before the owner and board attest? The owner type changed.")), htmlHash(resolutionA));
+for (const mutate of [
+  (input) => { input.sourceResolutionPacket.packetSHA256 = "c".repeat(64); },
+  (input) => { input.sourceResolutionPacket.relationships[0].requiredSourceUses[0].claimID = "invented"; },
+  (input) => { input.sourceResolutionPacket.relationships = []; },
+  (input) => { input.passages[0].text += " An additional exception."; },
+  (input) => { input.question += " A different supplied fact."; }
+]) {
+  const changed = structuredClone(resolutionA), input = JSON.parse(changed.input); mutate(input); changed.input = JSON.stringify(input);
+  assert.throws(() => htmlHash(changed), /Invalid source resolution packet/);
+}
+const badResolutionSchema = structuredClone(resolutionA);
+badResolutionSchema.text.format.schema.properties.sourceResolutions.properties.packetSHA256.enum = ["invented"];
+assert.throws(() => htmlHash(badResolutionSchema), /schema must bind/);
+const changedOutcomeSchema = structuredClone(resolutionA);
+changedOutcomeSchema.text.format.schema.properties.sourceResolutions.properties.relationships.items.properties.outcome.enum = ["resolved"];
+assert.notEqual(htmlHash(changedOutcomeSchema), htmlHash(resolutionA), "Normalization must preserve the resolution schema's actual constraints.");
+console.log("Owner HTTP request binding passed: isolated account/passage IDs and validated derived resolution hashes normalize; full source text, resolution/citation/schema bindings, instructions, model, tier and ceilings remain bound.");

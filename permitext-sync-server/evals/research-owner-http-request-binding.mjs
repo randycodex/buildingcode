@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { guidanceSourceResolutionPacket } from "../research-guidance-source-resolutions.mjs";
 
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 
@@ -15,6 +16,13 @@ export function ownerHTTPResearchRequestHash(body, { normalizeOfficialHTML = fal
     // NYC pages inject changing scripts that are outside the extracted text.
     // Preserve every supplied passage field and its exact schema binding.
     const normalized = structuredClone(body), input = JSON.parse(body.input);
+    const resolutionPacket = input.sourceResolutionPacket;
+    if (resolutionPacket !== undefined) {
+      assert.deepEqual(resolutionPacket, guidanceSourceResolutionPacket(input), "Invalid source resolution packet.");
+      assert(resolutionPacket, "A source resolution packet requires source relationships.");
+      assert.deepEqual(normalized.text.format.schema.properties.sourceResolutions?.properties.packetSHA256.enum,
+        [resolutionPacket.packetSHA256], "The resolution schema must bind its actual source packet.");
+    }
     const ids = new Map(), hashes = new Map();
     assert(Array.isArray(input.passages));
     const originals = new Map(input.passages.map((passage) => [passage.claimID, { ...passage }]));
@@ -49,6 +57,16 @@ export function ownerHTTPResearchRequestHash(body, { normalizeOfficialHTML = fal
         evidence.claimID = ids.get(evidence.claimID);
         if (hashes.has(evidence.sourceID)) evidence.contentHash = `html-content:${evidence.sourceID}`;
       }
+    }
+    if (resolutionPacket) {
+      // Check the real derived hash before normalizing it. The complete input,
+      // schema and every required citation remain in the outer request hash.
+      resolutionPacket.packetSHA256 = "normalized-source-resolution-input";
+      for (const relationship of resolutionPacket.relationships) for (const use of relationship.requiredSourceUses) {
+        assert(ids.has(use.claimID));
+        use.claimID = ids.get(use.claimID);
+      }
+      normalized.text.format.schema.properties.sourceResolutions.properties.packetSHA256.enum = [resolutionPacket.packetSHA256];
     }
     normalized.input = JSON.stringify(input);
     normalized.safety_identifier = "isolated-account";

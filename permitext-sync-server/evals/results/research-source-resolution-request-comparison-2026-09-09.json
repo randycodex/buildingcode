@@ -1,0 +1,159 @@
+{
+  "schema": "permitext.research-source-resolution-comparison.v1",
+  "checkedAt": "2026-09-09T22:50:08.858Z",
+  "baselineCommit": "b51897f42afb0cf4c8e3b9ade600fc0ca5bedcb4",
+  "baselineSummarySHA256": "aeb77f3430b61f2eae85de620963d7831fbf284b91d85e8ce8818a6736911dd1",
+  "sourceHashes": {
+    "app.mjs": "cafc24eeb8544c01402bf23d19cf8f0e0a9ebfa61f6f3d2ace727ca8f1fa6535",
+    "research-official-guidance-summary.mjs": "f9cf1049f0b72eb54eeaa3900461c9703b13a5d4063537647b6c15a29b80e8d3",
+    "research-guidance-source-resolutions.mjs": "a1b694b944dbc2f74143f737cf9f57194bc932087db026e7a3d6135f14eb3122",
+    "research-guidance-source-relationships.mjs": "d8e4c0531afc863d77476067128f226bf4624d56655f4faef4ecc7e74af61bd4",
+    "research-guidance-qualification-review.mjs": "5844b5e1913e04a501e4c2bbbce184f95ccfbd088ff7e34d6de5492b141be0d1",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "evals/research-owner-http-request-binding.mjs": "3cc8d2eb1c7f5d0a85d9d362da08f29a194e3cc68855fa881a4915b311de51e9",
+    "tests/research-guidance-source-resolutions-contract.mjs": "52c876ebfa040cb7395cd5fc451d6aee9ca28549f16354c67e8ebde02090c9c1",
+    "tests/research-official-pdf-http-contract.mjs": "2529d0f44d71a7cb288bfeba2f32c8782d775a99c00de1f989b06c556ec17b4d",
+    "tests/research-owner-http-request-binding-contract.mjs": "e61602dcf6ac2b625251bf0052bedac4d3deb51c1396a80380a71cf607e2c676",
+    "scripts/check-research-source-resolutions-20260909.mjs": "4697b8186287f6e921701d9ae9be3e159c3aaab517af2c591a82a5c216428a76",
+    "package.json": "3ded50019677aaac40cd3f298fb70e23974698db4e989c5bde7ba472694f90e8"
+  },
+  "inputs": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-draft-focus-2026-09-09.json",
+      "sha256": "8d5a6d2721446e9880590741989745c3ad08522e0e97a7e379856cdee4c1940b"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-span-2026-09-09.json",
+      "sha256": "17c9a21fbcbecb476023b7f52a8d6801d5b61b11763e33e1a5167b33e85b3bc2"
+    },
+    {
+      "file": "evals/results/research-owner-backlog-v4-2026-09-09.json",
+      "sha256": "8089beea03e1fa6ef21657d7f45b4696acd66aefe471c82caa0909e6841825c0"
+    }
+  ],
+  "pricingEnvironment": {
+    "PERMITEXT_RESEARCH_MODEL": "gpt-5.6-terra",
+    "PERMITEXT_RESEARCH_FAST_MODEL": "gpt-5.6-luna",
+    "PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS": "2",
+    "PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS": "0.2",
+    "PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS": "12",
+    "PERMITEXT_RESEARCH_PRICING_VERSION": "retained-pricing-20260909",
+    "PERMITEXT_RESEARCH_FAST_INPUT_USD_PER_MILLION_TOKENS": "0.2",
+    "PERMITEXT_RESEARCH_FAST_CACHED_INPUT_USD_PER_MILLION_TOKENS": "0.02",
+    "PERMITEXT_RESEARCH_FAST_OUTPUT_USD_PER_MILLION_TOKENS": "1.2",
+    "PERMITEXT_RESEARCH_FAST_PRICING_VERSION": "retained-pricing-20260909",
+    "PERMITEXT_RESEARCH_MAX_REQUEST_USD": "1",
+    "PERMITEXT_RESEARCH_USER_DAILY_CAP_USD": "1",
+    "PERMITEXT_RESEARCH_USER_MONTHLY_CAP_USD": "1",
+    "PERMITEXT_RESEARCH_DAILY_CAP_USD": "1",
+    "PERMITEXT_RESEARCH_MONTHLY_CAP_USD": "1"
+  },
+  "budget": {
+    "auditFile": "evals/results/research-owner-api-round2-draft-focus-cost-audit-2026-09-09.json",
+    "auditSHA256": "60d8effec177dbd8152dc54215cb2d844540e93fcbb5b21b4461506ed85a417a",
+    "authorizationUSD": 8.5,
+    "conservativeUSD": 8.094222,
+    "usageEstimateUSD": 4.27905217,
+    "remainingConservativeAuthorizationUSD": 0.405778,
+    "accountBalanceVerified": false
+  },
+  "summary": {
+    "retainedCases": 3,
+    "requestComparisons": 6,
+    "identicalNoRelationshipControlRequests": 6,
+    "detectedRelationships": 4,
+    "providerCalls": 0,
+    "networkCalls": 0,
+    "rewrittenDrafts": 0,
+    "changedSourcePassages": 0,
+    "changedOutputBudgets": 0,
+    "liveQualityConfirmed": false,
+    "liveSpeedMeasured": false
+  },
+  "limitations": [
+    "This compares request construction and conservative reservations on fixed retained input, not generated answers.",
+    "Verifier comparisons retain the exact historical draft without a new resolution plan; these are not dispatchable v13 full-turn candidates or semantic regrades.",
+    "Reservation figures are conservative per-request estimates under retained pricing, not usage or a new spending allowance. The actual new verifier input depends on the future generated draft.",
+    "All 110 questions remain in scope. Structural binding cannot prove scope, semantic truth or cross-paragraph consistency; the independent semantic gate remains required."
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-003",
+      "question": "Context: DOB NOW workflow An initial GC filing has been created for a project. Plumbing work for the same construction project and property will be filed later, potentially by a different applicant. Should the plumbing scope receive a new unrelated job number or a subsequent filing under the existing job?",
+      "sourcePacketSHA256": "4b916fe0311af461879e8f9a4f2bfeaaa8b4beae8542f1fc0a8f31847bdf9914",
+      "retainedDraftSHA256": "ad499cc7b9b294ec74d1f2f980e58755362d96467df9351ca986a34202e4c692",
+      "comparisons": [
+        {
+          "phase": "draft",
+          "beforeRequestSHA256": "7cb9b41f0f94c2f5ca3d591f64869bad55d67080e08d7b1cdd4018eb51597a63",
+          "afterRequestSHA256": "ce97328bb7ce28c0b30d4bb9fb95f104a3c50bee82e86705aabbab2f0b0987e4",
+          "additionalBytes": 2402,
+          "beforeMaximumRequestUSD": 0.16154,
+          "afterMaximumRequestUSD": 0.17355,
+          "relationships": 2
+        },
+        {
+          "phase": "verification",
+          "beforeRequestSHA256": "a88341b4674bf2946946797d9aa270ddf3cffabf04a7d3778a3995c3c2317464",
+          "afterRequestSHA256": "a275189d2d760ba418781e261331385b22ce097922d0263610c695f909592e28",
+          "additionalBytes": 1129,
+          "beforeMaximumRequestUSD": 0.026204,
+          "afterMaximumRequestUSD": 0.026769,
+          "relationships": 2
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-004",
+      "question": "Context: DOB NOW workflow The initial filing is approved, and the approved scope and drawings must now be revised. The filing was not submitted for legalization. What filing action is appropriate, and what limits must be disclosed?",
+      "sourcePacketSHA256": "cf42687ace6b2a6391f46dbd8dae9c61a068dafd33a238fbbf7b3cad2b5d581e",
+      "retainedDraftSHA256": "f542ae1cf392deba1e4128f2c4fc82d826fe86c9cb1bed3906ccc4ee46082e0a",
+      "comparisons": [
+        {
+          "phase": "draft",
+          "beforeRequestSHA256": "5376484a65ddfbec96d6dc846544dedd4425256f4a3ef7c0d1a267763f191b03",
+          "afterRequestSHA256": "16c11699aa339ff745a03f38bad545413f73c8dd810c84858e9377d45ac6eb3c",
+          "additionalBytes": 2242,
+          "beforeMaximumRequestUSD": 0.17947,
+          "afterMaximumRequestUSD": 0.19068,
+          "relationships": 1
+        },
+        {
+          "phase": "verification",
+          "beforeRequestSHA256": "1d7d8198953284d046b1a30138716f8f7c3b90a86b497fb7c244a69cdc57adb4",
+          "afterRequestSHA256": "e88029520bf8a8461da88b49adbd2924f2b513c469dedf6932407354e31f298b",
+          "additionalBytes": 971,
+          "beforeMaximumRequestUSD": 0.031213,
+          "afterMaximumRequestUSD": 0.031699,
+          "relationships": 1
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-023",
+      "question": "Context: DOB NOW workflow A filing representative has completed data entry and uploaded the documents. The applicant and owner have not yet completed their attestations. Can the filing representative attest for them and submit the job filing?",
+      "sourcePacketSHA256": "43ad5d3fc6d353a425ebf59a110db63a7949d7ee6a7df92798e9cdc7472f13f6",
+      "retainedDraftSHA256": "960c7be10f36dd7caad8076f7d043f74ef0058d460cdff14e9a3f2df61b09a52",
+      "comparisons": [
+        {
+          "phase": "draft",
+          "beforeRequestSHA256": "b91018a6f668780f6cbe5148c36cfee1b7b296e554570408f6627bb3aa66f7ff",
+          "afterRequestSHA256": "5cf5e903b94bee1fd29a73149ca675f8d3e1e9d831bae921a546dc6005bbfcf6",
+          "additionalBytes": 2161,
+          "beforeMaximumRequestUSD": 0.178145,
+          "afterMaximumRequestUSD": 0.18895,
+          "relationships": 1
+        },
+        {
+          "phase": "verification",
+          "beforeRequestSHA256": "499f098cc05ad5522ba26b352b13ba7503e0e9e729446761955e67aac5103bff",
+          "afterRequestSHA256": "2657dfc7b44a5881ff4b740744cc3aaaf75729559220abcfa119efec2bb04044",
+          "additionalBytes": 890,
+          "beforeMaximumRequestUSD": 0.028196,
+          "afterMaximumRequestUSD": 0.028641,
+          "relationships": 1
+        }
+      ]
+    }
+  ]
+}

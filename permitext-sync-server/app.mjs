@@ -283,6 +283,7 @@ import {
   researchOfficialGuidanceSummaryProof
 } from "./research-official-guidance-summary.mjs";
 import { validateGuidanceQualificationReview } from "./research-guidance-qualification-review.mjs";
+import { validateGuidanceSourceResolutions } from "./research-guidance-source-resolutions.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import { refreshZoningContextEvidence, zoningContextExcerptPrompt } from "./research-zoning-context-excerpts.mjs";
 import { isZoningConditionalExplanation, planZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
@@ -10106,7 +10107,9 @@ async function openAIResearchOfficialGuidanceSummary(question, userID, options) 
   };
   const requestOptions = { question, webSupport: options.webSupport, context: options, userID };
   try {
-    const draft = await call(researchOfficialGuidanceSummaryRequest({ ...requestOptions, model: options.model }));
+    const draftRequest = researchOfficialGuidanceSummaryRequest({ ...requestOptions, model: options.model });
+    const draft = await call(draftRequest);
+    validateGuidanceSourceResolutions(JSON.parse(draftRequest.input), draft.value);
     // Validate paragraph bindings before any semantic verifier call. The
     // immutable full passages remain behind the shorter user-facing prose.
     const interpretation = validateResearchInterpretation(
