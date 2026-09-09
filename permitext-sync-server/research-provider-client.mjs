@@ -165,6 +165,7 @@ export function researchProviderFailure({
 
 export async function requestResearchProvider(options) {
   const startedAt = performance.now();
+  const attemptTimings = [];
   let result;
   let failure;
   try {
@@ -173,7 +174,7 @@ export async function requestResearchProvider(options) {
       // Prevent a project-level automatic Fast tier from invalidating the
       // standard-price reservation. An explicit tier is checked by the guard.
       requestBody: { ...options.requestBody, service_tier: options.requestBody?.service_tier ?? "default" }
-    });
+    }, attemptTimings);
     return result;
   } catch (error) {
     failure = error;
@@ -186,7 +187,8 @@ export async function requestResearchProvider(options) {
         : String(options.requestBody?.text?.format?.name || "research").replace(/[^a-z0-9_]/gi, "").slice(0, 80),
       outcome: failure ? "failed" : "completed",
       durationMilliseconds: Math.round(performance.now() - startedAt),
-      providerAttempts: result?.attempts ?? failure?.providerAttempts ?? 0
+      providerAttempts: result?.attempts ?? failure?.providerAttempts ?? 0,
+      attemptTimings
     };
     // No question, draft, Project facts, account ID, or provider token is logged.
     try {
@@ -211,7 +213,7 @@ async function performResearchProviderRequest({
   settleEvaluationSpend = null,
   reserveProviderSpend = () => ({ active: false }),
   settleProviderSpend = () => {}
-}) {
+}, attemptTimings) {
   const attempts = Math.max(1, Math.min(2, Number(maximumAttempts) || 1));
   let aggregateUsage = emptyProviderUsage();
   let completedProviderAttempts = 0;
@@ -237,18 +239,36 @@ async function performResearchProviderRequest({
       throw error;
     }
     let response;
+    let attemptTiming;
     try {
       const timeoutSignal = AbortSignal.timeout(timeoutMilliseconds);
       completedProviderAttempts += 1;
-      response = await fetchImpl("https://api.openai.com/v1/responses", {
-        method: "POST",
-        headers: {
-          authorization: `Bearer ${apiKey}`,
-          "content-type": "application/json"
-        },
-        body: JSON.stringify(requestBody),
-        signal: signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal
-      });
+      attemptTiming = {
+        attempt: completedProviderAttempts,
+        headersMilliseconds: null,
+        bodyMilliseconds: null,
+        responseStatus: null,
+        bodyReadOutcome: "not_started"
+      };
+      attemptTimings.push(attemptTiming);
+      const headersStartedAt = performance.now();
+      try {
+        response = await fetchImpl("https://api.openai.com/v1/responses", {
+          method: "POST",
+          headers: {
+            authorization: `Bearer ${apiKey}`,
+            "content-type": "application/json"
+          },
+          body: JSON.stringify(requestBody),
+          signal: signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal
+        });
+      } finally {
+        // Non-streaming headers may arrive after generation. This measures the
+        // local wait for headers, not provider queue time or first-token time.
+        attemptTiming.headersMilliseconds = Math.round(performance.now() - headersStartedAt);
+      }
+      attemptTiming.responseStatus = Number.isInteger(response.status) && response.status >= 100 && response.status <= 599
+        ? response.status : null;
     } catch (error) {
       unreconciledProviderCostUSD += providerReservationAllowance(providerSpendReservation);
       if (signal?.aborted || ["RESEARCH_CANCELLED", "AbortError", "TimeoutError"].includes(providerErrorIdentity(error))) {
@@ -285,7 +305,19 @@ async function performResearchProviderRequest({
       });
     }
 
-    const payload = await response.json().catch(() => ({}));
+    let payload;
+    let bodyReadFailed = false;
+    const bodyStartedAt = performance.now();
+    attemptTiming.bodyReadOutcome = "failed";
+    try {
+      payload = await response.json().catch(() => {
+        bodyReadFailed = true;
+        return {};
+      });
+      if (!bodyReadFailed) attemptTiming.bodyReadOutcome = "completed";
+    } finally {
+      attemptTiming.bodyMilliseconds = Math.round(performance.now() - bodyStartedAt);
+    }
     const attemptUsage = providerUsageFromPayload(payload, requestBody.model);
     aggregateUsage = addProviderUsage(aggregateUsage, attemptUsage);
     if (!attemptUsage) {

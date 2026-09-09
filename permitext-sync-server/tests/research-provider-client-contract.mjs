@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { mock } from "node:test";
 import { requestResearchProvider } from "../research-provider-client.mjs";
 import {
   beginResearchSpendReservation, endResearchSpendReservation,
@@ -21,6 +22,53 @@ function requestOptions(overrides = {}) {
     failureMessage: "Research provider failed.",
     ...overrides
   };
+}
+
+// An injected clock separates local reservation/settlement work from waiting
+// for response headers and reading the body, without wall-clock sleeps.
+for (const bodyFails of [false, true]) {
+  let milliseconds = 0;
+  const clock = mock.method(performance, "now", () => milliseconds);
+  const phases = [];
+  let settledPayload;
+  try {
+    const result = await requestResearchProvider(requestOptions({
+      requestBody: { model: "test-model", input: "PRIVATE_QUESTION", safety_identifier: "PRIVATE_ACCOUNT" },
+      reserveProviderSpend: () => {
+        milliseconds += 3;
+        return { active: true, maximumRequestUSD: 0.03 };
+      },
+      fetchImpl: async () => {
+        milliseconds += 11;
+        return {
+          ok: true, status: 200,
+          json: async () => {
+            milliseconds += 7;
+            if (bodyFails) throw new SyntaxError("PRIVATE_BODY_PARSE_FAILURE");
+            return { id: "PRIVATE_RESPONSE", output: "PRIVATE_ANSWER", usage: { input_tokens: 10, output_tokens: 2 } };
+          }
+        };
+      },
+      settleProviderSpend: (reservation, payload) => { settledPayload = payload; milliseconds += 2; },
+      observePhase: (event) => { phases.push(event); throw new Error("Observer is unavailable"); }
+    }));
+    assert.equal(result.attempts, 1, "Telemetry failure must not cause another provider call.");
+    assert.equal(result.payload.id, bodyFails ? undefined : "PRIVATE_RESPONSE");
+    assert.equal(result.payload.permitext_provider_accounting.unreconciled_cost_usd, bodyFails ? 0.03 : 0);
+    assert.equal(settledPayload.id, bodyFails ? undefined : "PRIVATE_RESPONSE");
+    assert.equal(result.payload.attemptTimings, undefined, "Timing is internal observability, not answer content.");
+    assert.deepEqual(phases, [{
+      event: "research_provider_phase", stage: "research", outcome: "completed",
+      durationMilliseconds: 23, providerAttempts: 1,
+      attemptTimings: [{
+        attempt: 1, headersMilliseconds: 11, bodyMilliseconds: 7, responseStatus: 200,
+        bodyReadOutcome: bodyFails ? "failed" : "completed"
+      }]
+    }]);
+    assert.doesNotMatch(JSON.stringify(phases), /PRIVATE_|test-key/);
+  } finally {
+    clock.mock.restore();
+  }
 }
 
 {
@@ -58,6 +106,8 @@ function requestOptions(overrides = {}) {
   assert.equal(phases[0].outcome, "failed");
   assert.equal(phases[0].providerAttempts, 1);
   assert(phases[0].durationMilliseconds >= 0);
+  assert.equal(phases[0].attemptTimings.length, 1, "A blocked retry has no dispatched-attempt timing.");
+  assert.equal(phases[0].attemptTimings[0].responseStatus, 503);
   assert.doesNotMatch(JSON.stringify(phases), /PRIVATE_QUESTION|test-key/);
 }
 
@@ -67,7 +117,9 @@ function requestOptions(overrides = {}) {
   let evaluationSettlements = 0;
   let providerReservations = 0;
   let providerSettlements = 0;
+  const phases = [];
   const result = await requestResearchProvider(requestOptions({
+    observePhase: (event) => phases.push(event),
     fetchImpl: async () => {
       fetchAttempts += 1;
       return fetchAttempts === 1
@@ -112,6 +164,13 @@ function requestOptions(overrides = {}) {
   assert.equal(evaluationSettlements, 2);
   assert.equal(providerReservations, 2);
   assert.equal(providerSettlements, 2);
+  assert.equal(phases.length, 1);
+  assert.deepEqual(phases[0].attemptTimings.map(({ attempt, responseStatus, bodyReadOutcome }) =>
+    ({ attempt, responseStatus, bodyReadOutcome })), [
+    { attempt: 1, responseStatus: 503, bodyReadOutcome: "completed" },
+    { attempt: 2, responseStatus: 200, bodyReadOutcome: "completed" }
+  ]);
+  assert(phases[0].attemptTimings.every((timing) => timing.headersMilliseconds >= 0 && timing.bodyMilliseconds >= 0));
   const { permitext_cost_entries: costEntries, ...aggregateUsage } = result.payload.usage;
   assert.deepEqual(costEntries.map((entry) => entry.inputTokens), [10, 20]);
   assert.deepEqual(aggregateUsage, {
@@ -224,10 +283,12 @@ function requestOptions(overrides = {}) {
 
 for (const name of ["TimeoutError", "AbortError"]) {
   let fetchAttempts = 0;
+  const phases = [];
   const original = new DOMException(`${name} from test`, name);
   await assert.rejects(
     requestResearchProvider(requestOptions({
       reserveProviderSpend: () => ({ active: true, maximumRequestUSD: 0.03 }),
+      observePhase: (event) => { phases.push(event); throw new Error("Observer is unavailable"); },
       fetchImpl: async () => {
         fetchAttempts += 1;
         throw original;
@@ -241,15 +302,23 @@ for (const name of ["TimeoutError", "AbortError"]) {
     }
   );
   assert.equal(fetchAttempts, 1);
+  assert.equal(phases[0].outcome, "failed");
+  assert.equal(phases[0].attemptTimings.length, 1);
+  assert(phases[0].attemptTimings[0].headersMilliseconds >= 0);
+  assert.equal(phases[0].attemptTimings[0].bodyMilliseconds, null, "A body that never started is not a zero-duration read.");
+  assert.equal(phases[0].attemptTimings[0].responseStatus, null);
+  assert.equal(phases[0].attemptTimings[0].bodyReadOutcome, "not_started");
 }
 
 {
   const spendLimit = new Error("Research provider budget reached.");
   spendLimit.code = "RESEARCH_SPEND_CAP";
   let fetchAttempts = 0;
+  const phases = [];
   await assert.rejects(
     requestResearchProvider(requestOptions({
       reserveProviderSpend: () => { throw spendLimit; },
+      observePhase: (event) => phases.push(event),
       fetchImpl: async () => {
         fetchAttempts += 1;
         return providerResponse(200, { id: "must-not-run" });
@@ -258,6 +327,8 @@ for (const name of ["TimeoutError", "AbortError"]) {
     (error) => error === spendLimit
   );
   assert.equal(fetchAttempts, 0);
+  assert.equal(phases[0].providerAttempts, 0);
+  assert.deepEqual(phases[0].attemptTimings, []);
 }
 
 {
