@@ -592,17 +592,21 @@ textarea:focus-visible {
   text-transform: none;
 }
 
+.workspace-shell:has(> .workspace-issue:not([hidden])) {
+  grid-template-rows: var(--header-height) auto minmax(0, 1fr);
+}
+
 .workspace-issue {
-  position: fixed;
-  top: calc(var(--header-height) + var(--space-3));
-  right: var(--space-4);
-  z-index: 1200;
-  display: grid;
-  width: min(420px, calc(100vw - (2 * var(--space-4))));
-  gap: var(--space-3);
-  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  min-width: 0;
+  max-height: 30dvh;
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-4);
   border: 0;
-  border-radius: var(--radius-card);
+  border-radius: 0;
   background: var(--surface-raised);
   color: var(--text-primary);
   box-shadow: var(--shadow-panel);
@@ -613,6 +617,7 @@ textarea:focus-visible {
 }
 
 .workspace-issue-copy {
+  flex: 1 1 32rem;
   margin: 0;
   font-size: calc(var(--chrome-font-size) * 0.9);
   line-height: 1.4;
@@ -620,6 +625,8 @@ textarea:focus-visible {
 
 .workspace-issue-actions {
   display: flex;
+  flex: 0 0 auto;
+  margin-left: auto;
   justify-content: flex-end;
   gap: var(--space-2);
 }
@@ -1197,6 +1204,45 @@ textarea:focus-visible {
   max-width: 34rem;
   margin: 0;
   font-size: calc(var(--chrome-font-size) * 0.94);
+}
+
+.workspace-returning-content {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  max-width: 40rem;
+}
+
+.workspace-returning-content h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: calc(var(--chrome-font-size) * 1.5);
+}
+
+.workspace-returning-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.workspace-returning-actions button {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-control);
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--text-primary) 8%, var(--surface-raised));
+  cursor: pointer;
+}
+
+.workspace-returning-actions button:hover {
+  background: color-mix(in srgb, var(--text-primary) 12%, var(--surface-raised));
+}
+
+.workspace-returning-actions button:focus-visible {
+  outline: 2px solid var(--code-accent);
+  outline-offset: 3px;
 }
 
 .workspace-first-use {
@@ -9837,6 +9883,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-project-tile strong {
   align-self: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+  line-height: 1.4;
   font-size: calc(var(--chrome-font-size) * 0.76) !important;
 }
 

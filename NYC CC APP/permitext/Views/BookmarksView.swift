@@ -3,6 +3,7 @@ import UIKit
 
 struct BookmarksView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var savedFilterCodeSectionIDs: Set<Int64>
     @State private var savedFilterFolderIDs: Set<Int64>
     @State private var folderEditorTarget: FolderEditorTarget?
@@ -484,7 +485,11 @@ private var filteredSavedEmptyState: some View {
                 .accessibilityLabel("New project")
                 }
 
-            if !projectPages.isEmpty {
+            if dynamicTypeSize.isAccessibilitySize {
+                ForEach(projectFolders) { folder in
+                    projectTileSlot(folder, tileWidth: nil)
+                }
+            } else if !projectPages.isEmpty {
                 GeometryReader { proxy in
                     let pageWidth = proxy.size.width
                     TabView(selection: $projectPageIndex) {
@@ -515,36 +520,42 @@ private var filteredSavedEmptyState: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
             CodeScreenSectionEyebrow(text: "References", accent: accentColor)
 
-            GeometryReader { proxy in
-                let pageWidth = proxy.size.width
-                TabView(selection: $referencePageIndex) {
-                    ForEach(Array(referencePages.enumerated()), id: \.offset) { index, page in
-                        projectPageGrid(page, pageWidth: pageWidth)
-                            .frame(
-                                width: pageWidth,
-                                height: projectGridViewportHeight,
-                                alignment: .topLeading
-                            )
-                            .tag(index)
-                    }
+            if dynamicTypeSize.isAccessibilitySize {
+                ForEach(referenceFolders) { folder in
+                    projectTileSlot(folder, tileWidth: nil)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
-                .clipped()
-            }
-            .frame(height: projectGridViewportHeight)
+            } else {
+                GeometryReader { proxy in
+                    let pageWidth = proxy.size.width
+                    TabView(selection: $referencePageIndex) {
+                        ForEach(Array(referencePages.enumerated()), id: \.offset) { index, page in
+                            projectPageGrid(page, pageWidth: pageWidth)
+                                .frame(
+                                    width: pageWidth,
+                                    height: projectGridViewportHeight,
+                                    alignment: .topLeading
+                                )
+                                .tag(index)
+                        }
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .frame(width: pageWidth, height: projectGridViewportHeight, alignment: .top)
+                    .clipped()
+                }
+                .frame(height: projectGridViewportHeight)
 
-            if referencePages.count > 1 {
-                HStack(spacing: 6) {
-                    ForEach(referencePages.indices, id: \.self) { index in
-                        Circle()
-                            .fill(index == referencePageIndex ? Color.appChrome : Color.secondary.opacity(0.35))
-                            .frame(width: 6, height: 6)
+                if referencePages.count > 1 {
+                    HStack(spacing: 6) {
+                        ForEach(referencePages.indices, id: \.self) { index in
+                            Circle()
+                                .fill(index == referencePageIndex ? Color.appChrome : Color.secondary.opacity(0.35))
+                                .frame(width: 6, height: 6)
+                        }
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 4)
+                    .accessibilityHidden(true)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.top, 4)
-                .accessibilityHidden(true)
             }
         }
     }
@@ -597,7 +608,7 @@ private var filteredSavedEmptyState: some View {
     }
 
     @ViewBuilder
-    private func projectTileSlot(_ folder: CodeFolder?, tileWidth: CGFloat) -> some View {
+    private func projectTileSlot(_ folder: CodeFolder?, tileWidth: CGFloat?) -> some View {
         if let folder {
             if library.hasProjectAccess {
                 NavigationLink {
@@ -638,29 +649,25 @@ private var filteredSavedEmptyState: some View {
         let count = library.bookmarkCount(inFolder: folder.id)
 
         return VStack(alignment: .leading, spacing: 5) {
-            HStack(alignment: .center, spacing: 7) {
-                Circle()
-                    .fill(foreground)
-                    .frame(width: 8, height: 8)
+            Text(folder.name)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(foreground)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-                Text(folder.name)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(foreground)
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
+            HStack {
+                Text("\(count) saved")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Spacer(minLength: 4)
                 Image(systemName: "folder")
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(foreground)
             }
-
-            Text("\(count) saved")
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(foreground.opacity(0.74))
-                .lineLimit(1)
         }
         .padding(CodeScreenMetrics.compactCardPadding)
-        .frame(height: CodeScreenMetrics.savedProjectTileHeight, alignment: .center)
+        .frame(height: dynamicTypeSize.isAccessibilitySize ? nil : CodeScreenMetrics.savedProjectTileHeight, alignment: .center)
         .background(color)
         .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
     }
@@ -1069,6 +1076,7 @@ struct ProjectView: View {
     @State private var isProjectHubLoading = false
     @State private var projectHubError: String?
     @State private var isProjectHubVisible = false
+    @State private var isProjectDescriptionExpanded = false
     @State private var lastProjectHubLoadAt: Date?
     @State private var projectReportShareURL: URL?
     @State private var isProjectReportBuilding = false
@@ -1295,11 +1303,6 @@ struct ProjectView: View {
         VStack(alignment: .leading, spacing: 12) {
             CodeEyebrow(text: "Project Hub", accent: accentColor)
 
-            Text("Code Questions, Notebook, Research, Working Notes, and issued records are adapted for secure review on iPhone. Governed workflow changes remain on the web.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-
             if let snapshot = projectHubSnapshot, snapshot.loadedFromCache {
                 Label(
                     "Offline snapshot from \(projectHubDate(snapshot.cachedAt ?? "")) — IDs, citations, hashes, and version lineage are preserved.",
@@ -1314,8 +1317,6 @@ struct ProjectView: View {
                         .fill(Color.secondary.opacity(0.10))
                 )
             }
-
-            projectHubMetrics
 
             if isProjectHubLoading && projectHubSnapshot == nil {
                 HStack(spacing: 8) {
@@ -1339,29 +1340,36 @@ struct ProjectView: View {
                     )
             }
 
-            projectCodeQuestionSummary
+            if !projectCodeQuestions.isEmpty {
+                projectCodeQuestionSummary
+            }
             projectNotebookSummary
-            projectResearchSummary
-            projectReportSummary
-        }
-    }
+            if !(projectHubSnapshot?.researchAnswers.isEmpty ?? true) {
+                projectResearchSummary
+            }
+            if !(projectHubSnapshot?.reports.isEmpty ?? true) {
+                projectReportSummary
+            }
 
-    private var projectHubMetrics: some View {
-        LazyVGrid(
-            columns: [
-                GridItem(.flexible(), spacing: 8),
-                GridItem(.flexible(), spacing: 8)
-            ],
-            spacing: 8
-        ) {
-            projectHubMetric(value: "\(projectBookmarks.count)", label: "Saved")
-            projectHubMetric(value: "\(projectCodeQuestions.count)", label: "Questions")
-            projectHubMetric(
-                value: "\((projectHubSnapshot?.notebookCards ?? []).filter { PermitextReleaseSurfaceVisibility.coordination || $0.cardType != "coordination-item" }.count)",
-                label: "Notebook"
-            )
-            projectHubMetric(value: "\(projectHubSnapshot?.researchAnswers.count ?? 0)", label: "Research")
-            projectHubMetric(value: "\(projectHubSnapshot?.reports.count ?? 0)", label: "Reports")
+            DisclosureGroup("More Project details") {
+                VStack(alignment: .leading, spacing: 16) {
+                    if projectCodeQuestions.isEmpty {
+                        projectCodeQuestionSummary
+                    }
+                    if projectHubSnapshot?.researchAnswers.isEmpty ?? true {
+                        projectResearchSummary
+                    }
+                    if projectHubSnapshot?.reports.isEmpty ?? true {
+                        projectReportSummary
+                    }
+                    Text("Review saved Project work here. Create and manage Code Questions and Reports on Permitext Web.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.top, 8)
+            }
+            .font(.subheadline.weight(.semibold))
+            .tint(.primary)
         }
     }
 
@@ -1376,23 +1384,6 @@ struct ProjectView: View {
                 }
             )
         }
-    }
-
-    private func projectHubMetric(value: String, label: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(value)
-                .font(.headline.weight(.bold))
-                .foregroundStyle(.primary)
-            Text(label)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
-        .padding(.horizontal, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(accentColor.opacity(0.12))
-        )
     }
 
     @ViewBuilder
@@ -1414,6 +1405,7 @@ struct ProjectView: View {
                             .foregroundStyle(.secondary)
                     }
                     .foregroundStyle(.primary)
+                    .frame(minHeight: 44)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -1722,14 +1714,14 @@ struct ProjectView: View {
 
     private var projectHeader: some View {
         VStack(alignment: .leading, spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
-            HStack(alignment: .center, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
                 Circle()
                     .fill(accentColor)
                     .frame(width: 12, height: 12)
                 Text(folder?.name ?? (isProjectFolder ? "Project" : "Reference"))
-                    .font(.largeTitle.weight(.bold))
+                    .font(.title2.weight(.bold))
                     .foregroundStyle(.primary)
-                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
                 Button {
                     if let folder {
@@ -1747,10 +1739,15 @@ struct ProjectView: View {
 
             if let description = folder?.description.trimmingCharacters(in: .whitespacesAndNewlines),
                !description.isEmpty {
-                Text(description)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                DisclosureGroup(isProjectFolder ? "Project context" : "Reference context", isExpanded: $isProjectDescriptionExpanded) {
+                    Text(description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 6)
+                }
+                .font(.subheadline.weight(.semibold))
+                .tint(.primary)
             }
 
             if let facts = folder?.structuredFacts, !facts.isEmpty {

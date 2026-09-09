@@ -289,7 +289,11 @@ private struct ProjectNotebookSessionView: View {
     }
 
     private func notebookDate(_ value: String) -> String {
-        guard let date = ISO8601DateFormatter().date(from: value) else { return value }
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let date = fractional.date(from: value) ?? ISO8601DateFormatter().date(from: value) else {
+            return "Date unavailable"
+        }
         return date.formatted(date: .abbreviated, time: .omitted)
     }
 }

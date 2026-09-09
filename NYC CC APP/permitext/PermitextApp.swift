@@ -536,13 +536,13 @@ private struct Phase3EntitledResearchHarness: View {
     var body: some View {
         TabView(selection: $library.selectedTab) {
             BookmarksView(filterDefaults: configuration.defaults)
-                .tabItem { Image(systemName: library.selectedTab == .bookmarks ? "folder.fill" : "folder") }
+                .tabItem { Label("Saved", systemImage: library.selectedTab == .bookmarks ? "folder.fill" : "folder") }
                 .accessibilityLabel("Saved")
                 .tag(AppTab.bookmarks)
 
             readerTab
                 .environment(\.isBrowserTabActive, library.selectedTab == .browse)
-                .tabItem { Image(systemName: "text.line.first.and.arrowtriangle.forward") }
+                .tabItem { Label("Reader 1", systemImage: "text.line.first.and.arrowtriangle.forward") }
                 .accessibilityLabel("First reader")
                 .tag(AppTab.browse)
 
@@ -551,18 +551,18 @@ private struct Phase3EntitledResearchHarness: View {
                 systemImage: "text.line.last.and.arrowtriangle.forward",
                 description: Text("The acceptance journey uses the first Reader.")
             )
-            .tabItem { Image(systemName: "text.line.last.and.arrowtriangle.forward") }
+            .tabItem { Label("Reader 2", systemImage: "text.line.last.and.arrowtriangle.forward") }
             .accessibilityLabel("Second reader")
             .tag(AppTab.browseSecondary)
 
             SearchView()
-                .tabItem { Image(systemName: "magnifyingglass") }
+                .tabItem { Label("Search", systemImage: "magnifyingglass") }
                 .accessibilityLabel("Search")
                 .tag(AppTab.search)
 
             ResearchView(cacheDirectoryURL: configuration.cacheDirectoryURL)
                 .tabItem {
-                    Image(systemName: "sparkle")
+                    Label("Research", systemImage: "sparkle")
                         .accessibilityLabel("Research")
                         .accessibilityIdentifier("research-tab")
                 }
@@ -1046,7 +1046,7 @@ private struct PermitextTabNavigation: View {
         TabView(selection: $library.selectedTab) {
             BookmarksView()
                 .tabItem {
-                    Image(systemName: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
+                    Label("Saved", systemImage: library.selectedTab == .bookmarks ? "folder.fill" : "folder")
                         .accessibilityLabel("Saved")
                 }
                 .tag(AppTab.bookmarks)
@@ -1054,28 +1054,28 @@ private struct PermitextTabNavigation: View {
             BrowseView(browserContext: .primary)
                 .environment(\.isBrowserTabActive, library.selectedTab == .browse)
                 .tabItem {
-                    Image(systemName: "text.line.first.and.arrowtriangle.forward")
+                    Label("Reader 1", systemImage: "text.line.first.and.arrowtriangle.forward")
                         .accessibilityLabel("First reader")
                 }
                 .tag(AppTab.browse)
 
             IndependentReaderHost(browserContext: .secondary)
                 .tabItem {
-                    Image(systemName: "text.line.last.and.arrowtriangle.forward")
+                    Label("Reader 2", systemImage: "text.line.last.and.arrowtriangle.forward")
                         .accessibilityLabel("Second reader")
                 }
                 .tag(AppTab.browseSecondary)
 
             SearchView()
                 .tabItem {
-                    Image(systemName: "magnifyingglass")
+                    Label("Search", systemImage: "magnifyingglass")
                         .accessibilityLabel("Search")
                 }
                 .tag(AppTab.search)
 
             ResearchView()
                 .tabItem {
-                    Image(systemName: "sparkle")
+                    Label("Research", systemImage: "sparkle")
                         .accessibilityLabel("Research")
                         .accessibilityIdentifier("research-tab")
                 }

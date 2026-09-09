@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260907-shell-revalidation-v55";
+} from "./offline-storage.js?v=20260908-uiux-hig-v57";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260907-shell-revalidation-v55";
+} from "./research-intent-state.js?v=20260908-uiux-hig-v57";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -28878,6 +28878,10 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       } else {
         renderSavedItemsByCode(content, orderedItems, paneID, commonRenderOptions);
       }
+    } else if (selectedFolder && resolvedItems.length === 0 && !searchActive) {
+      appendEmptySaved(content, "No saved evidence yet", folderIsProject(selectedFolder)
+        ? "Save a passage from Reader or Search, then add it to this Project."
+        : "Save a passage from Reader or Search, then add it to this Reference.");
     } else if (combinedItems.length > 0) {
       appendEmptySaved(content, "No saved items match", selectedFolder
         ? "Try another search or code book, or add evidence to this destination."
@@ -33038,9 +33042,27 @@ function appendPaneSequence(panes) {
       emptyState.className = "workspace-empty-state";
       emptyState.setAttribute("aria-label", "Empty workspace");
       if (!emptyState.firstElementChild) {
+        const content = document.createElement("div");
+        content.className = "workspace-returning-content";
+        const heading = document.createElement("h1");
+        heading.textContent = "Your workspace";
         const message = document.createElement("p");
         message.textContent = "Open a Reader, Search, Saved, or a Project to begin.";
-        emptyState.append(message);
+        const actions = document.createElement("div");
+        actions.className = "workspace-returning-actions";
+        for (const [label, control] of [
+          ["Open Reader", addReaderButton],
+          ["Search codes", toggleSearchButton],
+          ["Saved & Projects", toggleSavedButton]
+        ]) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = label;
+          button.addEventListener("click", () => control?.click());
+          actions.append(button);
+        }
+        content.append(heading, message, actions);
+        emptyState.append(content);
       }
       nodes.push(emptyState);
     }

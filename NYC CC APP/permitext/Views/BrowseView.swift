@@ -1292,7 +1292,11 @@ enum CodeScreenMetrics {
     static let compactCardPadding: CGFloat = 9
     static let dividerOpacity: CGFloat = 1
     /// Saved project tile content height (width comes from the 2-column grid).
-    static let savedProjectTileHeight: CGFloat = 57
+    static var savedProjectTileHeight: CGFloat {
+        (UIFont.preferredFont(forTextStyle: .caption1).lineHeight * 3)
+            + UIFont.preferredFont(forTextStyle: .caption2).lineHeight
+            + (compactCardPadding * 2) + 5
+    }
 
     static var jumpBackInPreviewBlockHeight: CGFloat {
         UIFont.preferredFont(forTextStyle: .caption2).lineHeight * 3 + 6
