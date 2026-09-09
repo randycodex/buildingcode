@@ -1,0 +1,97 @@
+{
+  "schema": "permitext-owner-loft-pdf-live-review-v1",
+  "reviewedOn": "2026-09-09T08:54:01.738Z",
+  "liveSourceCommit": "42482e3e8268f18489de2035627197cac8c8276b",
+  "liveResult": {
+    "file": "evals/results/research-owner-api-round2-live-loft-pdf-2026-09-09.json",
+    "sha256": "f89cce9d535794630a575361d9ad86ec5795b1c6eba825294628af0f4d503042"
+  },
+  "costAudit": {
+    "file": "evals/results/research-owner-api-round2-loft-pdf-cost-audit-2026-09-09.json",
+    "sha256": "8324572b5442b781c26201dfcfd68122e6d450a27690f273dd3dd5c4595561ef"
+  },
+  "referenceKey": {
+    "file": "evals/research-reconciled-answer-key.json",
+    "sha256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455"
+  },
+  "newProfessionalApproval": false,
+  "strictQualityAcceptedCostPerAnswerUSD": null,
+  "reviewMethod": "Assistant comparison of the delivered answer, unchanged authored scenario/key, the actual supplied PDF passages, and visual inspection of the current one-page official service notice. The runtime verifier result is retained separately and is not treated as a complete answer-key grade.",
+  "case": {
+    "id": "DOBNOW-016",
+    "inputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+    "expectedAnswerSHA256": "4bb8204a87532f1b66a3993ef014ebb33ece7f59c69c2f78f1ccbdf0c3a73059",
+    "deliveredAnswerSHA256": "cba002707c9caf3f49bfc4dfbaee8c8d9f735b2cea7580ab9a7e2ef0f477cd9b",
+    "liveStatus": "completed",
+    "verificationPass": true,
+    "reviewStatus": "core-supported-with-answer-key-and-presentation-gaps",
+    "criteria": [
+      {
+        "concept": "Require both the property flag and scope relationship stated in the scenario.",
+        "result": "supported",
+        "evidence": "The Yes answer applies the stated IMD-impact facts; the approval paragraph separately relies on the stated property flag. It does not infer IMD impact solely from the flag."
+      },
+      {
+        "concept": "Distinguish submitting the request from obtaining the Certification.",
+        "result": "supported",
+        "evidence": "Approval requires an issued clearance, not submission alone; the scenario-specific sentence identifies Certification as the applicable type."
+      },
+      {
+        "concept": "Map the Yes and No responses to their distinct Loft Board submission types.",
+        "result": "partial",
+        "evidence": "The Yes/Certification route is explicit and LNO is excluded for this scenario. The No/commercial-unit/non-IMD-impact alternative is not explained."
+      },
+      {
+        "concept": "Include the Narrative Statement in the Yes/Certification path.",
+        "result": "supported",
+        "evidence": "The answer explicitly requires a Narrative Statement for the selected route."
+      }
+    ],
+    "remainingFindings": [
+      "The expected answer places the Loft Board request after submission of the job filing. That source-supported sequence is omitted from the generated answer.",
+      "The approval paragraph opens with the general either-Certification-or-LNO statement before applying the Certification-only route to this scenario. Applying the selected branch directly would be clearer.",
+      "The draft repeats a generic authority disclaimer that the server also appends, and includes Scope of Work tab instructions beyond the narrow question."
+    ],
+    "attributionReview": "The service-notice page supports the Yes/Certification/Narrative Statement mapping. Both cited PDFs support the general approval hold, and the service-notice table supports the applied route. Citation identities and page links are retained.",
+    "sourceCoverage": "The current service-notice PDF hash matches the repaired fixture. It supplies the table absent from release-note text extraction. This confirms this PDF-backed route, not general OCR or independent visual validation inside the application.",
+    "metrics": {
+      "durationMilliseconds": 35556,
+      "providerCalls": 2,
+      "paidSearchCalls": 0,
+      "publicPDFRequests": 3,
+      "usageEstimateUSD": 0.01280125,
+      "conservativeUSD": 0.023742,
+      "draftParagraphWords": 127,
+      "stageMilliseconds": [
+        {
+          "phase": "permitext_official_guidance_summary",
+          "duration": 29821
+        },
+        {
+          "phase": "permitext_official_guidance_verification",
+          "duration": 2639
+        }
+      ],
+      "previous": {
+        "status": "failed",
+        "durationMilliseconds": 25498,
+        "providerCalls": 3,
+        "usageEstimateUSD": 0.05746935,
+        "conservativeUSD": 0.084072,
+        "draftParagraphWords": 210
+      }
+    }
+  },
+  "budget": {
+    "authorizationUSD": 8,
+    "conservativeUSD": 7.49254,
+    "remainingUSD": 0.50746,
+    "providerAccountBalanceChecked": false
+  },
+  "limitations": [
+    "One delivered answer does not establish reliability across the 110 cases.",
+    "The successful call was slower than the earlier failed attempt; no latency improvement is claimed.",
+    "Cost comparisons across development versions are not typical subscriber economics.",
+    "No Project workflow, UI, phone, push or deployment was exercised."
+  ]
+}

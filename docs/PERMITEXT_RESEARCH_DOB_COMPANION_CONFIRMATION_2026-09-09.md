@@ -54,3 +54,26 @@ The focused source-selection, HTML attribution, summary binding/integrity and of
 The full `env -u OPENAI_API_KEY -u PERMITEXT_RUN_PAID_RESEARCH_EVALS npm run test:research-chat` suite also passed with exit code 0; its local log is `/tmp/permitext-loft-full-suite-20260909.log`. This includes the updated source-context contracts, other Research regressions, and request-binding/budget checks. Syntax and `git diff --check` passed. No Project/Notebook/Reports/export flow, phone or rendered UX workflow was exercised. These changes are local; no push or deployment occurred.
 
 Remaining work is to fix the five unattempted Zoning request packages without turning section references into fabricated highlights, inspect the relevant Appendix J visual evidence, and run a newly bound, budgeted preflight before more paid testing. The repaired DOB answers also need live confirmation. Preserve the full 110-case acceptance scope and use the remaining conservative allowance deliberately; request more API budget only if needed.
+
+## Subsequent live confirmation: Loft Board PDF route
+
+The earlier coverage counts and budget above describe that historical batch. The later mapped-review ledger records provider attempts for all 110 numbered cases, without claiming that all were delivered or accepted. At `42482e3e8268f18489de2035627197cac8c8276b`, a new single-use driver confirmed the repaired DOBNOW-016 PDF route using the unchanged authored question and scenario. Runtime behavior was unchanged after the preceding full Research suite passed.
+
+The current service-notice PDF was fetched with the same public-request headers used by Permitext and visually inspected in full. Its SHA-256 still matches `3f59cec0e8946db320a73934029ba31b14e0216b277916dee24cd5e5a941dfe5`. The committed-source preflight fetched all three official PDFs, verified that the missing Yes/No submission mapping and source-supported sequence reached the actual summary request, and intercepted provider dispatch at zero cost. Its maximum initial request reservation was $0.121035 within the $0.50 turn cap.
+
+The live turn delivered HTTP 200 in **35.556 seconds**, with one Terra summary and one Luna verification, no retries, no paid search, three successful public PDF GETs and zero pending provider requests. Verification passed. The answer correctly applies the stated IMD-impact facts to the Certification route, includes the Narrative Statement, and distinguishes an issued clearance from merely submitting a request. Its citations identify the service notice page and release-note page. These claims were reviewed against the supplied passages and the rendered service notice, separately from the model's pass verdict.
+
+The case remains **core supported, with answer-key and presentation gaps**. It excludes LNO for the stated scenario but does not explain the No/commercial-unit alternative required by the key. It omits the key's source-supported sequence of adding the request after the job filing is submitted. It also presents the general either-clearance statement before applying the scenario-specific route and duplicates the server's authority disclosure. These issues were not hidden by the successful delivery or repaired source coverage; no reference answer or approval status was changed.
+
+The generated paragraphs contain **127 words**, compared with 210 in the earlier failed draft, excluding links and server-added labels. However, drafting took **29.821 seconds** and verification **2.639 seconds**; the earlier failed full attempt took 25.498 seconds. This is not evidence of a speed improvement. The trace does not separate provider queue time from generation time. Direct document retrieval removed the former paid search call, but that did not make this individual request faster.
+
+The retained audit estimates **$0.01280125** for this turn and **$0.023742 conservatively**, compared with $0.05746935 and $0.084072 for the earlier failed attempt. The current $8 round now totals **$7.492540 conservatively**, leaving **$0.507460**. These are recorded-usage calculations using the checked [OpenAI prices](https://developers.openai.com/api/docs/pricing), not a provider-account balance or a claim about typical subscriber costs.
+
+Retained evidence, relative to `permitext-sync-server/`:
+
+- `evals/results/research-owner-api-round2-loft-pdf-preflight-2026-09-09.json`
+- `evals/results/research-owner-api-round2-live-loft-pdf-2026-09-09.json`
+- `evals/results/research-owner-api-round2-loft-pdf-cost-audit-2026-09-09.json`
+- `evals/results/research-owner-loft-pdf-answer-review-2026-09-09.json`
+
+The driver is consumed and must not be replayed. The raw answer, verifier result, source hashes, unchanged input hash, cost ledger and separate assistant review are retained. This confirms the repaired PDF-backed workflow source path; it does not implement general OCR or establish that arbitrary scanned PDFs work. Remaining answer quality, speed and full-cohort acceptance work stays open. No Project/Notebook/Reports/export workflow, phone, UI, live filing, push or deployment was exercised.
