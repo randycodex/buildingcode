@@ -56,6 +56,14 @@ Affected questions: ZR-08, ZR-12, ZR-13, ZR-17, FGC-12, GAP-03, GAP-06, GAP-07, 
 
 Closure: Stated facts remain conditional premises rather than being unnecessarily reopened; missing facts are requested only when they can change the asked conclusion.
 
+Local repair addendum, September 9: the `20260909-building-and-system-fact-scope-v7` parser removes the false new-building status from FGC-01 and separates a system's served dwelling units from the building's total units. It preserves direct building descriptions, negation, uncertainty, hypothetical scope and follow-up facts; legacy positive facts are rechecked against their original wording. New/existing equipment and new building permits no longer establish building status.
+
+The MC-03 diagnosis is now more precise: the word **part**, not **designed**, triggers the sentence's qualification. Before this repair, the current prompt already retained the complete two-unit statement as a supplied qualified premise, with no unknown-fact prompt. The remaining reproduced defect was the shared storage key: that system statement could erase a previously supplied building-wide unit count. The repair gives the system its own key and preserves both scopes. It does not declare a proposed system built or its count to be the total number of units in the building.
+
+The [110-question parser audit](../evals/results/research-fact-subject-scope-audit-2026-09-09.json) records changes only for FGC-01 and MC-03; the other 108 question projections are unchanged. The [subject-scope regression](../tests/research-fact-subject-scope-contract.mjs) covers equipment/building wording, system-versus-total counts, qualified quantities, follow-ups and legacy revalidation. These are local parser repairs, not new generated-answer passes. R3 and the full-answer acceptance counts remain open and unchanged.
+
+Validation: `npm run test:research-chat` passed on the final parser source, including the new subject-scope contract and the existing qualified-facts contract. The audit's source hashes and 110 case rows were verified; live execution and result overwrite were rejected. No paid calls were made and the $0.578301 remaining conservative allowance is unchanged. The full local suite log is `/tmp/permitext-fact-subject-research-suite-final-20260909.log`.
+
 ### R4 — Confirm mapped-location and definition checks accept supported uncertainty
 
 Status: partly-repaired-awaiting-confirmation. Area: Answer verification.
@@ -116,7 +124,7 @@ Closure: A prepriced, authorized sample measures full-turn p50/p90 latency and c
 
 ## Execution order and stopping rules
 
-1. Repair the locally reproduced fact-scope errors under R3. Preserve genuine new/existing building descriptions, qualified premises and negative controls; a new component must not establish a new building.
+1. The two demonstrated parser scope defects under R3 are locally repaired with negative controls and a 110-question parser comparison. Continue the remaining R3 answer-level findings; preserve the distinction between supplied qualified premises and actual missing facts.
 2. Continue R1 and R5 for the demonstrated timing contradiction and verification-scope failure. Group related cases rather than repeating only the same two examples. Preserve all other work items and affected questions.
 3. Complete local regressions before a newly priced, single-use live comparison. Do not replay consumed drivers or infer that the remaining allowance covers the complete cohort.
 4. A case closes only with a delivered answer meeting its unchanged substantive reference, material qualifications, point-specific citations and presentation requirements. An automatic verifier pass alone is insufficient. Proposed reference corrections remain separate from scoring.

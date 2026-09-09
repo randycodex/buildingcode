@@ -1,7 +1,7 @@
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 
 export const researchConversationFactsVersion =
-  "20260908-negative-work-premise-v6";
+  "20260909-building-and-system-fact-scope-v7";
 export const researchConversationFactPromptVersion = "20260909-fact-context-v1";
 export const researchQualifiedFactInstruction =
   "Qualified user statements retain negation, limited scope or approximate quantities. Apply them as premises only as worded, without promoting them to broader categorical facts. They are not missing merely because they are qualified; 'on the stated facts' is a valid conditional basis. Do not infer existing from not new, or full sprinkler coverage from partial coverage. Keep actual uncertainty unresolved and request clarification only when it can change the requested decision.";
@@ -100,6 +100,42 @@ function matchedValue(text, pattern, index = 1) {
   return match ? compactText(match[index]) : "";
 }
 
+// Recognize building attributes, rather than guessing across arbitrary words
+// between "new/existing" and "building". Unrecognized phrasing stays in the
+// original user text; it must not manufacture a categorical building status.
+const buildingAttribute = String.raw`(?:(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)[- ]stor(?:y|ies)|Group\s+[A-Z](?:-\d+)?|Type\s+(?:I{1,3}|IV|V)[AB]?(?:\s+construction)?|commercial|residential|mixed[- ]use|(?:single|two|multi)[- ]family|(?:high|low)[- ]rise|(?:semi[- ])?detached|attached|apartment|office|industrial|institutional|school|warehouse|historic|landmarked|vacant|occupied|(?:steel|timber|wood|concrete|masonry|brick)(?:[- ]framed)?|reinforced[- ]concrete)`;
+const buildingStatusNounPhrase = new RegExp(String.raw`\b(existing|new)\s+(?:(?:${buildingAttribute})\s+){0,8}(?:building|structure)\b`, "gi");
+
+function buildingStatusValue(text) {
+  const headEnding = /^(?:\s*[,.;?!:]|\s*$|\s+(?:is|are|was|were|has|have|had|will|shall|must|can|may|in|on|at|of|for|to|from|with|without|under|over|that|which|where|and|but)\b)/i;
+  const statuses = new Set();
+  for (const match of text.matchAll(buildingStatusNounPhrase)) {
+    if (headEnding.test(text.slice(match.index + match[0].length))) {
+      statuses.add(match[1].toLowerCase());
+    }
+  }
+  for (const match of text.matchAll(/\b(?:building|structure)\s+(?:is|was|will be)\s+(existing|new)\b/gi)) {
+    if (headEnding.test(text.slice(match.index + match[0].length))) statuses.add(match[1].toLowerCase());
+  }
+  // A new project or a building permit does not itself establish new construction.
+  for (const match of text.matchAll(/\b(?:building|structure|project)\s+(?:is|was|will be)\s+new construction\b/gi)) {
+    if (headEnding.test(text.slice(match.index + match[0].length))) statuses.add("new");
+  }
+  return statuses.size === 1 ? [...statuses][0] : "";
+}
+
+function mentionsBuildingStatus(text) {
+  // Strip qualification only to identify its subject, never to establish a fact.
+  const subjectText = text.replace(/\b(?:not|never|possibly|probably|reportedly)\s+|\bnon[- ]/gi, "")
+    .replace(/\bisn['’]t\b/gi, "is").replace(/\bwasn['’]t\b/gi, "was")
+    .replace(/\b(?:may|might|could)\s+be\b/gi, "is");
+  return Boolean(buildingStatusValue(subjectText));
+}
+
+function systemDwellingUnitScope(text) {
+  return /\bsystem\b[^.;?]{0,60}\b(?:serves?|served|serving)\b[^.;?]{0,45}\bdwelling units?\b/i.test(text);
+}
+
 function occupancyFactValue(text) {
   const patterns = [
     /\b(?:building|space|project|room|it|this)\b[^.;?]{0,40}\b(?:is|as)\s+(?:an?\s+)?(?:occupancy\s+)?Group\s+([A-Z](?:-\d+)?)\b/i,
@@ -148,6 +184,9 @@ function structuredFacts(question, kind, topicDecision) {
 
   const dwellingUnits = matchedValue(text, /\b(?:with|has|had|contains?|containing)\s+([\d,]+)\s+dwelling units?\b/i);
   if (dwellingUnits) add("dwelling_unit_count", dwellingUnits, `The active-topic project contains ${formattedNumber(dwellingUnits)} dwelling units.`);
+
+  const servedDwellingUnits = matchedValue(text, /\bsystem\s+(?:(?:is|was|will be)\s+)?(?:(?:designed|intended|proposed)\s+to\s+)?(?:serves?|served|serving)\s+([\d,]+|one|two|three|four|five|six|seven|eight|nine|ten)\s+dwelling units?\b/i);
+  if (servedDwellingUnits) add("system_served_dwelling_unit_count", canonicalCount(servedDwellingUnits), `The user describes a system serving ${canonicalCount(servedDwellingUnits)} dwelling units; this is not a building-wide unit count.`);
 
   const occupants = matchedValue(
     text,
@@ -219,9 +258,10 @@ function structuredFacts(question, kind, topicDecision) {
   const occupancy = occupancyFactValue(text);
   if (occupancy) add("occupancy_group", occupancy.toUpperCase(), `The active-topic building is Group ${occupancy.toUpperCase()}.`);
 
-  if (/^(?:an?\s+)?existing\b[^.;?]{0,120}\b(?:building|structure|project)\b|\b(?:this|that)\s+is\s+an?\s+existing\b[^.;?]{0,80}\b(?:building|structure|project)\b|\b(?:this|the|an?)\s+(?:building|structure|project)\s+(?:is|was)\s+existing\b|\bexisting\s+(?:building|structure|project)\b/i.test(text)) {
+  const buildingStatus = buildingStatusValue(text);
+  if (buildingStatus === "existing") {
     add("building_status", "existing", "The active-topic building is existing.");
-  } else if (/^(?:an?\s+)?new\b[^.;?]{0,120}\b(?:building|structure|project)\b|\b(?:this|that)\s+is\s+an?\s+new\b[^.;?]{0,80}\b(?:building|structure|project)\b|\b(?:this|the|an?)\s+(?:building|structure|project)\s+(?:is|will be)\s+new\b|\bnew\s+(?:building|structure|project)\b/i.test(text)) {
+  } else if (buildingStatus === "new") {
     add("building_status", "new", "The active-topic building is new construction.");
   }
 
@@ -299,7 +339,7 @@ function structuredFacts(question, kind, topicDecision) {
 
 const qualifiedFactMentions = [
   ["sprinkler_status", /\bsprinkler(?:ed|s|ing| status| system| protection)?\b/i],
-  ["building_status", /\b(?:existing|new)\b[^.;?]{0,80}\b(?:building|structure|project)\b|\b(?:building|structure|project)\b[^.;?]{0,40}\b(?:existing|new)\b/i],
+  ["building_status", { test: mentionsBuildingStatus }],
   ["story_count", /\b(?:story|stories)\b/i],
   ["occupancy_group", /\b(?:occupancy|Group\s+[A-Z](?:-\d+)?)\b/i],
   ["construction_type", /\b(?:construction type|Type\s+[IV]+[AB]?\s+construction)\b/i],
@@ -308,7 +348,8 @@ const qualifiedFactMentions = [
   ["occupant_count", /\boccupants?\b/i],
   ["travel_distance_feet", /\btravel distance\b/i],
   ["employee_count", /\bemployees?\b/i],
-  ["dwelling_unit_count", /\bdwelling units?\b/i],
+  ["dwelling_unit_count", { test: (text) => /\bdwelling units?\b/i.test(text) && !systemDwellingUnitScope(text) }],
+  ["system_served_dwelling_unit_count", { test: systemDwellingUnitScope }],
   ["area_square_feet", /\b(?:sf|sq\.?\s*ft\.?|square feet)\b/i],
   ["work_scope", /\b(?:work|scope|alteration|new construction|change of (?:use|occupancy))\b/i],
   ["work_commencement", /\bcommencement\b|\bwork\b[^.;?]{0,65}\b(?:begun|started|commenced)\b/i],
