@@ -82,11 +82,11 @@ assert(repairedCaseIDs.every((id) => attempted.has(id)));
 assert(newCaseIDs.every((id) => !attempted.has(id)));
 assert.equal(roundPreviousConservativeUSD, 7.670836);
 const profile = { promptVersion: "20260909-document-summary-v8", schema: "permitext-owner-api-round2-source-span-v1", sourceCommit,
-  authorization: "Owner authorized continued API tests within a fresh $8 round, with notice before more is needed. Historical costs remain separate. This single-use confirmation tests exact source-span selection, focused complete responsibilities FAQ pairs and subsequent-filing qualifications under guidance prompt v8 on unchanged authored DOBNOW-023 and DOBNOW-003 scenarios and questions, once each. The preceding conservative round total is $7.670836, leaving $0.329164. Maximum $0.30 for two unassigned Research HTTP turns, at most $0.15 and two provider requests per turn, four provider requests in total, no paid search, manual retry, separate judge, Project workflow or deployment.",
+  authorization: "Owner authorized continued API tests within a fresh $8 round, with notice before more is needed. Historical costs remain separate. This single-use confirmation tests exact source-span selection, focused complete responsibilities FAQ pairs and subsequent-filing qualifications under guidance prompt v8 on unchanged authored DOBNOW-023 and DOBNOW-003 scenarios and questions, once each. The preceding conservative round total is $7.670836, leaving $0.329164. Maximum $0.30 for two unassigned Research HTTP turns, at most $0.20 and two provider requests per turn, four provider requests in total, no paid search, manual retry, separate judge, Project workflow or deployment.",
   preDispatchAbortEvidence, previousResultHashes, historicalConservativeSpendUSD: previousConservativeSpendUSD, previousConservativeSpendUSD: roundPreviousConservativeUSD, authorizationUSD: 8,
   priorRoundResults: [...firstRound.priorRoundResults, { file: firstRoundFile, sha256: hash(firstRoundBytes) }],
   ownerDatasetSHA256: hash(ownerBytes), roundID: "owner-api-round2-20260908",
-  maximumCumulativeSpendUSD: Math.min(0.3, Number((8 - roundPreviousConservativeUSD).toFixed(6))), maximumTurnSpendUSD: 0.15, maximumTurns: 2, maximumProviderRequests: 4, maximumProviderRequestsPerTurn: 2,
+  maximumCumulativeSpendUSD: Math.min(0.3, Number((8 - roundPreviousConservativeUSD).toFixed(6))), maximumTurnSpendUSD: 0.2, maximumTurns: 2, maximumProviderRequests: 4, maximumProviderRequestsPerTurn: 2,
   repetitions: 1, separateJudgeRequests: 0, manualRetries: 0,
   keySHA256: hash(keyBytes),
   pricingSource: "https://developers.openai.com/api/docs/pricing", pricingCheckedOn: "2026-09-09",
@@ -96,7 +96,7 @@ const profile = { promptVersion: "20260909-document-summary-v8", schema: "permit
   repairedCaseIDs, newCaseIDs, cases: caseIDs };
 assert(roundPreviousConservativeUSD + profile.maximumCumulativeSpendUSD <= profile.authorizationUSD);
 assert(profile.maximumTurnSpendUSD <= profile.maximumCumulativeSpendUSD);
-const preflightURL = new URL("evals/results/research-owner-api-round2-source-span-preflight-2026-09-09.json", root);
+const preflightURL = new URL("evals/results/research-owner-api-round2-source-span-preflight-v2-2026-09-09.json", root);
 const resultURL = new URL("evals/results/research-owner-api-round2-live-source-span-2026-09-09.json", root);
 const sourceFiles = ["app.mjs", "research-answer-presentation.mjs", "research-official-guidance-summary.mjs", "research-guidance-qualification-review.mjs", "evals/research-answer-key-amendments.json", "research-answer-quality.mjs", "research-focused-technical-scope.mjs", "research-conversation-topic.mjs", "research-technical-topic-routes.mjs", "evidence-discovery.mjs", "research-conversation-facts.mjs", "research-fact-qualification.mjs", "research-source-policy.mjs", "research-official-html-attribution.mjs", "research-official-pdf-attribution.mjs", "research-official-pdf-ranking.mjs", "research-official-pdf-worker.mjs", "research-dob-workflow-routing.mjs", "evals/research-answer-key-reconciliation.mjs", "research-config.mjs", "research-cost-usage.mjs", "research-provider-client.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-safety.mjs",
   "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs", "research-zoning-metadata.mjs", "research-zoning-conditional-explanation.mjs", "project-foundation-contract.mjs", "research-corpus-registry.mjs", "research-model-routing.mjs", "evals/research-owner-scope-input.mjs",
@@ -206,6 +206,7 @@ globalThis.fetch = async (url, options) => {
       }
       assert.equal(input.question.replace(/\s+/g, " ").trim(), active.question.replace(/\s+/g, " ").trim());
     }
+    active.initialSourceStatistics = Object.entries(Object.groupBy(JSON.parse(body.input).passages, (passage) => passage.sourceID)).map(([sourceID, passages]) => ({sourceID, passages: passages.length, characters: passages.reduce((sum, passage) => sum + passage.text.length, 0)}));
     active.initialPhase = phase;
     active.initialRequestSHA256 = requestHash(body);
     active.initialRawRequestSHA256 = hash(options.body);
