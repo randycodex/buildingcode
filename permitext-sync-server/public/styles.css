@@ -16385,3 +16385,18 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   .topbar .workspace-actions-button,
   .topbar .topbar-settings-button { min-height: 44px; height: 44px; }
 }
+
+/* Retained-work review stays separate from destructive data actions. */
+.legacy-workspace-recovery > div:not([hidden]) {
+  display: grid;
+  gap: var(--space-2);
+}
+.legacy-workspace-recovery .settings-link-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--text-primary);
+}
+.legacy-workspace-recovery [role="status"]:empty {
+  display: none;
+}

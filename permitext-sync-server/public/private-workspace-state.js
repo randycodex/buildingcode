@@ -165,3 +165,60 @@ export function accountContextChangedError() {
   error.code = "ACCOUNT_CONTEXT_CHANGED";
   return error;
 }
+
+const legacyNoticeDismissedKey = "permitext:legacyWorkspaceNoticeDismissed:v1";
+
+export function legacyWorkspaceNoticeDismissed(storage) {
+  return storage.getItem(legacyNoticeDismissedKey) === "1";
+}
+
+export function dismissLegacyWorkspaceNotice(storage) {
+  storage.setItem(legacyNoticeDismissedKey, "1");
+}
+
+function retainedLegacyEntries(storage) {
+  return Object.keys(storage).filter((key) => key === legacyBase || key === legacyRegistry ||
+    key.startsWith(legacyLayoutPrefix) || key.startsWith(`${legacyBase}:detached:`))
+    .map((key) => [key, storage.getItem(key)]);
+}
+
+export function legacyWorkspaceRecoveryReview(storage, accountUserID = "") {
+  return reviewLegacyEntries(retainedLegacyEntries(storage), accountUserID);
+}
+
+function reviewLegacyEntries(entries, accountUserID) {
+  let unreadableEntries = 0;
+  const parsed = entries.map(([key, raw]) => {
+    try { return [key, JSON.parse(raw)]; }
+    catch { unreadableEntries += 1; return [key, null]; }
+  });
+  const workspace = parsed.find(([key]) => key === legacyBase)?.[1];
+  const owner = workspace?.account?.userID || workspace?.accountUserID || "";
+  const owners = parsed.reduce((result, [, value]) => privateOwnerIDs(value, result), new Set());
+  const ownershipVerified = Boolean(accountUserID && owner === accountUserID &&
+    !unreadableEntries && [...owners].every((item) => item === accountUserID));
+  // This summary deliberately contains no account IDs, keys or saved content.
+  return {
+    format: "permitext-legacy-workspace-review", version: 1,
+    retainedEntries: entries.length, unreadableEntries,
+    ownershipVerified, signedIn: Boolean(accountUserID),
+    recovery: !entries.length ? "missing" : unreadableEntries ? "partial-or-unreadable" :
+      ownershipVerified ? "export-available" : "ownership-review-required"
+  };
+}
+
+export function legacyWorkspaceRecoveryBundle(storage, accountUserID) {
+  const entries = retainedLegacyEntries(storage);
+  const review = reviewLegacyEntries(entries, accountUserID);
+  if (review.recovery !== "export-available") {
+    throw new Error("Sign in to the recorded owner account before exporting older work. Unverified data remains preserved for support review.");
+  }
+  const workspaces = Object.fromEntries(entries.map(([key, raw]) => [key,
+    JSON.parse(raw, (field, item) => /^(sessionToken|backendSessionToken|accessToken|refreshToken|idToken|identityToken|authorization)$/i.test(field) ? undefined : item)
+  ]));
+  return {
+    format: "permitext-legacy-workspace-recovery", version: 1, access: "export-only",
+    exportedAt: new Date().toISOString(), workspaces,
+    instructions: "Recovery copy of retained browser workspace records only. External images and server-only data are not included. Review before manually copying content. This file does not import, synchronize, or replace current work. Originals remain in browser storage."
+  };
+}

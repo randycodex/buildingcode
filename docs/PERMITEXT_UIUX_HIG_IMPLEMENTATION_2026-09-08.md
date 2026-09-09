@@ -95,3 +95,33 @@ contracts, UX audit, and git diff whitespace check passed. Device Hub repeatedly
 returned accessibility timeouts or noWindowsAvailable, so post-change interaction,
 Account appearance, and increased Dynamic Type verification remain pending. No
 physical-device installation, production deployment, or App Store change is claimed.
+
+## Retained browser workspace recovery follow-up
+
+At owner request, dismissing or reviewing the legacy-workspace banner now records
+its dismissal across reloads. This applies only to that notice; unrelated workspace
+errors retain their existing behavior. A failed dismissal write stays visible with
+a retry explanation. Original quarantined records remain intact.
+
+Account > Data & Storage now has Review older workspace data above destructive
+controls. The review reports retained/unreadable/missing records without exposing
+private content. When the recorded owner and all embedded ownership identifiers
+match the active account, Download recovery copy exports a credential-redacted
+snapshot for manual review. It does not import, replay, sync, overwrite, or delete
+anything; external images and server-only data are explicitly outside that copy.
+Unverified ownership offers a content-free diagnostic download and support link.
+Ownership is checked against the exact captured bytes that will be exported.
+
+Focused verification passed: account isolation (including ownership mismatch,
+missing owner, mixed owners, unreadable data, redaction, mutable-storage snapshot,
+dismissal persistence and failed writes), account-mutation isolation, UX alignment,
+UX audit and offline contracts. The browser showed three retained records with
+unverified ownership, correctly withheld content export, retained access after
+reload, and downloaded diagnostics through keyboard activation with a visible
+focus outline. No browser console errors were observed. Rendered review used the
+existing dark appearance; light appearance was not separately exercised. The
+owner-matched export path was verified with synthetic in-memory records, not by
+changing this browser's account or legacy data. No support message was sent.
+
+Shell generation: 20260908-workspace-recovery-v62; cache: permitext-pro-shell-v801.
+Local preview only; no main merge or production deployment.
