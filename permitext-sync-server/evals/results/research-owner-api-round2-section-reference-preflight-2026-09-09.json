@@ -1,0 +1,620 @@
+{
+  "schema": "permitext-owner-api-round2-section-reference-v1",
+  "sourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+  "authorization": "Owner authorized continued API testing within a fresh $8 round and requested notice before more is needed. Historical spending stays separate. This single-use batch attempts the five numbered cases with no preceding provider dispatch, once each, preserving their authored questions and section references. Batch maximum $1.161233, the conservative remainder of the round. Each next turn requires a full $0.50 conservative reservation. No manual retry, extra judge, Project workflow test or deployment.",
+  "preDispatchAbortEvidence": {
+    "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-2026-09-09.json",
+    "sha256": "890f8a447d3a6326c1579d41ddad140a9b64dfdeabe1e43d9d9bf09e0bd68143",
+    "providerCalls": 0,
+    "providerCostUSD": 0,
+    "reason": "Initial request binding guard aborted before recording or sending any provider request; the isolated runtime reservation is not a provider charge."
+  },
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 6.838767,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sha256": "f406901dcca5f06398166f4a08bcfbadf6639bf24755777a0c7a9434d8ca7d8f"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sha256": "f991b5d3ce3757dddbea968291341571817c8cf9f3703101766766047c39ba57"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sha256": "6cacf237b64e02d3b388adafea5f0b48865f3c9778e5d15e77b8fc19b8de03ca"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sha256": "485cba41a9c4a277347fa950f590c2ed25ebb6f48fe35b55f5d3e8fdae3bba12"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sha256": "68f098015f6d49060f62a725dc805f76b6f4692203e30f9de45cd3e8282a6cc9"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 1.161233,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 5,
+  "maximumProviderRequests": 25,
+  "maximumProviderRequestsPerTurn": 5,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-09",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual unassigned HTTP Research on isolated accounts and storage. Author-specified section references use the explicit section_reference API mode; no highlight, visual review or parcel fact is fabricated. Canonical source retrieval and ordinary verification remain active. Answer keys and review expectations are excluded from planning, drafting and verification. Web support remains configured normally, but these enacted-source questions must not request web tools or external documents. All five inputs must pass the zero-API preflight. Earlier failures and all 110 numbered cases remain in the cumulative acceptance scope. No UI, phone, Project workflow or deployment testing.",
+  "requestComparison": "The existing request binding normalizes opaque run-specific identifiers only; authored text, selected sources, runtime instructions and schemas remain bound. Raw request hashes are also recorded.",
+  "repairedCaseIDs": [],
+  "newCaseIDs": [
+    "ZR-03",
+    "ZR-06",
+    "ZR-09",
+    "ZR-19",
+    "ZR-20"
+  ],
+  "cases": [
+    "ZR-03",
+    "ZR-06",
+    "ZR-09",
+    "ZR-19",
+    "ZR-20"
+  ],
+  "sourceHashes": {
+    "app.mjs": "fe47c5fb9812b78223a65cfde99874609de3b8a81565342daed64be5c11c9341",
+    "research-answer-presentation.mjs": "f8f3853d4441d4940de0bf222104dce0ee81a1e91e450b3e08dfdb02ff6049ba",
+    "research-official-guidance-summary.mjs": "4e2e14d754f658e06693469be4628873b171a0fdc47ce3b6ec642205a9c38c0e",
+    "evals/research-answer-key-amendments.json": "ddcf7fb5675285991b0a7275749890794c3671a1f7888cc6c5ebee2b5977bc24",
+    "research-answer-quality.mjs": "cad6d658ff2805ee6e56e48b2b135f5dec28863b02020183731b0815b2ecec4f",
+    "research-focused-technical-scope.mjs": "4c7f8ff22bc4bd11bf87a55417b8795b164443e0a704d9e64ebc33f27fc27f49",
+    "research-conversation-topic.mjs": "77baee9c8db51501fca1bfee6ea192869f8e6fd8a7c35b48eb8d5a7f848f7858",
+    "research-technical-topic-routes.mjs": "319075fb7223e387a70ee4038b62cab0c1df839c68de374317277d4548c8ef62",
+    "evidence-discovery.mjs": "47f76c9ba11ea1d5c05edc996eebe110fd4f467bccffe05c4fc1b2e6b6e2d714",
+    "research-conversation-facts.mjs": "67ec6ab2e04908151af796b1a08d2ebd9bdc58bdfb7a748642efb83dd9068ef2",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-source-policy.mjs": "0f569a60606aaace85c6cfde2dd179720717603da47ca7d898b1c66630d63980",
+    "research-official-html-attribution.mjs": "97e0e666a244e6969a9cb690e042fed74fa1a68a8f58351d8f79e0bbb85290c7",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "research-official-pdf-ranking.mjs": "c0d326957b27d2501065ba652f682b911afcffb134a95f74f0b8f1fd2953c6b4",
+    "research-official-pdf-worker.mjs": "39ec76ae01ef399819d5a815f980e2ac52b4fc0844510b7944622d18f4539587",
+    "research-dob-workflow-routing.mjs": "c024a9c6696d3ffbd3c50afffbdc800b93ea4fea3a0952245ffe19dd7682ebab",
+    "evals/research-answer-key-reconciliation.mjs": "3e3a2294a5ea9363e0f242690f8548b5593b77181300c55ecbf6051b47cf4b69",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "5371e9c7e7d38cbf985f0fa3757d627a3b8b55fcd923b229966f340fbac27e1a",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "23bada6715261d6c9e33beb23f8f53987cc16e33c9e31094454421354bb8a9f2",
+    "research-evidence-assembly.mjs": "c42d01095e4c77081feedb569488046a0795f7bb33ae1e63d8956f63da9762f4",
+    "research-definition-excerpts.mjs": "2bb1b8191c7e17bea8526f9adc2d4220fa6f10d4df486a1fae7729f01e534c6a",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "research-zoning-metadata.mjs": "4f877fd927b2844b1636eaad971047dbff371292e583f389e9ae7fe63f59303c",
+    "research-zoning-conditional-explanation.mjs": "1a21cbe6a443c9e009029eb149a29424316b4c6c5596dd0aee90fc9339f1df38",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "180d11108ff7d6cdec8eae0e8a64401981955531a3eb55e9535c19d49516bd24",
+    "evals/research-reconciled-answer-key.json": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "7ed6285b7bb1fae0117cc89e95ad4443b6423884818bf3a729341ffb8fc84500",
+    "scripts/run-research-owner-api-round2-section-reference-20260909.mjs": "099ae2973c3c335c969dbe6e1470167435afcb486b30775c7245ed86664328ec"
+  },
+  "startedAt": "2026-09-09T06:10:41.391Z",
+  "status": "preflight-passed",
+  "results": [
+    {
+      "id": "ZR-03",
+      "question": "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+      "inputSHA256": "98b25e17083b1ec7beca9a5d94072cc89db6409f3be51c6ae5612952f8f1770c",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "d5d65b6e3ff4fe07db7dda16cfe9137dcbc88a36f588609327125f0861ac2e7f",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": null,
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20021237",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "dd43238f8fa7608e2f68071938addfa434fd8f023f12e09a96f0a31c68bfe6be",
+      "initialRawRequestSHA256": "c91a90ff670a622b40d68162f841dbc6e5f31c7eb186ac128b03ed41dfa9ccdb",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 37899,
+      "interceptCount": 1,
+      "durationMilliseconds": 399,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.248615,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "4ed8ed28-b283-40ac-8567-4f5b095a2669",
+          "createdAt": "2026-09-09T06:10:41.672Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 367,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-06",
+      "question": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+      "inputSHA256": "3fa70b15d9febe7d7d05102c8f7db199350747b8e2788f3801538039284b985f",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "967e91b36d9fe4ee46f83de0bf6ee1a8e4975e750287e52273c83c54f7055cca",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": null,
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20022472",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20022473",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20022474",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20019206",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20021237",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "58a83944e200990d3b44b1cdebddf037fbb299a17ac4fe76e7ad747cac050376",
+      "initialRawRequestSHA256": "6a41d49a52b885fa3b7ad6b5e687529bc5609405fa998e149e7d83a6f8f850fa",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 44902,
+      "interceptCount": 1,
+      "durationMilliseconds": 465,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.28363,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "ae784ab5-bc63-464f-9e4a-7a5972dae00d",
+          "createdAt": "2026-09-09T06:10:42.137Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 414,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-09",
+      "question": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area and is merely described as containing qualifying affordable housing. What does the Section 23-22 table establish numerically, and what qualification and affordable-floor-area facts are still needed before concluding that the higher FAR is available?",
+      "inputSHA256": "2a988abd132792a81e4104ea4ce3d9c61ea56b1df51c66079d5c317c599a60c4",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "77efece2c4b221a1052fba98e392bb9e4244f4b854327e88edd22947c31fa9d4",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": null,
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018017",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20022699",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20022711",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        },
+        {
+          "sectionID": "20018523",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "b4e09519b298a757381e144b60dc6971b9705f6cf659d5693bcf84e94729464a",
+      "initialRawRequestSHA256": "695cfd09ec08df129621ca9a00d9056598c8d158e8dd1ed3702a42963951c75b",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 57599,
+      "interceptCount": 1,
+      "durationMilliseconds": 371,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.347115,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "f7115c90-4e13-4cc0-aced-dfe5b412d291",
+          "createdAt": "2026-09-09T06:10:42.722Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 339,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-19",
+      "question": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+      "inputSHA256": "cbe137fe86be80a9f03d4eb2bf95f04e45e0eac5b49d3fd27ba7a6a7e1632ce0",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "8fd9c19a49a0765a1a672dc7fc590c5460a5d02cbb5589398808fb778a972967",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": null,
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018523",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "5ec5f252ef0ecdeff0f41f300e4de4e9bdf207e66c230e5b9bdc84fea5a0e014",
+      "initialRawRequestSHA256": "3cfd3efdb64322c6ae3c70cddd5d9dfffec950b04060474384234810b265d79e",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 46298,
+      "interceptCount": 2,
+      "durationMilliseconds": 351,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.029061,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "1aeaa325-bd3b-4fb5-ab3a-eb0386f05fe5",
+          "createdAt": "2026-09-09T06:10:43.150Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 320,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-20",
+      "question": "A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?",
+      "inputSHA256": "88fcfb02683d0a05b4450b076d775d94bed04a1e54ff18addcb29afb40add985",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "8fd9c19a49a0765a1a672dc7fc590c5460a5d02cbb5589398808fb778a972967",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": null,
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018523",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        }
+      ],
+      "status": "preflight-intercepted",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "256b61cb830030af3efc328460de97d34294c2f24c8ded9c6183b9d34d648836",
+      "initialRawRequestSHA256": "83db26d2b0c8650829a7022d45cbe166663ff946b8f8cc229b4de26dd0b19ad8",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 48196,
+      "interceptCount": 2,
+      "durationMilliseconds": 293,
+      "httpStatus": 502,
+      "initialMaximumUSD": 0.03001,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "7523615e-f484-4e75-bd11-9786723096f3",
+          "createdAt": "2026-09-09T06:10:43.566Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 261,
+          "failureCode": "RESEARCH_PROVIDER_ERROR",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ]
+    }
+  ],
+  "providerCalls": [],
+  "documentRequests": [],
+  "completedAt": "2026-09-09T06:10:43.882Z",
+  "spend": {
+    "active": true,
+    "capUSD": 1.161233,
+    "reservedUSD": 0,
+    "actualUSD": 0,
+    "requestCount": 7,
+    "pendingRequestCount": 0
+  }
+}

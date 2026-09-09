@@ -1,0 +1,1978 @@
+{
+  "schema": "permitext-owner-api-round2-retained-audit-v1",
+  "checkedAt": "2026-09-09T06:13:47.847Z",
+  "sourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+  "pricing": {
+    "checkedOn": "2026-09-08",
+    "source": "https://developers.openai.com/api/docs/pricing",
+    "tier": "standard short context",
+    "perMillionUSD": {
+      "gpt-5.6-terra": {
+        "input": 2,
+        "cacheRead": 0.2,
+        "cacheWrite": 2.5,
+        "output": 12
+      },
+      "gpt-5.6-luna": {
+        "input": 0.2,
+        "cacheRead": 0.02,
+        "cacheWrite": 0.25,
+        "output": 1.2
+      }
+    },
+    "webSearchCallUSD": 0.01,
+    "providerInvoiceVerified": false
+  },
+  "sourceHashes": {
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-economics.mjs": "122a4b603f1e1f59146f1ccd56a43b1e23da0559bbf7179050c2905f1994302f",
+    "app.mjs": "fe47c5fb9812b78223a65cfde99874609de3b8a81565342daed64be5c11c9341",
+    "scripts/report-research-owner-api-round2-20260908.mjs": "045085d6255d9a3cb06040af9b0db586a755e3f47378acf4bfda152f22a6c4d5"
+  },
+  "ledgers": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sha256": "f406901dcca5f06398166f4a08bcfbadf6639bf24755777a0c7a9434d8ca7d8f"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sha256": "f991b5d3ce3757dddbea968291341571817c8cf9f3703101766766047c39ba57"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sha256": "6cacf237b64e02d3b388adafea5f0b48865f3c9778e5d15e77b8fc19b8de03ca"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sha256": "485cba41a9c4a277347fa950f590c2ed25ebb6f48fe35b55f5d3e8fdae3bba12"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sha256": "68f098015f6d49060f62a725dc805f76b6f4692203e30f9de45cd3e8282a6cc9"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+    }
+  ],
+  "historicalLedgerHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "roundID": "owner-api-round2-20260908",
+  "summary": {
+    "packages": 14,
+    "recordedProviderCalls": 222,
+    "newProviderCalls": 0,
+    "networkCalls": 0,
+    "usageEstimateUSD": 3.83473987,
+    "conservativeUSD": 7.283466,
+    "previouslyOmittedCacheWritePremiumUSD": 0.45738205,
+    "webSearchCalls": 56,
+    "components": {
+      "uncachedInputUSD": 0.090269,
+      "cacheReadUSD": 0.01393942,
+      "cacheWriteUSD": 2.28691025,
+      "outputUSD": 0.8836212,
+      "webSearchUSD": 0.56
+    },
+    "fullHTTPAttempts": 91,
+    "deliveredAttempts": 62,
+    "undeliveredAttempts": 29,
+    "notDispatchedCases": 5,
+    "verifierOnlyChecks": 0,
+    "verifierOnlyCostUSD": 0,
+    "fullHTTPCostUSD": 3.83473987,
+    "failedAttemptCostUSD": 1.34138162,
+    "additionalAnsweringCallsUSD": 0.3136647,
+    "deliveredAttemptCostP50USD": 0.0365639,
+    "deliveredAttemptCostP90USD": 0.07453789,
+    "failureAmortizedCostPerDeliveredUSD": 0.061850643064516125,
+    "strictQualityAcceptedCostPerAnswerUSD": null,
+    "fullHTTPDurationP50Milliseconds": 14041,
+    "fullHTTPDurationP90Milliseconds": 28075,
+    "deliveredDurationP50Milliseconds": 13224,
+    "deliveredDurationP90Milliseconds": 28393,
+    "newRoundUniqueProviderAttemptedCases": 70,
+    "authorizationUSD": 8,
+    "remainingConservativeAuthorizationUSD": 0.716534,
+    "historicalSupplementalCaseIDs": [
+      "PDF-BPP"
+    ],
+    "fullCohortProviderAttempted": 110,
+    "fullCohortNotProviderAttempted": [],
+    "newlyProviderAttemptedCases": [
+      "FGC-11",
+      "FGC-12",
+      "FGC-14",
+      "FGC-15",
+      "MC-11",
+      "MC-12",
+      "MC-14",
+      "PC-06",
+      "PC-07",
+      "PC-09",
+      "PC-11",
+      "PC-13",
+      "PC-14",
+      "GAP-06",
+      "GAP-07",
+      "GAP-09",
+      "GAP-10",
+      "GAP-12",
+      "GAP-13",
+      "GAP-14",
+      "GAP-15",
+      "GAP-08",
+      "MC-09",
+      "MC-13",
+      "GAP-03",
+      "CC-02",
+      "CC-05",
+      "ZR-02",
+      "ZR-04",
+      "ZR-05",
+      "ZR-07",
+      "ZR-10",
+      "ZR-11",
+      "ZR-12",
+      "ZR-13",
+      "ZR-15",
+      "ZR-16",
+      "ZR-17",
+      "DOBNOW-001",
+      "DOBNOW-002",
+      "DOBNOW-005",
+      "DOBNOW-007",
+      "DOBNOW-008",
+      "DOBNOW-009",
+      "DOBNOW-020",
+      "DOBNOW-021",
+      "DOBNOW-003",
+      "DOBNOW-004",
+      "DOBNOW-006",
+      "DOBNOW-010",
+      "DOBNOW-011",
+      "DOBNOW-012",
+      "DOBNOW-013",
+      "DOBNOW-014",
+      "DOBNOW-015",
+      "DOBNOW-016",
+      "DOBNOW-017",
+      "DOBNOW-022",
+      "DOBNOW-023",
+      "DOBNOW-024",
+      "ZR-03",
+      "ZR-06",
+      "ZR-09",
+      "ZR-19",
+      "ZR-20"
+    ]
+  },
+  "byPhase": [
+    {
+      "phase": "permitext_code_interpretation",
+      "calls": 72,
+      "usageEstimateUSD": 2.3900883,
+      "inputTokens": 816821,
+      "outputTokens": 58294
+    },
+    {
+      "phase": "web_support",
+      "calls": 27,
+      "usageEstimateUSD": 0.6706444,
+      "inputTokens": 572570,
+      "outputTokens": 11469
+    },
+    {
+      "phase": "permitext_official_guidance_summary",
+      "calls": 28,
+      "usageEstimateUSD": 0.3800925,
+      "inputTokens": 98241,
+      "outputTokens": 11211
+    },
+    {
+      "phase": "permitext_zoning_source_bounded_repair",
+      "calls": 8,
+      "usageEstimateUSD": 0.2086105,
+      "inputTokens": 50905,
+      "outputTokens": 6780
+    },
+    {
+      "phase": "permitext_research_verification",
+      "calls": 59,
+      "usageEstimateUSD": 0.14757277,
+      "inputTokens": 612779,
+      "outputTokens": 23695
+    },
+    {
+      "phase": "permitext_official_guidance_verification",
+      "calls": 28,
+      "usageEstimateUSD": 0.0377314,
+      "inputTokens": 115408,
+      "outputTokens": 7403
+    }
+  ],
+  "byModel": [
+    {
+      "model": "gpt-5.6-terra",
+      "calls": 100,
+      "usageEstimateUSD": 2.9511262,
+      "inputTokens": 892137,
+      "outputTokens": 68611
+    },
+    {
+      "model": "gpt-5.6-luna",
+      "calls": 122,
+      "usageEstimateUSD": 0.88361367,
+      "inputTokens": 1374587,
+      "outputTokens": 50241
+    }
+  ],
+  "highestCostAttempts": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+      "id": "ZR-09",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.050371,
+      "usageEstimateUSD": 0.1240281,
+      "conservativeUSD": 0.221186,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 55466
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sourceCommit": "417f00816fffc69659707820ba0d7cdc4f9e28cf",
+      "id": "ZR-05",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 4,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.08772544,
+      "conservativeUSD": 0.159977,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 44667
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sourceCommit": "53685fb3e3adad62084abd17de974db9d471107d",
+      "id": "GAP-15",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0389014,
+      "usageEstimateUSD": 0.08459519,
+      "conservativeUSD": 0.178913,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 30181
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "FGC-15",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0362999,
+      "usageEstimateUSD": 0.08080794,
+      "conservativeUSD": 0.173669,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 27079
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "MC-14",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0351461,
+      "usageEstimateUSD": 0.07991744,
+      "conservativeUSD": 0.171157,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 31741
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sourceCommit": "3dd14d266ba31d4df51306946e7448bb1c115c2f",
+      "id": "GAP-08",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.07761552,
+      "conservativeUSD": 0.12384,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 22863
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "MC-12",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0341468,
+      "usageEstimateUSD": 0.07701614,
+      "conservativeUSD": 0.164218,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 29154
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "GAP-06",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0323526,
+      "usageEstimateUSD": 0.07542749,
+      "conservativeUSD": 0.163834,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 30825
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sourceCommit": "417f00816fffc69659707820ba0d7cdc4f9e28cf",
+      "id": "ZR-11",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.07453789,
+      "conservativeUSD": 0.141412,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 37353
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sourceCommit": "8aee45526ce540ec36262bce071036b6084e6ea0",
+      "id": "ZR-11",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0741886,
+      "conservativeUSD": 0.137827,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 23518
+    }
+  ],
+  "attempts": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sourceCommit": "d11d615f300e4f18c2f718bf00c597d4d6a7ce46",
+      "id": "ZR-18",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.003706,
+      "conservativeUSD": 0.006587,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 15101
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sourceCommit": "d11d615f300e4f18c2f718bf00c597d4d6a7ce46",
+      "id": "MC-01",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.06152055,
+      "conservativeUSD": 0.118241,
+      "historicalFailureCodes": [
+        "RESEARCH_SPEND_CAP"
+      ],
+      "durationMilliseconds": 18952
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "id": "ZR-18",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0036276,
+      "conservativeUSD": 0.006485,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 12235
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "id": "MC-01",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.06094147,
+      "conservativeUSD": 0.118591,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 13123
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "id": "PC-04",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04663747,
+      "conservativeUSD": 0.091594,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 9529
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "id": "PC-10",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03152367,
+      "conservativeUSD": 0.060798,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 9158
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sourceCommit": "3a88666c9594130d80a7b0d4facf4b92809b915e",
+      "id": "MC-15",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.06273017,
+      "conservativeUSD": 0.123379,
+      "historicalFailureCodes": [
+        "RESEARCH_SPEND_CAP"
+      ],
+      "durationMilliseconds": 10924
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "FGC-11",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03242192,
+      "conservativeUSD": 0.062988,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 8908
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "FGC-12",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0297386,
+      "usageEstimateUSD": 0.06679739,
+      "conservativeUSD": 0.143512,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 30125
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "FGC-14",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03238672,
+      "conservativeUSD": 0.063758,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 5628
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "FGC-15",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0362999,
+      "usageEstimateUSD": 0.08080794,
+      "conservativeUSD": 0.173669,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 27079
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "MC-11",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03630067,
+      "conservativeUSD": 0.071546,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 7251
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "MC-12",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0341468,
+      "usageEstimateUSD": 0.07701614,
+      "conservativeUSD": 0.164218,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 29154
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "MC-14",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0351461,
+      "usageEstimateUSD": 0.07991744,
+      "conservativeUSD": 0.171157,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 31741
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "PC-06",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03339437,
+      "conservativeUSD": 0.065409,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 8800
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "PC-07",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03793062,
+      "conservativeUSD": 0.073822,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 10393
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "PC-09",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.02672377,
+      "conservativeUSD": 0.051761,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 8272
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "PC-11",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03899922,
+      "conservativeUSD": 0.075984,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 8681
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "PC-13",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03595637,
+      "conservativeUSD": 0.070773,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 9126
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "PC-14",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03938667,
+      "conservativeUSD": 0.077409,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 10812
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "GAP-06",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0323526,
+      "usageEstimateUSD": 0.07542749,
+      "conservativeUSD": 0.163834,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 30825
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "GAP-07",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04650654,
+      "conservativeUSD": 0.089702,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 28393
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "GAP-09",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03096812,
+      "conservativeUSD": 0.060578,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 10229
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "GAP-10",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03393227,
+      "conservativeUSD": 0.066004,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 12591
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "GAP-12",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.05262612,
+      "conservativeUSD": 0.100768,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 15111
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "GAP-13",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03715402,
+      "conservativeUSD": 0.069447,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 18797
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sourceCommit": "6075b20ae2a36cfaeca87130eebc83dc527a942a",
+      "id": "GAP-14",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04589272,
+      "conservativeUSD": 0.089708,
+      "historicalFailureCodes": [
+        "RESEARCH_SPEND_CAP"
+      ],
+      "durationMilliseconds": 12941
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sourceCommit": "53685fb3e3adad62084abd17de974db9d471107d",
+      "id": "GAP-06",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03025437,
+      "conservativeUSD": 0.07649,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 13179
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sourceCommit": "53685fb3e3adad62084abd17de974db9d471107d",
+      "id": "GAP-15",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0389014,
+      "usageEstimateUSD": 0.08459519,
+      "conservativeUSD": 0.178913,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 30181
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sourceCommit": "3dd14d266ba31d4df51306946e7448bb1c115c2f",
+      "id": "GAP-08",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.07761552,
+      "conservativeUSD": 0.12384,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 22863
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "id": "MC-09",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 2,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0364398,
+      "usageEstimateUSD": 0.0715963,
+      "conservativeUSD": 0.149057,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 26677
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "id": "MC-13",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03862842,
+      "conservativeUSD": 0.072871,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 26631
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "id": "MC-15",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.02174362,
+      "conservativeUSD": 0.041217,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 12132
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "id": "GAP-03",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04226922,
+      "conservativeUSD": 0.08214,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 12856
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "id": "GAP-08",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.0202685,
+      "usageEstimateUSD": 0.04676989,
+      "conservativeUSD": 0.104344,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 24939
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sourceCommit": "5522677479de386213351707a72151a1e02eae85",
+      "id": "MC-09",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.01531327,
+      "conservativeUSD": 0.071465,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 22277
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "CC-02",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04098182,
+      "conservativeUSD": 0.076575,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 22145
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "CC-05",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03577232,
+      "conservativeUSD": 0.06804,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 14607
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-02",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0602385,
+      "conservativeUSD": 0.109242,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 27373
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-04",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.00335085,
+      "conservativeUSD": 0.006267,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 8000
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-05",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0365639,
+      "conservativeUSD": 0.069099,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 16174
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-07",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0282735,
+      "conservativeUSD": 0.05322,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 7304
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-10",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0430294,
+      "conservativeUSD": 0.082594,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 14041
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-11",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0645335,
+      "conservativeUSD": 0.120661,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 15939
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-12",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.00361335,
+      "conservativeUSD": 0.006567,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 10188
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-13",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0436991,
+      "conservativeUSD": 0.081781,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 19585
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-15",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.00314245,
+      "conservativeUSD": 0.005888,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 6681
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-16",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.00317495,
+      "conservativeUSD": 0.005956,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 6240
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sourceCommit": "ec4c2691579dfc39ed8bb6ec069995a625566bcc",
+      "id": "ZR-17",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0717819,
+      "conservativeUSD": 0.132692,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 26245
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sourceCommit": "417f00816fffc69659707820ba0d7cdc4f9e28cf",
+      "id": "ZR-02",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0299716,
+      "conservativeUSD": 0.054592,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 13099
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sourceCommit": "417f00816fffc69659707820ba0d7cdc4f9e28cf",
+      "id": "ZR-05",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 4,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.08772544,
+      "conservativeUSD": 0.159977,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 44667
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sourceCommit": "417f00816fffc69659707820ba0d7cdc4f9e28cf",
+      "id": "ZR-07",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0283485,
+      "conservativeUSD": 0.05331,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 8522
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sourceCommit": "417f00816fffc69659707820ba0d7cdc4f9e28cf",
+      "id": "ZR-11",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 4,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.07453789,
+      "conservativeUSD": 0.141412,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 37353
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sourceCommit": "8aee45526ce540ec36262bce071036b6084e6ea0",
+      "id": "ZR-05",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04620425,
+      "conservativeUSD": 0.086129,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 17598
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sourceCommit": "8aee45526ce540ec36262bce071036b6084e6ea0",
+      "id": "ZR-07",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0277105,
+      "conservativeUSD": 0.052298,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 7871
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sourceCommit": "8aee45526ce540ec36262bce071036b6084e6ea0",
+      "id": "ZR-11",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0741886,
+      "conservativeUSD": 0.137827,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 23518
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sourceCommit": "24d6dfa5f8fa27880f0ad4448724c28598821baa",
+      "id": "DOBNOW-001",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0381184,
+      "conservativeUSD": 0.065055,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 19023
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sourceCommit": "24d6dfa5f8fa27880f0ad4448724c28598821baa",
+      "id": "DOBNOW-002",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0332996,
+      "conservativeUSD": 0.05911,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 12089
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sourceCommit": "24d6dfa5f8fa27880f0ad4448724c28598821baa",
+      "id": "DOBNOW-005",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0349548,
+      "conservativeUSD": 0.061992,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 10683
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sourceCommit": "24d6dfa5f8fa27880f0ad4448724c28598821baa",
+      "id": "DOBNOW-007",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03404775,
+      "conservativeUSD": 0.060385,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 9140
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sourceCommit": "24d6dfa5f8fa27880f0ad4448724c28598821baa",
+      "id": "DOBNOW-008",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04054235,
+      "conservativeUSD": 0.072021,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 15193
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sourceCommit": "24d6dfa5f8fa27880f0ad4448724c28598821baa",
+      "id": "DOBNOW-009",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0339304,
+      "conservativeUSD": 0.06004,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 9668
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sourceCommit": "24d6dfa5f8fa27880f0ad4448724c28598821baa",
+      "id": "DOBNOW-020",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0424913,
+      "conservativeUSD": 0.075739,
+      "historicalFailureCodes": [
+        "Error"
+      ],
+      "durationMilliseconds": 15508
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sourceCommit": "24d6dfa5f8fa27880f0ad4448724c28598821baa",
+      "id": "DOBNOW-021",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0694393,
+      "conservativeUSD": 0.127029,
+      "historicalFailureCodes": [
+        "RESEARCH_SPEND_CAP"
+      ],
+      "durationMilliseconds": 22299
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-001",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03842215,
+      "conservativeUSD": 0.06559,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 17309
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-008",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.02207935,
+      "conservativeUSD": 0.039872,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 13699
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-020",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04705815,
+      "conservativeUSD": 0.083203,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 24315
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-021",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0421408,
+      "conservativeUSD": 0.074047,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 19571
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-003",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0372104,
+      "conservativeUSD": 0.065159,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 15710
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-004",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0660781,
+      "conservativeUSD": 0.120541,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 22474
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-006",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04036525,
+      "conservativeUSD": 0.071769,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 13241
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-010",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0333564,
+      "conservativeUSD": 0.059377,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 9673
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-011",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0358733,
+      "conservativeUSD": 0.064487,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 10766
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-012",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0353915,
+      "conservativeUSD": 0.062351,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 13803
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sourceCommit": "4f557f3d9e12987b70bb6f3532bf220ce4869236",
+      "id": "DOBNOW-013",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0370232,
+      "conservativeUSD": 0.064798,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 14222
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-003",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0164781,
+      "conservativeUSD": 0.029909,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 13631
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-004",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.02061965,
+      "conservativeUSD": 0.037551,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 15190
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-006",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04164775,
+      "conservativeUSD": 0.07202,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 13224
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-012",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0133333,
+      "conservativeUSD": 0.023739,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 9801
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-014",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03953355,
+      "conservativeUSD": 0.070883,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 12924
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-015",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0371978,
+      "conservativeUSD": 0.06595,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 15046
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-016",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.05746935,
+      "conservativeUSD": 0.084072,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 25498
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-017",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03993795,
+      "conservativeUSD": 0.069301,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 19136
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-022",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.04358355,
+      "conservativeUSD": 0.075978,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 24728
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-023",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03406145,
+      "conservativeUSD": 0.059964,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 13033
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sourceCommit": "1dfe61e4d427742a47fa84ed0e52d344d2dec71e",
+      "id": "DOBNOW-024",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03457835,
+      "conservativeUSD": 0.060649,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 13525
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+      "id": "ZR-03",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.0397475,
+      "conservativeUSD": 0.074587,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 12110
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+      "id": "ZR-06",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.043101,
+      "conservativeUSD": 0.076785,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 16570
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+      "id": "ZR-09",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 3,
+      "answeringCalls": 2,
+      "additionalAnsweringCallsUSD": 0.050371,
+      "usageEstimateUSD": 0.1240281,
+      "conservativeUSD": 0.221186,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 55466
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+      "id": "ZR-19",
+      "scope": "research-http",
+      "delivered": true,
+      "charged": true,
+      "providerCalls": 1,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.00340755,
+      "conservativeUSD": 0.006296,
+      "historicalFailureCodes": [],
+      "durationMilliseconds": 10988
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+      "id": "ZR-20",
+      "scope": "research-http",
+      "delivered": false,
+      "charged": false,
+      "providerCalls": 2,
+      "answeringCalls": 1,
+      "additionalAnsweringCallsUSD": 0,
+      "usageEstimateUSD": 0.03733085,
+      "conservativeUSD": 0.065845,
+      "historicalFailureCodes": [
+        "RESEARCH_VERIFICATION_FAILED"
+      ],
+      "durationMilliseconds": 28075
+    }
+  ],
+  "notDispatched": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "id": "ZR-03",
+      "reason": "Unresolved offline input or source requirement",
+      "failureStage": "authored_selection_creation",
+      "errorCode": "RESEARCH_VISUAL_REVIEW_REQUIRED"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "id": "ZR-06",
+      "reason": "Unresolved offline input or source requirement",
+      "failureStage": "authored_selection_creation",
+      "errorCode": "RESEARCH_VISUAL_REVIEW_REQUIRED"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "id": "ZR-09",
+      "reason": "Unresolved offline input or source requirement",
+      "failureStage": "authored_selection_creation",
+      "errorCode": "INVALID_RESEARCH_SELECTION"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "id": "ZR-19",
+      "reason": "Unresolved offline input or source requirement",
+      "failureStage": "authored_selection_creation",
+      "errorCode": "INVALID_RESEARCH_SELECTION"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "id": "ZR-20",
+      "reason": "Unresolved offline input or source requirement",
+      "failureStage": "authored_selection_creation",
+      "errorCode": "INVALID_RESEARCH_SELECTION"
+    }
+  ],
+  "limitations": [
+    "Mixed development versions, repeated cases and synthetic evaluation accounts; not a representative customer-month forecast.",
+    "Delivered answers include known quality defects. A consistent strict review of all answers is absent, so no cost per quality-accepted answer is claimed.",
+    "Additional answering requests and failed-attempt costs overlap; do not add them as independent savings.",
+    "Web tool fees and cache writes are included. Hosting, payment fees, support and refunds are outside these provider-only figures.",
+    "Runtime verification and repairs, failed calls and web-search fees remain part of Research cost. No separate paid judges were added in this round.",
+    "The new $8 authorization and its conservative ledger are separate from the historical $7.887898 ledger. No current account balance or invoice was read. Project workflow testing, deployment, pricing and routing changes remain outside this round."
+  ]
+}

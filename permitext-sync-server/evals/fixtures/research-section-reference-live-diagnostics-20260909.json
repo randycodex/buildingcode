@@ -1,0 +1,901 @@
+{
+  "schema": "permitext-section-reference-live-diagnostics-v1",
+  "liveSourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+  "liveResult": {
+    "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+    "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+  },
+  "runtimeLogSHA256": "bcf397d22ec36aa3311e1d93640438b75512c7c6a206f9c7fff143250d65fc64",
+  "source": "Retained isolated HTTP provider outputs and runtime diagnostics. No synthetic answer replacement and no extra API request.",
+  "cases": [
+    {
+      "id": "ZR-03",
+      "question": "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+      "liveStatus": "failed",
+      "providerResponses": [
+        {
+          "phase": "permitext_code_interpretation",
+          "requestSHA256": "dd43238f8fa7608e2f68071938addfa434fd8f023f12e09a96f0a31c68bfe6be",
+          "response": {
+            "answerText": "Appendix J establishes that designated areas within Manufacturing Districts are identified on the Appendix J maps and assigns different self-service-storage approval paths by subarea (ZR Appendix J).\n\nFor Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19.\n\nFor Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192.\n\nNo site, property, or parcel conclusion can be made without its address or BBL and the applicable official Appendix J map.",
+            "supportedPoints": [
+              {
+                "heading": "Appendix J designations and storage approval paths",
+                "explanation": "Appendix J states that boundaries of certain designated areas within Manufacturing Districts are shown on its maps. It distinguishes Subarea 1, where self-service storage facilities follow the as-of-right provisions of Section 42-19, from Subarea 2, where those facilities require a City Planning Commission special permit under Section 74-192.",
+                "sectionID": "20021237",
+                "sourceIDs": [
+                  "11700b13-18bb-4f3c-904a-365de27bca2e"
+                ]
+              }
+            ],
+            "assumptions": [],
+            "missingFacts": [
+              "The property address or BBL.",
+              "The applicable official Appendix J map showing the property's location."
+            ],
+            "followUpQuestions": [],
+            "evidenceLimitations": [
+              "Permitext limited this answer to the enacted evidence assembled for the current question. The supplied Appendix J text identifies that map location controls but does not include a selected official map or a property location from which mapped applicability can be determined."
+            ],
+            "additionalEvidenceNeeded": [
+              "The applicable official Appendix J map and property-location evidence (address or BBL) sufficient to place the property on that map."
+            ],
+            "supportingSourceUses": [],
+            "citations": [
+              {
+                "sectionID": "20021237",
+                "sourceIDs": [
+                  "11700b13-18bb-4f3c-904a-365de27bca2e"
+                ],
+                "relevance": "Governing Appendix J text establishes the map-based designated-area framework and the distinct Subarea 1 and Subarea 2 approval paths for self-service storage facilities."
+              }
+            ]
+          }
+        },
+        {
+          "phase": "permitext_zoning_source_bounded_repair",
+          "requestSHA256": "460c6c568a4f3cb27b3116f6a926a3125c754579639e384acb4c110f631b2e0b",
+          "response": {
+            "answerText": "For Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19.\n\nFor Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192.\n\nNo site, property, or parcel conclusion can be made without its address or BBL and the applicable official Appendix J map.",
+            "supportedPointUpserts": [],
+            "supportedPointRemovals": [],
+            "citationUpserts": [],
+            "citationRemovals": [],
+            "missingFactsAdd": [],
+            "missingFactsRemove": [],
+            "evidenceLimitationsAdd": [],
+            "evidenceLimitationsRemove": [],
+            "additionalEvidenceNeededAdd": [],
+            "additionalEvidenceNeededRemove": []
+          }
+        }
+      ],
+      "runtimeFailures": [
+        {
+          "code": "RESEARCH_VERIFICATION_FAILED",
+          "failureStage": null,
+          "message": "The source-bounded Zoning repair did not pass every deterministic safety gate.",
+          "verificationAttempts": [
+            {
+              "attempt": 1,
+              "pass": false,
+              "issues": [
+                {
+                  "type": "zoning_missing_mapped_location",
+                  "detail": "For this Appendix J source-boundary answer, remove named designated-area, borough, community-district, map-number, and table-row inventory and remove every site, property, or parcel result. Use these exact standalone sentences without a preface or extension: \"For Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19.\" \"For Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192.\" Add a separate boundary requiring the address or BBL plus the applicable official Appendix J map, and list both missing items in missingFacts."
+                }
+              ],
+              "diagnostics": {
+                "zoningSafety": {
+                  "schemaVersion": 1,
+                  "kind": "zoning_mapped_location",
+                  "sourceBoundaryQuestion": true,
+                  "citedAppendixJ": true,
+                  "mappedLocationBoundaryPresent": false,
+                  "triggeringClauses": [
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "224c0c81c7d6b84826c220dbe94512abef146d5ce716bd5b58183add88fd0a6f",
+                      "clauseLength": 198,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "9186c7cd52a5b3cd0d483e16764deefe5f80c3030b947eb2bae9d7279390e961",
+                      "clauseLength": 105,
+                      "locationBoundary": false,
+                      "sourceRule": true,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "8bb5163d533a122a8f9737723ed14ad8373972594d950077feaae612b6b9aa62",
+                      "clauseLength": 117,
+                      "locationBoundary": false,
+                      "sourceRule": true,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "ca6834a64fe430719b295ad196249e89404608b8b0abfbc7c654ce9dfb114b60",
+                      "clauseLength": 122,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "9186c7cd52a5b3cd0d483e16764deefe5f80c3030b947eb2bae9d7279390e961",
+                      "clauseLength": 105,
+                      "locationBoundary": false,
+                      "sourceRule": true,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "8bb5163d533a122a8f9737723ed14ad8373972594d950077feaae612b6b9aa62",
+                      "clauseLength": 117,
+                      "locationBoundary": false,
+                      "sourceRule": true,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "ca6834a64fe430719b295ad196249e89404608b8b0abfbc7c654ce9dfb114b60",
+                      "clauseLength": 122,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "supported_point_explanation",
+                      "clauseHash": "048e1e2cf398134aae54f9c1b4689f216896d0d925ce7694afc9a99251b9a338",
+                      "clauseLength": 114,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "supported_point_explanation",
+                      "clauseHash": "d82eb305d8807d195e3577669ba174c2043c450706a29605ff139b7192796004",
+                      "clauseLength": 228,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "attempt": 2,
+              "pass": false,
+              "issues": [
+                {
+                  "type": "zoning_missing_mapped_location",
+                  "detail": "For this Appendix J source-boundary answer, remove named designated-area, borough, community-district, map-number, and table-row inventory and remove every site, property, or parcel result. Use these exact standalone sentences without a preface or extension: \"For Subarea 1, self-service storage facilities are subject to the as-of-right provisions of Section 42-19.\" \"For Subarea 2, self-service storage facilities require a City Planning Commission special permit under Section 74-192.\" Add a separate boundary requiring the address or BBL plus the applicable official Appendix J map, and list both missing items in missingFacts."
+                }
+              ],
+              "diagnostics": {
+                "zoningSafety": {
+                  "schemaVersion": 1,
+                  "kind": "zoning_mapped_location",
+                  "sourceBoundaryQuestion": true,
+                  "citedAppendixJ": true,
+                  "mappedLocationBoundaryPresent": false,
+                  "triggeringClauses": [
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "9186c7cd52a5b3cd0d483e16764deefe5f80c3030b947eb2bae9d7279390e961",
+                      "clauseLength": 105,
+                      "locationBoundary": false,
+                      "sourceRule": true,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "8bb5163d533a122a8f9737723ed14ad8373972594d950077feaae612b6b9aa62",
+                      "clauseLength": 117,
+                      "locationBoundary": false,
+                      "sourceRule": true,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "ca6834a64fe430719b295ad196249e89404608b8b0abfbc7c654ce9dfb114b60",
+                      "clauseLength": 122,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "conclusion",
+                      "clauseHash": "0c7558c29805d2241672f3007d262dbdf3a44d1d1a94b61b72718947a91bc0c7",
+                      "clauseLength": 106,
+                      "locationBoundary": false,
+                      "sourceRule": true,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "8bb5163d533a122a8f9737723ed14ad8373972594d950077feaae612b6b9aa62",
+                      "clauseLength": 117,
+                      "locationBoundary": false,
+                      "sourceRule": true,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "ca6834a64fe430719b295ad196249e89404608b8b0abfbc7c654ce9dfb114b60",
+                      "clauseLength": 122,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "supported_point_explanation",
+                      "clauseHash": "048e1e2cf398134aae54f9c1b4689f216896d0d925ce7694afc9a99251b9a338",
+                      "clauseLength": 114,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "supported_point_explanation",
+                      "clauseHash": "d82eb305d8807d195e3577669ba174c2043c450706a29605ff139b7192796004",
+                      "clauseLength": 228,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "bindingIssue": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-06",
+      "question": "Can a proposed self-service storage facility be found permitted as-of-right on a specific property when its address, mapped zoning district, special-district status, Appendix J subarea, lot area, and any December 19, 2017 existing-facility facts have not been provided?",
+      "liveStatus": "failed",
+      "providerResponses": [
+        {
+          "phase": "permitext_code_interpretation",
+          "requestSHA256": "58a83944e200990d3b44b1cdebddf037fbb299a17ac4fe76e7ad747cac050376",
+          "response": {
+            "answerText": "**No parcel-specific as-of-right finding can be made from the supplied facts.** Although a self-service storage facility is marked “♦P” in M1, M2, and M3 districts—meaning permitted with limitations plus additional conditions—the property’s zoning district and Appendix J map status are unknown. (ZR § 42-191.)\n\nIn an Appendix J Subarea 1 designated area, the use is subject to the as-of-right provisions but must be limited to establishments providing industrial floor space or the specified “business-sized” storage space. In Subarea 2, it requires a City Planning Commission special permit under ZR § 74-192 rather than being as-of-right. Appendix J identifies the designated areas and their Subarea 1 or 2 status by map; no property location or official map determination was supplied. (ZR §§ 42-192, 74-192; Appendix J.) The December 19, 2017 provisions cannot establish a present proposal’s status without facts showing whether a facility existed on that date, whether satisfactory DOB documentation was filed, and—for an enlargement or extension—whether the zoning-lot area has increased since that date. The supplied text also makes the “P” conditions applicable; for this use, those conditions require conformance with the cited performance standards. (ZR §§ 42-192, 42-193.)",
+            "supportedPoints": [
+              {
+                "heading": "Manufacturing-district table classification",
+                "explanation": "ZR § 42-191 classifies a self-service storage facility as Use Group IX(A), Use D2. The table marks it “♦P” in M1, M2, and M3 districts: “♦” means permitted with limitations and “P” means additional conditions. This does not establish that the unidentified property is in any of those districts.",
+                "sectionID": "20022472",
+                "sourceIDs": [
+                  "b5e77f11-3aa2-47fb-9dd8-1e8789d5330d"
+                ]
+              },
+              {
+                "heading": "Appendix J can change the as-of-right path",
+                "explanation": "Within designated Manufacturing District areas shown in Appendix J, Subarea 1 is subject to the as-of-right provisions, with the stated industrial-floor-space or business-sized-storage limitation. In Subarea 2, a self-service storage facility requires a City Planning Commission special permit under ZR § 74-192. Appendix J supplies the Subarea framework, but no selected map or property location establishes which, if any, applies to this property.",
+                "sectionID": "20022473",
+                "sourceIDs": [
+                  "1f18524e-75d1-43c5-9175-6b47e21e03f1"
+                ]
+              },
+              {
+                "heading": "Appendix J designated-area mapping",
+                "explanation": "Appendix J states that its maps show boundaries of designated areas within Manufacturing Districts and distinguishes Subarea 1 as-of-right areas from Subarea 2 special-permit areas. The supplied excerpt does not locate the unidentified property on any map.",
+                "sectionID": "20021237",
+                "sourceIDs": [
+                  "650e4c09-c4df-4293-a7de-c3c8773fcc35"
+                ]
+              },
+              {
+                "heading": "Subarea 2 is a special-permit route",
+                "explanation": "For a zoning lot in an Appendix J Subarea 2 designated area, ZR § 74-192 authorizes the City Planning Commission to permit development, certain enlargement, or change of use for a Use Group IX(A) self-service storage facility, subject to the Commission’s required finding of appropriateness. It is not an as-of-right authorization.",
+                "sectionID": "20019206",
+                "sourceIDs": [
+                  "a73399d7-b9d7-48c3-a322-ec4285fad6fb"
+                ]
+              },
+              {
+                "heading": "Additional-condition and existing-facility rules",
+                "explanation": "Because the table marks this use with “P,” ZR § 42-193 requires conformity with the referenced performance standards. Separately, ZR § 42-192 treats a facility existing on December 19, 2017 in an Appendix J designated area as conforming only if satisfactory documentation was filed with DOB showing it existed on that date and met the Section 12-10 definition. The specified enlargement, extension, and reconstruction provisions depend on the historical facility, documentation, zoning-lot-area, and floor-area facts stated in that section.",
+                "sectionID": "20022474",
+                "sourceIDs": [
+                  "a87c36f1-a487-41f9-b6c1-6a7a39478fe3"
+                ]
+              }
+            ],
+            "assumptions": [],
+            "missingFacts": [
+              "Property address or BBL, and the controlling official zoning-map or verified mapped-district evidence, are needed to determine whether the zoning lot is in an M1, M2, or M3 district and whether it lies in an Appendix J designated area or Subarea 1 or 2.",
+              "The proposed facility’s industrial floor space or qualifying “business-sized” storage-space design is material if the lot is in Appendix J Subarea 1.",
+              "Whether a self-service storage facility existed on December 19, 2017; whether the owner filed DOB-satisfactory documentation of its existence and compliance with the Section 12-10 definition; and, if an enlargement or extension is proposed, whether zoning-lot area increased after that date are material only to the historical-facility provisions of ZR § 42-192."
+            ],
+            "followUpQuestions": [],
+            "evidenceLimitations": [
+              "This answer is limited to the supplied continuously amended NYC Zoning Resolution text through August 13, 2026. The supplied excerpt of ZR § 42-192 omits detailed Subarea 1 industrial/business-sized-space, signage, and reporting provisions, and no Appendix J map locating the property was supplied."
+            ],
+            "additionalEvidenceNeeded": [
+              "A usable address or BBL and controlling official zoning-map/Appendix J map evidence for the zoning lot.",
+              "If relying on a Subarea 1 or pre-December 19, 2017 facility pathway, project design information and DOB filing/approval records sufficient to establish the applicable statutory conditions."
+            ],
+            "supportingSourceUses": [],
+            "citations": [
+              {
+                "sectionID": "20022472",
+                "sourceIDs": [
+                  "b5e77f11-3aa2-47fb-9dd8-1e8789d5330d"
+                ],
+                "relevance": "Classifies self-service storage as D2 and shows the ♦P table notation in M1, M2, and M3 districts."
+              },
+              {
+                "sectionID": "20022473",
+                "sourceIDs": [
+                  "1f18524e-75d1-43c5-9175-6b47e21e03f1"
+                ],
+                "relevance": "Establishes Appendix J Subarea 1, Subarea 2, and December 19, 2017 existing-facility rules."
+              },
+              {
+                "sectionID": "20022474",
+                "sourceIDs": [
+                  "a87c36f1-a487-41f9-b6c1-6a7a39478fe3"
+                ],
+                "relevance": "Applies performance standards to uses marked P."
+              },
+              {
+                "sectionID": "20019206",
+                "sourceIDs": [
+                  "a73399d7-b9d7-48c3-a322-ec4285fad6fb"
+                ],
+                "relevance": "Establishes the City Planning Commission special-permit path for Subarea 2."
+              },
+              {
+                "sectionID": "20021237",
+                "sourceIDs": [
+                  "650e4c09-c4df-4293-a7de-c3c8773fcc35"
+                ],
+                "relevance": "Establishes that Appendix J maps distinguish designated Subarea 1 and Subarea 2 areas."
+              }
+            ]
+          }
+        }
+      ],
+      "runtimeFailures": [
+        {
+          "code": "RESEARCH_VERIFICATION_FAILED",
+          "failureStage": null,
+          "message": "The Zoning answer did not pass the bounded correction policy.",
+          "verificationAttempts": [
+            {
+              "attempt": 1,
+              "pass": false,
+              "issues": [
+                {
+                  "type": "conditional_determination_boundary_missing",
+                  "detail": "Lead with the unresolved determination, not an approval or prohibition. Keep any conclusion conditional too."
+                },
+                {
+                  "type": "zoning_missing_mapped_location",
+                  "detail": "Do not make a parcel-specific Zoning conclusion while mapped applicability is unresolved. State the boundary, keep the conclusion conditional, and name the missing address/BBL, mapped district, map area, or special-district fact in missingFacts."
+                }
+              ],
+              "diagnostics": {
+                "zoningSafety": {
+                  "schemaVersion": 1,
+                  "kind": "zoning_mapped_location",
+                  "sourceBoundaryQuestion": false,
+                  "citedAppendixJ": true,
+                  "mappedLocationBoundaryPresent": false,
+                  "triggeringClauses": [
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "b1df3f0ed605b732cbb147e48edaf9e895ffc6a1b661b2e2a7f6991e0c83aa96",
+                      "clauseLength": 79,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "f1cdc459cabfca3f0377ad585c1c79bdf34bac1dc935de5ba1ecf697f4ca1177",
+                      "clauseLength": 205,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "488dacda02afce6797f87bc06a0303cbbf83fef437a4d7b89f87b745bd53b45a",
+                      "clauseLength": 12,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "810af585efe6dc2d1b39c9f77001d56a11cdc44c6e82ac27496658694eaee2fc",
+                      "clauseLength": 92,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "58df1b68ec8e2d5fb1dff30c7bf6d5941905eade597e450f460b0f5388208aed",
+                      "clauseLength": 114,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "69e8eddb8ad5862ed06e893fa303abe929063c809b4e922bdd9e9a32bd5caf63",
+                      "clauseLength": 115,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "2f0eee74b1540ad9b3b3da9edfd8c167a09c4fde19a211348015ceb7123432b2",
+                      "clauseLength": 81,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "295c622dbb209fdd55d8bcf99df43e4218f02a1ebf7509093b74446eb9474f99",
+                      "clauseLength": 63,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "8cbec751da959b5db11dde71fe8b42e4c5376449f9b3ba11a8b88c7dbf577614",
+                      "clauseLength": 21,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "bf59b7af763d97f5f5ff67e1e85ecbc154d51c408cfec2283adc9a6678ffe390",
+                      "clauseLength": 10,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "41ce811be9e59e6ae1a67bc85b92a36d75d8fdf786b740f7ce40752c79a8e9a8",
+                      "clauseLength": 58,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "b5feaa89e3ca9868a830de33c4d6b4922313a83c47f31e1b0ad1fb71b76b5627",
+                      "clauseLength": 87,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "answer_text",
+                      "clauseHash": "7c9eca9df5f9022c2e3188ef991d29ea0fb2e8426536be525bbde2da3573b243",
+                      "clauseLength": 23,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "conclusion",
+                      "clauseHash": "b1df3f0ed605b732cbb147e48edaf9e895ffc6a1b661b2e2a7f6991e0c83aa96",
+                      "clauseLength": 79,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "conclusion",
+                      "clauseHash": "f1cdc459cabfca3f0377ad585c1c79bdf34bac1dc935de5ba1ecf697f4ca1177",
+                      "clauseLength": 205,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "conclusion",
+                      "clauseHash": "1db9e6793a3be6461a07b859f8927f97e602993d562a9f861a32591d68bc44bf",
+                      "clauseLength": 14,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "810af585efe6dc2d1b39c9f77001d56a11cdc44c6e82ac27496658694eaee2fc",
+                      "clauseLength": 92,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "58df1b68ec8e2d5fb1dff30c7bf6d5941905eade597e450f460b0f5388208aed",
+                      "clauseLength": 114,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "69e8eddb8ad5862ed06e893fa303abe929063c809b4e922bdd9e9a32bd5caf63",
+                      "clauseLength": 115,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "2f0eee74b1540ad9b3b3da9edfd8c167a09c4fde19a211348015ceb7123432b2",
+                      "clauseLength": 81,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "295c622dbb209fdd55d8bcf99df43e4218f02a1ebf7509093b74446eb9474f99",
+                      "clauseLength": 63,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "8cbec751da959b5db11dde71fe8b42e4c5376449f9b3ba11a8b88c7dbf577614",
+                      "clauseLength": 21,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "bf59b7af763d97f5f5ff67e1e85ecbc154d51c408cfec2283adc9a6678ffe390",
+                      "clauseLength": 10,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    },
+                    {
+                      "fieldKind": "explanation",
+                      "clauseHash": "41ce811be9e59e6ae1a67bc85b92a36d75d8fdf786b740f7ce40752c79a8e9a8",
+                      "clauseLength": 58,
+                      "locationBoundary": false,
+                      "sourceRule": false,
+                      "directConclusion": true
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          "bindingIssue": null
+        }
+      ]
+    },
+    {
+      "id": "ZR-09",
+      "question": "A 10,000-square-foot R7A zoning lot is proposed with 48,000 square feet of residential floor area and is merely described as containing qualifying affordable housing. What does the Section 23-22 table establish numerically, and what qualification and affordable-floor-area facts are still needed before concluding that the higher FAR is available?",
+      "liveStatus": "completed",
+      "providerResponses": [
+        {
+          "phase": "permitext_code_interpretation",
+          "requestSHA256": "b4e09519b298a757381e144b60dc6971b9705f6cf659d5693bcf84e94729464a",
+          "response": "{\"answerText\":\"**The proposed FAR is 4.80.** On a 10,000-square-foot R7A zoning lot, Table 23-22 sets a **4.00 FAR / 40,000-square-foot** maximum for standard residences and a **5.01 FAR / 50,100-square-foot** maximum for zoning lots containing qualifying affordable housing or qualifying senior housing (ZR § 23-22). Thus, 48,000 square feet is **8,000 square feet above** the standard-residence ceiling but **2,100 square feet below** the qualifying-housing table ceiling. Numerically, it fits only the latter category.\\n\\nCalculation: 48,000 ÷ 10,000 = **4.80 FAR**. The table calculations are 10,000 × 4.00 = **40,000 square feet** and 10,000 × 5.01 = **50,100 square feet** (ZR §§ 12-10, 23-22).\\n\\nThe statement that the lot “contains qualifying affordable housing” does not itself establish eligibility for the 5.01 FAR. “Qualifying affordable housing” must be shown to be: (1) an MIH development in an MIH area, (2) a UAP development, or (3) a building subject to an affordable housing regulatory agreement (ZR § 12-10). For a UAP development, residential FAR may exceed the standard-residence FAR **only by the amount of affordable housing provided**; therefore, the 8,000-square-foot increment over 4.00 FAR must be supported by the applicable affordable-housing amount (ZR § 27-111).\\n\\nThe needed affordable-floor-area facts are whether all units (other than a super’s unit) are affordable; or, for a mixed project, the residential floor area of affordable units, non-affordable units (excluding a super’s unit), and eligible common areas. In a mixed MIH or UAP site, affordable floor area equals the affordable-unit residential floor area plus the eligible-common-area floor area allocated by the specified affordable-unit-area fraction (ZR § 27-111). The supplied § 12-10 text contains the corresponding MIH-site calculation and an older “generating site” formulation; it does not by itself establish this project’s qualifying path (ZR § 12-10).\\n\\nIf the project relies on an MIH or UAP route, the affordable housing must meet § 27-16 for the regulatory period, subject to the stated limited treatment of housing under an affordable housing regulatory agreement. For an offsite MIH/UAP site, the supplied text also requires the stated Community District/proximity relationship; outside UAP offsite option areas, a UAP site must be within the UAP zoning lot (ZR § 27-16).\",\"supportedPoints\":[{\"heading\":\"R7A table limits and proposed FAR\",\"explanation\":\"Table 23-22 assigns R7A a 4.00 maximum residential FAR for standard residences and 5.01 for zoning lots containing qualifying affordable housing or qualifying senior housing. On the stated 10,000-square-foot zoning lot, those limits equal 40,000 and 50,100 square feet, respectively. The proposed 48,000 square feet produces a 4.80 FAR under the definition of floor area ratio: 48,000 ÷ 10,000 = 4.80. It exceeds the standard-residence maximum by 8,000 square feet and is 2,100 square feet below the qualifying-housing table maximum.\",\"sectionID\":\"20018017\",\"sourceIDs\":[\"6e425039-d5ae-4ce0-b4f1-bd1e156aece6\",\"56f2a76f-1c50-4499-946f-5e3478cf9a39\"]},{\"heading\":\"Qualifying status must be established\",\"explanation\":\"“Qualifying affordable housing” includes MIH developments in Mandatory Inclusionary Housing areas, UAP developments, and buildings subject to an affordable housing regulatory agreement. A UAP development outside an MIH area may exceed the standard-residence FAR in Section 23-22 only by the amount of affordable housing provided. Accordingly, a general project description does not establish entitlement to the R7A 5.01 FAR category or the 8,000-square-foot increment above 4.00 FAR.\",\"sectionID\":\"20018523\",\"sourceIDs\":[\"56f2a76f-1c50-4499-946f-5e3478cf9a39\",\"b5b53e7e-e014-414a-b9f7-2f35724f2d54\"]},{\"heading\":\"Affordable-floor-area calculation and site conditions\",\"explanation\":\"For an MIH or UAP site with all units affordable other than a super’s unit, all residential floor area is affordable floor area. For a mixed site, affordable floor area is the affordable-unit residential floor area plus the eligible-common-area residential floor area multiplied by the ratio of affordable-unit residential floor area to total qualifying unit residential floor area, excluding a super’s unit. MIH/UAP affordable housing must meet Section 27-16 for the regulatory period, except that housing restricted under an affordable housing regulatory agreement need comply only with paragraphs (a) and (j) of that section. The supplied paragraph (a) also controls stated offsite MIH/UAP site location conditions.\",\"sectionID\":\"20022711\",\"sourceIDs\":[\"b5b53e7e-e014-414a-b9f7-2f35724f2d54\",\"e050dd6f-9858-4498-9808-fb54e3a6d42d\",\"56f2a76f-1c50-4499-946f-5e3478cf9a39\"]}],\"assumptions\":[],\"missingFacts\":[\"Which qualifying route is relied on: an MIH development in an MIH area, a UAP development, or a building subject to an affordable housing regulatory agreement.\",\"For an MIH route, the facts and approvals showing compliance with the applicable § 27-111 definition of an MIH development; for a UAP route, facts showing the project is outside an MIH area and satisfies the Chapter 27 UAP requirements.\",\"If an affordable housing regulatory agreement is the route, the executed agreement and facts establishing the required agency connection, public funding, income restrictions, regulatory duration, and the applicable rental or homeownership provisions.\",\"Whether all dwelling, rooming, and supportive-housing units other than any super’s unit are affordable. If not, the residential floor area of affordable units, non-affordable units excluding any super’s unit, and eligible common areas needed to calculate affordable floor area.\",\"For a UAP route, the amount of qualifying affordable housing/affordable floor area that supports the 8,000-square-foot increment above the 4.00 FAR standard-residence limit.\",\"If affordable housing is offsite, the MIH/UAP site location, Community District relationship, perimeter-to-perimeter distance where applicable, and whether the project is within a UAP offsite option area. Outside such areas, the UAP site must be within the UAP zoning lot.】【。],\" ,\"followUpQuestions=[],\" ,\"evidenceLimitations=[\",\"This answer is limited to the supplied continuously amended NYC Zoning Resolution passages, including the stated text through 2026-08-13. The supplied evidence establishes the R7A table values and certain definitions and site requirements, but does not supply the full substantive requirements of the referenced MIH, UAP, regulatory-agreement, or § 27-16 paragraph (j) routes.\"] ,\"followUpQuestions\":[],\"evidenceLimitations\":[\"This answer is limited to the supplied continuously amended NYC Zoning Resolution passages, including the stated text through 2026-08-13. The supplied evidence establishes the R7A table values and certain definitions and site requirements, but does not supply the full substantive requirements of the referenced MIH, UAP, regulatory-agreement, or § 27-16 paragraph (j) routes.\"],\"additionalEvidenceNeeded\":[\"The applicable MIH/UAP approval and affordability documentation, or the executed affordable housing regulatory agreement, identifying the qualifying route.\",\"A unit schedule and floor-area schedule separating affordable-unit residential floor area, non-affordable-unit residential floor area, any super’s unit, and eligible common-area residential floor area.\",\"If offsite affordable housing is claimed, zoning-lot/site location materials sufficient to evaluate the supplied § 27-16 location conditions.\"],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"20018017\",\"sourceIDs\":[\"6e425039-d5ae-4ce0-b4f1-bd1e156aece6\"],\"relevance\":\"ZR § 23-22 Table: R7A maximum FARs of 4.00 for standard residences and 5.01 for qualifying affordable housing or qualifying senior housing.\"},{\"sectionID\":\"20018523\",\"sourceIDs\":[\"56f2a76f-1c50-4499-946f-5e3478cf9a39\"],\"relevance\":\"Defines floor area ratio and qualifying affordable housing, including the three qualifying paths.\"},{\"sectionID\":\"20022699\",\"sourceIDs\":[\"b5b53e7e-e014-414a-b9f7-2f35724f2d54\"],\"relevance\":\"Defines affordable floor area for MIH/UAP sites, identifies UAP developments, and limits a UAP FAR increase to the amount of affordable housing provided.\"},{\"sectionID\":\"20022711\",\"sourceIDs\":[\"e050dd6f-9858-4498-9808-fb54e3a6d42d\"],\"relevance\":\"States regulatory-period"
+        },
+        {
+          "phase": "permitext_code_interpretation",
+          "requestSHA256": "2fb275a6f51e2c0d54ca8daa805fef958c61e80c01580ecdded6a375ea669da8",
+          "response": {
+            "answerText": "**The proposed FAR is 4.80.** On a 10,000-square-foot R7A zoning lot, the Section 23-22 table sets a maximum of **4.00 FAR (40,000 square feet)** for standard residences and **5.01 FAR (50,100 square feet)** for zoning lots containing qualifying affordable housing or qualifying senior housing (ZR § 23-22). Thus, 48,000 square feet exceeds the standard-residence limit by 8,000 square feet but is 2,100 square feet below the table’s 5.01-FAR ceiling.\n\nCalculation: 48,000 sf ÷ 10,000 sf = **4.80 FAR**; 10,000 sf × 4.00 = **40,000 sf**; 10,000 sf × 5.01 = **50,100 sf**.\n\nThe description alone does not establish eligibility for the higher table column. “Qualifying affordable housing” must be an MIH development in an MIH area, a UAP development, or a building subject to an affordable housing regulatory agreement (ZR § 12-10). For a UAP development, residential FAR may exceed the standard FAR only by the amount of affordable housing provided on the UAP zoning lot, or—within a UAP Offsite Option Area—on a qualifying UAP site under ZR § 27-16(a) (ZR § 27-111). The affordable-floor-area amount must therefore be determined: if all relevant units (other than a super’s unit) are affordable, all residential floor area is affordable floor area; if any are not, affordable floor area is the affordable-unit residential area plus the prescribed proportional share of eligible common-area floor area (ZR § 27-111). Affordable housing on an MIH or UAP site is also subject to § 27-16 for the regulatory period, except housing restricted by an affordable housing regulatory agreement need comply only with § 27-16(a) and (j).",
+            "supportedPoints": [
+              {
+                "heading": "R7A table limits and calculation",
+                "explanation": "ZR § 23-22 assigns R7A a 4.00 maximum FAR for standard residences and a 5.01 maximum FAR for zoning lots containing qualifying affordable housing or qualifying senior housing. The stated 48,000 square feet on a 10,000-square-foot lot is 4.80 FAR. This equals 40,000 square feet at 4.00 FAR and 50,100 square feet at 5.01 FAR; the proposal is above the standard ceiling and below the qualifying-housing table ceiling.",
+                "sectionID": "20018017",
+                "sourceIDs": [
+                  "6e425039-d5ae-4ce0-b4f1-bd1e156aece6"
+                ]
+              },
+              {
+                "heading": "Qualification for higher column",
+                "explanation": "Qualifying affordable housing includes an MIH development in a Mandatory Inclusionary Housing area, a UAP development, or a building subject to an affordable housing regulatory agreement. A UAP development may exceed the § 23-22 standard-residence FAR only by the amount of affordable housing provided on the UAP zoning lot, or, in a UAP Offsite Option Area, on a UAP site under § 27-16(a).",
+                "sectionID": "20018523",
+                "sourceIDs": [
+                  "56f2a76f-1c50-4499-946f-5e3478cf9a39",
+                  "b5b53e7e-e014-414a-b9f7-2f35724f2d54"
+                ]
+              },
+              {
+                "heading": "Affordable-floor-area determination and site requirements",
+                "explanation": "For an MIH or UAP site with all applicable units affordable other than a super’s unit, all residential floor area is affordable floor area. If one or more units are not affordable, affordable floor area is affordable-unit residential floor area plus the prescribed proportional share of eligible common-area floor area. Affordable housing in an MIH or UAP site must meet § 27-16 for the regulatory period, except housing restricted by an affordable housing regulatory agreement need comply only with § 27-16(a) and (j).",
+                "sectionID": "20022711",
+                "sourceIDs": [
+                  "b5b53e7e-e014-414a-b9f7-2f35724f2d54",
+                  "e050dd6f-9858-4498-9808-fb54e3a6d42d"
+                ]
+              }
+            ],
+            "assumptions": [],
+            "missingFacts": [
+              "Which qualifying route is asserted: MIH development in an MIH area, UAP development, or a building subject to an affordable housing regulatory agreement.",
+              "For an MIH or UAP route, the affordable-unit residential floor area; any non-affordable dwelling or rooming-unit residential floor area other than a super’s unit; and eligible common-area residential floor area, so affordable floor area can be calculated.",
+              "For a UAP route, whether the affordable housing is on the UAP zoning lot or, if offsite, whether the project is within a UAP Offsite Option Area and the UAP-site location satisfies § 27-16(a).",
+              "For an affordable-housing-regulatory-agreement route, the executed agreement and its qualifying basis, including its required affordability restrictions and public-funding connection."
+            ],
+            "followUpQuestions": [],
+            "evidenceLimitations": [
+              "This answer is limited to the supplied current continuously amended Zoning Resolution passages; it does not establish mapped MIH-area, UAP Offsite Option Area, or other location-based applicability."
+            ],
+            "additionalEvidenceNeeded": [
+              "Project affordability documents and floor-area schedule sufficient to establish the qualifying route and calculate affordable floor area.",
+              "If applicable, MIH/UAP location and regulatory-period compliance documentation, including the applicable § 27-16 conditions. "
+            ],
+            "supportingSourceUses": [],
+            "citations": [
+              {
+                "sectionID": "20018017",
+                "sourceIDs": [
+                  "6e425039-d5ae-4ce0-b4f1-bd1e156aece6"
+                ],
+                "relevance": "R7A table values and resulting standard and qualifying-housing floor-area ceilings."
+              },
+              {
+                "sectionID": "20018523",
+                "sourceIDs": [
+                  "56f2a76f-1c50-4499-946f-5e3478cf9a39"
+                ],
+                "relevance": "Definition of FAR and qualifying affordable housing."
+              },
+              {
+                "sectionID": "20022699",
+                "sourceIDs": [
+                  "b5b53e7e-e014-414a-b9f7-2f35724f2d54"
+                ],
+                "relevance": "Affordable-floor-area calculation and UAP FAR limitation."
+              },
+              {
+                "sectionID": "20022711",
+                "sourceIDs": [
+                  "e050dd6f-9858-4498-9808-fb54e3a6d42d"
+                ],
+                "relevance": "MIH/UAP-site requirements and limited regulatory-agreement exception."
+              }
+            ]
+          }
+        },
+        {
+          "phase": "permitext_research_verification",
+          "requestSHA256": "258f65557d92af3d8855019fc853d2f87e2c409c5c74a689d1a9038c8f6bcf83",
+          "response": {
+            "pass": true,
+            "issues": [],
+            "unnecessaryMissingFactIndices": []
+          }
+        }
+      ],
+      "runtimeFailures": []
+    },
+    {
+      "id": "ZR-19",
+      "question": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+      "liveStatus": "completed",
+      "providerResponses": [
+        {
+          "phase": "permitext_code_interpretation",
+          "requestSHA256": "5ec5f252ef0ecdeff0f41f300e4de4e9bdf207e66c230e5b9bdc84fea5a0e014",
+          "response": {
+            "answerText": "**No—not merely because they share ownership.** Under the supplied current ZR § 12-10 definition, the current-transaction routes require two lots of record in one block to be contiguous for a minimum of 10 linear feet, plus either the required party-in-interest status or a recorded Declaration of Restrictions. Eight linear feet is less than 10, so those routes are not available on the stated facts. The definition also preserves separate historical routes for a lot of record existing on December 15, 1961, or a tract that was in single ownership on that date; the supplied facts do not establish whether either historical route applies. A zoning lot also may or may not coincide with a tax lot on the official tax map.",
+            "supportedPoints": [
+              {
+                "heading": "Shared ownership does not by itself combine the tax lots",
+                "explanation": "ZR § 12-10 defines a zoning lot through alternative branches. For the current filing-time branches, the tract must consist of two or more lots of record that are contiguous for a minimum of 10 linear feet and must satisfy either the specified party-in-interest requirements or the recorded-Declaration requirements. Because the stated contiguity is eight linear feet, it does not meet that 10-linear-foot threshold; common ownership alone does not cure the shortfall. The definition separately includes historical branches for a lot of record existing on December 15, 1961, or a tract that was in single ownership on December 15, 1961, so those branches cannot be ruled in or out without the relevant historical facts. The definition further states that a zoning lot may or may not coincide with a lot shown on the City's official tax map.",
+                "sectionID": "20018523",
+                "sourceIDs": [
+                  "03ab8443-8579-4429-88b3-3182ae001d0b"
+                ]
+              }
+            ],
+            "assumptions": [],
+            "missingFacts": [
+              "Whether either tax lot was a lot of record existing on December 15, 1961, or an applicable subsequent amendment date.",
+              "Whether the tract was in single ownership on December 15, 1961, which could independently implicate a historical definition branch.",
+              "If reliance is placed on a current filing-time branch despite the stated eight-foot contiguity, the exact recorded lot boundaries and any claimed Declaration of Restrictions or party-in-interest facts would need professional verification; the stated eight-foot measurement presently defeats that branch."
+            ],
+            "followUpQuestions": [],
+            "evidenceLimitations": [
+              "The supplied enacted evidence is limited to the continuously amended NYC Zoning Resolution text through 2026-08-13, principally the definition in ZR § 12-10; it does not establish the lots' historical record status, historical ownership, or recorded instruments."
+            ],
+            "additionalEvidenceNeeded": [
+              "Historical title, tax-lot, and lot-of-record records sufficient to determine whether a December 15, 1961 historical branch applies.",
+              "A survey or other approved-record documentation confirming the applicable contiguous boundary measurement and any recorded Declaration or related title instruments, if a current filing-time route is asserted."
+            ],
+            "supportingSourceUses": [],
+            "citations": [
+              {
+                "sectionID": "20018523",
+                "sourceIDs": [
+                  "03ab8443-8579-4429-88b3-3182ae001d0b"
+                ],
+                "relevance": "ZR § 12-10 is the governing enacted definition. It establishes the alternative historical branches, the current 10-linear-foot contiguity requirement, the party-in-interest and Declaration conditions, and the distinction between zoning lots and tax lots."
+              }
+            ]
+          }
+        }
+      ],
+      "runtimeFailures": []
+    },
+    {
+      "id": "ZR-20",
+      "question": "A 5,000-square-foot below-grade storage level has more than one-half of its floor-to-ceiling height below the applicable base plane and is not used for dwelling purposes. Does it count as zoning floor area?",
+      "liveStatus": "failed",
+      "providerResponses": [
+        {
+          "phase": "permitext_code_interpretation",
+          "requestSHA256": "256b61cb830030af3efc328460de97d34294c2f24c8ded9c6183b9d34d648836",
+          "response": {
+            "answerText": "No—on the stated facts, the 5,000-square-foot storage level does not count as zoning floor area, provided the special lowered-yard rule does not reclassify any portion. ZR § 12-10 defines a space with “more than one-half its height (measured from floor to ceiling) below the base plane” as a cellar, and provides that floor area does not include “cellar space, except where such space is used for dwelling purposes.” Because the stated use is storage rather than dwelling use, the level is excluded; the 5,000-square-foot size does not change that result.\n\nThe supplied definition also contains special measurement rules for a sloping base plane, a through lot using the nearest street-wall-line level, and a post-December 5, 1990 yard lowered below the base-plane level. The question does not establish whether the lowered-yard condition applies, so that qualification remains unresolved. The separate statement that cellar space used for retailing is included for parking, bicycle-parking, and loading calculations does not make the storage level floor area generally.",
+            "supportedPoints": [
+              {
+                "heading": "Cellar exclusion from floor area",
+                "explanation": "ZR § 12-10 defines a cellar, where a base plane is used, as a space wholly or partly below the base plane with “more than one-half its height (measured from floor to ceiling) below the base plane.” The same definition states that floor area does not include “cellar space, except where such space is used for dwelling purposes.” Applying the supplied facts, the below-grade storage level is cellar space and is not used for dwelling purposes, so it is excluded from zoning floor area.",
+                "sectionID": "20018523",
+                "sourceIDs": [
+                  "4a7bd60e-008c-4de3-acb8-eadeaf073a36"
+                ]
+              },
+              {
+                "heading": "Special measurement qualifications",
+                "explanation": "The same definition provides additional rules if a sloping base plane is established, if the property is a through lot measured by the nearest street-wall-line level, or if a yard was lowered below the base-plane level after December 5, 1990. Those conditions are not established here; the lowered-yard condition could affect the classification of some floor space and therefore remains an unresolved qualification.",
+                "sectionID": "20018523",
+                "sourceIDs": [
+                  "4a7bd60e-008c-4de3-acb8-eadeaf073a36"
+                ]
+              },
+              {
+                "heading": "Limited retail-cellar consequence",
+                "explanation": "ZR § 12-10 separately states that cellar space used for retailing is included for calculating accessory off-street parking, accessory bicycle parking, and accessory off-street loading requirements. That expressly limited consequence does not apply to the stated storage use and does not make the space general zoning floor area.",
+                "sectionID": "20018523",
+                "sourceIDs": [
+                  "4a7bd60e-008c-4de3-acb8-eadeaf073a36"
+                ]
+              }
+            ],
+            "assumptions": [],
+            "missingFacts": [
+              "Whether, subsequent to December 5, 1990, any yard on the zoning lot was lowered below the applicable base-plane level, which could invoke the special measurement rule in ZR § 12-10.",
+              "Whether a sloping base plane or through-lot street-wall-line measurement applies, if those conditions are relevant to the stated base-plane determination."
+            ],
+            "followUpQuestions": [],
+            "evidenceLimitations": [
+              "The conclusion is based on the supplied continuously amended NYC Zoning Resolution text through 2026-08-13, principally ZR § 12-10; no parcel-specific survey, base-plane documentation, or additional zoning provisions were supplied."
+            ],
+            "additionalEvidenceNeeded": [],
+            "supportingSourceUses": [],
+            "citations": [
+              {
+                "sectionID": "20018523",
+                "sourceIDs": [
+                  "4a7bd60e-008c-4de3-acb8-eadeaf073a36"
+                ],
+                "relevance": "Governs the cellar definition, the exclusion of non-dwelling cellar space from floor area, the special measurement clauses, and the limited retail-cellar calculation consequence."
+              }
+            ]
+          }
+        },
+        {
+          "phase": "permitext_zoning_source_bounded_repair",
+          "requestSHA256": "516495e4610de9db701f58431335a518b76a58e2d0f7bd0ace383be2fb7afe4f",
+          "response": {
+            "answerText": "No—on the stated facts, the 5,000-square-foot storage level does not count as zoning floor area, provided that the stated base-plane measurement remains controlling and the special lowered-yard rule does not reclassify any portion. ZR § 12-10 defines a cellar, where a base plane is used to determine building height, as a space wholly or partly below the base plane with more than one-half of its floor-to-ceiling height below the base plane. Because the level is a cellar and is not used for dwelling purposes, it is excluded from floor area; the 5,000-square-foot size does not change that result.\n\nThat conclusion remains conditional because the supplied facts do not establish the special measurement conditions. If a sloping base plane is established, the cellar test is measured from the street-wall-line level used to establish that base plane. The supplied facts also do not establish whether a through-lot street-wall-line measurement is relevant. Most importantly, it is unknown whether, after December 5, 1990, any yard on the zoning lot—other than the specified garage-entrance portion—was lowered below the base-plane level. Under that condition, floor space with at least one-half of its height above curb level is considered a basement, which could affect the classification.\n\nThe separate retail-cellar rule is limited to calculations for accessory off-street parking, accessory bicycle parking, and accessory off-street loading; it does not make the stated storage level general zoning floor area.",
+            "supportedPointUpserts": [
+              {
+                "targetIndex": 0,
+                "value": {
+                  "heading": "Cellar exclusion from floor area",
+                  "explanation": "ZR § 12-10 defines a cellar, where a base plane is used, as a space wholly or partly below the base plane with more than one-half of its height (measured from floor to ceiling) below the base plane. On the stated facts, the storage level is a cellar and is not used for dwelling purposes; accordingly, the non-dwelling cellar exclusion applies and the 5,000 square feet is excluded from zoning floor area, subject to the unresolved special measurement conditions.",
+                  "sectionID": "20018523",
+                  "sourceIDs": [
+                    "4a7bd60e-008c-4de3-acb8-eadeaf073a36"
+                  ]
+                }
+              },
+              {
+                "targetIndex": 1,
+                "value": {
+                  "heading": "Special measurement qualifications",
+                  "explanation": "The supplied ZR § 12-10 passage provides that, when a sloping base plane is established, cellar height is measured from the street-wall-line level used to establish that base plane. It also provides that, where a yard was lowered below the base-plane level after December 5, 1990 (except the specified garage-entrance portion), floor space with at least one-half of its height above curb level is considered a basement. Whether those conditions apply is unresolved. Whether a through-lot street-wall-line measurement is relevant is also unresolved on the supplied facts.",
+                  "sectionID": "20018523",
+                  "sourceIDs": [
+                    "4a7bd60e-008c-4de3-acb8-eadeaf073a36"
+                  ]
+                }
+              }
+            ],
+            "supportedPointRemovals": [],
+            "citationUpserts": [
+              {
+                "targetIndex": 0,
+                "value": {
+                  "sectionID": "20018523",
+                  "sourceIDs": [
+                    "4a7bd60e-008c-4de3-acb8-eadeaf073a36"
+                  ],
+                  "relevance": "ZR § 12-10 supplies the controlling base-plane cellar definition and the sloping-base-plane and post-December 5, 1990 lowered-yard measurement conditions."
+                }
+              }
+            ],
+            "citationRemovals": [],
+            "missingFactsAdd": [
+              "Whether, subsequent to December 5, 1990, any yard on the zoning lot—other than the specified portion in front of a garage entrance—was lowered below the applicable base-plane level; if so, the supplied definition treats floor space with at least one-half of its height above curb level as a basement."
+            ],
+            "missingFactsRemove": [],
+            "evidenceLimitationsAdd": [],
+            "evidenceLimitationsRemove": [],
+            "additionalEvidenceNeededAdd": [],
+            "additionalEvidenceNeededRemove": []
+          }
+        }
+      ],
+      "runtimeFailures": [
+        {
+          "code": "RESEARCH_VERIFICATION_FAILED",
+          "failureStage": null,
+          "message": "The source-bounded Zoning repair did not pass every deterministic safety gate.",
+          "verificationAttempts": [
+            {
+              "attempt": 1,
+              "pass": false,
+              "issues": [
+                {
+                  "type": "answer_obligation_source_not_bound",
+                  "detail": "Apply the more-than-one-half-height cellar test and the non-dwelling cellar floor-area exclusion. The matching supported point is not bound to the controlling source."
+                },
+                {
+                  "type": "zoning_definition_lowered_yard_fact",
+                  "detail": "The supplied definition's post-December 5, 1990 lowered-yard condition is unresolved. Keep the direct answer and conclusion conditional, and name that measurement fact in missingFacts."
+                }
+              ]
+            },
+            {
+              "attempt": 2,
+              "pass": false,
+              "issues": [
+                {
+                  "type": "answer_obligation_source_not_bound",
+                  "detail": "Apply the more-than-one-half-height cellar test and the non-dwelling cellar floor-area exclusion. The matching supported point is not bound to the controlling source."
+                },
+                {
+                  "type": "zoning_definition_lowered_yard_fact",
+                  "detail": "The supplied definition's post-December 5, 1990 lowered-yard condition is unresolved. Keep the direct answer and conclusion conditional, and name that measurement fact in missingFacts."
+                }
+              ]
+            }
+          ],
+          "bindingIssue": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "schema": "permitext-owner-section-reference-review-v1",
+  "reviewedOn": "2026-09-09",
+  "liveSourceCommit": "2ffbd3b6b21687f7d1465c6ac785d43fbf5ad265",
+  "referenceKeySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "liveResult": {
+    "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+    "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+  },
+  "costAudit": {
+    "file": "evals/results/research-owner-api-round2-section-reference-cost-audit-2026-09-09.json",
+    "sha256": "6f70a99f6fe47c617b641514afa5c03493622cc5bd1e77a859508015bcc52edb"
+  },
+  "diagnosticFixture": {
+    "file": "evals/fixtures/research-section-reference-live-diagnostics-20260909.json",
+    "sha256": "80d58416986ab9a51c6f64e05333b05abd9bd624c00b9e6bc61d0be92edf276d"
+  },
+  "newProfessionalApproval": false,
+  "strictQualityAcceptedCostPerAnswerUSD": null,
+  "reviewMethod": "Manual development review of all five retained draft/final answers, source passages, input premises and runtime diagnostics against the reconciled key. No paid judge, live source update, UI or Project workflow check. Apparent checker errors are investigation findings, not complete acceptance.",
+  "summary": {
+    "attempted": 5,
+    "delivered": 2,
+    "failed": 3,
+    "providerCalls": 9,
+    "pendingProviderRequests": 0,
+    "publicDocumentGETs": 0,
+    "usageEstimateUSD": 0.247615,
+    "conservativeUSD": 0.444699,
+    "durationP50Milliseconds": 16570,
+    "durationP90Milliseconds": 55466,
+    "totalRoundUsageEstimateUSD": 3.83473987,
+    "totalRoundConservativeUSD": 7.283466,
+    "remainingConservativeAuthorizationUSD": 0.716534,
+    "fullCohortAttempted": 110,
+    "fullCohortUnattempted": []
+  },
+  "cases": [
+    {
+      "id": "ZR-03",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-checker-investigation",
+      "durationMilliseconds": 12110,
+      "inputSHA256": "98b25e17083b1ec7beca9a5d94072cc89db6409f3be51c6ae5612952f8f1770c",
+      "expectedAnswerSHA256": "eb4d986521b0ddf6539666857bc600f3bf3b1d8d4ee0ca0bee9739e79608305b",
+      "deliveredAnswerTextSHA256": null,
+      "notes": "The draft contains the correct Appendix J source-level distinction and withholds any parcel result pending address/BBL and an official map. The first repair removes the prefatory sentence, but the mapped-location gate still reports the explicit no-conclusion sentence as an affirmative result and does not recognize a mapped boundary. Supported-point paraphrases also trigger the narrow source-rule detector. Reproduce both the legitimate rule paraphrases and appended unsafe parcel conclusions before changing this gate. There was no delivered answer."
+    },
+    {
+      "id": "ZR-06",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-checker-and-attribution-defects",
+      "durationMilliseconds": 16570,
+      "inputSHA256": "3fa70b15d9febe7d7d05102c8f7db199350747b8e2788f3801538039284b985f",
+      "expectedAnswerSHA256": "17ff57cdfd02813cdce4297866e03f7ef2c83c4615102e2e03ea6f2a7ed9ab6b",
+      "deliveredAnswerTextSHA256": null,
+      "notes": "The draft expressly withholds an as-of-right parcel finding and explains the selected manufacturing/storage, map, performance-standard and historical-documentation framework. The boundary detector misses the negative nominal construction No parcel-specific as-of-right finding can be made. Independently, the final supported point attaches the 42-192 historical-facility analysis only to the 42-193 source ID; fix that attribution rather than accepting the whole draft after a boundary repair. The draft also does not expressly name special-district status among the missing location facts. No delivery or professional acceptance."
+    },
+    {
+      "id": "ZR-09",
+      "liveStatus": "completed",
+      "reviewStatus": "development-core-confirmed-with-scope-and-latency-gaps",
+      "durationMilliseconds": 55466,
+      "inputSHA256": "2a988abd132792a81e4104ea4ce3d9c61ea56b1df51c66079d5c317c599a60c4",
+      "expectedAnswerSHA256": "b1ebaa619ce37d643ad20b2aa01b96cebf2f3618418b7b449a886108a91f7eb5",
+      "deliveredAnswerTextSHA256": "e0995fb2b61d78d79453548459f793f7ded0b4c0ede484da1d67952cdb80c95e",
+      "notes": "The delivered answer calculates 4.80 FAR, 50,100 square feet at the 5.01 ceiling, and preserves the qualifying route and affordable-floor-area conditions. The 4.00 standard-residence comparison is grounded in the supplied table. It repeats calculations and expands into substantial affordable-floor-area detail. Its general UAP explanation omits the closing grandfathered-generating-site alternative present in the supplied definition; maintain that scope qualification where material. Some secondary excerpts are partial. The first Terra response exhausted its 3,000-output-token allowance after 34.133 seconds; the existing runtime retried the draft. Total HTTP duration was 55.466 seconds with three provider requests. Core confirmation is not full professional acceptance."
+    },
+    {
+      "id": "ZR-19",
+      "liveStatus": "completed",
+      "reviewStatus": "delivered-quality-failure-stated-premise",
+      "durationMilliseconds": 10988,
+      "inputSHA256": "cbe137fe86be80a9f03d4eb2bf95f04e45e0eac5b49d3fd27ba7a6a7e1632ce0",
+      "expectedAnswerSHA256": "feb8984ec23f183d58b24473ad7021cd55564bcc13dc9024062343f1847f0802",
+      "deliveredAnswerTextSHA256": "b607fc75bf87224ec4869a4276ea99b48de040776a556080d005437eef3b017b",
+      "notes": "The current ten-linear-foot threshold and distinction between zoning and tax lots are correctly stated. However, the question explicitly says the lots were not historically one zoning lot. The answer reopens the historical branches and asks for historical facts, plus unnecessary boundary/instrument verification despite the stated eight-foot fact. Preserve the supplied premise and answer the current combination question directly. Passing runtime checks does not remove this quality failure."
+    },
+    {
+      "id": "ZR-20",
+      "liveStatus": "failed",
+      "reviewStatus": "undelivered-checker-investigation",
+      "durationMilliseconds": 28075,
+      "inputSHA256": "88fcfb02683d0a05b4450b076d775d94bed04a1e54ff18addcb29afb40add985",
+      "expectedAnswerSHA256": "ace98a76c3aef72b21228c2f06e2f82213319c5aadffec19288b9278c2fdaf05",
+      "deliveredAnswerTextSHA256": null,
+      "notes": "The draft and repair apply the non-dwelling cellar exclusion and identify sloping-base-plane, through-lot and lowered-yard qualifications. They bind the relevant supported point to the supplied 12-10 source ID. The deterministic gate nevertheless reports an unbound governing source and an unresolved lowered-yard condition; both alleged omissions are visibly addressed in the retained response. Investigate matcher/identifier/wording handling with negative controls; do not bypass source binding. The repair increases verbosity and repeats a missing fact. No answer was delivered."
+    }
+  ],
+  "nextWork": [
+    "Reproduce mapped-boundary false rejections while preserving rejection of appended parcel conclusions.",
+    "Reproduce cellar obligation source binding and lowered-yard qualifier checks with actual section-reference IDs.",
+    "Preserve the stated historical exclusion in ZR-19 and repair the mixed-source supported point in ZR-06.",
+    "Reduce draft duplication and irrelevant retrieval before another cost/latency confirmation.",
+    "Resolve noncontiguous exact-passage projection and continue full 110-case quality review; attempted coverage is not acceptance."
+  ]
+}
