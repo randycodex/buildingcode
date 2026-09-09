@@ -2,8 +2,9 @@
 // These DOB workflow relationships are emitted only while both their question
 // context and the fetched source wording are present. Full passages remain in
 // the request and the ordinary semantic verifier remains mandatory.
-export const guidanceSourceRelationshipsVersion = "20260909-source-relationships-v1";
+export const guidanceSourceRelationshipsVersion = "20260909-source-relationships-v2";
 const compact = (value) => typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
+const evidenceFor = (passage, excerpts) => ({ sourceID: passage.sourceID, claimID: passage.claimID, contentHash: passage.contentHash, excerpts });
 
 export function guidanceSourceRelationships(input) {
   const question = compact(input?.question);
@@ -12,8 +13,8 @@ export function guidanceSourceRelationships(input) {
   const subsequentQuestion = /\bsubsequent\s+filings?\b/i.test(question);
   if (!actorQuestion && !subsequentQuestion) return [];
   const relationships = [], seen = new Set();
-  for (const passage of input.passages || []) {
-    if (!passage.sourceID || !passage.claimID || !/^[a-f0-9]{64}$/.test(passage.contentHash || "")) continue;
+  const validPassages = (input.passages || []).filter((passage) => passage.sourceID && passage.claimID && /^[a-f0-9]{64}$/.test(passage.contentHash || ""));
+  for (const passage of validPassages) {
     const text = compact(passage.text);
     const add = (kind, excerpts, questionToResolve) => {
       const key = `${kind}:${passage.sourceID}:${passage.claimID}`;
@@ -21,7 +22,7 @@ export function guidanceSourceRelationships(input) {
       seen.add(key);
       relationships.push({
         kind, questionToResolve,
-        evidence: { sourceID: passage.sourceID, claimID: passage.claimID, contentHash: passage.contentHash, excerpts }
+        evidence: evidenceFor(passage, excerpts)
       });
     };
     if (actorQuestion) {
@@ -37,11 +38,22 @@ export function guidanceSourceRelationships(input) {
         "Reconcile the after-initial-submission initiation statement with the passage acknowledging a subsequent filing before initial submission. Distinguish creation from submission and identify any unresolved creation-timing question instead of presenting one statement as universal.");
     }
   }
+  if (subsequentQuestion) {
+    const general = validPassages.map((passage) => ({ passage, excerpt: compact(passage.text).match(/\ban LOC needs to be requested for each filing, initial and subsequent filings[.!?]?/i)?.[0] ||
+      compact(passage.text).match(/\ba Letter of Completion\s*\(LOC\) is requested separately on each filing[.!?]?/i)?.[0] })).find((item) => item.excerpt);
+    const specialized = validPassages.map((passage) => ({ passage, excerpt: compact(passage.text).match(/\bDo I need to request a Letter of Completion for the subsequent filing of an NB or Alteration-CO filing\?\s*—\s*No,\s*the status of the subsequent filings will remain Permit Entire\.\s*Only the status of the initial \(I1\) filing will change to CO issued\./i)?.[0] })).find((item) => item.excerpt);
+    if (general && specialized) relationships.push({
+      kind: "filing_completion_scope",
+      questionToResolve: "The chosen filing path has separate processing and a job-type-dependent completion consequence. Reconcile the general separate-LOC direction with the specialized NB/Alteration-CO initial-CO path. State the branches briefly and identify the initial job type if unknown; do not drop the completion consequence while explaining which filing to use.",
+      evidence: evidenceFor(general.passage, [general.excerpt]),
+      relatedEvidence: [evidenceFor(specialized.passage, [specialized.excerpt])]
+    });
+  }
   return relationships;
 }
 
 export const guidanceSourceRelationshipInstruction = [
   "The sourceRelationships identify applicability questions from the fetched passages, not an answer key or independent authority.",
-  "Resolve each material relationship before writing or approving a general statement about required actors, readiness to submit, or creation timing. Verify the excerpts in their complete source context and apply the user's facts.",
+  "Resolve each material relationship before writing or approving a general statement about required actors, readiness to submit, creation timing, or the consequences of a filing choice. Verify the excerpts and any relatedEvidence in their complete source context and apply the user's facts.",
   "When the source condition cannot be resolved from the facts, preserve a brief conditional qualification or the precise unresolved issue with its source citation. Do not silently choose one side of competing timing guidance or infer that named prerequisites are sufficient. Keep the answer focused on the requested decision, without unrelated form-entry instructions."
 ].join(" ");

@@ -141,6 +141,9 @@ const responseDouble = async (url, options) => {
         assert(input.passages.some((passage) => /subsequent filing of an NB or Alteration-CO filing.*remain Permit Entire/s.test(passage.text)),
           "The FAQ question that scopes the exception must be in the primary passage text.");
         assert(input.passages.some((passage) => /subsequent filing in pre-filing status/.test(passage.text)));
+        const completion = input.sourceRelationships.find((relationship) => relationship.kind === "filing_completion_scope");
+        assert(completion?.relatedEvidence.some((evidence) => evidence.sourceID === "dob-nb-altco-faq"),
+          "Both model stages need the specialized completion consequence alongside the general rule.");
       }
       if (portalCase === "DOBNOW-004") {
         assert(input.passages.some((passage) => /same Applicant of Record as the original filing/.test(passage.text) && /fields are NOT editable/.test(passage.text)));
@@ -355,7 +358,7 @@ try {
     assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
     const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
     assert.match(answer.answerText, expected[id]);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v9");
+    assert.equal(answer.promptVersion, "20260909-document-summary-v10");
     assert.equal(answer.officialGuidanceSummary.version, "20260909-document-summary-v2",
       "New summaries retain the required qualification receipt; older v1 records remain readable.");
   }

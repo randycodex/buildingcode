@@ -9,8 +9,19 @@ const inputs = retained.providerCalls.filter((call) => call.phase === "permitext
 for (const { id, input } of inputs) {
   const before = structuredClone(input);
   const relationships = guidanceSourceRelationships(input);
-  assert.equal(relationships.length, 1);
+  assert.equal(relationships.length, id === "DOBNOW-023" ? 1 : 2);
   assert.equal(relationships[0].kind, id === "DOBNOW-023" ? "conditional_stakeholder" : "creation_and_submission_timing");
+  if (id === "DOBNOW-003") {
+    assert.equal(relationships[1].kind, "filing_completion_scope");
+    for (const evidence of [relationships[1].evidence, ...relationships[1].relatedEvidence]) {
+      const source = input.passages.find((passage) => passage.sourceID === evidence.sourceID && passage.claimID === evidence.claimID);
+      assert.equal(evidence.contentHash, source.contentHash);
+      assert(evidence.excerpts.every((excerpt) => source.text.replace(/\s+/g, " ").trim().includes(excerpt)));
+    }
+    const withoutSpecialized = { ...input, passages: input.passages.filter((passage) => passage.sourceID !== "dob-nb-altco-faq") };
+    assert.deepEqual(guidanceSourceRelationships(withoutSpecialized).map((relationship) => relationship.kind), ["creation_and_submission_timing"],
+      "The cross-source completion question requires the actual specialized source, not just generic LOC text.");
+  }
   const evidence = relationships[0].evidence;
   const source = input.passages.find((passage) => passage.sourceID === evidence.sourceID && passage.claimID === evidence.claimID);
   assert.equal(evidence.contentHash, source.contentHash);
@@ -21,7 +32,9 @@ for (const { id, input } of inputs) {
   assert.deepEqual(guidanceSourceRelationships({ ...input, passages: [] }), []);
   assert.deepEqual(guidanceSourceRelationships({ ...input, passages: input.passages.map((passage) => ({ ...passage, contentHash: "invalid" })) }), []);
   const changed = structuredClone(input);
-  for (const passage of changed.passages) passage.text = passage.text.replace(/required Stakeholder/gi, "optional contact").replace(/before creating the subsequent filing/gi, "after the initial filing has been submitted");
+  for (const passage of changed.passages) passage.text = passage.text.replace(/required Stakeholder/gi, "optional contact")
+    .replace(/before creating the subsequent filing/gi, "after the initial filing has been submitted")
+    .replace(/remain Permit Entire/gi, "receive a separate LOC");
   assert.deepEqual(guidanceSourceRelationships(changed), [], "A source update removing the detected relationship must remove the hint.");
   const sources = input.passages.map((passage) => ({
     id: passage.sourceID, title: passage.title, url: passage.url.split("#")[0],
@@ -35,6 +48,8 @@ for (const { id, input } of inputs) {
     const packet = JSON.parse(request.input);
     assert.deepEqual(packet.sourceRelationships, relationships, "Both drafting and verification receive source-derived relationships.");
     assert.match(request.instructions, /Resolve each material relationship/);
+    assert.match(request.instructions, /A negative permission answer or a statement of necessary conditions does not assert that every submission requirement has been met/);
+    assert.match(request.instructions, /continue checking every volunteered claim and material actor condition/);
     assert.equal(packet.passages.length, input.passages.length, "A relationship never replaces or trims its source evidence.");
   }
 }
@@ -48,4 +63,4 @@ assert.equal(guidanceSourceRelationships(actorInput)[0].kind, "conditional_stake
 assert.match(guidanceSourceRelationships(actorInput)[0].evidence.excerpts.join(" "), /Association/);
 assert.equal(guidanceSourceRelationships({ ...actorInput, question: "Can the representative sign for the owner?" })[0].kind, "conditional_stakeholder");
 assert.deepEqual(guidanceSourceRelationships({ question: actorInput.question + " When X is the Owner Type, Y is a required Stakeholder. Both must attest before filing.", passages: [] }), []);
-console.log("Source-derived attestation and filing-timing relationships preserve fetched evidence, reach both model stages and disappear when source conditions or question scope change. No API calls or model-quality acceptance claimed.");
+console.log("Source-derived attestation, filing-timing and cross-source completion relationships preserve fetched evidence, reach both model stages and disappear when source conditions or question scope change. No API calls or model-quality acceptance claimed.");

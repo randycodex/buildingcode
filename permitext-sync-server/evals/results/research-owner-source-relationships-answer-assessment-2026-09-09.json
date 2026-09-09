@@ -1,0 +1,543 @@
+{
+  "schema": "permitext-owner-source-relationships-answer-assessment-v1",
+  "reviewedAt": "2026-09-09T10:48:41.146Z",
+  "liveSourceCommit": "95a4f5a636759cb3dbe006ab855a720772fa3e47",
+  "sources": [
+    {
+      "kind": "live",
+      "file": "evals/results/research-owner-api-round2-live-source-relationships-2026-09-09.json",
+      "sha256": "bd547e03b922ce3131d8c919445e1cffc118321a2a500a18dd02ffb5076ac18e"
+    },
+    {
+      "kind": "preflight",
+      "file": "evals/results/research-owner-api-round2-source-relationships-preflight-2026-09-09.json",
+      "sha256": "999a87878400891cf604a120495bae270b232c43a4437e89e94ee779f72a60aa"
+    },
+    {
+      "kind": "audit",
+      "file": "evals/results/research-owner-api-round2-source-relationships-cost-audit-2026-09-09.json",
+      "sha256": "f0265f56f50f56a3397b033d4fb2220eb31c3bced8de2a6049ecafd67f811319"
+    }
+  ],
+  "keySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "method": "Manual review of unchanged authored benchmark questions and expected concepts against the actual retained HTTP drafts, complete provider inputs and verifier verdicts. Transport assertions do not prove model understanding or professional approval.",
+  "preflightNotes": "Both committed-source initial requests were intercepted without paid provider dispatch. Their live hashes matched the retained preflight; actual full passages and source relationships were preserved across drafting and verification.",
+  "cases": [
+    {
+      "id": "DOBNOW-023",
+      "inputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "httpStatus": 502,
+      "delivered": false,
+      "providerVerifierPass": false,
+      "serverVerificationPassed": false,
+      "manualBenchmarkPass": false,
+      "newProfessionalApproval": false,
+      "substantiveExpectedConceptsPresent": true,
+      "draftCore": "The draft now distinguishes preparation from attestation/submission, identifies the applicant review/signature/submission steps, and states the conditional Board representative requirement and unknown Owner Type.",
+      "missingExpected": [],
+      "checkerFindings": "The verifier no longer objects to applicant submission and recognizes the Board condition. It rejects the answer only for omitting DPL-1 upload and form age. Against the authored question about representative authority, with documents already uploaded and no claim that all submission requirements are satisfied, this is an overbroad readiness-checklist demand. The server correctly preserves that negative verdict; no bypass is proposed.",
+      "presentationGaps": [
+        "Three paragraphs repeat the representative submission prohibition and owner-review point.",
+        "Unasked login, email and Preview to File directions make the answer longer than the expected direct authority answer."
+      ],
+      "reviewStatus": "Substantive expected concepts are present, but the answer is undelivered and its presentation still needs tightening.",
+      "draftParagraphWords": 186,
+      "metrics": {
+        "file": "evals/results/research-owner-api-round2-live-source-relationships-2026-09-09.json",
+        "sourceCommit": "95a4f5a636759cb3dbe006ab855a720772fa3e47",
+        "id": "DOBNOW-023",
+        "scope": "research-http",
+        "delivered": false,
+        "charged": false,
+        "providerCalls": 2,
+        "answeringCalls": 1,
+        "additionalAnsweringCallsUSD": 0,
+        "usageEstimateUSD": 0.02603665,
+        "conservativeUSD": 0.048211,
+        "historicalFailureCodes": [
+          "RESEARCH_VERIFICATION_FAILED"
+        ],
+        "durationMilliseconds": 21043,
+        "draftMilliseconds": 6597,
+        "verificationMilliseconds": 12000
+      },
+      "sourceSpanReviewStructurallyValid": true,
+      "originalPassageTextFullyPreserved": true,
+      "fullDraftAndVerifierSourcesEqual": true,
+      "sourceRelationshipsEqualAcrossStages": true,
+      "retainedNormalizedRequestHashesMatch": true,
+      "preflightInitialHashMatches": true,
+      "requests": [
+        {
+          "phase": "permitext_official_guidance_summary",
+          "requestSHA256": "be3911ed91aa31384db099adad9647a7fb8ac11db4881078c8e31375f1a9bed4",
+          "rawRequestSHA256": "8a052e2be3d838327b907c54dd756883eb26258f600ed7ef2b44bac5f4fe0df9",
+          "retainedRequestSHA256": "a85ff306f31b7c5970f3e4ffbf124664f661da7be32fadf6bb08c0b7ded12623"
+        },
+        {
+          "phase": "permitext_official_guidance_verification",
+          "requestSHA256": "a8145ec20fc7ed91d96209be688d17e1a23f4e6354f3cff5b8bfbd651c9aa45d",
+          "rawRequestSHA256": "142606faf3c540b1c2533a17120d2e36139d931fc863e440a4fe8883bc3657fb",
+          "retainedRequestSHA256": "a8145ec20fc7ed91d96209be688d17e1a23f4e6354f3cff5b8bfbd651c9aa45d"
+        }
+      ],
+      "draft": {
+        "paragraphs": [
+          {
+            "text": "No. The filing representative cannot attest for the applicant or owner and cannot submit this job filing. The Applicant of Record must complete the applicant attestation and electronic signature before submission; the applicant also must review the filing, provide the final electronic signature, and officially submit it electronically. Filing representatives may enter and view filing information, but they cannot submit filings or permits.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-14224abff07118e8caab44b5"
+              },
+              {
+                "sourceID": "dob-stakeholder-faq",
+                "claimID": "official-passage-926f000a6298a375216c4474"
+              },
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-32c900bcb9155791c4b8e4ed"
+              },
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-8a6759ed9b246c862f6ec2fc"
+              }
+            ]
+          },
+          {
+            "text": "The owner must review the filing and personally complete the Owner’s Attestation in the Statements & Signatures tab, using the same email address entered for the owner in the Stakeholders section. All DOB NOW job filings require the owner’s confirmation authorizing the applicant to submit and acknowledging review of the application. The representative can use Preview to File to identify what remains incomplete before the applicant submits.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-14224abff07118e8caab44b5"
+              },
+              {
+                "sourceID": "dob-stakeholder-faq",
+                "claimID": "official-passage-640683ee941434bcfcba4c90"
+              },
+              {
+                "sourceID": "dob-stakeholder-faq",
+                "claimID": "official-passage-e69f2581a742ad4ed10f6776"
+              }
+            ]
+          },
+          {
+            "text": "If the filing’s Owner Type is Condo Unit Owner or Co-Op Tenant-Shareholder, the Board representative is also a required stakeholder and must log in and attest; both the owner and Board representative must complete their attestations before the filing can proceed. The facts provided do not identify the Owner Type, so this additional condition may apply.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-build-release-notes",
+                "claimID": "official-passage-2e6a1d190b996cb029e2e04a"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [],
+        "evidenceLimitations": []
+      },
+      "providerVerdict": {
+        "pass": false,
+        "issues": [
+          {
+            "type": "missed_material_conclusion",
+            "detail": "The answer omits the guide's material prerequisite that the applicant must upload the DPL-1 as a Required Document, with the form date no more than one year before submission."
+          }
+        ],
+        "qualificationReview": {
+          "packetSHA256": "b01fc9c7198806f65bd8f6dc079ebfc6403bb375d00e81f6fbe2d9351b2df6a3",
+          "passages": [
+            {
+              "passageIndex": 0,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "The passage identifies stakeholder account and data-entry fields but adds no material condition to who attests or submits."
+            },
+            {
+              "passageIndex": 1,
+              "finding": "missing_or_misstated",
+              "conditionSpanIDs": [
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer addresses the applicant attestation but omits the required DPL-1 upload and its one-year date condition."
+            },
+            {
+              "passageIndex": 2,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "The passage concerns owner association and account access, not the representative's authority to attest or submit."
+            },
+            {
+              "passageIndex": 3,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0,
+                1
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer preserves that the owner can review the filing and complete the Owner's Attestation."
+            },
+            {
+              "passageIndex": 4,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0,
+                1,
+                2,
+                3
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer preserves the owner's review, same-email login requirement, Statements & Signatures location and attestation action."
+            },
+            {
+              "passageIndex": 5,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "The passage addresses signatures on PW2 rather than the requested filing-representative attestation and submission question."
+            },
+            {
+              "passageIndex": 6,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0,
+                1,
+                2
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer preserves the filing representative's data-entry and viewing role and inability to submit filings or permits."
+            },
+            {
+              "passageIndex": 7,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer preserves that Preview to File can show what remains incomplete before submission."
+            },
+            {
+              "passageIndex": 8,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "This passage is specifically about work permits, while the answer's general submission conclusion is supported by the broader filing-representative passage."
+            },
+            {
+              "passageIndex": 9,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "The passage concerns a tax-abatement attestation and is unrelated to the requested filing workflow."
+            },
+            {
+              "passageIndex": 10,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+              ],
+              "answerReferences": [
+                "paragraph:2"
+              ],
+              "reason": "The answer preserves the conditional Condo Unit Owner or Co-Op Tenant-Shareholder Board stakeholder and dual-attestation requirement."
+            },
+            {
+              "passageIndex": 11,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "The passage concerns deleting certain paid filings and adds no condition to attestation or submission."
+            },
+            {
+              "passageIndex": 12,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer preserves that the applicant, owner and other stakeholders must electronically sign."
+            },
+            {
+              "passageIndex": 13,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer preserves that the applicant must review the filing and provide the final electronic signature."
+            },
+            {
+              "passageIndex": 14,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer preserves that the applicant officially submits the filing electronically."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "DOBNOW-003",
+      "inputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "httpStatus": 200,
+      "delivered": true,
+      "providerVerifierPass": true,
+      "serverVerificationPassed": true,
+      "manualBenchmarkPass": false,
+      "newProfessionalApproval": false,
+      "substantiveExpectedConceptsPresent": false,
+      "draftCore": "The answer retains the same job number and filing extension, different-applicant option, separate processing and review type, and now explains the conflicting creation-timing entries and missing initial submission status.",
+      "missingExpected": [
+        "General separate-LOC and specialized NB/Alteration-CO initial-CO completion branches are omitted.",
+        "The unknown initial job type needed to select the completion path is not identified."
+      ],
+      "checkerFindings": "The provider accepts the answer and marks the specialized completion FAQ not material to the filing-choice question. That omits an explicit authored benchmark requirement. The source relationship repairs the timing discussion, but completeness shifts to a different omission; transport success is not full acceptance.",
+      "presentationGaps": [
+        "Three long paragraphs include unasked BIN/job-number search and menu instructions.",
+        "The creation-timing gap is repeated in both prose and evidence limitations.",
+        "A statement that the sources lack a plumbing-specific exception is unnecessary for the requested filing choice."
+      ],
+      "reviewStatus": "Delivered with the creation-timing gap corrected; incomplete against the unchanged completion-path benchmark.",
+      "draftParagraphWords": 270,
+      "metrics": {
+        "file": "evals/results/research-owner-api-round2-live-source-relationships-2026-09-09.json",
+        "sourceCommit": "95a4f5a636759cb3dbe006ab855a720772fa3e47",
+        "id": "DOBNOW-003",
+        "scope": "research-http",
+        "delivered": true,
+        "charged": true,
+        "providerCalls": 2,
+        "answeringCalls": 1,
+        "additionalAnsweringCallsUSD": 0,
+        "usageEstimateUSD": 0.02193915,
+        "conservativeUSD": 0.039506,
+        "historicalFailureCodes": [],
+        "durationMilliseconds": 19869,
+        "draftMilliseconds": 10277,
+        "verificationMilliseconds": 8144
+      },
+      "sourceSpanReviewStructurallyValid": true,
+      "originalPassageTextFullyPreserved": true,
+      "fullDraftAndVerifierSourcesEqual": true,
+      "sourceRelationshipsEqualAcrossStages": true,
+      "retainedNormalizedRequestHashesMatch": true,
+      "preflightInitialHashMatches": true,
+      "requests": [
+        {
+          "phase": "permitext_official_guidance_summary",
+          "requestSHA256": "c19d2a8b34868883faf2938106558954c7e04bf212b4b357fa509246bf14f2b2",
+          "rawRequestSHA256": "e4f5c0afb46f7bae0a93e6f6cd4aa2957c0753a8470518efb0d80e66721b9bd1",
+          "retainedRequestSHA256": "af25311025b3ecf225d3475efa60c20598bf411ac6da3c587f4c03abdcf33298"
+        },
+        {
+          "phase": "permitext_official_guidance_verification",
+          "requestSHA256": "5018488b6baeccfeebc40d7a5e3de9e8a5bd7399c0e8b91758948f876a63a326",
+          "rawRequestSHA256": "2107d532bc7a5f5eb536864b62d7d061dd09e832031a175d9fe588bf943c2e9e",
+          "retainedRequestSHA256": "5018488b6baeccfeebc40d7a5e3de9e8a5bd7399c0e8b91758948f876a63a326"
+        }
+      ],
+      "draft": {
+        "paragraphs": [
+          {
+            "text": "The plumbing scope should be filed as a subsequent filing under the existing job number, not as a new unrelated job number, if it is part of the same construction project and property. The guidance says all filings for the same construction project should use the same job number with an alphabetic/numeric filing extension; a subsequent filing adds new scope of work and new work types on the same property and may use a new applicant. Although it is strongly encouraged rather than framed here as an absolute prohibition on a separate job, the stated workflow preference is to use the subsequent filing.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-7f1688f6576d2692a3be6e22"
+              }
+            ]
+          },
+          {
+            "text": "Because the initial GC filing has already been created, the guidance supports locating that initial (I1) filing—by BIN search or known job-number search—and selecting the Subsequent Filing action. The subsequent plumbing application functions as a separate application, may have a different review type, and can be permitted before the initial filing is permitted. It may be initiated and submitted after the I1 has been submitted and before an LOC is issued for the I1; the supplied facts do not say whether the I1 has been submitted, so that submission-status prerequisite remains to be confirmed.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-5b682c1399f57019c03eda89"
+              },
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-7f1688f6576d2692a3be6e22"
+              }
+            ]
+          },
+          {
+            "text": "The supplied FAQ also says a subsequent filing created while the I1 remains in pre-filing status may have I1-populated fields grayed out and recommends completing as much of the I1 as possible before creating the subsequent filing; it does not clearly establish that creation is categorically unavailable before I1 submission. For the stated plan to file plumbing later, however, submission of the subsequent application is expressly tied to the I1 having been submitted.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-7f1688f6576d2692a3be6e22"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [
+          "Whether the existing initial GC filing has been submitted (rather than remaining in pre-filing status), which affects readiness to submit the subsequent plumbing filing."
+        ],
+        "evidenceLimitations": [
+          "The supplied guidance does not state a plumbing-specific exception to the same-project/same-property subsequent-filing workflow.",
+          "The supplied FAQ gives an express timing rule for initiating and submitting a subsequent filing after I1 submission, while separately describing a subsequent filing in pre-filing status; it leaves the precise availability and effect of creation before I1 submission unresolved."
+        ]
+      },
+      "providerVerdict": {
+        "pass": true,
+        "issues": [],
+        "qualificationReview": {
+          "packetSHA256": "f378dfda4e6243bcf59d3bc6424c81e335dd76ab50bbf7dede00b592fcc075ac",
+          "passages": [
+            {
+              "passageIndex": 0,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                6,
+                7,
+                9,
+                10,
+                11,
+                12,
+                14,
+                15
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer preserves the same-project and same-property same-job-number guidance, the subsequent-filing scope, the different-applicant option, and the separate-application treatment."
+            },
+            {
+              "passageIndex": 1,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "answerReferences": [
+                "paragraph:1"
+              ],
+              "reason": "The answer identifies BIN or job-number search and selecting Subsequent Filing from the initial filing."
+            },
+            {
+              "passageIndex": 2,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                12,
+                13,
+                14,
+                15,
+                16
+              ],
+              "answerReferences": [
+                "paragraph:0"
+              ],
+              "reason": "The answer reflects the preference for subsequent filings instead of unrelated or separately related job-number treatment."
+            },
+            {
+              "passageIndex": 3,
+              "finding": "addressed",
+              "conditionSpanIDs": [
+                0,
+                1,
+                2,
+                8,
+                20,
+                21,
+                22,
+                23
+              ],
+              "answerReferences": [
+                "paragraph:1",
+                "paragraph:2",
+                "missing_fact:0",
+                "evidence_limitation:0"
+              ],
+              "reason": "The answer preserves the submitted-I1 timing rule, the different-applicant rule, the pre-filing-status qualification, and the unresolved creation-timing issue."
+            },
+            {
+              "passageIndex": 4,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "This passage addresses Structural and Foundation work types for New Building filings, not the plumbing-scope question presented."
+            },
+            {
+              "passageIndex": 5,
+              "finding": "not_material",
+              "conditionSpanIDs": [],
+              "answerReferences": [],
+              "reason": "This passage addresses Letter of Completion status for New Building and Alteration-CO filings, not the plumbing-scope filing decision."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "newProfessionalApproval": false,
+  "strictQualityAcceptedCostPerAnswerUSD": null,
+  "budget": {
+    "authorizationUSD": 8,
+    "packageCapUSD": 0.24,
+    "packageProviderCalls": 4,
+    "packageFullHTTPTurns": 2,
+    "packageUsageEstimateUSD": 0.0479758,
+    "packageConservativeUSD": 0.087717,
+    "cumulativeUsageEstimateUSD": 4.13764707,
+    "cumulativeConservativeUSD": 7.833214,
+    "remainingConservativeAuthorizationUSD": 0.166786,
+    "pendingRequests": 0,
+    "providerInvoiceVerified": false,
+    "currentAccountBalanceVerified": false
+  },
+  "subsequentLocalRepair": {
+    "promptVersion": "20260909-document-summary-v10",
+    "relationshipVersion": "20260909-source-relationships-v2",
+    "summary": "Match verification completeness to the requested decision without overriding a failed verdict; retain cross-source filing-completion consequences before drafting; target short direct answers without redundant navigation or repeated qualifications.",
+    "liveConfirmed": false
+  },
+  "nextAction": "Finish and commit offline checks for prompt v10 and the cross-source completion relationship. Any new paid run needs a fresh source-bound preflight and single-use driver, and must fit the remaining allowance. The representative initial request alone previously reserved $0.179010, exceeding the remaining $0.166786; do not assume the next paired comparison is affordable.",
+  "limitations": [
+    "All 110 numbered cases remain in scope, and these two development samples do not establish full-cohort acceptance.",
+    "The two source-relationship targets improved in these samples, but model variance and added source content prevent a clean isolated attribution.",
+    "No reduction in overall latency or cost is demonstrated: source and prompt changes increased token content, and per-case costs rose versus v8.",
+    "No Project workflow, UI, phone, push or deployment was tested. No paid search, retry or separate judge was added."
+  ]
+}

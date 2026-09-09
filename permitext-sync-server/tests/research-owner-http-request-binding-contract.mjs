@@ -87,4 +87,26 @@ const changedRelationship = withRelationship(htmlA), changedInput = JSON.parse(c
 changedInput.sourceRelationships[0].questionToResolve = "A different applicability question.";
 changedRelationship.input = JSON.stringify(changedInput);
 assert.notEqual(htmlHash(changedRelationship), htmlHash(withRelationship(htmlA)), "Diagnostic normalization must retain the actual relationship question.");
+const withRelatedEvidence = (body) => {
+  const next = withRelationship(body), input = JSON.parse(next.input);
+  const related = { ...input.passages[0], sourceID: "specialized", claimID: `${input.passages[0].claimID}-specialized`,
+    url: "https://www.nyc.gov/specialized", text: "A specialized completion condition applies." };
+  input.passages.push(related);
+  input.sourceRelationships[0].relatedEvidence = [{ sourceID: related.sourceID, claimID: related.claimID,
+    contentHash: related.contentHash, excerpts: [related.text] }];
+  next.text.format.schema.properties.paragraphs.items.properties.sourceUses.items.properties.claimID.enum.push(related.claimID);
+  next.text.format.schema.properties.paragraphs.items.properties.sourceUses.items.properties.sourceID.enum.push(related.sourceID);
+  next.input = JSON.stringify(input); return next;
+};
+assert.equal(htmlHash(withRelatedEvidence(htmlA)), htmlHash(withRelatedEvidence(htmlB)),
+  "Cross-source relationships normalize both HTML evidence bindings while preserving their content.");
+for (const mutate of [
+  (input) => { input.sourceRelationships[0].relatedEvidence[0].sourceID = "wrong-source"; },
+  (input) => { input.sourceRelationships[0].relatedEvidence[0].contentHash = "c".repeat(64); },
+  (input) => { input.sourceRelationships[0].relatedEvidence[0].excerpts = ["An invented exception."]; },
+  (input) => { input.sourceRelationships[0].relatedEvidence = {}; }
+]) {
+  const body = withRelatedEvidence(htmlA), input = JSON.parse(body.input); mutate(input); body.input = JSON.stringify(input);
+  assert.throws(() => htmlHash(body));
+}
 console.log("Owner HTTP request binding passed: isolated account/passage IDs normalize; source text, section identity, citation binding, instructions, model, tier and token ceilings remain bound.");

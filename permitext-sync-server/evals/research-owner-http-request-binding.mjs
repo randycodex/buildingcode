@@ -37,14 +37,18 @@ export function ownerHTTPResearchRequestHash(body, { normalizeOfficialHTML = fal
       claimSchema.enum.every((id) => ids.has(id)), "The guidance schema must bind exactly the declared passages.");
     claimSchema.enum = claimSchema.enum.map((id) => ids.get(id));
     for (const relationship of input.sourceRelationships || []) {
-      const evidence = relationship?.evidence, passage = originals.get(evidence?.claimID);
-      assert(passage && evidence.sourceID === passage.sourceID && evidence.contentHash === passage.contentHash,
-        "A source relationship must retain its original passage binding.");
-      assert(Array.isArray(evidence.excerpts) && evidence.excerpts.length && evidence.excerpts.every((excerpt) =>
-        typeof excerpt === "string" && excerpt.trim() && passage.text.replace(/\s+/g, " ").trim().includes(excerpt)),
-      "Source relationship excerpts must match their declared passage.");
-      evidence.claimID = ids.get(evidence.claimID);
-      if (hashes.has(evidence.sourceID)) evidence.contentHash = `html-content:${evidence.sourceID}`;
+      assert(relationship?.relatedEvidence === undefined || Array.isArray(relationship.relatedEvidence),
+        "Related source evidence must be an array of passage bindings.");
+      for (const evidence of [relationship?.evidence, ...(relationship?.relatedEvidence || [])]) {
+        const passage = originals.get(evidence?.claimID);
+        assert(passage && evidence.sourceID === passage.sourceID && evidence.contentHash === passage.contentHash,
+          "A source relationship must retain its original passage binding.");
+        assert(Array.isArray(evidence.excerpts) && evidence.excerpts.length && evidence.excerpts.every((excerpt) =>
+          typeof excerpt === "string" && excerpt.trim() && passage.text.replace(/\s+/g, " ").trim().includes(excerpt)),
+        "Source relationship excerpts must match their declared passage.");
+        evidence.claimID = ids.get(evidence.claimID);
+        if (hashes.has(evidence.sourceID)) evidence.contentHash = `html-content:${evidence.sourceID}`;
+      }
     }
     normalized.input = JSON.stringify(input);
     normalized.safety_identifier = "isolated-account";
