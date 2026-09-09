@@ -1,0 +1,1573 @@
+{
+  "schema": "permitext-dob-source-preparation-v1",
+  "checkedAt": "2026-09-09T03:33:21.313Z",
+  "sourceCommit": "175e7f9e1fbccf31e65dead3cdad4e0beadaaed7",
+  "scope": "Public source retrieval and existing page selection only; no generated answers, paid API, source completeness claim, or UI workflow. Authored scenario and question remain unchanged. Contextual route is a separate diagnostic, not a replacement benchmark input.",
+  "authoredContext": {
+    "file": "/Users/randy/Library/Mobile Documents/com~apple~CloudDocs/Downloads/Permitext_Consolidated_Evaluation_Questions_Answer_Key.md",
+    "sha256": "40ca00c0ac4d3f6b9523694334b8fcdefedcd69e05145bd1630e279f6a0e0950",
+    "heading": "Part III — DOB NOW Expediter / Workflow Evaluation Cases",
+    "diagnosticPrefix": "DOB NOW: Build filing workflow. ",
+    "note": "The prefix is a separate contextual-routing probe derived from the packet topic. It has not been inserted into the benchmark, live questions, conversation history, or production input."
+  },
+  "keySHA256": "6953d0c784e839e7724b7b8641b6e24b97ed1f8989c5a01ab649b848de362cf8",
+  "providerCalls": 0,
+  "officialDocumentRequests": [
+    "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+    "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+  ],
+  "documents": [
+    {
+      "id": "dob-application-guide",
+      "title": "DOB NOW application user guide",
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "publisher": "NYC Department of Buildings",
+      "catalogReviewedOn": "2026-09-08",
+      "finalURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+      "pageCount": 38,
+      "textlessPages": [],
+      "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+      "extractionLimitations": [
+        "Whole-page text extraction; diagrams and table geometry are not independently verified."
+      ]
+    },
+    {
+      "id": "dob-build-release-notes",
+      "title": "DOB NOW: Build release notes",
+      "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+      "publisher": "NYC Department of Buildings",
+      "catalogReviewedOn": "2026-09-08",
+      "finalURL": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+      "pageCount": 159,
+      "textlessPages": [],
+      "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+      "extractionLimitations": [
+        "Whole-page text extraction; diagrams and table geometry are not independently verified."
+      ]
+    }
+  ],
+  "sourceHashes": {
+    "research-dob-workflow-routing.mjs": "43123783f7728722784781be079961f35d94d6a75f4bd030685f7838086ab0aa",
+    "research-official-html-attribution.mjs": "1df895ea6b221335f4e1daebf2d7d881d5a3a93e0a3910f43a9146b9cc3491ee",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "evals/research-answer-key-reconciliation.mjs": "b80058045574d41a9cbdc32f8c5bffc0e46fbb7be1c56a7042009ec1069dd19c"
+  },
+  "results": [
+    {
+      "id": "DOBNOW-001",
+      "question": "The proposed interior renovation does not require the alteration to meet New Building requirements. It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.\n\nHow should the five DOB NOW Alteration-routing questions be answered, and what job type results?",
+      "rawRoute": "dob_now_workflow",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 6,
+              "id": "official-passage-5b682c1399f57019c03eda89",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1647,
+              "firstLine": "Page 6 of 38 To create a subsequent filing, select Search from the dashboard . Select BIN Search to find filings on the BIN or select Job Number Search if the job number is alr eady known. From the Filing Action column next to the initial (I1) filing, select action Subsequent Filing . J ob T ypes"
+            },
+            {
+              "pageNumber": 19,
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2457,
+              "firstLine": "Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,"
+            },
+            {
+              "pageNumber": 20,
+              "id": "official-passage-4b24312f98d2cb7b6ee67114",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3069,
+              "firstLine": "Page 20 of 38 Façade Alteration: If the proposed work involves façade modification . Adult Establishment : If the proposed work contains an adult establishment as defined in 12 - 10 of the Zoning Resolution . Provide a plot diagram (PD - 1 form). If the property profile indicates that the property is not an adult establishment and the question is answered as"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 19,
+              "id": "official-passage-fec304803330bcf0cafe2f48",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 697,
+              "firstLine": "February 2026 - Loft Board Requests in DOB NOW: Build Loft Board Request are to be submitted in DOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certi fic ation has been issued. The Loft Board will also review Certificate of Occupancy request."
+            },
+            {
+              "pageNumber": 24,
+              "id": "official-passage-0562a6ca550d783c43269de9",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 886,
+              "firstLine": "February 2026 - New Restrictions on Structural Permits in DOB NOW In accordance with Buildings Bulletin 2025 - 011 , DOB NOW will restrict the issuance and renewal of Structural (ST) permits connected to a New Building, enlargement, or change in use, but filed as a separate Alteration filing. Filing Requirements:"
+            },
+            {
+              "pageNumber": 68,
+              "id": "official-passage-483941efa04fc10c55d30c2c",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 856,
+              "firstLine": "January 2024 – On - Site Fossil Fuel Combustion Limitations (Local Law 154 of 2021 ) January 1 , 2024 Based on the answers to the PW1 and SO questions in the previous slide, as well as the Occupancy Classification and number of Building Stories entered on the Zoning Information tab, a banner will appear on the job filing and"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-002",
+      "question": "A reconstruction otherwise resembles a new building, but a portion of the existing foundation will remain in place and become part of the completed building.\n\nShould the applicant select New Building?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 7,
+              "id": "official-passage-674fa7301b0f8839e37fe829",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3115,
+              "firstLine": "Page 7 of 38 Limited Alteration – An appli cation for the following types of repair s and/or replacement of existing equipment that does not include any construction work: • Plumbing"
+            },
+            {
+              "pageNumber": 15,
+              "id": "official-passage-a98b5951ad0aa5cdd44dab9d",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1096,
+              "firstLine": "Page 15 of 38 P LANS/WORK (PW1) Location Information Location refers to the place where the proposed work will be taking place. Enter the House Number, Street Name, Borough, Block, and Lot. The"
+            },
+            {
+              "pageNumber": 34,
+              "id": "official-passage-080a7fc0d5c9b97d41bbb029",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3358,
+              "firstLine": "Page 34 of 38 NL New Law Tenement – Originally erected as a multiple dwelling in accordance with the law Department of Housing Preservation and Development) before April 18, 1929. NLs comply with MDL Article 7. s in effect after April 12, 1901 and prior to April 18, 1929, and recorded as NL in the Tenement House"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 12,
+              "id": "official-passage-8a7766c7027d1fb71340e371",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 837,
+              "firstLine": "August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas Filings in DOB NOW: Build for specific Job Types and Work Types on properties that are flagged as Tidal Wetlands (TW), Freshwater Wetlands (FW), and/or Coastal Erosion Hazard Areas (CEHA) will have new required documents prior to approval."
+            },
+            {
+              "pageNumber": 21,
+              "id": "official-passage-7b8bd71389ed40fcc700697a",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 853,
+              "firstLine": "February 2026 - Local Law 154 of 2021: On - site Fossil Fuel Limitations for Affordable Housing A ‘ No Fossil Fuel ’ banner will appear on the DOB NOW Property Profile of a building when a New Building (NB) or Alteration - CO New Building with Existing Elements to Remain job is submitted in DOB NOW for a building that is fewer than 7 stories and 50 perc ent or more of the dwelling units in the building are subject to a regulatory agreement, restrictive declaration, or similar instrum ent with a"
+            },
+            {
+              "pageNumber": 24,
+              "id": "official-passage-0562a6ca550d783c43269de9",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 886,
+              "firstLine": "February 2026 - New Restrictions on Structural Permits in DOB NOW In accordance with Buildings Bulletin 2025 - 011 , DOB NOW will restrict the issuance and renewal of Structural (ST) permits connected to a New Building, enlargement, or change in use, but filed as a separate Alteration filing. Filing Requirements:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-003",
+      "question": "An initial GC filing has been created for a project. Plumbing work for the same construction project and property will be filed later, potentially by a different applicant.\n\nShould the plumbing scope receive a new unrelated job number or a subsequent filing under the existing job?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 5,
+              "id": "official-passage-789cc7ccd439eb8374132031",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1842,
+              "firstLine": "Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to"
+            },
+            {
+              "pageNumber": 7,
+              "id": "official-passage-674fa7301b0f8839e37fe829",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3115,
+              "firstLine": "Page 7 of 38 Limited Alteration – An appli cation for the following types of repair s and/or replacement of existing equipment that does not include any construction work: • Plumbing"
+            },
+            {
+              "pageNumber": 19,
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2457,
+              "firstLine": "Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 22,
+              "id": "official-passage-2f0c6cbc4a06ee5663abd1d8",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 840,
+              "firstLine": "February 2026 - Reporting Construction Cost Applicants have the option of reporting the costs of the entire project including work types that will be filed as subsequent filings on the Initial filing . The following new question will be added on the Initial filing. If the answer is Yes , the applicant will report the entire project cost on the Initial filing."
+            },
+            {
+              "pageNumber": 41,
+              "id": "official-passage-f0622fe489e11f2e02796905",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 531,
+              "firstLine": "February 2025 – SCA Update to Local Law 154 of 2021 Banner February 7 , 2025 The On - site Fossil Fuel Combustion section on the Plans/Work (PW1) tab for New Building and Alteration - CO New Building with Existing Elements to Remain filings has been updated to remove the option for School Construction"
+            },
+            {
+              "pageNumber": 109,
+              "id": "official-passage-3f5a0fd84f3085275d06b8cc",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 930,
+              "firstLine": "May 2023 – Subsequent Filings (2) What is a subsequent filing? A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one on the in iti al or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing can have a differen t r eview type"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-004",
+      "question": "The initial filing is approved, and the approved scope and drawings must now be revised. The filing was not submitted for legalization.\n\nWhat filing action is appropriate, and what limits must be disclosed?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 3,
+              "id": "official-passage-5c72e99f7c6df87074779ee7",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2640,
+              "firstLine": "Page 3 of 38 DOB Application Process Plan Submission and Review Most construction work requires a permit from the Department of Buildings. Before a permit can be obtained, typically plans are filed on the"
+            },
+            {
+              "pageNumber": 19,
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2457,
+              "firstLine": "Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,"
+            },
+            {
+              "pageNumber": 37,
+              "id": "official-passage-39ac1145e438a7c30df01280",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1620,
+              "firstLine": "Page 37 of 38 LETTER OF COMPLETION If an initial or amended C ertificate of Occupancy is not required for the filing, a Letter of Completion (LOC) can be obtained. The following is required to request an LOC:"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 28,
+              "id": "official-passage-7681d2fae56e5a9b8c56353f",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 736,
+              "firstLine": "September 2025 – Local Law 127 Build PW1 Updates for Ancillary Dwelling Units New Ancillary Dwelling Unit questions have been added to initial Alt - CO - GC or New Building - GC jobs in DOB NOW under the Filing Review Type, Work Type/Filing Includes section. ▪ Only one ADU is allowed per one - or two - family dwelling and must not exceed 800 square feet of zoning floor area. This"
+            },
+            {
+              "pageNumber": 78,
+              "id": "official-passage-99b929ceef30c2f80add7ac7",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 917,
+              "firstLine": "December 2023 – Code Year, Timeout and On Hold Message December 15, 2023 • A system fix was made so that the “Review is requested under which building code” field on a subsequent filing does not get updated with the code year from the initial (I1) filing when the I1 is resubmitted ."
+            },
+            {
+              "pageNumber": 104,
+              "id": "official-passage-d1e11f496a30764f3c3477cd",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 836,
+              "firstLine": "June 2023 – Site Safety Plan Review Fees New Fees for Site Safety Plan Review The Department of Buildings’ rules have been amended to include fees for site safety plan review. The new site safety plan review fees are:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-005",
+      "question": "The filing concerns a business that employs 42 people.\n\nShould the DOB NOW small-business question be answered Yes?",
+      "rawRoute": "dob_now_workflow",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 7,
+              "id": "official-passage-674fa7301b0f8839e37fe829",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3115,
+              "firstLine": "Page 7 of 38 Limited Alteration – An appli cation for the following types of repair s and/or replacement of existing equipment that does not include any construction work: • Plumbing"
+            },
+            {
+              "pageNumber": 16,
+              "id": "official-passage-ce20f813e92241a7bc12804a",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2812,
+              "firstLine": "Page 16 of 38 Stakeholders All stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with information from the eFiling account."
+            },
+            {
+              "pageNumber": 38,
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2366,
+              "firstLine": "Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 28,
+              "id": "official-passage-7681d2fae56e5a9b8c56353f",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 736,
+              "firstLine": "September 2025 – Local Law 127 Build PW1 Updates for Ancillary Dwelling Units New Ancillary Dwelling Unit questions have been added to initial Alt - CO - GC or New Building - GC jobs in DOB NOW under the Filing Review Type, Work Type/Filing Includes section. ▪ Only one ADU is allowed per one - or two - family dwelling and must not exceed 800 square feet of zoning floor area. This"
+            },
+            {
+              "pageNumber": 34,
+              "id": "official-passage-1a011488efb58db77084c115",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 747,
+              "firstLine": "August 2025 – Electrical Enhancements BIS electrical permits that are not in “ Closed ” or “ Completed ” status were updated to “ Abandoned ” status in BIS . This means :"
+            },
+            {
+              "pageNumber": 131,
+              "id": "official-passage-90b143ee6a40cf77d250ddeb",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 692,
+              "firstLine": "September 2022 – Small Business Support Team • A new Small Business Support form specific to inquiries from the small business community is accessible from the Department’s website at www.nyc.gov/buildings . A new Small Business Support Team will provide one - on - one guidance on planned or ongoing construction projects."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-006",
+      "question": "The project is large and expensive but has not been accepted into the Major Projects Development Program.\n\nShould the filing be identified as an approved MPP project?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 7,
+              "id": "official-passage-674fa7301b0f8839e37fe829",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3115,
+              "firstLine": "Page 7 of 38 Limited Alteration – An appli cation for the following types of repair s and/or replacement of existing equipment that does not include any construction work: • Plumbing"
+            },
+            {
+              "pageNumber": 16,
+              "id": "official-passage-ce20f813e92241a7bc12804a",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2812,
+              "firstLine": "Page 16 of 38 Stakeholders All stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with information from the eFiling account."
+            },
+            {
+              "pageNumber": 20,
+              "id": "official-passage-4b24312f98d2cb7b6ee67114",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3069,
+              "firstLine": "Page 20 of 38 Façade Alteration: If the proposed work involves façade modification . Adult Establishment : If the proposed work contains an adult establishment as defined in 12 - 10 of the Zoning Resolution . Provide a plot diagram (PD - 1 form). If the property profile indicates that the property is not an adult establishment and the question is answered as"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 104,
+              "id": "official-passage-d1e11f496a30764f3c3477cd",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 836,
+              "firstLine": "June 2023 – Site Safety Plan Review Fees New Fees for Site Safety Plan Review The Department of Buildings’ rules have been amended to include fees for site safety plan review. The new site safety plan review fees are:"
+            },
+            {
+              "pageNumber": 132,
+              "id": "official-passage-56c546b03aa005b62ecbfbb3",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1207,
+              "firstLine": "September 2022 – Major Projects Development Program MPP is a new voluntary program created by the Department to facilitate large and complex development projects. The program includes: • Dedicated project coordination and guidance services for large and complex development projects from"
+            },
+            {
+              "pageNumber": 137,
+              "id": "official-passage-61b13c4a4f57311fc6d61ac6",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1186,
+              "firstLine": "July 2022 – Site Safety Updates Beginning July 15, 2022, site safety plans can be submitted before the job is approved and are no longer required for subsequent filings in DOB NOW. • A banner will appear on the filing and an email will be sent to the stakeholders on the job indicating"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-007",
+      "question": "A GC alteration removes and replaces the entire existing roof deck or roof assembly.\n\nHow should the DOB NOW roof question be answered?",
+      "rawRoute": "dob_now_workflow",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 7,
+              "id": "official-passage-674fa7301b0f8839e37fe829",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3115,
+              "firstLine": "Page 7 of 38 Limited Alteration – An appli cation for the following types of repair s and/or replacement of existing equipment that does not include any construction work: • Plumbing"
+            },
+            {
+              "pageNumber": 19,
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2457,
+              "firstLine": "Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,"
+            },
+            {
+              "pageNumber": 24,
+              "id": "official-passage-31bafce3ee21b25c2d6a6bca",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1627,
+              "firstLine": "Page 24 of 38 NYCECC Compliance This section is applicable for General Construction, Foundation, Boiler Equipment, Mechanical Systems and Plumbing applications with differing criteria based on job type. Compliance with the 202 0 New York City Energy Conservation Code (NYCECC ) requires an energy submission. See the"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 21,
+              "id": "official-passage-7b8bd71389ed40fcc700697a",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 853,
+              "firstLine": "February 2026 - Local Law 154 of 2021: On - site Fossil Fuel Limitations for Affordable Housing A ‘ No Fossil Fuel ’ banner will appear on the DOB NOW Property Profile of a building when a New Building (NB) or Alteration - CO New Building with Existing Elements to Remain job is submitted in DOB NOW for a building that is fewer than 7 stories and 50 perc ent or more of the dwelling units in the building are subject to a regulatory agreement, restrictive declaration, or similar instrum ent with a"
+            },
+            {
+              "pageNumber": 24,
+              "id": "official-passage-0562a6ca550d783c43269de9",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 886,
+              "firstLine": "February 2026 - New Restrictions on Structural Permits in DOB NOW In accordance with Buildings Bulletin 2025 - 011 , DOB NOW will restrict the issuance and renewal of Structural (ST) permits connected to a New Building, enlargement, or change in use, but filed as a separate Alteration filing. Filing Requirements:"
+            },
+            {
+              "pageNumber": 67,
+              "id": "official-passage-0f7fb5f58be91de4652b3782",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 621,
+              "firstLine": "January 2024 – On - Site Fossil Fuel Combustion Limitations (Local Law 154 of 2021 ) January 1 , 2024 A banner will appear on the DOB NOW Property Profile when a New Building (NB) or Alteration - CO New Building with Existing Elements to Remain job is submitted in DOB NOW and the building is subject to the restrictions in"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-008",
+      "question": "The Applicant of Record's documented calculation shows that the proposed alteration **alters 60 percent of the building's gross floor area**. The building type and Construction Superintendent/site-safety applicability facts are not supplied.\n\nHow should the more-than-50-percent alteration question be answered?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 18,
+              "id": "official-passage-83fa6f6e03d43b4fed8cb606",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2411,
+              "firstLine": "Page 18 of 38 Support of Excavation Work Type Select the Enlargement Type: Horizontal Enlargement, Verti cal Enlargement or Not Applicable. Subcategories: Berming, Sloping, Benching; Slurry Shaft/Wall; Tangent/Secant Piles; Ground Freezing; Soil Grouting/Improvement/Mixing;"
+            },
+            {
+              "pageNumber": 20,
+              "id": "official-passage-4b24312f98d2cb7b6ee67114",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3069,
+              "firstLine": "Page 20 of 38 Façade Alteration: If the proposed work involves façade modification . Adult Establishment : If the proposed work contains an adult establishment as defined in 12 - 10 of the Zoning Resolution . Provide a plot diagram (PD - 1 form). If the property profile indicates that the property is not an adult establishment and the question is answered as"
+            },
+            {
+              "pageNumber": 35,
+              "id": "official-passage-5dfdf2e3d111d433245194a7",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2049,
+              "firstLine": "Page 35 of 38 under t he 1938 Building Code was left intact, the applicant must then check the box ‘Prior to 1968’. Number of stories of tallest adjacent building: Less than 7, From 7 - 14, More than 14 Height of tallest adjacent building: Less than 35 ft, From 35 - 75 ft, From 76 - 150 ft, More than 150 ft"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 28,
+              "id": "official-passage-7681d2fae56e5a9b8c56353f",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 736,
+              "firstLine": "September 2025 – Local Law 127 Build PW1 Updates for Ancillary Dwelling Units New Ancillary Dwelling Unit questions have been added to initial Alt - CO - GC or New Building - GC jobs in DOB NOW under the Filing Review Type, Work Type/Filing Includes section. ▪ Only one ADU is allowed per one - or two - family dwelling and must not exceed 800 square feet of zoning floor area. This"
+            },
+            {
+              "pageNumber": 130,
+              "id": "official-passage-fdc2c0c81c7d775bd3fb0cd9",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 531,
+              "firstLine": "November 2022 – System Enhancements (2) • Option to remove legalization fees for work to legalize a WWP for a Request for Corrective Action (RCA)/Homeowner Relief Program • On the Zoning tab a field was added for Proposed and Existing Dwelling Units (Lot), which will be used to"
+            },
+            {
+              "pageNumber": 155,
+              "id": "official-passage-3af1daa338351c874c1eca01",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 643,
+              "firstLine": "February 2022 – Mandatory Inclusionary Housing (MIH) Applicants for a New Building or Alteration - CO on a building flagged in the BIS Property Profile as an MIH Area building, but the building is not in an MIH area, should upload a New York City Zoning and Land Use (ZoLa) map printout showing the building is located outside of the MIH area to satisfy the as"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-009",
+      "question": "The maximum excavation depth shown on the plans is exactly 12 feet.\n\nDoes the work require excavation greater than 12 feet?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 9,
+              "id": "official-passage-73a1ac982ac51fc1cc1a0544",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2308,
+              "firstLine": "Page 9 of 38 Construction Fence (FN) A construction fence is a temporary protective structure erected around a demolition or construction site. Typically, it is a solid fence at least eight feet high that protects the public from potential hazards on the site."
+            },
+            {
+              "pageNumber": 22,
+              "id": "official-passage-25cdbdf079b484c1fb937533",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2434,
+              "firstLine": "Page 22 of 38 H as a structural peer review been requested by the Commissioner?: Indicate if the application is subject to the structural peer review provisions of the 2014 Building §1617. If the application is subject to the provisions, the license number of the qualified NYS professional engineer who served as the structural peer reviewer must be indicated."
+            },
+            {
+              "pageNumber": 23,
+              "id": "official-passage-1210bde4d89b706fb02695dc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2259,
+              "firstLine": "Page 23 of 38 Work on exterior of building: Indicate if work is on the exterior of the building. Are you altering more than 50% of the gross floor area of the building?: If ‘ Yes ’ is selected, a Site Safety Plan is required . Are you altering 10% of more of the existing floor surface area?: Local Law 188 of 2017 requires identify ing if a job on occupied multiple dwellings"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 11,
+              "id": "official-passage-e9794381d7a51b4304a4c101",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 426,
+              "firstLine": "August 2026 – DOB NOW Enhancement In the Plans/Work (PW1) tab of the filing, for any work type other than ST , FO , EA , applicants are now able to answer No to the question “ Is this Alteration being filed in connection with a development, enlargement or change in use on this BIN as defined in Zoning Resolution Section 12 - 10?” if there is any in - conjunction New Building job or a Related"
+            },
+            {
+              "pageNumber": 60,
+              "id": "official-passage-9fcb4d503983ad6f4c8e5f68",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1052,
+              "firstLine": "May 2024 – Document Updates May 24 , 2024 A waiver can no longer be requested for the Preliminary Commissioning Report Certification as a Required Document. • The Preliminary Commissioning Report is triggered by the values entered on the energy submission of the"
+            },
+            {
+              "pageNumber": 98,
+              "id": "official-passage-e238484add8fa69dc0ba4a07",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 428,
+              "firstLine": "July 2023 – Alteration ZD1 Validation July 20, 2023 Approved ZD1 validation for Alteration jobs with the Foundation, Structural, Support of Excavation and Earthwork work types – a new question on the PW1 will require entering a related New Building,"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-010",
+      "question": "The plumbing work will interrupt or otherwise affect the water supply serving the building's sprinkler or standpipe system.\n\nHow should the corresponding plumbing question be answered?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 7,
+              "id": "official-passage-674fa7301b0f8839e37fe829",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3115,
+              "firstLine": "Page 7 of 38 Limited Alteration – An appli cation for the following types of repair s and/or replacement of existing equipment that does not include any construction work: • Plumbing"
+            },
+            {
+              "pageNumber": 22,
+              "id": "official-passage-25cdbdf079b484c1fb937533",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2434,
+              "firstLine": "Page 22 of 38 H as a structural peer review been requested by the Commissioner?: Indicate if the application is subject to the structural peer review provisions of the 2014 Building §1617. If the application is subject to the provisions, the license number of the qualified NYS professional engineer who served as the structural peer reviewer must be indicated."
+            },
+            {
+              "pageNumber": 24,
+              "id": "official-passage-31bafce3ee21b25c2d6a6bca",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1627,
+              "firstLine": "Page 24 of 38 NYCECC Compliance This section is applicable for General Construction, Foundation, Boiler Equipment, Mechanical Systems and Plumbing applications with differing criteria based on job type. Compliance with the 202 0 New York City Energy Conservation Code (NYCECC ) requires an energy submission. See the"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 22,
+              "id": "official-passage-2f0c6cbc4a06ee5663abd1d8",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 840,
+              "firstLine": "February 2026 - Reporting Construction Cost Applicants have the option of reporting the costs of the entire project including work types that will be filed as subsequent filings on the Initial filing . The following new question will be added on the Initial filing. If the answer is Yes , the applicant will report the entire project cost on the Initial filing."
+            },
+            {
+              "pageNumber": 124,
+              "id": "official-passage-f7ed2ac73634343c79c99c61",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 683,
+              "firstLine": "March 2023 – Estimated Job Cost and Technical Reports • Estimated Job Cost field removed from New Building filings Technical Report updates: • Exterior Insulation and Finish System was removed from the system in error when 2022 TRs were added to"
+            },
+            {
+              "pageNumber": 135,
+              "id": "official-passage-c42b1b9928426d7e447ee3db",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 869,
+              "firstLine": "August 2022 – System Enhancements (3) • If an owner eFiling account does not have a Business Name , the Business Name field will not show when the email address is added to the Owner section in DOB NOW. This is instead of showing PR as the placeholder for the Business Name."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-011",
+      "question": "The scope requires the standpipe service to be out of service for 36 hours.\n\nHow should the longer-than-24-hours question be answered?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 7,
+              "id": "official-passage-674fa7301b0f8839e37fe829",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3115,
+              "firstLine": "Page 7 of 38 Limited Alteration – An appli cation for the following types of repair s and/or replacement of existing equipment that does not include any construction work: • Plumbing"
+            },
+            {
+              "pageNumber": 22,
+              "id": "official-passage-25cdbdf079b484c1fb937533",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2434,
+              "firstLine": "Page 22 of 38 H as a structural peer review been requested by the Commissioner?: Indicate if the application is subject to the structural peer review provisions of the 2014 Building §1617. If the application is subject to the provisions, the license number of the qualified NYS professional engineer who served as the structural peer reviewer must be indicated."
+            },
+            {
+              "pageNumber": 24,
+              "id": "official-passage-31bafce3ee21b25c2d6a6bca",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1627,
+              "firstLine": "Page 24 of 38 NYCECC Compliance This section is applicable for General Construction, Foundation, Boiler Equipment, Mechanical Systems and Plumbing applications with differing criteria based on job type. Compliance with the 202 0 New York City Energy Conservation Code (NYCECC ) requires an energy submission. See the"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 28,
+              "id": "official-passage-7681d2fae56e5a9b8c56353f",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 736,
+              "firstLine": "September 2025 – Local Law 127 Build PW1 Updates for Ancillary Dwelling Units New Ancillary Dwelling Unit questions have been added to initial Alt - CO - GC or New Building - GC jobs in DOB NOW under the Filing Review Type, Work Type/Filing Includes section. ▪ Only one ADU is allowed per one - or two - family dwelling and must not exceed 800 square feet of zoning floor area. This"
+            },
+            {
+              "pageNumber": 60,
+              "id": "official-passage-9fcb4d503983ad6f4c8e5f68",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1052,
+              "firstLine": "May 2024 – Document Updates May 24 , 2024 A waiver can no longer be requested for the Preliminary Commissioning Report Certification as a Required Document. • The Preliminary Commissioning Report is triggered by the values entered on the energy submission of the"
+            },
+            {
+              "pageNumber": 84,
+              "id": "official-passage-eb4678386f4eece0ad980a27",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 736,
+              "firstLine": "September 2023 – Artwork on Temporary Protective Structures September 1, 2023 The Owner’s Attestation for Sidewalk Shed, Construction Fence, and Supported Scaffold work types will include the following question:"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-012",
+      "question": "The project will disturb 19,000 square feet of soil and create exactly 5,000 square feet of impervious surface. It is an otherwise applicable NB, Alteration-CO, or Alteration-with-enlargement filing.\n\nDoes the stated DOB NOW stormwater condition apply?",
+      "rawRoute": "dob_now_workflow",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 4,
+              "id": "official-passage-cbc176dcdfce49382cca9f87",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1764,
+              "firstLine": "Page 4 of 38 and in keeping with the approved plans. Once an inspection passes or is certified by an RDP, the job status will be complete (signed off), or the owne r or the RDP can request a Letter of Completion or can apply for a new or amended Certificate of Occupancy. Additionally, for c ertain projects involving structural, fire - protection, plumbing, or mechanical work, there are inspections that need to be perfor med by a Department - approved"
+            },
+            {
+              "pageNumber": 18,
+              "id": "official-passage-83fa6f6e03d43b4fed8cb606",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2411,
+              "firstLine": "Page 18 of 38 Support of Excavation Work Type Select the Enlargement Type: Horizontal Enlargement, Verti cal Enlargement or Not Applicable. Subcategories: Berming, Sloping, Benching; Slurry Shaft/Wall; Tangent/Secant Piles; Ground Freezing; Soil Grouting/Improvement/Mixing;"
+            },
+            {
+              "pageNumber": 23,
+              "id": "official-passage-1210bde4d89b706fb02695dc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2259,
+              "firstLine": "Page 23 of 38 Work on exterior of building: Indicate if work is on the exterior of the building. Are you altering more than 50% of the gross floor area of the building?: If ‘ Yes ’ is selected, a Site Safety Plan is required . Are you altering 10% of more of the existing floor surface area?: Local Law 188 of 2017 requires identify ing if a job on occupied multiple dwellings"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 6,
+              "id": "official-passage-663d0a9a6a3a70b7a7790e40",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 699,
+              "firstLine": "August 2026 - Builders Pavement Plan Filings in DOB NOW: Build (cont’d) Waiver of Legal Grade Fee While a filing is under Plan Examiner Review, i f the reviewer determines that a Waiver of Legal Grade fee applies to the job filing, the job filing will be placed in objections status, and the $345 fee will display in both the Job Filing Highlights,"
+            },
+            {
+              "pageNumber": 23,
+              "id": "official-passage-17968f54f8e7d833d3a794ba",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1024,
+              "firstLine": "February 2026 - Local Law 48/Local Law 51 of 2025: Sidewalk Shed Filing and Permit Changes Sidewalk Shed Permit Expiration All sidewalk shed permits will have a maximum duration of 90 days. New Questions on the PW1 and PW2"
+            },
+            {
+              "pageNumber": 132,
+              "id": "official-passage-56c546b03aa005b62ecbfbb3",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1207,
+              "firstLine": "September 2022 – Major Projects Development Program MPP is a new voluntary program created by the Department to facilitate large and complex development projects. The program includes: • Dedicated project coordination and guidance services for large and complex development projects from"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-013",
+      "question": "At least one residential unit will be occupied during construction at some point before the permit is signed off by DOB.\n\nHow should the occupied-dwelling-unit question be answered, and what follows?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 7,
+              "id": "official-passage-674fa7301b0f8839e37fe829",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3115,
+              "firstLine": "Page 7 of 38 Limited Alteration – An appli cation for the following types of repair s and/or replacement of existing equipment that does not include any construction work: • Plumbing"
+            },
+            {
+              "pageNumber": 23,
+              "id": "official-passage-1210bde4d89b706fb02695dc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2259,
+              "firstLine": "Page 23 of 38 Work on exterior of building: Indicate if work is on the exterior of the building. Are you altering more than 50% of the gross floor area of the building?: If ‘ Yes ’ is selected, a Site Safety Plan is required . Are you altering 10% of more of the existing floor surface area?: Local Law 188 of 2017 requires identify ing if a job on occupied multiple dwellings"
+            },
+            {
+              "pageNumber": 38,
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2366,
+              "firstLine": "Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 128,
+              "id": "official-passage-3d55fc060818f5d16247ca28",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 796,
+              "firstLine": "November 2022 – TCO Inspection Update Temporary Construction Equipment No Longer Requires a Final Inspection • A Technical Report (TR1) - Final is no longer be required for Sidewalk Shed (SH), Construction Fence (FN), Supported Scaffold (SF) and Protection and Mechanical Methods (PMM) work types in DOB NOW: Build . (See"
+            },
+            {
+              "pageNumber": 132,
+              "id": "official-passage-56c546b03aa005b62ecbfbb3",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1207,
+              "firstLine": "September 2022 – Major Projects Development Program MPP is a new voluntary program created by the Department to facilitate large and complex development projects. The program includes: • Dedicated project coordination and guidance services for large and complex development projects from"
+            },
+            {
+              "pageNumber": 139,
+              "id": "official-passage-70385ce86ca4735704c897ef",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1429,
+              "firstLine": "July 2022 – Site Safety Release Update For Site Safety Release, options are provided to release a Construction Superintendent, Site Safety Coordinator or Site Safety Manager from a substantially completed job. To release a Construction Superintendent , an authorization letter and photographs are required to be uploaded in the Documents section. The authorization letter can be signed by one"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-014",
+      "question": "The DOB NOW workflow indicates that DHCR data identifies at least one rent-controlled or rent-stabilized unit. The owner believes the building contains none but has not provided supporting documentation.\n\nMay the filing simply answer No to the rent-regulated-housing question?",
+      "rawRoute": "dob_now_workflow",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 7,
+              "id": "official-passage-674fa7301b0f8839e37fe829",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3115,
+              "firstLine": "Page 7 of 38 Limited Alteration – An appli cation for the following types of repair s and/or replacement of existing equipment that does not include any construction work: • Plumbing"
+            },
+            {
+              "pageNumber": 16,
+              "id": "official-passage-ce20f813e92241a7bc12804a",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2812,
+              "firstLine": "Page 16 of 38 Stakeholders All stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with information from the eFiling account."
+            },
+            {
+              "pageNumber": 38,
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2366,
+              "firstLine": "Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 23,
+              "id": "official-passage-17968f54f8e7d833d3a794ba",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1024,
+              "firstLine": "February 2026 - Local Law 48/Local Law 51 of 2025: Sidewalk Shed Filing and Permit Changes Sidewalk Shed Permit Expiration All sidewalk shed permits will have a maximum duration of 90 days. New Questions on the PW1 and PW2"
+            },
+            {
+              "pageNumber": 28,
+              "id": "official-passage-7681d2fae56e5a9b8c56353f",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 736,
+              "firstLine": "September 2025 – Local Law 127 Build PW1 Updates for Ancillary Dwelling Units New Ancillary Dwelling Unit questions have been added to initial Alt - CO - GC or New Building - GC jobs in DOB NOW under the Filing Review Type, Work Type/Filing Includes section. ▪ Only one ADU is allowed per one - or two - family dwelling and must not exceed 800 square feet of zoning floor area. This"
+            },
+            {
+              "pageNumber": 135,
+              "id": "official-passage-c42b1b9928426d7e447ee3db",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 869,
+              "firstLine": "August 2022 – System Enhancements (3) • If an owner eFiling account does not have a Business Name , the Business Name field will not show when the email address is added to the Owner section in DOB NOW. This is instead of showing PR as the placeholder for the Business Name."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-015",
+      "question": "The Owner Type is Condo Unit Owner.\n\nIs the unit owner's attestation sufficient for the filing to proceed?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 5,
+              "id": "official-passage-789cc7ccd439eb8374132031",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1842,
+              "firstLine": "Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to"
+            },
+            {
+              "pageNumber": 16,
+              "id": "official-passage-ce20f813e92241a7bc12804a",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2812,
+              "firstLine": "Page 16 of 38 Stakeholders All stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with information from the eFiling account."
+            },
+            {
+              "pageNumber": 38,
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2366,
+              "firstLine": "Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 20,
+              "id": "official-passage-2e6a1d190b996cb029e2e04a",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 548,
+              "firstLine": "February 2026 - Condo/Co - Op Board added as a Stakeholder in PW1 When Condo Unit Owner or Co - Op Tenant - Shareholder is selected as the Owner Type on a DOB NOW job filing, the Condo/Co - Op Board will be added as a required Stakeholder. ▪ The Board’s representative must log in to DOB NOW using an NYC.ID account and attest that the Board has authorized the"
+            },
+            {
+              "pageNumber": 28,
+              "id": "official-passage-7681d2fae56e5a9b8c56353f",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 736,
+              "firstLine": "September 2025 – Local Law 127 Build PW1 Updates for Ancillary Dwelling Units New Ancillary Dwelling Unit questions have been added to initial Alt - CO - GC or New Building - GC jobs in DOB NOW under the Filing Review Type, Work Type/Filing Includes section. ▪ Only one ADU is allowed per one - or two - family dwelling and must not exceed 800 square feet of zoning floor area. This"
+            },
+            {
+              "pageNumber": 159,
+              "id": "official-passage-ed1502c6f3a5b2f15a17c9c2",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 866,
+              "firstLine": "August 2021 – Property Ownership Certification Applications for New Building and Alteration - CO in DOB NOW: Build created on or after August 16, 2021 require a Property Ownership Certification Form to proceed with a permit request. Who is required to submit the Property Ownership Certification form?"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-016",
+      "question": "The DOB NOW Property Profile contains a Loft Law flag, and the proposed work will occur in or affect an Interim Multiple Dwelling unit.\n\nHow should the IMD-impact question be answered, and what approval boundary follows?",
+      "rawRoute": "dob_now_workflow",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 19,
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2457,
+              "firstLine": "Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,"
+            },
+            {
+              "pageNumber": 20,
+              "id": "official-passage-4b24312f98d2cb7b6ee67114",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 3069,
+              "firstLine": "Page 20 of 38 Façade Alteration: If the proposed work involves façade modification . Adult Establishment : If the proposed work contains an adult establishment as defined in 12 - 10 of the Zoning Resolution . Provide a plot diagram (PD - 1 form). If the property profile indicates that the property is not an adult establishment and the question is answered as"
+            },
+            {
+              "pageNumber": 38,
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2366,
+              "firstLine": "Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 12,
+              "id": "official-passage-8a7766c7027d1fb71340e371",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 837,
+              "firstLine": "August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas Filings in DOB NOW: Build for specific Job Types and Work Types on properties that are flagged as Tidal Wetlands (TW), Freshwater Wetlands (FW), and/or Coastal Erosion Hazard Areas (CEHA) will have new required documents prior to approval."
+            },
+            {
+              "pageNumber": 19,
+              "id": "official-passage-fec304803330bcf0cafe2f48",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 697,
+              "firstLine": "February 2026 - Loft Board Requests in DOB NOW: Build Loft Board Request are to be submitted in DOB NOW: Build . Job filings on buildings with a Loft Law flag in the Property Profile will not be approved until a Loft Board Request has been submitted for review and a Letter of No Objection (LNO) or a Loft Board Certi fic ation has been issued. The Loft Board will also review Certificate of Occupancy request."
+            },
+            {
+              "pageNumber": 40,
+              "id": "official-passage-0d4b0419646fb1d927dd8d98",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1254,
+              "firstLine": "July 2025 – New Anti - Harassment Requirements flag on DOB NOW Property Profile : P roperties located in the below Anti - Harassment Districts of the Zoning Resolution will have an Anti - Harassment flag on the DOB NOW Property Profile. A new Additional Supporting Document named HPD/DCP Demolition Certification should be uploaded in DOB NOW prior to approval for certain Alteration and Full Demolition jobs on properties with the Anti - Harassment flag."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-017",
+      "question": "An applicable NB or Alteration-CO GC filing for a newly erected single-family residence includes an Ancillary Dwelling Unit in the basement.\n\nWhich DOB NOW responses and document requirement follow?",
+      "rawRoute": "dob_now_workflow",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 4,
+              "id": "official-passage-cbc176dcdfce49382cca9f87",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1764,
+              "firstLine": "Page 4 of 38 and in keeping with the approved plans. Once an inspection passes or is certified by an RDP, the job status will be complete (signed off), or the owne r or the RDP can request a Letter of Completion or can apply for a new or amended Certificate of Occupancy. Additionally, for c ertain projects involving structural, fire - protection, plumbing, or mechanical work, there are inspections that need to be perfor med by a Department - approved"
+            },
+            {
+              "pageNumber": 33,
+              "id": "official-passage-750716bdf2be901e1592994a",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2910,
+              "firstLine": "Page 33 of 38 5 Metal Structures (Old Code) 6 Heavy Timber Structures (Old Code) Multiple Dwelling Classification :"
+            },
+            {
+              "pageNumber": 38,
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2366,
+              "firstLine": "Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 10,
+              "id": "official-passage-11be290b8c65ea254e3b1e9a",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 603,
+              "firstLine": "August 2026 - DOHMH Radon and Vapor Level Certificate for Ancillary Dwelling Units A new required document is required for ADUs constructed within newly erected single - family residences. The DOHMH Radon and Vapor Level Certificate is applicable to NB and Alt - CO job types, under GC/PW1 if the applicant answers: 1. Yes to \"Does the scope of work include an Ancillary Dwelling Unit (ADU)?\""
+            },
+            {
+              "pageNumber": 28,
+              "id": "official-passage-7681d2fae56e5a9b8c56353f",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 736,
+              "firstLine": "September 2025 – Local Law 127 Build PW1 Updates for Ancillary Dwelling Units New Ancillary Dwelling Unit questions have been added to initial Alt - CO - GC or New Building - GC jobs in DOB NOW under the Filing Review Type, Work Type/Filing Includes section. ▪ Only one ADU is allowed per one - or two - family dwelling and must not exceed 800 square feet of zoning floor area. This"
+            },
+            {
+              "pageNumber": 31,
+              "id": "official-passage-4134e783c85f6c459df5e477",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 432,
+              "firstLine": "September 2025 – Local Law 127 Build Schedule of Occupancy Changes for Ancillary Dwelling Units Ancillary Dwelling Unit has been added to the Schedule of Occupancy in DOB NOW as a Description of Use option for Residential Occupancy Classification, Occupancy group R - 3. When selected, the system will display information when hovering in the Description of Use field that reads “Includes ADUs governed by Building Code Appendix U”."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-018",
+      "question": "An initial NB-GC filing is on a property flagged in DOB NOW as potentially affected by Tidal Wetlands, Freshwater Wetlands, or a Coastal Erosion Hazard Area.\n\nWhat documents and conditional responses are required under the August 2026 workflow?",
+      "rawRoute": "wetland_documents",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "wetland_documents",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 18,
+              "id": "official-passage-83fa6f6e03d43b4fed8cb606",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2411,
+              "firstLine": "Page 18 of 38 Support of Excavation Work Type Select the Enlargement Type: Horizontal Enlargement, Verti cal Enlargement or Not Applicable. Subcategories: Berming, Sloping, Benching; Slurry Shaft/Wall; Tangent/Secant Piles; Ground Freezing; Soil Grouting/Improvement/Mixing;"
+            },
+            {
+              "pageNumber": 19,
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2457,
+              "firstLine": "Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,"
+            },
+            {
+              "pageNumber": 25,
+              "id": "official-passage-9443edd1e924e69f3db3ade9",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2007,
+              "firstLine": "Page 25 of 38 Sprinkler The installation, modification, repair, or removal of the system of piping and sprinkler heads connected to one or more sourc es of water supply . Tidal Wetlands"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 12,
+              "id": "official-passage-8a7766c7027d1fb71340e371",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 837,
+              "firstLine": "August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas Filings in DOB NOW: Build for specific Job Types and Work Types on properties that are flagged as Tidal Wetlands (TW), Freshwater Wetlands (FW), and/or Coastal Erosion Hazard Areas (CEHA) will have new required documents prior to approval."
+            },
+            {
+              "pageNumber": 13,
+              "id": "official-passage-bd1acc9d874e42c204e38873",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 612,
+              "firstLine": "August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas (cont’d) Required Documents Filings that meet the criteria will have two required documents added to the filing: DEC Jurisdictional Determination and DEC Permit . All applicants will be required to submit the DEC Jurisdictional Determination. If that document indicates that"
+            },
+            {
+              "pageNumber": 155,
+              "id": "official-passage-3af1daa338351c874c1eca01",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 643,
+              "firstLine": "February 2022 – Mandatory Inclusionary Housing (MIH) Applicants for a New Building or Alteration - CO on a building flagged in the BIS Property Profile as an MIH Area building, but the building is not in an MIH area, should upload a New York City Zoning and Land Use (ZoLa) map printout showing the building is located outside of the MIH area to satisfy the as"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-019",
+      "question": "A new Builders Pavement Plan application is initiated after August 17, 2026.\n\nWhere must it be filed, which review type applies, and what authorization step appears?",
+      "rawRoute": "builders_pavement",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "builders_pavement",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 3,
+              "id": "official-passage-5c72e99f7c6df87074779ee7",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2640,
+              "firstLine": "Page 3 of 38 DOB Application Process Plan Submission and Review Most construction work requires a permit from the Department of Buildings. Before a permit can be obtained, typically plans are filed on the"
+            },
+            {
+              "pageNumber": 19,
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2457,
+              "firstLine": "Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,"
+            },
+            {
+              "pageNumber": 21,
+              "id": "official-passage-77cecf57b4d2079bf3332031",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2686,
+              "firstLine": "Page 21 of 38 Filing to comply with Local Laws: Enter any applicable local law number and corresponding year. Filing to Address Violations : Enter a DOB Violation Number and/or OATH/ECB summons number for work without permit that is on the same BIN as the filing. When an OATH/ECB summons number is ente red, a civil penalty for work without permit is calculated as an L2"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 4,
+              "id": "official-passage-7abdf8a15d4dc8442b57f72d",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 541,
+              "firstLine": "August 2026 - Builders Pavement Plan Filings in DOB NOW: Build All new Builders Pavement Plan (BPP) filings will be submitted in DOB NOW: Build . No new BPP filings can be submitted in Buildings Information System (BIS) . To submit a BPP filing in DOB NOW: Build, log in at nyc.gov/dobnow, Builders Pavement Plan is a new Work Type. BPP"
+            },
+            {
+              "pageNumber": 5,
+              "id": "official-passage-22b1f31c902f479d13cc6211",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 420,
+              "firstLine": "August 2026 - Builders Pavement Plan Filings in DOB NOW: Build (cont’d) The BPP5 can be printed from the Public Portal or from the job filing to bring to the Department of Transportation. • From the job filing, click the Authorization to DOT button will appear at the top of the page to display the BPP5. • From the Public Portal, click into the job filing and select the Authorization to DOT button to display the BPP5."
+            },
+            {
+              "pageNumber": 6,
+              "id": "official-passage-663d0a9a6a3a70b7a7790e40",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 699,
+              "firstLine": "August 2026 - Builders Pavement Plan Filings in DOB NOW: Build (cont’d) Waiver of Legal Grade Fee While a filing is under Plan Examiner Review, i f the reviewer determines that a Waiver of Legal Grade fee applies to the job filing, the job filing will be placed in objections status, and the $345 fee will display in both the Job Filing Highlights,"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-020",
+      "question": "The DOB NOW Property Profile identifies the property as LPC-calendared. The proposed filing is an otherwise applicable Alteration initial filing.\n\nCan the Researcher promise immediate DOB approval without LPC processing?",
+      "rawRoute": "dob_now_workflow",
+      "rawGuidanceOnly": true,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 3,
+              "id": "official-passage-5c72e99f7c6df87074779ee7",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2640,
+              "firstLine": "Page 3 of 38 DOB Application Process Plan Submission and Review Most construction work requires a permit from the Department of Buildings. Before a permit can be obtained, typically plans are filed on the"
+            },
+            {
+              "pageNumber": 5,
+              "id": "official-passage-789cc7ccd439eb8374132031",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1842,
+              "firstLine": "Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to"
+            },
+            {
+              "pageNumber": 19,
+              "id": "official-passage-5bdd162d6e75ae930ee42abc",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2457,
+              "firstLine": "Page 19 of 38 Does this application include a new roof or the replacing of an entire existing roof deck or roof assembly? (GC work type) If yes is selected, Local Law 92/94 of 2019 Sustainable R oof Zone will populate in the Required Documents section. Is this application filed in connection with a development, enlargement, or change in use, as defined in Zoning Resolution Se ction 12 - 10? (FO, ST,"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 8,
+              "id": "official-passage-54c1862c76975f64f265cbdb",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 769,
+              "firstLine": "August 2026 - Updated Landmarks (LPC) Requirements (cont’d) DOB will not issue a permit for work on a landmarked property without LPC approval. This applies to all Initial and Subsequent filings and PAAs for Alteration and Alteration - CO job types, except specified exempt work types. Initial or Subsequent filings"
+            },
+            {
+              "pageNumber": 12,
+              "id": "official-passage-8a7766c7027d1fb71340e371",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 837,
+              "firstLine": "August 2026 – Required Documents for DOB NOW Job Filings in Wetland Areas Filings in DOB NOW: Build for specific Job Types and Work Types on properties that are flagged as Tidal Wetlands (TW), Freshwater Wetlands (FW), and/or Coastal Erosion Hazard Areas (CEHA) will have new required documents prior to approval."
+            },
+            {
+              "pageNumber": 56,
+              "id": "official-passage-e7c0b3e448e498a1918305e0",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 582,
+              "firstLine": "June 2024 – Site Safety Plan Review Fees June 13, 2024 When site safety plan review fees were launched in DOB NOW on June 2, 2023, DOB NOW required payment of the fees only if the associated New Building or Alteration - CO was filed on or after June 2, 2023. Beginning June 14, 2024,"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-021",
+      "question": "The user provides only the property address and asks which Building Code review year to select in DOB NOW.\n\nWhat is the right Researcher answer?",
+      "rawRoute": "dob_now_workflow",
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 5,
+              "id": "official-passage-789cc7ccd439eb8374132031",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1842,
+              "firstLine": "Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to"
+            },
+            {
+              "pageNumber": 9,
+              "id": "official-passage-73a1ac982ac51fc1cc1a0544",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2308,
+              "firstLine": "Page 9 of 38 Construction Fence (FN) A construction fence is a temporary protective structure erected around a demolition or construction site. Typically, it is a solid fence at least eight feet high that protects the public from potential hazards on the site."
+            },
+            {
+              "pageNumber": 15,
+              "id": "official-passage-a98b5951ad0aa5cdd44dab9d",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1096,
+              "firstLine": "Page 15 of 38 P LANS/WORK (PW1) Location Information Location refers to the place where the proposed work will be taking place. Enter the House Number, Street Name, Borough, Block, and Lot. The"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 2,
+              "id": "official-passage-dd50b15c0d45cbc34a26a05b",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 567,
+              "firstLine": "August 2026 – Reinstatement of BIS Electrical Jobs on Cross Streets BIS electrical permits in Abandoned status that were created using an intersection address can be reinstated in DOB NOW by selecting Using Cross Streets. • When creating an electrical job filing, select the"
+            },
+            {
+              "pageNumber": 78,
+              "id": "official-passage-99b929ceef30c2f80add7ac7",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 917,
+              "firstLine": "December 2023 – Code Year, Timeout and On Hold Message December 15, 2023 • A system fix was made so that the “Review is requested under which building code” field on a subsequent filing does not get updated with the code year from the initial (I1) filing when the I1 is resubmitted ."
+            },
+            {
+              "pageNumber": 111,
+              "id": "official-passage-7096d99848153582726ad77b",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 911,
+              "firstLine": "May 2023 – Schedule of Occupancy & Alteration Updates • Schedule of Occupancy corrections after a Final Certificate of Occupancy is issued. o This addresses the following system defect: A Final CO is issued on a BIN. On that same BIN, a new Job Schedule of Occupancy (JSO) is created for a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-022",
+      "question": "The user provides a brief work description but no property restrictions, filing type, complete scope, agency approvals, or Applicant of Record certification basis.\n\nMay the Researcher recommend Professional Certification rather than Standard Plan Examination?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 5,
+              "id": "official-passage-789cc7ccd439eb8374132031",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1842,
+              "firstLine": "Page 5 of 38 JOB FILING /APPLICATION A job is an application submitted for a construction project on a property, which can vary from making alterations to a single unit in an existing building or to constructing a new building with many units. A job filing/application is submitted to obtain a Work Permit to"
+            },
+            {
+              "pageNumber": 13,
+              "id": "official-passage-99e3ff631d01ad61590ccecf",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1367,
+              "firstLine": "Page 13 of 38 Filing Review Type Standard Plan Examination or Review – submission of an application subject to t he Department’s standard examination process for plan review and approval ."
+            },
+            {
+              "pageNumber": 38,
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2366,
+              "firstLine": "Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 7,
+              "id": "official-passage-1b2c3647b4e37342017ab2ae",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 622,
+              "firstLine": "August 2026 - Updated Landmarks (LPC) Requirements Landmarks Preservation Commission (LPC), Calendared Properties will have an automatic 40 - day hold applied before the filing can be approved. • For Standard Plan Examination Review filings the 40 - day hold begins when the job status is PE Review."
+            },
+            {
+              "pageNumber": 36,
+              "id": "official-passage-ae7b6c381b82dee2869e3578",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 703,
+              "firstLine": "July 2025 - No Pro - Cert filings allowed for SOE or FO jobs with Underpinning subcategory 2 1 • If a job includes Support of Excavation (SE) as the work type,"
+            },
+            {
+              "pageNumber": 109,
+              "id": "official-passage-3f5a0fd84f3085275d06b8cc",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 930,
+              "firstLine": "May 2023 – Subsequent Filings (2) What is a subsequent filing? A subsequent filing is an additional filing under the same job filing number that allows an applicant (the same one on the in iti al or a new applicant) to add new scope of work and new work types to a job on the same property. A subsequent filing can have a differen t r eview type"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-023",
+      "question": "A filing representative has completed data entry and uploaded the documents. The applicant and owner have not yet completed their attestations.\n\nCan the filing representative attest for them and submit the job filing?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 16,
+              "id": "official-passage-ce20f813e92241a7bc12804a",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2812,
+              "firstLine": "Page 16 of 38 Stakeholders All stakeholders require an eFiling account. Visit www.nyc.gov/efilin gtips for more information. All grayed - out fields will auto - populate with information from the eFiling account."
+            },
+            {
+              "pageNumber": 37,
+              "id": "official-passage-39ac1145e438a7c30df01280",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1620,
+              "firstLine": "Page 37 of 38 LETTER OF COMPLETION If an initial or amended C ertificate of Occupancy is not required for the filing, a Letter of Completion (LOC) can be obtained. The following is required to request an LOC:"
+            },
+            {
+              "pageNumber": 38,
+              "id": "official-passage-14224abff07118e8caab44b5",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2366,
+              "firstLine": "Page 38 of 38 STATEMENTS & SIGNATURES Applicant o f Record ’s Attestation The applicant completes the section to provide an electronic signature before the application can be submitted. The applicant also uploads a"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 20,
+              "id": "official-passage-2e6a1d190b996cb029e2e04a",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 548,
+              "firstLine": "February 2026 - Condo/Co - Op Board added as a Stakeholder in PW1 When Condo Unit Owner or Co - Op Tenant - Shareholder is selected as the Owner Type on a DOB NOW job filing, the Condo/Co - Op Board will be added as a required Stakeholder. ▪ The Board’s representative must log in to DOB NOW using an NYC.ID account and attest that the Board has authorized the"
+            },
+            {
+              "pageNumber": 137,
+              "id": "official-passage-61b13c4a4f57311fc6d61ac6",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1186,
+              "firstLine": "July 2022 – Site Safety Updates Beginning July 15, 2022, site safety plans can be submitted before the job is approved and are no longer required for subsequent filings in DOB NOW. • A banner will appear on the filing and an email will be sent to the stakeholders on the job indicating"
+            },
+            {
+              "pageNumber": 139,
+              "id": "official-passage-70385ce86ca4735704c897ef",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1429,
+              "firstLine": "July 2022 – Site Safety Release Update For Site Safety Release, options are provided to release a Construction Superintendent, Site Safety Coordinator or Site Safety Manager from a substantially completed job. To release a Construction Superintendent , an authorization letter and photographs are required to be uploaded in the Documents section. The authorization letter can be signed by one"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DOBNOW-024",
+      "question": "The filing does not require an initial or amended Certificate of Occupancy. Its status is Permit Entire; final PW3 costs are verified; all required documents are submitted; applicable final technical reports are certified; all permits are inspected and Signed-Off; and all AHV permits are approved.\n\nIs the filing ready for an LOC request under the guide's listed prerequisites?",
+      "rawRoute": null,
+      "rawGuidanceOnly": false,
+      "contextualRoute": "dob_now_workflow",
+      "selected": [
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf",
+          "pages": [
+            {
+              "pageNumber": 3,
+              "id": "official-passage-5c72e99f7c6df87074779ee7",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 2640,
+              "firstLine": "Page 3 of 38 DOB Application Process Plan Submission and Review Most construction work requires a permit from the Department of Buildings. Before a permit can be obtained, typically plans are filed on the"
+            },
+            {
+              "pageNumber": 4,
+              "id": "official-passage-cbc176dcdfce49382cca9f87",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1764,
+              "firstLine": "Page 4 of 38 and in keeping with the approved plans. Once an inspection passes or is certified by an RDP, the job status will be complete (signed off), or the owne r or the RDP can request a Letter of Completion or can apply for a new or amended Certificate of Occupancy. Additionally, for c ertain projects involving structural, fire - protection, plumbing, or mechanical work, there are inspections that need to be perfor med by a Department - approved"
+            },
+            {
+              "pageNumber": 37,
+              "id": "official-passage-39ac1145e438a7c30df01280",
+              "contentHash": "9befc1cc76dd0efbfb76fed2960c262f1c4a61fc8dd786f9c30341251cc852b5",
+              "characters": 1620,
+              "firstLine": "Page 37 of 38 LETTER OF COMPLETION If an initial or amended C ertificate of Occupancy is not required for the filing, a Letter of Completion (LOC) can be obtained. The following is required to request an LOC:"
+            }
+          ]
+        },
+        {
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf",
+          "pages": [
+            {
+              "pageNumber": 23,
+              "id": "official-passage-17968f54f8e7d833d3a794ba",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1024,
+              "firstLine": "February 2026 - Local Law 48/Local Law 51 of 2025: Sidewalk Shed Filing and Permit Changes Sidewalk Shed Permit Expiration All sidewalk shed permits will have a maximum duration of 90 days. New Questions on the PW1 and PW2"
+            },
+            {
+              "pageNumber": 137,
+              "id": "official-passage-61b13c4a4f57311fc6d61ac6",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1186,
+              "firstLine": "July 2022 – Site Safety Updates Beginning July 15, 2022, site safety plans can be submitted before the job is approved and are no longer required for subsequent filings in DOB NOW. • A banner will appear on the filing and an email will be sent to the stakeholders on the job indicating"
+            },
+            {
+              "pageNumber": 139,
+              "id": "official-passage-70385ce86ca4735704c897ef",
+              "contentHash": "03c2b6c9eac3f540be3911f8813b3e1a3591c25f78c7bc721d19d3ce3678b9e0",
+              "characters": 1429,
+              "firstLine": "July 2022 – Site Safety Release Update For Site Safety Release, options are provided to release a Construction Superintendent, Site Safety Coordinator or Site Safety Manager from a substantially completed job. To release a Construction Superintendent , an authorization letter and photographs are required to be uploaded in the Documents section. The authorization letter can be signed by one"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "missing_authored_workflow_context",
+      "caseIDs": [
+        "DOBNOW-002",
+        "DOBNOW-003",
+        "DOBNOW-004",
+        "DOBNOW-006",
+        "DOBNOW-008",
+        "DOBNOW-009",
+        "DOBNOW-010",
+        "DOBNOW-011",
+        "DOBNOW-013",
+        "DOBNOW-015",
+        "DOBNOW-022",
+        "DOBNOW-023",
+        "DOBNOW-024"
+      ],
+      "detail": "The standalone workflow route is absent for 13 exact scenario-plus-question inputs. All route when the separately declared workflow-topic prefix is added. This is a routing probe, not full HTTP or answer-quality evidence."
+    },
+    {
+      "id": "required_pdf_page_not_selected",
+      "caseID": "DOBNOW-008",
+      "source": "dob-application-guide",
+      "selectedPages": [
+        18,
+        20,
+        35
+      ],
+      "relevantPage": 23,
+      "detail": "Page 23 contains the more-than-50-percent question, but the current top-three page selection does not include it."
+    },
+    {
+      "id": "required_pdf_page_not_selected",
+      "caseID": "DOBNOW-021",
+      "source": "dob-application-guide",
+      "selectedPages": [
+        5,
+        9,
+        15
+      ],
+      "relevantPage": 19,
+      "detail": "Page 19 contains the Building Code review selection field, but the current top-three page selection does not include it."
+    }
+  ],
+  "limitations": [
+    "No expected answer, required concept, source citation requirement or forbidden claim was used to choose the retrieved pages.",
+    "The two PDFs are a source-selection probe; this is not the actual web-search candidate set or a proof of complete current workflow coverage.",
+    "The live portal was not inspected. Source conflicts and later amendments still need review.",
+    "No provider attempt was added to the 83-of-110 coverage count.",
+    "A temporary generic term-frequency ranking experiment recovered the missed page for DOBNOW-008 but still missed DOBNOW-021; that unaccepted experiment was not implemented."
+  ]
+}
