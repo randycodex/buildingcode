@@ -110,6 +110,10 @@ Affected questions: CC-03, DOBNOW-018, FGC-03, FGC-04, MC-15, GAP-05, PC-05, GAP
 
 Closure: The complete delivered answer follows direct answer, rule/citation, application and material qualifications without repeated generated fields or unasked instructions. Substantive fixes retain their own closure requirements.
 
+Local drafting refinement: official-guidance prompt v12 distinguishes route selection from submission instructions, preserves relevant actor/review permissions, applies supplied premises directly and limits secondary fields to concise gap labels. Only two drafting instruction strings changed; verification instructions and runtime enforcement remain unchanged. The [fixed-input comparison](../evals/results/research-draft-focus-request-comparison-2026-09-09.json) reconstructs the exact retained packets without rebinding or rewriting source passages or candidate prose. Both complete verifier requests are identical to v11. Draft requests add 238 bytes each; sources, facts, schemas, models and output budgets are unchanged. These are offline construction checks, not new accepted answers or speed measurements.
+
+Validation: `npm run test:research-chat` passed on prompt v12, including PDF/HTML source attribution, qualification receipts, negative-verdict rejection and HTTP delivery contracts using mocked provider transport. The comparison's hashes, live-execution rejection and overwrite protection passed. The full local suite log is `/tmp/permitext-draft-focus-research-suite-20260909.log`. A separate single-use live package is limited to two unchanged questions, four provider calls and $0.45 total within the existing $8.50 allowance.
+
 ## Validation work
 
 ### V1 — Review latest answers without a matched retained answer review

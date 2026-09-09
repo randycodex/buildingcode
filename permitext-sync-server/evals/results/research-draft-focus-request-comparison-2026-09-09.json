@@ -1,0 +1,69 @@
+{
+  "schema": "permitext.research-draft-focus-comparison.v1",
+  "checkedAt": "2026-09-09T22:29:39.614Z",
+  "baselineCommit": "5033f203f3eab74f412ceb035c4c4df7ac3161f2",
+  "baselineSummarySHA256": "aeb77f3430b61f2eae85de620963d7831fbf284b91d85e8ce8818a6736911dd1",
+  "sourceHashes": {
+    "research-official-guidance-summary.mjs": "6b77f0a1e5b8116f17891b5eeff41bd710902820ef5d58d7c3ae6b06126e5b52",
+    "research-guidance-qualification-review.mjs": "5844b5e1913e04a501e4c2bbbce184f95ccfbd088ff7e34d6de5492b141be0d1",
+    "research-guidance-source-relationships.mjs": "d8e4c0531afc863d77476067128f226bf4624d56655f4faef4ecc7e74af61bd4",
+    "research-claim-scope.mjs": "2c8435c8676c077e2f782cf9cf56afa0f0fb94af48004d1e3dae8e032296c6e0",
+    "research-conversation-facts.mjs": "b59035e495d34465efe30fa53faaf52274a865d609c72802a20b387538f0a1c8",
+    "research-source-policy.mjs": "0f569a60606aaace85c6cfde2dd179720717603da47ca7d898b1c66630d63980",
+    "scripts/check-research-draft-focus-20260909.mjs": "a54f02a991da7aec56aa7c076fc323e29dbef67b30b3157b2850476c94e2c773"
+  },
+  "runFile": "evals/results/research-owner-api-round2-live-claim-scope-2026-09-09.json",
+  "runSHA256": "96bf0051c296cc9f7a07b35093b6159093de6b968f2204e649d058369bd14978",
+  "summary": {
+    "cases": 2,
+    "requestEnvelopes": 4,
+    "providerCalls": 0,
+    "networkCalls": 0,
+    "semanticVerdictsChanged": 0,
+    "sourceFactSchemaModelOrOutputBudgetChanges": 0,
+    "answerQualityConfirmed": false,
+    "latencyMeasured": false
+  },
+  "results": [
+    {
+      "id": "DOBNOW-003",
+      "phase": "draft",
+      "sourcePacketSHA256": "bce50e6afdcf8c2b73ef61129b218be605582f5f9536ee05533f79b074d43a79",
+      "beforeSHA256": "37b210f3d9d557a3b49bd841f0e65c2f7da8fc0ff9419f54e395afe511c85a04",
+      "afterSHA256": "8e7e3bab6249480a9b4f11ac4531e35085060325417ba9284874985cd2c9b188",
+      "additionalBytes": 238,
+      "completeRequestUnchanged": false,
+      "onlyDraftInstructionsChanged": true
+    },
+    {
+      "id": "DOBNOW-003",
+      "phase": "verification",
+      "sourcePacketSHA256": "bce50e6afdcf8c2b73ef61129b218be605582f5f9536ee05533f79b074d43a79",
+      "beforeSHA256": "99c7da7ac9d645aa3a6b458d9b4cac320e0b34f3e0bdeec2e1f66b1acf1751f2",
+      "afterSHA256": "99c7da7ac9d645aa3a6b458d9b4cac320e0b34f3e0bdeec2e1f66b1acf1751f2",
+      "additionalBytes": 0,
+      "completeRequestUnchanged": true,
+      "onlyDraftInstructionsChanged": false
+    },
+    {
+      "id": "DOBNOW-004",
+      "phase": "draft",
+      "sourcePacketSHA256": "1644983b49ac7995d67f208c35da65bd016c19aef3189b907e1080d8ed298d85",
+      "beforeSHA256": "ab776c615cf86a9948a4e05d6d27bc1361d1fe16ee9a00c219ef84584d49196b",
+      "afterSHA256": "aeb142a858884e7d48b9f4e57340f39ac8d61a979a48dfbaa101924c5de45ac4",
+      "additionalBytes": 238,
+      "completeRequestUnchanged": false,
+      "onlyDraftInstructionsChanged": true
+    },
+    {
+      "id": "DOBNOW-004",
+      "phase": "verification",
+      "sourcePacketSHA256": "1644983b49ac7995d67f208c35da65bd016c19aef3189b907e1080d8ed298d85",
+      "beforeSHA256": "6b9336ad4190c0f4c61e724864cd29d3b00c60df497be0ded0e62826e67cdbcf",
+      "afterSHA256": "6b9336ad4190c0f4c61e724864cd29d3b00c60df497be0ded0e62826e67cdbcf",
+      "additionalBytes": 0,
+      "completeRequestUnchanged": true,
+      "onlyDraftInstructionsChanged": false
+    }
+  ]
+}
