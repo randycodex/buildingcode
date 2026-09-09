@@ -1,4 +1,6 @@
 import { bindExplicitZoningRuleSources, zoningAttributionBindingVersion } from "./research-zoning-attribution.mjs";
+import { planZoningMappedScopeReview, zoningMappedReviewInstruction, zoningMappedReviewSchema,
+  validateZoningMappedScopeReview, resolveZoningMappedScopeSafety } from "./research-zoning-mapped-review.mjs";
 import {
   X509Certificate,
   createHash,
@@ -10554,7 +10556,10 @@ export async function openAIResearchVerification(question, evidence, interpretat
       "For each supported point, evaluate every passage in its sourceIDs array. Its sectionID identifies the primary section, not the exclusive source. The supported-point binding lookup resolves these IDs but does not establish substantive support. Fail with incorrect_citation if a claim lacks support in that point's bound passages, even when a supporting passage appears elsewhere in the answer's citations or supplied evidence. Never infer a missing binding from a shared topic or section number.",
       "Distinguish an enacted rule from its application to supplied facts. Accept a conclusion strictly deduced from the bound rule and those facts without requiring the code to repeat the question's wording. In particular, an additional stated feature does not itself create an exception to an unqualified applicable mandatory requirement; a separate sentence naming the user's proposed omission is not needed to conclude that omission fails that requirement. Keep the conclusion within that rule's scope. Reject deductions that depend on an unstated factual premise, classification, equivalence, exception or external legal rule.",
       zoningResearchSafetyInstruction(evidence),
-      "Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs.",
+      options.mappedScopeReview ? zoningMappedReviewInstruction : "",
+      isZoningConditionalExplanation(options.zoningPlan)
+        ? "For a conditional source explanation, evaluate answerText and supportedPoints together: answerText supplies the direct unresolved finding and concise application; supportedPoints may supply the distinct cited rules and historical alternatives. Do not require the same rules twice. Any conclusion or explanation fields are compatibility summaries, not additional required paragraphs."
+        : "Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs.",
       "Presentation must fit the question: accept a concise direct paragraph for a simple or expressly short request, a compact checklist for parallel requirements, and a Markdown table only for a real side-by-side comparison. Fail with missed_material_conclusion if formatting hides the governing result or material qualification. Fail with unsupported_requirement if a bold statement, practical note, calculation, drawing note, or human-readable inline code reference is not supported by the supplied enacted evidence and structured citation map.",
       "Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text.",
       options.allowOfficialGuidanceOnly
@@ -10659,6 +10664,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
             sources: options.webSupport.sources || []
           })}`
         : "",
+      options.mappedScopeReview ? `MAPPED SCOPE REVIEW\n${JSON.stringify(options.mappedScopeReview)}` : "",
       `PROPOSED ANSWER JSON\n${JSON.stringify(interpretation)}`
     ].filter(Boolean).join("\n\n"),
     text: {
@@ -10666,7 +10672,7 @@ export async function openAIResearchVerification(question, evidence, interpretat
         type: "json_schema",
         name: "permitext_research_verification",
         strict: true,
-        schema: researchDecisionFactVerificationSchema
+        schema: zoningMappedReviewSchema(researchDecisionFactVerificationSchema, options.mappedScopeReview)
       }
     }
   };
@@ -10695,7 +10701,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
     throw invalid;
   }
   return {
-    result: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0),
+    result: validateZoningMappedScopeReview({ packet: options.mappedScopeReview, value, answer: interpretation, evidence,
+      verification: validateResearchVerification(value, Array.isArray(interpretation.missingFacts) ? interpretation.missingFacts.length : 0) }),
     model: payload.model || configuration.model,
     usage: researchUsageFromProviderPayload(payload, configuration.model)
   };
@@ -19738,6 +19745,7 @@ async function handleResearchConversationMessage(request, response) {
       conversationFactContext,
       questionPlan: zoningPlan
     });
+    let zoningMappedScopeReview = null;
     let webAttribution = evaluateResearchWebAttribution({
       question,
       answer: result.interpretation,
@@ -19896,12 +19904,17 @@ async function handleResearchConversationMessage(request, response) {
           evidence: assembledEvidence,
           webSupport
         });
-        return requiredClaimCoverage.pass &&
+        const otherGatesPass = requiredClaimCoverage.pass &&
           claimMateriality.pass &&
           zoningDeterministicControls.pass &&
           answerQuality.pass &&
-          zoningSafety.pass &&
           webAttribution.pass;
+        zoningMappedScopeReview = otherGatesPass ? planZoningMappedScopeReview({
+          plan: zoningPlan, answer: result.interpretation, evidence: assembledEvidence, safety: zoningSafety
+        }) : null;
+        // This admits a draft only to the existing mandatory verifier. The map
+        // finding remains unresolved until that verifier explicitly reviews it.
+        return otherGatesPass && (zoningSafety.pass || Boolean(zoningMappedScopeReview));
       };
       const currentZoningIssues = () => combinedResearchAnswerRevisionIssues({
         requiredClaimCoverage,
@@ -20033,15 +20046,22 @@ async function handleResearchConversationMessage(request, response) {
             structuredEvidenceAnalysis: evidenceAnalysisResult.analysis,
             zoningPlan,
             zoningDeterministicContext,
+            mappedScopeReview: zoningMappedScopeReview,
             model: modelRouting.configuration.verificationModel,
             signal: progressResponse.signal
           }
         );
         verifierUsage = combinedResearchUsage(verifierUsage, verification.usage);
-        const contextualVerification = researchVerificationResultForWebContext(
+        let contextualVerification = researchVerificationResultForWebContext(
           verification.result,
           { webSupport, webAttribution }
         );
+        if (zoningMappedScopeReview) {
+          zoningSafety = resolveZoningMappedScopeSafety({ safety: zoningSafety, packet: zoningMappedScopeReview,
+            verification: contextualVerification, answer: result.interpretation, evidence: assembledEvidence });
+          if (!zoningSafety.pass && contextualVerification.pass) contextualVerification = { ...contextualVerification,
+            pass: false, issues: [{ type: "fact_evidence_confusion", detail: "The required map-scope review did not resolve the safety finding." }] };
+        }
         verificationAttempts.push({
           ...contextualVerification,
           model: verification.model

@@ -17,6 +17,8 @@ import { researchQualifiedFactInstruction } from "../research-conversation-facts
 import { zoningResearchSafetyInstruction, zoningResearchSafetyPromptContext } from "../research-zoning-safety.mjs";
 import { zoningResearchPromptContext } from "../research-zoning-planner.mjs";
 import { zoningContextExcerptPrompt } from "../research-zoning-context-excerpts.mjs";
+import { isZoningConditionalExplanation } from "../research-zoning-conditional-explanation.mjs";
+import { zoningMappedReviewInstruction, zoningMappedReviewSchema } from "../research-zoning-mapped-review.mjs";
 import { resolveResearchCodeBasis } from "../research-code-basis.mjs";
 import { createResearchCorpusRegistry, routeResearchCorpora } from "../research-corpus-registry.mjs";
 
@@ -68,7 +70,8 @@ export async function buildResearchRequestEnvelopeBuilders(environment = researc
   const schemaStart = source.indexOf("const researchVerificationIssueTypes =");
   const schemaEnd = source.indexOf("function validateResearchVerification(", schemaStart);
   assert(verificationStart >= 0 && verificationEnd > verificationStart && schemaStart >= 0 && schemaEnd > schemaStart);
-  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext, zoningContextExcerptPrompt, evaluateResearchWebAttribution };
+  const verificationDependencies = { ...dependencies, zoningResearchSafetyPromptContext, zoningResearchPromptContext, zoningContextExcerptPrompt,
+    isZoningConditionalExplanation, zoningMappedReviewInstruction, zoningMappedReviewSchema, evaluateResearchWebAttribution };
   const buildVerifierRequest = new Function(...Object.keys(verificationDependencies),
     `${source.slice(schemaStart, schemaEnd)} return ${source.slice(verificationStart, verificationEnd).replace(/^async function/, "function")} return requestBody; };`
   )(...Object.values(verificationDependencies));

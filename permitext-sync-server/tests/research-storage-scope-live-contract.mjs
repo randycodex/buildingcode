@@ -7,7 +7,8 @@ import { planZoningResearchQuestion, zoningResearchDeterministicContext, evaluat
   evaluateZoningDeterministicControls } from "../research-zoning-planner.mjs";
 import { planZoningConditionalExplanation } from "../research-zoning-conditional-explanation.mjs";
 import { bindExplicitZoningRuleSources } from "../research-zoning-attribution.mjs";
-import { zoningMappedClauseAnalysis } from "../research-zoning-safety.mjs";
+import { zoningMappedClauseAnalysis, evaluateZoningResearchSafety } from "../research-zoning-safety.mjs";
+import { planZoningMappedScopeReview, validateZoningMappedScopeReview, resolveZoningMappedScopeSafety } from "../research-zoning-mapped-review.mjs";
 
 globalThis.fetch = async () => { throw new Error("No network in retained storage-scope checks."); };
 Object.assign(process.env, { PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1", PERMITEXT_RUN_UNAPPROVED_ZONING_DIAGNOSTICS: "1" });
@@ -54,4 +55,18 @@ const clauses = zoningMappedClauseAnalysis(reconciled.answer);
 assert(clauses.some((clause) => clause.locationBoundary && /an as-of-right determination/.test(clause.clause)));
 assert(!clauses.some((clause) => /supplied facts.*The property/.test(clause.clause)),
   "Closing Markdown emphasis must not join adjacent sentences into one assertion.");
+const safety = evaluateZoningResearchSafety({ ...input, evidence: assembled.sources, answer: reconciled.answer, questionPlan: plan });
+const scopeReview = planZoningMappedScopeReview({ plan, answer: reconciled.answer, evidence: assembled.sources, safety });
+assert(scopeReview, "The retained ordinary source prose must be eligible for explicit semantic scope review.");
+assert.equal(resolveZoningMappedScopeSafety({ safety, packet: scopeReview, verification: { pass: true },
+  answer: reconciled.answer, evidence: assembled.sources }), safety, "An ordinary pass cannot clear the map finding.");
+const synthetic = { mappedScopeReview: { packetHash: scopeReview.packetHash, units: scopeReview.units.map((unit) => ({
+  unitID: unit.id, classification: "source_explanation", sourceIDs: unit.sourceIDs,
+  reason: "Synthetic scope verdict to test control flow, not a live substantive review."
+})) } };
+const checked = validateZoningMappedScopeReview({ packet: scopeReview, value: synthetic,
+  answer: reconciled.answer, evidence: assembled.sources, verification: { pass: true, issues: [] } });
+assert.equal(resolveZoningMappedScopeSafety({ safety, packet: scopeReview, verification: checked,
+  answer: reconciled.answer, evidence: assembled.sources }).pass, true);
+assert.equal(after.pass, false, "A scope verdict cannot clear the separate real historical-branch omissions.");
 console.log("Retained storage-scope draft: missing facts preserved; source binding and nominal boundary repaired; two omitted branches rejected; zero new API calls or full-quality acceptance.");
