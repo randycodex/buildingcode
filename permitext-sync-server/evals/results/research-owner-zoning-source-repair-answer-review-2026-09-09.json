@@ -1,0 +1,140 @@
+{
+  "schema": "permitext-owner-zoning-source-repair-answer-review-v1",
+  "reviewedAt": "2026-09-09T02:54:47.550Z",
+  "sourceCommit": "417f00816fffc69659707820ba0d7cdc4f9e28cf",
+  "liveResult": {
+    "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+    "sha256": "f991b5d3ce3757dddbea968291341571817c8cf9f3703101766766047c39ba57"
+  },
+  "scope": "Manual review of complete delivered answers and retained drafts/verification/repairs against the reconciled question and supplied canonical sources. No separate paid judge, current-source refresh, customer-workflow test or professional approval.",
+  "verification": {
+    "recordedSourceHashesVerified": 30,
+    "initialHTTPRequestBindingsMatched": 4,
+    "newProviderCalls": 11,
+    "pendingActualProviderRequests": 0,
+    "authoredInputsPreserved": 4
+  },
+  "summary": {
+    "attempted": 4,
+    "delivered": 2,
+    "failed": 2,
+    "coreConclusionMatchesDelivered": 2,
+    "wholeAnswerQualityOutstanding": [
+      "ZR-05",
+      "ZR-07",
+      "ZR-11"
+    ],
+    "professionalAcceptanceClaimed": false,
+    "batchUsageEstimateUSD": 0.22058343,
+    "batchConservativeUSD": 0.409291,
+    "cumulativeRoundUsageEstimateUSD": 2.29875822,
+    "cumulativeRoundConservativeUSD": 4.559932,
+    "remainingConservativeAuthorizationUSD": 3.440068,
+    "fullCohortProviderAttempted": 83,
+    "fullCohortUnattempted": 27
+  },
+  "cases": [
+    {
+      "id": "ZR-02",
+      "outcome": "delivered; source-bounded answer matches the reviewed table",
+      "findings": [
+        "Preserves all seven use rows, M1/M2/M3 cells and every legend notation, including additional conditions for M1 outdoor racket courts.",
+        "Cites only the exact selected ZR 42-111 passage; explicitly bounds the unresolved 42-10 reference.",
+        "No unnecessary missing facts or follow-up questions."
+      ],
+      "comparison": {
+        "previousMilliseconds": 27373,
+        "currentMilliseconds": 13099,
+        "previousProviderCalls": 3,
+        "currentProviderCalls": 2,
+        "previousUsageEstimateUSD": 0.0602385,
+        "currentUsageEstimateUSD": 0.0299716
+      },
+      "limitation": "One paired development observation; not a latency distribution or representative savings estimate."
+    },
+    {
+      "id": "ZR-05",
+      "outcome": "failed verification; no delivered answer",
+      "findings": [
+        "Requested official metadata reaches the draft and is labeled as a supplied snapshot, without claiming a live refresh.",
+        "The first draft preserves the three required 2024 events and also lists older supplied events.",
+        "First verification objects to mandatory research-check language and to edition metadata not carried in the cited-passage verification context.",
+        "The bounded repair deletes both June 6, 2024 events; final verification correctly rejects the resulting omission."
+      ],
+      "nextWork": [
+        "Preserve all relevant events through repairs with source-derived completeness checks.",
+        "Separate recommended historical research steps from legal requirements and carry trustworthy source-edition metadata into verification.",
+        "Review answer authority labels and reduce irrelevant current-rule retrieval for metadata-only questions."
+      ],
+      "currentness": "The official history endpoint was not successfully refreshed; the supplied snapshot does not prove current amendment completeness."
+    },
+    {
+      "id": "ZR-07",
+      "outcome": "failed deterministic safety check; no delivered answer",
+      "findings": [
+        "The new draft explicitly withholds a permitted FAR, computes only the proposed 4.0 ratio, and asks for the controlling mapped district/address or BBL.",
+        "The previous retained draft now passes offline, but this equivalent new wording still triggers a false mapped-location conclusion.",
+        "The new output also gives useful special-district/overlay follow-up evidence boundaries."
+      ],
+      "nextWork": [
+        "Use this retained draft to diagnose clause-level uncertainty classification and preserve appended-approval negative cases before another paid confirmation."
+      ]
+    },
+    {
+      "id": "ZR-11",
+      "outcome": "delivered; core rule matches, arithmetic prose still needs correction",
+      "findings": [
+        "States the 80-percent basic cap, 8,000-square-foot result, three potential modification routes and independent rear-yard limitation.",
+        "The old shallow-lot hyphen mismatch is resolved.",
+        "A semantic repair was still needed to avoid asserting unbound open-area and other bulk requirements.",
+        "Final answer says the proposed 8,500 square feet is 500 square feet (85%); it should clearly say 85 percent of the lot and 500 square feet over the basic cap. The supported point contains the correct calculation, but the main answer remains unclear."
+      ],
+      "nextWork": [
+        "Preserve dimensional arithmetic relationships in answer repair.",
+        "Keep broader unevaluated constraints framed as scope limitations, with only bound rear-yard rules asserted."
+      ]
+    }
+  ],
+  "zeroDispatchHarnessAbort": {
+    "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-2026-09-09.json",
+    "sha256": "890f8a447d3a6326c1579d41ddad140a9b64dfdeabe1e43d9d9bf09e0bd68143",
+    "providerCalls": 0,
+    "providerCostUSD": 0,
+    "reason": "Initial request binding guard aborted before recording or sending any provider request; the isolated runtime reservation is not a provider charge."
+  },
+  "remainingQuestions": [
+    "ZR-03",
+    "ZR-06",
+    "ZR-09",
+    "ZR-19",
+    "ZR-20",
+    "DOBNOW-001",
+    "DOBNOW-002",
+    "DOBNOW-003",
+    "DOBNOW-004",
+    "DOBNOW-005",
+    "DOBNOW-006",
+    "DOBNOW-007",
+    "DOBNOW-008",
+    "DOBNOW-009",
+    "DOBNOW-010",
+    "DOBNOW-011",
+    "DOBNOW-012",
+    "DOBNOW-013",
+    "DOBNOW-014",
+    "DOBNOW-015",
+    "DOBNOW-016",
+    "DOBNOW-017",
+    "DOBNOW-020",
+    "DOBNOW-021",
+    "DOBNOW-022",
+    "DOBNOW-023",
+    "DOBNOW-024"
+  ],
+  "limits": [
+    "83 attempted questions does not mean 83 complete acceptable answers.",
+    "All 110 numbered questions remain in scope; this was a repair confirmation, so unique coverage did not increase.",
+    "The full-scope offline diagnostic contains an older historical-ledger coverage summary. Use the current round cost audit for current attempts and budget.",
+    "Provider estimates are not an account-balance or invoice check. Historical campaign costs stay separate."
+  ]
+}
