@@ -1,10 +1,16 @@
 import { createHash } from "node:crypto";
 import { researchOfficialGuidanceAuthorityStatement } from "./research-source-policy.mjs";
 import { researchQualifiedFactInstruction } from "./research-conversation-facts.mjs";
+import {
+  guidanceQualificationReviewPacket,
+  guidanceQualificationReviewInstruction,
+  guidanceQualificationVerificationSchema
+} from "./research-guidance-qualification-review.mjs";
 
 export const researchOfficialGuidanceSummaryVersion = "20260908-document-summary-v1";
+const qualifiedSummaryVersion = "20260909-document-summary-v2";
 // Prompt revisions do not invalidate integrity records for saved summaries.
-export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v6";
+export const researchOfficialGuidanceSummaryPromptVersion = "20260909-document-summary-v7";
 const compact = (value) => String(value || "").replace(/\s+/g, " ").trim();
 const stringList = { type: "array", maxItems: 6, items: { type: "string" } };
 const bindingKey = (sourceID, claimID) => `${sourceID}\u0000${claimID}`;
@@ -62,6 +68,8 @@ export function researchOfficialGuidanceSummaryRequest({ question, webSupport, c
   const verification = Boolean(proposedAnswer);
   const sourceIDs = [...new Set(input.passages.map((passage) => passage.sourceID))];
   const claimIDs = [...new Set(input.passages.map((passage) => passage.claimID))];
+  const requestInput = { ...input, ...(verification ? { proposedAnswer } : {}) };
+  if (verification) requestInput.qualificationReviewPacket = guidanceQualificationReviewPacket(requestInput);
   return {
     model, store: false, reasoning: { effort: "low" }, max_output_tokens: verification ? 1800 : 2200,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
@@ -75,6 +83,7 @@ export function researchOfficialGuidanceSummaryRequest({ question, webSupport, c
       "Use supplied user facts as premises. Ask for a missing fact only if it changes the answer. Earlier assistant text is context, never source authority. If the passages cannot resolve the question, say exactly what remains unresolved and give the responsive guidance they do establish.",
       "Apply known facts to select the source-supported branch, then state its action and approval condition directly. Retain an explicit prerequisite or sequence needed for that action; page layout alone is not a sequence. Direct logical application and faithful paraphrase are allowed, but may not add a condition, actor, deadline or process order. Distinguish an unresolved recommendation from a prohibition. Use acronyms as written unless the evidence supplies their expansion; do not invent document chronology.",
       ...(input.conversationFacts.qualified?.length ? [researchQualifiedFactInstruction] : []),
+      ...(verification ? [guidanceQualificationReviewInstruction] : []),
       verification
         ? "Independently verify every substantive sentence and its cited source/claim pair against the complete passages. A valid ID alone does not establish support. Reject an unsupported detail, changed condition, omitted material exception, wrong date or source, ungrounded Yes/No, or a claim of enacted authority. Also reject an answer that omits a requested step or a source-stated prerequisite material to the requested action or approval. Check uncited passages for qualifications to each conclusion, not only whether its cited passage agrees. Report only errors actually present in the proposed answer, with the offending statement and the source condition or missing support. Do not reject faithful paraphrase merely because it uses different words. Do not require unrelated fees, legacy filing rules, document boilerplate or other unasked topics. Return the verification schema; use existing issue types such as unsupported_requirement, missed_material_conclusion, misstated_provision or wrong_attribution."
         : "Answer the actual question directly in the opening sentence using the supplied facts. Follow with the governing guidance and its application, including source-stated prerequisites material to the requested action or approval. Use concise paragraphs or compact lists as useful. Summarize; do not paste the page or repeat its headings, footer, contact information or unrelated sections. Do not pad a narrow question with a general project checklist.",
@@ -83,10 +92,10 @@ export function researchOfficialGuidanceSummaryRequest({ question, webSupport, c
         ? "Check that every cited paragraph is supported by its own selected passages. The server appends the noncontrolling authority label and source links; those are not additional legal claims."
         : "Give each paragraph at least one exact sourceID/claimID pair for its claims. Preserve any material qualification from those passages. Write text without URLs, Markdown links or internal evidence IDs; the server adds the source links and authority label. Leave the generic authority disclaimer to the server; retain source-specific approval limits in the appropriate paragraph. Place source-specific facts in paragraphs; missingFacts and evidenceLimitations are only genuine gaps, never new rules."
     ].join(" "),
-    input: JSON.stringify({ ...input, ...(verification ? { proposedAnswer } : {}) }),
+    input: JSON.stringify(requestInput),
     text: { format: {
       type: "json_schema", name: verification ? "permitext_official_guidance_verification" : "permitext_official_guidance_summary", strict: true,
-      schema: verification ? verificationSchema : {
+      schema: verification ? guidanceQualificationVerificationSchema(verificationSchema, requestInput.qualificationReviewPacket) : {
         type: "object", additionalProperties: false,
         properties: {
           paragraphs: { type: "array", minItems: 1, maxItems: 6, items: {
@@ -167,14 +176,18 @@ function summaryFingerprint(question, answer) {
 // This is an integrity record, not a signature or substitute for the live
 // semantic check. The server creates it only after a successful verifier call.
 export function researchOfficialGuidanceSummaryProof(question, answer, verification, verificationInput) {
-  if (verification?.pass !== true || verification.issues?.length !== 0 || !verification.model) {
+  if (verification?.pass !== true || verification.issues?.length !== 0 || !verification.model ||
+      (verification.qualificationReview && verification.qualificationReview.pass !== true)) {
     throw invalid("A guidance summary needs a successful semantic verification.");
   }
   sourceBindings({ sources: answer.supportingSources });
   return {
-    version: researchOfficialGuidanceSummaryVersion,
+    version: verification.qualificationReview ? qualifiedSummaryVersion : researchOfficialGuidanceSummaryVersion,
     answerSHA256: summaryFingerprint(question, answer),
     verificationInputSHA256: createHash("sha256").update(verificationInput).digest("hex"),
+    ...(verification.qualificationReview ? {
+      qualificationReviewSHA256: createHash("sha256").update(JSON.stringify(verification.qualificationReview)).digest("hex")
+    } : {}),
     verification: { ...verification }
   };
 }
@@ -183,7 +196,12 @@ export function hasVerifiedResearchOfficialGuidanceSummary(question, answer) {
   const proof = answer?.officialGuidanceSummary;
   try {
     sourceBindings({ sources: answer.supportingSources });
-    return proof?.version === researchOfficialGuidanceSummaryVersion &&
+    const qualificationIntegrity = proof?.version === qualifiedSummaryVersion
+      ? proof.verification?.qualificationReview?.pass === true &&
+        proof.qualificationReviewSHA256 === createHash("sha256").update(JSON.stringify(proof.verification.qualificationReview)).digest("hex")
+      : proof?.version === researchOfficialGuidanceSummaryVersion &&
+        !proof.qualificationReviewSHA256 && !proof.verification?.qualificationReview;
+    return qualificationIntegrity &&
       proof.verification?.pass === true && proof.verification.issues?.length === 0 &&
       typeof proof.verification.model === "string" && proof.verification.model.trim().length > 0 &&
       /^[a-f0-9]{64}$/.test(proof.verificationInputSHA256 || "") &&

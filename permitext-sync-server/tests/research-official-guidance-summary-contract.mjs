@@ -122,6 +122,31 @@ assert(hasVerifiedResearchOfficialGuidanceSummary(question, savedInput));
 const persisted = persist(savedInput).answer;
 assert.equal(persisted.answerText, answer.answerText);
 assert.deepEqual(persisted.supportingSources, answer.supportingSources);
+assert.equal(savedInput.officialGuidanceSummary.version, "20260908-document-summary-v1", "Historical source-bound summaries remain readable.");
+const qualifiedInput = structuredClone(savedInput);
+qualifiedInput.officialGuidanceSummary = researchOfficialGuidanceSummaryProof(question, qualifiedInput, {
+  pass: true, issues: [], model: "offline-verifier",
+  qualificationReview: { version: "20260909-guidance-qualifications-v1", packetSHA256: "c".repeat(64), pass: true,
+    passages: [{ sourceID: "notice", claimID: "review", contentHash: hash, finding: "addressed" }] }
+}, verification.input);
+assert.equal(qualifiedInput.officialGuidanceSummary.version, "20260909-document-summary-v2");
+assert(hasVerifiedResearchOfficialGuidanceSummary(question, qualifiedInput));
+assert.deepEqual(persist(qualifiedInput).answer.officialGuidanceSummary, qualifiedInput.officialGuidanceSummary);
+for (const mutate of [
+  (value) => { delete value.officialGuidanceSummary.verification.qualificationReview; },
+  (value) => { delete value.officialGuidanceSummary.qualificationReviewSHA256; },
+  (value) => { delete value.officialGuidanceSummary.qualificationReviewSHA256; delete value.officialGuidanceSummary.verification.qualificationReview; },
+  (value) => { value.officialGuidanceSummary.verification.qualificationReview.pass = false; },
+  (value) => { value.officialGuidanceSummary.verification.qualificationReview.passages[0].contentHash = "d".repeat(64); }
+]) {
+  const changed = structuredClone(qualifiedInput);
+  mutate(changed);
+  assert(!hasVerifiedResearchOfficialGuidanceSummary(question, changed));
+  assert.throws(() => persist(changed), /require evidence/);
+}
+assert.throws(() => researchOfficialGuidanceSummaryProof(question, qualifiedInput, {
+  pass: true, issues: [], model: "offline-verifier", qualificationReview: { pass: false }
+}, verification.input));
 for (const mutate of [
   (value) => { value.answerText = value.answerText.replace("does not", "does"); },
   (value) => { value.conclusion = "The permit is approved."; },

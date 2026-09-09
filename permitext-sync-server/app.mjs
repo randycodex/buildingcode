@@ -282,6 +282,7 @@ import {
   researchOfficialGuidanceSummaryInterpretation,
   researchOfficialGuidanceSummaryProof
 } from "./research-official-guidance-summary.mjs";
+import { validateGuidanceQualificationReview } from "./research-guidance-qualification-review.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import { refreshZoningContextEvidence, zoningContextExcerptPrompt } from "./research-zoning-context-excerpts.mjs";
 import { isZoningConditionalExplanation, planZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
@@ -10124,7 +10125,10 @@ async function openAIResearchOfficialGuidanceSummary(question, userID, options) 
       proposedAnswer: { ...draft.value, answerText: interpretation.answerText }
     });
     const checked = await call(verificationRequest);
-    const verification = { ...validateResearchVerification(checked.value), model: checked.model };
+    const verification = validateGuidanceQualificationReview({
+      input: JSON.parse(verificationRequest.input), value: checked.value,
+      verification: { ...validateResearchVerification(checked.value), model: checked.model }
+    });
     if (!verification.pass) {
       throw Object.assign(new Error("The official guidance summary did not pass source verification. Your question is still here."), {
         code: "RESEARCH_VERIFICATION_FAILED", verificationAttempts: [verification]

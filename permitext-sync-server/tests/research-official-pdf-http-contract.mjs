@@ -106,6 +106,7 @@ let providerDoubles = 0;
 let documentDoubles = 0;
 let corruptDocument = false;
 let rejectSummary = false;
+let qualificationFailure = null;
 let summaryDoubles = 0;
 let verificationDoubles = 0;
 let portalCase = null;
@@ -222,6 +223,20 @@ const responseDouble = async (url, options) => {
       value = rejectSummary
         ? { pass: false, issues: [{ type: "overstated_compliance", detail: "The document does not say filing automatically grants a construction permit." }] }
         : { pass: true, issues: [] };
+      // This deterministic verifier double tests receipt transport and gating,
+      // not the semantic accuracy of any generated or fixture answer.
+      value.qualificationReview = {
+        packetSHA256: input.qualificationReviewPacket.packetSHA256,
+        passages: input.passages.map((passage, passageIndex) => ({
+          passageIndex, finding: "addressed", conditionQuotes: [passage.text.slice(0, 160)],
+          answerReferences: ["paragraph:0"], reason: "Synthetic verifier fixture for source-review transport."
+        }))
+      };
+      if (qualificationFailure === "missing_receipt") delete value.qualificationReview;
+      if (qualificationFailure === "omitted_condition") {
+        value.qualificationReview.passages[0].finding = "missing_or_misstated";
+        value.qualificationReview.passages[0].reason = "The proposed answer omits a required condition in this passage.";
+      }
     }
     return Response.json({ model: body.model, status: "completed", usage: { input_tokens: 100, output_tokens: 100 }, output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }] });
   }
@@ -266,6 +281,7 @@ try {
   assert.match(answer.answerText, /Standard Plan Review/);
   assert.match(answer.answerText, /#page=1/);
   assert.equal(answer.verification.pass, true);
+  assert.equal(answer.officialGuidanceSummary.verification.qualificationReview.pass, true);
   assert.equal(answer.citations.length, 0, "Official guidance must not become enacted-code citations.");
   assert.equal(answer.supportingSources[0].sourceValidation, "official_pdf");
   assert.equal(answer.supportingSources[0].controlling, false);
@@ -320,9 +336,9 @@ try {
     assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
     const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
     assert.match(answer.answerText, expected[id]);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v6");
-    assert.equal(answer.officialGuidanceSummary.version, "20260908-document-summary-v1",
-      "A prompt update must preserve the saved integrity-proof contract.");
+    assert.equal(answer.promptVersion, "20260909-document-summary-v7");
+    assert.equal(answer.officialGuidanceSummary.version, "20260909-document-summary-v2",
+      "New summaries retain the required qualification receipt; older v1 records remain readable.");
   }
   missingSafetySources = true;
   const partialSafety = await ask();
@@ -342,6 +358,15 @@ try {
   assert(failed && failed.charged === false && failed.pendingProviderRequestCount === 0,
     "A rejected summary must not consume the user's turn; dispatched provider usage still settles.");
   rejectSummary = false;
+  for (const failure of ["missing_receipt", "omitted_condition"]) {
+    qualificationFailure = failure;
+    const beforeRejected = providerDoubles;
+    const rejectedReview = await ask();
+    assert(rejectedReview.status >= 400);
+    assert.equal(rejectedReview.body.code, "RESEARCH_VERIFICATION_FAILED");
+    assert.equal(providerDoubles - beforeRejected, 2, "A failed qualification review must not add a retry or separate judge.");
+  }
+  qualificationFailure = null;
   const beforeCorruptDocument = documentDoubles;
   // Keep the generic PDF failure check independent of catalog fallback.
   question = `According to the official service notice at ${sourceURL}, which review type applies to the new application?`;
