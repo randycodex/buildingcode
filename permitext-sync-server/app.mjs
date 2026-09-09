@@ -8280,6 +8280,8 @@ async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
 
 function researchPrompt(question, evidence, options = {}) {
   const sources = evidence.map((section) => {
+    const metadata = section.richSourceKind === "amendment-history";
+    const textLabel = metadata ? "OFFICIAL_METADATA_TEXT" : "ENACTED_TEXT";
     const lines = [
       `PASSAGE_ID: ${section.sourceID}`,
       `SECTION_ID: ${section.sectionID}`,
@@ -8290,6 +8292,7 @@ function researchPrompt(question, evidence, options = {}) {
       `APPLICABILITY_STATUS: ${section.applicabilityStatus || "current"}`,
       `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
       `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
+      metadata ? "SOURCE_CLASS: official_metadata; supplied corpus snapshot; not refreshed in this turn; not historical enacted text" : "",
       `PASSAGE_TEXT_SHA256: ${section.sectionTextHash || "unavailable"}`,
       `EVIDENCE_ORIGIN: ${section.origin || "user_pinned"}`,
       `EVIDENCE_FUNCTION: ${section.evidencePriority?.primaryFunction || "candidate"}`,
@@ -8298,14 +8301,14 @@ function researchPrompt(question, evidence, options = {}) {
       `RELATIONSHIP: ${section.relationship || "Automatically assembled enacted evidence"}`,
       `RETRIEVAL_REASON: ${section.retrievalReason || section.relationship || "Authorized enacted evidence"}`,
       section.origin === "user_pinned" && section.userSelectedText && !section.pinnedSelectionExcerpted
-        ? "USER_SELECTED_TEXT: same as ENACTED_TEXT"
+        ? `USER_SELECTED_TEXT: same as ${textLabel}`
         : "",
       zoningContextExcerptPrompt(section),
       `REQUIRED_CLAIM_COVERAGE: ${section.evidencePriority?.claimCoverageRequired === true ? "yes" : "no"}`,
       section.evidencePriority?.claimCoverageReason
         ? `REQUIRED_CLAIM_REASON: ${section.evidencePriority.claimCoverageReason}`
         : "",
-      `ENACTED_TEXT: ${section.text}`
+      `${textLabel}: ${section.text}`
     ].filter(Boolean);
     if (section.richSourceID && section.richSourceGrids) {
       lines.push(
@@ -10180,6 +10183,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           ? "A prior response could not be parsed or bound to the supplied evidence. Return one complete schema-valid answer using only the exact supplied identifiers; do not add commentary outside the JSON object. Keep every explanation, citation relevance, limitation, missing fact, and follow-up concise; combine overlapping points and do not repeat the same rule so the complete JSON fits within the response limit."
           : "",
         "Make governing code conclusions only from the authorized enacted evidence supplied in the request.",
+        evidence.some((source) => source.richSourceKind === "amendment-history")
+          ? "Official amendment-history metadata may substantiate only the events and report links it lists. Bind those observations to its own PASSAGE_ID, label them as supplied snapshot metadata, and do not claim a live refresh or use them as historical enacted requirements."
+          : "",
         "Evidence marked user_pinned must be considered, but Permitext-discovered enacted evidence may identify a different controlling provision.",
         "Supporting web context may explain or contextualize an answer but is noncontrolling and must never create or override an enacted requirement.",
         "Never use web support to guess the identity of an unexplained acronym, agency, or program, or to substitute a similarly named authority. Request the exact authority when its identity is unresolved.",
@@ -10493,6 +10499,8 @@ export async function openAIResearchVerification(question, evidence, interpretat
     `PASSAGE_ID: ${source.sourceID}`,
     `SECTION_ID: ${source.sectionID}`,
     `SECTION: ${source.codePrefix} ${source.sectionNumber}`,
+    source.richSourceKind === "amendment-history"
+      ? "SOURCE_CLASS: official_metadata; supplied corpus snapshot; not refreshed in this turn; not historical enacted text" : "",
     `EVIDENCE_ROLE: ${source.evidencePriority?.evidenceRole || "supporting"}`,
     `TOPIC_ROUTE_RELATIONSHIP: ${source.evidencePriority?.topicRouteRelationship || "unrestricted"}`,
     `RELATIONSHIP: ${source.relationship || "Automatically assembled enacted evidence"}`,
@@ -10523,6 +10531,9 @@ export async function openAIResearchVerification(question, evidence, interpretat
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.",
+      evidence.some((source) => source.richSourceKind === "amendment-history")
+        ? "For an official amendment-history metadata passage, verify only observations about its listed events and report links against that PASSAGE_ID. Reject claims that the snapshot was refreshed live or that its event listing establishes historical enacted requirements."
+        : "",
       "For each supported point, evaluate every passage in its sourceIDs array. Its sectionID identifies the primary section, not the exclusive source. The supported-point binding lookup resolves these IDs but does not establish substantive support. Fail with incorrect_citation if a claim lacks support in that point's bound passages, even when a supporting passage appears elsewhere in the answer's citations or supplied evidence. Never infer a missing binding from a shared topic or section number.",
       "Distinguish an enacted rule from its application to supplied facts. Accept a conclusion strictly deduced from the bound rule and those facts without requiring the code to repeat the question's wording. In particular, an additional stated feature does not itself create an exception to an unqualified applicable mandatory requirement; a separate sentence naming the user's proposed omission is not needed to conclude that omission fails that requirement. Keep the conclusion within that rule's scope. Reject deductions that depend on an unstated factual premise, classification, equivalence, exception or external legal rule.",
       zoningResearchSafetyInstruction(evidence),

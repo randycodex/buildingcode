@@ -5,7 +5,7 @@ import { zoningTemporalApplicationObligations, zoningTemporalApplicationIssues }
 
 export const zoningResearchPlannerVersion = "20260908-historical-source-intent-v5";
 
-export const zoningResearchCompilerVersion = "20260908-temporal-application-v23";
+export const zoningResearchCompilerVersion = "20260909-word-hyphen-obligations-v24";
 export const zoningResearchRepairVersion = "20260901-source-bounded-patch-v2";
 
 export const zoningResearchPaths = Object.freeze({
@@ -1778,11 +1778,14 @@ function escapedPattern(value) {
 }
 
 function textContainsObligationValue(text, value) {
-  const expected = compactText(value);
+  // Normalize only hyphens inside words. Numeric ranges, minus signs and
+  // section references remain exact; shallow-lot and shallow lot are equivalent.
+  const normalizedWords = (value) => compactText(value).replace(/(?<=\p{L})[-\u2010\u2011](?=\p{L})/gu, " ");
+  const expected = normalizedWords(value);
   if (!expected) return false;
   const leftBoundary = /^[A-Za-z0-9]/.test(expected) ? "(?<![A-Za-z0-9])" : "";
   const rightBoundary = /[A-Za-z0-9]$/.test(expected) ? "(?![A-Za-z0-9])" : "";
-  return new RegExp(`${leftBoundary}${escapedPattern(expected)}${rightBoundary}`, "i").test(compactText(text));
+  return new RegExp(`${leftBoundary}${escapedPattern(expected)}${rightBoundary}`, "i").test(normalizedWords(text));
 }
 
 function obligationCoveredByText(answerObligation, text) {

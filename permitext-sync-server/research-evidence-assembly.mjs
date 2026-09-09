@@ -11,8 +11,9 @@ import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
+import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260909-focused-technical-v31";
+export const researchEvidenceAssemblyVersion = "20260909-selected-table-boundary-v32";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -45,7 +46,7 @@ export const researchEvidenceStrategies = Object.freeze({
 });
 
 const selectedEvidenceCuePattern = /\b(?:selected|pinned)\s+(?:code\s+)?(?:passage|passages|evidence|text)|\b(?:both|this|these|the)\s+(?:selected\s+)?(?:passage|passages|provision|provisions|text)\b/i;
-const strictSelectedEvidenceBoundaryPattern = /\b(?:based|using|relying)\s+only\s+on\s+(?:the\s+)?selected\s+(?:(?:building\s+)?code\s+)?(?:passage|passages|evidence|text)\b|\bbased\s+only\s+on\s+(?:the\s+)?selected\b|\bfrom\s+(?:the\s+)?selected\s+(?:(?:building\s+)?code\s+)?(?:passage|passages|evidence|text)\b/i;
+const strictSelectedEvidenceBoundaryPattern = /\b(?:based|using|relying)\s+only\s+on\s+(?:the\s+)?selected\s+(?:(?:building\s+)?code\s+)?(?:passage|passages|evidence|text)\b|\busing\s+only\s+(?:the\s+)?(?:selected|pinned)\s+(?:(?:building\s+)?code\s+)?(?:passages?|evidence|text|tables?)\b|\bbased\s+only\s+on\s+(?:the\s+)?selected\b|\bfrom\s+(?:the\s+)?selected\s+(?:(?:building\s+)?code\s+)?(?:passage|passages|evidence|text)\b/i;
 const broaderEvidenceCuePattern = /\b(?:applicab(?:le|ility)|comply|compliance|exception|exceptions|definition|definitions|defined|table|tables|calculate|calculation|other provisions?|additional provisions?|related provisions?|cross[- ]references?|project[- ]specific|verify|verification)\b/i;
 
 function explicitCodeReferences(value) {
@@ -339,7 +340,7 @@ function candidateValues(discovery) {
   return Array.isArray(discovery?.candidates) ? discovery.candidates : [];
 }
 
-async function canonicalSection(resolveSection, value, origin) {
+async function canonicalSection(resolveSection, value, origin, { includeAmendmentHistory = false } = {}) {
   const requested = sectionDescriptor(value);
   const requestedRichSourceIDs = Array.isArray(value?.richSourceIDs)
     ? new Set(value.richSourceIDs.map((item) => compactText(item)).filter(Boolean))
@@ -359,7 +360,8 @@ async function canonicalSection(resolveSection, value, origin) {
     body: resolved.body,
     crossReferences: Array.isArray(resolved.crossReferences) ? resolved.crossReferences : [],
     richSources: (Array.isArray(resolved.richSources) ? resolved.richSources : [])
-      .filter((source) => requestedRichSourceIDs === null || requestedRichSourceIDs.has(compactText(source?.id)))
+      .filter((source) => requestedRichSourceIDs === null || requestedRichSourceIDs.has(compactText(source?.id)) ||
+        (includeAmendmentHistory && source.kind === "amendment-history"))
       .map((source) => structuredClone(source))
   };
 }
@@ -428,7 +430,13 @@ function applicableStructuredTable(value) {
 function attachStructuredTable(record, value, characterAllowance) {
   const table = applicableStructuredTable(value);
   const tableText = String(table?.text || "").trim();
-  if (!table || !tableText || tableText.length > characterAllowance) return record;
+  if (!table || !tableText) return record;
+  // HTML-derived table text can differ from the complete selected passage only
+  // in whitespace. Preserve its verified grid without replacing that passage
+  // or importing a different table to recover the same legend.
+  const sameCompleteText = table.preserveSectionContext && record.canonicalContextComplete &&
+    tableText.replace(/\s/g, "") === record.text.replace(/\s/g, "");
+  if (tableText.length > characterAllowance && !sameCompleteText) return record;
   if (table.preserveSectionContext && !record.canonicalContextComplete) return record;
   return {
     ...record,
@@ -1031,6 +1039,24 @@ export async function assembleResearchEvidence({
     : limits.maximumCharacters;
 
   let discoveredCount = 0;
+  const includeRequestedHistory = (section, explicitlyPinned = false) => {
+    if (strictPinnedEvidenceBoundary || discoveredCount >= limits.maximumDiscovered) return false;
+    const history = requestedZoningAmendmentHistory(section, query.question, { explicitlyPinned });
+    if (!history || sources.some((source) => source.richSourceID === history.id)) return false;
+    const record = zoningAmendmentHistoryRecord(section, history, {
+      sourceID: `research-metadata-${history.id}`,
+      characterAllowance: Math.min(limits.maximumCharactersPerSource, supplementalCharacterCeiling - characterCount),
+      retrievedAt
+    });
+    if (!record) return false;
+    sources.push(record);
+    characterCount += record.text.length;
+    discoveredCount += 1;
+    return true;
+  };
+  for (const entry of resolvedPins) {
+    if (entry.resolved) includeRequestedHistory(entry.value, true);
+  }
   for (const [index, candidate] of candidates.entries()) {
     if (discoveredCount >= limits.maximumDiscovered) break;
     const identity = sectionIdentity(candidate);
@@ -1039,9 +1065,15 @@ export async function assembleResearchEvidence({
     if (remainingCharacters < 1) break;
     let resolved;
     try {
-      resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered);
+      resolved = await canonicalSection(resolveSection, candidate, sourceOrigins.discovered, {
+        includeAmendmentHistory: asksForZoningAmendmentHistoryEvents(query.question)
+      });
     } catch {
       resolverFailureCount += 1;
+      continue;
+    }
+    if (includeRequestedHistory(resolved)) {
+      includedSectionIdentities.add(sectionIdentity(resolved));
       continue;
     }
     const remainingCandidateSlots = Math.max(

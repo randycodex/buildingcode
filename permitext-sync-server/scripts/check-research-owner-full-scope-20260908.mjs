@@ -120,7 +120,7 @@ const report = { schema: "permitext-owner-authored-source-diagnostic-v1", checke
   sourceHashes: { ...Object.fromEntries(await Promise.all([
       "app.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-safety.mjs", "research-corpus-registry.mjs",
       "research-dob-workflow-routing.mjs", "research-source-policy.mjs", "research-focused-technical-scope.mjs", "research-conversation-topic.mjs", "research-technical-topic-routes.mjs", "evidence-discovery.mjs",
-      "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs",
+      "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs", "research-zoning-metadata.mjs",
       "research-topic-dependencies.mjs", "project-foundation-contract.mjs",
       "research-zoning-conditional-explanation.mjs", "research-model-routing.mjs",
       "evals/research-owner-scope-input.mjs", "scripts/check-research-owner-full-scope-20260908.mjs"
