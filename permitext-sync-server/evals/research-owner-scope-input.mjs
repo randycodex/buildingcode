@@ -21,11 +21,21 @@ export async function ownerResearchScopeInput(testCase, { original = false, zoni
   const projected = original ? reconciledResearchEvaluationInput(testCase) : ownerCodeResearchInput(testCase);
   const projectFacts = Object.entries(projected.projectContext || {}).flatMap(([key, value]) =>
     (Array.isArray(value) ? value : [value]).map((entry) => `${key}: ${entry}`));
-  const pinnedEvidence = (projected.selectedEvidence || []).map((selection, index) => ({
-    sectionID: String(selection.sectionID), sourceID: `authored-selection-${selection.sectionID}-${index}`,
-    codePrefix: selection.codePrefix, sectionNumber: selection.sectionNumber,
-    selectedText: (selection.exactPassages || []).join("\n\n")
-  }));
+  const pinnedEvidence = (projected.selectedEvidence || []).flatMap((selection, index) => {
+    const passages = selection.exactPassages;
+    if (!Array.isArray(passages) || !passages.length ||
+        passages.some((passage) => typeof passage !== "string" || !passage.trim())) {
+      throw Object.assign(new Error(`Authored exact passages are missing or invalid: ${selection.sectionID}`),
+        { code: "AUTHORED_SELECTION_INVALID" });
+    }
+    // Separate fragments are separate highlights, even within one section.
+    // Joining them fabricates adjacency and can fail canonical validation.
+    return passages.map((selectedText, passageIndex) => ({
+      sectionID: String(selection.sectionID),
+      sourceID: `authored-selection-${selection.sectionID}-${index}${passages.length > 1 ? `-${passageIndex}` : ""}`,
+      codePrefix: selection.codePrefix, sectionNumber: selection.sectionNumber, selectedText
+    }));
+  });
   for (const [index, id] of (projected.selectedEvidenceSectionIDs || []).entries()) {
     const summary = await zoningSummary(id);
     if (!summary) throw Object.assign(new Error(`Authored Zoning selection unavailable: ${id}`), { code: "AUTHORED_SELECTION_UNAVAILABLE" });

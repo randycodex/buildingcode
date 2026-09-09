@@ -13,7 +13,7 @@ import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./resear
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260909-pinned-excerpt-precedence-v33";
+export const researchEvidenceAssemblyVersion = "20260909-pinned-table-dependencies-v34";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -1042,6 +1042,15 @@ export async function assembleResearchEvidence({
   const structuredPinnedCount = sources.filter((source) =>
     source.origin === sourceOrigins.pinned && source.richSourceID
   ).length;
+  const pinnedTableReferences = new Set(sources
+    .filter((source) => source.origin === sourceOrigins.pinned)
+    .flatMap((source) => [...tableReferences(source.text, source.codePrefix)]));
+  const missingPinnedTable = (reference) => {
+    if (reference.referenceKind !== "table") return false;
+    const identity = comparableTableReference(`Table ${reference.sectionNumber}`, reference.codePrefix);
+    return pinnedTableReferences.has(identity) && !sources.some((source) => source.richSourceGrids &&
+      comparableTableReference(source.richSourceCanonicalReference || source.richSourceReference, source.codePrefix) === identity);
+  };
   const supplementalCharacterCeiling = pinnedEvidence.length
     ? Math.min(limits.maximumCharacters, pinnedCharacterCount + limits.maximumSupplementalCharacters)
     : limits.maximumCharacters;
@@ -1289,7 +1298,7 @@ export async function assembleResearchEvidence({
         const identity = sectionIdentity(reference);
         if (
           !identity ||
-          includedSectionIdentities.has(identity) ||
+          (includedSectionIdentities.has(identity) && !missingPinnedTable(reference)) ||
           queuedCrossReferenceIdentities.has(identity)
         ) continue;
         queuedCrossReferenceIdentities.add(identity);
@@ -1315,7 +1324,7 @@ export async function assembleResearchEvidence({
         const identity = sectionIdentity(reference);
         if (
           !identity ||
-          includedSectionIdentities.has(identity) ||
+          (includedSectionIdentities.has(identity) && !missingPinnedTable(reference)) ||
           queuedCrossReferenceIdentities.has(identity)
         ) continue;
         queuedCrossReferenceIdentities.add(identity);
@@ -1351,7 +1360,10 @@ export async function assembleResearchEvidence({
       continue;
     }
     const identity = sectionIdentity(resolved);
-    if (!identity || includedSectionIdentities.has(identity)) continue;
+    // An exact excerpt does not supply the complete table in its section.
+    // Add the referenced grid separately, retaining every selected fragment.
+    const sameSectionTable = includedSectionIdentities.has(identity) && missingPinnedTable(reference);
+    if (!identity || (includedSectionIdentities.has(identity) && !sameSectionTable)) continue;
     const allowance = Math.min(limits.maximumCharactersPerSource, remainingCharacters);
     const targeted = targetedDefinitionCount < limits.maximumTargetedDefinitions
       ? targetedDefinitionValue(
@@ -1384,6 +1396,9 @@ export async function assembleResearchEvidence({
       retrievedAt
     });
     if (!record.text) break;
+    if (sameSectionTable && (!record.richSourceGrids ||
+        comparableTableReference(record.richSourceCanonicalReference || record.richSourceReference, record.codePrefix) !==
+        comparableTableReference(`Table ${reference.sectionNumber}`, reference.codePrefix))) continue;
     sources.push(record);
     if (targeted.excerpt) targetedDefinitionCount += 1;
     includedSectionIdentities.add(identity);
@@ -1462,7 +1477,7 @@ export async function assembleResearchEvidence({
     .filter((source) => source.origin === sourceOrigins.discovered)
     .map(sectionIdentity)
     .filter(Boolean));
-  const requestedTableReferences = new Set(candidates
+  const requestedTableReferences = new Set([...pinnedTableReferences, ...candidates
     .filter((candidate) => includedDiscoveredIdentities.has(sectionIdentity(candidate)))
     .flatMap((candidate) =>
     (Array.isArray(candidate?.sourceReviewRequirements) ? candidate.sourceReviewRequirements : [])
@@ -1470,7 +1485,7 @@ export async function assembleResearchEvidence({
       .flatMap((requirement) => Array.isArray(requirement.references) ? requirement.references : [])
       .map((reference) => comparableTableReference(reference, candidate.codePrefix))
       .filter(Boolean)
-  ));
+  )]);
   const resolvedTableReferences = new Set(sources
     .map((source) => comparableTableReference(
       source.richSourceCanonicalReference || source.richSourceReference,
@@ -1479,6 +1494,12 @@ export async function assembleResearchEvidence({
     .filter(Boolean));
   const allRequestedTablesResolved = requestedTableReferences.size === 0 ||
     [...requestedTableReferences].every((reference) => resolvedTableReferences.has(reference));
+  const missingPinnedTableReferences = [...pinnedTableReferences].filter((reference) => !resolvedTableReferences.has(reference));
+  if (missingPinnedTableReferences.length) limitations.push({
+    kind: "referenced-table-review-required",
+    references: missingPinnedTableReferences,
+    text: "Selected text refers to a table whose complete structured values are not in this evidence package. Do not infer row or column relationships from separate selected fragments."
+  });
   for (const limitation of Array.isArray(discovery?.coverageLimitations)
     ? discovery.coverageLimitations
     : []) {

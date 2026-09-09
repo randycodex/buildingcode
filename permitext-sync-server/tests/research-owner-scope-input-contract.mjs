@@ -11,6 +11,7 @@ const cases = [...original.cases.map((item) => ({ item, original: true })),
   ...additional.cases.map((item) => ({ item, original: false }))];
 assert.equal(cases.length, 110);
 let pins = 0;
+let exactGroups = 0;
 let exactPassages = 0;
 for (const { item, original } of cases) {
   const options = { original, zoningSummary: zoningSectionSummary };
@@ -24,13 +25,22 @@ for (const { item, original } of cases) {
   assert.equal(input.question, [original && item.questionContext ? `Context: ${item.questionContext}` : "", original && item.scenario, item.question].filter(Boolean).join("\n\n"));
   assert.deepEqual(input.messages, []);
   assert.equal(input.pinnedEvidence.length,
-    (item.selectedEvidence?.length || 0) + (item.selectedEvidenceSectionIDs?.length || 0));
+    (item.selectedEvidence || []).reduce((count, selection) => count + selection.exactPassages.length, 0) +
+    (item.selectedEvidenceSectionIDs?.length || 0));
+  assert.equal(new Set(input.pinnedEvidence.map((source) => source.sourceID)).size, input.pinnedEvidence.length);
+  const exactPins = input.pinnedEvidence.filter((source) => Object.hasOwn(source, "selectedText"));
+  assert.deepEqual(exactPins.map((pin) => ({ sectionID: pin.sectionID, selectedText: pin.selectedText })),
+    (item.selectedEvidence || []).flatMap((selection) => selection.exactPassages.map((selectedText) => ({
+      sectionID: String(selection.sectionID), selectedText
+    }))));
   for (const selection of item.selectedEvidence || []) {
-    const pin = input.pinnedEvidence.find((source) => source.sectionID === String(selection.sectionID));
-    assert.equal(pin.selectedText, selection.exactPassages.join("\n\n"));
-    assert.equal(pin.codePrefix, selection.codePrefix);
-    assert.equal(pin.sectionNumber, selection.sectionNumber);
-    exactPassages++;
+    for (const selectedText of selection.exactPassages) {
+      const pin = exactPins.find((source) => source.sectionID === String(selection.sectionID) && source.selectedText === selectedText);
+      assert.equal(pin.codePrefix, selection.codePrefix);
+      assert.equal(pin.sectionNumber, selection.sectionNumber);
+      exactPassages++;
+    }
+    exactGroups++;
   }
   for (const id of item.selectedEvidenceSectionIDs || []) {
     const pin = input.pinnedEvidence.find((source) => source.sectionID === String(id));
@@ -48,8 +58,14 @@ for (const { item, original } of cases) {
   }
   pins += input.pinnedEvidence.length;
 }
-assert.equal(pins, 47);
-assert.equal(exactPassages, 8);
+assert.equal(pins, 53);
+assert.equal(exactGroups, 8);
+assert.equal(exactPassages, 14);
+for (const exactPassages of [undefined, null, [], [""], [" \n "], ["Valid passage", null], "Not an array"]) {
+  await assert.rejects(() => ownerResearchScopeInput({ question: "Explain my selection.",
+    selectedEvidence: [{ sectionID: "2197", exactPassages }] }, { original: true }),
+  { code: "AUTHORED_SELECTION_INVALID" });
+}
 assert.throws(() => ownerResearchHTTPSelections({ pinnedEvidence: [{ sectionID: "113", selectedText: "" }] }));
 assert.throws(() => ownerResearchHTTPSelections({ pinnedEvidence: [{ selectedText: "Exact passage" }] }));
 const cc01 = await ownerResearchScopeInput(original.cases.find((item) => item.id === "CC-01"), { original: true });
@@ -64,4 +80,4 @@ assert.ok([...corpus.selected, ...(corpus.pinnedCorpora || [])].some((item) => i
   "Authored Zoning pins must select their corpus even when the question names no ZR section.");
 await assert.rejects(() => ownerResearchScopeInput({ question: "Explain my selection.", selectedEvidenceSectionIDs: [123] },
   { original: true, zoningSummary: async () => null }), { code: "AUTHORED_SELECTION_UNAVAILABLE" });
-console.log("All 110 authored inputs preserve 47 pins, eight exact selections and Project facts without reference-answer leakage.");
+console.log("All 110 authored inputs preserve 53 pins: 14 exact fragments in eight authored groups and 39 section references, with Project facts and no reference-answer leakage.");

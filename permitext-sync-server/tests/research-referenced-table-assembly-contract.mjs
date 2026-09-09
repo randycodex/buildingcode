@@ -208,4 +208,45 @@ assert(
   "A single complete anonymous legacy grid in its own table section must receive that table's canonical identity."
 );
 
-console.log("Permitext referenced-table Research assembly contract passed.");
+const pinnedRule = "The maximum number of stories shall not exceed the limits specified in Table 504.4.";
+const pinnedFragments = [pinnedRule, "Table 504.4"].map((selectedText, index) => ({
+  sectionID: "BC:504.4", codePrefix: "BC", sectionNumber: "504.4", sourceID: `pin-${index}`, selectedText
+}));
+const fromPinned = async (options = {}) => assembleResearchEvidence({
+  question: "Determine the allowed number of stories.", pinnedEvidence: pinnedFragments,
+  discover: async () => ({ candidates: [], coverageLimitations: [] }),
+  resolveSection: async (request) => sections.get(request.sectionNumber) || null,
+  ...options
+});
+const pinnedTable = await fromPinned();
+assert.deepEqual(pinnedTable.sources.filter((source) => source.origin === "user_pinned").map((source) => source.text),
+  pinnedFragments.map((pin) => pin.selectedText), "Table retrieval must not replace the exact highlights.");
+const companion = pinnedTable.sources.filter((source) => source.richSourceID === table5044.id);
+assert.equal(companion.length, 1, "An existing section pin must not suppress or duplicate its referenced structured table.");
+assert.equal(companion[0].origin, "permitext_cross_reference");
+assert.equal(companion[0].text, table5044.text);
+assert.deepEqual(companion[0].richSourceGrids, table5044.grids);
+assert.equal(companion[0].richSourceContentHash, table5044.contentHash);
+assert.equal(pinnedTable.usage.crossReferenceCount, 1);
+assert(!pinnedTable.limitations.some((item) => item.kind === "referenced-table-review-required"));
+
+for (const options of [
+  { strategy: { mode: "pinned_first", reason: "question_explicitly_bounded_to_selected_evidence" } },
+  { limits: { maximumCharacters: pinnedRule.length + "Table 504.4".length + 10 } },
+  { resolveSection: async (request) => ({ ...sections.get(request.sectionNumber), richSources: [] }) },
+  { resolveSection: async (request) => ({ ...sections.get(request.sectionNumber),
+    richSources: [{ ...table5044, reference: "BC Table 506.2" }] }) }
+]) {
+  const missing = await fromPinned(options);
+  assert.equal(missing.sources.filter((source) => source.richSourceID).length, 0);
+  assert(missing.limitations.some((item) => item.kind === "referenced-table-review-required"),
+    "A missing, mismatched, over-budget or excluded table must remain an explicit evidence gap.");
+  assert(missing.usage.characterCount <= missing.limits.maximumCharacters);
+}
+const alreadySelected = await fromPinned({ pinnedEvidence: [{
+  ...pinnedFragments[0], selectedText: table5044.text, richSourceID: table5044.id,
+  richSourceKind: "table", richSourceReference: table5044.reference, richSourceContentHash: table5044.contentHash,
+  richSourceGrids: table5044.grids, richSourceRowCount: table5044.rowCount
+}] });
+assert.equal(alreadySelected.sources.length, 1, "Do not duplicate an already selected complete table.");
+console.log("Permitext referenced-table Research assembly contract passed, including separate exact fragments and their same-section table dependency.");

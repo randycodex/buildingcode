@@ -69,17 +69,60 @@ try {
   const replay = await create([reference], { requestID });
   assert.equal(replay.status, 200); assert.equal(replay.body.conversation.id, first.body.conversation.id);
   assert.equal((await create([{ ...reference, sectionID: "20018017" }], { requestID })).status, 409);
-  // Use a single contiguous authored passage for the unchanged legacy path.
-  // Joining noncontiguous fragments is not a valid selection; do not weaken
-  // canonical matching to make that separate harness problem pass here.
-  const exactCase = key.cases.find((item) => item.id === "CC-02");
-  const exactInput = await ownerResearchScopeInput(exactCase, { original: true, zoningSummary: zoningSectionSummary });
-  const exact = await create(ownerResearchHTTPSelections(exactInput));
-  assert.equal(exact.status, 201, JSON.stringify(exact.body));
-  const savedExact = (await adapter.listResearchConversations(account.appUserID)).find((item) => item.id === exact.body.conversation.id);
-  for (const source of savedExact.sources.filter((source) => source.kind === "selection")) {
-    assert(source.selectedText.length > 0); assert.equal(source.selectionMode, undefined);
+  // The authored groups contain multiple, sometimes noncontiguous passages.
+  // Each must survive independently through canonical validation and dispatch.
+  const compact = (text) => String(text).replace(/\s+/g, " ").trim();
+  const scissorGroup = key.cases.find((item) => item.id === "CC-01").selectedEvidence[0];
+  const joined = await create([{ sectionID: scissorGroup.sectionID, selectedText: scissorGroup.exactPassages.join("\n\n") }]);
+  assert.equal(joined.status, 400);
+  assert.equal(joined.body.code, "INVALID_RESEARCH_SELECTION", "Joining separated passages must remain invalid.");
+  let exactGroupCount = 0, exactFragmentCount = 0;
+  for (const exactCase of key.cases.filter((item) => item.selectedEvidence?.length)) {
+    const expected = exactCase.selectedEvidence.flatMap((group) => group.exactPassages.map((selectedText) => ({
+      sectionID: String(group.sectionID), selectedText
+    })));
+    exactGroupCount += exactCase.selectedEvidence.length;
+    exactFragmentCount += expected.length;
+    const exactInput = await ownerResearchScopeInput(exactCase, { original: true, zoningSummary: zoningSectionSummary });
+    const exact = await create(ownerResearchHTTPSelections(exactInput));
+    assert.equal(exact.status, 201, `${exactCase.id}: ${JSON.stringify(exact.body)}`);
+    const savedExact = (await adapter.listResearchConversations(account.appUserID)).find((item) => item.id === exact.body.conversation.id);
+    assert.equal(savedExact.primaryProjectID, null);
+    const savedSelections = savedExact.sources.filter((source) => source.kind === "selection");
+    assert.deepEqual(savedSelections.map((source) => ({ sectionID: source.sectionID, selectedText: compact(source.selectedText) })),
+      expected.map((source) => ({ ...source, selectedText: compact(source.selectedText) })));
+    assert.equal(new Set(savedSelections.map((source) => source.id)).size, expected.length);
+    for (const source of savedSelections) {
+      assert.equal(source.selectionMode, undefined);
+      assert.match(source.selectedTextHash, /^[a-f0-9]{64}$/);
+      assert.deepEqual(source.visualSources, [], "Authored text does not confer visual review.");
+    }
+    requests = [];
+    const response = await ask(savedExact.id, exactInput.question);
+    assert(response.status >= 400, "The intercepted provider cannot produce an answer.");
+    assert.equal(requests.length, 1, `${exactCase.id}: ${JSON.stringify(response.body)}`);
+    const prompt = compact(requests[0].input);
+    for (const source of savedSelections) {
+      assert(prompt.includes(source.id), `${exactCase.id}: lost source identity ${source.id}`);
+      assert(prompt.includes(compact(source.selectedText)), `${exactCase.id}: lost an authored fragment`);
+    }
+    const expectedTable = { "CC-03": "BC Table 1004.1.3", "CC-04": "PC Table 403.1" }[exactCase.id];
+    if (expectedTable) {
+      const lines = requests[0].input.split("\n");
+      assert.equal(lines.filter((line) => line === `STRUCTURED_OFFICIAL_SOURCE: ${expectedTable}`).length, 1,
+        `${exactCase.id}: the requested table must arrive once as a separate canonical source`);
+      const grids = lines.filter((line) => line.startsWith("STRUCTURED_TABLE_GRIDS_JSON: "))
+        .flatMap((line) => JSON.parse(line.slice("STRUCTURED_TABLE_GRIDS_JSON: ".length)));
+      if (exactCase.id === "CC-03") assert(grids.some((grid) => grid.rows.some((row) =>
+        row.cells.some((cell) => cell.text.includes("Unconcentrated (tables and chairs)")) &&
+        row.cells.some((cell) => cell.text.includes("15 net")))),
+      "The actual model request must preserve the canonical table relationship, not just the separate fragments.");
+    }
+    assert((await adapter.listResearchConversations(account.appUserID)).find((item) => item.id === savedExact.id)
+      .messages.every((message) => message.role !== "assistant"));
   }
+  assert.equal(exactGroupCount, 8);
+  assert.equal(exactFragmentCount, 14);
   for (const id of ["ZR-03", "ZR-06", "ZR-09", "ZR-19", "ZR-20"]) {
     const input = await ownerResearchScopeInput(key.cases.find((item) => item.id === id), { original: true, zoningSummary: zoningSectionSummary });
     const selections = ownerResearchHTTPSelections(input);
@@ -153,7 +196,7 @@ try {
     "For this specific property, what did ZR Section 42-192 require in 2010?");
   assert.equal(requests.length, 0, "Missing historical enacted text must still block provider dispatch.");
   assert.equal(historicalAnswer.body.code, "RESEARCH_ZONING_PREREQUISITES_REQUIRED");
-  console.log("Section-reference HTTP contract passed: all five authored inputs reach a zero-usage boundary, exact-passage and visual safeguards remain intact; zero external/provider calls.");
+  console.log("Section-reference HTTP contract passed: five section-reference cases and all 14 exact fragments in eight authored groups reach the intercepted provider boundary; canonical and visual safeguards remain intact; zero external/provider calls.");
 } finally {
   if (server) { server.closeAllConnections(); await new Promise((resolve) => server.close(resolve)); }
   globalThis.fetch = nativeFetch;

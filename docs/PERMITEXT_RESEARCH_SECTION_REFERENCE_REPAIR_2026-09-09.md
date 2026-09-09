@@ -15,3 +15,26 @@ Validation uses the real isolated Research HTTP handler with intercepted zero-us
 Open limitations remain. Some unrelated discovered sources and partial secondary provisions still reach the bounded package. The exact-passage compatibility case is CC-02; this does not certify all eight authored exact-passage groups. CC-01 revealed that joining noncontiguous fragments into one highlight is invalid. A separate faithful fragment projection is still needed; do not loosen canonical matching or relabel past runs as having validated it.
 
 The new single-use five-case driver is `permitext-sync-server/scripts/run-research-owner-api-round2-section-reference-20260909.mjs`. Its default is a no-API preflight. It retains all prior ledgers, requires source/request binding, reserves $0.50 before each turn, and caps the batch at the $1.161233 conservative remainder of the current $8 round. Historical $7.887898 spending remains separate. Account balance and provider invoices have not been read. No Project workflow, phone, UI, deployment or publication testing is included.
+
+## Follow-up: exact fragments and their table dependencies
+
+The original exact-passage limitation above was reproduced at `98ccdeafe`: CC-01 failed conversation creation with HTTP 400 / `INVALID_RESEARCH_SELECTION`, before any provider dispatch. The authored group contained separate passages that the adapter joined into one noncontiguous highlight. The expanded HTTP contract failed on that actual error before the repair; its log is `/tmp/permitext-owner-fragment-before-20260909.log`.
+
+`ownerResearchScopeInput` now projects each exact passage independently, retaining its section, authored text, order and distinct source identity. It rejects missing, empty or malformed passage arrays instead of dropping them. The eight authored groups contain 14 fragments. Together with the unchanged 39 section references, all 110 cases now project 53 pins rather than the earlier 47. Questions, supplied facts, answer keys and approval records are unchanged. The all-case input contract confirms that expected answers and reviewer fields cannot affect those inputs.
+
+The real isolated HTTP contract now covers all five Construction Code cases, not only CC-02. It verifies all 14 fragments after canonical validation, in saved unassigned Research selections, and in the actual request intercepted immediately before provider dispatch. It checks separate source identities, text hashes and the absence of fabricated visual review. Joining the separated CC-01 passages still fails canonical validation. No model response is generated or accepted by this test.
+
+That repair exposed a second issue: pinning part of a section prevented cross-reference expansion from adding the complete table in that same section. CC-03 therefore supplied the table label and `15 net` as independent snippets without a structured table. The new assembly contract reproduced the absent table before the runtime fix (`/tmp/permitext-fragment-table-before-20260909.log`).
+
+Assembler version `20260909-pinned-table-dependencies-v34` permits a referenced table to be added separately when an existing pin has not supplied it. The exact selected passages remain intact. The companion uses canonical table text, grids, identity and content hash and consumes the existing cross-reference and character budgets. An already included complete table is not duplicated. Missing, mismatched, over-budget or explicitly excluded tables retain an evidence limitation; no row/column relationship is inferred from disconnected snippets.
+
+The HTTP test confirms that CC-03 receives `BC Table 1004.1.3` once with the canonical row cells containing the assembly categories and corresponding values. CC-04 similarly receives `PC Table 403.1` once. These are automatically resolved canonical companions, not additional selections falsely attributed to the author. The prepared assembly table groups several assembly subcategories within a row; this check proves preservation of that source structure, not independent visual validation of the official table or a correct generated calculation.
+
+Validation passed:
+
+- All 110 authored-input projections, including 14 exact fragments and 39 section references, with reference-answer isolation.
+- Same-section table dependency tests, including absent/mismatched grids, budget limits, strict selected-evidence scope and an already selected table.
+- The complete `npm run test:research-chat` suite (exit 0), including the expanded real HTTP test. Final log: `/tmp/permitext-fragment-table-research-suite-20260909.log`.
+- `git diff --check`.
+
+This follow-up used no paid provider calls. The last live audit remains at $7.468798 conservatively for the current $8 round, leaving $0.531202; those are ledger calculations, not a refreshed account balance. The prior live drivers remain consumed and their results are not relabeled as having tested this revision. Live answer correctness, brevity, latency and cost still need confirmation. Unrelated retrieved material remains a separate quality/cost issue. No Project/Notebook/Reports/export workflow, UI, phone, push or deployment work was performed.
