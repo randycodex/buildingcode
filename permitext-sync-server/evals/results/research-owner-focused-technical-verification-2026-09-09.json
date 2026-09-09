@@ -1,0 +1,43 @@
+{
+  "schema": "permitext-focused-technical-verification-v1",
+  "checkedAt": "2026-09-09T01:58:03.066Z",
+  "sourceBindings": [
+    {
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "checkedSourceCount": 27,
+      "allMatchRecordedCommit": true
+    },
+    {
+      "sourceCommit": "5522677479de386213351707a72151a1e02eae85",
+      "checkedSourceCount": 28,
+      "allMatchRecordedCommit": true
+    }
+  ],
+  "checks": [
+    {
+      "command": "npm run test:research-chat",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "exitCode": 0,
+      "logSHA256": "7cd33d8f05a3722d4d244167e9793cecc22a8905f5a8b12e52aa5741ccd060eb",
+      "scope": "Complete offline Research suite before the live batch; no Project workflow."
+    },
+    {
+      "command": "node tests/research-answer-quality-contract.mjs",
+      "sourceCommit": "5522677479de386213351707a72151a1e02eae85",
+      "exitCode": 0,
+      "scope": "Existing answer-quality and repair controls after the percentage-domain fix."
+    },
+    {
+      "command": "node tests/research-dining-percentage-scope-contract.mjs",
+      "sourceCommit": "5522677479de386213351707a72151a1e02eae85",
+      "exitCode": 0,
+      "logSHA256": "935580ddfd9f40e4d18ad5905c88311d755cba079c6301746df6f34c0dd10a24",
+      "scope": "Both retained exhaust drafts, mixed-topic repair isolation and genuine dining misbinding."
+    }
+  ],
+  "pendingProviderRequests": 0,
+  "productionDeployed": false,
+  "projectWorkflowTested": false,
+  "sourceComparisonFile": "evals/results/research-owner-focused-technical-source-comparison-2026-09-09.json",
+  "sourceComparisonSHA256": "3c2ce75d6191b2e4b846064b1595b4045a919eb18204a86cb03b6acd3b466e63"
+}

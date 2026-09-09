@@ -1,0 +1,1327 @@
+{
+  "schema": "permitext-owner-api-round2-percentage-scope-v1",
+  "sourceCommit": "5522677479de386213351707a72151a1e02eae85",
+  "authorization": "Owner explicitly authorized fresh API tests with $8 currently available and requested notice if more is needed. This is a new $8 round; historical costs stay separate. This single-use batch checks the exhaust case after repairing the unrelated dining-percentage rejection and dispatches only turns that fit the offline preflight. Maximum $0.50 for the batch within the remaining $8 round allowance. Each next turn requires a full $0.50 remaining conservative allowance. No Project workflow tests or deployment.",
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 3.260594,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 0.5,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 1,
+  "maximumProviderRequests": 5,
+  "maximumProviderRequestsPerTurn": 5,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "6953d0c784e839e7724b7b8641b6e24b97ed1f8989c5a01ab649b848de362cf8",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-08",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual automatic-retrieval HTTP Research flow on isolated local accounts and storage. Expected answers are not supplied to drafting or verification. Automatic web support remains enabled in configuration; each focused enacted-code question must avoid it. The driver rejects web tools and document reads. Offline preflight intercepts every provider call. Preflight-blocked turns are skipped without spending. No public eligibility, deployment, Project workflow or phone changes.",
+  "cases": [
+    "MC-09"
+  ],
+  "preflightSHA256": "f0f7e8e3e4b569bdbfcdbb023b1a64465931c1c5fda39e69342324d13d30779b",
+  "sourceHashes": {
+    "app.mjs": "ee781714a773d2bd6b61020e3ab50728e665b1c366a65ff2b5f257d036862c2a",
+    "research-answer-quality.mjs": "cad6d658ff2805ee6e56e48b2b135f5dec28863b02020183731b0815b2ecec4f",
+    "research-focused-technical-scope.mjs": "4c7f8ff22bc4bd11bf87a55417b8795b164443e0a704d9e64ebc33f27fc27f49",
+    "research-conversation-topic.mjs": "77baee9c8db51501fca1bfee6ea192869f8e6fd8a7c35b48eb8d5a7f848f7858",
+    "research-technical-topic-routes.mjs": "319075fb7223e387a70ee4038b62cab0c1df839c68de374317277d4548c8ef62",
+    "evidence-discovery.mjs": "47f76c9ba11ea1d5c05edc996eebe110fd4f467bccffe05c4fc1b2e6b6e2d714",
+    "research-conversation-facts.mjs": "a8ae9fe2815d17f1cbd61d1995f4ad311bdf3267904ed52bdc070b73b7e57213",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-source-policy.mjs": "f916933dd3ac3609bc4cf0b71fbe29e3d9c30ee71ca1272ae506da4bfc76b8af",
+    "research-official-html-attribution.mjs": "1df895ea6b221335f4e1daebf2d7d881d5a3a93e0a3910f43a9146b9cc3491ee",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "525ed1ae6faa3640926462d9dd423bc3ea17b1261cde3d94d3a3a26b37039104",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "d61971dfb9c6295e2ddf38d0298645c0a59f788e2fbf119feb352e5ae33ac744",
+    "research-evidence-assembly.mjs": "b7bc0cf480804991b877993498268e01c277a31699dc6bd3f948b370a051b36a",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "15e7dc17bd9ff1fa69938ba13b35686d56ee2cf5178a9350f1f5b5199e0ee97f",
+    "evals/research-reconciled-answer-key.json": "6953d0c784e839e7724b7b8641b6e24b97ed1f8989c5a01ab649b848de362cf8",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "eef06bb4d0acf230929cb355f15427d197f7f20c961651feaa8f2003d57dea54",
+    "scripts/run-research-owner-api-round2-percentage-scope-20260909.mjs": "47c884044cf9977fa2adde4ce8c921e2c4556b63387d2b0b43789c3fca9b7349"
+  },
+  "startedAt": "2026-09-09T01:54:41.124Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "MC-09",
+      "question": "An environmental exhaust outlet is located four feet horizontally from a mechanical outdoor-air intake. No special exception or engineered re-entrainment analysis is identified. Is four feet enough?",
+      "inputSHA256": "507fe315d964a751d4b9e66008989180582ca797e191a4cd21e4cabbfc54127a",
+      "readerSelectionsSHA256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "185bddc3e94f0a7f8ec76e6d5bd9afca18b72e8dcb232bfe57127106771404b7",
+      "initialModel": "gpt-5.6-terra",
+      "initialRequestBytes": 46723,
+      "durationMilliseconds": 22277,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.292735,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "9ffd2088-b7fc-4c9f-9c05-f6bb5d0623c1",
+          "createdAt": "2026-09-09T01:54:41.629Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 20299,
+          "cachedInputTokens": 12828,
+          "cacheWriteInputTokens": 7465,
+          "outputTokens": 1441,
+          "totalTokens": 21740,
+          "estimatedCostUSD": 0.015313,
+          "actualProviderCostUSD": 0.015313,
+          "conservativeProviderCostUSD": 0.071465,
+          "durationMilliseconds": 22191,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "requestedModel": "gpt-5.6-terra",
+        "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+        "evidenceVersion": "20260909-focused-technical-v31:structured-v1",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": 2022,
+          "codeEdition": "2022 New York City Construction Codes",
+          "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-2022-construction-codes",
+              "label": "2022 NYC Construction Codes",
+              "codeEdition": "2022 New York City Construction Codes",
+              "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+              "codeYear": 2022,
+              "applicabilityStatus": "current-enacted-edition",
+              "routeReason": "ordinary Construction Code default",
+              "blockedReason": null,
+              "codePrefixes": [
+                "AC",
+                "BC",
+                "FGC",
+                "MC",
+                "PC"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: 2022 NYC Construction Codes",
+          "limitation": null,
+          "resolvedAt": "2026-09-09T01:54:41.867Z"
+        },
+        "answerText": "**No.** Four feet is not enough for an environmental air exhaust outlet located horizontally from a mechanical outdoor-air intake. The required separation is **10 feet**; the proposed 4-foot separation is **6 feet short** (MC § 501.3.1, Item 3).\n\nThe intake-location rule is consistent: mechanical outdoor-air intakes must be at least 10 feet horizontally from hazardous or noxious contaminant sources, including exhausts, while the separate 3-foot-below alternative applies only to a contaminant source within 10 feet when the Item 3 separation cannot be achieved (MC § 401.4, Items 3–4). Environmental exhaust is expressly not considered hazardous or noxious under MC § 501.3.1. The only supplied exception to the 10-foot environmental-exhaust/intake separation is limited to specified low-flow Class 1 or Class 2 exhaust serving a single room, dwelling, or sleeping unit and requires manufacturer-established combined energy-recovery cross-contamination plus re-entrainment below 10% of intake airflow. You state no such exception or analysis is identified.",
+        "conclusion": "**No.** Four feet is not enough for an environmental air exhaust outlet located horizontally from a mechanical outdoor-air intake. The required separation is **10 feet**; the proposed 4-foot separation is **6 feet short** (MC § 501.3.1, Item 3).",
+        "supportedPoints": [
+          {
+            "heading": "Environmental exhaust requires 10 feet from a mechanical intake",
+            "explanation": "For all environmental air exhaust outlets, the termination must be 10 feet from mechanical air intakes. A 4-foot horizontal separation therefore does not comply with that stated minimum.",
+            "sectionID": "10455",
+            "sourceIDs": [
+              "research-permitext_discovered-id:10455-2"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "The 3-foot-below intake provision does not create a general 4-foot alternative",
+            "explanation": "Mechanical and gravity outdoor-air intakes must generally be 10 feet horizontally from hazardous or noxious contaminant sources, including exhausts. Where that Item 3 requirement cannot be achieved, the intake must be at least 3 feet below a contaminant source within 10 feet. Environmental exhaust outlets are expressly not considered hazardous or noxious, so that provision does not establish a 4-foot horizontal allowance for the stated environmental exhaust outlet.",
+            "sectionID": "10406",
+            "sourceIDs": [
+              "research-permitext_discovered-id:10406-1",
+              "research-permitext_discovered-id:10455-2"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Narrow exception to the 10-foot separation",
+            "explanation": "The 10-foot separation is not required only for the specified low-flow Class 1 or Class 2 exhaust serving a single room, dwelling, or sleeping unit, and only where manufacturer-established combined energy-recovery-device cross-contamination and intake re-entrainment are below 10 percent of intake airflow. The supplied facts identify no such exception or analysis.",
+            "sectionID": "10455",
+            "sourceIDs": [
+              "research-permitext_discovered-id:10455-2"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "The intake-location rule is consistent: mechanical outdoor-air intakes must be at least 10 feet horizontally from hazardous or noxious contaminant sources, including exhausts, while the separate 3-foot-below alternative applies only to a contaminant source within 10 feet when the Item 3 separation cannot be achieved (MC § 401.4, Items 3–4). Environmental exhaust is expressly not considered hazardous or noxious under MC § 501.3.1. The only supplied exception to the 10-foot environmental-exhaust/intake separation is limited to specified low-flow Class 1 or Class 2 exhaust serving a single room, dwelling, or sleeping unit and requires manufacturer-established combined energy-recovery cross-contamination plus re-entrainment below 10% of intake airflow. You state no such exception or analysis is identified.",
+        "assumptions": [],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This answer is limited to the supplied 2022 NYC Mechanical Code provisions and does not evaluate separate requirements that may apply to a particular specialized exhaust system."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "10455",
+            "sectionNumber": "501.3.1",
+            "title": "501.3.1 Location of exhaust outlets.",
+            "codePrefix": "MC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:10455-2"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:10455-2",
+                "selectedText": "501.3.1 501.3.1 Location of exhaust outlets. The termination point of exhaust outlets and ducts discharging to the outdoors shall be located with the minimum distances of separation specified in Items 1 through 6 of this section. Separation shall not be required between an air intake and the discharge air from non-evaporative heat rejection or heat absorption appliances such as air-cooled condensers, dry coolers, or heat pump evaporators; such air is not exhaust. The inlet and discharge of the appliance shall not reduce the effective separation of other exhausts from ventilation intakes to less than the required minimums. 1. For ducts conveying noxious, toxic, explosive or flammable vapors, fumes or dusts (including but not limited to exhaust from dry cleaning establishments and spray booths): 30 feet (9144 mm) from property lines; 10 feet (3048 mm) from operable openings into buildings; 6 feet (1828.8 mm) from exterior walls and roofs; 30 feet (9144 mm) from combustible walls and operable openings into buildings which are in the direction of the exhaust discharge; 10 feet (3048 mm) above adjoining grade. Additional requirements may apply to Hazardous Exhaust Systems; see Section 510 . 2. For other product-conveying outlets: 10 feet (3048 mm) from the property lines; 3 feet (914.4 mm) from exterior walls and roofs; 10 feet (3048 mm) from operable openings into buildings; 10 feet (3048 mm) above adjoining grade; 10 feet from any exterior fire escape, stair, or balcony. 3. For all environmental air exhaust outlets: 3 feet (914.4 mm) from property lines separating lots; 3 feet (914.4 mm) from operable openings into buildings for all occupancies other than Group U, and 10 feet (3048 mm) from mechanical air intakes. Such exhaust outlets shall not be considered hazardous or noxious. Exception: A 10 foot (3048 mm) separation is not required between a mechanical air intake and an exhaust outlet which serve either of the following: 1. a single room, dwelling or sleeping unit with less than 750 cfm (354 L/s) Class 1 exhaust air; or 2. a single dwelling or sleeping unit with less than 400 cfm (189 L/s) Class 2 exhaust air. For this exception, the sum of any energy recovery device cross contamination and any re-entrainment of exhaust through the intake shall be less than 10% of the intake air flow as established by the manufacturer. The distance requirements from property lines and operable openings shall be maintained. Air Class shall be determined in accordance with ASHRAE Standard 62.1. 4. Exhaust outlets and openings serving structures in flood hazard areas shall comply with the additional requirements of Appendix G of the New York City Building Code . 5. For specific systems see the following sections: 5.1. Clothes dryer exhaust, Section 504.4. 5.2. Kitchen hoods and other kitchen exhaust equipment, Sections 506.3.13, 506.4 and 506.5. 5.3. Dust stock and refuse conveying systems, Section 511 . 5.4. Subslab soil exhaust systems, Section 512.4. 5.5. Smoke control systems, Section 909.10.3 of the New York City Building Code . 5.6. Refrigerant discharge, Section 1105.7. 5.7. Machinery room discharge, Section 1105.6.1. 6. In Occupancy Groups R-2 and R-3 each dwelling unit may be individually exhausted directly to the outdoors with a dedicated exhaust fan and shall comply with the following: 6.1. The exhaust system for the kitchen and the toilet/baths may be combined to the inlet of a single fan, provided such exhaust system serves only one dwelling unit. 6.2. The dedicated exhaust from each dwelling unit shall be directed away from any window serving the same dwelling unit from which the exhaust is taken, and in addition, such exhaust opening shall terminate at least: 6.2.1. Two feet (609.6 mm) from any operational window or door serving the same dwelling unit. 6.2.2. Three feet (914.4 mm) from any operational window or door serving an adjoining dwelling unit. 6.2.3. Three feet (914.4 mm) from any operational window or door serving another occupancy group in the same building. 6.2.4. Ten feet (3048 mm) from any outdoor air intake opening other than intakes serving the same dwelling unit. 6.2.5. Ten feet (3048 mm) above the public sidewalk adjoining the same building. 6.2.6 All other minimum distances prescribed in items 1 through 5 of Section 501.3.1 shall be satisfied",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the 10-foot minimum separation between environmental air exhaust outlets and mechanical air intakes, and states the limited exception."
+          },
+          {
+            "sectionID": "10406",
+            "sectionNumber": "401.4",
+            "title": "401.4 Intake opening location.",
+            "codePrefix": "MC",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "corpusID": "nyc-2022-construction-codes",
+            "corpusLabel": "2022 NYC Construction Codes",
+            "applicabilityStatus": "current-enacted-edition",
+            "sourceIDs": [
+              "research-permitext_discovered-id:10406-1"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "research-permitext_discovered-id:10406-1",
+                "selectedText": "401.4 401.4 Intake opening location. Ventilation air intake openings shall comply with all of the following: 1. Intake openings shall be located not less than 10 feet (3048 mm) from lot lines or buildings on the same lot. For buildings on lots measuring less than 20 feet (6096 mm) in width, intake openings shall be located at the centerline between lot lines. Where openings front on a street or public way, the distance shall be measured to the centerline of the street or public way. 2. Outdoor air intakes for office occupancies having occupied floors located more than 75 feet (22 860 mm) above the lowest level of fire department vehicle access serving spaces above the second story and serving spaces greater than 10,000 square feet (929 m 2 ) of floor area shall be located at least 20 feet (6096 mm) above ground level, at least 30 feet (9144 mm) from exhaust outlets and other exhaust discharges, and at least 20 feet (6096 mm) from areas that may collect vehicular exhaust, such as off street loading bays. 3. Mechanical and gravity outdoor air intake openings shall be located not less than 10 feet (3048 mm) horizontally from any hazardous or noxious contaminant source, such as vents, exhausts (including but not limited to exhaust from dry cleaning establishments, spray booths, and cooling towers), streets, alleys, parking lots and loading docks, except as specified in Item 3 of Section 501.3.1. Outdoor air intake openings shall be permitted to be located less than 10 feet (3048 mm) horizontally from streets, alleys, parking lots and loading docks provided that the openings are located not less than 25 feet (7620 mm) vertically above such locations. Where openings front on a street or public way, the distance shall be measured to the centerline of the street or public way. 4. Where the requirements of Item 3 above cannot be achieved, intake openings shall be located not less than 3 feet (914.4 mm) below contaminant sources where such sources are located within 10 feet (3048 mm) of the opening. 5. Intake openings in Group I occupancies shall comply with ANSI/ASHRAE/ASHE 170, as required. 6. Intake openings on structures in flood hazard areas shall comply with the additional requirements of Appendix G of the New York City Building Code . Exception: Group R-3 occupancies are not required to comply with Section 401.4. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Establishes the intake-location rule and its limited 3-foot-below provision for contaminant sources."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "10406",
+          "10455",
+          "305",
+          "113",
+          "10587",
+          "10639",
+          "10643",
+          "10647",
+          "10737",
+          "11268"
+        ],
+        "evidenceSourceIDs": [
+          "research-permitext_discovered-id:10406-1",
+          "research-permitext_discovered-id:10455-2",
+          "research-permitext_discovered-id:305-3",
+          "research-permitext_discovered-id:113-4",
+          "research-permitext_cross_reference-id:10587-4",
+          "research-permitext_cross_reference-id:10639-5",
+          "research-permitext_cross_reference-id:10643-6",
+          "research-permitext_cross_reference-id:10647-7",
+          "research-permitext_cross_reference-id:10737-9",
+          "research-permitext_cross_reference-id:11268-11"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 10,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 2,
+          "governingCitationCount": 2,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 8,
+          "userPinnedCount": 0,
+          "permitextDiscoveredCount": 4,
+          "crossReferenceCount": 6,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 2,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "MC 401.4",
+              "summary": "MC 401.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10406-1"
+              ]
+            },
+            {
+              "label": "MC 501.3.1",
+              "summary": "MC 501.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10455-2"
+              ]
+            }
+          ],
+          "generalRules": [
+            {
+              "label": "MC 401.4",
+              "summary": "MC 401.4 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10406-1"
+              ]
+            }
+          ],
+          "exceptions": [
+            {
+              "label": "MC 501.3.1",
+              "summary": "MC 501.3.1 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:10455-2"
+              ]
+            },
+            {
+              "label": "BC 403.7",
+              "summary": "BC 403.7 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:305-3"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "BC 202",
+              "summary": "BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_discovered-id:113-4"
+              ]
+            }
+          ],
+          "crossReferences": [
+            {
+              "label": "MC 504.4",
+              "summary": "MC 504.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:10587-4"
+              ]
+            },
+            {
+              "label": "MC 506.3.13",
+              "summary": "MC 506.3.13 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:10639-5"
+              ]
+            },
+            {
+              "label": "MC 506.4",
+              "summary": "MC 506.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:10643-6"
+              ]
+            },
+            {
+              "label": "MC 506.5",
+              "summary": "MC 506.5 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:10647-7"
+              ]
+            },
+            {
+              "label": "MC 512.4",
+              "summary": "MC 512.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:10737-9"
+              ]
+            },
+            {
+              "label": "MC 1105.7",
+              "summary": "MC 1105.7 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "research-permitext_cross_reference-id:11268-11"
+              ]
+            }
+          ],
+          "tables": [],
+          "userPinnedEvidence": [],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:10406-1",
+            "research-permitext_discovered-id:10455-2",
+            "research-permitext_discovered-id:305-3",
+            "research-permitext_discovered-id:113-4",
+            "research-permitext_cross_reference-id:10587-4",
+            "research-permitext_cross_reference-id:10639-5",
+            "research-permitext_cross_reference-id:10643-6",
+            "research-permitext_cross_reference-id:10647-7",
+            "research-permitext_cross_reference-id:10737-9",
+            "research-permitext_cross_reference-id:11268-11"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260908-negative-work-premise-v6",
+          "activeRootTopic": "An environmental exhaust outlet is located four feet horizontally from a mechanical outdoor-air intake. No special exception or engineered re-entrainment analysis is identified. Is four feet enough?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "An environmental exhaust outlet is located four feet horizontally from a mechanical outdoor-air intake. No special exception or engineered re-entrainment analysis is identified. Is four feet enough?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:10406-1",
+            "research-permitext_discovered-id:10455-2"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "research-permitext_discovered-id:10455-2",
+            "research-permitext_discovered-id:10406-1"
+          ],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:10455-2",
+            "research-permitext_discovered-id:10406-1"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:305-3",
+            "research-permitext_discovered-id:113-4",
+            "research-permitext_cross_reference-id:10587-4",
+            "research-permitext_cross_reference-id:10639-5",
+            "research-permitext_cross_reference-id:10643-6",
+            "research-permitext_cross_reference-id:10647-7",
+            "research-permitext_cross_reference-id:10737-9",
+            "research-permitext_cross_reference-id:11268-11"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:10406-1",
+              "label": "MC 401.4 — 401.4 Intake opening location.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:10406-1"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:10455-2",
+              "label": "MC 501.3.1 — 501.3.1 Location of exhaust outlets.",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:10455-2"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 2,
+          "coveredClaimCount": 2,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "research-permitext_discovered-id:10455-2",
+            "research-permitext_discovered-id:10406-1"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:research-permitext_discovered-id:10406-1",
+              "label": "MC 401.4 — 401.4 Intake opening location.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 1,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:10406-1"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:10406-1"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 1,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:10455-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:10406-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:10406-1",
+                        "research-permitext_discovered-id:10455-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:10455-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [
+                        "research-permitext_discovered-id:10406-1"
+                      ],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": false,
+                      "acceptable": false
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "required-passage:research-permitext_discovered-id:10455-2",
+              "label": "MC 501.3.1 — 501.3.1 Location of exhaust outlets.",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "research-permitext_discovered-id:10455-2"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "research-permitext_discovered-id:10455-2"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:10455-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:10406-1",
+                        "research-permitext_discovered-id:10455-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 2,
+                      "sourceIDs": [
+                        "research-permitext_discovered-id:10455-2"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260909-dining-percentage-domain-v29",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "research-permitext_discovered-id:10455-2",
+            "research-permitext_discovered-id:10406-1"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:305-3",
+            "research-permitext_discovered-id:113-4",
+            "research-permitext_cross_reference-id:10587-4",
+            "research-permitext_cross_reference-id:10639-5",
+            "research-permitext_cross_reference-id:10643-6",
+            "research-permitext_cross_reference-id:10647-7",
+            "research-permitext_cross_reference-id:10737-9",
+            "research-permitext_cross_reference-id:11268-11"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 2,
+            "citedProvisionCount": 2,
+            "governingCitationCount": 2,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 8,
+            "reviewedOnlyProvisionCount": 8,
+            "assembledSourceCount": 10,
+            "assembledProvisionCount": 10
+          },
+          "sources": [
+            {
+              "sourceID": "research-permitext_discovered-id:10406-1",
+              "sectionID": "10406",
+              "reference": "MC 401.4",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "401.4 401.4 Intake opening location. Ventilation air intake openings shall comply with all of the following: 1. Intake openings shall be located not less than 10 feet (3048 mm) from lot lines or buildings on the same lot. For buildings on lots measuring less than 20 feet (6096 mm) in width, intake openings shall be located at the centerline between lot lines. Where openings front on a street or public way, the distance shall be measured to the centerline of the street or public way. 2. Outdoor air intakes for office occupancies having occupied floors located more than 75 feet (22 860 mm) above the lowest level of fire department vehicle access serving spaces above the second story and serving spaces greater than 10,000 square feet (929 m 2 ) of floor area shall be located at least 20 feet (6096 mm) above ground level, at least 30 feet (9144 mm) from exhaust outlets and other exhaust discharges, and at least 20 feet (6096 mm) from areas that may collect vehicular exhaust, such as off street loading bays. 3. Mechanical and gravity outdoor air intake openings shall be located not less than 10 feet (3048 mm) horizontally from any hazardous or noxious contaminant source, such as vents, exhausts (including but not limited to exhaust from dry cleaning establishments, spray booths, and cooling towers), streets, alleys, parking lots and loading docks, except as specified in Item 3 of Section 501.3.1. Outdoor air intake openings shall be permitted to be located less than 10 feet (3048 mm) horizontally from streets, alleys, parking lots and loading docks provided that the openings are located not less than 25 feet (7620 mm) vertically above such locations. Where openings front on a street or public way, the distance shall be measured to the centerline of the street or public way. 4. Where the requirements of Item 3 above cannot be achieved, intake openings shall be located not less than 3 feet (914.4 mm) below contaminant sources where such sources are located within 10 feet (3048 mm) of the opening. 5. Intake openings in Group I occupancies shall comply with ANSI/ASHRAE/ASHE 170, as required. 6. Intake openings on structures in flood hazard areas shall comply with the additional requirements of Appendix G of the New York City Building Code . Exception: Group R-3 occupancies are not required to comply with Section 401.4. (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 ."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:10455-2",
+              "sectionID": "10455",
+              "reference": "MC 501.3.1",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "501.3.1 501.3.1 Location of exhaust outlets. The termination point of exhaust outlets and ducts discharging to the outdoors shall be located with the minimum distances of separation specified in Items 1 through 6 of this section. Separation shall not be required between an air intake and the discharge air from non-evaporative heat rejection or heat absorption appliances such as air-cooled condensers, dry coolers, or heat pump evaporators; such air is not exhaust. The inlet and discharge of the appliance shall not reduce the effective separation of other exhausts from ventilation intakes to less than the required minimums. 1. For ducts conveying noxious, toxic, explosive or flammable vapors, fumes or dusts (including but not limited to exhaust from dry cleaning establishments and spray booths): 30 feet (9144 mm) from property lines; 10 feet (3048 mm) from operable openings into buildings; 6 feet (1828.8 mm) from exterior walls and roofs; 30 feet (9144 mm) from combustible walls and operable openings into buildings which are in the direction of the exhaust discharge; 10 feet (3048 mm) above adjoining grade. Additional requirements may apply to Hazardous Exhaust Systems; see Section 510 . 2. For other product-conveying outlets: 10 feet (3048 mm) from the property lines; 3 feet (914.4 mm) from exterior walls and roofs; 10 feet (3048 mm) from operable openings into buildings; 10 feet (3048 mm) above adjoining grade; 10 feet from any exterior fire escape, stair, or balcony. 3. For all environmental air exhaust outlets: 3 feet (914.4 mm) from property lines separating lots; 3 feet (914.4 mm) from operable openings into buildings for all occupancies other than Group U, and 10 feet (3048 mm) from mechanical air intakes. Such exhaust outlets shall not be considered hazardous or noxious. Exception: A 10 foot (3048 mm) separation is not required between a mechanical air intake and an exhaust outlet which serve either of the following: 1. a single room, dwelling or sleeping unit with less than 750 cfm (354 L/s) Class 1 exhaust air; or 2. a single dwelling or sleeping unit with less than 400 cfm (189 L/s) Class 2 exhaust air. For this exception, the sum of any energy recovery device cross contamination and any re-entrainment of exhaust through the intake shall be less than 10% of the intake air flow as established by the manufacturer. The distance requirements from property lines and operable openings shall be maintained. Air Class shall be determined in accordance with ASHRAE Standard 62.1. 4. Exhaust outlets and openings serving structures in flood hazard areas shall comply with the additional requirements of Appendix G of the New York City Building Code . 5. For specific systems see the following sections: 5.1. Clothes dryer exhaust, Section 504.4. 5.2. Kitchen hoods and other kitchen exhaust equipment, Sections 506.3.13, 506.4 and 506.5. 5.3. Dust stock and refuse conveying systems, Section 511 . 5.4. Subslab soil exhaust systems, Section 512.4. 5.5. Smoke control systems, Section 909.10.3 of the New York City Building Code . 5.6. Refrigerant discharge, Section 1105.7. 5.7. Machinery room discharge, Section 1105.6.1. 6. In Occupancy Groups R-2 and R-3 each dwelling unit may be individually exhausted directly to the outdoors with a dedicated exhaust fan and shall comply with the following: 6.1. The exhaust system for the kitchen and the toilet/baths may be combined to the inlet of a single fan, provided such exhaust system serves only one dwelling unit. 6.2. The dedicated exhaust from each dwelling unit shall be directed away from any window serving the same dwelling unit from which the exhaust is taken, and in addition, such exhaust opening shall terminate at least: 6.2.1. Two feet (609.6 mm) from any operational window or door serving the same dwelling unit. 6.2.2. Three feet (914.4 mm) from any operational window or door serving an adjoining dwelling unit. 6.2.3. Three feet (914.4 mm) from any operational window or door serving another occupancy group in the same building. 6.2.4. Ten feet (3048 mm) from any outdoor air intake opening other than intakes serving the same dwelling unit. 6.2.5. Ten feet (3048 mm) above the public sidewalk adjoining the same building. 6.2.6 All other minimum distances prescribed in items 1 through 5 of Section 501.3.1 shall be satisfied"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:305-3",
+              "sectionID": "305",
+              "reference": "BC 403.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "exception",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "403.7 403.7 Outdoor air intakes. For high-rise buildings, outdoor air intakes serving spaces above the second story and serving spaces greater than 10,000 square feet (929 m 2 ) of floor area shall be located in accordance with Section 401.5 of the New York City Mechanical Code . Exception: Group R-2 occupancy."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:113-4",
+              "sectionID": "113",
+              "reference": "BC 202",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "definition",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "DWELLING UNIT. A single unit consisting of one or more habitable rooms and occupied or arranged to be occupied as a unit separate from all other units within a dwelling. EXTERIOR WALL . A wall , bearing or nonbearing , that is used as an enclosing wall for a building , other than a fire wall , and that has a slope of 60 degrees ( 1 . 05 rad ) or greater with the horizontal plane . FLAMMABLE VAPORS OR FUMES. The concentration of flammable constituents in air that exceed 25 percent of their lower flammable limit (LFL). FLOOD HAZARD AREA. The following two areas: 1. The area within a flood plain subject to a 1-percent or greater chance of flooding in any year. Also defined as the \"special flood hazard area\". 2. Where buildings are classified as Flood Design Class 4, the area within a flood plain delineated as shaded X-Zones. HIGH-RISE BUILDING. A building with an occupied floor located more than 75 feet (22 860 mm) above the lowest level of fire department vehicle access. LOT LINE. A line dividing one lot from another, or from a street or any public place. PUBLIC WAY. A street, alley or other parcel of land open to the outside air leading to a street that has been deeded, dedicated or otherwise permanently appropriated to the public for public use and which has a clear width and height of not less than 10 feet (3048 mm). SLEEPING UNIT. A dwelling unit, which may contain either toilet or kitchen facilities but not both. Any sleeping unit housing more than one family shall also be classified as a congregate living unit. The creation of or conversion to sleeping units shall be limited by Section 27-2077 of the New York City Housing Maintenance Code ."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10587-4",
+              "sectionID": "10587",
+              "reference": "MC 504.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "504.4 504.4 Exhaust installation. Dryer exhaust ducts for clothes dryers shall terminate on the outside of the building. Single dryer installations shall be equipped with a backdraft damper. Multiple dryer installations shall not have a backdraft damper. Screens shall not be installed at the duct termination. Ducts shall not be connected or installed with sheet metal screws or other fasteners that will obstruct the exhaust flow. Clothes dryer exhaust ducts shall not be connected to a vent connector, vent or chimney. Clothes dryer exhaust ducts shall not extend into or through ducts or plenums."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10639-5",
+              "sectionID": "10639",
+              "reference": "MC 506.3.13",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "506.3.13 506.3.13 Exhaust outlets serving Type I hoods. Exhaust outlets for grease ducts serving Type I hoods shall conform to the requirements of Sections 506.3.13.1 through 506.3.13.3."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10643-6",
+              "sectionID": "10643",
+              "reference": "MC 506.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "506.4 506.4 Ducts serving Type II hoods. Commercial kitchen exhaust systems serving Type II hoods shall comply with Sections 506.4.1 and 506.4.2."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10647-7",
+              "sectionID": "10647",
+              "reference": "MC 506.5",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "506.5 506.5 Exhaust equipment. Exhaust equipment, including fans and grease reservoirs, shall comply with Section 506.5.1through 506.5.5 and shall be of an approved design or shall be listed for the application."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:10737-9",
+              "sectionID": "10737",
+              "reference": "MC 512.4",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "512.4 512.4 Termination. Subslab soil exhaust system ducts shall extend through the roof and terminate not less than 6 inches (152.4 mm) above the roof and not less than 10 feet (3048 mm) from any operable openings or air intake."
+            },
+            {
+              "sourceID": "research-permitext_cross_reference-id:11268-11",
+              "sectionID": "11268",
+              "reference": "MC 1105.7",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "supporting_cross_reference",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "current-enacted-edition",
+              "text": "1105.7 1105.7 Termination of relief devices. In addition to the requirements of Section 9.7.8 of ASHRAE 15, pressure relief devices, fusible plugs and purge systems located within the machinery room shall terminate outside of the structure at a location not less than 15 feet (4572 mm) above the adjoining grade level and not less than 20 feet (6096 mm) from any window, ventilation opening or exit."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260908-zoning-unresolved-predicate-v18",
+          "pass": true,
+          "applies": false,
+          "categories": [],
+          "issues": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260909-focused-technical-v31",
+          "retrievalQuery": "An environmental exhaust outlet is located four feet horizontally from a mechanical outdoor-air intake. No special exception or engineered re-entrainment analysis is identified. Is four feet enough?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "An environmental exhaust outlet is located four feet horizontally from a mechanical outdoor-air intake. No special exception or engineered re-entrainment analysis is identified. Is four feet enough?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "An environmental exhaust outlet is located four feet horizontally from a mechanical outdoor-air intake. No special exception or engineered re-entrainment analysis is identified. Is four feet enough?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "An environmental exhaust outlet is located four feet horizontally from a mechanical outdoor-air intake. No special exception or engineered re-entrainment analysis is identified. Is four feet enough?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": false,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": true,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260908-negative-work-premise-v6",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 12,
+            "maximumDiscovered": 10,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 6,
+            "maximumCharacters": 48000,
+            "maximumSupplementalCharacters": 48000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 0,
+            "pinnedCharacterCount": 0,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 48000,
+            "supplementalCharacterCount": 10584,
+            "candidateCount": 3,
+            "discoveredCount": 3,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 6,
+            "topicDependencyCount": 0,
+            "characterCount": 10584,
+            "resolverFailureCount": 3,
+            "nonMaterialCandidateCount": 9
+          },
+          "limitations": [
+            {
+              "kind": "canonical-section-unavailable",
+              "count": 3,
+              "text": "3 enacted sections were not available from the canonical resolver."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260909-focused-technical-v30",
+            "searchedSectionCount": 12891,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ],
+                "routeReason": "ordinary Construction Code default"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260909-supporting-web-v17",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": 2022,
+            "codeEdition": "2022 New York City Construction Codes",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-2022-construction-codes",
+                "label": "2022 NYC Construction Codes",
+                "codeEdition": "2022 New York City Construction Codes",
+                "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+                "codeYear": 2022,
+                "applicabilityStatus": "current-enacted-edition",
+                "routeReason": "ordinary Construction Code default",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "AC",
+                  "BC",
+                  "FGC",
+                  "MC",
+                  "PC"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: 2022 NYC Construction Codes",
+            "limitation": null,
+            "resolvedAt": "2026-09-09T01:54:41.867Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "gpt-5.6-luna"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-09T01:54:41.867Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "accurate",
+          "reasons": [
+            "complex_question_language",
+            "complex_evidence_form"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-terra",
+          "actualAnswerModel": "gpt-5.6-terra",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": []
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "MC-09",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-terra",
+      "requestBytes": 46723,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "185bddc3e94f0a7f8ec76e6d5bd9afca18b72e8dcb232bfe57127106771404b7",
+      "startedAt": "2026-09-09T01:54:47.095Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 9820,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 9817
+        },
+        "output_tokens": 897,
+        "output_tokens_details": {
+          "reasoning_tokens": 144
+        },
+        "total_tokens": 10717
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0e8a12405db1e04c016aa0bc6a5fd887d29f66c74ff1d28b26",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** Four feet is not enough for an environmental air exhaust outlet located horizontally from a mechanical outdoor-air intake. The required separation is **10 feet**; the proposed 4-foot separation is **6 feet short** (MC § 501.3.1, Item 3).\\n\\nThe intake-location rule is consistent: mechanical outdoor-air intakes must be at least 10 feet horizontally from hazardous or noxious contaminant sources, including exhausts, while the separate 3-foot-below alternative applies only to a contaminant source within 10 feet when the Item 3 separation cannot be achieved (MC § 401.4, Items 3–4). Environmental exhaust is expressly not considered hazardous or noxious under MC § 501.3.1. The only supplied exception to the 10-foot environmental-exhaust/intake separation is limited to specified low-flow Class 1 or Class 2 exhaust serving a single room, dwelling, or sleeping unit and requires manufacturer-established combined energy-recovery cross-contamination plus re-entrainment below 10% of intake airflow. You state no such exception or analysis is identified.\",\"supportedPoints\":[{\"heading\":\"Environmental exhaust requires 10 feet from a mechanical intake\",\"explanation\":\"For all environmental air exhaust outlets, the termination must be 10 feet from mechanical air intakes. A 4-foot horizontal separation therefore does not comply with that stated minimum.\",\"sectionID\":\"10455\",\"sourceIDs\":[\"research-permitext_discovered-id:10455-2\"]},{\"heading\":\"The 3-foot-below intake provision does not create a general 4-foot alternative\",\"explanation\":\"Mechanical and gravity outdoor-air intakes must generally be 10 feet horizontally from hazardous or noxious contaminant sources, including exhausts. Where that Item 3 requirement cannot be achieved, the intake must be at least 3 feet below a contaminant source within 10 feet. Environmental exhaust outlets are expressly not considered hazardous or noxious, so that provision does not establish a 4-foot horizontal allowance for the stated environmental exhaust outlet.\",\"sectionID\":\"10406\",\"sourceIDs\":[\"research-permitext_discovered-id:10406-1\",\"research-permitext_discovered-id:10455-2\"]},{\"heading\":\"Narrow exception to the 10-foot separation\",\"explanation\":\"The 10-foot separation is not required only for the specified low-flow Class 1 or Class 2 exhaust serving a single room, dwelling, or sleeping unit, and only where manufacturer-established combined energy-recovery-device cross-contamination and intake re-entrainment are below 10 percent of intake airflow. The supplied facts identify no such exception or analysis.\",\"sectionID\":\"10455\",\"sourceIDs\":[\"research-permitext_discovered-id:10455-2\"]}],\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"This answer is limited to the supplied 2022 NYC Mechanical Code provisions and does not evaluate separate requirements that may apply to a particular specialized exhaust system.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"10455\",\"sourceIDs\":[\"research-permitext_discovered-id:10455-2\"],\"relevance\":\"Establishes the 10-foot minimum separation between environmental air exhaust outlets and mechanical air intakes, and states the limited exception.\"},{\"sectionID\":\"10406\",\"sourceIDs\":[\"research-permitext_discovered-id:10406-1\"],\"relevance\":\"Establishes the intake-location rule and its limited 3-foot-below provision for contaminant sources.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 9553
+    },
+    {
+      "caseID": "MC-09",
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 49720,
+      "maxOutputTokens": 4000,
+      "requestSHA256": "4512f36b500fa595fccfbf30f04e27fd75530713e4b8c08c3250c1fadb5aa42e",
+      "startedAt": "2026-09-09T01:54:56.689Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 10479,
+        "input_tokens_details": {
+          "cache_write_tokens": 7465,
+          "cached_tokens": 3011
+        },
+        "output_tokens": 544,
+        "output_tokens_details": {
+          "reasoning_tokens": 515
+        },
+        "total_tokens": 11023
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_0a0dae50e52c4918016aa0bc7789ac87d2a761509a3cc4477d",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"pass\":true,\"issues\":[],\"unnecessaryMissingFactIndices\":[]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 7065
+    }
+  ],
+  "documentRequests": [],
+  "cumulativeConservativeSpendUSD": 3.332059,
+  "spend": {
+    "active": true,
+    "capUSD": 0.5,
+    "reservedUSD": 0.015313,
+    "actualUSD": 0.015313,
+    "requestCount": 2,
+    "pendingRequestCount": 0
+  },
+  "completedAt": "2026-09-09T01:55:05.511Z"
+}

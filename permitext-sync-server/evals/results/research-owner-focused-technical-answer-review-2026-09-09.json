@@ -1,0 +1,133 @@
+{
+  "schema": "permitext-focused-technical-answer-review-v1",
+  "checkedAt": "2026-09-09T01:57:31.973Z",
+  "sourceCommit": "5522677479de386213351707a72151a1e02eae85",
+  "files": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    }
+  ],
+  "scope": "Development review of the five latest delivered answers against the reviewed owner key and retained enacted evidence. Core matches are not full professional approval. Prior failed drafts and costs are retained.",
+  "cases": [
+    {
+      "id": "MC-09",
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sourceCommit": "5522677479de386213351707a72151a1e02eae85",
+      "answerSHA256": "06249da5ecfdcee32bca33c2e46276dd0f826d5b294eeaed40d562c1addd1ec4",
+      "answerText": "**No.** Four feet is not enough for an environmental air exhaust outlet located horizontally from a mechanical outdoor-air intake. The required separation is **10 feet**; the proposed 4-foot separation is **6 feet short** (MC § 501.3.1, Item 3).\n\nThe intake-location rule is consistent: mechanical outdoor-air intakes must be at least 10 feet horizontally from hazardous or noxious contaminant sources, including exhausts, while the separate 3-foot-below alternative applies only to a contaminant source within 10 feet when the Item 3 separation cannot be achieved (MC § 401.4, Items 3–4). Environmental exhaust is expressly not considered hazardous or noxious under MC § 501.3.1. The only supplied exception to the 10-foot environmental-exhaust/intake separation is limited to specified low-flow Class 1 or Class 2 exhaust serving a single room, dwelling, or sleeping unit and requires manufacturer-established combined energy-recovery cross-contamination plus re-entrainment below 10% of intake airflow. You state no such exception or analysis is identified.",
+      "status": "core-match-with-exception-precision-gap",
+      "finding": "The delivered answer reaches no/10 feet/6 feet short, correctly distinguishes the hazardous/noxious intake rule, and no longer invokes dining accessibility. Its compressed Class 1/Class 2 exception summary should distinguish the single-room Class 1 branch from the Class 2 dwelling/sleeping-unit branch. The recorded failed drafts contain this same grouping issue; eliminating their unrelated deterministic rejection does not certify their semantics.",
+      "runtimeVerificationPassed": true,
+      "verificationAttempts": 1,
+      "durationMilliseconds": 22277,
+      "usageEstimateUSD": 0.01531327,
+      "conservativeUSD": 0.071465,
+      "sourceReferences": [
+        "MC 501.3.1",
+        "MC 401.4"
+      ],
+      "professionalApproval": false
+    },
+    {
+      "id": "MC-13",
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "answerSHA256": "cda0d18a6db2a0d2fde8a293d2d60fd6fee501148efb612f29866abcf9e7e197",
+      "answerText": "**No.** One appliance does not permit substituting a Type II hood where that appliance is medium-duty and produces grease-laden vapors. Type I hoods are required over medium-duty cooking appliances and wherever cooking produces grease or smoke (MC § 507.2). A Type II hood applies only to appliances producing heat, moisture, or combustion products **without** grease or smoke from cooking (MC § 507.3). MC § 507.1 also expressly requires a Type I hood when any appliance under a single hood requires one; the rule is based on the appliance’s emissions/duty classification, not the number of appliances.\n\nThe supplied evidence contains limited alternatives: an electric appliance may avoid a Type I hood only with approved-testing-agency documentation of grease effluent of 5 mg/m³ or less at 500 cfm when tested under UL 710B; and a listed-and-labeled integral down-draft appliance/exhaust system under NFPA 96 does not require a hood above it (MC §§ 507.2, 507.1). Whether either exception applies cannot be determined from the stated facts.",
+      "status": "core-match",
+      "finding": "Correct Type I requirement for medium-duty grease-producing equipment, no one-appliance Type II allowance, and preserved tested-electric and listed integral down-draft alternatives. A bounded missing-fact repair removed unnecessary prerequisites and received a second semantic verification.",
+      "runtimeVerificationPassed": true,
+      "verificationAttempts": 2,
+      "durationMilliseconds": 26631,
+      "usageEstimateUSD": 0.03862842,
+      "conservativeUSD": 0.072871,
+      "sourceReferences": [
+        "MC 507.2",
+        "MC 507.3",
+        "MC 507.1"
+      ],
+      "professionalApproval": false
+    },
+    {
+      "id": "MC-15",
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "answerSHA256": "e1d4911ed27f22b269d4f2e08cb445e575125e2a7b900d3a645fd63fba1fd524",
+      "answerText": "**No.** A mechanical makeup-air system for a commercial kitchen exhaust system must be **automatically controlled to start and operate simultaneously with the exhaust system**; requiring staff to turn it on separately does not meet that control requirement (MC § 508.1).\n\nThe stated fan sizing addresses the separate requirement that building makeup air from all sources be approximately equal to building exhaust air, but it does not replace the simultaneous automatic-control requirement. The supplied evidence also requires makeup-air intake locations to comply with MC § 401.4; intake-location compliance is not established by the stated facts.",
+      "status": "core-match-with-scope-excess",
+      "finding": "Correct automatic simultaneous operation and distinction from airflow sizing. The formerly unsupported approved-design-documents assertion is absent. The unasked intake-location discussion is supported but distracts from the controls decision. Energy Code coverage is explicitly unresolved.",
+      "runtimeVerificationPassed": true,
+      "verificationAttempts": 1,
+      "durationMilliseconds": 12132,
+      "usageEstimateUSD": 0.02174362,
+      "conservativeUSD": 0.041217,
+      "sourceReferences": [
+        "MC 508.1",
+        "MC 401.4"
+      ],
+      "professionalApproval": false
+    },
+    {
+      "id": "GAP-03",
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "answerSHA256": "34f15e7aecaf8b627ccf148b87789244871ac5defefd705b5f16f72c8b2ce1fe",
+      "answerText": "**No.** A minor-alteration permit exemption means only that a DOB permit is not required; it does not authorize work that violates the Construction Code, Zoning Resolution, or another law or rule enforced by DOB. It also does not relieve the owner of obligations to comply with, or file with, other City agencies. (AC § 28-105.4)\n\nMinor alterations and ordinary repairs are permit-exempt (AC § 28-105.4.2), but the work must actually satisfy the statutory definition. Among other limits, it cannot affect health, fire or structural safety, or safe operation of service equipment, and it cannot include work affecting required exits, loading, light, heat, ventilation, elevators, accessibility, or fire-protection/suppression systems. (AC § 28-105.4.2.1)",
+      "status": "core-match-with-scope-excess",
+      "finding": "Correctly preserves substantive code, zoning and other-law compliance despite permit exemption. The answer unnecessarily revisits eligibility after the question already establishes it. No automatic web search occurred.",
+      "runtimeVerificationPassed": true,
+      "verificationAttempts": 1,
+      "durationMilliseconds": 12856,
+      "usageEstimateUSD": 0.04226922,
+      "conservativeUSD": 0.08214,
+      "sourceReferences": [
+        "AC 28-105.4",
+        "AC 28-105.4.2",
+        "AC 28-105.4.2.1"
+      ],
+      "professionalApproval": false
+    },
+    {
+      "id": "GAP-08",
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sourceCommit": "091a5ac8081eb585ed041bd34153d1869959521c",
+      "answerSHA256": "8840d3b464b4ce33735775180f57258c884f6bd0d0a671d1d9c3876bc9a314f3",
+      "answerText": "**Yes.** The commissioner may revoke a permit when the application or submittal documents contained a false statement or misrepresentation of a material fact upon which the approval was issued. The supplied 2022 NYC Administrative Code provisions set no cutoff making revocation unavailable because construction has begun. (AC §§ 28-105.10, 28-105.10.1)\n\nRevocation requires written notice to the permit holder, stating the reasons and the applicant’s right to submit information opposing revocation: within **10 business days** after delivery by hand or electronic delivery, or within **15 business days** after the **posting of notice by mail**. The proposed-revocation notice may be accompanied by a stop-work order. (AC §§ 28-105.10.1, 28-207.2)",
+      "status": "core-match",
+      "finding": "Correct material-false-statement revocation authority despite construction commencement, notice and response opportunity. A full revision replaced mailed with the supplied provision wording posting of notice by mail. No automatic web search occurred.",
+      "runtimeVerificationPassed": true,
+      "verificationAttempts": 2,
+      "durationMilliseconds": 24939,
+      "usageEstimateUSD": 0.04676989,
+      "conservativeUSD": 0.104344,
+      "sourceReferences": [
+        "AC 28-105.10",
+        "AC 28-105.10.1",
+        "AC 28-207.2"
+      ],
+      "professionalApproval": false
+    }
+  ],
+  "summary": {
+    "httpAttempts": 6,
+    "providerCalls": 15,
+    "latestDelivered": 5,
+    "strictProfessionalPassCount": null,
+    "usageEstimateUSD": 0.23632072,
+    "conservativeSpendUSD": 0.521094,
+    "newRoundRemainingConservativeUSD": 4.667941,
+    "fullCohortProviderAttempted": 70,
+    "fullCohortNotProviderAttempted": 40
+  },
+  "next": [
+    "Tighten the exhaust exception branches without reopening the established negative premise.",
+    "Reduce nonessential intake-location and exemption-eligibility discussion.",
+    "Address prior whole-answer issues and GAP-14, whose latest attempt still has no deliverable.",
+    "Complete the 40 remaining original numbered cases with fresh offline HTTP preflights and the remaining authorized budget."
+  ]
+}
