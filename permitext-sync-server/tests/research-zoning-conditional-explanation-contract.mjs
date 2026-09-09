@@ -55,10 +55,20 @@ for (const id of ["ZR-06", "ZR-07", "ZR-13"]) {
     }
     for (const lead of [
       "Cannot confirm whether this property is allowed as-of-right from the available facts.",
-      "Permitext cannot establish whether the facility is permitted from the stated facts."
+      "Permitext cannot establish whether the facility is permitted from the stated facts.",
+      "No site, property, or parcel conclusion can be made from the supplied facts.",
+      "No parcel-specific as-of-right finding can be made from the supplied facts.",
+      "No property determination may yet be reached from the supplied facts."
     ]) {
-      const bounded = { ...answer, answerText: answer.answerText.replace(/^[^.]+\./, lead) };
+      const bounded = { ...answer, conclusion: lead, answerText: answer.answerText.replace(/^[^.]+\./, lead) };
+      assert.equal(evaluateZoningDeterministicControls({ plan: responsePlan, deterministicContext, answer: bounded, providerRequestCount: 2 }).pass, true, lead);
       assert.equal(evaluateZoningResearchSafety({ ...input, evidence: assembled.sources, answer: bounded, questionPlan: responsePlan }).pass, true, lead);
+      for (const field of ["answerText", "conclusion"]) {
+        for (const suffix of [". The owner may proceed.", "; the property is approved.", ", but this site is within Subarea 1."]) {
+          const unsafe = { ...bounded, [field]: bounded[field].replace(/\.$/, "") + suffix };
+          assert.equal(evaluateZoningResearchSafety({ ...input, evidence: assembled.sources, answer: unsafe, questionPlan: responsePlan }).pass, false, `${field}: ${lead}${suffix}`);
+        }
+      }
     }
   }
   assert.equal(evaluateZoningDeterministicControls({ plan, deterministicContext, answer, providerRequestCount: 1 }).pass, false);

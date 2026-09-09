@@ -5,7 +5,7 @@ import { zoningTemporalApplicationObligations, zoningTemporalApplicationIssues }
 
 export const zoningResearchPlannerVersion = "20260909-complete-definition-budget-v6";
 
-export const zoningResearchCompilerVersion = "20260909-numeric-comparison-relations-v25";
+export const zoningResearchCompilerVersion = "20260909-conditional-source-coverage-v26";
 export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
 
 export const zoningResearchPaths = Object.freeze({
@@ -882,7 +882,7 @@ function observedFailureObligations({ question, evidence = [], plan, facts = que
           ["base plane"],
           ["cellar"],
           ["not used for dwelling", "non-dwelling", "not dwelling"],
-          ["does not count", "excluded from floor area", "shall not include"]
+          ["does not count", "excluded from floor area", "excluded from zoning floor area", "shall not include"]
         ],
         requireSourceBound: true
       }

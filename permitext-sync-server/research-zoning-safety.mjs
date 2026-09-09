@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
-import { unresolvedZoningFARSelectionPattern } from "./research-zoning-conditional-explanation.mjs";
+import { unresolvedZoningFARSelectionPattern, unresolvedZoningPropertyDeterminationPattern } from "./research-zoning-conditional-explanation.mjs";
 
 export const zoningResearchSafetyVersion =
-  "20260909-zoning-unresolved-inference-v21";
+  "20260909-zoning-qualified-source-claims-v22";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -361,7 +361,7 @@ function hasAppendedMappedActorConclusion(value) {
   };
   return clauses.some((clause) => {
     if (unresolvedWhetherBoundary(clause) || statesUnprovenFARAllowance(clause)) return false;
-    const boundaryMatch = clause.match(boundaryMarker) || clause.match(unresolvedMappedDecisionPattern) || clause.match(unresolvedZoningFARSelectionPattern);
+    const boundaryMatch = clause.match(boundaryMarker) || clause.match(unresolvedMappedDecisionPattern) || clause.match(unresolvedZoningFARSelectionPattern) || clause.match(unresolvedZoningPropertyDeterminationPattern);
     const explicitInputBoundary = statesExplicitMappedInputBoundary(clause);
     if (!boundaryMatch && !explicitInputBoundary) return false;
     if (!/\b(?:mapped|map|location|site|property|parcel|address|BBL|Subarea|district|designated\s+area|zoning\s+district|FAR|floor[- ]area ratio)\b/i.test(clause)) {
@@ -375,13 +375,14 @@ function hasAppendedMappedActorConclusion(value) {
     if (boundaryConnector.test(clause)) {
       const segments = clause.split(boundaryConnector).map(compactText).filter(Boolean);
       const boundarySegments = segments.filter((segment) =>
-        boundaryMarker.test(segment) || unresolvedMappedDecisionPattern.test(segment) || unresolvedZoningFARSelectionPattern.test(segment) || statesExplicitMappedInputBoundary(segment)
+        boundaryMarker.test(segment) || unresolvedMappedDecisionPattern.test(segment) || unresolvedZoningFARSelectionPattern.test(segment) || unresolvedZoningPropertyDeterminationPattern.test(segment) || statesExplicitMappedInputBoundary(segment)
       );
       if (boundarySegments.length > 0) {
         return segments.some((segment) =>
           !boundaryMarker.test(segment) &&
           !unresolvedMappedDecisionPattern.test(segment) &&
           !unresolvedZoningFARSelectionPattern.test(segment) &&
+          !unresolvedZoningPropertyDeterminationPattern.test(segment) &&
           !statesExplicitMappedInputBoundary(segment) &&
           !safeEvidenceOnlyContinuation(segment)
         );
@@ -395,6 +396,7 @@ function statesLocationBoundary(value) {
   value = compactText(value).replace(/\*\*|__/g, "");
   if (unresolvedWhetherBoundary(value) || statesUnprovenFARAllowance(value)) return true;
   const boundaryPresent = unresolvedZoningFARSelectionPattern.test(value) ||
+    unresolvedZoningPropertyDeterminationPattern.test(value) ||
     unresolvedMappedDecisionPattern.test(value) ||
     /\bno\s+(?:site-specific|property-specific|parcel-specific)\s+(?:conclusion|determination)\s+(?:can|may)\s+be\s+(?:made|reached|given)\b/i.test(value) ||
     /\b(?:site-specific|property-specific|parcel-specific)\b[^.]{0,140}\b(?:cannot|not|unknown|unresolved|requires?)\b/i.test(value) ||
@@ -468,7 +470,8 @@ function hasMappedSpecificExample(value) {
   const clauses = compactText(value)
     .split(/(?<!\d)\.|\.(?!\d)|[!?;]+|\b(?:but|however)\b[\s,]*/i)
     .map(compactText)
-    .filter((clause) => !unresolvedWhetherBoundary(clause) && !statesUnprovenFARAllowance(clause));
+    .filter((clause) => !unresolvedWhetherBoundary(clause) && !statesUnprovenFARAllowance(clause) &&
+      !statesAppendixJMapDescription(clause));
   const text = clauses.join(". ");
   // A deferred FAR selection can contain words such as "permitted" without
   // asserting permission. Require an assertion outside the bounded clauses
@@ -788,8 +791,20 @@ function hasUnsafeMappedPredicateSubject(value) {
   return false;
 }
 
+function statesAppendixJMapDescription(value) {
+  const text = compactText(value).replace(/\s*\(ZR\s+Appendix\s+J\)\s*[.]?$/i, "");
+  // Closed source-subject descriptions do not locate a project on a map.
+  // Anchoring prevents a source preface from excusing an appended parcel claim.
+  const authority = String.raw`(?:Appendix\s+J|the\s+selected\s+Appendix\s+J\s+material)`;
+  const designatedAreas = String.raw`(?:certain\s+)?designated areas within Manufacturing Districts`;
+  const mapStatement = new RegExp(String.raw`^${authority}\s+(?:states|establishes|shows)\s+that\s+(?:boundaries\s+of\s+)?${designatedAreas}\s+are\s+(?:shown|identified)\s+on\s+(?:its|the Appendix J)\s+maps(?:\s+and\s+assigns\s+different\s+self[- ]service[- ]storage\s+approval\s+paths\s+by\s+subarea)?[.]?$`, "i");
+  const comparison = /^(?:Appendix J|It) distinguishes Subarea 1, where self[- ]service storage facilities (?:follow|are subject to) the as[- ]of[- ]right provisions of Section 42-19, from Subarea 2, where those facilities require a City Planning Commission special permit under Section 74-192[.]?$/i;
+  return mapStatement.test(text) || comparison.test(text);
+}
+
 function statesGenericAppendixJTreatment(value) {
   const text = compactText(value);
+  if (statesAppendixJMapDescription(text)) return true;
   const reviewedGenericSurface =
     /^(?:the\s+)?(?:selected\s+)?material\s+(?:identifies?|shows?|establishes?)\s+designated areas?\s+by\s+map\s+and\s+divides?\s+their\s+treatment\s+into\s+two\s+subareas\b/i.test(text) ||
     /^(?:in|within)\s+(?:the\s+)?Subarea\s*[12]\s*,\s*(?:(?:the\s+)?as[- ]of[- ]right provisions?\s+of\s+Section\s+42-19\s+govern(?:s)?\s+self[- ]service storage|Section\s+74-192\s+requires?\s+(?:a\s+)?(?:City Planning Commission|CPC)\s+special permit)\b/i.test(text) ||
@@ -954,10 +969,11 @@ function mappedClauseAnalysis(answer) {
     return splitMappedConclusionClauses(field.value).map((clause) => {
       const establishedSourceRule = statesSourceLevelMappedAreaRule(clause);
       const genericAppendixJTreatment = statesGenericAppendixJTreatment(clause);
+      const sourceDescription = statesAppendixJMapDescription(clause);
       const sourceRule = establishedSourceRule || genericAppendixJTreatment;
       const clauseHasMappedOrRegulatoryPredicate =
         hasMappedOrRegulatoryPredicate(clause);
-      const parcelSpecificConclusion =
+      const parcelSpecificConclusion = !sourceDescription && (
         hasEmbeddedSpecificMappedActorConclusion(clause) ||
         hasAppendedMappedActorConclusion(clause) ||
         (!sourceRule && (
@@ -966,7 +982,7 @@ function mappedClauseAnalysis(answer) {
           hasMappedSpecificExample(clause) ||
           hasSpecificMappedActorConclusion(clause) ||
           hasNonGenericMappedClaimSubject(clause)
-        ));
+        )));
       return {
         fieldKind: field.fieldKind,
         clause,
@@ -1013,21 +1029,46 @@ function mappedLocationAttemptDiagnostic({
   };
 }
 
+const cellarProvidedCondition = /(?:^|[,;]\s*)provided(?:\s+that)?\s/i;
+
 function statesLoweredYardBoundary(value) {
-  return /\b(?:lowered yard|yard (?:was|is|had been) lowered|yard-lowering)\b[^.]{0,180}\b(?:unknown|not (?:provided|established|verified)|missing|unresolved|must be (?:confirmed|verified|established)|depends?|subject to|conditional)\b/i.test(value) ||
-    /\b(?:depends?|subject to|conditional|cannot be (?:determined|confirmed)|no final (?:classification|determination))\b[^.]{0,180}\b(?:lowered yard|yard (?:was|is|had been) lowered|yard-lowering)\b/i.test(value) ||
+  value = compactText(value).replace(/\*\*|__/g, "");
+  return /\b(?:lowered[- ]yard|yard (?:was|is|had been) lowered|yard-lowering)\b[^.]{0,180}\b(?:unknown|not (?:provided|established|verified)|missing|unresolved|must be (?:confirmed|verified|established)|depends?|subject to|conditional)\b/i.test(value) ||
+    /\b(?:depends?|subject to|conditional|cannot be (?:determined|confirmed)|no final (?:classification|determination))\b[^.]{0,180}\b(?:lowered[- ]yard|yard (?:was|is|had been) lowered|yard-lowering)\b/i.test(value) ||
+    cellarProvidedCondition.test(value) && /\bprovided(?: that)?\b[^.]{0,180}\b(?:lowered[- ]yard|yard (?:was|is|had been) lowered|yard-lowering)\b/i.test(value) ||
     /\bif\b[^.]{0,180}\byard\b[^.]{0,100}\blowered\b[^.]{0,180}\b(?:classification|result)\b[^.]{0,80}\b(?:may|could|can)\s+(?:differ|change)\b/i.test(value);
 }
 
+function statesMissingLoweredYardFact(value) {
+  const text = compactText(value);
+  // A whether-question in missingFacts is already an explicit uncertainty;
+  // the date and intervening lot/base-plane description do not change that.
+  return /\bwhether\b[^.]{0,180}\byard\b[^.]{0,180}\blowered\b/i.test(text) ||
+    /\b(?:lowered[- ]yard|yard (?:was|is|had been) lowered)\b[^.]{0,180}\b(?:unknown|not (?:provided|established|verified)|missing|unresolved|must be (?:confirmed|verified|established))\b/i.test(text);
+}
+
 function statesUnconditionalCellarClassification(value) {
-  return compactText(value).split(/(?<=[.!?;])\s+/).some((clause) => {
-    if (/^(?:yes|no)[.!]?$/i.test(clause)) return true;
-    if (/\b(?:whether|cannot be determined|could not be determined|depends? on)\b/i.test(clause) ||
-      /\b(?:if|only if|unless|when)\b/i.test(clause)) return false;
-    return /\b(?:level|space|area|floor|storage|it|this)\b[^.]{0,120}\b(?:is|are)\s+(?:excluded|included|a cellar|not a cellar)\b/i.test(clause) ||
-      /\b(?:level|space|area|floor|storage|it|this)\b[^.]{0,120}\b(?:does not|does|will not|will)\s+count\b/i.test(clause) ||
-      /\b(?:level|space|area|floor|storage|it|this)\b[^.]{0,120}\b(?:must|shall|will)\s+be\s+(?:omitted|excluded|included)\b[^.]{0,80}\b(?:zoning )?floor area\b/i.test(clause) ||
-      /\b(?:counts?|qualifies)\s+as\s+(?:zoning )?floor area\b/i.test(clause);
+  return String(value || "").split(/\n\s*\n/).some((paragraph) => {
+    // A qualification after a semicolon can govern the same derivation.
+    // Keep sentences and supported-point fields separate, however.
+    const clauses = compactText(paragraph).replace(/\*\*|__/g, "")
+      .split(/(?<=[.!?])\s+|[;,]\s*(?=(?:however|nevertheless|nonetheless|but|yet)\b)/i);
+    // An explicitly conditional result can govern its following derivation.
+    // Merely mentioning an unknown fact cannot excuse a later conclusion.
+    const qualifiedLead = statesLoweredYardBoundary(clauses[0]) &&
+      (cellarProvidedCondition.test(clauses[0]) || /\bsubject to\b|^(?:if|only if|unless|when)\b/i.test(clauses[0]));
+    return clauses.some((clause) => {
+      if (/^(?:ZR\s*(?:§\s*)?12-10\s+(?:separately\s+)?states\s+that\s+)?cellar space used for retailing is included (?:only )?for calculating accessory off-street parking, accessory bicycle parking, and accessory off-street loading requirements[.]?$/i.test(clause)) return false;
+      if (/\b(?:regardless of|irrespective of|even if)\b[^.]{0,150}\b(?:yard|measurement)\b/i.test(clause)) return true;
+      if (/^(?:yes|no)[.!]?$/i.test(clause)) return true;
+      if (/\b(?:whether|cannot be determined|could not be determined|depends? on)\b/i.test(clause) ||
+        /\b(?:if|only if|unless|when|subject to)\b/i.test(clause) || cellarProvidedCondition.test(clause) ||
+        qualifiedLead && !/^(?:however|nevertheless|nonetheless|but|yet)\b/i.test(clause)) return false;
+      return /\b(?:level|space|area|floor|storage|it|this)\b[^.]{0,120}\b(?:is|are)\s+(?:excluded|included|a cellar|not a cellar)\b/i.test(clause) ||
+        /\b(?:level|space|area|floor|storage|it|this)\b[^.]{0,120}\b(?:does not|does|will not|will)\s+count\b/i.test(clause) ||
+        /\b(?:level|space|area|floor|storage|it|this)\b[^.]{0,120}\b(?:must|shall|will)\s+be\s+(?:omitted|excluded|included)\b[^.]{0,80}\b(?:zoning )?floor area\b/i.test(clause) ||
+        /\b(?:counts?|qualifies)\s+as\s+(?:zoning )?floor area\b/i.test(clause);
+    });
   });
 }
 
@@ -1505,10 +1546,13 @@ export function evaluateZoningResearchSafety({
   if (
     profile.loweredYardClause &&
     (
-      !/\b(?:lowered yard|yard (?:was|is|had been) lowered)\b[^.]{0,180}\b(?:unknown|not (?:provided|established|verified)|missing|unresolved|must be (?:confirmed|verified|established))\b/i.test(missingFacts) ||
+      !(answer?.missingFacts || []).some(statesMissingLoweredYardFact) ||
       !directAnswerFields.length ||
       !directAnswerFields.some(statesLoweredYardBoundary) ||
-      statesUnconditionalCellarClassification(narrative)
+      [answer?.answerText, answer?.conclusion, answer?.explanation,
+        ...(answer?.supportedPoints || []).flatMap((point) => [point.heading, point.explanation]),
+        ...(answer?.evidenceLimitations || [])]
+        .some(statesUnconditionalCellarClassification)
     )
   ) {
     issues.push({

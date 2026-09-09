@@ -1,10 +1,14 @@
 import { createHash } from "node:crypto";
 
-export const zoningConditionalExplanationVersion = "20260909-conditional-source-explanation-v2";
+export const zoningConditionalExplanationVersion = "20260909-conditional-source-explanation-v3";
 // Withholding a permitted FAR is an unresolved determination, not a finding
 // that the property is prohibited. Keep this separate from positive approval
 // predicates so the safety check can still inspect any appended claim.
 export const unresolvedZoningFARSelectionPattern = /\bno\s+(?:(?:maximum|minimum|permitted|allowable|residential|commercial|community[- ]facility)\s+)*(?:FAR|floor[- ]area ratio)\s+(?:can|may)\s+(?:yet\s+)?be\s+(?:selected|determined|established|confirmed|identified)\b/i;
+// These negative nominal statements withhold a determination. They do not
+// assert that a property is prohibited. Appended assertions are checked by
+// the mapped-clause safety analysis, independently of this phrase match.
+export const unresolvedZoningPropertyDeterminationPattern = /\bno\s+(?:site|property|parcel)(?:[- ]specific)?(?:\s*,?\s*(?:or\s+|and\s+)?(?:site|property|parcel)(?:[- ]specific)?){0,2}\s+(?:as[- ]of[- ]right\s+)?(?:conclusion|determination|finding|result|assessment)\s+(?:can|may)\s+(?:yet\s+)?be\s+(?:made|reached|given|established|confirmed)\b/i;
 const disposition = "conditional_source_explanation";
 const factPatterns = Object.freeze({
   property_identifier: /\b(?:address|BBL|block\s*(?:and|\/)\s*lot|property identifier|parcel identifier)\b/i,
@@ -74,7 +78,8 @@ export function zoningConditionalExplanationIssues({ plan, answer = {} } = {}) {
   const issues = [];
   const lead = compact(answer.answerText).split(/(?<=[.!?])\s/)[0];
   const boundary = /\b(?:cannot|can't)\b[^.!?]{0,180}\b(?:determin|confirm|conclud|establish|decid|approv|find|say)|\b(?:not (?:yet )?(?:established|determined|confirmed)|undetermined|unresolved|insufficient (?:facts|information)|not enough (?:facts|information))\b/i;
-  const statesBoundary = (text) => boundary.test(text) || unresolvedZoningFARSelectionPattern.test(text);
+  const statesBoundary = (text) => boundary.test(text) || unresolvedZoningFARSelectionPattern.test(text) ||
+    unresolvedZoningPropertyDeterminationPattern.test(text);
   if (!statesBoundary(lead) || (answer.conclusion && !statesBoundary(compact(answer.conclusion)))) {
     issues.push({ code: "CONDITIONAL_DETERMINATION_BOUNDARY_MISSING", detail: "Lead with the unresolved determination, not an approval or prohibition. Keep any conclusion conditional too." });
   }
