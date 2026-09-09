@@ -3,10 +3,11 @@ import { isAppendixJSourceBoundaryQuestion } from "./research-zoning-safety.mjs"
 import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zoningConditionalExplanationPrompt } from "./research-zoning-conditional-explanation.mjs";
 import { zoningTemporalApplicationObligations, zoningTemporalApplicationIssues } from "./research-zoning-temporal-application.mjs";
 import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
+import { zoningExplicitAttributionIssues, zoningAttributionPrompt } from "./research-zoning-attribution.mjs";
 
 export const zoningResearchPlannerVersion = "20260909-complete-definition-budget-v6";
 
-export const zoningResearchCompilerVersion = "20260909-stated-history-premise-v27";
+export const zoningResearchCompilerVersion = "20260909-explicit-source-attribution-v28";
 export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
 
 export const zoningResearchPaths = Object.freeze({
@@ -1465,6 +1466,7 @@ export function zoningResearchDeterministicContext({
     });
   const passages = (Array.isArray(evidence) ? evidence : []).map((source) => ({
     sourceID: source.sourceID,
+    codePrefix: source.codePrefix,
     sectionID: source.sectionID,
     sectionNumber: source.sectionNumber,
     textHash: source.sectionTextHash || stableHash(sourceText(source)),
@@ -1518,6 +1520,7 @@ export function zoningResearchPromptContext(plan, deterministicContext) {
     "Answer only the planned question path. Treat collateral provisions as reviewed-only and do not create conclusions from them.",
     "Preserve exact table symbols, dates, arithmetic inputs, prerequisite order, passage identifiers, and source hashes supplied by the server.",
     "Cover every mandatory answer obligation explicitly in the user-facing answer and in the supported point bound to its supplied source.",
+    zoningAttributionPrompt,
     "Do not infer property or mapped applicability. Do not rewrite an otherwise supported answer merely to add unrelated context."
   ].filter(Boolean).join("\n");
 }
@@ -1913,7 +1916,9 @@ export function evaluateZoningDeterministicControls({
     text: compactText([point?.heading, point?.explanation].filter(Boolean).join(" ")),
     sourceIDs: new Set((Array.isArray(point?.sourceIDs) ? point.sourceIDs : []).map(String))
   }));
-  const issues = zoningConditionalExplanationIssues({ plan, answer });
+  const issues = zoningConditionalExplanationIssues({ plan, answer }).concat(
+    zoningExplicitAttributionIssues({ answer, passages: deterministicContext?.passages })
+  );
   if (
     plan?.disposition !== zoningResearchDispositions.ready && !isZoningConditionalExplanation(plan) &&
     Number(providerRequestCount) > 0

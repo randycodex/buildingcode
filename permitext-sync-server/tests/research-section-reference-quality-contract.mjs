@@ -55,8 +55,21 @@ if (!process.argv.includes("--inspect")) {
   }
   const storage = records.get("ZR-06");
   // The nominal negative lead must satisfy the conditional-plan boundary.
-  // This does not certify the draft's separate source-attribution defects.
-  assert(storage.controls(storage.answer).pass, JSON.stringify(storage.controls(storage.answer).issues));
+  // The separate mixed-source point must fail even though both provisions have
+  // valid top-level citations. This runs through the conditional-plan compiler.
+  const storageIssues = storage.controls(storage.answer).issues;
+  assert(!storageIssues.some((issue) => issue.code === "CONDITIONAL_DETERMINATION_BOUNDARY_MISSING"));
+  assert.deepEqual(storageIssues.map((issue) => [issue.code, issue.pointIndex, issue.sectionNumber]),
+    [["EXPLICIT_ZONING_RULE_SOURCE_NOT_BOUND", 4, "42-192"]]);
+  const existingFacilitySource = storage.answer.citations.find((citation) => citation.sectionID === "20022473").sourceIDs[0];
+  const performanceSource = storage.answer.supportedPoints[4].sourceIDs[0];
+  const boundStorage = structuredClone(storage.answer);
+  boundStorage.supportedPoints[4].sourceIDs.push(existingFacilitySource);
+  assert(storage.controls(boundStorage).pass, JSON.stringify(storage.controls(boundStorage).issues));
+  const switchedStorage = structuredClone(storage.answer);
+  switchedStorage.supportedPoints[4].sourceIDs = [existingFacilitySource];
+  assert.deepEqual(storage.controls(switchedStorage).issues.map((issue) => [issue.code, issue.sectionNumber, issue.sourceIDs]),
+    [["EXPLICIT_ZONING_RULE_SOURCE_NOT_BOUND", "42-193", [performanceSource]]]);
   assert(!storage.safety(storage.answer).pass, "The retained storage draft still has unresolved defects.");
   const { answer, repaired, controls, safety } = records.get("ZR-20");
   assert(controls(answer).pass, JSON.stringify(controls(answer).issues));

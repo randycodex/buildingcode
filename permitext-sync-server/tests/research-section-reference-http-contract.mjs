@@ -122,7 +122,16 @@ try {
       assert.match(prompt, /Qualifying affordable housing[”"]? shall include/);
       assert.doesNotMatch(prompt, /ENACTED_TEXT: above-grade mass transit station/);
     }
-    if (id === "ZR-06") assert.match(prompt, /documentation satisfactory to the Department of Buildings/);
+    if (id === "ZR-06") {
+      assert.match(prompt, /documentation satisfactory to the Department of Buildings/);
+      assert.match(prompt, /Each supported point must include the supplied source IDs for every provision it explicitly credits with a rule/);
+      const contextLine = prompt.split("\n").find((line) => line.startsWith("DETERMINISTIC_CONTEXT: "));
+      assert(contextLine, "The actual HTTP request must carry source-attribution identities.");
+      const context = JSON.parse(contextLine.slice("DETERMINISTIC_CONTEXT: ".length));
+      for (const number of ["42-192", "42-193"]) {
+        assert(context.passages.some((source) => source.codePrefix === "ZR" && source.sectionNumber === number && source.sourceID));
+      }
+    }
     assert((await adapter.listResearchConversations(account.appUserID)).find((item) => item.id === saved.id).messages.every((message) => message.role !== "assistant"));
   }
   const mapText = (await zoningSection("20021237")).blocks.map((block) => block.plainText || "").join("\n\n");
