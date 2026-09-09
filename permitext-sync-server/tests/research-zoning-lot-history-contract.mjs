@@ -19,15 +19,15 @@ input.pinnedEvidence = input.pinnedEvidence.map((pin) => ({ ...pin, selectionMod
   sourceID: delivered.citations.find((citation) => citation.sectionID === pin.sectionID).sourceIDs[0] }));
 const plan = planZoningResearchQuestion(input);
 const assembled = await assembledResearchEvidenceForTurn({ ...input, corpusPlan: await researchCorpusPlanForTurn(input), zoningPlan: plan });
-const checks = (candidate, supplied = input) => {
+const checks = (candidate, supplied = input, sources = assembled.sources) => {
   const questionPlan = planZoningResearchQuestion(supplied);
-  const context = zoningResearchDeterministicContext({ ...supplied, evidence: assembled.sources, plan: questionPlan });
+  const context = zoningResearchDeterministicContext({ ...supplied, evidence: sources, plan: questionPlan });
   return {
     context,
     controls: evaluateZoningDeterministicControls({ plan: questionPlan, deterministicContext: context, answer: candidate, providerRequestCount: 1 }),
-    safety: evaluateZoningResearchSafety({ ...supplied, evidence: assembled.sources, answer: candidate, questionPlan }),
+    safety: evaluateZoningResearchSafety({ ...supplied, evidence: sources, answer: candidate, questionPlan }),
     prompt: zoningResearchPromptContext(questionPlan, context),
-    safetyPrompt: zoningResearchSafetyPromptContext({ ...supplied, evidence: assembled.sources, questionPlan })
+    safetyPrompt: zoningResearchSafetyPromptContext({ ...supplied, evidence: sources, questionPlan })
   };
 };
 const original = checks(delivered);
@@ -141,4 +141,19 @@ for (const extra of [
   assert(checks(conditional, supplied).safety.pass, JSON.stringify(checks(conditional, supplied).safety.issues));
 }
 
-console.log("Zoning-lot history contract passed: actual delivered defect; stated, missing, disputed and hypothetical premises; source/rule obligations preserved; zero API calls.");
+// Replay the subsequently delivered answer against canonical sources carrying
+// its actual identities. This establishes regression behavior, not a new call.
+const confirmation = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-lot-history-2026-09-09.json", import.meta.url)));
+const confirmed = confirmation.results.find((item) => item.id === "ZR-19");
+assert.equal(confirmed.status, "completed");
+assert.equal(confirmed.question, input.question);
+const confirmedInput = { ...input, pinnedEvidence: input.pinnedEvidence.map((pin) => ({ ...pin,
+  sourceID: confirmed.answer.citations.find((citation) => citation.sectionID === pin.sectionID).sourceIDs[0] })) };
+const confirmedAssembly = await assembledResearchEvidenceForTurn({ ...confirmedInput,
+  corpusPlan: await researchCorpusPlanForTurn(confirmedInput), zoningPlan: planZoningResearchQuestion(confirmedInput) });
+const confirmedChecks = checks(confirmed.answer, confirmedInput, confirmedAssembly.sources);
+assert(confirmedChecks.controls.pass, JSON.stringify(confirmedChecks.controls.issues));
+assert(confirmedChecks.safety.pass, JSON.stringify(confirmedChecks.safety.issues));
+for (const field of ["missingFacts", "followUpQuestions", "additionalEvidenceNeeded"]) assert.deepEqual(confirmed.answer[field], []);
+
+console.log("Zoning-lot history contract passed: original defect and subsequent delivered repair; stated, missing, disputed and hypothetical premises; source/rule obligations preserved; zero new API calls.");

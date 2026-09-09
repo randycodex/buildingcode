@@ -1,0 +1,72 @@
+{
+  "schema": "permitext-owner-lot-history-development-review-v1",
+  "checkedAt": "2026-09-09T06:59:55.119Z",
+  "sourceCommit": "d5355ee51a3e5e95bd54346d1f6e03cb976e2add",
+  "evidence": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-lot-history-2026-09-09.json",
+      "sha256": "102534c93f3b63786d3ac946a3b8af1270def90a7693acae633c8a2d921869bb"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-lot-history-cost-audit-2026-09-09.json",
+      "sha256": "e2bbf36e48cbae20ad0e8c6a131813c64f77df1a27b9c1360163ff71939194cc"
+    }
+  ],
+  "id": "ZR-19",
+  "status": "targeted_repair_confirmed_full_quality_review_open",
+  "confirmed": [
+    "The direct No and eight-foot versus ten-foot comparison are supported by the supplied current definition.",
+    "The response applies the user-stated absence of a historical zoning lot and does not pretend to verify title history.",
+    "Missing facts, follow-up questions and additional evidence requests are empty; the prior irrelevant historical inquiries are gone.",
+    "The material rule and supporting points cite the supplied 12-10 source identity."
+  ],
+  "unresolved": [
+    "The answer still repeats the threshold, historical premise and tax-map distinction between the lead and supporting points.",
+    "The lead adds filing mechanics that are unnecessary to the eight-foot result. Its building-permit or certificate-of-occupancy wording omits the source condition that the CO alternative applies if no building permit is required, and made at the time could imply a narrower recording time than the source establishes. Omit this collateral detail or preserve its exact conditions.",
+    "The current response used deterministic verification only. There was no separate semantic-verifier or judge API request, and this review does not establish full professional acceptance."
+  ],
+  "comparison": {
+    "wordCountDefinition": "Whitespace-delimited words in answerText plus supported point headings/explanations and the five authored fact/limitation arrays. Excludes derived duplicate conclusion, full source passages and metadata; not a rendered UI measurement.",
+    "before": {
+      "mainWords": 121,
+      "authoredWords": 427,
+      "missingFacts": 3,
+      "evidenceRequests": 2,
+      "fullHTTPMilliseconds": 10988
+    },
+    "after": {
+      "mainWords": 117,
+      "authoredWords": 329,
+      "missingFacts": 0,
+      "evidenceRequests": 0,
+      "fullHTTPMilliseconds": 10887
+    }
+  },
+  "execution": {
+    "providerRequests": 1,
+    "externalDocumentRequests": 0,
+    "verificationHistory": [
+      {
+        "pass": true,
+        "issues": [],
+        "model": "permitext-deterministic-zoning-compiler"
+      }
+    ],
+    "repairApplied": false,
+    "pendingRequests": 0,
+    "manualRetries": 0
+  },
+  "cost": {
+    "usageEstimateUSD": 0.00332775,
+    "conservativeUSD": 0.006202,
+    "roundUsageEstimateUSD": 3.83806762,
+    "roundConservativeUSD": 7.289668,
+    "remainingConservativeAuthorizationUSD": 0.710332,
+    "providerInvoiceVerified": false
+  },
+  "scope": "One actual unassigned Research question on isolated storage; all 110 numbered cases remain in scope. No Project workflow, UI, phone, deployment or pricing test. This consumed driver must not be replayed."
+}

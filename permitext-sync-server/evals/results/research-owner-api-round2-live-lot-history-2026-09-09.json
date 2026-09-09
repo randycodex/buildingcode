@@ -1,0 +1,1501 @@
+{
+  "schema": "permitext-owner-api-round2-lot-history-v1",
+  "sourceCommit": "d5355ee51a3e5e95bd54346d1f6e03cb976e2add",
+  "authorization": "Owner authorized continued API testing within a fresh $8 round and requested notice before more is needed. Historical spending stays separate. This single-use batch confirms the historical-premise repair on ZR-19 once, preserving its authored question and section reference. Batch maximum $0.50 within the round's $0.716534 conservative remainder. The turn requires a full $0.50 conservative reservation. No manual retry, extra judge, Project workflow test or deployment.",
+  "preDispatchAbortEvidence": {
+    "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-2026-09-09.json",
+    "sha256": "890f8a447d3a6326c1579d41ddad140a9b64dfdeabe1e43d9d9bf09e0bd68143",
+    "providerCalls": 0,
+    "providerCostUSD": 0,
+    "reason": "Initial request binding guard aborted before recording or sending any provider request; the isolated runtime reservation is not a provider charge."
+  },
+  "previousResultHashes": [
+    {
+      "file": "evals/results/research-owner-live-pilot-2026-09-07.json",
+      "sha256": "5c5be0c37fa4e2f2f06c005253a70c7a754ef4ee6b5372b3bbad4d9e2bafb672"
+    },
+    {
+      "file": "evals/results/research-owner-live-source-confirmation-v2-2026-09-08.json",
+      "sha256": "3f568e7f61b20827a17b376dcfe1c21206accd588241b3f3b7cf484d60d60d4a"
+    },
+    {
+      "file": "evals/results/research-owner-live-far-confirmation-2026-09-08.json",
+      "sha256": "db9335ee1d4035db14cd0a29539773eb0b2f5552a8513824ca04a3e06490faab"
+    },
+    {
+      "file": "evals/results/research-owner-live-quality-confirmation-2026-09-08.json",
+      "sha256": "6fb53c6558d3619a164003877cbd0999642523a49b2349c8bf20820120303323"
+    },
+    {
+      "file": "evals/results/research-owner-live-scope-confirmation-v2-2026-09-08.json",
+      "sha256": "6e09ecf92eaac108e88eaa2e02ca7061098e401f19c7e5bcafd966bf77d27956"
+    },
+    {
+      "file": "evals/results/research-owner-live-document-summary-confirmation-2026-09-08.json",
+      "sha256": "8aa068eaccc63e59aeab4b24d0809110e4ee8dc8210a6533028ebc305883a5af"
+    },
+    {
+      "file": "evals/results/research-owner-live-fixture-confirmation-2026-09-08.json",
+      "sha256": "e441b649c6665c050413a6967fb5da88bc543fb47408226777c608f01172dccf"
+    },
+    {
+      "file": "evals/results/research-owner-live-technical-expansion-2026-09-08.json",
+      "sha256": "27fc4e827bdcaffca01da45e6713e79c949be4fd9629f1c4c0fc3fb53317f67c"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    },
+    {
+      "file": "evals/results/research-owner-live-premise-expansion-2026-09-08.json",
+      "sha256": "c6d1062c6d23366a497d28541e53d28623337a9959a884bca707b967a6a67f66"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-2026-09-08.json",
+      "sha256": "cece4fdb8fa961e97f1c8919cbb1a3caa01d5ee36bbf63f96985d93d1e737081"
+    },
+    {
+      "file": "evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json",
+      "sha256": "7aa7e278ea37531271d9ed8be1b95246d3d5e3e71b8750eb16bcc59adb5dc301"
+    },
+    {
+      "file": "evals/results/research-owner-live-fountain-expansion-2026-09-08.json",
+      "sha256": "e8bba5ff21f1d00971c20fc353fca88a8657d91925631ff655ad170caea3c0fd"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-2026-09-08.json",
+      "sha256": "9266c038a2ffc73336b6bf3c5238e4834cd89165bc870503d988290234821330"
+    },
+    {
+      "file": "evals/results/research-owner-live-plumbing-repair-confirmation-v2-2026-09-08.json",
+      "sha256": "71405533d9d535086549b7516f6a9990e05bdf9beb6235e6b9bc256bc7d680f0"
+    },
+    {
+      "file": "evals/results/research-owner-live-compact-confirmation-2026-09-08.json",
+      "sha256": "6e73eb363a0a2b67e2fdfc97736320b406d215c9886dd0ef9f951bef17709c9b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-2026-09-08.json",
+      "sha256": "bdbefdae24bd9494ccbe24c63bd1fc090435604df2616fa61a01c5d4913a07dc"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v2-2026-09-08.json",
+      "sha256": "ca788d0bc585d95f5a546f946ed271ad352f988474e57a69a4f30782973ba20b"
+    },
+    {
+      "file": "evals/results/research-owner-live-decision-fact-verifier-v3-2026-09-08.json",
+      "sha256": "b8bce5087d8d7d0a62c2f26f73104251a7dabd18ec3d24b3eaf3c243cfab1435"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-small-confirmation-2026-09-08.json",
+      "sha256": "5532e393ba3b9b547b301448a2a7e1a0a7c3e49cbf13aed2fde36f43df3fa4b7"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-direct-rule-confirmation-2026-09-08.json",
+      "sha256": "7fc920d3527b238af81287a58ec38c365acab11304b2ccd56030b40661e450cc"
+    },
+    {
+      "file": "evals/results/research-owner-live-zoning-expansion-2026-09-08.json",
+      "sha256": "a0876a67a3033854797830eabc700769a08cc013e3ebbf416fc9c066f661573e"
+    }
+  ],
+  "historicalConservativeSpendUSD": 7.887898,
+  "previousConservativeSpendUSD": 7.283466,
+  "authorizationUSD": 8,
+  "priorRoundResults": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sha256": "f406901dcca5f06398166f4a08bcfbadf6639bf24755777a0c7a9434d8ca7d8f"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sha256": "f991b5d3ce3757dddbea968291341571817c8cf9f3703101766766047c39ba57"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sha256": "6cacf237b64e02d3b388adafea5f0b48865f3c9778e5d15e77b8fc19b8de03ca"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sha256": "485cba41a9c4a277347fa950f590c2ed25ebb6f48fe35b55f5d3e8fdae3bba12"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sha256": "68f098015f6d49060f62a725dc805f76b6f4692203e30f9de45cd3e8282a6cc9"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+    }
+  ],
+  "ownerDatasetSHA256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+  "roundID": "owner-api-round2-20260908",
+  "maximumCumulativeSpendUSD": 0.5,
+  "maximumTurnSpendUSD": 0.5,
+  "maximumTurns": 1,
+  "maximumProviderRequests": 5,
+  "maximumProviderRequestsPerTurn": 5,
+  "repetitions": 1,
+  "separateJudgeRequests": 0,
+  "manualRetries": 0,
+  "keySHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "pricingSource": "https://developers.openai.com/api/docs/pricing",
+  "pricingCheckedOn": "2026-09-09",
+  "routing": "Existing hybrid Luna/Terra routing and production verification/repair policy, subject to the lower evaluation spending cap; standard service tier. No forced model substitution.",
+  "scope": "Actual unassigned HTTP Research on isolated accounts and storage. Author-specified section references use the explicit section_reference API mode; no highlight, visual review or parcel fact is fabricated. Canonical source retrieval and ordinary verification remain active. Answer keys and review expectations are excluded from planning, drafting and verification. Web support remains configured normally, but these enacted-source questions must not request web tools or external documents. The authored input must pass the zero-API preflight. Earlier failures and all 110 numbered cases remain in the cumulative acceptance scope. No UI, phone, Project workflow or deployment testing.",
+  "requestComparison": "The existing request binding normalizes opaque run-specific identifiers only; authored text, selected sources, runtime instructions and schemas remain bound. Raw request hashes are also recorded.",
+  "repairedCaseIDs": [
+    "ZR-19"
+  ],
+  "newCaseIDs": [],
+  "cases": [
+    "ZR-19"
+  ],
+  "preflightSHA256": "a0388435db0ea07a5231ee4264a9d9ec5c765b49c6bdd65a9b8ee1f82d64723e",
+  "sourceHashes": {
+    "app.mjs": "fe47c5fb9812b78223a65cfde99874609de3b8a81565342daed64be5c11c9341",
+    "research-answer-presentation.mjs": "f8f3853d4441d4940de0bf222104dce0ee81a1e91e450b3e08dfdb02ff6049ba",
+    "research-official-guidance-summary.mjs": "4e2e14d754f658e06693469be4628873b171a0fdc47ce3b6ec642205a9c38c0e",
+    "evals/research-answer-key-amendments.json": "ddcf7fb5675285991b0a7275749890794c3671a1f7888cc6c5ebee2b5977bc24",
+    "research-answer-quality.mjs": "cad6d658ff2805ee6e56e48b2b135f5dec28863b02020183731b0815b2ecec4f",
+    "research-focused-technical-scope.mjs": "4c7f8ff22bc4bd11bf87a55417b8795b164443e0a704d9e64ebc33f27fc27f49",
+    "research-conversation-topic.mjs": "77baee9c8db51501fca1bfee6ea192869f8e6fd8a7c35b48eb8d5a7f848f7858",
+    "research-technical-topic-routes.mjs": "319075fb7223e387a70ee4038b62cab0c1df839c68de374317277d4548c8ef62",
+    "evidence-discovery.mjs": "47f76c9ba11ea1d5c05edc996eebe110fd4f467bccffe05c4fc1b2e6b6e2d714",
+    "research-conversation-facts.mjs": "67ec6ab2e04908151af796b1a08d2ebd9bdc58bdfb7a748642efb83dd9068ef2",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-source-policy.mjs": "0f569a60606aaace85c6cfde2dd179720717603da47ca7d898b1c66630d63980",
+    "research-official-html-attribution.mjs": "97e0e666a244e6969a9cb690e042fed74fa1a68a8f58351d8f79e0bbb85290c7",
+    "research-official-pdf-attribution.mjs": "3801fcbff30e6fe4f9a7f1c3695d48643d44c6b51a3f7f4dde1b27114a9c9bf3",
+    "research-official-pdf-ranking.mjs": "c0d326957b27d2501065ba652f682b911afcffb134a95f74f0b8f1fd2953c6b4",
+    "research-official-pdf-worker.mjs": "39ec76ae01ef399819d5a815f980e2ac52b4fc0844510b7944622d18f4539587",
+    "research-dob-workflow-routing.mjs": "c024a9c6696d3ffbd3c50afffbdc800b93ea4fea3a0952245ffe19dd7682ebab",
+    "evals/research-answer-key-reconciliation.mjs": "3e3a2294a5ea9363e0f242690f8548b5593b77181300c55ecbf6051b47cf4b69",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-provider-client.mjs": "f089eda67b8d13de199806980701794eb7db6eae4e7c438def89aad768bb4725",
+    "research-zoning-planner.mjs": "abd7700b26d644f48aee441e4d59ec92516715fc635e0f03c582ed9a943db286",
+    "research-zoning-temporal-application.mjs": "50b5fb4849d7f56b7382848b29e2aaa96f423e766cd0d765b8bede1b71fdfc4e",
+    "research-zoning-safety.mjs": "c71c443a0e3ad20020d02c9528a5f0fae36aa1ecf1f8ce5dfaed0a1acade7fcc",
+    "research-evidence-assembly.mjs": "c42d01095e4c77081feedb569488046a0795f7bb33ae1e63d8956f63da9762f4",
+    "research-definition-excerpts.mjs": "2bb1b8191c7e17bea8526f9adc2d4220fa6f10d4df486a1fae7729f01e534c6a",
+    "research-zoning-context-excerpts.mjs": "05c194e84f2512f7f8fee3d81e86670fb6d403ef30dc341fa0089c9a301a62f4",
+    "research-zoning-metadata.mjs": "4f877fd927b2844b1636eaad971047dbff371292e583f389e9ae7fe63f59303c",
+    "research-zoning-conditional-explanation.mjs": "39e5e5f2bfde49804c940d45fdff37ff2e4d58ac9d57517e9c0cbf6f15ea6ef2",
+    "project-foundation-contract.mjs": "27e3e6f49a1d06215b1a7ab8dc37749183463332b94e5328591d4f72e3fed1ca",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "evals/research-owner-scope-input.mjs": "180d11108ff7d6cdec8eae0e8a64401981955531a3eb55e9535c19d49516bd24",
+    "evals/research-reconciled-answer-key.json": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+    "evals/research-owner-code-candidates.json": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "evals/research-owner-http-request-binding.mjs": "7ed6285b7bb1fae0117cc89e95ad4443b6423884818bf3a729341ffb8fc84500",
+    "research-zoning-lot-history.mjs": "bb31a791175f7a165974123424326e82d47f61fcd84b826ac3cdbc0710fe3dfa",
+    "research-project-fact-coverage.mjs": "7aa3ee319e0fb02c999ea135a627ed8d42dc7e7b17fd2fc904862929bfa311f6",
+    "scripts/run-research-owner-api-round2-lot-history-20260909.mjs": "398c6147049605e6d5dac5b5a12558220a90c25ed931f91479ecf5b8d8864f6a"
+  },
+  "startedAt": "2026-09-09T06:56:16.638Z",
+  "status": "completed",
+  "results": [
+    {
+      "id": "ZR-19",
+      "question": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+      "inputSHA256": "cbe137fe86be80a9f03d4eb2bf95f04e45e0eac5b49d3fd27ba7a6a7e1632ce0",
+      "requestedCodeVersion": "NYC Zoning Resolution — text through 2026-08-13",
+      "readerSelectionsSHA256": "8fd9c19a49a0765a1a672dc7fc590c5460a5d02cbb5589398808fb778a972967",
+      "authoredProjectFacts": [],
+      "authoredQuestionContext": null,
+      "selectionCharacterCounts": [
+        {
+          "sectionID": "20018523",
+          "characters": 0,
+          "selectionMode": "section_reference"
+        }
+      ],
+      "status": "completed",
+      "maximumTurnSpendUSD": 0.5,
+      "initialRequestSHA256": "119325f71bcd7126a3215ff6e458e7fe35eb65f58affb0b4431f475778fe5e72",
+      "initialRawRequestSHA256": "36f39cb5c0ef384576394c58dce9f6c651e1f707cc03b1b51f59e40300720602",
+      "initialModel": "gpt-5.6-luna",
+      "initialRequestBytes": 47174,
+      "durationMilliseconds": 10887,
+      "httpStatus": 200,
+      "initialMaximumUSD": 0.029499,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "0bc2cf52-6c8f-4641-ba7e-a62b6b77c9dd",
+          "createdAt": "2026-09-09T06:56:16.899Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-luna",
+          "requestedModel": "gpt-5.6-luna",
+          "modelUsage": [
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "fast",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 1,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 9678,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 9675,
+          "outputTokens": 757,
+          "totalTokens": 10435,
+          "estimatedCostUSD": 0.003328,
+          "actualProviderCostUSD": 0.003328,
+          "conservativeProviderCostUSD": 0.006202,
+          "durationMilliseconds": 10848,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna"
+        }
+      ],
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-luna",
+        "requestedModel": "gpt-5.6-luna",
+        "promptVersion": "20260827-material-completeness-v31:compact-v3:conversational-v4",
+        "evidenceVersion": "20260909-pinned-excerpt-precedence-v33:structured-v1",
+        "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+        "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+        "codeBasis": {
+          "schemaVersion": 2,
+          "registryVersion": "20260908-zoning-history-context-v7",
+          "jurisdiction": "New York City",
+          "codeYear": null,
+          "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+          "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+          "retrievalScope": "routed-multi-corpus",
+          "routingMode": "question-and-conversation-topic",
+          "basisSource": "permitext-router",
+          "projectID": null,
+          "projectCodeVersion": null,
+          "projectCodeVersionRecognized": null,
+          "projectCodeVersionSupported": null,
+          "projectCodeVersionRetrieved": null,
+          "searchedCorpora": [
+            {
+              "id": "nyc-zoning-resolution",
+              "label": "NYC Zoning Resolution",
+              "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+              "codeYear": null,
+              "applicabilityStatus": "continuously-amended",
+              "routeReason": "zoning cue",
+              "blockedReason": null,
+              "codePrefixes": [
+                "ZR"
+              ]
+            }
+          ],
+          "pinnedCorpora": [],
+          "unavailableCorpora": [],
+          "excludedCorpora": [
+            {
+              "id": "nyc-existing-building-code-2027",
+              "label": "NYC Existing Building Code",
+              "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+              "codeYear": 2026,
+              "applicabilityStatus": "future-effective",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "EBC"
+              ]
+            },
+            {
+              "id": "nyc-1968-building-code",
+              "label": "1968 NYC Building Code",
+              "codeEdition": "1968 NYC Building Code — historical",
+              "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+              "codeYear": 1968,
+              "applicabilityStatus": "historical",
+              "routeReason": "excluded from ordinary Research",
+              "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+              "codePrefixes": [
+                "BC68"
+              ]
+            }
+          ],
+          "disclosure": "Sources searched: NYC Zoning Resolution",
+          "limitation": null,
+          "resolvedAt": "2026-09-09T06:56:16.918Z"
+        },
+        "answerText": "**No.** Same ownership alone does not make the two tax lots one zoning lot. On the stated premise that they were not historically one zoning lot, the historical branches of the definition do not establish the combined tract. The current alternatives require the lots to be contiguous for a minimum of **10 linear feet**—not eight—and also require either the applicable party-in-interest conditions or a recorded Declaration of Restrictions made at the time of the building-permit or certificate-of-occupancy filing (ZR § 12-10). An eight-foot connection therefore fails both current combination routes, regardless of common ownership. A zoning lot also may or may not coincide with tax lots shown on the official tax map; tax-lot identity is not controlling.",
+        "conclusion": "**No.** Same ownership alone does not make the two tax lots one zoning lot. On the stated premise that they were not historically one zoning lot, the historical branches of the definition do not establish the combined tract. The current alternatives require the lots to be contiguous for a minimum of **10 linear feet**—not eight—and also require either the applicable party-in-interest conditions or a recorded Declaration of Restrictions made at the time of the building-permit or certificate-of-occupancy filing (ZR § 12-10). An eight-foot connection therefore fails both current combination routes, regardless of common ownership. A zoning lot also may or may not coincide with tax lots shown on the official tax map; tax-lot identity is not controlling.",
+        "supportedPoints": [
+          {
+            "heading": "Eight feet is below the current contiguity threshold",
+            "explanation": "ZR § 12-10 defines a current zoning lot formed from two or more lots of record as requiring contiguity for a minimum of 10 linear feet. The stated eight-linear-foot connection is insufficient. The historical zoning-lot branches are not available on the user’s stated premise that the parcels were not historically one zoning lot.",
+            "sectionID": "20018523",
+            "sourceIDs": [
+              "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+            ],
+            "evidenceRole": "governing"
+          },
+          {
+            "heading": "Common ownership is not independently sufficient",
+            "explanation": "For the current 10-foot-contiguity routes, § 12-10 additionally requires either that each party having an interest be a party in interest under paragraph (c), or that the tract be declared to be treated as one zoning lot through one or more written Declarations of Restrictions covering the entire tract, executed or waived by the relevant parties and recorded. The definition also states that a zoning lot may or may not coincide with a lot shown on the official New York City tax map.",
+            "sectionID": "20018523",
+            "sourceIDs": [
+              "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+            ],
+            "evidenceRole": "governing"
+          }
+        ],
+        "explanation": "",
+        "assumptions": [
+          "The stated eight-linear-foot contiguity and common ownership are accepted as premises for this question.",
+          "The statement that the parcels were not historically one zoning lot is accepted as a premise, not independently verified title history."
+        ],
+        "missingFacts": [],
+        "followUpQuestions": [],
+        "evidenceLimitations": [
+          "This conclusion is limited to the supplied, continuously amended NYC Zoning Resolution text through 2026-08-13, principally ZR § 12-10; no separate historical-title or recorded-document review was performed."
+        ],
+        "additionalEvidenceNeeded": [],
+        "supportingSourceUses": [],
+        "supportingSources": [],
+        "citations": [
+          {
+            "sectionID": "20018523",
+            "sectionNumber": "12-10",
+            "title": "DEFINITIONS",
+            "codePrefix": "ZR",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "corpusID": "nyc-zoning-resolution",
+            "corpusLabel": "NYC Zoning Resolution",
+            "applicabilityStatus": "continuously-amended",
+            "sourceIDs": [
+              "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+                "selectedText": "zoning lot General Definition Last Amended 2/2/2011 A \"zoning lot\" is either: (a) a lot of record existing on December 15, 1961, or any applicable subsequent amendment thereto; (b) a tract of land, either unsubdivided or consisting of two or more contiguous lots of record, located within a single block, which, on December 15, 1961, or any applicable subsequent amendment thereto, was in single ownership; (c) a tract of land, either unsubdivided or consisting of two or more lots of record contiguous for a minimum of 10 linear feet, located within a single block, which at the time of filing for a building permit (or, if no building permit is required, at the time of the filing for a certificate of occupancy) is under single fee ownership and with respect to which each party having any interest therein is a party in interest (as defined herein); or (d) a tract of land, either unsubdivided or consisting of two or more lots of record contiguous for a minimum of 10 linear feet, located within a single block, which at the time of filing for a building permit (or, if no building permit is required, at the time of filing for a certificate of occupancy) is declared to be a tract of land to be treated as one zoning lot for the purpose of this Resolution. Such declaration shall be made in one written Declaration of Restrictions covering all of such tract of land or in separate written Declarations of Restrictions covering parts of such tract of land and which in the aggregate cover the entire tract of land comprising the zoning lot. Any Declaration of Restrictions or Declarations of Restrictions which individually or collectively cover a tract of land are referred to herein as \"Declarations.\" Each Declaration shall be executed by each party in interest (as defined herein) in the portion of such tract of land covered by such Declaration (excepting any such party as shall have waived its right to execute such Declaration in a written instrument executed by such party in recordable form and recorded at or prior to the recording of the Declaration). Each Declaration and waiver of right to execute a Declaration shall be recorded in the Conveyances Section of the Office of the City Register or, if applicable, the County Clerk's Office of the county in which such tract of land is located, against each lot of record constituting a portion of the land covered by such Declaration. A zoning lot, therefore, may or may not coincide with a lot as shown on the official tax map of the City of New York, or on any recorded subdivision plat or deed. Parcels within City-owned tracts of land located in Broad Channel within the boundaries of Community Board 14 in the Borough of Queens that were numerically identified for leasing purposes on maps filed in the Office of Borough President prior to December 15, 1961, may be considered as individual lots of record as of September 10, 1981. (e) For purposes of the provisions of paragraph (c) hereof: (1) prior to issuing a building permit or a certificate of occupancy, as the case may be, the Department of Buildings shall be furnished with a certificate issued to the applicant therefor by a title insurance company licensed to do business in the State of New York showing that each party having any interest in the subject tract of land is a party in interest (as defined herein); except that where the City of New York is a fee owner, such certificate may be issued by the New York City Law Department; and (2) a \"party in interest\" in the tract of land shall include only (W) the fee owner thereof, (X) the holder of any enforceable recorded interest superior to that of the fee owner and which could result in such holder obtaining possession of all or substantially all of such tract of land, (Y) the holder of any enforceable recorded interest in all or substantially all of such tract of land which would be adversely affected by the development thereof and (Z) the holder of any unrecorded interest in all or substantially all of such tract of land which would be superior to and adversely affected by the development thereof and which would be disclosed by a physical inspection of the tract of land. (f) For purposes of the provisions of paragraph (d) hereof: (1) prior to issuing a building permit or a certificate of occupancy, as the case may be, the Department of Buildings shall be furnished with a certificate issued to the applicant therefor by a title insurance company licensed to do business in the State of New York showing that each party in interest (excepting those parties waiving their respective rights to join therein, as set forth in this definition) has executed the Declaration and that the same, as well as each such waiver, have been duly recorded; except that where the City of New York is a fee owner, such certificate may be issued by the New York City Law Department; (2) the Buildings Department, in issuing a building permit for construction of a building or other structure on the zoning lot declared pursuant to paragraph (d) above or, if no building permit is required, in issuing a certificate of occupancy for such building or other structure, shall accept an application for same from and, if all conditions for issuance of same are fulfilled, shall issue same to any party to the Declaration; (3) by their execution and recording of a Declaration, the parties to the Declaration, and all parties who have waived their respective rights to execute such Declaration, shall be deemed to have agreed that no breach by any party to the Declaration, or any agreement ancillary thereto, shall have any effect on the treatment of the tract of land covered by the Declaration as one zoning lot for purposes of this Resolution and such tract of land shall be treated as one zoning lot unless such zoning lot is subdivided in accordance with the provisions of this Resolution; and (4) a \"party in interest\" in the portion of the tract of land covered by a Declaration shall include only (W) the fee owner or owners thereof, (X) the holder of any enforceable recorded interest in all or part thereof which would be superior to the Declaration and which could result in such holder obtaining possession of any portion of such tract of land, (Y) the holder of any enforceable recorded interest in all or part thereof which would be adversely affected by the Declaration, and (Z) the holder of any unrecorded interest in all or part thereof which would be superior to and adversely affected by the Declaration and which would be disclosed by a physical inspection of the portion of the tract of land covered by the Declaration. A zoning lot may be subdivided into two or more zoning lots, provided that all resulting zoning lots and all buildings thereon shall comply with all of the applicable provisions of this Resolution. If such zoning lot, however, is occupied by a non-complying building, such zoning lot may be subdivided provided such subdivision does not create a new non-compliance or increase the degree of non-compliance of such building. Where ownership of a zoning lot or portion thereof was effected prior to the effective date of this amendment, as evidenced by an attorney's affidavit, any development, enlargement or alteration on such zoning lot may be based upon such prior effected ownership as then defined in the zoning lot definition of Section 12-10. Such prior leasehold agreements shall be duly recorded prior to August 1, 1978. Prior to the issuance of any permit for a development or enlargement pursuant to this Resolution a complete metes and bounds of the zoning lot, the tax lot number, the block number and the ownership of the zoning lot as set forth in paragraphs (a), (b), (c) and (d) herein shall be recorded by the applicant in the Conveyances Section of the Office of the City Register (or, if applicable, the County Clerk's Office) of the county in which the said zoning lot is located. The zoning lot definition in effect prior to the effective date of this amendment shall continue to apply to Board of Standards and Appeals approvals in effect at the effective date hereof.",
+                "visualSources": []
+              }
+            ],
+            "evidenceRole": "governing",
+            "relevance": "Governs the definition of zoning lot, including the 10-linear-foot contiguity threshold, current ownership/party-in-interest and Declaration routes, historical branches, and the distinction between zoning lots and tax lots."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "20018523",
+          "20017344",
+          "20017584",
+          "20017586"
+        ],
+        "evidenceSourceIDs": [
+          "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+          "research-permitext_discovered-id:20017344-2",
+          "research-permitext_discovered-id:20017584-3",
+          "research-permitext_discovered-id:20017586-4"
+        ],
+        "sourceSummary": {
+          "enactedProvisionCount": 4,
+          "contextualProvisionCount": 0,
+          "citedProvisionCount": 1,
+          "governingCitationCount": 1,
+          "supportingCitationCount": 0,
+          "contextualCitationCount": 0,
+          "reviewedOnlyProvisionCount": 3,
+          "userPinnedCount": 1,
+          "permitextDiscoveredCount": 3,
+          "crossReferenceCount": 0,
+          "supportingWebSourceCount": 0,
+          "unresolvedProjectFactCount": 0,
+          "requiredClaimCount": 1,
+          "searchedCorpusCount": 1,
+          "pinnedCorpusCount": 0,
+          "citedCorpusCount": 1
+        },
+        "structuredEvidenceAnalysis": {
+          "schemaVersion": 1,
+          "controllingProvisions": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+              ]
+            }
+          ],
+          "generalRules": [],
+          "exceptions": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+              ]
+            }
+          ],
+          "conditions": [],
+          "limitations": [],
+          "definitions": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+              ]
+            }
+          ],
+          "crossReferences": [],
+          "tables": [
+            {
+              "label": "ZR 12-10",
+              "summary": "ZR 12-10 is governing enacted evidence on the unrestricted topic route; apply only its exact supplied text.",
+              "sourceIDs": [
+                "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+              ]
+            }
+          ],
+          "userPinnedEvidence": [
+            "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+          ],
+          "permitextDiscoveredEvidence": [
+            "research-permitext_discovered-id:20017344-2",
+            "research-permitext_discovered-id:20017584-3",
+            "research-permitext_discovered-id:20017586-4"
+          ],
+          "projectFactsUsed": [],
+          "unresolvedProjectFacts": [],
+          "evidenceLimitations": [
+            "Permitext limited this answer to the enacted evidence assembled for the current question."
+          ],
+          "highValueFollowUpQuestions": []
+        },
+        "factUsage": {
+          "schemaVersion": 1,
+          "projectContext": [],
+          "conversation": [],
+          "other": []
+        },
+        "conversationFacts": {
+          "schemaVersion": 1,
+          "factsVersion": "20260908-negative-work-premise-v6",
+          "activeRootTopic": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+          "turnKind": "established",
+          "establishedFacts": [],
+          "hypotheticalFacts": [],
+          "unknownFacts": [],
+          "extractedFactKeys": [],
+          "nextFactTopics": [
+            {
+              "rootTopic": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+              "establishedFacts": [],
+              "unknownFacts": []
+            }
+          ]
+        },
+        "requiredClaimCoverage": {
+          "schemaVersion": 1,
+          "coverageVersion": "20260827-citation-coverage-v2",
+          "pass": true,
+          "requiredClaimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownCitationSourceIDs": [],
+          "requiredEvidenceSourceIDs": [
+            "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+          ],
+          "supportedPointEvidenceSourceIDs": [
+            "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+          ],
+          "citedEvidenceSourceIDs": [
+            "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+          ],
+          "nonRequiredEvidenceSourceIDs": [
+            "research-permitext_discovered-id:20017344-2",
+            "research-permitext_discovered-id:20017584-3",
+            "research-permitext_discovered-id:20017586-4"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+              "label": "ZR 12-10 — DEFINITIONS",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+                  ],
+                  "missingSourceIDs": [],
+                  "missingSupportedPointSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "covered": true
+                }
+              ]
+            }
+          ]
+        },
+        "claimMateriality": {
+          "schemaVersion": 1,
+          "materialityVersion": "20260811-exact-passage-claim-materiality-v1",
+          "pass": true,
+          "claimCount": 1,
+          "coveredClaimCount": 1,
+          "missingClaimIDs": [],
+          "unknownAnswerSourceIDs": [],
+          "irrelevantAnswerSourceIDs": [],
+          "citedEvidenceSourceIDs": [
+            "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+          ],
+          "claims": [
+            {
+              "id": "required-passage:e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+              "label": "ZR 12-10 — DEFINITIONS",
+              "claimRole": "governing",
+              "covered": true,
+              "matchedOptionIndex": 0,
+              "matchedPointIndex": 0,
+              "evidenceOptions": [
+                {
+                  "optionIndex": 0,
+                  "sourceIDs": [
+                    "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+                  ],
+                  "evidenceRoles": [
+                    "governing"
+                  ],
+                  "qualifyingSourceIDs": [
+                    "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+                  ],
+                  "contextualSourceIDs": [],
+                  "irrelevantSourceIDs": [],
+                  "missingCitationSourceIDs": [],
+                  "materialitySatisfied": true,
+                  "exactPassagesCited": true,
+                  "matchedPointIndex": 0,
+                  "covered": true,
+                  "supportedPoints": [
+                    {
+                      "pointIndex": 0,
+                      "sourceIDs": [
+                        "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    },
+                    {
+                      "pointIndex": 1,
+                      "sourceIDs": [
+                        "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+                      ],
+                      "missingSupportedPointSourceIDs": [],
+                      "irrelevantSourceIDs": [],
+                      "exactPassagesBound": true,
+                      "acceptable": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "zoningDeterministicControls": {
+          "schemaVersion": 2,
+          "plannerVersion": "20260909-complete-definition-budget-v6",
+          "compilerVersion": "20260909-stated-history-premise-v27",
+          "pass": true,
+          "issues": []
+        },
+        "answerQuality": {
+          "schemaVersion": 1,
+          "qualityVersion": "20260909-dining-percentage-domain-v29",
+          "pass": true,
+          "unknownAnswerSourceIDs": [],
+          "orphanCitationSourceIDs": [],
+          "uncitedSupportedPointSourceIDs": [],
+          "irrelevantCitationSourceIDs": [],
+          "collateralCitationSourceIDs": [],
+          "missingApplicabilityDisclosureSourceIDs": [],
+          "missingParallelTableCategorySourceIDs": [],
+          "missingZoningModificationPathDisclosureSourceIDs": [],
+          "unestablishedAccessoryRelationshipSourceIDs": [],
+          "misattributedAccessoryAssemblyRelationshipSourceIDs": [],
+          "missingPC403NonaccessoryScopeDisclosureSourceIDs": [],
+          "unsupportedNormalGroupBFixturePermissionSourceIDs": [],
+          "missingMultipleOccupancyFractionSequenceSourceIDs": [],
+          "missingTypeBNYCContextSourceIDs": [],
+          "conflatedLavatoryVanitySourceIDs": [],
+          "unconditionalPriorCodeAccessibilitySourceIDs": [],
+          "misstatedCumulativeConditionSourceIDs": [],
+          "unsupportedExitAccessExpansionSourceIDs": [],
+          "unsupportedCertificateOperationRoomThresholdSourceIDs": [],
+          "misboundAccessibleDiningSurfaceRuleSourceIDs": [],
+          "misstatedAccessibleDiningSurfacePercentageSourceIDs": [],
+          "misstatedTable403AuthoritySourceIDs": [],
+          "missingRequestedAreaConversions": [],
+          "missingRequestedAreaConversionSourceIDs": [],
+          "citedSourceIDs": [
+            "e1878f7e-4fe2-4d3a-90e0-46693dbaf004"
+          ],
+          "reviewedOnlySourceIDs": [
+            "research-permitext_discovered-id:20017344-2",
+            "research-permitext_discovered-id:20017584-3",
+            "research-permitext_discovered-id:20017586-4"
+          ],
+          "evidenceEconomy": {
+            "citedSourceCount": 1,
+            "citedProvisionCount": 1,
+            "governingCitationCount": 1,
+            "supportingCitationCount": 0,
+            "contextualCitationCount": 0,
+            "reviewedOnlySourceCount": 3,
+            "reviewedOnlyProvisionCount": 3,
+            "assembledSourceCount": 4,
+            "assembledProvisionCount": 4
+          },
+          "sources": [
+            {
+              "sourceID": "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+              "sectionID": "20018523",
+              "reference": "ZR 12-10",
+              "evidenceRole": "governing",
+              "evidenceFunction": "controlling_rule",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "zoning lot General Definition Last Amended 2/2/2011 A \"zoning lot\" is either: (a) a lot of record existing on December 15, 1961, or any applicable subsequent amendment thereto; (b) a tract of land, either unsubdivided or consisting of two or more contiguous lots of record, located within a single block, which, on December 15, 1961, or any applicable subsequent amendment thereto, was in single ownership; (c) a tract of land, either unsubdivided or consisting of two or more lots of record contiguous for a minimum of 10 linear feet, located within a single block, which at the time of filing for a building permit (or, if no building permit is required, at the time of the filing for a certificate of occupancy) is under single fee ownership and with respect to which each party having any interest therein is a party in interest (as defined herein); or (d) a tract of land, either unsubdivided or consisting of two or more lots of record contiguous for a minimum of 10 linear feet, located within a single block, which at the time of filing for a building permit (or, if no building permit is required, at the time of filing for a certificate of occupancy) is declared to be a tract of land to be treated as one zoning lot for the purpose of this Resolution. Such declaration shall be made in one written Declaration of Restrictions covering all of such tract of land or in separate written Declarations of Restrictions covering parts of such tract of land and which in the aggregate cover the entire tract of land comprising the zoning lot. Any Declaration of Restrictions or Declarations of Restrictions which individually or collectively cover a tract of land are referred to herein as \"Declarations.\" Each Declaration shall be executed by each party in interest (as defined herein) in the portion of such tract of land covered by such Declaration (excepting any such party as shall have waived its right to execute such Declaration in a written instrument executed by such party in recordable form and recorded at or prior to the recording of the Declaration). Each Declaration and waiver of right to execute a Declaration shall be recorded in the Conveyances Section of the Office of the City Register or, if applicable, the County Clerk's Office of the county in which such tract of land is located, against each lot of record constituting a portion of the land covered by such Declaration. A zoning lot, therefore, may or may not coincide with a lot as shown on the official tax map of the City of New York, or on any recorded subdivision plat or deed. Parcels within City-owned tracts of land located in Broad Channel within the boundaries of Community Board 14 in the Borough of Queens that were numerically identified for leasing purposes on maps filed in the Office of Borough President prior to December 15, 1961, may be considered as individual lots of record as of September 10, 1981. (e) For purposes of the provisions of paragraph (c) hereof: (1) prior to issuing a building permit or a certificate of occupancy, as the case may be, the Department of Buildings shall be furnished with a certificate issued to the applicant therefor by a title insurance company licensed to do business in the State of New York showing that each party having any interest in the subject tract of land is a party in interest (as defined herein); except that where the City of New York is a fee owner, such certificate may be issued by the New York City Law Department; and (2) a \"party in interest\" in the tract of land shall include only (W) the fee owner thereof, (X) the holder of any enforceable recorded interest superior to that of the fee owner and which could result in such holder obtaining possession of all or substantially all of such tract of land, (Y) the holder of any enforceable recorded interest in all or substantially all of such tract of land which would be adversely affected by the development thereof and (Z) the holder of any unrecorded interest in all or substantially all of such tract of land which would be superior to and adversely affected by the development thereof and which would be disclosed by a physical inspection of the tract of land. (f) For purposes of the provisions of paragraph (d) hereof: (1) prior to issuing a building permit or a certificate of occupancy, as the case may be, the Department of Buildings shall be furnished with a certificate issued to the applicant therefor by a title insurance company licensed to do business in the State of New York showing that each party in interest (excepting those parties waiving their respective rights to join therein, as set forth in this definition) has executed the Declaration and that the same, as well as each such waiver, have been duly recorded; except that where the City of New York is a fee owner, such certificate may be issued by the New York City Law Department; (2) the Buildings Department, in issuing a building permit for construction of a building or other structure on the zoning lot declared pursuant to paragraph (d) above or, if no building permit is required, in issuing a certificate of occupancy for such building or other structure, shall accept an application for same from and, if all conditions for issuance of same are fulfilled, shall issue same to any party to the Declaration; (3) by their execution and recording of a Declaration, the parties to the Declaration, and all parties who have waived their respective rights to execute such Declaration, shall be deemed to have agreed that no breach by any party to the Declaration, or any agreement ancillary thereto, shall have any effect on the treatment of the tract of land covered by the Declaration as one zoning lot for purposes of this Resolution and such tract of land shall be treated as one zoning lot unless such zoning lot is subdivided in accordance with the provisions of this Resolution; and (4) a \"party in interest\" in the portion of the tract of land covered by a Declaration shall include only (W) the fee owner or owners thereof, (X) the holder of any enforceable recorded interest in all or part thereof which would be superior to the Declaration and which could result in such holder obtaining possession of any portion of such tract of land, (Y) the holder of any enforceable recorded interest in all or part thereof which would be adversely affected by the Declaration, and (Z) the holder of any unrecorded interest in all or part thereof which would be superior to and adversely affected by the Declaration and which would be disclosed by a physical inspection of the portion of the tract of land covered by the Declaration. A zoning lot may be subdivided into two or more zoning lots, provided that all resulting zoning lots and all buildings thereon shall comply with all of the applicable provisions of this Resolution. If such zoning lot, however, is occupied by a non-complying building, such zoning lot may be subdivided provided such subdivision does not create a new non-compliance or increase the degree of non-compliance of such building. Where ownership of a zoning lot or portion thereof was effected prior to the effective date of this amendment, as evidenced by an attorney's affidavit, any development, enlargement or alteration on such zoning lot may be based upon such prior effected ownership as then defined in the zoning lot definition of Section 12-10. Such prior leasehold agreements shall be duly recorded prior to August 1, 1978. Prior to the issuance of any permit for a development or enlargement pursuant to this Resolution a complete metes and bounds of the zoning lot, the tax lot number, the block number and the ownership of the zoning lot as set forth in paragraphs (a), (b), (c) and (d) herein shall be recorded by the applicant in the Conveyances Section of the Office of the City Register (or, if applicable, the County Clerk's Office) of the county in which the said zoning lot is located. The zoning lot definition in effect prior to the effective date of this amendment shall continue to apply to Board of Standards and Appeals approvals in effect at the effective date hereof."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20017344-2",
+              "sectionID": "20017344",
+              "reference": "ZR 42-311",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "42-311 Residential uses in M1-1D through M1-5D Districts In M1-1D, M1-2D, M1-3D, M1-4D and M1-5D Districts, residential uses shall be permitted on zoning lots that include existing residences and are not located in either a designated area shown on the maps in APPENDIX J (Designated Areas Within Manufacturing Districts) of this Resolution or within 100 feet of Third Avenue in Brooklyn. Such residential use shall be subject to the regulations of Sections 43-61 (Bulk Regulations for Residential Uses in M1-1D Through M1-5D Districts) and 44-022 (Applicability of regulations in M1-1D through M1-5D Districts) For all other zoning lots, new residences or enlargements of existing residences may be permitted by authorization of the City Planning Commission provided the zoning lot existing on June 20, 1988, meets the criteria of paragraphs (a), (b) or (c) of this Section. (a) On zoning lots containing residential or community facility uses, new residences or enlargements of existing residences may be authorized, provided: (1) the zoning lot contains a building that has one or more stories of lawful residential or community facility uses and no more than one story of commercial or manufacturing uses therein; (2) the zoning lot contains no other commercial or manufacturing uses; and (3) 25 percent or more of the aggregate length of the block fronts on both sides of the street facing each other is occupied by zoning lots containing residential or community facility uses. (b) On vacant zoning lots, new residences may be authorized, provided: (1) the zoning lot has been vacant continuously since June 20, l988, or has been vacant continuously for five years prior to the date of application for such authorization; (2) a zoning lot abutting on one side lot line and fronting on the same street is occupied by a community facility building or a building containing residences; and (3) either of the following conditions exist: (i) such vacant zoning"
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20017584-3",
+              "sectionID": "20017584",
+              "reference": "ZR 25-55",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "25-55 Additional Regulations for Required Spaces When Provided Off Site R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, as indicated, when required accessory off-street parking spaces are provided off the site in accordance with the provisions of Sections 25-52 (Off-site Spaces for Residences), 25-53 (Off-site Spaces for Permitted Non-residential Uses) or 25-54 (Joint and Shared Facilities), the following additional regulations shall apply: Such spaces shall be in the same ownership (single fee ownership or alternative ownership arrangements of the zoning lot definition in Section 12-10) as the use to which they are accessory, and shall be subject to deed restrictions filed in an office of record, binding the owner and the owner’s heirs and assigns to maintain the required number of spaces available throughout the life of such use. Such spaces shall conform to all applicable regulations of the district in which they are located."
+            },
+            {
+              "sourceID": "research-permitext_discovered-id:20017586-4",
+              "sectionID": "20017586",
+              "reference": "ZR 25-61",
+              "evidenceRole": "supporting",
+              "evidenceFunction": "candidate",
+              "topicRouteRelationship": "unrestricted",
+              "applicabilityStatus": "continuously-amended",
+              "text": "25-61 General Provisions R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, as indicated, all permitted or required accessory off-street parking spaces shall conform to the provisions of the following Sections: Section 25-62 (Size and Location of Spaces) Section 25-63 (Location of Access to the Street) Section 25-64 (Surfacing) Section 25-65 (Screening) Section 25-66 (Parking Lot Landscaping) Section 25-67 (For Parking Facilities Containing Car Sharing Vehicles) No portion of a side lot ribbon shall be less than eight feet wide and no portion shall be more than 10 feet wide on an interior lot or through lot and not more than 20 feet wide on a corner lot. If two zoning lots share a common side lot ribbon along a common side lot line, the width of a shared side lot ribbon must be at least eight feet. Special regulations applying to large-scale residential developments are set forth in Article VII, Chapter 8, and to large-scale community facility developments in Article VII, Chapter 9."
+            }
+          ]
+        },
+        "zoningSafety": {
+          "schemaVersion": 1,
+          "safetyVersion": "20260909-zoning-stated-history-premise-v23",
+          "pass": true,
+          "applies": true,
+          "categories": [
+            "citation-boundary",
+            "stable-passage",
+            "definition",
+            "definition-branches",
+            "definition-tax-map-distinction",
+            "amendment",
+            "effective-date"
+          ],
+          "zoningSourceIDs": [
+            "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+            "research-permitext_discovered-id:20017344-2",
+            "research-permitext_discovered-id:20017584-3",
+            "research-permitext_discovered-id:20017586-4"
+          ],
+          "issues": []
+        },
+        "zoningArchitecture": {
+          "plannerVersion": "20260909-complete-definition-budget-v6",
+          "plan": {
+            "schemaVersion": 2,
+            "plannerVersion": "20260909-complete-definition-budget-v6",
+            "path": "definition_cross_reference",
+            "pathLabel": "definition and cross-reference",
+            "disposition": "ready",
+            "requirements": [],
+            "missingFacts": [],
+            "clarification": null,
+            "evidenceLimits": {
+              "maximumCandidates": 8,
+              "maximumDiscovered": 3,
+              "maximumTargetedDefinitions": 2,
+              "maximumCrossReferences": 4,
+              "maximumCharacters": 14000,
+              "maximumSupplementalCharacters": 12000,
+              "maximumCharactersPerSource": 12000
+            },
+            "deterministicControls": {
+              "exactPassageBinding": true,
+              "stableSourceHashes": true,
+              "tableGridAndLegend": false,
+              "effectiveDateEventBinding": false,
+              "arithmeticLedger": false,
+              "propertyAndMapPrerequisites": false
+            },
+            "callPolicy": {
+              "initialTier": "fast",
+              "initialModelRole": "luna_first",
+              "subjectiveVerification": false,
+              "verifierTier": null,
+              "maximumProviderCalls": 2,
+              "allowFullAnswerRewrite": false,
+              "repairEligible": true,
+              "repairTier": "accurate",
+              "maximumRepairAttempts": 1,
+              "repairMode": "source_bounded_structured_patch",
+              "terraEscalation": "provider_failure_or_one_source_bounded_repair"
+            },
+            "questionSignals": {
+              "sourceBoundaryExplanationOnly": false,
+              "historicalSubstantiveTextRequested": false,
+              "explicitMissingFact": false,
+              "propertyIdentifierPresent": false,
+              "mappedStatusPresent": false
+            },
+            "planHash": "90da0644204597b4f4be8f8d257d7d1a1cb776df5cea44fe4fa0b5feebea6a5b"
+          },
+          "deterministicContext": {
+            "schemaVersion": 2,
+            "compilerVersion": "20260909-stated-history-premise-v27",
+            "plannerVersion": "20260909-complete-definition-budget-v6",
+            "planHash": "90da0644204597b4f4be8f8d257d7d1a1cb776df5cea44fe4fa0b5feebea6a5b",
+            "path": "definition_cross_reference",
+            "dates": [],
+            "arithmetic": {
+              "measurements": [],
+              "calculations": []
+            },
+            "answerObligations": [
+              {
+                "id": "definition_historical_branches",
+                "kind": "definition_branch",
+                "detail": "Apply the user's stated absence of a historical zoning lot as a premise for this question, not as independently verified title history. Briefly acknowledge that this premise excludes the historical definition branches for the proposed combined tract. Do not reopen that history in missing facts, follow-up questions or evidence requests; do not demand a historical date recital. Preserve the current branches' contiguity and ownership or Declaration conditions.",
+                "values": [],
+                "sourceIDs": [
+                  "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+                  "research-permitext_discovered-id:20017344-2",
+                  "research-permitext_discovered-id:20017584-3",
+                  "research-permitext_discovered-id:20017586-4"
+                ],
+                "requireAllValues": false,
+                "lotHistoryPremise": {
+                  "version": "20260909-stated-history-premise-v1",
+                  "exclusion": "stated",
+                  "groundingStatements": [
+                    "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot."
+                  ]
+                }
+              },
+              {
+                "id": "definition_contiguity_threshold",
+                "kind": "definition_branch",
+                "detail": "State the minimum current-branch contiguity threshold.",
+                "values": [
+                  "10 linear feet",
+                  "10 feet"
+                ],
+                "sourceIDs": [
+                  "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+                  "research-permitext_discovered-id:20017344-2",
+                  "research-permitext_discovered-id:20017584-3",
+                  "research-permitext_discovered-id:20017586-4"
+                ],
+                "requireAllValues": false
+              },
+              {
+                "id": "definition_party_or_declaration",
+                "kind": "definition_branch",
+                "detail": "Identify the party-in-interest or recorded-Declaration requirements for the current branches.",
+                "values": [
+                  "party in interest",
+                  "Declaration"
+                ],
+                "sourceIDs": [
+                  "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+                  "research-permitext_discovered-id:20017344-2",
+                  "research-permitext_discovered-id:20017584-3",
+                  "research-permitext_discovered-id:20017586-4"
+                ],
+                "requireAllValues": false
+              },
+              {
+                "id": "definition_tax_map_distinction",
+                "kind": "definition_branch",
+                "detail": "Distinguish a zoning lot from a tax lot shown on the official tax map.",
+                "values": [
+                  "tax map",
+                  "tax lot"
+                ],
+                "sourceIDs": [
+                  "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+                  "research-permitext_discovered-id:20017344-2",
+                  "research-permitext_discovered-id:20017584-3",
+                  "research-permitext_discovered-id:20017586-4"
+                ],
+                "requireAllValues": false
+              }
+            ],
+            "structuredTables": [],
+            "passages": [
+              {
+                "sourceID": "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+                "sectionID": "20018523",
+                "sectionNumber": "12-10",
+                "textHash": "99e56b271c9971508f2d7dae2a679768bc72da041ff702d0436d002a37bd2ac3",
+                "evidenceRole": "governing",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20017344-2",
+                "sectionID": "20017344",
+                "sectionNumber": "42-311",
+                "textHash": "213ac9ab85ef14d9f7135c553d757dad054dd7101b8e5a100609394a165e721a",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20017584-3",
+                "sectionID": "20017584",
+                "sectionNumber": "25-55",
+                "textHash": "f25148847541b35ec99f2c19b38b80eb9747831a2f256088e4be171339e08b18",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20017586-4",
+                "sectionID": "20017586",
+                "sectionNumber": "25-61",
+                "textHash": "5f973232a119403aca185a95d76d480339244544aea7d1706555001b91c9994c",
+                "evidenceRole": "supporting",
+                "topicRouteRelationship": "unrestricted"
+              }
+            ],
+            "contextHash": "c50d2eec4c3b2f1143999f7757fbbca81e6dc62e141f71d2b4678427ba0741ca"
+          },
+          "evidenceSelection": {
+            "pass": true,
+            "sources": [
+              {
+                "sourceID": "e1878f7e-4fe2-4d3a-90e0-46693dbaf004",
+                "origin": "user_pinned",
+                "sourceType": "enacted_text",
+                "relationship": "Section referenced by the user; no exact passage or visual was selected",
+                "authorityClass": "enacted",
+                "retrievalReason": "Explicitly pinned by the user",
+                "retrievalRank": null,
+                "retrievalScore": null,
+                "retrievalVersion": "20260909-pinned-excerpt-precedence-v33",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "controlling_rule",
+                  "functions": [
+                    "controlling_rule",
+                    "exception",
+                    "calculation_table",
+                    "definition"
+                  ],
+                  "materialityRank": 0,
+                  "evidenceRole": "governing",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": false,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": true,
+                  "claimCoverageReason": "user-pinned enacted evidence",
+                  "reasons": [
+                    "user-pinned evidence",
+                    "exception or permitted reduction",
+                    "calculation or table provision",
+                    "definition provision"
+                  ]
+                },
+                "retrievedAt": "2026-09-09T06:56:17.256Z",
+                "sectionID": "20018523",
+                "codePrefix": "ZR",
+                "sectionNumber": "12-10",
+                "title": "DEFINITIONS",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "zoning lot General Definition Last Amended 2/2/2011 A \"zoning lot\" is either: (a) a lot of record existing on December 15, 1961, or any applicable subsequent amendment thereto; (b) a tract of land, either unsubdivided or consisting of two or more contiguous lots of record, located within a single block, which, on December 15, 1961, or any applicable subsequent amendment thereto, was in single ownership; (c) a tract of land, either unsubdivided or consisting of two or more lots of record contiguous for a minimum of 10 linear feet, located within a single block, which at the time of filing for a building permit (or, if no building permit is required, at the time of the filing for a certificate of occupancy) is under single fee ownership and with respect to which each party having any interest therein is a party in interest (as defined herein); or (d) a tract of land, either unsubdivided or consisting of two or more lots of record contiguous for a minimum of 10 linear feet, located within a single block, which at the time of filing for a building permit (or, if no building permit is required, at the time of filing for a certificate of occupancy) is declared to be a tract of land to be treated as one zoning lot for the purpose of this Resolution. Such declaration shall be made in one written Declaration of Restrictions covering all of such tract of land or in separate written Declarations of Restrictions covering parts of such tract of land and which in the aggregate cover the entire tract of land comprising the zoning lot. Any Declaration of Restrictions or Declarations of Restrictions which individually or collectively cover a tract of land are referred to herein as \"Declarations.\" Each Declaration shall be executed by each party in interest (as defined herein) in the portion of such tract of land covered by such Declaration (excepting any such party as shall have waived its right to execute such Declaration in a written instrument executed by such party in recordable form and recorded at or prior to the recording of the Declaration). Each Declaration and waiver of right to execute a Declaration shall be recorded in the Conveyances Section of the Office of the City Register or, if applicable, the County Clerk's Office of the county in which such tract of land is located, against each lot of record constituting a portion of the land covered by such Declaration. A zoning lot, therefore, may or may not coincide with a lot as shown on the official tax map of the City of New York, or on any recorded subdivision plat or deed. Parcels within City-owned tracts of land located in Broad Channel within the boundaries of Community Board 14 in the Borough of Queens that were numerically identified for leasing purposes on maps filed in the Office of Borough President prior to December 15, 1961, may be considered as individual lots of record as of September 10, 1981. (e) For purposes of the provisions of paragraph (c) hereof: (1) prior to issuing a building permit or a certificate of occupancy, as the case may be, the Department of Buildings shall be furnished with a certificate issued to the applicant therefor by a title insurance company licensed to do business in the State of New York showing that each party having any interest in the subject tract of land is a party in interest (as defined herein); except that where the City of New York is a fee owner, such certificate may be issued by the New York City Law Department; and (2) a \"party in interest\" in the tract of land shall include only (W) the fee owner thereof, (X) the holder of any enforceable recorded interest superior to that of the fee owner and which could result in such holder obtaining possession of all or substantially all of such tract of land, (Y) the holder of any enforceable recorded interest in all or substantially all of such tract of land which would be adversely affected by the development thereof and (Z) the holder of any unrecorded interest in all or substantially all of such tract of land which would be superior to and adversely affected by the development thereof and which would be disclosed by a physical inspection of the tract of land. (f) For purposes of the provisions of paragraph (d) hereof: (1) prior to issuing a building permit or a certificate of occupancy, as the case may be, the Department of Buildings shall be furnished with a certificate issued to the applicant therefor by a title insurance company licensed to do business in the State of New York showing that each party in interest (excepting those parties waiving their respective rights to join therein, as set forth in this definition) has executed the Declaration and that the same, as well as each such waiver, have been duly recorded; except that where the City of New York is a fee owner, such certificate may be issued by the New York City Law Department; (2) the Buildings Department, in issuing a building permit for construction of a building or other structure on the zoning lot declared pursuant to paragraph (d) above or, if no building permit is required, in issuing a certificate of occupancy for such building or other structure, shall accept an application for same from and, if all conditions for issuance of same are fulfilled, shall issue same to any party to the Declaration; (3) by their execution and recording of a Declaration, the parties to the Declaration, and all parties who have waived their respective rights to execute such Declaration, shall be deemed to have agreed that no breach by any party to the Declaration, or any agreement ancillary thereto, shall have any effect on the treatment of the tract of land covered by the Declaration as one zoning lot for purposes of this Resolution and such tract of land shall be treated as one zoning lot unless such zoning lot is subdivided in accordance with the provisions of this Resolution; and (4) a \"party in interest\" in the portion of the tract of land covered by a Declaration shall include only (W) the fee owner or owners thereof, (X) the holder of any enforceable recorded interest in all or part thereof which would be superior to the Declaration and which could result in such holder obtaining possession of any portion of such tract of land, (Y) the holder of any enforceable recorded interest in all or part thereof which would be adversely affected by the Declaration, and (Z) the holder of any unrecorded interest in all or part thereof which would be superior to and adversely affected by the Declaration and which would be disclosed by a physical inspection of the portion of the tract of land covered by the Declaration. A zoning lot may be subdivided into two or more zoning lots, provided that all resulting zoning lots and all buildings thereon shall comply with all of the applicable provisions of this Resolution. If such zoning lot, however, is occupied by a non-complying building, such zoning lot may be subdivided provided such subdivision does not create a new non-compliance or increase the degree of non-compliance of such building. Where ownership of a zoning lot or portion thereof was effected prior to the effective date of this amendment, as evidenced by an attorney's affidavit, any development, enlargement or alteration on such zoning lot may be based upon such prior effected ownership as then defined in the zoning lot definition of Section 12-10. Such prior leasehold agreements shall be duly recorded prior to August 1, 1978. Prior to the issuance of any permit for a development or enlargement pursuant to this Resolution a complete metes and bounds of the zoning lot, the tax lot number, the block number and the ownership of the zoning lot as set forth in paragraphs (a), (b), (c) and (d) herein shall be recorded by the applicant in the Conveyances Section of the Office of the City Register (or, if applicable, the County Clerk's Office) of the county in which the said zoning lot is located. The zoning lot definition in effect prior to the effective date of this amendment shall continue to apply to Board of Standards and Appeals approvals in effect at the effective date hereof.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": false,
+                "targetedDefinition": {
+                  "schemaVersion": 1,
+                  "version": "20260909-zoning-definition-dependencies-v3",
+                  "sourceMode": "canonical_enacted_definition_entries",
+                  "sectionID": "20018523",
+                  "codePrefix": "ZR",
+                  "sectionNumber": "12-10",
+                  "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                  "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                  "jurisdiction": "New York City",
+                  "labels": [
+                    "zoning lot"
+                  ],
+                  "passages": [
+                    "zoning lot General Definition Last Amended 2/2/2011 A \"zoning lot\" is either: (a) a lot of record existing on December 15, 1961, or any applicable subsequent amendment thereto; (b) a tract of land, either unsubdivided or consisting of two or more contiguous lots of record, located within a single block, which, on December 15, 1961, or any applicable subsequent amendment thereto, was in single ownership; (c) a tract of land, either unsubdivided or consisting of two or more lots of record contiguous for a minimum of 10 linear feet, located within a single block, which at the time of filing for a building permit (or, if no building permit is required, at the time of the filing for a certificate of occupancy) is under single fee ownership and with respect to which each party having any interest therein is a party in interest (as defined herein); or (d) a tract of land, either unsubdivided or consisting of two or more lots of record contiguous for a minimum of 10 linear feet, located within a single block, which at the time of filing for a building permit (or, if no building permit is required, at the time of filing for a certificate of occupancy) is declared to be a tract of land to be treated as one zoning lot for the purpose of this Resolution. Such declaration shall be made in one written Declaration of Restrictions covering all of such tract of land or in separate written Declarations of Restrictions covering parts of such tract of land and which in the aggregate cover the entire tract of land comprising the zoning lot. Any Declaration of Restrictions or Declarations of Restrictions which individually or collectively cover a tract of land are referred to herein as \"Declarations.\" Each Declaration shall be executed by each party in interest (as defined herein) in the portion of such tract of land covered by such Declaration (excepting any such party as shall have waived its right to execute such Declaration in a written instrument executed by such party in recordable form and recorded at or prior to the recording of the Declaration). Each Declaration and waiver of right to execute a Declaration shall be recorded in the Conveyances Section of the Office of the City Register or, if applicable, the County Clerk's Office of the county in which such tract of land is located, against each lot of record constituting a portion of the land covered by such Declaration. A zoning lot, therefore, may or may not coincide with a lot as shown on the official tax map of the City of New York, or on any recorded subdivision plat or deed. Parcels within City-owned tracts of land located in Broad Channel within the boundaries of Community Board 14 in the Borough of Queens that were numerically identified for leasing purposes on maps filed in the Office of Borough President prior to December 15, 1961, may be considered as individual lots of record as of September 10, 1981. (e) For purposes of the provisions of paragraph (c) hereof: (1) prior to issuing a building permit or a certificate of occupancy, as the case may be, the Department of Buildings shall be furnished with a certificate issued to the applicant therefor by a title insurance company licensed to do business in the State of New York showing that each party having any interest in the subject tract of land is a party in interest (as defined herein); except that where the City of New York is a fee owner, such certificate may be issued by the New York City Law Department; and (2) a \"party in interest\" in the tract of land shall include only (W) the fee owner thereof, (X) the holder of any enforceable recorded interest superior to that of the fee owner and which could result in such holder obtaining possession of all or substantially all of such tract of land, (Y) the holder of any enforceable recorded interest in all or substantially all of such tract of land which would be adversely affected by the development thereof and (Z) the holder of any unrecorded interest in all or substantially all of such tract of land which would be superior to and adversely affected by the development thereof and which would be disclosed by a physical inspection of the tract of land. (f) For purposes of the provisions of paragraph (d) hereof: (1) prior to issuing a building permit or a certificate of occupancy, as the case may be, the Department of Buildings shall be furnished with a certificate issued to the applicant therefor by a title insurance company licensed to do business in the State of New York showing that each party in interest (excepting those parties waiving their respective rights to join therein, as set forth in this definition) has executed the Declaration and that the same, as well as each such waiver, have been duly recorded; except that where the City of New York is a fee owner, such certificate may be issued by the New York City Law Department; (2) the Buildings Department, in issuing a building permit for construction of a building or other structure on the zoning lot declared pursuant to paragraph (d) above or, if no building permit is required, in issuing a certificate of occupancy for such building or other structure, shall accept an application for same from and, if all conditions for issuance of same are fulfilled, shall issue same to any party to the Declaration; (3) by their execution and recording of a Declaration, the parties to the Declaration, and all parties who have waived their respective rights to execute such Declaration, shall be deemed to have agreed that no breach by any party to the Declaration, or any agreement ancillary thereto, shall have any effect on the treatment of the tract of land covered by the Declaration as one zoning lot for purposes of this Resolution and such tract of land shall be treated as one zoning lot unless such zoning lot is subdivided in accordance with the provisions of this Resolution; and (4) a \"party in interest\" in the portion of the tract of land covered by a Declaration shall include only (W) the fee owner or owners thereof, (X) the holder of any enforceable recorded interest in all or part thereof which would be superior to the Declaration and which could result in such holder obtaining possession of any portion of such tract of land, (Y) the holder of any enforceable recorded interest in all or part thereof which would be adversely affected by the Declaration, and (Z) the holder of any unrecorded interest in all or part thereof which would be superior to and adversely affected by the Declaration and which would be disclosed by a physical inspection of the portion of the tract of land covered by the Declaration. A zoning lot may be subdivided into two or more zoning lots, provided that all resulting zoning lots and all buildings thereon shall comply with all of the applicable provisions of this Resolution. If such zoning lot, however, is occupied by a non-complying building, such zoning lot may be subdivided provided such subdivision does not create a new non-compliance or increase the degree of non-compliance of such building. Where ownership of a zoning lot or portion thereof was effected prior to the effective date of this amendment, as evidenced by an attorney's affidavit, any development, enlargement or alteration on such zoning lot may be based upon such prior effected ownership as then defined in the zoning lot definition of Section 12-10. Such prior leasehold agreements shall be duly recorded prior to August 1, 1978. Prior to the issuance of any permit for a development or enlargement pursuant to this Resolution a complete metes and bounds of the zoning lot, the tax lot number, the block number and the ownership of the zoning lot as set forth in paragraphs (a), (b), (c) and (d) herein shall be recorded by the applicant in the Conveyances Section of the Office of the City Register (or, if applicable, the County Clerk's Office) of the county in which the said zoning lot is located. The zoning lot definition in effect prior to the effective date of this amendment shall continue to apply to Board of Standards and Appeals approvals in effect at the effective date hereof."
+                  ],
+                  "canonicalSectionCharacterCount": 268088,
+                  "excerptCharacterCount": 8114,
+                  "canonicalContextComplete": false
+                },
+                "userSelectedText": ""
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20017344-2",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “two”, “lots”, “lot”, “same”, “block”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “two”, “lots”, “lot”, “same”, “block”.",
+                "retrievalRank": 2,
+                "retrievalScore": 29.449,
+                "retrievalVersion": "20260909-focused-technical-v30",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-09T06:56:17.256Z",
+                "sectionID": "20017344",
+                "codePrefix": "ZR",
+                "sectionNumber": "42-311",
+                "title": "Residential uses in M1-1D through M1-5D Districts",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "42-311 Residential uses in M1-1D through M1-5D Districts In M1-1D, M1-2D, M1-3D, M1-4D and M1-5D Districts, residential uses shall be permitted on zoning lots that include existing residences and are not located in either a designated area shown on the maps in APPENDIX J (Designated Areas Within Manufacturing Districts) of this Resolution or within 100 feet of Third Avenue in Brooklyn. Such residential use shall be subject to the regulations of Sections 43-61 (Bulk Regulations for Residential Uses in M1-1D Through M1-5D Districts) and 44-022 (Applicability of regulations in M1-1D through M1-5D Districts) For all other zoning lots, new residences or enlargements of existing residences may be permitted by authorization of the City Planning Commission provided the zoning lot existing on June 20, 1988, meets the criteria of paragraphs (a), (b) or (c) of this Section. (a) On zoning lots containing residential or community facility uses, new residences or enlargements of existing residences may be authorized, provided: (1) the zoning lot contains a building that has one or more stories of lawful residential or community facility uses and no more than one story of commercial or manufacturing uses therein; (2) the zoning lot contains no other commercial or manufacturing uses; and (3) 25 percent or more of the aggregate length of the block fronts on both sides of the street facing each other is occupied by zoning lots containing residential or community facility uses. (b) On vacant zoning lots, new residences may be authorized, provided: (1) the zoning lot has been vacant continuously since June 20, l988, or has been vacant continuously for five years prior to the date of application for such authorization; (2) a zoning lot abutting on one side lot line and fronting on the same street is occupied by a community facility building or a building containing residences; and (3) either of the following conditions exist: (i) such vacant zoning",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": false,
+                "truncated": true,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20017584-3",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “lot”, “same”, “owner”, “zoning”, “they”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “lot”, “same”, “owner”, “zoning”, “they”. The proposed passage includes a cross-reference that may require additional evidence.",
+                "retrievalRank": 3,
+                "retrievalScore": 25.831,
+                "retrievalVersion": "20260909-focused-technical-v30",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-09T06:56:17.256Z",
+                "sectionID": "20017584",
+                "codePrefix": "ZR",
+                "sectionNumber": "25-55",
+                "title": "Additional Regulations for Required Spaces When Provided Off Site",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "25-55 Additional Regulations for Required Spaces When Provided Off Site R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, as indicated, when required accessory off-street parking spaces are provided off the site in accordance with the provisions of Sections 25-52 (Off-site Spaces for Residences), 25-53 (Off-site Spaces for Permitted Non-residential Uses) or 25-54 (Joint and Shared Facilities), the following additional regulations shall apply: Such spaces shall be in the same ownership (single fee ownership or alternative ownership arrangements of the zoning lot definition in Section 12-10) as the use to which they are accessory, and shall be subject to deed restrictions filed in an office of record, binding the owner and the owner’s heirs and assigns to maintain the required number of spaces available throughout the life of such use. Such spaces shall conform to all applicable regulations of the district in which they are located.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              },
+              {
+                "sourceID": "research-permitext_discovered-id:20017586-4",
+                "origin": "permitext_discovered",
+                "sourceType": "enacted_text",
+                "relationship": "It matches “two”, “lots”, “lot”, “eight”, “feet”.",
+                "authorityClass": "enacted",
+                "retrievalReason": "It matches “two”, “lots”, “lot”, “eight”, “feet”.",
+                "retrievalRank": 4,
+                "retrievalScore": 25.041,
+                "retrievalVersion": "20260909-focused-technical-v30",
+                "retrievalDepth": 0,
+                "evidencePriority": {
+                  "version": "20260908-explicit-descendant-scope-v5",
+                  "primaryFunction": "candidate",
+                  "functions": [
+                    "candidate"
+                  ],
+                  "materialityRank": 9,
+                  "evidenceRole": "supporting",
+                  "controllingRoot": null,
+                  "controllingTopicRoutes": [],
+                  "topicRoutes": [],
+                  "topicRouteRelationship": "unrestricted",
+                  "pinnedScopeActive": true,
+                  "hierarchyDepth": null,
+                  "descendantClaimCoverage": true,
+                  "claimCoverageRequired": false,
+                  "claimCoverageReason": null,
+                  "reasons": []
+                },
+                "retrievedAt": "2026-09-09T06:56:17.256Z",
+                "sectionID": "20017586",
+                "codePrefix": "ZR",
+                "sectionNumber": "25-61",
+                "title": "General Provisions",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "jurisdiction": "New York City",
+                "corpusID": "nyc-zoning-resolution",
+                "corpusLabel": "NYC Zoning Resolution",
+                "applicabilityStatus": "continuously-amended",
+                "text": "25-61 General Provisions R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 In all districts, as indicated, all permitted or required accessory off-street parking spaces shall conform to the provisions of the following Sections: Section 25-62 (Size and Location of Spaces) Section 25-63 (Location of Access to the Street) Section 25-64 (Surfacing) Section 25-65 (Screening) Section 25-66 (Parking Lot Landscaping) Section 25-67 (For Parking Facilities Containing Car Sharing Vehicles) No portion of a side lot ribbon shall be less than eight feet wide and no portion shall be more than 10 feet wide on an interior lot or through lot and not more than 20 feet wide on a corner lot. If two zoning lots share a common side lot ribbon along a common side lot line, the width of a shared side lot ribbon must be at least eight feet. Special regulations applying to large-scale residential developments are set forth in Article VII, Chapter 8, and to large-scale community facility developments in Article VII, Chapter 9.",
+                "canonicalContextResolved": true,
+                "canonicalContextComplete": true,
+                "truncated": false,
+                "targetedDefinition": null
+              }
+            ],
+            "rejected": [],
+            "gateFailures": [],
+            "usage": {
+              "sourceCount": 4,
+              "characterCount": 12029,
+              "pinnedCharacterCount": 8114,
+              "maximumCharacters": 14000
+            }
+          },
+          "evidenceReadiness": {
+            "schemaVersion": 1,
+            "pass": true,
+            "disposition": "ready",
+            "issues": [],
+            "requiredEvidence": []
+          },
+          "repairVersion": "20260909-atomic-metadata-patch-v3",
+          "sourceBoundedRepairApplied": false,
+          "repairPacketHashes": []
+        },
+        "retrieval": {
+          "schemaVersion": 1,
+          "assemblyVersion": "20260909-pinned-excerpt-precedence-v33",
+          "retrievalQuery": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+          "previousTopicApplied": false,
+          "projectFactsApplied": false,
+          "topicDecision": {
+            "version": "20260902-format-follow-up-v3",
+            "decision": "topic_switch",
+            "question": {
+              "text": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "rootTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "currentTopic": {
+              "text": "",
+              "source": "none",
+              "codeReferences": []
+            },
+            "nextRootTopic": {
+              "text": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "nextCurrentTopic": {
+              "text": "Two tax lots on the same block have the same owner but touch for only eight linear feet and were not historically one zoning lot. Can they now be treated as one zoning lot merely because they share ownership?",
+              "source": "current_question",
+              "codeReferences": []
+            },
+            "contextPolicy": {
+              "includeRootTopic": false,
+              "includeCurrentTopic": false,
+              "replaceRootTopic": true
+            },
+            "signals": {
+              "returnToOriginal": false,
+              "correction": false,
+              "relevanceComparison": false,
+              "explicitSwitch": false,
+              "projectSubjectContinuation": false,
+              "hypotheticalContinuation": false,
+              "formatTransformation": false,
+              "contextualContinuation": true,
+              "relatedReference": false,
+              "disjointExplicitReference": false,
+              "selfContained": false,
+              "rootTokenOverlap": 0,
+              "currentTokenOverlap": 0
+            }
+          },
+          "conversationFactsVersion": "20260908-negative-work-premise-v6",
+          "conversationFactPromptVersion": "20260909-fact-context-v1",
+          "sourceMode": "text_only",
+          "sourceScope": "authorized_enacted_text",
+          "strategy": {
+            "mode": "broad",
+            "reason": "default_authorized_retrieval"
+          },
+          "limits": {
+            "maximumTopicDependencies": 14,
+            "maximumCandidates": 8,
+            "maximumDiscovered": 3,
+            "maximumTargetedDefinitions": 2,
+            "maximumCrossReferences": 3,
+            "maximumCharacters": 14000,
+            "maximumSupplementalCharacters": 12000,
+            "maximumCharactersPerSource": 12000
+          },
+          "usage": {
+            "pinnedCount": 1,
+            "pinnedCharacterCount": 8114,
+            "pinnedCanonicalContextCharacterCount": 0,
+            "pinnedSelectionExactCount": 0,
+            "pinnedSelectionTruncatedCount": 0,
+            "pinnedSelectionExcerptedCount": 0,
+            "structuredPinnedCount": 0,
+            "supplementalCharacterCeiling": 14000,
+            "supplementalCharacterCount": 3915,
+            "candidateCount": 8,
+            "discoveredCount": 3,
+            "targetedDefinitionCount": 1,
+            "crossReferenceCount": 0,
+            "topicDependencyCount": 0,
+            "characterCount": 12029,
+            "resolverFailureCount": 0,
+            "nonMaterialCandidateCount": 0,
+            "finalSourceCount": 4,
+            "finalCharacterCount": 12029
+          },
+          "limitations": [
+            {
+              "kind": "evidence-character-limit",
+              "text": "At least one enacted section was shortened to keep this answer within the evidence character limit."
+            },
+            {
+              "kind": "targeted-definition-excerpt",
+              "count": 1,
+              "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+            },
+            {
+              "kind": "cross-reference-limit",
+              "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+            },
+            {
+              "kind": "retrieval-completeness",
+              "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+            },
+            {
+              "kind": "visual-source-review-required",
+              "text": "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. Review and explicitly select the applicable visual source before preparing that candidate."
+            }
+          ],
+          "discovery": {
+            "retrievalVersion": "20260909-focused-technical-v30",
+            "searchedSectionCount": 4068,
+            "outsideCurrentLibrary": [],
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codePrefixes": [
+                  "ZR"
+                ],
+                "routeReason": "zoning cue"
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "applicabilityStatus": "future-effective",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "applicabilityStatus": "historical",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "routeReason": "excluded from ordinary Research"
+              }
+            ]
+          },
+          "sourcePolicyVersion": "20260909-supporting-web-v22",
+          "codeBasis": {
+            "schemaVersion": 2,
+            "registryVersion": "20260908-zoning-history-context-v7",
+            "jurisdiction": "New York City",
+            "codeYear": null,
+            "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+            "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+            "retrievalScope": "routed-multi-corpus",
+            "routingMode": "question-and-conversation-topic",
+            "basisSource": "permitext-router",
+            "projectID": null,
+            "projectCodeVersion": null,
+            "projectCodeVersionRecognized": null,
+            "projectCodeVersionSupported": null,
+            "projectCodeVersionRetrieved": null,
+            "searchedCorpora": [
+              {
+                "id": "nyc-zoning-resolution",
+                "label": "NYC Zoning Resolution",
+                "codeEdition": "NYC Zoning Resolution — text through 2026-08-13",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1",
+                "codeYear": null,
+                "applicabilityStatus": "continuously-amended",
+                "routeReason": "zoning cue",
+                "blockedReason": null,
+                "codePrefixes": [
+                  "ZR"
+                ]
+              }
+            ],
+            "pinnedCorpora": [],
+            "unavailableCorpora": [],
+            "excludedCorpora": [
+              {
+                "id": "nyc-existing-building-code-2027",
+                "label": "NYC Existing Building Code",
+                "codeEdition": "NYC Existing Building Code — effective July 17, 2027",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1",
+                "codeYear": 2026,
+                "applicabilityStatus": "future-effective",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "EBC"
+                ]
+              },
+              {
+                "id": "nyc-1968-building-code",
+                "label": "1968 NYC Building Code",
+                "codeEdition": "1968 NYC Building Code — historical",
+                "codeVersion": "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1",
+                "codeYear": 1968,
+                "applicabilityStatus": "historical",
+                "routeReason": "excluded from ordinary Research",
+                "blockedReason": "Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.",
+                "codePrefixes": [
+                  "BC68"
+                ]
+              }
+            ],
+            "disclosure": "Sources searched: NYC Zoning Resolution",
+            "limitation": null,
+            "resolvedAt": "2026-09-09T06:56:16.918Z"
+          },
+          "webSupportRequested": false,
+          "webSupportReasons": [],
+          "allowOfficialGuidanceOnly": false,
+          "webSupportSearched": false,
+          "webQuery": null,
+          "webLimitation": null
+        },
+        "verification": {
+          "status": "passed",
+          "pass": true,
+          "attempts": 1,
+          "regenerated": false,
+          "sourceBoundedRepairApplied": false,
+          "history": [
+            {
+              "pass": true,
+              "issues": [],
+              "model": "permitext-deterministic-zoning-compiler"
+            }
+          ]
+        },
+        "authorityStatus": "supported_by_enacted_text",
+        "authorityLabel": "Supported by enacted text",
+        "sourceAsOf": "2026-09-09T06:56:16.918Z",
+        "routing": {
+          "version": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "mode": "hybrid",
+          "answerTier": "fast",
+          "reasons": [
+            "zoning_compiler_luna_first:definition_cross_reference"
+          ],
+          "evidenceAnalysisModel": "permitext-deterministic-evidence-map",
+          "requestedAnswerModel": "gpt-5.6-luna",
+          "actualAnswerModel": "gpt-5.6-luna",
+          "verificationModel": "gpt-5.6-luna",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "verificationIssueTypes": [],
+          "zoningPlannerVersion": "20260909-complete-definition-budget-v6",
+          "maximumProviderCalls": 2,
+          "fullAnswerRewriteAllowed": false,
+          "sourceBoundedRepairApplied": false,
+          "repairVersion": "20260909-atomic-metadata-patch-v3"
+        },
+        "disclaimer": "AI-generated research assistance—not an official code determination. Verify cited text, source status, and Project facts before relying on this answer for filing, design, permitting, or construction."
+      }
+    }
+  ],
+  "providerCalls": [
+    {
+      "caseID": "ZR-19",
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-luna",
+      "requestBytes": 47174,
+      "maxOutputTokens": 3000,
+      "requestSHA256": "119325f71bcd7126a3215ff6e458e7fe35eb65f58affb0b4431f475778fe5e72",
+      "rawRequestSHA256": "36f39cb5c0ef384576394c58dce9f6c651e1f707cc03b1b51f59e40300720602",
+      "startedAt": "2026-09-09T06:56:17.376Z",
+      "httpStatus": 200,
+      "usage": {
+        "input_tokens": 9678,
+        "input_tokens_details": {
+          "cache_write_tokens": 9675,
+          "cached_tokens": 0
+        },
+        "output_tokens": 757,
+        "output_tokens_details": {
+          "reasoning_tokens": 113
+        },
+        "total_tokens": 10435
+      },
+      "serviceTier": "default",
+      "output": [
+        {
+          "id": "msg_02f68e376122050d016aa103162a6887d2b248cf59db9130f8",
+          "type": "message",
+          "status": "completed",
+          "content": [
+            {
+              "type": "output_text",
+              "annotations": [],
+              "logprobs": [],
+              "text": "{\"answerText\":\"**No.** Same ownership alone does not make the two tax lots one zoning lot. On the stated premise that they were not historically one zoning lot, the historical branches of the definition do not establish the combined tract. The current alternatives require the lots to be contiguous for a minimum of **10 linear feet**—not eight—and also require either the applicable party-in-interest conditions or a recorded Declaration of Restrictions made at the time of the building-permit or certificate-of-occupancy filing (ZR § 12-10). An eight-foot connection therefore fails both current combination routes, regardless of common ownership. A zoning lot also may or may not coincide with tax lots shown on the official tax map; tax-lot identity is not controlling.\",\"supportedPoints\":[{\"heading\":\"Eight feet is below the current contiguity threshold\",\"explanation\":\"ZR § 12-10 defines a current zoning lot formed from two or more lots of record as requiring contiguity for a minimum of 10 linear feet. The stated eight-linear-foot connection is insufficient. The historical zoning-lot branches are not available on the user’s stated premise that the parcels were not historically one zoning lot.\",\"sectionID\":\"20018523\",\"sourceIDs\":[\"e1878f7e-4fe2-4d3a-90e0-46693dbaf004\"]},{\"heading\":\"Common ownership is not independently sufficient\",\"explanation\":\"For the current 10-foot-contiguity routes, § 12-10 additionally requires either that each party having an interest be a party in interest under paragraph (c), or that the tract be declared to be treated as one zoning lot through one or more written Declarations of Restrictions covering the entire tract, executed or waived by the relevant parties and recorded. The definition also states that a zoning lot may or may not coincide with a lot shown on the official New York City tax map.\",\"sectionID\":\"20018523\",\"sourceIDs\":[\"e1878f7e-4fe2-4d3a-90e0-46693dbaf004\"]}],\"assumptions\":[\"The stated eight-linear-foot contiguity and common ownership are accepted as premises for this question.\",\"The statement that the parcels were not historically one zoning lot is accepted as a premise, not independently verified title history.\"],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"This conclusion is limited to the supplied, continuously amended NYC Zoning Resolution text through 2026-08-13, principally ZR § 12-10; no separate historical-title or recorded-document review was performed.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"citations\":[{\"sectionID\":\"20018523\",\"sourceIDs\":[\"e1878f7e-4fe2-4d3a-90e0-46693dbaf004\"],\"relevance\":\"Governs the definition of zoning lot, including the 10-linear-foot contiguity threshold, current ownership/party-in-interest and Declaration routes, historical branches, and the distinction between zoning lots and tax lots.\"}]}"
+            }
+          ],
+          "phase": "final_answer",
+          "role": "assistant"
+        }
+      ],
+      "incompleteDetails": null,
+      "durationMilliseconds": 10082
+    }
+  ],
+  "documentRequests": [],
+  "cumulativeConservativeSpendUSD": 7.289668,
+  "spend": {
+    "active": true,
+    "capUSD": 0.5,
+    "reservedUSD": 0.003328,
+    "actualUSD": 0.003328,
+    "requestCount": 1,
+    "pendingRequestCount": 0
+  },
+  "completedAt": "2026-09-09T06:56:27.814Z"
+}
