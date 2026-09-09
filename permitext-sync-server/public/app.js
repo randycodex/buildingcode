@@ -80,7 +80,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260908-uiux-hig-v57";
+} from "./offline-storage.js?v=20260908-reader-fill-v58";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +115,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260908-uiux-hig-v57";
+} from "./research-intent-state.js?v=20260908-reader-fill-v58";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -3196,19 +3196,7 @@ function isFixedWidthPaneID(paneID) {
 }
 
 function isFlexibleReaderPaneID(paneID) {
-  if (!paneID?.startsWith("reader:")) return false;
-  if (isProAccount()) return true;
-  return (state.readers || []).length === 2;
-}
-
-function isFixedWidthReaderPaneID(paneID) {
-  if (!paneID?.startsWith("reader:")) return false;
-  if (isFlexibleReaderPaneID(paneID)) return false;
-  if (activePaneIDs().length >= 4) return true;
-  const readerCount = (state.readers || []).length;
-  if (readerCount > 3) return true;
-  const hasSideColumns = activePaneIDs().some((id) => !id.startsWith("reader:"));
-  return readerCount >= 2 && hasSideColumns;
+  return Boolean(paneID?.startsWith("reader:"));
 }
 
 function linkedReaderPaneIDForSearch(searchID) {
@@ -3998,8 +3986,6 @@ function applyPaneWeight(panel, paneID) {
   if (value !== storedValue) state.paneWeights[paneID] = value;
   const hasManyColumns = activePaneIDs().length >= 4;
   const flexibleReader = isFlexibleReaderPaneID(paneID);
-  const sourceLinkedReader = paneID?.startsWith("reader:") &&
-    (state.readers || []).some((reader) => `reader:${reader.id}` === paneID && reader.savedSourcePaneID);
   const explicitlyResizedReader = flexibleReader &&
     Number.isFinite(value) &&
     value > defaultWidth + 0.5;
@@ -4010,16 +3996,16 @@ function applyPaneWeight(panel, paneID) {
     "--pane-resized-min-width",
     `${flexibleReader && !explicitlyResizedReader ? defaultWidth : width}px`
   );
-  panel.style.setProperty("--pane-default-min-width", hasManyColumns ? `${defaultWidth}px` : "0px");
+  panel.style.setProperty("--pane-default-min-width", flexibleReader || hasManyColumns ? `${defaultWidth}px` : "0px");
   if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
     panel.style.flex = `1 1 ${width}px`;
     return;
   }
-  if (sourceLinkedReader) {
-    panel.style.flex = `0 0 ${width}px`;
+  if (flexibleReader && activePaneIDs().length === 1) {
+    panel.style.flex = `1 1 ${defaultWidth}px`;
     return;
   }
-  if (isFixedWidthPaneID(paneID) || isFixedWidthReaderPaneID(paneID)) {
+  if (isFixedWidthPaneID(paneID)) {
     panel.style.flex = `0 0 ${width}px`;
     return;
   }

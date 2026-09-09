@@ -54,3 +54,29 @@ Reader typography, code content, research answer generation/rendering, billing, 
 4. Repeat the affected local checks and rendered acceptance on the combined branch before release.
 
 Local setup uses a `node_modules` symlink to the original checkout's existing dependencies. It is not part of the commit. Temporary build logs, appearance fixtures, simulator data, and generated client assets are also excluded.
+
+## Reader width correction and local Pro review
+
+Following owner review, automatic Reader expansion now applies on every plan,
+including source-linked Readers. A sole Reader fills the available workspace even
+when an older custom width was saved. Multiple default-width Readers share the
+remaining space until each reaches 600px, then the workspace scrolls horizontally.
+Manual widths remain respected in multi-column layouts. Utility widths are unchanged.
+The existing centered 800px maximum text width and typography remain unchanged.
+Shell generation is now `20260908-reader-fill-v58`, cache `permitext-pro-shell-v797`.
+
+Rendered at a 1864px workspace: one Reader measured about 1862px (excluding edge
+handles), two about 931px each, three about 620px each, and four exactly 600px each.
+The single Reader's text measured 800px. Returning to one Reader expanded it again;
+no browser console errors were reported. A new executable Reader-width regression
+contract covers plan independence, restored/source-linked Readers, minimum width,
+manual sizing, utility behavior, and retention of the text-width CSS. UX alignment,
+offline recovery, and UX audit checks passed. The full smoke suite also passed on
+an isolated test server at port 8796, leaving the review preview available.
+
+At the owner's request, the sole local Web browser account received a Pro grant
+in `/private/tmp/permitext-uiux-qa/sync-store.json` through the local grant API.
+The browser visibly shows PRO. This grants no production subscription and changes
+no real billing. The preview launcher is temporary, binds to loopback, uses isolated
+storage, and has no OpenAI key or Research mock mode enabled. Live AI Research is
+not configured. No authorization bypass or grant credential is included in source.

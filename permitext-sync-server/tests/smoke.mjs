@@ -1258,15 +1258,15 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function isFlexibleReaderPaneID(paneID)") &&
-        workspaceScript.text.includes("if (isProAccount()) return true;") &&
-        workspaceScript.text.includes("(state.readers || []).length === 2") &&
-        workspaceScript.text.includes("if (isFlexibleReaderPaneID(paneID)) return false;") &&
+        workspaceScript.text.includes('return Boolean(paneID?.startsWith("reader:"))') &&
+        workspaceScript.text.includes("flexibleReader && activePaneIDs().length === 1") &&
+        workspaceScript.text.includes("flexibleReader || hasManyColumns") &&
         workspaceScript.text.includes("const explicitlyResizedReader = flexibleReader") &&
         workspaceScript.text.includes("value > defaultWidth + 0.5") &&
         workspaceScript.text.includes("if (flexibleReader && !explicitlyResizedReader)") &&
         workspaceScript.text.includes('panel.style.flex = `1 1 ${width}px`') &&
         workspaceScript.text.includes('panel.style.flex = `0 0 ${width}px`'),
-      "Pro Readers and Free dual Readers should share the remaining viewport, preserve divider resizing, and stop shrinking at their default minimum width."
+      "Readers on every plan should share the remaining viewport, preserve divider resizing, and stop shrinking at their default minimum width."
     );
     assert(
       workspaceScript.text.includes("function renderReaderTrust") &&
