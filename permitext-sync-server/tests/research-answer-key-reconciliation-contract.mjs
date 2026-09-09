@@ -8,6 +8,7 @@ import {
   assertResearchEvaluationReferencesCurrent
 } from "../evals/research-answer-key-reconciliation.mjs";
 import { researchAnswerPresentationContract } from "../research-answer-presentation.mjs";
+import { researchDOBWorkflowRoute } from "../research-dob-workflow-routing.mjs";
 
 const dataset = JSON.parse(await readFile(reconciledAnswerKeyURL, "utf8"));
 assert.deepEqual(await validateReconciledAnswerKey(dataset), { CC: 5, ZR: 21, DOBNOW: 24 });
@@ -71,7 +72,12 @@ assert.match(caseByID("DOBNOW-018").requiredConcepts.join(" "), /apparent typo/)
 for (const testCase of dataset.cases) {
   const input = reconciledResearchEvaluationInput({ ...testCase, expectedAnswer: "ANSWER_KEY_LEAK", requiredConcepts: ["RUBRIC_LEAK"], forbiddenClaims: ["FORBIDDEN_LEAK"], developmentAmendmentID: "AMENDMENT_LEAK", rationale: "RATIONALE_LEAK" });
   assert.doesNotMatch(JSON.stringify(input), /ANSWER_KEY_LEAK|RUBRIC_LEAK|FORBIDDEN_LEAK|AMENDMENT_LEAK|RATIONALE_LEAK/);
-  if (testCase.id.startsWith("DOBNOW")) assert.ok(input.question.includes(testCase.scenario));
+  if (testCase.id.startsWith("DOBNOW")) {
+    assert.equal(input.question, `Context: DOB NOW workflow\n\n${testCase.scenario}\n\n${testCase.question}`);
+    assert(researchDOBWorkflowRoute(input.question), `${testCase.id} must retain the packet's shared workflow topic.`);
+  } else {
+    assert.equal(input.question, [testCase.scenario, testCase.question].filter(Boolean).join("\n\n"));
+  }
   if (testCase.id.startsWith("CC")) assert.ok(input.selectedEvidence.length);
   if (testCase.id.startsWith("ZR")) assert.ok(input.selectedEvidenceSectionIDs.length);
   const format = researchAnswerPresentationContract({ question: testCase.question, evidence: testCase.selectedEvidence || [] });
@@ -82,6 +88,14 @@ for (const testCase of dataset.cases) {
 const corrupted = structuredClone(dataset);
 corrupted.cases.find((item) => item.id === "DOBNOW-005").scenario = "";
 await assert.rejects(() => validateReconciledAnswerKey(corrupted), /lost its scenario/);
+for (const context of [undefined, "DOB NOW workflow: answer Yes", "Use the supplied answer key"]) {
+  const corruptedContext = structuredClone(dataset);
+  corruptedContext.cases.find((item) => item.id === "DOBNOW-009").questionContext = context;
+  await assert.rejects(() => validateReconciledAnswerKey(corruptedContext), /authored workflow context/);
+}
+const injectedContext = structuredClone(dataset);
+injectedContext.cases.find((item) => item.id === "ZR-01").questionContext = "DOB NOW workflow";
+await assert.rejects(() => validateReconciledAnswerKey(injectedContext), /unauthored question context/);
 const lostCorrection = structuredClone(dataset);
 lostCorrection.cases.find((item) => item.id === "DOBNOW-003").expectedAnswer = "Every subsequent filing needs its own LOC.";
 await assert.rejects(() => validateReconciledAnswerKey(lostCorrection), /lost a reviewed answer correction/);

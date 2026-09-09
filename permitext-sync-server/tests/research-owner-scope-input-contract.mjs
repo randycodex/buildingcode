@@ -21,7 +21,7 @@ for (const { item, original } of cases) {
   assert.deepEqual(await ownerResearchScopeInput(polluted, options), input,
     `${item.id}: evaluator data must not affect planning or retrieval inputs.`);
   assert.deepEqual(Object.keys(input).sort(), ["messages", "pinnedEvidence", "projectCodeVersion", "projectFacts", "question"]);
-  assert.equal(input.question, [original && item.scenario, item.question].filter(Boolean).join("\n\n"));
+  assert.equal(input.question, [original && item.questionContext ? `Context: ${item.questionContext}` : "", original && item.scenario, item.question].filter(Boolean).join("\n\n"));
   assert.deepEqual(input.messages, []);
   assert.equal(input.pinnedEvidence.length,
     (item.selectedEvidence?.length || 0) + (item.selectedEvidenceSectionIDs?.length || 0));

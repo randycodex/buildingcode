@@ -19,6 +19,7 @@ Put a condition that changes Yes/No in the opening answer. Use adjacent citation
 - CC-04 has an explicit development correction for the optional Assembly calculation. Its original approved source is preserved, and approval of the corrected wording remains pending.
 - CC-01 through CC-03 have development amendments aligning missing-fact expectations with supplied facts and evidence boundaries. Their original source inputs and historical approvals are preserved; the amendments await professional review.
 - The 24 DOB NOW scenarios are restored. Several Zoning questions are replaced with their revised repository versions; their original intake wording remains visible below.
+- DOB NOW inputs preserve the packet's shared workflow topic as explicit question context. It supplies no answer, threshold, consequence, citation requirement, or reviewer expectation; the individual scenarios and questions are unchanged.
 - Construction answers retain Plumbing Code scope and vanity/lavatory distinctions. Explicit development corrections below preserve the original source record and carry their own pending-review status. DOB NOW answers retain the subsequent-filing completion distinction, PAA source conflict, site-safety applicability, DEP drainage condition, and distinct Loft Board routes.
 - This work does not authorize paid model calls, change source approval status, enable public Research, or establish professional sign-off. New reconciled prose has no new independent professional approval.
 
@@ -1179,6 +1180,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-001`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 The proposed interior renovation does not require the alteration to meet New Building requirements. It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.
@@ -1217,6 +1222,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-002`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 A reconstruction otherwise resembles a new building, but a portion of the existing foundation will remain in place and become part of the completed building.
@@ -1254,6 +1263,10 @@ Should the applicant select New Building?
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-003`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 
@@ -1302,6 +1315,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-004`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 The initial filing is approved, and the approved scope and drawings must now be revised. The filing was not submitted for legalization.
@@ -1347,6 +1364,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-005`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 The filing concerns a business that employs 42 people.
@@ -1383,6 +1404,10 @@ Should the DOB NOW small-business question be answered Yes?
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-006`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 
@@ -1422,6 +1447,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-007`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 A GC alteration removes and replaces the entire existing roof deck or roof assembly.
@@ -1457,6 +1486,10 @@ Answer **Yes**. The Application User Guide states that this response causes the 
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-008`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 
@@ -1501,6 +1534,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-009`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 The maximum excavation depth shown on the plans is exactly 12 feet.
@@ -1538,6 +1575,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-010`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 The plumbing work will interrupt or otherwise affect the water supply serving the building's sprinkler or standpipe system.
@@ -1574,6 +1615,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-011`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 The scope requires the standpipe service to be out of service for 36 hours.
@@ -1609,6 +1654,10 @@ Answer **Yes**. The Application User Guide identifies an **FDNY Letter of No Obj
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-012`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 
@@ -1654,6 +1703,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-013`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 At least one residential unit will be occupied during construction at some point before the permit is signed off by DOB.
@@ -1689,6 +1742,10 @@ The owner should answer **Yes** to the occupied-dwelling-unit question. The Appl
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-014`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 
@@ -1727,6 +1784,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-015`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 The Owner Type is Condo Unit Owner.
@@ -1762,6 +1823,10 @@ Is the unit owner's attestation sufficient for the filing to proceed?
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-016`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 
@@ -1804,6 +1869,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-017`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 An applicable NB or Alteration-CO GC filing for a newly erected single-family residence includes an Ancillary Dwelling Unit in the basement.
@@ -1841,6 +1910,10 @@ Answer **Yes** to the ADU question and select **Basement** as the location. Unde
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-018`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 
@@ -1884,6 +1957,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-019`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 A new Builders Pavement Plan application is initiated after August 17, 2026.
@@ -1921,6 +1998,10 @@ File it in **DOB NOW: Build** using the **Builders Pavement Plan** work type and
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-020`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 
@@ -1960,6 +2041,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-021`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 The user provides only the property address and asks which Building Code review year to select in DOB NOW.
@@ -1998,6 +2083,10 @@ What is the right Researcher answer?
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-022`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 
@@ -2039,6 +2128,10 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-023`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Authored context supplied to Research:**
+
+DOB NOW workflow
+
 **Scenario supplied to Research:**
 
 A filing representative has completed data entry and uploaded the documents. The applicant and owner have not yet completed their attestations.
@@ -2076,6 +2169,10 @@ Can the filing representative attest for them and submit the job filing?
 Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before live filing guidance.
 
 Source case: `dobnow-024`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
+
+**Authored context supplied to Research:**
+
+DOB NOW workflow
 
 **Scenario supplied to Research:**
 

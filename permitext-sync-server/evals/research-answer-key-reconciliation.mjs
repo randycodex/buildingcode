@@ -11,7 +11,7 @@ const amendmentFields = new Set(["expectedAnswer", "requiredConcepts", "forbidde
 // claims are evaluator data. They must never become answering-model input.
 export function reconciledResearchEvaluationInput(testCase) {
   return {
-    question: [testCase.scenario, testCase.question].filter(Boolean).join("\n\n"),
+    question: [testCase.questionContext ? `Context: ${testCase.questionContext}` : "", testCase.scenario, testCase.question].filter(Boolean).join("\n\n"),
     codeVersion: testCase.codeVersion,
     projectContext: structuredClone(testCase.projectContext || {}),
     selectedEvidence: structuredClone(testCase.selectedEvidence || []),
@@ -36,9 +36,13 @@ export async function assertResearchEvaluationReferencesCurrent(sourceCaseIDs, s
 
 export function parseDOBReviewCases(packet) {
   const section = (body, name) => body.match(new RegExp(`^### ${name}\\n\\n([\\s\\S]*?)(?=^### |$(?![\\s\\S]))`, "m"))?.[1]?.trim() || "";
+  // The packet declares its shared topic before the individual scenarios.
+  // Preserve that authored context separately from answers and review rules.
+  const questionContext = packet.split(/^## /m, 1)[0].match(/\b(DOB NOW workflow) guidance\b/)?.[1] || "";
   const cases = new Map();
   for (const match of packet.matchAll(/^## `(dobnow-\d+)`[^\n]*\n([\s\S]*?)(?=^## `dobnow-|$(?![\s\S]))/gm)) {
     cases.set(match[1], {
+      questionContext,
       scenario: section(match[2], "Scenario"),
       question: section(match[2], "Question"),
       expectedAnswer: section(match[2], "Proposed answer key"),
@@ -112,9 +116,12 @@ export async function validateReconciledAnswerKey(dataset) {
     assert(JSON.stringify(testCase.requiredConcepts) === JSON.stringify(amendment?.replacement.requiredConcepts || sourceCase.requiredConcepts), `${testCase.id} lost a required concept.`);
     assert(JSON.stringify(testCase.forbiddenClaims) === JSON.stringify(amendment?.replacement.forbiddenClaims || sourceCase.forbiddenClaims), `${testCase.id} lost a forbidden-claim boundary.`);
     if (testCase.id.startsWith("DOBNOW")) {
+      assert(sourceCase.questionContext && testCase.questionContext === sourceCase.questionContext,
+        `${testCase.id} lost or changed its authored workflow context.`);
       assert(testCase.scenario && testCase.scenario === sourceCase.scenario, `${testCase.id} lost its scenario.`);
       assert(testCase.expectedAnswer === (amendment?.replacement.expectedAnswer || sourceCase.expectedAnswer), `${testCase.id} lost a reviewed answer correction.`);
     } else {
+      assert(!testCase.questionContext, `${testCase.id} gained unauthored question context.`);
       if (testCase.id.startsWith("CC")) {
         assert(testCase.expectedAnswer === (amendment?.replacement.expectedAnswer || sourceCase.expectedConclusion), `${testCase.id} differs from its reviewed construction answer.`);
         assert(JSON.stringify(testCase.selectedEvidence) === JSON.stringify(sourceCase.selectedEvidence), `${testCase.id} lost its selected passages.`);
@@ -141,6 +148,7 @@ export function renderReconciledAnswerKey(dataset) {
     "", "## Reconciliation and review boundaries", "",
     ...dataset.sourceNotes.map((note) => `- ${note}`),
     "- The 24 DOB NOW scenarios are restored. Several Zoning questions are replaced with their revised repository versions; their original intake wording remains visible below.",
+    "- DOB NOW inputs preserve the packet's shared workflow topic as explicit question context. It supplies no answer, threshold, consequence, citation requirement, or reviewer expectation; the individual scenarios and questions are unchanged.",
     "- Construction answers retain Plumbing Code scope and vanity/lavatory distinctions. Explicit development corrections below preserve the original source record and carry their own pending-review status. DOB NOW answers retain the subsequent-filing completion distinction, PAA source conflict, site-safety applicability, DEP drainage condition, and distinct Loft Board routes.",
     "- This work does not authorize paid model calls, change source approval status, enable public Research, or establish professional sign-off. New reconciled prose has no new independent professional approval.",
     "", "## Source provenance", "",
@@ -156,6 +164,7 @@ export function renderReconciledAnswerKey(dataset) {
       `Source case: \`${testCase.sourceCaseID}\`; recorded status: ${testCase.sourceCaseStatus}; reviewed: ${testCase.sourceReviewedAt}. Scope: ${testCase.sourceApprovalScope}`, "");
     if (testCase.developmentAmendmentID) lines.push(
       `**Development correction:** \`${testCase.developmentAmendmentID}\`. Status: ${testCase.reconciliationStatus}. The original approval above is historical; it does not approve this corrected wording or rubric.`, "");
+    if (testCase.questionContext) lines.push("**Authored context supplied to Research:**", "", testCase.questionContext, "");
     if (testCase.scenario) lines.push("**Scenario supplied to Research:**", "", testCase.scenario, "");
     if (testCase.projectContext && Object.keys(testCase.projectContext).length) {
       lines.push("**Project facts supplied to Research:**", "", "```json", JSON.stringify(testCase.projectContext, null, 2), "```", "");

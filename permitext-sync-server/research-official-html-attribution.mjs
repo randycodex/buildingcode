@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { parse } from "parse5";
 import { researchOfficialPDFPassages } from "./research-official-pdf-attribution.mjs";
+import { researchOfficialPDFPageScores } from "./research-official-pdf-ranking.mjs";
 
 const defaultMaximumBytes = 1_500_000;
 const defaultMaximumPDFBytes = 15_000_000;
@@ -170,11 +171,14 @@ function queryTokens(value) {
 }
 
 export function selectResearchOfficialHTMLPassages(passages, query, options = {}) {
+  const candidates = Array.isArray(passages) ? passages : [];
+  const pdfScores = researchOfficialPDFPageScores(candidates, query);
   const tokens = queryTokens(query);
   const requiredTerms = new Set((options.requiredPassageTerms || []).map((term) => normalizedText(term).toLowerCase()));
   const maximum = Math.max(1, Number(options.maximum || maximumSelectedPassages));
-  return (Array.isArray(passages) ? passages : [])
+  return candidates
     .map((passage) => {
+      if (passage?.kind === "pdf_page") return { passage, score: pdfScores.get(passage) || 0 };
       const searchableText = passage?.kind === "pdf_page" ? passage.text : passage?.claim;
       const passageTokens = queryTokens(searchableText);
       const sharedTokens = [...tokens].filter((token) => passageTokens.has(token));

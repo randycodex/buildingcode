@@ -1266,7 +1266,8 @@
         "Application User Guide, PDF page 6, Job Types — Alteration and the five routing questions."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-002",
@@ -1300,7 +1301,8 @@
         "NYC Administrative Code §28-101.4.5 when the evaluation tests the legal basis for retaining existing building elements."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-003",
@@ -1341,7 +1343,8 @@
         "New Building and Alteration-CO FAQs, subsequent-filing LOC treatment."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-004",
@@ -1380,7 +1383,8 @@
         "DOB NOW: Build release history concerning adding or removing floors through a PAA."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-005",
@@ -1413,7 +1417,8 @@
         "DOB NOW: Build Release Notes, September 2022 Small Business entry."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-006",
@@ -1447,7 +1452,8 @@
         "1 RCNY §101-17 where the evaluation tests program eligibility or procedure."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-007",
@@ -1479,7 +1485,8 @@
         "Application User Guide, PW1 roof question and required-document consequence, page 19 of the PDF."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-008",
@@ -1518,7 +1525,8 @@
         "Current Building Code Chapter 33 and Administrative Code Article 110 criteria for any final project-specific conclusion."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-009",
@@ -1551,7 +1559,8 @@
         "Application User Guide, excavation-depth question and PGL consequence, pages 22-23 of the PDF."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-010",
@@ -1583,7 +1592,8 @@
         "Application User Guide, Plumbing question, page 22 of the PDF."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-011",
@@ -1615,7 +1625,8 @@
         "Application User Guide, Standpipe question, page 22 of the PDF."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-012",
@@ -1653,7 +1664,8 @@
         "DEP Stormwater Permits, current sewer-drainage condition, numerical thresholds, and Title 15 Chapter 19.1 reference."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-013",
@@ -1685,7 +1697,8 @@
         "Application User Guide, Statements & Signatures, Occupied Dwelling Units, page 38 of the PDF."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-014",
@@ -1718,7 +1731,8 @@
         "Application User Guide, Statements & Signatures, Rent Controlled or Rent Stabilized Housing, page 38 of the PDF."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-015",
@@ -1750,7 +1764,8 @@
         "DOB NOW: Build Release Notes, February 2026, Condo/Co-op Board stakeholder update."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-016",
@@ -1787,7 +1802,8 @@
         "DOB NOW: Build Release Notes, February 2026, Loft Board Requests."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-017",
@@ -1821,7 +1837,8 @@
         "DOB NOW: Build Release Notes, August 2026, DOHMH Radon and Vapor Level Certificate for ADUs."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-018",
@@ -1859,7 +1876,8 @@
         "Wetland-area Required Documents service notice, including the operative document table."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-019",
@@ -1893,7 +1911,8 @@
         "DOB Service Updates, effective August 17, 2026."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-020",
@@ -1927,7 +1946,8 @@
         "DOB NOW: Build Release Notes, August 2026, Updated Landmarks Requirements."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-021",
@@ -1962,7 +1982,8 @@
         "Applicable enacted code and transition provisions selected by the reviewer."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-022",
@@ -1998,7 +2019,8 @@
         "Current DOB exclusions and restrictions applicable to the proposed filing."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-023",
@@ -2032,7 +2054,8 @@
         "Application User Guide, Statements & Signatures, page 38 of the PDF."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     },
     {
       "id": "DOBNOW-024",
@@ -2066,7 +2089,8 @@
         "Application User Guide, Letter of Completion prerequisites, page 37 of the PDF."
       ],
       "reconciliationStatus": "reconciled-locally; source review scope preserved",
-      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim."
+      "citationRequirements": "Cite each material claim at its point of use; name edition or source snapshot and relevant page/section. Source links identify evidence, not a live verification claim.",
+      "questionContext": "DOB NOW workflow"
     }
   ]
 }
