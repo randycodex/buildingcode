@@ -1395,15 +1395,18 @@ struct CodeScreenTitle: View {
 struct CodeScreenTitleRow<Trailing: View>: View {
     let title: String
     let collapseProgress: CGFloat
+    let minimumHeight: CGFloat
     @ViewBuilder let trailing: () -> Trailing
 
     init(
         title: String,
         collapseProgress: CGFloat = 0,
+        minimumHeight: CGFloat = 0,
         @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }
     ) {
         self.title = title
         self.collapseProgress = collapseProgress
+        self.minimumHeight = minimumHeight
         self.trailing = trailing
     }
 
@@ -1415,16 +1418,16 @@ struct CodeScreenTitleRow<Trailing: View>: View {
                 Text(title)
                     .font(CodeTypography.screenTitle)
                     .foregroundStyle(.primary)
-                    .frame(height: titleBandHeight, alignment: .leading)
+                    .frame(height: max(titleBandHeight, minimumHeight), alignment: .leading)
                     .scaleEffect(1 - (collapseProgress * 0.08), anchor: .leading)
                     .opacity(1 - (collapseProgress * 0.22))
 
                 Spacer(minLength: 0)
 
                 trailing()
-                    .frame(height: titleBandHeight, alignment: .center)
+                    .frame(height: max(titleBandHeight, minimumHeight), alignment: .center)
             }
-            .frame(height: titleBandHeight, alignment: .leading)
+            .frame(height: max(titleBandHeight, minimumHeight), alignment: .leading)
 
             Spacer()
                 .frame(height: 8)

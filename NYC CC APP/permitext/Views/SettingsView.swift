@@ -206,9 +206,6 @@ struct SettingsView: View {
                 .padding(.top, CodeScreenMetrics.scrollMeasuredTitleTopPadding)
                 .padding(.bottom, tabBarClearance)
             }
-            .overlay(alignment: .top) {
-                CodeTopContentFade(title: "Account", progress: collapseProgress)
-            }
             .background(CodeAppBackdrop(accent: settingsChromeColor).ignoresSafeArea())
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)

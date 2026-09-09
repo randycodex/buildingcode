@@ -73,9 +73,9 @@ struct BookmarksView: View {
             exportMenuContent
         } label: {
             Image(systemName: "square.and.arrow.up")
-                .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .foregroundStyle(Color.appChrome)
-                .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
+                .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -96,9 +96,9 @@ struct BookmarksView: View {
             }
         } label: {
             Image(systemName: "arrow.up.arrow.down")
-                .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .foregroundStyle(Color.appChrome)
-                .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
+                .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -110,9 +110,9 @@ struct BookmarksView: View {
             showingSettings = true
         } label: {
             Image(systemName: library.signedInAccount == nil ? "person.crop.circle" : "person.crop.circle.fill")
-                .font(.system(size: CodeScreenMetrics.screenHeaderActionPointSize, weight: .semibold))
+                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                 .foregroundStyle(Color.appChrome)
-                .frame(width: CodeScreenMetrics.screenHeaderActionSlotSize, height: CodeScreenMetrics.screenHeaderActionSlotSize)
+                .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -256,14 +256,32 @@ struct BookmarksView: View {
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
     }
 
+    private var savedHeaderActionButtons: some View {
+        HStack(spacing: 0) {
+            sortButton
+            if !library.bookmarks.isEmpty {
+                exportButton
+            }
+            accountButton
+        }
+        .padding(.horizontal, 4)
+    }
+
+    @ViewBuilder
+    private var savedHeaderActions: some View {
+        if #available(iOS 26.0, *) {
+            savedHeaderActionButtons
+                .glassEffect(.regular, in: Capsule())
+        } else {
+            savedHeaderActionButtons
+                .background(.regularMaterial, in: Capsule())
+        }
+    }
+
 private var savedScreenHeader: some View {
     VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
-        CodeScreenTitleRow(title: "Saved", collapseProgress: collapseProgress) {
-            HStack(spacing: 6) {
-                sortButton
-                exportButton
-                accountButton
-            }
+        CodeScreenTitleRow(title: "Saved", collapseProgress: collapseProgress, minimumHeight: 44) {
+            savedHeaderActions
         }
 
         VStack(alignment: .leading, spacing: 0) {

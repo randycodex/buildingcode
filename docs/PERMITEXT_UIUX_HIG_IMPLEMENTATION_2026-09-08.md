@@ -80,3 +80,18 @@ The browser visibly shows PRO. This grants no production subscription and change
 no real billing. The preview launcher is temporary, binds to loopback, uses isolated
 storage, and has no OpenAI key or Research mock mode enabled. Live AI Research is
 not configured. No authorization bypass or grant credential is included in source.
+
+## Saved controls and Account header follow-up
+
+At owner request, Saved now groups Sort, Export, and Account in a Liquid Glass
+capsule on iOS 26 and later, with a regular-material fallback on older supported
+iOS versions. Icons use the existing Project toolbar size and each action has a
+44-point target. The title row reserves enough height for the capsule. Empty
+Saved collections omit Export from the group instead of leaving an invisible slot.
+Account no longer draws the custom CodeTopContentFade overlay above its content.
+
+Validation: Debug simulator build passed for arm64 and x86_64; UX alignment
+contracts, UX audit, and git diff whitespace check passed. Device Hub repeatedly
+returned accessibility timeouts or noWindowsAvailable, so post-change interaction,
+Account appearance, and increased Dynamic Type verification remain pending. No
+physical-device installation, production deployment, or App Store change is claimed.
