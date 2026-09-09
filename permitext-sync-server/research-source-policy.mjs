@@ -1,7 +1,7 @@
 import { researchDOBWorkflowRoute } from "./research-dob-workflow-routing.mjs";
 import { hasCompleteEnactedTechnicalScope } from "./research-focused-technical-scope.mjs";
 
-export const researchSourcePolicyVersion = "20260909-supporting-web-v18";
+export const researchSourcePolicyVersion = "20260909-supporting-web-v19";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";

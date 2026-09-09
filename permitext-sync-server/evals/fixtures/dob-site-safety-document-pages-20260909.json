@@ -1,0 +1,281 @@
+{
+  "schema": "permitext-official-document-page-fixture-v1",
+  "retrievedAt": "2026-09-09T04:34:38.978Z",
+  "purpose": "Frozen official source pages for offline retrieval validation; no answer-key or customer-app bundle.",
+  "documents": [
+    {
+      "source": {
+        "id": "dob-2022-code-changes",
+        "title": "2022 Construction Codes updates to DOB NOW",
+        "url": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf",
+        "publisher": "NYC Department of Buildings",
+        "catalogReviewedOn": "2026-09-09"
+      },
+      "document": {
+        "url": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf",
+        "format": "pdf",
+        "pageCount": 19,
+        "textlessPages": [],
+        "passages": [
+          {
+            "index": 0,
+            "kind": "pdf_page",
+            "heading": "PDF page 1",
+            "intro": "",
+            "text": "2022 CONSTRUCTION CODES\nUPDATES TO DOB NOW\nUpdated 11/23/2022\n1",
+            "claim": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=1) — 2022 CONSTRUCTION CODES UPDATES TO DOB NOW Updated 11/23/2022 1",
+            "pageNumber": 1,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=1",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-f98a88fec8e69479cf6d5e7a"
+          },
+          {
+            "index": 1,
+            "kind": "pdf_page",
+            "heading": "PDF page 2",
+            "intro": "",
+            "text": "▪ Code Review Selection\n▪ Technical Reports\n▪ PW1 Scope of Work Questions and Required Documents\n▪ Fees\n▪ Site Safety\n▪ Limited Alteration Application (LAA)\n▪ Resources\nCONTENT\nbuild safe | live safe 2",
+            "claim": "[PDF page 2](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=2) — ▪ Code Review Selection ▪ Technical Reports ▪ PW1 Scope of Work Questions and Required Documents ▪ Fees ▪ Site Safety ▪ Limited Alteration Application (LAA) ▪ Resources CONTENT build safe | live safe 2",
+            "pageNumber": 2,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=2",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-05335fb197ddfa71a00ed4c0"
+          },
+          {
+            "index": 2,
+            "kind": "pdf_page",
+            "heading": "PDF page 3",
+            "intro": "",
+            "text": "CODE REVIEW SELECTION\n3",
+            "claim": "[PDF page 3](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=3) — CODE REVIEW SELECTION 3",
+            "pageNumber": 3,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=3",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-65cff1c56c2daf97a7391c7d"
+          },
+          {
+            "index": 3,
+            "kind": "pdf_page",
+            "heading": "PDF page 4",
+            "intro": "",
+            "text": "Options for selecting code review\n▪ New Building (NB) and ALT - CO - New Building with Existing Elements to Remain\nCODE REVIEW SELECTION\n4\nInitial (I1) Filing Date Code Options for Initial Filing Code Options for Subsequent Filings submitted\nafter November 7, 2022\nBefore\nNovember 7, 2022 Codes prior to 2022 (as applicable)\nCode selected for initial filing will auto - populate in\nsubsequent filings, except:\n• Temporary Construction Equipment (SH, FN,\nSF, PM, SE) and Curb Cut filings will auto -\npopulate to 2022 code.\n• Elevator filings will have the option of 2014 or\n2022 code\nOn or after\nNovember 7, 2022 2022 code 2022 code",
+            "claim": "[PDF page 4](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=4) — Options for selecting code review ▪ New Building (NB) and ALT - CO - New Building with Existing Elements to Remain CODE REVIEW SELECTION 4 Initial (I1) Filing Date Code Options for Initial Filing Code Options for Subsequent Filings submitted after November 7, 2022 Before November 7, 2022 Codes prior to 2022 (as applicable) Code selected for initial filing will auto - populate in subsequent filings, except: • Temporary Construction Equipment (SH, FN, SF, PM, SE) and Curb Cut filings will auto - populate to 2022 code. • Elevator filings will have the option of 2014 or 2022 code On or after November 7, 2022 2022 code 2022 code",
+            "pageNumber": 4,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=4",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-239141d00c1612777a253009"
+          },
+          {
+            "index": 4,
+            "kind": "pdf_page",
+            "heading": "PDF page 5",
+            "intro": "",
+            "text": "Options for selecting code review\n▪ ALT - CO\nCODE REVIEW SELECTION\n5\nInitial (I1) Filing Date Code Options for Initial Filing Code Options for Subsequent Filings submitted\nafter November 7, 2022\nBefore\nNovember 7, 2022 Codes prior to 2022 (as applicable)\nCode selected for initial filing will auto - populate in\nsubsequent filings, except:\n• Temporary Construction Equipment (SH, FN,\nSF, PM, SE) and Curb Cut filings will auto -\npopulate to 2022 code.\n• Elevator filings will have the option of 2014 or\n2022 code\nOn or after\nNovember 7, 2022 2022, 2014, 1968, or Pre - 1968 code\nCode selected for initial filing will auto - populate in\nsubsequent filings, except:\n• Temporary Construction Equipment (SH, FN, SF,\nPM, SE), PL, SP, MS and CC filings will auto -\npopulate to 2022 code.\n• Elevator filings will have the option of 2014 or\n2022 code",
+            "claim": "[PDF page 5](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=5) — Options for selecting code review ▪ ALT - CO CODE REVIEW SELECTION 5 Initial (I1) Filing Date Code Options for Initial Filing Code Options for Subsequent Filings submitted after November 7, 2022 Before November 7, 2022 Codes prior to 2022 (as applicable) Code selected for initial filing will auto - populate in subsequent filings, except: • Temporary Construction Equipment (SH, FN, SF, PM, SE) and Curb Cut filings will auto - populate to 2022 code. • Elevator filings will have the option of 2014 or 2022 code On or after November 7, 2022 2022, 2014, 1968, or Pre - 1968 code Code selected for initial filing will auto - populate in subsequent filings, except: • Temporary Construction Equipment (SH, FN, SF, PM, SE), PL, SP, MS and CC filings will auto - populate to 2022 code. • Elevator filings will have the option of 2014 or 2022 code",
+            "pageNumber": 5,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=5",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-1c1c820f4d40bd1d89e758fc"
+          },
+          {
+            "index": 5,
+            "kind": "pdf_page",
+            "heading": "PDF page 6",
+            "intro": "",
+            "text": "Options for selecting code review\n▪ Alteration\nCODE REVIEW SELECTION\n6\nInitial (I1) Filing Date Code Options for Initial Filing Code Options for Subsequent Filings\nsubmitted after November 7, 2022\nBefore\nNovember 7, 2022 Codes prior to 2022 (as applicable)\nSelect 2022, 1968, or Pre - 1968 code (2014\nand 2008 code will not be options * ), except:\n• Temporary Construction Equipment (SH,\nFN, SF, PM, SE) PL, SD, SP, MS and CC\nfilings will auto - populate to 2022 code.\n• Elevator filing will only have the option of\n2022 code\nOn or after\nNovember 7, 2022\nSelect 2022, 1968, or Pre - 1968 code (2014 and\n2008 code will not be options), except:\n• Temporary Construction Equipment (SH,\nFN, SF, PM) PL, SD, SP, MS and CC filings\nwill auto - populate to 2022 code.\n• Elevator filing will only have the option of\n2022 code\nSelect 2022, 1968, or Pre - 1968 code (2014 and\n2008 code will not be options), except:\n• Temporary Construction Equipment (SH,\nFN, SF, PM, SE) PL, SD, SP, MS and CC\nfilings will auto - populate to 2022 code.\n• Elevator filing will only have the option of\n2022 code\n* § 28 - 101.4 Effective date. Except as otherwise provided in sections 28 - 101.4.1, 28 - 101.4.2, 28 - 101.4.3, 28 - 101.4.4, and 28 - 101.4.5, on and\nafter July 1, 2008, all work shall be performed in accordance with the provisions of this code.",
+            "claim": "[PDF page 6](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=6) — Options for selecting code review ▪ Alteration CODE REVIEW SELECTION 6 Initial (I1) Filing Date Code Options for Initial Filing Code Options for Subsequent Filings submitted after November 7, 2022 Before November 7, 2022 Codes prior to 2022 (as applicable) Select 2022, 1968, or Pre - 1968 code (2014 and 2008 code will not be options * ), except: • Temporary Construction Equipment (SH, FN, SF, PM, SE) PL, SD, SP, MS and CC filings will auto - populate to 2022 code. • Elevator filing will only have the option of 2022 code On or after November 7, 2022 Select 2022, 1968, or Pre - 1968 code (2014 and 2008 code will not be options), except: • Temporary Construction Equipment (SH, FN, SF, PM) PL, SD, SP, MS and CC filings will auto - populate to 2022 code. • Elevator filing will only have the option of 2022 code Select 2022, 1968, or Pre - 1968 code (2014 and 2008 code will not be options), except: • Temporary Construction Equipment (SH, FN, SF, PM, SE) PL, SD, SP, MS and CC filings will auto - populate to 2022 code. • Elevator filing will only have the option of 2022 code * § 28 - 101.4 Effective date. Except as otherwise provided in sections 28 - 101.4.1, 28 - 101.4.2, 28 - 101.4.3, 28 - 101.4.4, and 28 - 101.4.5, on and after July 1, 2008, all work shall be performed in accordance with the provisions of this code.",
+            "pageNumber": 6,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=6",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-80f9786ccc1fb6d8e59a6472"
+          },
+          {
+            "index": 6,
+            "kind": "pdf_page",
+            "heading": "PDF page 7",
+            "intro": "",
+            "text": "TECHNICAL REPORTS (TR1)\n• New Technical Reports\n7 build safe | live safe\nCombustible Exterior Wall Coverings BC 1705.16 (2022) GC, FO\nConstruction Operations Influencing\nAdjacent Structures\nBC 1705.25.2\n(2022)\nAN, SG, GC*, MH*, ST*, FO*, EA*,\nSOE*, PMM*, DM*\nDesignated Seismic System Qualification BC 1705.12.1\n(2022) GC\nNon Potable Water Systems BC 1705.38 (2022) PL\nOpen - web Steel Joists and Joist Girders BC 1705.2.7 (2022) GC, ST\nPositive Pressure Exhaust and Vent\nSystems in Plenums and Ducts BC 1705.39 (2022) GC\nPrestressed Rock and Soil Anchors\nInspection BC 1705.8.1 (2022) GC, ST, FO, SOE\nSpecial Inspections Code Section Work Type(s) *Conditional",
+            "claim": "[PDF page 7](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=7) — TECHNICAL REPORTS (TR1) • New Technical Reports 7 build safe | live safe Combustible Exterior Wall Coverings BC 1705.16 (2022) GC, FO Construction Operations Influencing Adjacent Structures BC 1705.25.2 (2022) AN, SG, GC*, MH*, ST*, FO*, EA*, SOE*, PMM*, DM* Designated Seismic System Qualification BC 1705.12.1 (2022) GC Non Potable Water Systems BC 1705.38 (2022) PL Open - web Steel Joists and Joist Girders BC 1705.2.7 (2022) GC, ST Positive Pressure Exhaust and Vent Systems in Plenums and Ducts BC 1705.39 (2022) GC Prestressed Rock and Soil Anchors Inspection BC 1705.8.1 (2022) GC, ST, FO, SOE Special Inspections Code Section Work Type(s) *Conditional",
+            "pageNumber": 7,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=7",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-b2cb2452279b1fb1b16a297e"
+          },
+          {
+            "index": 7,
+            "kind": "pdf_page",
+            "heading": "PDF page 8",
+            "intro": "",
+            "text": "TECHNICAL REPORTS (TR1)\n• New Technical Reports\n8 build safe | live safe\nFull list of Technical Reports: https://www1.nyc.gov/assets/buildings/pdf/dob_now_technical_reports.pdf\nSeismic Anchorage of Access Floors BC 1705.12.2\n(2022)\nGC\nSeismic Anchorage of Storage Racks BC 1705.12.4\n(2022)\nGC\nSeismic Plumbing, Mechanical, Fuel\nGas, and Electrical Components\nBC 1705.12.3\n(2022)\nPL*, GC*, MH*, ST*\nTenant Protection Plan Compliance\nInspection BC 1705.26 (2022) PL*, SP*, ST*, AN*, CC*, SG*,\nGC*, MH*, BO*, ST*, FO*, EA*,\nSOE*\nType IV Construction (CLT/SCL) BC 1705.5.6 (2022) ST*\nUnderpinning and alternate methods of\nsupport of buildings and adjacent\nproperty\nBC 1705.25.4\n(2022), BC 1817\n(2022)\nGC, FO, EA, SOE, PMM\nWood – Inspection for Seismic\nResistance\nBC 1705.5.5 (2022) ST*\nSpecial Inspections Code Section Work Type(s) *Conditional",
+            "claim": "[PDF page 8](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=8) — TECHNICAL REPORTS (TR1) • New Technical Reports 8 build safe | live safe Full list of Technical Reports: https://www1.nyc.gov/assets/buildings/pdf/dob_now_technical_reports.pdf Seismic Anchorage of Access Floors BC 1705.12.2 (2022) GC Seismic Anchorage of Storage Racks BC 1705.12.4 (2022) GC Seismic Plumbing, Mechanical, Fuel Gas, and Electrical Components BC 1705.12.3 (2022) PL*, GC*, MH*, ST* Tenant Protection Plan Compliance Inspection BC 1705.26 (2022) PL*, SP*, ST*, AN*, CC*, SG*, GC*, MH*, BO*, ST*, FO*, EA*, SOE* Type IV Construction (CLT/SCL) BC 1705.5.6 (2022) ST* Underpinning and alternate methods of support of buildings and adjacent property BC 1705.25.4 (2022), BC 1817 (2022) GC, FO, EA, SOE, PMM Wood – Inspection for Seismic Resistance BC 1705.5.5 (2022) ST* Special Inspections Code Section Work Type(s) *Conditional",
+            "pageNumber": 8,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=8",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-2654590b2788c8c8bab578ad"
+          },
+          {
+            "index": 8,
+            "kind": "pdf_page",
+            "heading": "PDF page 9",
+            "intro": "",
+            "text": "The following questions and required documents are added to certain filings:\nPW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS\nbuild safe | live safe 9\nBC 1609.1.6 Wind tunnel test limitations\nApplicable Work Types:\nST , FO , EA , and GC (façade only)\nExisting Question:\nIs the structure design based on a Wind Tunnel Test? = Yes\nNew Question:\nDoes the wind tunnel test require a peer review per 1609.1.6? (Yes/No)\nIf Yes, the following new document is required:\nWind Tunnel Test Peer Review Report (BC 1609.1.6)",
+            "claim": "[PDF page 9](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=9) — The following questions and required documents are added to certain filings: PW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS build safe | live safe 9 BC 1609.1.6 Wind tunnel test limitations Applicable Work Types: ST , FO , EA , and GC (façade only) Existing Question: Is the structure design based on a Wind Tunnel Test? = Yes New Question: Does the wind tunnel test require a peer review per 1609.1.6? (Yes/No) If Yes, the following new document is required: Wind Tunnel Test Peer Review Report (BC 1609.1.6)",
+            "pageNumber": 9,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=9",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-af1724e2c490155d969d5652"
+          },
+          {
+            "index": 9,
+            "kind": "pdf_page",
+            "heading": "PDF page 10",
+            "intro": "",
+            "text": "build safe | live safe 10\nBC 1803.6 Geotechnical reports\nApplicable Work Types:\nFO, EA, and SOE\nNew Question:\nDoes the building qualify for an exception to the\nGeotechnical Report requirement pursuant to BC\n1803.6? (Yes/No)\nIf No, the following document is required:\nGeotechnical Report\nPW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS",
+            "claim": "[PDF page 10](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=10) — build safe | live safe 10 BC 1803.6 Geotechnical reports Applicable Work Types: FO, EA, and SOE New Question: Does the building qualify for an exception to the Geotechnical Report requirement pursuant to BC 1803.6? (Yes/No) If No, the following document is required: Geotechnical Report PW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS",
+            "pageNumber": 10,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=10",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-1dd21c8cd76588978aad4af5"
+          },
+          {
+            "index": 10,
+            "kind": "pdf_page",
+            "heading": "PDF page 11",
+            "intro": "",
+            "text": "build safe | live safe 11\nBC 1817 Underpinning and Alternate Methods of Support of Buildings and Adjacent Property\nApplicable Work Types:\nFO (including underpinning) and EA\nNew Question:\nDoes the proposed work disturb, displace or otherwise affect the\nlateral or vertical support of buildings? (BC 1817.1) (Y/N)\nIf Yes, the following document is required:\nEvaluation of Adjacent Building Report (BC 1817.3)\nIf No, the following new question is displayed:\nDoes the proposed work disturb, displace or otherwise affect the\nlateral or vertical support of property that does not contain a\nbuilding? (BC 1817.2) (Y/N)\nIf Yes , applicant to include minimum requirements for\nundeveloped adjacent property in construction documents per BC\n1817.2.\nPW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS",
+            "claim": "[PDF page 11](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=11) — build safe | live safe 11 BC 1817 Underpinning and Alternate Methods of Support of Buildings and Adjacent Property Applicable Work Types: FO (including underpinning) and EA New Question: Does the proposed work disturb, displace or otherwise affect the lateral or vertical support of buildings? (BC 1817.1) (Y/N) If Yes, the following document is required: Evaluation of Adjacent Building Report (BC 1817.3) If No, the following new question is displayed: Does the proposed work disturb, displace or otherwise affect the lateral or vertical support of property that does not contain a building? (BC 1817.2) (Y/N) If Yes , applicant to include minimum requirements for undeveloped adjacent property in construction documents per BC 1817.2. PW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS",
+            "pageNumber": 11,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=11",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-3d988338bf9d1ce233abb289"
+          },
+          {
+            "index": 11,
+            "kind": "pdf_page",
+            "heading": "PDF page 12",
+            "intro": "",
+            "text": "build safe | live safe 12\nBC 1818 Geotechnical Peer Review\nApplicable work types:\nST, FO, EA, and SOE\nNew Question:\nIs a Geotechnical Peer Review required? (BC 1818.2)\nNew Question:\n\"Has a geotechnical peer review been requested by\nthe Commissioner?\" (Yes/No)\nIf Yes to either or both questions , a New Document\nis required :\nGeotechnical Peer Review Report (BC 1818)\nPW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS\nDOB NOW Document List (including eligibility for waiver/deferral)\nhttps://www1.nyc.gov/assets/buildings/pdf/dob_now_build_waiver_and_deferral_doc_request_list.pdf",
+            "claim": "[PDF page 12](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=12) — build safe | live safe 12 BC 1818 Geotechnical Peer Review Applicable work types: ST, FO, EA, and SOE New Question: Is a Geotechnical Peer Review required? (BC 1818.2) New Question: \"Has a geotechnical peer review been requested by the Commissioner?\" (Yes/No) If Yes to either or both questions , a New Document is required : Geotechnical Peer Review Report (BC 1818) PW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS DOB NOW Document List (including eligibility for waiver/deferral) https://www1.nyc.gov/assets/buildings/pdf/dob_now_build_waiver_and_deferral_doc_request_list.pdf",
+            "pageNumber": 12,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=12",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-2cc751ae0785761d2d72633c"
+          },
+          {
+            "index": 12,
+            "kind": "pdf_page",
+            "heading": "PDF page 13",
+            "intro": "",
+            "text": "build safe | live safe 13\nBC 3309.10 Protection of Roofs\nBC 3309.17 Site specific engineered enclosure system\nPW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS\nEngineered Enclosure System - new subcategory under Protection and Mechanical Methods work type",
+            "claim": "[PDF page 13](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=13) — build safe | live safe 13 BC 3309.10 Protection of Roofs BC 3309.17 Site specific engineered enclosure system PW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS Engineered Enclosure System - new subcategory under Protection and Mechanical Methods work type",
+            "pageNumber": 13,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=13",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-c3237a034a5575e2db6baa38"
+          },
+          {
+            "index": 13,
+            "kind": "pdf_page",
+            "heading": "PDF page 14",
+            "intro": "",
+            "text": "build safe | live safe 14\nBC 3309\nPW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS\nGrout is added as a material under scope of work for filings that include FO and SOE work types.",
+            "claim": "[PDF page 14](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=14) — build safe | live safe 14 BC 3309 PW1 SCOPE OF WORK QUESTIONS AND REQUIRED DOCUMENTS Grout is added as a material under scope of work for filings that include FO and SOE work types.",
+            "pageNumber": 14,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=14",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-4cda7207d1678a479f0a581b"
+          },
+          {
+            "index": 14,
+            "kind": "pdf_page",
+            "heading": "PDF page 15",
+            "intro": "",
+            "text": "FEES\nbuild safe | live safe 15\n▪ New Building initial filing fee minimum increased from $100 to $130.\n▪ New Building subsequent filing fee increased from $100 to $130.\n▪ Permit renewal fee increased from $100 to $130 per work type .\n▪ For composite permits, the permit renewal fee of $130 will be charged for each work type.\n▪ Fees for permits to install, alter or replace oil - burning equipment, gas or electric heating or any\nother energy source equipment is $130 per device .\nFor a full description of the fee changes, review Chapter 1 of the General Administrative Provisions of\nthe 2022 Construction Codes .\nThe above fees are effective for BIS jobs as of November 23, 2022.",
+            "claim": "[PDF page 15](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=15) — FEES build safe | live safe 15 ▪ New Building initial filing fee minimum increased from $100 to $130. ▪ New Building subsequent filing fee increased from $100 to $130. ▪ Permit renewal fee increased from $100 to $130 per work type . ▪ For composite permits, the permit renewal fee of $130 will be charged for each work type. ▪ Fees for permits to install, alter or replace oil - burning equipment, gas or electric heating or any other energy source equipment is $130 per device . For a full description of the fee changes, review Chapter 1 of the General Administrative Provisions of the 2022 Construction Codes . The above fees are effective for BIS jobs as of November 23, 2022.",
+            "pageNumber": 15,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=15",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-a0602b77984f0da12c507632"
+          },
+          {
+            "index": 15,
+            "kind": "pdf_page",
+            "heading": "PDF page 16",
+            "intro": "",
+            "text": "SITE SAFETY: HIGHLIGHTS\nbuild safe | live safe 16\n(1) A major building is an existing or\nproposed building 10 or more stories\nor 125 feet or more in height, or an\nexisting or proposed building with a\nbuilding footprint of 100,000 square\nfeet or more regardless of height .\nOctober 2022 Service Notice\nFor a full description of site safety\nrequirements, review Building Code\nChapter 33 and Article 110 of Title 28\nof the NYC Administrative Code .\nSCOPE OF WORK ON A MAJOR BUILDING CS, SSM, SSC REQUIREMENTS\nNew building\nConstruction Superintendent\nAND\nSite Safety Manager or Site Safety\nCoordinator\nVertical or horizontal enlargements\nConstruction Superintendent\nAND\nSite Safety Manager or Site Safety\nCoordinator\nFull demolition\nConstruction Superintendent\nAND\nSite Safety Manager or Site Safety\nCoordinator\nPartial demolition limited to interior components\nwithout mechanical demolition equipment other than\nhandheld tools and involving more than 50% of the\ngross floor area of the building, or the removal of one\nor more floors\nConstruction Superintendent\nwith mechanical demolition equipment other than\nhandheld tools and not involving more than 50% of\nthe gross floor area of the building, or the removal of\none or more floors\nSite Safety Manager or Site Safety\nCoordinator\nwith mechanical demolition equipment other than\nhandheld tools and involving more than 50% of the\ngross floor area of the building, or the removal of one\nor more floors\nConstruction Superintendent\nAND\nSite Safety Manager or Site Safety\nCoordinator\nPartial exterior demolition (other than enlargements\nor façade work)\nnot involving more than 50% of the gross floor area of\nthe building, or the removal of one or more floors Site Safety Manager or Site Safety\nCoordinator\ninvolving more than 50% of the gross floor area of the\nbuilding, or the removal of one or more floors\nConstruction Superintendent\nAND\nSite Safety Manager or Site Safety\nCoordinator\nAlteration work other than a work type listed above\ninvolving more than 50% of the gross floor area of the\nbuilding, or requiring special inspection for\nunderpinning or protection of the sides of\nexcavations\nConstruction Superintendent\nFaçade Work more than 14 stories or 200 ft in height Site Safety Manager",
+            "claim": "[PDF page 16](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=16) — SITE SAFETY: HIGHLIGHTS build safe | live safe 16 (1) A major building is an existing or proposed building 10 or more stories or 125 feet or more in height, or an existing or proposed building with a building footprint of 100,000 square feet or more regardless of height . October 2022 Service Notice For a full description of site safety requirements, review Building Code Chapter 33 and Article 110 of Title 28 of the NYC Administrative Code . SCOPE OF WORK ON A MAJOR BUILDING CS, SSM, SSC REQUIREMENTS New building Construction Superintendent AND Site Safety Manager or Site Safety Coordinator Vertical or horizontal enlargements Construction Superintendent AND Site Safety Manager or Site Safety Coordinator Full demolition Construction Superintendent AND Site Safety Manager or Site Safety Coordinator Partial demolition limited to interior components without mechanical demolition equipment other than handheld tools and involving more than 50% of the gross floor area of the building, or the removal of one or more floors Construction Superintendent with mechanical demolition equipment other than handheld tools and not involving more than 50% of the gross floor area of the building, or the removal of one or more floors Site Safety Manager or Site Safety Coordinator with mechanical demolition equipment other than handheld tools and involving more than 50% of the gross floor area of the building, or the removal of one or more floors Construction Superintendent AND Site Safety Manager or Site Safety Coordinator Partial exterior demolition (other than enlargements or façade work) not involving more than 50% of the gross floor area of the building, or the removal of one or more floors Site Safety Manager or Site Safety Coordinator involving more than 50% of the gross floor area of the building, or the removal of one or more floors Construction Superintendent AND Site Safety Manager or Site Safety Coordinator Alteration work other than a work type listed above involving more than 50% of the gross floor area of the building, or requiring special inspection for underpinning or protection of the sides of excavations Construction Superintendent Façade Work more than 14 stories or 200 ft in height Site Safety Manager",
+            "pageNumber": 16,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=16",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-b7d02e52e095232cbb712000"
+          },
+          {
+            "index": 16,
+            "kind": "pdf_page",
+            "heading": "PDF page 17",
+            "intro": "",
+            "text": "SITE SAFETY: HIGHLIGHTS\nbuild safe | live safe 17\nConstruction Superintendent not required on 1 - ,2 - or 3 - Family Buildings\n▪ The permit holder must be registered with the Department of Buildings as a General Contractor .\n▪ The registered GC will appear as site safety stakeholder on the permit and needs to attest on the\nSite Safety tab of the PW2.\n▪ A system update has removed the requirement for a CS from permitted DOB NOW jobs for 1 - , 2 - , or\n3 - family buildings where the permit holder is a registered GC. The jobs have been removed from the\nCS’s count of jobs and the permit can be renewed to print a permit showing the CS is removed.\n▪ A site safety plan is only required if the job requires a CS. The duties to be performed by a CS\n(inspections, keep a log book , etc.) are only required if the job requires a CS.\nChanges to subsequent filings:\n▪ Site Safety professionals are associated with a job not individual filings. The Site Safety stakeholder\nadded to a permit on the initial (I1) filing will auto - populate in the permits for any subsequent filings.\n▪ Changing the site safety professional on a permit will update the site safety professional on all\npermits associated with that job.",
+            "claim": "[PDF page 17](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=17) — SITE SAFETY: HIGHLIGHTS build safe | live safe 17 Construction Superintendent not required on 1 - ,2 - or 3 - Family Buildings ▪ The permit holder must be registered with the Department of Buildings as a General Contractor . ▪ The registered GC will appear as site safety stakeholder on the permit and needs to attest on the Site Safety tab of the PW2. ▪ A system update has removed the requirement for a CS from permitted DOB NOW jobs for 1 - , 2 - , or 3 - family buildings where the permit holder is a registered GC. The jobs have been removed from the CS’s count of jobs and the permit can be renewed to print a permit showing the CS is removed. ▪ A site safety plan is only required if the job requires a CS. The duties to be performed by a CS (inspections, keep a log book , etc.) are only required if the job requires a CS. Changes to subsequent filings: ▪ Site Safety professionals are associated with a job not individual filings. The Site Safety stakeholder added to a permit on the initial (I1) filing will auto - populate in the permits for any subsequent filings. ▪ Changing the site safety professional on a permit will update the site safety professional on all permits associated with that job.",
+            "pageNumber": 17,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=17",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-9d1c331af50b6879eeac1874"
+          },
+          {
+            "index": 17,
+            "kind": "pdf_page",
+            "heading": "PDF page 18",
+            "intro": "",
+            "text": "LIMITED ALTERATION APPLICATIONS: HIGHLIGHTS\nbuild safe | live safe 18\n▪ Category 1 – limited to new installations for existing systems only. The annual monetary limit for\nCategory 1 has been increased from $35,000 to $50,000 for any 12 - month period for any\nCategory 1 application.\n▪ Category 2 – in addition to alterations of existing systems, now replacements, rearrangements,\nand repairs are also allowed under a Category 2 filing. There is no monetary limit for this\ncategory.\n▪ All appliance heat inputs have been increased from 1 million BTU/h (293 kW) to 3 million BTU/h\n(879 kW) for plumbing alteration applications only.",
+            "claim": "[PDF page 18](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=18) — LIMITED ALTERATION APPLICATIONS: HIGHLIGHTS build safe | live safe 18 ▪ Category 1 – limited to new installations for existing systems only. The annual monetary limit for Category 1 has been increased from $35,000 to $50,000 for any 12 - month period for any Category 1 application. ▪ Category 2 – in addition to alterations of existing systems, now replacements, rearrangements, and repairs are also allowed under a Category 2 filing. There is no monetary limit for this category. ▪ All appliance heat inputs have been increased from 1 million BTU/h (293 kW) to 3 million BTU/h (879 kW) for plumbing alteration applications only.",
+            "pageNumber": 18,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=18",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-46507c7afababd81eb72e109"
+          },
+          {
+            "index": 18,
+            "kind": "pdf_page",
+            "heading": "PDF page 19",
+            "intro": "",
+            "text": "RESOURCES\nbuild safe | live safe 19\n▪ 2022 Construction Codes\nhttps://www1.nyc.gov/site/buildings/codes/2022 - construction - codes.page\n▪ Build Safe, Live Safe Presentations\n(code changes for combustible wall construction, fire protection and accessibility)\nhttps://www.nyc.gov/site/buildings/safety/construction - safety - presentations.page\n▪ Buildings Bulletins\nhttps://www1.nyc.gov/site/buildings/codes/building - bulletins - current.page\n▪ Service Updates\nhttps://www1.nyc.gov/site/buildings/dob/service - updates.page\n▪ Frequently Asked Questions\nhttps://www1.nyc.gov/site/buildings/industry/dob - now - build - faqs.page",
+            "claim": "[PDF page 19](https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=19) — RESOURCES build safe | live safe 19 ▪ 2022 Construction Codes https://www1.nyc.gov/site/buildings/codes/2022 - construction - codes.page ▪ Build Safe, Live Safe Presentations (code changes for combustible wall construction, fire protection and accessibility) https://www.nyc.gov/site/buildings/safety/construction - safety - presentations.page ▪ Buildings Bulletins https://www1.nyc.gov/site/buildings/codes/building - bulletins - current.page ▪ Service Updates https://www1.nyc.gov/site/buildings/dob/service - updates.page ▪ Frequently Asked Questions https://www1.nyc.gov/site/buildings/industry/dob - now - build - faqs.page",
+            "pageNumber": 19,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=19",
+            "contentHash": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+            "id": "official-passage-a17bfd0a0074967fb54bd493"
+          }
+        ]
+      }
+    },
+    {
+      "source": {
+        "id": "dob-family-site-safety-notice",
+        "title": "2022 Construction Codes: Construction Superintendent on 1-, 2- or 3-family buildings",
+        "url": "https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf",
+        "publisher": "NYC Department of Buildings",
+        "catalogReviewedOn": "2026-09-09"
+      },
+      "document": {
+        "url": "https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf",
+        "format": "pdf",
+        "pageCount": 1,
+        "textlessPages": [],
+        "passages": [
+          {
+            "index": 0,
+            "kind": "pdf_page",
+            "heading": "PDF page 1",
+            "intro": "",
+            "text": "Eric Ulrich Commissioner nyc.gov/buildings\nbuild safe | live safe\nOctober 27, 2022\nSERVICE NOTICE\n2022 Construction Codes : Construction Superintendent Not\nRequired on 1-, 2- or 3-Family Buildings\nThe 2022 Construction Codes , which take effect November 7, 2022, provide\nthat new building, enlargement, major alteration (AltCO), and demolition jobs\non 1-, 2-, or 3-family buildings do not require a Construction Superintendent\n(CS) if the permit holder is registered with the NYC Department of Buildings as\na General Contractor (GC). DOB will apply this provision to new building,\nenlargement, major alteration (AltCO), and demolition jobs on 1-, 2-, or 3-family\nbuildings subject to the 2014 Construction Codes.\nA system update will occur before November 7, 2022, to remove the requirement for a CS from\npermitted DOB NOW jobs for 1-, 2-, or 3-family buildings where the permit holder is a registered\nGC. To remove the CS, renew the permit on or after November 7, 2022.\nFor further assistance, submit an inquiry at www.nyc.gov/dobhelp .",
+            "claim": "[PDF page 1](https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf#page=1) — Eric Ulrich Commissioner nyc.gov/buildings build safe | live safe October 27, 2022 SERVICE NOTICE 2022 Construction Codes : Construction Superintendent Not Required on 1-, 2- or 3-Family Buildings The 2022 Construction Codes , which take effect November 7, 2022, provide that new building, enlargement, major alteration (AltCO), and demolition jobs on 1-, 2-, or 3-family buildings do not require a Construction Superintendent (CS) if the permit holder is registered with the NYC Department of Buildings as a General Contractor (GC). DOB will apply this provision to new building, enlargement, major alteration (AltCO), and demolition jobs on 1-, 2-, or 3-family buildings subject to the 2014 Construction Codes. A system update will occur before November 7, 2022, to remove the requirement for a CS from permitted DOB NOW jobs for 1-, 2-, or 3-family buildings where the permit holder is a registered GC. To remove the CS, renew the permit on or after November 7, 2022. For further assistance, submit an inquiry at www.nyc.gov/dobhelp .",
+            "pageNumber": 1,
+            "sourceURL": "https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf#page=1",
+            "contentHash": "df8d7fb864ecf602d89fd3497b361f943cfc4d186aea861e1f3d6b3a9610ae71",
+            "id": "official-passage-6a23dcb4c6c6e49ca6cb7d84"
+          }
+        ]
+      }
+    }
+  ]
+}

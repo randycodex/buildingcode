@@ -7,13 +7,29 @@ import { reconciledResearchEvaluationInput } from "../evals/research-answer-key-
 globalThis.fetch = async () => { throw new Error("No network in PDF page ranking checks."); };
 const fixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-official-document-pages-20260909.json", import.meta.url)));
 const key = JSON.parse(await readFile(new URL("../evals/research-reconciled-answer-key.json", import.meta.url)));
+const safetyFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-site-safety-document-pages-20260909.json", import.meta.url)));
 const hash = (value) => createHash("sha256").update(value).digest("hex");
-for (const { source, document } of fixture.documents) {
+for (const { source, document } of [...fixture.documents, ...safetyFixture.documents]) {
   for (const passage of document.passages) {
     assert.equal(passage.id, `official-passage-${hash(`${source.url}\u0000${passage.contentHash}\u0000${passage.pageNumber}\u0000${passage.text}`).slice(0, 24)}`);
     assert.equal(passage.sourceURL, `${source.url}#page=${passage.pageNumber}`);
   }
 }
+const safetyQuestion = reconciledResearchEvaluationInput(key.cases.find((item) => item.id === "DOBNOW-008")).question;
+const safetySelection = (document) => selectResearchOfficialHTMLPassages(document.passages, safetyQuestion,
+  { maximum: 3, requiredPassageTerms: ["safety", "superintendent"] });
+assert(safetySelection(fixture.documents[0].document).some((passage) => passage.pageNumber === 23));
+const changes = safetySelection(safetyFixture.documents[0].document);
+assert(changes.some((passage) => passage.pageNumber === 16));
+const familyPage = changes.find((passage) => passage.pageNumber === 17);
+assert(familyPage, "Retain the exception's complete source page alongside the general trigger.");
+assert.match(familyPage.text, /Construction Superintendent not required on 1\s*-\s*,\s*2\s*-\s*or 3\s*-\s*Family Buildings/);
+assert.match(familyPage.text, /permit holder must be registered/);
+assert.match(familyPage.text, /site safety plan is only required if the job requires a CS/);
+const notice = safetySelection(safetyFixture.documents[1].document);
+assert.equal(notice.length, 1);
+assert.match(notice[0].text, /major alteration \(AltCO\)/);
+assert.match(notice[0].text, /General Contractor/);
 
 // These are minimum relevant-page checks, not a completeness rubric. Several
 // cases also require a newer notice, FAQ, enacted text, or live filing facts.

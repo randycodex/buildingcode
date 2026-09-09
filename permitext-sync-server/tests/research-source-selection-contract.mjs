@@ -37,6 +37,15 @@ assert.equal(researchDOBWorkflowRoute("How should the roof question be answered?
   "A form question without an identified portal must not be assumed to concern DOB NOW.");
 assert.equal(researchDOBWorkflowRoute("How should the DOB NOW roof question be answered, and does the work comply with BC 1507.1? ").guidanceOnly, false);
 assert.equal(researchWebSupportTrigger({ question: "Using only the selected code text, how should the DOB NOW roof question be answered?" }, {}).useWeb, false);
+const safetyCase = originalCases.cases.find((item) => item.id === "DOBNOW-008");
+const safetyQuestion = [`Context: ${safetyCase.questionContext}`, safetyCase.scenario, safetyCase.question].join("\n\n");
+const safetyRoute = researchDOBWorkflowRoute(safetyQuestion);
+assert.equal(safetyRoute.topic, "site_safety_documents");
+assert.equal(safetyRoute.directDocumentRetrieval, true);
+assert.deepEqual(safetyRoute.sources.map((source) => source.id), ["dob-application-guide", "dob-2022-code-changes", "dob-family-site-safety-notice"]);
+assert.equal(researchDOBWorkflowRoute(`${safetyQuestion} Use https://www.nyc.gov/another-specific-notice.pdf.`).directDocumentRetrieval, false);
+assert.equal(researchDOBWorkflowRoute(`${safetyQuestion} Is my project legally compliant with BC 3301.13?`).guidanceOnly, false);
+assert.equal(researchWebSupportTrigger({ question: `Do not use the web. ${safetyQuestion}` }, {}).useWeb, false);
 const reviewCase = originalCases.cases.find((item) => item.id === "DOBNOW-021");
 const reviewQuestion = [`Context: ${reviewCase.questionContext}`, reviewCase.scenario, reviewCase.question].join("\n\n");
 for (const question of [reviewQuestion,

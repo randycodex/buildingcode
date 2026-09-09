@@ -402,6 +402,10 @@ export async function bindResearchWebSupportToOfficialDocuments(webSupport, opti
     },
     ...(sources.length === 0 ? {
       limitation: "Permitext could not bind the guidance to readable text from an approved official HTML or PDF source; the guidance was not used."
+    } : validationFailures.length ? {
+      limitation: [webSupport.limitation,
+        `Some requested official documents could not be validated: ${validationFailures.map((failure) => `${failure.url} (${failure.code})`).join("; ")}. Their conditions and exceptions remain unverified; the retrieved passages do not establish what the missing documents say.`
+      ].filter(Boolean).join(" ")
     } : {})
   };
 }

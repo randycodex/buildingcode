@@ -42,6 +42,9 @@ export function parseDOBReviewCases(packet) {
   const cases = new Map();
   for (const match of packet.matchAll(/^## `(dobnow-\d+)`[^\n]*\n([\s\S]*?)(?=^## `dobnow-|$(?![\s\S]))/gm)) {
     cases.set(match[1], {
+      status: /^\*\*Status:\*\* APPROVED FOR TERRA ANSWER-KEY TESTING ONLY\s*$/m.test(match[2])
+        ? "approved-for-answer-key-testing-only" : null,
+      reviewedAt: match[2].match(/^Reviewer \/ role: \*\*Permitext owner — accepted (\d{4}-\d{2}-\d{2})\*\*/m)?.[1] || null,
       questionContext,
       scenario: section(match[2], "Scenario"),
       question: section(match[2], "Question"),
@@ -116,6 +119,8 @@ export async function validateReconciledAnswerKey(dataset) {
     assert(JSON.stringify(testCase.requiredConcepts) === JSON.stringify(amendment?.replacement.requiredConcepts || sourceCase.requiredConcepts), `${testCase.id} lost a required concept.`);
     assert(JSON.stringify(testCase.forbiddenClaims) === JSON.stringify(amendment?.replacement.forbiddenClaims || sourceCase.forbiddenClaims), `${testCase.id} lost a forbidden-claim boundary.`);
     if (testCase.id.startsWith("DOBNOW")) {
+      assert(sourceCase.status && sourceCase.reviewedAt && testCase.sourceCaseStatus === sourceCase.status &&
+        testCase.sourceReviewedAt === sourceCase.reviewedAt, `${testCase.id} changed its original approval history.`);
       assert(sourceCase.questionContext && testCase.questionContext === sourceCase.questionContext,
         `${testCase.id} lost or changed its authored workflow context.`);
       assert(testCase.scenario && testCase.scenario === sourceCase.scenario, `${testCase.id} lost its scenario.`);

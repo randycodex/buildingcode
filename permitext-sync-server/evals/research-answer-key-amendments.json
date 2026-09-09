@@ -257,6 +257,65 @@
           "Development amendment zr18-applicable-date-and-conditions-20260908 corrects a temporal inference in the prior reference and preserves material source qualifications. The original reviewed source case, question, selected evidence and approval history remain unchanged; this revised development rubric awaits professional review."
         ]
       }
+    },
+    {
+      "id": "dobnow008-scoped-site-safety-exception-20260909",
+      "caseID": "DOBNOW-008",
+      "sourceDataset": "review-packets/dob-now-expediter-draft-review.md",
+      "sourceCaseID": "dobnow-008",
+      "sourceCaseSHA256": "8e7713876410d64ed0addd73dfbe4a31e4bbfec20b6097ffdad4f4bfd09d22a8",
+      "status": "development-correction-pending-professional-review",
+      "reviewedOn": "2026-09-09",
+      "rationale": "The previous reference left the SSP-only-if-CS sentence unbounded outside its one-, two-, and three-family heading and asked for confirmation of a calculation already documented in the scenario. Preserve the scope visible on PDF page 17, the associated permit-holder/work conditions, and the independent final-applicability boundary. This correction does not adopt a generated answer as authority.",
+      "sourceReferences": [
+        {
+          "reference": "DOB NOW Application User Guide, page 23",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf#page=23",
+          "basis": "The percentage question concerns gross floor area altered and identifies the portal SSP consequence."
+        },
+        {
+          "reference": "2022 Construction Codes Updates to DOB NOW, pages 16–17",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf#page=17",
+          "checkedOn": "2026-09-09",
+          "documentSHA256": "83dd216edabeca0925514200c85500226070f0d8409f9327cc48222468833af2",
+          "basis": "Both pages visually reviewed. Page 17 scopes the SSP/CS statement beneath the family-building heading; page 16 has a separate major-building table and directs full requirements to Chapter 33 and Article 110."
+        },
+        {
+          "reference": "October 27, 2022 Construction Superintendent service notice",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf",
+          "checkedOn": "2026-09-09",
+          "documentSHA256": "df8d7fb864ecf602d89fd3497b361f943cfc4d186aea861e1f3d6b3a9610ae71",
+          "basis": "Named work categories and registered General Contractor permit-holder condition for the bounded workflow exception."
+        }
+      ],
+      "replacement": {
+        "expectedAnswer": "Answer **Yes**. The stated Applicant of Record calculation establishes that the proposed alteration alters 60 percent of the building’s gross floor area, which exceeds 50 percent. Preserve that measurement; affected area and construction cost are not substitutes. The missing building-type and site-safety facts do not prevent answering this percentage question.\n\nThe Application User Guide identifies a Site Safety Plan consequence for a Yes response, but that response alone does not establish the final legal obligation for every project. Read it together with the scoped DOB site-safety guidance. Page 17 of the 2022 DOB NOW code-change presentation places its SSP/Construction Superintendent statement within the one-, two-, and three-family building discussion and requires the permit holder to be a registered General Contractor. The related service notice describes New Building, enlargement, major alteration (AltCO), and demolition jobs within that exception. Do not generalize the page-17 statement into a universal rule that a Site Safety Plan can never be required without a Construction Superintendent.\n\nThe final site-safety determination remains conditional on the building, work and applicable Construction Superintendent/site-safety criteria. A final project-specific conclusion needs the applicable Chapter 33 and Administrative Code Article 110 requirements and remaining facts. This does not change the Yes answer to the stated percentage question or establish permit approval.",
+        "requiredConcepts": [
+          "Apply the stated documented calculation: 60 percent of gross floor area altered exceeds 50 percent.",
+          "Preserve the area altered by the proposed scope; do not substitute affected area or construction cost.",
+          "Do not require reconfirmation of the documented calculation as a missing fact for this bounded percentage question.",
+          "Separate the portal response or generated item from the final legal site-safety obligation.",
+          "Preserve the one-, two-, and three-family heading scope, registered-General-Contractor permit-holder condition and the related notice’s named work categories.",
+          "Do not generalize the scoped SSP/CS relationship to every building and work type.",
+          "Keep the final site-safety determination conditional on the missing applicability facts without withholding the direct percentage answer."
+        ],
+        "forbiddenClaims": [
+          "The percentage may be based on construction cost.",
+          "A Site Safety Plan is the only possible site-safety obligation.",
+          "Every project answering Yes requires a Site Safety Plan regardless of building type or current exceptions.",
+          "“Affected area,” construction cost, and gross floor area altered are interchangeable measures.",
+          "A Site Safety Plan is never required on any project without a Construction Superintendent.",
+          "The supplied documented calculation must be reconfirmed before the more-than-50-percent question can be answered."
+        ],
+        "missingFacts": [],
+        "reconciliationNotes": [
+          "Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval.",
+          "Replace the compilation answer with the reviewed correction/qualification, including official-source conflicts where documented.",
+          "Development amendment dobnow008-scoped-site-safety-exception-20260909 confines the 2022 presentation statement to its visually verified heading scope and accepts the stated documented calculation. The original source packet and approval history remain unchanged.",
+          "The corrected development answer remains pending professional review; no new release or paid-run approval follows from this amendment."
+        ]
+      },
+      "evaluationInputSHA256": "34f281c348b4ca9f6d887afc4f458660add356b09c75a914b1c0ce2f08ebf43e"
     }
   ]
 }

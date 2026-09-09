@@ -30,7 +30,7 @@ Intake: `Permitext_Consolidated_Evaluation_Questions_Answer_Key.md`; SHA-256 `40
 - [research-cases.json](../permitext-sync-server/evals/research-cases.json) — SHA-256 `da3a0e1061b94d9707abc713d0827a8c1df46b9d8a873e9544b35ac9d90eeefb`.
 - [zoning-cases.json](../permitext-sync-server/evals/zoning-cases.json) — SHA-256 `90b9cf4c5c3ea40522103d42a9b8ec052b044cf42be019cae53eed61cfa008a6`.
 - [review-packets/dob-now-expediter-draft-review.md](../permitext-sync-server/evals/review-packets/dob-now-expediter-draft-review.md) — SHA-256 `715301e11a99f50ea320402102bb5376e627a41fce0510f7d8705f05929be975`.
-- [research-answer-key-amendments.json](../permitext-sync-server/evals/research-answer-key-amendments.json) — SHA-256 `aaa414e7d011656407cc4f79327c45c9f76d748779fb09c94cbf199b965564c7`.
+- [research-answer-key-amendments.json](../permitext-sync-server/evals/research-answer-key-amendments.json) — SHA-256 `ddcf7fb5675285991b0a7275749890794c3671a1f7888cc6c5ebee2b5977bc24`.
 
 DOB workflow material remains dated to its review snapshot. Consult current [DOB FAQs](https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page), [NB/Alteration-CO FAQs](https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page), [PAA guidance](https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page), [Application User Guide](https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf), [release notes](https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf), and [service updates](https://www.nyc.gov/site/buildings/dob/service-updates.page) for live guidance. A source URL is not a claim that all 50 answers were newly verified online.
 
@@ -1487,6 +1487,8 @@ Source basis: Official DOB workflow review snapshot 2026-08-22; refresh before l
 
 Source case: `dobnow-008`; recorded status: approved-for-answer-key-testing-only; reviewed: 2026-08-22. Scope: Terra answer-key testing only
 
+**Development correction:** `dobnow008-scoped-site-safety-exception-20260909`. Status: development-correction-pending-professional-review. The original approval above is historical; it does not approve this corrected wording or rubric.
+
 **Authored context supplied to Research:**
 
 DOB NOW workflow
@@ -1501,14 +1503,21 @@ How should the more-than-50-percent alteration question be answered?
 
 **Expected answer:**
 
-Answer **Yes** to the more-than-50-percent gross-floor-area question, provided the plans and calculation confirm the stated 60 percent. Do not conclude from that response alone that a Site Safety Plan is legally required in every project. Confirm the building type and current Construction Superintendent/site-safety criteria. DOB's 2022 code-change materials state that qualifying one-, two-, and three-family work may not require a Construction Superintendent and that a Site Safety Plan is required only when the job requires a Construction Superintendent.
+Answer **Yes**. The stated Applicant of Record calculation establishes that the proposed alteration alters 60 percent of the building’s gross floor area, which exceeds 50 percent. Preserve that measurement; affected area and construction cost are not substitutes. The missing building-type and site-safety facts do not prevent answering this percentage question.
+
+The Application User Guide identifies a Site Safety Plan consequence for a Yes response, but that response alone does not establish the final legal obligation for every project. Read it together with the scoped DOB site-safety guidance. Page 17 of the 2022 DOB NOW code-change presentation places its SSP/Construction Superintendent statement within the one-, two-, and three-family building discussion and requires the permit holder to be a registered General Contractor. The related service notice describes New Building, enlargement, major alteration (AltCO), and demolition jobs within that exception. Do not generalize the page-17 statement into a universal rule that a Site Safety Plan can never be required without a Construction Superintendent.
+
+The final site-safety determination remains conditional on the building, work and applicable Construction Superintendent/site-safety criteria. A final project-specific conclusion needs the applicable Chapter 33 and Administrative Code Article 110 requirements and remaining facts. This does not change the Yes answer to the stated percentage question or establish permit approval.
 
 **Required concepts:**
 
-- Use gross floor area and the area altered by the proposed scope.
-- Confirm the calculation and scope boundary rather than relying on a verbal estimate.
+- Apply the stated documented calculation: 60 percent of gross floor area altered exceeds 50 percent.
+- Preserve the area altered by the proposed scope; do not substitute affected area or construction cost.
+- Do not require reconfirmation of the documented calculation as a missing fact for this bounded percentage question.
 - Separate the portal response or generated item from the final legal site-safety obligation.
-- Check the building type and current Construction Superintendent/site-safety criteria.
+- Preserve the one-, two-, and three-family heading scope, registered-General-Contractor permit-holder condition and the related notice’s named work categories.
+- Do not generalize the scoped SSP/CS relationship to every building and work type.
+- Keep the final site-safety determination conditional on the missing applicability facts without withholding the direct percentage answer.
 
 **Forbidden conclusions:**
 
@@ -1516,6 +1525,8 @@ Answer **Yes** to the more-than-50-percent gross-floor-area question, provided t
 - A Site Safety Plan is the only possible site-safety obligation.
 - Every project answering Yes requires a Site Safety Plan regardless of building type or current exceptions.
 - “Affected area,” construction cost, and gross floor area altered are interchangeable measures.
+- A Site Safety Plan is never required on any project without a Construction Superintendent.
+- The supplied documented calculation must be reconfirmed before the more-than-50-percent question can be answered.
 
 **Authority / evidence to verify:**
 
@@ -1527,6 +1538,8 @@ Answer **Yes** to the more-than-50-percent gross-floor-area question, provided t
 
 - Restore the original scenario and use the corrected, owner-reviewed answer and rubric; retain the limited testing approval.
 - Replace the compilation answer with the reviewed correction/qualification, including official-source conflicts where documented.
+- Development amendment dobnow008-scoped-site-safety-exception-20260909 confines the 2022 presentation statement to its visually verified heading scope and accepts the stated documented calculation. The original source packet and approval history remain unchanged.
+- The corrected development answer remains pending professional review; no new release or paid-run approval follows from this amendment.
 
 ## DOBNOW-009 — Excavation exactly 12 feet
 

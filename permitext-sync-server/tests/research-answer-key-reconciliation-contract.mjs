@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import {
   reconciledAnswerKeyURL, reconciledAnswerKeyMarkdownURL,
   validateReconciledAnswerKey, renderReconciledAnswerKey, reconciledResearchEvaluationInput,
-  assertResearchEvaluationReferencesCurrent
+  assertResearchEvaluationReferencesCurrent, parseDOBReviewCases
 } from "../evals/research-answer-key-reconciliation.mjs";
 import { researchAnswerPresentationContract } from "../research-answer-presentation.mjs";
 import { researchDOBWorkflowRoute } from "../research-dob-workflow-routing.mjs";
@@ -65,6 +65,30 @@ await assert.rejects(() => assertResearchEvaluationReferencesCurrent([originalDi
 assert.match(caseByID("DOBNOW-003").expectedAnswer, /CO process/);
 assert.match(caseByID("DOBNOW-004").expectedAnswer, /current FAQ/);
 assert.match(caseByID("DOBNOW-008").expectedAnswer, /Construction Superintendent/);
+const safetyCase = caseByID("DOBNOW-008");
+const safetyPacket = await readFile(new URL(`../evals/${safetyCase.sourceDataset}`, import.meta.url), "utf8");
+const safetySource = parseDOBReviewCases(safetyPacket).get(safetyCase.sourceCaseID);
+assert.equal(safetyCase.developmentAmendmentID, "dobnow008-scoped-site-safety-exception-20260909");
+assert.equal(safetyCase.reconciliationStatus, "development-correction-pending-professional-review");
+assert.equal(safetySource.status, "approved-for-answer-key-testing-only");
+assert.equal(safetySource.reviewedAt, "2026-08-22");
+assert.equal(safetyCase.scenario, safetySource.scenario);
+assert.equal(safetyCase.question, safetySource.question);
+assert.equal(safetyCase.questionContext, safetySource.questionContext);
+assert.deepEqual(safetyCase.missingFacts, [], "The documented percentage can be answered without reopening the stated area calculation.");
+assert.match(safetyCase.expectedAnswer, /^Answer \*\*Yes\*\*/);
+assert.match(safetyCase.requiredConcepts.join(" "), /one-, two-, and three-family heading scope/);
+await assert.rejects(() => assertResearchEvaluationReferencesCurrent([safetyCase.sourceCaseID], safetyCase.sourceDataset),
+  { code: "RESEARCH_EVALUATION_REFERENCE_AMENDED" });
+for (const id of ["DOBNOW-005", "DOBNOW-008"]) {
+  for (const field of ["sourceCaseStatus", "sourceReviewedAt"]) {
+    const rewrittenApproval = structuredClone(dataset);
+    rewrittenApproval.cases.find((item) => item.id === id)[field] = "unreviewed-new-approval";
+    await assert.rejects(() => validateReconciledAnswerKey(rewrittenApproval), /original approval history/);
+  }
+}
+assert.equal(parseDOBReviewCases(safetyPacket.replaceAll("APPROVED FOR TERRA ANSWER-KEY TESTING ONLY", "PROPOSED"))
+  .get(safetyCase.sourceCaseID).status, null, "The parser must derive approval from the source packet.");
 assert.match(caseByID("DOBNOW-012").expectedAnswer, /City-owned sewer/);
 assert.match(caseByID("DOBNOW-016").expectedAnswer, /Narrative Statement/);
 assert.match(caseByID("DOBNOW-018").requiredConcepts.join(" "), /apparent typo/);

@@ -38,13 +38,25 @@ Object.assign(process.env, {
 const sourceURL = "https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf";
 const releaseURL = "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf";
 const guideURL = "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf";
+const codeChangesURL = "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf";
+const familyNoticeURL = "https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf";
 const guideDocument = new PDFDocument();
 const guideChunks = [];
 const guideComplete = new Promise((resolve) => { guideDocument.on("data", (chunk) => guideChunks.push(chunk)); guideDocument.on("end", () => resolve(Buffer.concat(guideChunks))); });
 guideDocument.text("Synthetic routing regression source. DOB NOW Alteration routing asks whether the work must meet New Building requirements, is inconsistent with the Certificate of Occupancy, changes occupancy or use, makes a major change to exits, or changes the number of stories. All five No responses result in the Alteration job type. This is portal guidance, not a compliance determination.");
 guideDocument.addPage().text("Synthetic review-field regression source. The DOB NOW Building Code review year selection depends on job type, filing date and work type. The address identifies the property; an address alone does not select a review year. This describes the portal field, not enacted code applicability.");
+guideDocument.addPage().text("Synthetic percentage-question regression source. Does the alteration alter more than 50 percent of the building gross floor area? A Yes response triggers the Site Safety Plan workflow item. Actual applicability needs the appropriate site safety criteria.");
 guideDocument.end();
 const guideBytes = await guideComplete;
+async function syntheticPDF(text) {
+  const document = new PDFDocument();
+  const chunks = [];
+  const complete = new Promise((resolve) => { document.on("data", (chunk) => chunks.push(chunk)); document.on("end", () => resolve(Buffer.concat(chunks))); });
+  document.text(text); document.end();
+  return complete;
+}
+const codeChangesBytes = await syntheticPDF("Synthetic source: Site Safety Highlights. Construction Superintendent for 1-, 2-, or 3-family buildings. The permit holder must be registered as a General Contractor. In this limited family-building context, a Site Safety Plan is required only when a Construction Superintendent is required. Other building scopes have separate criteria.");
+const familyNoticeBytes = await syntheticPDF("Synthetic service notice: Construction Superintendent exception for qualifying New Building, AltCO, Enlargement or Demolition jobs on 1-, 2-, or 3-family buildings with a registered General Contractor as permit holder. This is a limited exception, not a rule for all jobs.");
 const releaseDocument = new PDFDocument();
 const releaseChunks = [];
 const releaseComplete = new Promise((resolve) => { releaseDocument.on("data", (chunk) => releaseChunks.push(chunk)); releaseDocument.on("end", () => resolve(Buffer.concat(releaseChunks))); });
@@ -80,6 +92,7 @@ let rejectSummary = false;
 let summaryDoubles = 0;
 let verificationDoubles = 0;
 let portalCase = null;
+let missingSafetySources = false;
 let responseDoubleFailure = null;
 const responseDouble = async (url, options) => {
   if (String(url) === "https://api.openai.com/v1/responses") {
@@ -100,14 +113,27 @@ const responseDouble = async (url, options) => {
         assert.equal(input.conversationFacts.qualified.length, 2);
         assert.match(body.instructions, /on the stated facts/);
       }
+      if (portalCase === "DOBNOW-008") {
+        assert(input.passages.some((passage) => passage.url.startsWith(guideURL) && /gross floor area/.test(passage.text)));
+        if (missingSafetySources) {
+          assert.match(input.retrievalLimitation, /documents could not be validated/);
+          assert.match(input.retrievalLimitation, /conditions and exceptions remain unverified/);
+        } else {
+          assert(input.passages.some((passage) => passage.url.startsWith(codeChangesURL) && /In this limited family[ -]+building context/.test(passage.text.replace(/\s+/g, " "))),
+            JSON.stringify(input.passages.map(({ url, text }) => ({ url, text }))));
+          assert(input.passages.some((passage) => passage.url.startsWith(familyNoticeURL) && /AltCO, Enlargement or Demolition/.test(passage.text.replace(/\s+/g, " "))));
+        }
+        assert.match(body.instructions, /A heading limits the statements beneath it/);
+      }
     }
     let value;
     if (body.text.format.name === "permitext_official_guidance_summary") {
       summaryDoubles += 1;
       const wetlands = /wetlands/i.test(input.question);
-      const passages = portalCase ? input.passages.filter((passage) => passage.url.startsWith(guideURL) && passage.page === (portalCase === "DOBNOW-001" ? 1 : 2))
+      const passages = portalCase === "DOBNOW-008" ? input.passages
+        : portalCase ? input.passages.filter((passage) => passage.url.startsWith(guideURL) && passage.page === (portalCase === "DOBNOW-001" ? 1 : 2))
         : wetlands ? input.passages : input.passages.slice(0, 1);
-      if (portalCase) assert.equal(passages.length, 1);
+      if (portalCase && portalCase !== "DOBNOW-008") assert.equal(passages.length, 1);
       value = {
         paragraphs: [{
           text: rejectSummary ? "The filing automatically grants the construction permit."
@@ -115,6 +141,10 @@ const responseDouble = async (url, options) => {
               ? "On the stated facts, answer No to all five routing questions; the resulting job type is Alteration."
             : portalCase === "DOBNOW-021"
               ? "An address alone is insufficient to select the review year. Provide the job type, filing date and work type."
+            : portalCase === "DOBNOW-008"
+              ? missingSafetySources
+                ? "Answer Yes to the percentage question: the alteration alters 60 percent of gross floor area. The exception documents could not be retrieved, so final Site Safety Plan applicability remains unresolved."
+                : "Answer Yes to the percentage question: the alteration alters 60 percent of gross floor area. Final Site Safety Plan applicability remains conditional on the building and work criteria, including the scoped family-building exception with a registered General Contractor."
             : wetlands
               ? "Submit the DEC Jurisdictional Determination. If it requires a DEC Permit, submit that permit before approval; otherwise request a waiver for the permit document."
               : replayPath
@@ -143,6 +173,9 @@ const responseDouble = async (url, options) => {
   }
   if (String(url) === releaseURL) return new Response(releaseBytes, { headers: { "content-type": "application/pdf" } });
   if (String(url) === guideURL) return new Response(guideBytes, { headers: { "content-type": "application/pdf" } });
+  if (String(url) === codeChangesURL || String(url) === familyNoticeURL) return missingSafetySources
+    ? new Response("Synthetic unavailable source", { status: 503 })
+    : new Response(String(url) === codeChangesURL ? codeChangesBytes : familyNoticeBytes, { headers: { "content-type": "application/pdf" } });
   throw new Error(`Unexpected external request in offline contract: ${String(url)}`);
 };
 globalThis.fetch = async (...args) => {
@@ -211,7 +244,7 @@ try {
   assert.equal(summaryDoubles, 3);
   assert.equal(verificationDoubles, 3);
   const retained = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json", import.meta.url)));
-  for (const id of ["DOBNOW-001", "DOBNOW-021"]) {
+  for (const id of ["DOBNOW-001", "DOBNOW-021", "DOBNOW-008"]) {
     portalCase = id;
     question = retained.results.find((item) => item.id === id).question;
     const beforePortal = providerDoubles;
@@ -221,12 +254,19 @@ try {
     assert.equal(answer.retrieval.allowOfficialGuidanceOnly, true);
     assert.equal(answer.citations.length, 0, "Portal guidance must not acquire irrelevant enacted citations.");
     assert.equal(answer.verification.pass, true);
-    assert.equal(providerDoubles - beforePortal, 3, "One search, one summary, one verifier; no repair calls.");
-    assert.match(answer.answerText, id === "DOBNOW-001" ? /On the stated facts/ : /address alone is insufficient/);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v2");
+    assert.equal(providerDoubles - beforePortal, id === "DOBNOW-008" ? 2 : 3, "Known site-safety documents bypass search; summary and verifier remain required.");
+    assert.match(answer.answerText, id === "DOBNOW-001" ? /On the stated facts/ : id === "DOBNOW-021" ? /address alone is insufficient/ : /alters 60 percent/);
+    assert.equal(answer.promptVersion, "20260909-document-summary-v3");
     assert.equal(answer.officialGuidanceSummary.version, "20260908-document-summary-v1",
       "A prompt update must preserve the saved integrity-proof contract.");
   }
+  missingSafetySources = true;
+  const partialSafety = await ask();
+  assert.equal(partialSafety.status, 200, `${JSON.stringify(partialSafety.body)}\n${responseDoubleFailure?.stack || ""}`);
+  const partialAnswer = partialSafety.body.conversation.messages.at(-1).answer;
+  assert.match(partialAnswer.answerText, /applicability remains unresolved/);
+  assert(partialAnswer.evidenceLimitations.some((limitation) => /conditions and exceptions remain unverified/.test(limitation)));
+  missingSafetySources = false;
   portalCase = null;
   rejectSummary = true;
   question = "A new Builders Pavement Plan application is initiated after August 17, 2026. Where must it be filed, which review type applies, and what authorization step appears?";
