@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 import { unresolvedZoningFARSelectionPattern, unresolvedZoningPropertyDeterminationPattern } from "./research-zoning-conditional-explanation.mjs";
+import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
 
 export const zoningResearchSafetyVersion =
-  "20260909-zoning-qualified-source-claims-v22";
+  "20260909-zoning-stated-history-premise-v23";
 
 const zoningCorpusID = "nyc-zoning-resolution";
 
@@ -1244,6 +1245,7 @@ function riskProfile({
     parkingAlternativeMentioned,
     parkingAlternativeRuleSupplied,
     definitionBranchReview,
+    lotHistoryPremise: definitionBranchReview ? zoningLotHistoryPremise({ question, projectFacts, conversationFactContext }) : null,
     zoningLotTaxMapDistinction,
     loweredYardClause,
     missingExistingCondition,
@@ -1290,7 +1292,7 @@ export function zoningResearchSafetyPromptContext(options = {}) {
       ? "When applying a Zoning definition, preserve every supplied special measurement clause that could change the classification and every expressly limited downstream consequence that the question implicates. Do not generalize a consequence listed only for parking, loading, or another named calculation into the definition for all purposes."
       : "",
     profile.definitionBranchReview
-      ? "The supplied definition contains alternative branches. Address every branch that could decide the stated facts separately; do not treat one historical or current branch as a substitute for another."
+      ? zoningLotHistoryPrompt(profile.lotHistoryPremise) || "The supplied definition contains alternative branches. Address every branch that could decide the stated facts separately; do not treat one historical or current branch as a substitute for another."
       : "",
     profile.zoningLotTaxMapDistinction
       ? "Preserve the supplied distinction that a zoning lot may or may not coincide with a lot shown on the official tax map; do not treat tax-lot and zoning-lot identity as automatic."
@@ -1513,6 +1515,7 @@ export function evaluateZoningResearchSafety({
   }
   if (
     profile.definitionBranchReview &&
+    !profile.lotHistoryPremise?.exclusion &&
     !(
       /\blot of record\b[^.]{0,180}\b(?:December\s+15,\s+1961|applicable subsequent amendment date|historical date)\b/i.test(narrative) ||
       /\b(?:December\s+15,\s+1961|applicable subsequent amendment date|historical date)\b[^.]{0,180}\blot of record\b/i.test(narrative)
@@ -1523,6 +1526,8 @@ export function evaluateZoningResearchSafety({
       detail: "The Zoning Lot definition has a separate historical lot-of-record branch. Address it independently from the historical single-ownership and current filing or declaration branches."
     });
   }
+  issues.push(...zoningLotHistoryApplicationIssues({ premise: profile.lotHistoryPremise, answer })
+    .map(({ code, ...issue }) => ({ type: code.toLowerCase(), ...issue })));
   const overstatedTaxMapDistinction = statesOverstatedTaxMapDistinction(narrative);
   if (
     profile.zoningLotTaxMapDistinction &&

@@ -101,7 +101,17 @@ try {
     assert.equal(typeof prompt, "string");
     assert.doesNotMatch(prompt, /READER_SELECTION_SCOPE: The user selected the full section/);
     assert.doesNotMatch(prompt, /USER_SELECTED_EXCERPT:/);
-    if (id === "ZR-19") assert.match(prompt, /contiguous for a minimum of 10 linear feet/);
+    if (id === "ZR-19") {
+      assert.match(prompt, /contiguous for a minimum of 10 linear feet/);
+      assert.match(prompt, /Do not reopen/);
+      const contextLine = prompt.split("\n").find((line) => line.startsWith("DETERMINISTIC_CONTEXT: "));
+      assert(contextLine, "The actual HTTP request must carry the premise-aware context.");
+      const context = JSON.parse(contextLine.slice("DETERMINISTIC_CONTEXT: ".length));
+      const history = context.answerObligations.find((item) => item.id === "definition_historical_branches");
+      assert.equal(history.lotHistoryPremise.exclusion, "stated");
+      assert.deepEqual(history.values, []);
+      assert(history.lotHistoryPremise.groundingStatements.some((text) => text.includes("were not historically one zoning lot")));
+    }
     if (id === "ZR-20") {
       assert.match(prompt, /sloping base plane/); assert.match(prompt, /dwelling purposes/);
       assert.match(prompt, /basement/); assert.match(prompt, /cellar/);

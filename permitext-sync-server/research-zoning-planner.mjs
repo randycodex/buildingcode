@@ -2,10 +2,11 @@ import { createHash } from "node:crypto";
 import { isAppendixJSourceBoundaryQuestion } from "./research-zoning-safety.mjs";
 import { isZoningConditionalExplanation, zoningConditionalExplanationIssues, zoningConditionalExplanationPrompt } from "./research-zoning-conditional-explanation.mjs";
 import { zoningTemporalApplicationObligations, zoningTemporalApplicationIssues } from "./research-zoning-temporal-application.mjs";
+import { zoningLotHistoryPremise, zoningLotHistoryPrompt, zoningLotHistoryApplicationIssues } from "./research-zoning-lot-history.mjs";
 
 export const zoningResearchPlannerVersion = "20260909-complete-definition-budget-v6";
 
-export const zoningResearchCompilerVersion = "20260909-conditional-source-coverage-v26";
+export const zoningResearchCompilerVersion = "20260909-stated-history-premise-v27";
 export const zoningResearchRepairVersion = "20260909-atomic-metadata-patch-v3";
 
 export const zoningResearchPaths = Object.freeze({
@@ -1284,7 +1285,7 @@ function directRuleAnswerObligations(question, evidence = []) {
   return obligations;
 }
 
-function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic, facts = question }) {
+function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic, facts = question, lotHistoryPremise = null }) {
   const obligations = [];
   const sourceIDs = evidence.map((source) => source?.sourceID).filter(Boolean);
   const flatEvidence = compactText(evidenceText(evidence));
@@ -1415,13 +1416,18 @@ function scenarioAnswerObligations({ question, evidence = [], plan, arithmetic, 
     /\(a\).*\(b\).*\(c\).*\(d\)/i.test(flatEvidence)
   ) {
     const definitionChecks = [
-      ["definition_historical_branches", "Distinguish the historical definition branches from the current contiguity branches.", ["December 15, 1961"]],
+      ["definition_historical_branches", lotHistoryPremise?.exclusion
+        ? zoningLotHistoryPrompt(lotHistoryPremise)
+        : "Distinguish the historical definition branches from the current contiguity branches.",
+      lotHistoryPremise?.exclusion ? [] : ["December 15, 1961"]],
       ["definition_contiguity_threshold", "State the minimum current-branch contiguity threshold.", ["10 linear feet", "10 feet"]],
       ["definition_party_or_declaration", "Identify the party-in-interest or recorded-Declaration requirements for the current branches.", ["party in interest", "Declaration"]],
       ["definition_tax_map_distinction", "Distinguish a zoning lot from a tax lot shown on the official tax map.", ["tax map", "tax lot"]]
     ];
     for (const [id, detail, values] of definitionChecks) {
-      obligations.push(obligation(id, "definition_branch", detail, values, sourceIDs));
+      const check = obligation(id, "definition_branch", detail, values, sourceIDs);
+      if (id === "definition_historical_branches") check.lotHistoryPremise = lotHistoryPremise;
+      obligations.push(check);
     }
   }
 
@@ -1473,6 +1479,7 @@ export function zoningResearchDeterministicContext({
     evidence,
     plan,
     arithmetic,
+    lotHistoryPremise: zoningLotHistoryPremise({ question, projectFacts, conversationFactContext }),
     facts: resolvedFactText({ question, projectFacts, conversationFactContext })
   }).concat(tableLegendObligations(question, evidence), zoningTemporalApplicationObligations({
     question, evidence, facts: resolvedFactText({ question, projectFacts, conversationFactContext }),
@@ -1968,6 +1975,7 @@ export function evaluateZoningDeterministicControls({
         ? primaryText
         : text;
     issues.push(...zoningTemporalApplicationIssues({ obligation: answerObligation, answer }));
+    issues.push(...zoningLotHistoryApplicationIssues({ premise: answerObligation.lotHistoryPremise, answer }));
     const covered = obligationCoveredByText(answerObligation, scopeText);
     if (!covered) {
       issues.push({
