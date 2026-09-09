@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "caseID": "ZR-06",
+  "status": "development-review-unaccepted",
+  "reviewedAt": "2026-09-09T07:49:23.093665+00:00",
+  "reviewer": "Codex development review; not professional or release approval",
+  "sourceCommit": "8bc4730559231fd43dbbc95f79d6fcf62f6599c6",
+  "resultFile": "evals/results/research-owner-api-round2-live-storage-scope-2026-09-09.json",
+  "delivered": false,
+  "scope": "The authored storage-use question and all five selected sections; no Project or UI workflow.",
+  "runtime": {
+    "httpStatus": 502,
+    "durationMilliseconds": 25182,
+    "providerRequests": 1,
+    "semanticVerifierRequests": 0,
+    "pendingProviderRequests": 0,
+    "usageEstimateUSD": 0.048738,
+    "conservativeProviderCostUSD": 0.085383
+  },
+  "confirmedImprovement": [
+    "The generated missingFacts includes special-district status and current zoning-lot area, including the separate historical-area requirement if relying on the existing-facility path.",
+    "The explicit source-attribution guard correctly rejects the new mixed-source fifth point: it credits ZR 42-193 but is bound only to ZR 42-192."
+  ],
+  "remainingDefects": [
+    {
+      "kind": "citation_binding",
+      "pointIndex": 4,
+      "detail": "The new draft reverses the prior binding error. It now binds the historical rule to 42-192 but omits 42-193 from the same point despite explicitly stating its performance requirement. Correct top-level citations elsewhere do not cure this."
+    },
+    {
+      "kind": "deterministic_false_rejection",
+      "detail": "The nominal lead says an as-of-right determination for the specific property cannot be made, but the conditional boundary checker rejects that word order. General table, subarea and source descriptions also trigger the mapped-location checker. These observed failures are not encoded as desired regression behavior."
+    },
+    {
+      "kind": "completeness",
+      "detail": "The draft discusses documented conforming status and enlargement/extension but omits the supplied reconstruction and nonconforming-use branches required by the reconciled answer key."
+    },
+    {
+      "kind": "economy",
+      "detail": "The main answer grew from 190 to 241 whitespace-delimited words and total authored prose from 696 to 966, with six supporting points versus five. Repeated rule descriptions remain. Counts exclude derived conclusion/explanation copies, source quotations and metadata."
+    }
+  ],
+  "officialSourcesChecked": [
+    "https://zr.planning.nyc.gov/article-iv/chapter-2/42-191",
+    "https://zr.planning.nyc.gov/article-iv/chapter-2/42-192",
+    "https://zr.planning.nyc.gov/article-iv/chapter-2/42-193",
+    "https://zr.planning.nyc.gov/article-vii/chapter-4",
+    "https://zr.planning.nyc.gov/appendix-j-designated-areas-within-manufacturing-districts"
+  ],
+  "nextWork": "Repair the new nominal-boundary form, reduce dependence on exact prose forms in mapped-scope validation, and make point-level source binding dependable before another paid repetition. Complete the missing historical branches while reducing duplicate prose. Preserve mandatory semantic verification and all unsafe property-result tests.",
+  "fullQualityAccepted": false,
+  "all110CasesRemainInScope": true
+}
