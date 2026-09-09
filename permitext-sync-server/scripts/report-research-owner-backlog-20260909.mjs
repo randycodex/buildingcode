@@ -26,6 +26,16 @@ const cohort = [...originals.cases, ...added.cases];
 assert.equal(cohort.length, 110);
 const ids = new Set(cohort.map((item) => item.id));
 assert.equal(ids.size, 110);
+const priorInventoryFile = "evals/results/research-owner-backlog-2026-09-09.json";
+const priorInventory = await read(priorInventoryFile);
+const supplementalReviewFile = "evals/results/research-owner-unmatched-answer-review-2026-09-09.json";
+const supplementalReview = await read(supplementalReviewFile,
+  "324f63ea67b8366c0b16ccf6ad3d413d585f6340cc194c21065ba5ed34282ab2");
+assert.deepEqual(new Set(supplementalReview.cases.map((item) => item.id)),
+  new Set(priorInventory.cases.filter((item) => item.status === "latest_answer_review_not_located").map((item) => item.id)));
+assert.equal(supplementalReview.cases.length, 24);
+assert.equal(supplementalReview.summary.newProviderCalls, 0);
+assert.equal(supplementalReview.summary.newNetworkCalls, 0);
 
 const attempts = [];
 const runRefs = [...audit.historicalLedgerHashes, ...audit.ledgers];
@@ -56,7 +66,8 @@ const reviewFields = new Set(["coreReview", "note", "notes", "reviewStatus", "st
   "findings", "mainAnswerReview", "presentationReview", "reviewNote", "mainConclusion", "remainingQualityGap",
   "wholeAnswerAcceptance", "strictExpectedAnswerAlignment", "wholeAnswerDevelopmentReview", "issues", "reviewDetail",
   "presentationNotes", "remainingFindings", "unresolved", "confirmed", "missingExpected", "checkerFindings",
-  "presentationGaps", "materialCompleteness", "presentation", "mainCalculationAndCitationReview", "reviewNotes"]);
+  "presentationGaps", "materialCompleteness", "presentation", "mainCalculationAndCitationReview", "reviewNotes",
+  "backlogDisposition", "workItemIDs"]);
 const reviews = [];
 const scannedReviewFiles = [];
 for (const name of (await readdir(new URL("evals/results/", root))).sort()) {
@@ -121,9 +132,9 @@ const workItems = [
     state: "partly-repaired-awaiting-confirmation",
     localEvidence: ["evals/results/research-owner-focused-source-validation-2026-09-09.json", "tests/research-official-pdf-http-contract.mjs"],
     closeWhen: "Authority and field questions retain material conditions without unrelated readiness demands; complete PDF groups and missing-group rejection work in the live path. No failed semantic verdict is overridden." },
-  { id: "R6", area: "Citation accuracy", title: "Bind volunteered exception claims to their actual authorities",
+  { id: "R6", area: "Citation accuracy", title: "Bind each retained claim to all of its supporting authorities",
     cases: "GAP-14", state: "open",
-    closeWhen: "Every volunteered temporary, interim or partial occupancy exception is supported at the point of use, or omitted when outside the question; the answer delivers within its reserved cost." },
+    closeWhen: "Mixed-source points and additional narrative claims retain every needed source identity, or unasked claims are omitted. Top-level citations or a separate correctly cited point do not cure a missing binding in another point. Occupancy-exception claims remain included in this repair." },
   { id: "R7", area: "Answer format", title: "Remove repeated rules, unrelated branches and unasked navigation",
     cases: [...presentationGapIDs].join(" "), state: "open",
     closeWhen: "The complete delivered answer follows direct answer, rule/citation, application and material qualifications without repeated generated fields or unasked instructions. Substantive fixes retain their own closure requirements." },
@@ -143,6 +154,14 @@ const cases = cohort.map((item) => {
   let status;
   if (!attempt.delivered) status = "latest_attempt_undelivered";
   else if (!matched.length) status = "latest_answer_review_not_located";
+  else if (matched[0].file === supplementalReviewFile) {
+    status = matched[0].findings.backlogDisposition;
+    assert(["historical_whole_answer_review_pass", "delivered_with_substance_or_scope_gap", "delivered_with_presentation_gap"].includes(status));
+    if (status === "historical_whole_answer_review_pass") {
+      assert.equal(matched[0].findings.strictExpectedAnswerAlignment, true);
+      assert.equal(matched[0].findings.wholeAnswerDevelopmentReview, "passes-current-reference");
+    }
+  }
   else if (substantiveGapIDs.has(item.id)) status = "delivered_with_substance_or_scope_gap";
   else if (presentationGapIDs.has(item.id)) status = "delivered_with_presentation_gap";
   else if (fullHistoricalReviewIDs.has(item.id)) {
@@ -158,7 +177,14 @@ const cases = cohort.map((item) => {
     status, latestAttempt: attempt, latestReview: matched[0] || null,
     fullCurrentBaselineAcceptance: "unproven", workItemIDs: [] };
 });
-workItems.find((item) => item.id === "V1").cases = cases.filter((item) => item.status === "latest_answer_review_not_located").map((item) => item.id).join(" ");
+for (const review of supplementalReview.cases) for (const id of review.workItemIDs) {
+  const item = workItems.find((item) => item.id === id);
+  assert(item && id.startsWith("R"), "Supplemental triage must use an existing repair work item.");
+  item.cases = [...new Set([...item.cases.split(" ").filter(Boolean), review.id])].join(" ");
+}
+const missingReviewWork = workItems.find((item) => item.id === "V1");
+missingReviewWork.cases = supplementalReview.cases.map((item) => item.id).join(" ");
+missingReviewWork.state = "retained-answer-review-complete";
 for (const item of workItems) {
   item.cases = item.cases.split(" ").filter(Boolean);
   assert.equal(item.cases.length, new Set(item.cases).size);
@@ -169,16 +195,19 @@ for (const item of workItems) {
 }
 assert(cases.filter((item) => item.status.includes("gap") || !item.latestAttempt.delivered)
   .every((item) => item.workItemIDs.some((id) => id.startsWith("R"))), "Every known gap needs a repair work item.");
-const counts = Object.fromEntries([...new Set(cases.map((item) => item.status))].map((status) =>
+const counts = Object.fromEntries(["latest_answer_review_not_located", "delivered_with_substance_or_scope_gap",
+  "delivered_with_presentation_gap", "historical_whole_answer_review_pass", "historical_core_review_only", "latest_attempt_undelivered"].map((status) =>
   [status, cases.filter((item) => item.status === status).length]));
 assert.equal(Object.values(counts).reduce((a, b) => a + b), 110);
 const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
 const report = { schema: "permitext-owner-research-backlog-v1", generatedAt: new Date().toISOString(), sourceCommit,
+  previousInventory: { file: priorInventoryFile, sha256: files.get(priorInventoryFile) },
   generator: { file: "scripts/report-research-owner-backlog-20260909.mjs", sha256: hash(await readFile(new URL(import.meta.url))) },
   method: "Inventory of retained attempts and explicitly matched development reviews. Gap categories are manual triage of the saved findings, not new semantic grading. No provider, public-document, Project, UI or deployment calls.",
   summary: { numberedCases: 110, latestDelivered: cases.filter((item) => item.latestAttempt.delivered).length,
     latestUndelivered: cases.filter((item) => !item.latestAttempt.delivered).length, counts,
-    repairWorkItems: 7, validationWorkItems: 3, newProviderCalls: 0, newNetworkCalls: 0,
+    repairWorkItems: 7, validationWorkItems: 3, completedValidationWorkItems: ["V1"], remainingValidationWorkItems: ["V2", "V3"],
+    newProviderCalls: 0, newNetworkCalls: 0,
     currentBaselineFullAcceptanceEstablished: false },
   budget: { auditFile, auditSHA256: files.get(auditFile), authorizationUSD: audit.summary.authorizationUSD,
     conservativeUSD: audit.summary.conservativeUSD, usageEstimateUSD: audit.summary.usageEstimateUSD,
@@ -187,7 +216,7 @@ const report = { schema: "permitext-owner-research-backlog-v1", generatedAt: new
   limitations: [
     "The seven repair items are a scoped grouping of known findings, not a proven total of independent bugs. Case overlap is intentional; do not sum work-item case counts.",
     "Latest-attempt results span different code and prompt versions. Failed old attempts can have subsequent local repairs; those repairs need separate confirmation.",
-    "Positive prior core reviews are narrower than complete answer acceptance. Three explicit whole-answer development passes remain historical, not current-baseline or professional approval.",
+    "Positive prior core reviews are narrower than complete answer acceptance. All explicit whole-answer development passes remain saved-sample findings, not current-baseline or professional approval.",
     "No matched review means no matching standalone answer-review JSON was located in the scanned files. It does not prove the answer is wrong or that no review exists elsewhere.",
     "All original and added questions remain in scope. The supplemental PDF-BPP probe and verifier-only checks are excluded from the 110-case count.",
     "The reference key and source snapshots have evolved; historical passing judgments must be revalidated before current acceptance. No answer-key or runtime verdict was changed by this inventory."
