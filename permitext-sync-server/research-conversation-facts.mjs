@@ -1,7 +1,7 @@
 import { researchFactQualification } from "./research-fact-qualification.mjs";
 
 export const researchConversationFactsVersion =
-  "20260909-building-and-system-fact-scope-v7";
+  "20260909-occupancy-document-fact-scope-v8";
 export const researchConversationFactPromptVersion = "20260909-fact-context-v1";
 export const researchQualifiedFactInstruction =
   "Qualified user statements retain negation, limited scope or approximate quantities. Apply them as premises only as worded, without promoting them to broader categorical facts. They are not missing merely because they are qualified; 'on the stated facts' is a valid conditional basis. Do not infer existing from not new, or full sprinkler coverage from partial coverage. Keep actual uncertainty unresolved and request clarification only when it can change the requested decision.";
@@ -136,6 +136,27 @@ function systemDwellingUnitScope(text) {
   return /\bsystem\b[^.;?]{0,60}\b(?:serves?|served|serving)\b[^.;?]{0,45}\bdwelling units?\b/i.test(text);
 }
 
+function mentionsOccupancyDocument(text) {
+  return /\bcertificates?\s+of\s+occupancy\b/i.test(text);
+}
+
+function mentionsOccupancyClassification(text) {
+  // An unavailable/unissued document does not withdraw a user-supplied Group.
+  // Keep any separate classification language in the same statement in scope.
+  const classificationText = text.replace(/\bcertificates?\s+of\s+occupancy\b/gi, "document");
+  return /\b(?:occupancy|Group\s+[A-Z](?:-\d+)?)\b/i.test(classificationText);
+}
+
+function occupancyDocumentFactKeys(text) {
+  if (!mentionsOccupancyDocument(text)) return [];
+  const subjects = [...new Set([...text.matchAll(/\b(?:(temporary|final|amended)\s+)?certificates?\s+of\s+occupancy\b/gi)]
+    .map(match => `${match[1] ? `${match[1].toLowerCase()}_` : ""}certificate_of_occupancy`))];
+  const facets = [];
+  if (/\b(?:available|unavailable|missing|provided|supplied|located|copy)\b/i.test(text)) facets.push("availability");
+  if (/\b(?:issued|unissued|issuance|pending)\b/i.test(text)) facets.push("issuance");
+  return subjects.flatMap(subject => (facets.length ? facets : ["status"]).map(facet => `${subject}_${facet}`));
+}
+
 function occupancyFactValue(text) {
   const patterns = [
     /\b(?:building|space|project|room|it|this)\b[^.;?]{0,40}\b(?:is|as)\s+(?:an?\s+)?(?:occupancy\s+)?Group\s+([A-Z](?:-\d+)?)\b/i,
@@ -169,6 +190,15 @@ function structuredFacts(question, kind, topicDecision) {
     if (!value || facts.some((item) => item.key === key)) return;
     facts.push(fact({ key, value, statement, kind, sourceText: text }));
   };
+
+  // Availability and issuance are distinct: a newly issued certificate may
+  // still be unavailable to the user. Preserve explicit corrections by facet.
+  const documentStatus = text.match(/\b(?:(temporary|final|amended)\s+)?certificate of occupancy\s+(?:is|was|has been)\s+(available|issued)\s*[.!]?$/i);
+  if (documentStatus) {
+    const prefix = documentStatus[1] ? `${documentStatus[1].toLowerCase()}_` : "";
+    const value = documentStatus[2].toLowerCase();
+    add(`${prefix}certificate_of_occupancy_${value === "available" ? "availability" : "issuance"}`, value, text);
+  }
 
   const area = matchedValue(
     text,
@@ -307,7 +337,7 @@ function structuredFacts(question, kind, topicDecision) {
     if (/\bsprinkler(?:ed| status| system)?\b/i.test(text)) {
       add("sprinkler_status", "unknown", "The active-topic building's sprinkler status");
     }
-    if (/\boccupancy(?: group| classification)?\b/i.test(text)) {
+    if (mentionsOccupancyClassification(text)) {
       add("occupancy_group", "unknown", "The active-topic building's occupancy group");
     }
     if (/\b(?:story|stories|story count)\b/i.test(text)) {
@@ -341,7 +371,11 @@ const qualifiedFactMentions = [
   ["sprinkler_status", /\bsprinkler(?:ed|s|ing| status| system| protection)?\b/i],
   ["building_status", { test: mentionsBuildingStatus }],
   ["story_count", /\b(?:story|stories)\b/i],
-  ["occupancy_group", /\b(?:occupancy|Group\s+[A-Z](?:-\d+)?)\b/i],
+  ["occupancy_group", { test: mentionsOccupancyClassification }],
+  ...["", "temporary_", "final_", "amended_"].flatMap(prefix => ["availability", "issuance", "status"].map((facet) => {
+    const key = `${prefix}certificate_of_occupancy_${facet}`;
+    return [key, { test: (text) => occupancyDocumentFactKeys(text).includes(key) }];
+  })),
   ["construction_type", /\b(?:construction type|Type\s+[IV]+[AB]?\s+construction)\b/i],
   ["building_height_feet", /\bheight\b|\b(?:feet|ft)\s+high\b/i],
   ["occupant_load", /\boccupant load\b/i],
@@ -393,7 +427,9 @@ function qualifiedFacts(question, topicDecision) {
       /\b(?:floor|room|space|level|cellar|basement|portion|area|tenant|unit|wing)\b[^.;?]{0,40}\bsprinkler|\bsprinkler[^.;?]{0,40}\b(?:on|in|at|for)\b[^.;?]{0,30}\b(?:floor|room|space|level|cellar|basement|portion|area|tenant|unit|wing)\b|\b(?:above|below)\s+grade\b/i.test(clause) ||
       !extracted.some((item) => item.key === "sprinkler_status")
     );
-    const requiresQualification = qualification.qualified || limitedSprinklerScope || kind === researchConversationFactKinds.unknown;
+    const documentUncertainty = mentionsOccupancyDocument(clause) &&
+      /\b(?:unavailable|missing|unissued|pending|claims?|asserts?|alleges?|reports?|reportedly|believes?|thinks?|says?|said|apparently|seems?|appears?|unverified)\b/i.test(clause);
+    const requiresQualification = qualification.qualified || limitedSprinklerScope || documentUncertainty || kind === researchConversationFactKinds.unknown;
     if (requiresQualification || hypotheticalScope) {
       const keys = new Set(extracted.map((item) => item.key));
       for (const [key, pattern] of qualifiedFactMentions) {
@@ -445,7 +481,18 @@ function normalizedTopics(topicContext) {
     const rootTopic = compactText(topic?.rootTopic);
     if (!rootTopic || result.some((item) => normalizedTopic(item.rootTopic) === normalizedTopic(rootTopic))) continue;
     const established = normalizedFactList(topic?.establishedFacts, researchConversationFactKinds.established);
-    const unknown = normalizedFactList(topic?.unknownFacts, researchConversationFactKinds.unknown);
+    const unknown = normalizedFactList(topic?.unknownFacts, researchConversationFactKinds.unknown).flatMap((item) => {
+      if (item.qualificationVersion !== researchConversationFactsVersion && item.key === "occupancy_group" &&
+          item.statement.startsWith("Qualified user statement; do not infer an unqualified fact:") &&
+          item.sourceText && mentionsOccupancyDocument(item.sourceText) && !mentionsOccupancyClassification(item.sourceText)) {
+        // Recover the subject from original wording only. A classification
+        // already lost by an older parser cannot be reconstructed here.
+        return occupancyDocumentFactKeys(item.sourceText).map((key) => fact({ key, value: "unknown",
+          statement: `Qualified user statement; do not infer an unqualified fact: ${item.sourceText}`,
+          kind: researchConversationFactKinds.unknown, sourceText: item.sourceText }));
+      }
+      return item;
+    });
     const revalidated = [];
     const needsConfirmation = [];
     for (const item of established) {

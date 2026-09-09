@@ -1,0 +1,1511 @@
+{
+  "schema": "permitext.research-occupancy-document-scope-check.v1",
+  "checkedAt": "2026-09-09T23:40:19.393Z",
+  "baselineCommit": "2a03acf7183302f3e38472d339ca74c5fe8ecd64",
+  "baselineSourceHashes": {
+    "facts": "b59035e495d34465efe30fa53faaf52274a865d609c72802a20b387538f0a1c8",
+    "qualification": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323"
+  },
+  "sourceHashes": {
+    "research-conversation-facts.mjs": "8f9852590135b01db95136b5a70e81d766c2f0221727dae746aad20112996cd1",
+    "research-fact-qualification.mjs": "3e13f389a7a69e1161a01ac16fbbf54b2159bf964c3d8357ea92531597f07323",
+    "research-conversation-topic.mjs": "77baee9c8db51501fca1bfee6ea192869f8e6fd8a7c35b48eb8d5a7f848f7858",
+    "evals/research-owner-scope-input.mjs": "03a5cce96d6434fe33ffd9ec120cca2f53be56317b31486d3ce35452eddce78e",
+    "evals/research-answer-key-reconciliation.mjs": "3e3a2294a5ea9363e0f242690f8548b5593b77181300c55ecbf6051b47cf4b69",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "tests/research-fact-subject-scope-contract.mjs": "e4b6f6ccd059983ba62ad823bf5df74cd2c0c8cc5f4bcd280120c4c8dd0f43ea",
+    "scripts/check-research-occupancy-document-scope-20260909.mjs": "aaf99c11c7f4de94e2134579efb9eaea7a9c6333392aa2007433b96d51d1a5e2"
+  },
+  "inputs": [
+    {
+      "file": "evals/research-reconciled-answer-key.json",
+      "sha256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455"
+    },
+    {
+      "file": "evals/research-owner-code-candidates.json",
+      "sha256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7"
+    }
+  ],
+  "summary": {
+    "numberedQuestions": 110,
+    "changedCases": [
+      "ZR-17",
+      "DOBNOW-001",
+      "DOBNOW-024",
+      "GAP-14"
+    ],
+    "unchangedCases": 106,
+    "followupComparisons": 4,
+    "providerCalls": 0,
+    "networkCalls": 0,
+    "generatedAnswersTested": 0,
+    "liveQualityConfirmed": false
+  },
+  "limitations": [
+    "This compares current authored HTTP question text, including scenario/context, using the same topic decision. It does not run HTTP Research, retrieval or a Project workflow.",
+    "The original source wording and unresolved conditions remain; document status does not establish occupancy classification or legal approval.",
+    "Existing wrongly erased classifications cannot be reconstructed from a later document-only statement. Legacy migration only recovers the unknown fact's subject.",
+    "All 110 cases still require complete current-baseline generated-answer acceptance; these parser checks reclassify no historical answer."
+  ],
+  "cases": [
+    {
+      "id": "CC-01",
+      "caseDefinitionSHA256": "0a8ea495e1850ec03fb2c6e4399f8b4fe81577064ae8bc7b683cb2f35f279205",
+      "authoredInputSHA256": "a7b341e83c3e8c249bec4cedb328d9cf8321125b7cb7977f4cffe88dd490b5a6",
+      "questionSHA256": "79795b69cf7eb53a2b4f88ffd7bf14acdda1aa67eec1dfdd8663e222fdcb1120",
+      "changed": false,
+      "beforeSHA256": "1eae8e8984907bf64c58de8ec4e86528a18fd67f77882581cdd931df07c9e4c3",
+      "afterSHA256": "1eae8e8984907bf64c58de8ec4e86528a18fd67f77882581cdd931df07c9e4c3"
+    },
+    {
+      "id": "CC-02",
+      "caseDefinitionSHA256": "610a0c5bbba29173709aa698bfd13699ca0222f30d23bead2551f98c57ba7044",
+      "authoredInputSHA256": "a906f35bfafb4eeff9f65dba51df3d12e8aca111b47c237a5db9f3b12e9fcbb7",
+      "questionSHA256": "2d0c75dc1257e176d48256617bf5270bea18b3244efb6f97e38477bed8e41d47",
+      "changed": false,
+      "beforeSHA256": "f1fdcdfc9f2842b5d23b19ba5879ac16674369bbb3a40f4cd62075b4ed726cea",
+      "afterSHA256": "f1fdcdfc9f2842b5d23b19ba5879ac16674369bbb3a40f4cd62075b4ed726cea"
+    },
+    {
+      "id": "CC-03",
+      "caseDefinitionSHA256": "c6127f71829707e7a02a0b3de123300efee81f9384d48d1777a60730df77c0b2",
+      "authoredInputSHA256": "56ef0828b2ba6640ffff420d755446af5ff45bcacdd993cbe427c8c688c24a82",
+      "questionSHA256": "057f4e5a8b43017907a1a003ff8c76db153eda13ccb7c12266ee0b8937fcf2da",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "CC-04",
+      "caseDefinitionSHA256": "cdefaa4352f0b72498ee966ef4330289dcbbf0162b41a3091d7c81f8d941602b",
+      "authoredInputSHA256": "ed2e311316574a568977f59616796efea9e513e8bbba045f93ead99d8a4ac003",
+      "questionSHA256": "578b55216835df63c14ef602eb6272bcc9f1e9d8657ef36fc9a7efa26a34940d",
+      "changed": false,
+      "beforeSHA256": "4871c892b2f36c27ff856c8c2b2f2e4bcc073e19af512935a7c42ac0e2ed8c16",
+      "afterSHA256": "4871c892b2f36c27ff856c8c2b2f2e4bcc073e19af512935a7c42ac0e2ed8c16"
+    },
+    {
+      "id": "CC-05",
+      "caseDefinitionSHA256": "c2c44de2d3d0aa93b82f3bc656704e9cbbde38a2c612a6e884b6cda156d4a723",
+      "authoredInputSHA256": "fde91613c682799238433de4b23b245cbe60231337591bbc5ef634581a4bc28b",
+      "questionSHA256": "b0a9cdc3e1279a258a4fabe6f7edea698855ab9329d610bfba5c71fc4cafcb9b",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-01",
+      "caseDefinitionSHA256": "a1dda80303eed47b008612bffc1845bde57fbd65aba9fe3167b3a9bb8933a95a",
+      "authoredInputSHA256": "493cfa89342b223eac2eda1047388956fd667452ddad193abbbce9e1c865fcb0",
+      "questionSHA256": "64fa49502959753dd41d6220bf852bfe4317e097638f182514838b7a88f0ad01",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-02",
+      "caseDefinitionSHA256": "6e8ccfdde0d36d6ddd4dca9d58fbfee4f77e08980f51de191dc9db16ca102a96",
+      "authoredInputSHA256": "3e3869b33fdfbc7593abb68ed8cc0abe24493bf6db0d34c467385d0c240fe9a7",
+      "questionSHA256": "f7e84f9b6d8f9dbea6bb0e875c6921098edc14c9785b079c8cf4e47cce70c865",
+      "changed": false,
+      "beforeSHA256": "9883814545d9422cb268ad6c2ffe9f5eb5f45905f2e9cd6a0e81e328453153a6",
+      "afterSHA256": "9883814545d9422cb268ad6c2ffe9f5eb5f45905f2e9cd6a0e81e328453153a6"
+    },
+    {
+      "id": "ZR-03",
+      "caseDefinitionSHA256": "84bd57bc91c60aee9f42d3b6d4f01e08bb9bd8c76b4a8efba1813f13b7980d65",
+      "authoredInputSHA256": "98b25e17083b1ec7beca9a5d94072cc89db6409f3be51c6ae5612952f8f1770c",
+      "questionSHA256": "01fbf95651be6dfda5ef215bdbaf3df162f1fee14b89c40dcc1e7dabaf3ecf4d",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-04",
+      "caseDefinitionSHA256": "97dfc996f4a28873f77a611769bf21c1ddd38d91f0c484e6b68fd8a9947b16c6",
+      "authoredInputSHA256": "fcac143a86f5cd072ca2a9dcf935e3593360d9539f33cd10597986f068c1a2bc",
+      "questionSHA256": "a8afe07c4ab8b3cf254161f69e40665b39548686891cf8a749e1aedcf86a5706",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-05",
+      "caseDefinitionSHA256": "c577b76194236058b1e3ddb3ad2da99276833a3a4007d0b6d114a0d9386b1222",
+      "authoredInputSHA256": "f4cb3b9f53534ff845962746c7eade46a3cab446c240106138dc3c447c8d9861",
+      "questionSHA256": "809ae27ec86c6a9863e15a0dfbf839a78fa7029ef8d4b3d0503d6d4d7193c4a9",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-06",
+      "caseDefinitionSHA256": "23cf0d2dc9be65a4e388a519334b7a9f3b159f657b04c6eabe5372bdca006c48",
+      "authoredInputSHA256": "3fa70b15d9febe7d7d05102c8f7db199350747b8e2788f3801538039284b985f",
+      "questionSHA256": "7da186ed733eeaad0accb62082b5e18d2b5c6e89d0f1228fe681dfcf9f34e4b2",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-07",
+      "caseDefinitionSHA256": "c62195f5971f9ac93975c07cfaf30b3d3cabd1a73a1269808f3576cd7ff4cc4b",
+      "authoredInputSHA256": "5fcc4f363aa30b6b3ee1d496c834ee9271eedaff47b3eecc5ef00f92155e3cdf",
+      "questionSHA256": "d5fe388edd5598e57404f1d7bd8f205c83e383b9dbe387d3ae48685a8d5a6852",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-08",
+      "caseDefinitionSHA256": "dc3c5785f82188fdf9a531307e250f77dad783d1d3fc1a3e0fc8cd5793f3ebca",
+      "authoredInputSHA256": "822dbb7b3da8e20d299e63c292de981153eb48bbc04a805861f3894b1b0589c7",
+      "questionSHA256": "d940f8b3306fbae2293779ef18c358a3170d52aac8432ae884d3026055137427",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-09",
+      "caseDefinitionSHA256": "56bb4304e7a12b21630adbb0d29c3d2cd9c26e3b1c481c23e9bb317d1a043655",
+      "authoredInputSHA256": "2a988abd132792a81e4104ea4ce3d9c61ea56b1df51c66079d5c317c599a60c4",
+      "questionSHA256": "96c3d247c242193091172ffcf0634e853648c590a325446953d89fb2f8b760b2",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-10",
+      "caseDefinitionSHA256": "7ecbd460140c46d05c063e1d8520b86c087bb40c058cd46d3c01fb06c38832f2",
+      "authoredInputSHA256": "8777b3d4e1d6da63f697ae1cd06bdf9bbe589a9e854809d1f5083fe446da5dd6",
+      "questionSHA256": "9d711d7607944e155653012845f8b88e4b7c3e56045dc7641ca7b74919c17817",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-11",
+      "caseDefinitionSHA256": "c0165dcaafcbb824becec8a3fd538e0703152093bf7bc7ad930d5646b319362e",
+      "authoredInputSHA256": "5e3bcf4cc7e2e99244b95de2ed4cd101b7798d182f5586cd39e60f39899d08db",
+      "questionSHA256": "fd013dd512650650228a554083f832e211969341ca5aec90c2428c6707728805",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-12",
+      "caseDefinitionSHA256": "79c03d5a63e998ab3937f5767a72daeb20347f66d9051fdb2164945c5dfe37e2",
+      "authoredInputSHA256": "7492e120892a71f4528120959248a148d45755c00bae85ab984aed75d42251d1",
+      "questionSHA256": "a33848c330b047da9844f44e714387bcbbf8c2c7cccd4c649121224bcd10f5a5",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-13",
+      "caseDefinitionSHA256": "b5116b3ac75c44cc6aa7c3fdcd5cf1fd20cd748c7737de94ea1b41e25073ee3a",
+      "authoredInputSHA256": "a17cbe13280fa26ce9a3a717d4f32374b528835058fb32f5de58c24194f7b3d3",
+      "questionSHA256": "83e48cde85c3ea8c50b06b7575b3f38daed9d02f33d893de79b6dcbc98d4bcbe",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-14",
+      "caseDefinitionSHA256": "6b66dc08f0f21c3b1d03f8c67c93e1666ba1bbd6ef08b5ecdc05c64d06bcfc31",
+      "authoredInputSHA256": "f0bed626422e13a0bf8870cf20d35e9afdb94b6a37d5c986506f61869568f9ff",
+      "questionSHA256": "d63c80d4af5315378866c18636c046a148f0540819bb5e1982b8a18d90009717",
+      "changed": false,
+      "beforeSHA256": "5feb2e37a383e20f226f6ae0b4ddd82318bc4d38610705a8dafd5dbf55cfe156",
+      "afterSHA256": "5feb2e37a383e20f226f6ae0b4ddd82318bc4d38610705a8dafd5dbf55cfe156"
+    },
+    {
+      "id": "ZR-15",
+      "caseDefinitionSHA256": "917bff9e74bfac896ff7285efbe3683eb86cd31632d37fa9bf3d33529d388ff3",
+      "authoredInputSHA256": "db55f664247fb1caf7a12d7d7cf1d845a4bda7a2e6cd97e102e4569a399e49d8",
+      "questionSHA256": "ccd85be2604fe4676b4d242f67792c3732d79e01b50a3a2f93e97b60650edf4c",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-16",
+      "caseDefinitionSHA256": "b1d1caac5a22d19e76dd52b48f2b76d78f86bb32666f90d0a4ce75fbd85e0fd3",
+      "authoredInputSHA256": "c5278db259385dc8b5aede97d363f05daa1e9d805b635e9d2de56be9b1212351",
+      "questionSHA256": "00d4ec66f75e643aa3868eaacd04eee3389b1ef29a0bf95f3dd9acf23a40cb81",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-17",
+      "caseDefinitionSHA256": "922804a8311d063b1b332821c5bccc737c42fd319813d4e05e0d8baec539124c",
+      "authoredInputSHA256": "d36cee85c04c7abb76a6addb287a2fe5087e46d8b11847635f7e9305e81f33af",
+      "questionSHA256": "7bf7a844b5685c7922e0a54a876a13465e02f57084a5abf5cd3f5b9797909ad8",
+      "changed": true,
+      "beforeSHA256": "8fb6827ae8247ecef9eb681b8d19d9853b650670fb32b8cd31e6a5b85976fddf",
+      "afterSHA256": "3bdfccde206b20f599f5fb7bb7074c7332909aa91dbd16d4a78000ef6310ec51",
+      "question": "An 80-unit R7A residential development is within the Inner Transit Zone; every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333. How many accessory off-street residential parking spaces does Section 25-211 require for those units?",
+      "before": {
+        "established": [],
+        "unknown": [],
+        "hypothetical": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "unknown",
+            "statement": "Turn-only hypothetical: every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333.",
+            "kind": "hypothetical",
+            "sourceText": "every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333.",
+            "source": "user"
+          }
+        ],
+        "prompt": {
+          "established": [],
+          "hypothetical": [
+            "Turn-only hypothetical: every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333."
+          ],
+          "qualified": [],
+          "unknown": []
+        }
+      },
+      "after": {
+        "established": [],
+        "unknown": [],
+        "hypothetical": [
+          {
+            "id": "temporary_certificate_of_occupancy_issuance",
+            "key": "temporary_certificate_of_occupancy_issuance",
+            "value": "unknown",
+            "statement": "Turn-only hypothetical: every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333.",
+            "kind": "hypothetical",
+            "sourceText": "every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333.",
+            "source": "user"
+          }
+        ],
+        "prompt": {
+          "established": [],
+          "hypothetical": [
+            "Turn-only hypothetical: every unit's temporary certificate of occupancy, or final certificate if no temporary certificate is issued, will be issued after December 5, 2024, and no application qualifies for the pre-December 5, 2024 continuation in Section 11-333."
+          ],
+          "qualified": [],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "id": "ZR-18",
+      "caseDefinitionSHA256": "ddd3e0b40dc572bda434c673eac492416ec5d42e5cd18a20611570ce2ae91e86",
+      "authoredInputSHA256": "69c3e87b7fbed165b6850c1134ce1cd1c30ec5588a55d561f567c9aa3cd1d737",
+      "questionSHA256": "e9057c8ed15c463d00e24ba09fcbe1dfc4a5e6559ee9798b35ec42fb9d17410f",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-19",
+      "caseDefinitionSHA256": "c6a7bb821c603a38741d80ef27eaac9d3bada3d0a25d0d133b9685f7cab71cf6",
+      "authoredInputSHA256": "cbe137fe86be80a9f03d4eb2bf95f04e45e0eac5b49d3fd27ba7a6a7e1632ce0",
+      "questionSHA256": "40db4e86d9c63132493ff61aa844a241029f3a1a1e093452ba0ab8543a42ccb4",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "ZR-20",
+      "caseDefinitionSHA256": "a3a425df34680bc8fef70dd97eaebace8c535482bc8eb16d3f494fd174ca0a4f",
+      "authoredInputSHA256": "88fcfb02683d0a05b4450b076d775d94bed04a1e54ff18addcb29afb40add985",
+      "questionSHA256": "a652e50723b2ad06e7edaa30a0d33aaf37df931acf78d9e2fc2b7a64f3d3ac40",
+      "changed": false,
+      "beforeSHA256": "970a1f99fb0e4476f9626bdcf24a2d1eeafd65f2ac91ddbd7eea6337c14e8244",
+      "afterSHA256": "970a1f99fb0e4476f9626bdcf24a2d1eeafd65f2ac91ddbd7eea6337c14e8244"
+    },
+    {
+      "id": "ZR-21",
+      "caseDefinitionSHA256": "7d311aba625985a034956aa1f3734e13f29c32c4485416d501b589608b450e56",
+      "authoredInputSHA256": "78c1e6d1c6f1fcbd7a5079fc859c00763978859108d85f3166cfa830626afe45",
+      "questionSHA256": "81f7104844a880be81f96f839fa32d390c4b7a65d5c04c2bc110d19fe18f18b0",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-001",
+      "caseDefinitionSHA256": "55ff4653decb7a08e3c4c1db5c12e40e3a97992057abc264eab403081abbbb0a",
+      "authoredInputSHA256": "4cd643ac879632820aa66d55ba8afcd692c2d67d9e9aea087e5d723623515879",
+      "questionSHA256": "526584257f2c7ebc3493a0ede941bc26f8e8ab586aefb960eeeaed929d60bc0f",
+      "changed": true,
+      "beforeSHA256": "e0f92e428a90dbb970ab73457db0c9b3a27fdd29c2377622aa43903912fa899c",
+      "afterSHA256": "aea16dd0b2931c87a3f5fdd889b74dedcfc84cefa4c538075ef7cf869130a9ea",
+      "question": "Context: DOB NOW workflow\n\nThe proposed interior renovation does not require the alteration to meet New Building requirements. It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.\n\nHow should the five DOB NOW Alteration-routing questions be answered, and what job type results?",
+      "before": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "work_scope",
+            "key": "work_scope",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: Context: DOB NOW workflow The proposed interior renovation does not require the alteration to meet New Building requirements.",
+            "kind": "unknown",
+            "sourceText": "Context: DOB NOW workflow The proposed interior renovation does not require the alteration to meet New Building requirements.",
+            "source": "user"
+          },
+          {
+            "id": "story_count",
+            "key": "story_count",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "kind": "unknown",
+            "sourceText": "It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "source": "user"
+          },
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "kind": "unknown",
+            "sourceText": "It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [
+            "Context: DOB NOW workflow The proposed interior renovation does not require the alteration to meet New Building requirements.",
+            "It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories."
+          ],
+          "unknown": []
+        }
+      },
+      "after": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "work_scope",
+            "key": "work_scope",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: Context: DOB NOW workflow The proposed interior renovation does not require the alteration to meet New Building requirements.",
+            "kind": "unknown",
+            "sourceText": "Context: DOB NOW workflow The proposed interior renovation does not require the alteration to meet New Building requirements.",
+            "source": "user"
+          },
+          {
+            "id": "story_count",
+            "key": "story_count",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "kind": "unknown",
+            "sourceText": "It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "source": "user"
+          },
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "kind": "unknown",
+            "sourceText": "It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "source": "user"
+          },
+          {
+            "id": "certificate_of_occupancy_status",
+            "key": "certificate_of_occupancy_status",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "kind": "unknown",
+            "sourceText": "It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [
+            "Context: DOB NOW workflow The proposed interior renovation does not require the alteration to meet New Building requirements.",
+            "It is consistent with the current Certificate of Occupancy and does not change occupancy, use, exits, or number of stories."
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "id": "DOBNOW-002",
+      "caseDefinitionSHA256": "c0ae64701b619d94120d119c653fda055b3f4327df5fd5e505cc520ceb208e5d",
+      "authoredInputSHA256": "a234fa9933a8cda1d2ea3a5390f170840160a9068abc2eb501e3a6eb74f64acd",
+      "questionSHA256": "6c69f40db86b310b31dbf3fa57563aebe637eb990b211935ff07db0f23a2e2f9",
+      "changed": false,
+      "beforeSHA256": "60cc4787fb9e031c8f9cd2dc912921386ed7bbf8b4130429257e12d91fdf7217",
+      "afterSHA256": "60cc4787fb9e031c8f9cd2dc912921386ed7bbf8b4130429257e12d91fdf7217"
+    },
+    {
+      "id": "DOBNOW-003",
+      "caseDefinitionSHA256": "7837ab41b60c46478e72e2d7d16f1d0cce3bf682599ac41ebab55968ae504f9c",
+      "authoredInputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "questionSHA256": "14131b0272ae01bf208f7a27c9a02c59232383ae8cf394a866dac2e0887c8c35",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-004",
+      "caseDefinitionSHA256": "75bbf340a187dc075406cf9bfead2163f9d8f092357d17e313988ebbd09544b7",
+      "authoredInputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "questionSHA256": "9511046dd4d9347eefd270522ffbfa144836f5d2ca39daf5d4518f29036929c9",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-005",
+      "caseDefinitionSHA256": "056380f8857721b64baed8f46fe5a81cca69d6e9ad326e2a7ab9f1dc35bfe540",
+      "authoredInputSHA256": "6ec0e535ece5afc5a256b75f978ebfe24016aa17a99fce990cf6c070e12a17fa",
+      "questionSHA256": "c87a8c7da4ad40438306e5535162d288fb60bb1c7639c71fcabb4640e8d4f242",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-006",
+      "caseDefinitionSHA256": "ff26f97fa10cfadf4d509b246e3d09f0f0216f3970906a9a15d90e90f8adaec1",
+      "authoredInputSHA256": "30f752164ffaa6cd9862b763c580bf220adafd21651ea9d20f1680ea6aff8698",
+      "questionSHA256": "f7c3b049edc3bd59816be3c46ddca7d2b2e241500fb78f18db365c326a840f1a",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-007",
+      "caseDefinitionSHA256": "8ef478e683e51e44e6766fed3eabbec5f2b56530d799bc56f8ca0405ecbb5420",
+      "authoredInputSHA256": "fcb231ddb4605d3975d20cc3c4f1d20684a5b6f42eb0da6cf1d41f93628a8b4b",
+      "questionSHA256": "423551439e5e4a0ffa6232d3e8f1351af78f5dff7d334043072fb62ccba274d1",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-008",
+      "caseDefinitionSHA256": "2f2ddd75ec513a82a20fd06935d205cbeb465846857ce113b1db8bfaec889fd4",
+      "authoredInputSHA256": "d33c19c69ab1f6fb5981386eadcf5c1cd65c58f7f5b67258492f365ffe884815",
+      "questionSHA256": "55d1e947b0742905e792eb6cd79f0b1753ea21e30e35f91fbb124bd9d071da49",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-009",
+      "caseDefinitionSHA256": "1df878f88a75a7c4b5eba02d9fe24fab0b785ad0630e074fac1b01d44ebe41f1",
+      "authoredInputSHA256": "37fc2427c29161fc419702e0d0b81cc516986f46dc4c1409eae68c29d8837690",
+      "questionSHA256": "999f2d70180cff2a96fe8361e5fc3da2619a954bb1205dd3a280c6fcbb283328",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-010",
+      "caseDefinitionSHA256": "9f2c117663e6adf75f97ae2c6e32ff863ef5530b6b52475ee71aa0740e6b8252",
+      "authoredInputSHA256": "00c7df7639cf812e7df4c94ae0006a28b21175b965d5317863a9d16ad96faeb3",
+      "questionSHA256": "363b7acdceb7b7f55b7ca0753d4f445c9b8fbbe9a3efcd656d877e8aee9b5315",
+      "changed": false,
+      "beforeSHA256": "d003f61bbcd412804ef69f0c8d796ac503c1c55f94b55dce6fda42bdcfeaab5d",
+      "afterSHA256": "d003f61bbcd412804ef69f0c8d796ac503c1c55f94b55dce6fda42bdcfeaab5d"
+    },
+    {
+      "id": "DOBNOW-011",
+      "caseDefinitionSHA256": "a21d95ecbd5bf2dfdb5e22b7c51f32e46c40553912155fe09659f5d1ffcfc81f",
+      "authoredInputSHA256": "13fc63df66732233b28a7e0781ca0e5dc12c2a5529145016571469f60491952d",
+      "questionSHA256": "cf9237d1b6bec93a32b2aba195e8d3671dca119123ef950c815c9037792fff81",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-012",
+      "caseDefinitionSHA256": "1f646b604fc501b856a859914704dd57ba2e8ed4eaa866f4b2fb9b9985ffc12b",
+      "authoredInputSHA256": "fdce0b3e6b5040b5b8daca22240582b5e3f0713f736c68505845d230cb6206af",
+      "questionSHA256": "a72eb3a12cc6679660043414bb7db65c81f8ba7785e17995c409210a70e06581",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-013",
+      "caseDefinitionSHA256": "7e49dd96e2a853ac460092d630e9a4f2700fbfe7701882ac00e906cbca5cc1f7",
+      "authoredInputSHA256": "dd2377f7a8a14f78b23aafbf7037ec97a7adc04efea80db4407e1c462460dd04",
+      "questionSHA256": "bd257d208bac168756d6fdb25df1de123f7da40389599cfb97654ad29bf280ee",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-014",
+      "caseDefinitionSHA256": "95794a4dfb14530ea794be1566bd2474bc7f06c66df23f43ddbaa0e1814eefd4",
+      "authoredInputSHA256": "6310c53162c9a125c10cb37bf94a6545c4ca249c69a750a577f9b8b1203df9c9",
+      "questionSHA256": "b99c34ad95ba32aa6e8ec269022b1cbd58c43b67e14c4acaa2fe1de96f45e968",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-015",
+      "caseDefinitionSHA256": "d40dd6d38c85e090b5d4817dfa672c99c4576cfdff999cf4fecbeb1d7596abaa",
+      "authoredInputSHA256": "1b938d5b2bd20b415df3c20ef1fb533793e471ff46c050f42fcadcc540396385",
+      "questionSHA256": "e5bfe230a4f50a2d639547373966c7b1eceb31b93e578c4434effdea81d9cb3a",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-016",
+      "caseDefinitionSHA256": "157f151d4c154f901a61c02f08572e83157d83fcb6c1aa560b24444951664f55",
+      "authoredInputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+      "questionSHA256": "3d5e25ecbed58d4040b5c137365147661ecf08478622361f83541eac097f89b2",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-017",
+      "caseDefinitionSHA256": "a14c300f22449925e4af5e04ef2d5450a0bec0e4278718e8f3445eb28e1bfcbc",
+      "authoredInputSHA256": "50c015af7367d48909a1f3cda737096511939d4737f658984c4f3c77d6afe347",
+      "questionSHA256": "3c51d4c4442dc7894772ff507410b87ed332c5cf34a96035f654899ca753f7cc",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-018",
+      "caseDefinitionSHA256": "d0ce68b41d21c1cb011ff5f8e127ae03e13a8ee15a755dd36047008dda2a5519",
+      "authoredInputSHA256": "d735219b9bb802ca0c7021eaacd1fad207065e59cddaa6f4082fe75b6ffd8243",
+      "questionSHA256": "44f549c68eb53263abe27ccc09a3bc8e490c1cf9796bdd5b34b1e36c1e0410c3",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-019",
+      "caseDefinitionSHA256": "5025eeeaa7546986f6ad501010455b12e7fac7c3b6a7be7c8e8c6d80c4c4a691",
+      "authoredInputSHA256": "208c7d06f30d27f971b1410c69d19a1360efe193ab90fd480f53f3f22a79968e",
+      "questionSHA256": "455d307bbb9e6dee504c4438d3d35233707f491cfe8d1493b0c6b6985693f1b9",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-020",
+      "caseDefinitionSHA256": "25bc7b24866abf378e5caddc4388dd1ff288de0e116e3b3c7c94b33e3bb79f25",
+      "authoredInputSHA256": "bcf9e23c1414c2f06aff5870151d2f1f716074e011da2778eb0d48da75fa7611",
+      "questionSHA256": "374150c89650ae1f2a3e11fc25e4e94b0cd09c37380d53f5102c4b1a8cc9d9fe",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-021",
+      "caseDefinitionSHA256": "b7dc5f9c13f4190c5f904e0105b8323bce0746f0d434ddd6eb42f58d5d79e06d",
+      "authoredInputSHA256": "5522267061751e82aef377a93ef8b6b8f5eab50a57a9ed9739e46e010c65c70c",
+      "questionSHA256": "b2a67a2e8522ba6b4562c3cf0a9bed324a59f759bdf905a84e396737202148d8",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-022",
+      "caseDefinitionSHA256": "968229d346e53ab3710544bdb5ba44229d69e10ceb83b1a90b7d0eeea38f90e6",
+      "authoredInputSHA256": "4052ee13f21021b968d32c00a08095d1114c5a5d8ec780c3b85c9bcaa0fd22fc",
+      "questionSHA256": "d13edba06f499beaf9943bff3b8f6ba8d1e944ea4846731b2de1e9e9c51b3ea2",
+      "changed": false,
+      "beforeSHA256": "3175aab99d0f9888ff27fb42e0fedefca99793e1ef53c8147d14b2a93462faad",
+      "afterSHA256": "3175aab99d0f9888ff27fb42e0fedefca99793e1ef53c8147d14b2a93462faad"
+    },
+    {
+      "id": "DOBNOW-023",
+      "caseDefinitionSHA256": "1b28740856d95b4744a8a4eae0992e918e69def263e2af4b103fb7dd7ed5f578",
+      "authoredInputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "questionSHA256": "2c6ae9cd7e38dbbab90c08788a7dc3643f4a7d92b2471e0961562bb10028c468",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "DOBNOW-024",
+      "caseDefinitionSHA256": "130993c50b8ac1484f0f0bbce513ddf8659509323a2ec8bc7bd80240a247bbcb",
+      "authoredInputSHA256": "02ff4cc071196baa769bc8583ff0b6e4337926e237b2657883525f86014deb8c",
+      "questionSHA256": "ef5c847c15b150aa1016cc8c26609b300254abfad33c6ddaa7194f980598e048",
+      "changed": true,
+      "beforeSHA256": "eea74aea9abaeac8ee8f19179fc3ae321cffc075e7eff7ac1ba562dc363f5bba",
+      "afterSHA256": "2d93aa957504102ae1351893b63627730db1bc86eb554117101aceb48b2e6adf",
+      "question": "Context: DOB NOW workflow\n\nThe filing does not require an initial or amended Certificate of Occupancy. Its status is Permit Entire; final PW3 costs are verified; all required documents are submitted; applicable final technical reports are certified; all permits are inspected and Signed-Off; and all AHV permits are approved.\n\nIs the filing ready for an LOC request under the guide's listed prerequisites?",
+      "before": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: Context: DOB NOW workflow The filing does not require an initial or amended Certificate of Occupancy.",
+            "kind": "unknown",
+            "sourceText": "Context: DOB NOW workflow The filing does not require an initial or amended Certificate of Occupancy.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [
+            "Context: DOB NOW workflow The filing does not require an initial or amended Certificate of Occupancy."
+          ],
+          "unknown": []
+        }
+      },
+      "after": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "amended_certificate_of_occupancy_status",
+            "key": "amended_certificate_of_occupancy_status",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: Context: DOB NOW workflow The filing does not require an initial or amended Certificate of Occupancy.",
+            "kind": "unknown",
+            "sourceText": "Context: DOB NOW workflow The filing does not require an initial or amended Certificate of Occupancy.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [
+            "Context: DOB NOW workflow The filing does not require an initial or amended Certificate of Occupancy."
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "id": "FGC-01",
+      "caseDefinitionSHA256": "ba4e4276784e0071080117e425f5bd96f7657b663d6a3e97c9679b3830336f1d",
+      "authoredInputSHA256": "cdca6f41c1a51204276c695e8ca1eb836532b3c4c361ddd77e176e7e691f6e3a",
+      "questionSHA256": "b6c41653be865b7359f3aa4afbdb81e93e5311b807b0cb9c17ddc342ee8d56d8",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-02",
+      "caseDefinitionSHA256": "20809ecdda722104a2d72728f0a0f19cc84b4ce84aad18e6ed209e6bf54a6fb8",
+      "authoredInputSHA256": "ea13d1011d30bef9965f1d4c86403310628d5e65d59e84af0dfc506a8e36bbca",
+      "questionSHA256": "326433ad8a1d037f920f6b856007f8da11167eac7781bcbb90bcb869cb21b03c",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-03",
+      "caseDefinitionSHA256": "1eccd7a3e2076d34ceb59f15d7cb93ef1a9e93c9466bc0465977713d026ebec4",
+      "authoredInputSHA256": "1a795ca445422c512b7418dcfa9a85cace3409d8c987cfb7c009f0026856b42d",
+      "questionSHA256": "253e633b9df0dc6233d0b3881644eb71b631b86620558bf91e3f691147a28d84",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-04",
+      "caseDefinitionSHA256": "24b558f2ff15e6e6c28f0d1863d689ba68653d0ccf4fb3d97f39e1920eb6374c",
+      "authoredInputSHA256": "3f6c95861926cfd121b351dacbf64656ee02414f4c7c94391e245e01dcbfab1f",
+      "questionSHA256": "7ad4ccefe32dc9ce107a3398d869b75bf23a4a73a74bb30001ae12dd11d9ba51",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-05",
+      "caseDefinitionSHA256": "dea5f8ff036983b534204a4ab0b792909bf03d9bfb67b7b62c5d79adb09940c4",
+      "authoredInputSHA256": "f3f205b156798ed6f8ff923698de8e5b5b8db367d979ede3728c932cd69fae77",
+      "questionSHA256": "acea33930aba2d1ea78a8631421c98f875ba36857e90a64f6d06409fbb4db370",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-06",
+      "caseDefinitionSHA256": "7762dca813ab47f90d88a11be93742f5a0620625bbdfa5d5d62df04e5099c57b",
+      "authoredInputSHA256": "3c9343a346c3e8bbb2b9b7b4188c29967de1e1c4666deccab644e8b3b6de35be",
+      "questionSHA256": "61ae6deed0593ad8f6a6dc2541c558d2475df9ac9ab4fbf8d9df3561b7ba2e27",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-07",
+      "caseDefinitionSHA256": "8e81a9efad70a78808043106c0c6b89909f4ca092835658065fc84a6543b6492",
+      "authoredInputSHA256": "c3ed522f6d3aeb2d370cb7f87500862f18109d9248469e8a5735e36bb97cd0b3",
+      "questionSHA256": "8b9e552b3c22aecd5bf0b1939399662b4042bc32991783c34ffc285e0a1a7aa4",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-08",
+      "caseDefinitionSHA256": "0b1feea8466738b5cc34c9eb3675987516613f3752195ad74d5bf95b8d4a1fb9",
+      "authoredInputSHA256": "fd956466eb2d9069675160d6bc409b6576b0ca9508bc8e006d4dfdf39146f70d",
+      "questionSHA256": "bdee9bb2bfa1b75a1753b459c35f69a51eb4b3b32f126aa12dbea3b69b68c5c1",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-09",
+      "caseDefinitionSHA256": "f50a4c033bbbd3a5d36383938e42b7e3b7c8836edfef0a3fe5c6c96221bc10ad",
+      "authoredInputSHA256": "4361de1b510c71284a6c768433d2962e4db44cc542e561595ac184569f0796ff",
+      "questionSHA256": "e7bbf628f64b6db2e32af2a70567c5950cf21e4bbe0b67acb44873236fcc5816",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-10",
+      "caseDefinitionSHA256": "476157b26d179e8a80c1368bda017b222d59fc755778021a3d091e7d975ecd0e",
+      "authoredInputSHA256": "fdb1f5c00cda0092da8cdcbe882d2b179b1fb33239d060b916504bcd8caa2e00",
+      "questionSHA256": "b1b8e45d6edd644baa596c49637c7535c3afaa8d0d189aeed904ddd28e539d1b",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-11",
+      "caseDefinitionSHA256": "e3f25fb6b94f10c8b7cf97b899eb0372ad224595cac70ca51539f516468303ff",
+      "authoredInputSHA256": "038f8307710b6b0324ec6d3e441eb7b4940fa67a097e3a9b4ba8eb17bcef57e5",
+      "questionSHA256": "e014355957ea5e2cf92de0795ca014df8d54003efa18f310ec8de35ecafbd52a",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-12",
+      "caseDefinitionSHA256": "d3036cc41f2c9edc72a4dec4a7c650ac73a225062d0174053c7a83380dbfe389",
+      "authoredInputSHA256": "cc7180250aa68bf2e29dc8d410d42451b51c2817202e21e6b3f7fe8861b9bbd1",
+      "questionSHA256": "ecc061e929c5b953aef7560c45e8d7d967b2d3c4e72b522f45748c073bae0a13",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-13",
+      "caseDefinitionSHA256": "c2b32edae39e15957ac5ec0b0692f5e08bab6690f16a8af33d9cedc7accc8ebd",
+      "authoredInputSHA256": "f1227c268613c1a040060a32480fca3ec7e04823766f4cf49442f34ee5040b0e",
+      "questionSHA256": "7478a3b86c3300edb5faef8d220616342bc1ffbf5f5cf01b1e1f97145c10f9b5",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-14",
+      "caseDefinitionSHA256": "34704c4e0cf00e2666dc14a3cdd29eb5a3e06d2829643e8f2239e8938e8eb201",
+      "authoredInputSHA256": "41f5c41f2adb057d5e5c0c8f747a425c9d5fde053a978ca59391de26e5e94092",
+      "questionSHA256": "8b7389a54382006e20b5d24a8696e3d67ada3709a6671c1363de74a64ddf6234",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "FGC-15",
+      "caseDefinitionSHA256": "c84f77c3dbe393004b042358c663601dc3cf0d2cf203d3f4d5739b06759640e2",
+      "authoredInputSHA256": "333ec0d5602bc81292fd3be1a40ec1db59a9de95acecdbce63fefb767745bfe6",
+      "questionSHA256": "cb23c3551997276372b127190aec33643e607e71ffd7b51edb9c8d6c77970871",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-01",
+      "caseDefinitionSHA256": "dda39598d2ab693e2c427fa2dea06e9993b1cdbe8c1be9718b968aacce6d2874",
+      "authoredInputSHA256": "d60effb81376608e59a1463704885b1990bec1462d39b39323480702faac7364",
+      "questionSHA256": "9e38eeba06cb1919bfdaee8a1e42882cce81b8030218db171ec4dd52c9c8f3b4",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-02",
+      "caseDefinitionSHA256": "224efd1aef61486e44c4bf98aeb7d37ea17875e2fb8f5b0c6940864cadb8a702",
+      "authoredInputSHA256": "cf5b1458517fda6e7dd7489734e76ce42ad92a549922fa09e7365bc45f327212",
+      "questionSHA256": "d725e8ec7279000bbc98217a89822215c550d0b1d2ada57e5855854c1797a1d5",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-03",
+      "caseDefinitionSHA256": "188a9ce56e12f3aba98b0ecfabfc03b554fba442d728af11aa76db97cec3fb51",
+      "authoredInputSHA256": "5d00ce658daba0b279fa59590639f3480ce8b60b7656165d4206f77997344dfa",
+      "questionSHA256": "8e8a360667e36e66f0e4555d850014964965a964bbaeacf7a6102cd6c55a74c4",
+      "changed": false,
+      "beforeSHA256": "c61af3b8c2b817a401c98da2046eba34d2349b1ef461c535d54b3985916c0d19",
+      "afterSHA256": "c61af3b8c2b817a401c98da2046eba34d2349b1ef461c535d54b3985916c0d19"
+    },
+    {
+      "id": "MC-04",
+      "caseDefinitionSHA256": "da4d877a3c3b512a591d74ecafb455217d7706907b40aa5bc831e6800e0d9d6c",
+      "authoredInputSHA256": "ea95bb57abc34302382b92bbad81e4884f8b2ae9ffe6a24a3e39d9cec2a2f7a4",
+      "questionSHA256": "e73cde9c9fa86d858f915da9f681f5422334c6b269aefb95bb0766545e2eff89",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-05",
+      "caseDefinitionSHA256": "eed6560f7df5600a94ac94c0f3f3d6ae0698f8477c61f4465c47a8c00d8a8921",
+      "authoredInputSHA256": "1649561bdf0a9ce39f4c13ba07038abfd2ca62fedf7fed0a05c085dbe248e978",
+      "questionSHA256": "0ec9cc4364d9c9a3f09e6c23e798f84b654bf45c28776ff8ce8086e54f81fc47",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-06",
+      "caseDefinitionSHA256": "5456a29c671162a3652866192dbfd0a161c1f905c4659acccc2b9712048201db",
+      "authoredInputSHA256": "b9a951cb0fc5bfc249a51131502f8f43b57369f8cc38a671b82e01bf105fc299",
+      "questionSHA256": "9f2ca6acf1133c1e5594db66d3df759fc75a4715c2daee912daa01256481ef9e",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-07",
+      "caseDefinitionSHA256": "aeef7a032c6675b78949e598dc133007a62b1f7afa3a7964bd476d2ad1355e85",
+      "authoredInputSHA256": "bb718cdd38e1392c6b97eaccc4b5008a0cf934d65efd1ee6b3a7910f543bdffd",
+      "questionSHA256": "6b6d0039fd55227453021c8fca12b7212c5f611693a8cf5856966960832c80d3",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-08",
+      "caseDefinitionSHA256": "c4b6ac4789d1ca4ee4074efb949da0dcc57b2867d052865eeb9157629c40fd61",
+      "authoredInputSHA256": "0639df82464201ad460b59d1f78f437cbdeeffc22bb642d2688fc36f6a1a6c0b",
+      "questionSHA256": "61ad74dd11016970e9e7e3c3b1e925d19367bf16941191791fe8b2f455b42a29",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-09",
+      "caseDefinitionSHA256": "584d750490d1b01cb5fd3cc86404d733798ddb310ebec355afa02ef4275b69bc",
+      "authoredInputSHA256": "507fe315d964a751d4b9e66008989180582ca797e191a4cd21e4cabbfc54127a",
+      "questionSHA256": "21663b26fa0d3167765dc5fc3c2ccd96b90594705459393f924498ae28333cbc",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-10",
+      "caseDefinitionSHA256": "b446426989a184e7b5928b50b4d796c6050dfa2f80ed667560b1291838c828c9",
+      "authoredInputSHA256": "3e38c1bd791f407bd2e5e6881c0e6c9709b76a215b53a64b43494f9ba9db2381",
+      "questionSHA256": "45aae086206a107c9836b384694837d4e6d9005e0b93ec8d894c1a9f5c268a65",
+      "changed": false,
+      "beforeSHA256": "af8307e9ee6bc7d54e1554481343ef0936698c9f09a89e2db27c12e0b78d6d2f",
+      "afterSHA256": "af8307e9ee6bc7d54e1554481343ef0936698c9f09a89e2db27c12e0b78d6d2f"
+    },
+    {
+      "id": "MC-11",
+      "caseDefinitionSHA256": "d7d73c99ed8e96ede5b2afb4068df1dcf9cf86e438545bc75cfd9b8a44542cf0",
+      "authoredInputSHA256": "3afd0ac4549c292303046c389ca59715d8dd8cfe011ec11d17c3afcb2eafacc7",
+      "questionSHA256": "47da0f43d0e6e319f696b7ac78405d96b4df1598d1929862bf90c7d448693dfe",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-12",
+      "caseDefinitionSHA256": "caba93b470f7a7a733a6b4dd917eef9e18c716623ad0fef58a3cc5a2019d6f48",
+      "authoredInputSHA256": "f62d445e3e6e037d7e9db8ed19b821f07f497e5cf01a2103c0164cf87f082743",
+      "questionSHA256": "9f123ea88bf401b5b8adb1f2c8d007b5d223c8ac8a77b6ccefc49f1fcde3072b",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-13",
+      "caseDefinitionSHA256": "0034cc483f6b2150eadeebe89a176e305e89d0bdcc21df28bdacaccc2f1d3bcc",
+      "authoredInputSHA256": "be185cd980afb23f2dbf1fca8b1268a6a28c96864b9d9848a8943e59100bd1a2",
+      "questionSHA256": "ae4750c94e145f94c8934e46ce62e45dcf4c0858d7d625e86c92103fd73abaf4",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-14",
+      "caseDefinitionSHA256": "e19d8663fb226366d9a8a9b409f1bbf5d7a529962e9f49f8e3e82a407408566f",
+      "authoredInputSHA256": "260d0f2efe9d8933dd20977015891390e013b9c36bdd738d3ca0fa0e9fe24baf",
+      "questionSHA256": "ed2162991b5ca1d1dbb8a294a2db2c85050c7bcf205f5cb2f9b03fa944130559",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "MC-15",
+      "caseDefinitionSHA256": "249abb971ecbee98653a1acb43b6e4bb67bcccd4287a1d84d5be46617d963e1c",
+      "authoredInputSHA256": "db058bab439a31cc71a91b6b9fcf8c9936af0ae7b3a952ad11569eca577867b8",
+      "questionSHA256": "fe58a26644f87ca516f242b82f3dc9fa4c575b2031cd33f9cb3fcfcedfde94f2",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-01",
+      "caseDefinitionSHA256": "06cbf7768dd3d466cbed4752583de637a8109f1528092a2eb0468280f55d4e3e",
+      "authoredInputSHA256": "b0550366be3c5cb3cbb61f3175144f6cc4964178a08e516174e05c37230c8477",
+      "questionSHA256": "009cf9fad103ead1e86133de0afdc8f396e643438e250220a4b23cfa15e84b6a",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-02",
+      "caseDefinitionSHA256": "c78cd5fcba0065c85d65ba60a80e2be2d7af01dc788eccea87953d8acb75e2dd",
+      "authoredInputSHA256": "eab94c541bdc47c4c56f91ccfbfcaf5b20626c6bd3fc95048fd38e2cfc02c9f5",
+      "questionSHA256": "27d8309986f07f71da2dacb982797c0d1cbeec1cbdccf36403befcf4a2669db1",
+      "changed": false,
+      "beforeSHA256": "fe8f87cc983181cae3ce0c6a0762d19e85e795b036286411124191565d365e9a",
+      "afterSHA256": "fe8f87cc983181cae3ce0c6a0762d19e85e795b036286411124191565d365e9a"
+    },
+    {
+      "id": "GAP-03",
+      "caseDefinitionSHA256": "62c294e762dbf2a3c526c7d0d85abae1a5d5a07489feb8e867489ae9caef48c7",
+      "authoredInputSHA256": "786f4d5e5b5fe8d48f636d4e0536511ad7ad67b65769c33e1e48f948f9218497",
+      "questionSHA256": "41e5fbecd3715793002717f6c4739c724766842b4106dbb25472a3b7243053ce",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-04",
+      "caseDefinitionSHA256": "5b8c989127e960b76e842cbf442a10da6c43e50773722b2dbaf23de23c2b9d1a",
+      "authoredInputSHA256": "7689499faef837d8f2d46436c63c0c6447252309f41a97000774d9b2d78e7cbd",
+      "questionSHA256": "d7aa09b8da2c0c8c6db9aab112fe962baa5c6b286f2964c828eb1373fadc144f",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-05",
+      "caseDefinitionSHA256": "76e08cbcfc5698b73df2b6bb2ccb39a8114fc43adb283470a500c0795e1cd371",
+      "authoredInputSHA256": "7f09f11c062f1f19f77415fe2cfc6e46931bc35d446070a26ac7cbf4caa566e8",
+      "questionSHA256": "fd4df15a3c82eaf2c1904f3bc0cc7bcb9b88f2d719414dc1a68ec25e6a4d6bd6",
+      "changed": false,
+      "beforeSHA256": "bb1b1a58892b3d053e60a36ade4799d8f9922a8ef320e089e4f95c0130907243",
+      "afterSHA256": "bb1b1a58892b3d053e60a36ade4799d8f9922a8ef320e089e4f95c0130907243"
+    },
+    {
+      "id": "GAP-06",
+      "caseDefinitionSHA256": "c3069635ed3edc08b7c99b1d95df6ac369fa63746c741dcef6ff236e9d3bed45",
+      "authoredInputSHA256": "0abe1174604be439e088918b89beef2ba039554791e0e3d142f3d01ac41d8ef8",
+      "questionSHA256": "7200531c5cd8bdc36754dc5586f07a7629c3eddc71d1c062083f77d78bc74829",
+      "changed": false,
+      "beforeSHA256": "c6b3a4a2c6b5a2dedc3f9d8b898a3259e1a607b9817943e87f7efbb085da5ac8",
+      "afterSHA256": "c6b3a4a2c6b5a2dedc3f9d8b898a3259e1a607b9817943e87f7efbb085da5ac8"
+    },
+    {
+      "id": "GAP-07",
+      "caseDefinitionSHA256": "8c64ab71daa86ee2eb9163253b139d044ef43efe3cc730f1fdc0c5dc93e445ad",
+      "authoredInputSHA256": "2e1b755405a232eef0fa33a242e40f3b3c8bfc47bd0c123eff8085f9e5e45b63",
+      "questionSHA256": "10e7986452e8e6def1e3ca49f5836ab89cdfc2fb8193ae9cf0079ac678bfd80b",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-08",
+      "caseDefinitionSHA256": "abd0f2c84fa0f82cd0da3e1488db746fc1a91c2958cc72e100f4bd0288165f81",
+      "authoredInputSHA256": "d24e447e97c5d5bc2ff29275dfae6aaad12f7ad75cf073aa48e57a4c50a0da13",
+      "questionSHA256": "1f6360c8932c2bf3b56d0374a9796cf824c151e22d18a13295705d69447e7513",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-09",
+      "caseDefinitionSHA256": "0705d19dfbaddf73a95d4b2a825a7443c1ac22dc2d516d053433f3cad47f2e5d",
+      "authoredInputSHA256": "ad6040cb9e0410b4b68980584c0f53a4c2b5d39e5ddf5b4c991a3f70db092c54",
+      "questionSHA256": "d638e681ec3a65575380de638573b7e0229ae21860e144feeb0cb1448a05825d",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-10",
+      "caseDefinitionSHA256": "edb1ced75a106bea177901deca67f3271e2d26e1d586971a3a116ddabf83c5a1",
+      "authoredInputSHA256": "a639f54c09818ffcf49aa53be263e0fdd157a08a8c812e5b53d63c1c4854ce3b",
+      "questionSHA256": "5124951acc8518980c7e08355ed090a15d428db7865a84ee6a6c70c7ce8ff519",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-11",
+      "caseDefinitionSHA256": "8b955ef6eac1a06a21ff92890dfc11fb145faf3d24992e7fb7f69692f89bfb10",
+      "authoredInputSHA256": "369bcfe72531397105c16efe03e5f03952d6a45251310bb0c39e3c164a7bd405",
+      "questionSHA256": "3cf1fc3b35e25b433bda32d2727a0a8089a6bc23dfab2045f6b06d003e98ea2f",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-12",
+      "caseDefinitionSHA256": "aaacddc52b35a6ce9b6cf95a61a76556b252c908714731bf0a6fb35d08aefb13",
+      "authoredInputSHA256": "29d4a2885c2353a960a2562f6a698cc2639f45fa42edd795493c1531d9d346c2",
+      "questionSHA256": "59686ddbbff484d699277e30ed391e46e64af4e8c1f24be7c1632977e54a69b5",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-13",
+      "caseDefinitionSHA256": "9a4be54aa944c4f980e2d366a0aa530b4eafda1996443fdeb3f7363fc02bc095",
+      "authoredInputSHA256": "9f7f8dd5f35938934986e1f842ceda8530ac9fa5740e263ba86390bf2f375913",
+      "questionSHA256": "93bd17fe1c940993224af748df1c05e44809cc15fbaf66ba9ec01d8cba9a51b4",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "GAP-14",
+      "caseDefinitionSHA256": "57ccec4f22ca926334f569c379d1f9c6d2efdb349a5f54d9929641da0c4a40ed",
+      "authoredInputSHA256": "701f84751f8f8fb9c4bc7bcf1eed180e1e6f706c19574d67ee4dc53a70eb3d05",
+      "questionSHA256": "b9b51009e8b1fdd8b57bb9f3ed557a557af89a69d9dcc0987903cc82914288dc",
+      "changed": true,
+      "beforeSHA256": "1a4a88e9427dc786993796ccf0623245d10ea1f278e00959fea4d0ebd2e78177",
+      "afterSHA256": "78f7909cd9f4eff0a0cf37e78656953bf025fb92daafafe7b08f4f6a2a207c42",
+      "question": "Construction is complete and the project has passed its inspections, but the required Certificate of Occupancy has not yet been issued. Can the owner occupy the building because the physical work is finished?",
+      "before": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: Construction is complete and the project has passed its inspections, but the required Certificate of Occupancy has not yet been issued.",
+            "kind": "unknown",
+            "sourceText": "Construction is complete and the project has passed its inspections, but the required Certificate of Occupancy has not yet been issued.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [
+            "Construction is complete and the project has passed its inspections, but the required Certificate of Occupancy has not yet been issued."
+          ],
+          "unknown": []
+        }
+      },
+      "after": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "certificate_of_occupancy_issuance",
+            "key": "certificate_of_occupancy_issuance",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: Construction is complete and the project has passed its inspections, but the required Certificate of Occupancy has not yet been issued.",
+            "kind": "unknown",
+            "sourceText": "Construction is complete and the project has passed its inspections, but the required Certificate of Occupancy has not yet been issued.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [
+            "Construction is complete and the project has passed its inspections, but the required Certificate of Occupancy has not yet been issued."
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "id": "GAP-15",
+      "caseDefinitionSHA256": "3c0c48452ca69015cf10bf7f735ce5da1aa5eb0de2e7295b0d5e5a3b74ec0ecf",
+      "authoredInputSHA256": "9bd1ba44113017fe6fd6c553d295c26a12fbec24a9b6febf8de1f21d6701c272",
+      "questionSHA256": "b1ffc221853f84807843858db0babf4a9eb09afebd408f5ddd2153ffa72753cf",
+      "changed": false,
+      "beforeSHA256": "b8153f1b1d20fa01ce213716d118382acf193d13be20093aa8834819f6b77b9c",
+      "afterSHA256": "b8153f1b1d20fa01ce213716d118382acf193d13be20093aa8834819f6b77b9c"
+    },
+    {
+      "id": "PC-01",
+      "caseDefinitionSHA256": "c3ddd0a570cd7034dadc2f5c494a82e2e64fa606fdf9e072be2c35deaae194b5",
+      "authoredInputSHA256": "f875268eea2e4f073a1c02db0aa01ba1cc02342b1fe4610fbb2b4f48f464151a",
+      "questionSHA256": "9d5f66a5aed42f62efcd53640578061268c2ffad38a377fcb5d160167a2495a6",
+      "changed": false,
+      "beforeSHA256": "965e7f0152883f1360492a1b72bbd1c5568bbcf2a12d48bc354dfb908e670d4e",
+      "afterSHA256": "965e7f0152883f1360492a1b72bbd1c5568bbcf2a12d48bc354dfb908e670d4e"
+    },
+    {
+      "id": "PC-02",
+      "caseDefinitionSHA256": "734021b9dfc6eb3842eec7acdea4842e79d9dbbcc0913befb0e873d965022507",
+      "authoredInputSHA256": "2153718362110e26172d5d3c18ce43160308afd827e83788145df0d5498f89a5",
+      "questionSHA256": "3706c5318c04bda053624ca746f246e357b043e6233a6c6ebc0d04808f5c1b45",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-03",
+      "caseDefinitionSHA256": "39d1696630606088d44816f153abf8e06f51d8144affdb524aea07fd73f27ecd",
+      "authoredInputSHA256": "09c3a6affdb0e5ebb6b0d9d693a0ba75fca0eebb6d8aa285a65b4d1aaea7a783",
+      "questionSHA256": "ebdd51b73db5bb4d4de56517aa17459dfd23d74619604c36268b3a41d6c0d660",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-04",
+      "caseDefinitionSHA256": "defe08f05ff1fcdd93c1b19d54c724c9254288a6cceb3dd5db02de0b2f6973d7",
+      "authoredInputSHA256": "9d41ecca4caac0adb046438eafb997bf18f96dedc05f406de96f0b943a7f5e90",
+      "questionSHA256": "e17bdfa267c6bd219ae22592fa5e82267aeb324eb2b995db27f473ada5303ff0",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-05",
+      "caseDefinitionSHA256": "8208a91248657929c18caa7dc584ea35c387997e5b0d1a40bb5765101f4b10a3",
+      "authoredInputSHA256": "5784d46da5e710f6f9d81ccd3338e3161df26b8831e15c83f9b6a7419c888283",
+      "questionSHA256": "a484d3dd2e19dbfd18142dc0e4c94766d4a79e23e11b096d36d3a5ed144b3db3",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-06",
+      "caseDefinitionSHA256": "fc144bd1cbf0ff8235bff8860c55f26ce3b01d6acbc5ec90cccc4af0568fe738",
+      "authoredInputSHA256": "7ee33157a4fb0c10de807ca2896e47ca76fba736c6b9a1ba001db384f32dc7dd",
+      "questionSHA256": "2282135e1f26f0f2d16a978f16b89c55130ec8438fa899ff54211d366cbdf891",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-07",
+      "caseDefinitionSHA256": "365ac32bd5d12af5c560e6f653c94f5e2292b0b1f593e96ddc39375386d0a53b",
+      "authoredInputSHA256": "0090d9ad56c87640cb8e7ece2d35cfa2b5f5250beb727401744499c0a702e70a",
+      "questionSHA256": "e3df6d383addef2e90d9ad1522cb97486006a41d0ddd8a059ebaf684181010d0",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-08",
+      "caseDefinitionSHA256": "93b288525f5e8d76de73ff99f9966200e2d3724a3192ab670a4463d55f7970bc",
+      "authoredInputSHA256": "bb16b2b207c6364df58909c20aabc0a4e8bb10ee09ea9999e52015c774b9932b",
+      "questionSHA256": "5d060326a3efcea51a83c57da443a70f7423e7d98e2457a55b0d8358484d78fd",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-09",
+      "caseDefinitionSHA256": "469fbebd8bb1d4eafbf5ddd91255e8be110828ed6e5aba27ce65924581bf29d6",
+      "authoredInputSHA256": "3ee120d8f136881adb3f336a6a12f5b510c67389f9226577225b733e7a7ecebc",
+      "questionSHA256": "2ef23552e0cc1a3a7f60f8a41e64c5fa7fcb0f5457deba3aff0936570fab8e38",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-10",
+      "caseDefinitionSHA256": "c25b7615cd03934d3b440da1ad576d9a91e3634d86de1d1f4d105b90f36ed465",
+      "authoredInputSHA256": "6f54cb02dc567786e865e76a29259f515079ded9d04eef43139cce8ae3b88e0a",
+      "questionSHA256": "09bebcc887e69588318ba4c9b7eddbbab02582d8e36c31e3612dca84dbcfd249",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-11",
+      "caseDefinitionSHA256": "07ada333f9867b69f0ca1ff403d646d3435522b6953901b45546079629be175a",
+      "authoredInputSHA256": "518dda98b208a75a15cb479b02f8e3cc6ade40306c15b612493ff17fba04b595",
+      "questionSHA256": "620772d51e245786f7142426928638cc965ca62148564a03480c3895c1c8384c",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-12",
+      "caseDefinitionSHA256": "ee900dcd1a8d33b322475ce0ea72a2b6bc2bce20cdf9dd1809085051e5bdb2f2",
+      "authoredInputSHA256": "8f78216a421ecca46d52ec5b77ac63fdd397dd178e8e748e7fec6267e4f31e6e",
+      "questionSHA256": "0b837075091ad353a39c6c650dfe8882e48a91a6c6df38c8077a3343f5c9fe9d",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-13",
+      "caseDefinitionSHA256": "90f04d601ad7958e2bf67e93fb56fc6181ab9122f2aaeea4635cfb9fb2b76b0c",
+      "authoredInputSHA256": "c3c6c16cdd26891ca3c966057480f193eb315aab3c0a5ec8b61256f8d3fa94cf",
+      "questionSHA256": "3c4835eaa360fb0c976e50134c87551447ecafe621207407846441742888b6e3",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-14",
+      "caseDefinitionSHA256": "fb139e3c214f1531da51eec00954ab8fa2f2f1f9b645ee9961dd97f6bf63b990",
+      "authoredInputSHA256": "1911cae004a21de5487cc2d3f7f5573d4267d1829b07008a9c9d83159e4e6e23",
+      "questionSHA256": "e7eb2ca2766f08f2a67e38bd19c30653a1c7bbf241848cddd4aafaf625e0d5cb",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    },
+    {
+      "id": "PC-15",
+      "caseDefinitionSHA256": "3f77f87bbbabb22eecbc301ac8e0423bc4f3f6fc1566a6b9711e28ba3fdcbf14",
+      "authoredInputSHA256": "09402bbd1356819ce0f340f937d4595c28b0cfe39e9a2360338ad3130ea02c9f",
+      "questionSHA256": "086db7c7c563ee1203c05aaed5093ccc357790079c5c24ea2a9edd0ebfec9bba",
+      "changed": false,
+      "beforeSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202",
+      "afterSHA256": "4e5eac4da4755f8310af99a94091c8957044aacb4d642add3e289267111e6202"
+    }
+  ],
+  "followups": [
+    {
+      "question": "The Certificate of Occupancy is not available.",
+      "before": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: The Certificate of Occupancy is not available.",
+            "kind": "unknown",
+            "sourceText": "The Certificate of Occupancy is not available.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [],
+          "unknown": [
+            "Qualified user statement; do not infer an unqualified fact: The Certificate of Occupancy is not available."
+          ]
+        }
+      },
+      "after": {
+        "established": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "R-2",
+            "statement": "The active-topic building is Group R-2.",
+            "kind": "established",
+            "sourceText": "The building is occupancy Group R-2.",
+            "source": "user"
+          }
+        ],
+        "unknown": [
+          {
+            "id": "certificate_of_occupancy_availability",
+            "key": "certificate_of_occupancy_availability",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: The Certificate of Occupancy is not available.",
+            "kind": "unknown",
+            "sourceText": "The Certificate of Occupancy is not available.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [
+            "The active-topic building is Group R-2. Original user wording: The building is occupancy Group R-2."
+          ],
+          "hypothetical": [],
+          "qualified": [],
+          "unknown": [
+            "Qualified user statement; do not infer an unqualified fact: The Certificate of Occupancy is not available."
+          ]
+        }
+      }
+    },
+    {
+      "question": "The Certificate of Occupancy is unavailable.",
+      "before": {
+        "established": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "R-2",
+            "statement": "The active-topic building is Group R-2.",
+            "kind": "established",
+            "sourceText": "The building is occupancy Group R-2.",
+            "source": "user"
+          }
+        ],
+        "unknown": [],
+        "hypothetical": [],
+        "prompt": {
+          "established": [
+            "The active-topic building is Group R-2. Original user wording: The building is occupancy Group R-2."
+          ],
+          "hypothetical": [],
+          "qualified": [],
+          "unknown": []
+        }
+      },
+      "after": {
+        "established": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "R-2",
+            "statement": "The active-topic building is Group R-2.",
+            "kind": "established",
+            "sourceText": "The building is occupancy Group R-2.",
+            "source": "user"
+          }
+        ],
+        "unknown": [
+          {
+            "id": "certificate_of_occupancy_availability",
+            "key": "certificate_of_occupancy_availability",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: The Certificate of Occupancy is unavailable.",
+            "kind": "unknown",
+            "sourceText": "The Certificate of Occupancy is unavailable.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [
+            "The active-topic building is Group R-2. Original user wording: The building is occupancy Group R-2."
+          ],
+          "hypothetical": [],
+          "qualified": [],
+          "unknown": [
+            "Qualified user statement; do not infer an unqualified fact: The Certificate of Occupancy is unavailable."
+          ]
+        }
+      }
+    },
+    {
+      "question": "The temporary Certificate of Occupancy has not been issued.",
+      "before": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: The temporary Certificate of Occupancy has not been issued.",
+            "kind": "unknown",
+            "sourceText": "The temporary Certificate of Occupancy has not been issued.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [
+            "The temporary Certificate of Occupancy has not been issued."
+          ],
+          "unknown": []
+        }
+      },
+      "after": {
+        "established": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "R-2",
+            "statement": "The active-topic building is Group R-2.",
+            "kind": "established",
+            "sourceText": "The building is occupancy Group R-2.",
+            "source": "user"
+          }
+        ],
+        "unknown": [
+          {
+            "id": "temporary_certificate_of_occupancy_issuance",
+            "key": "temporary_certificate_of_occupancy_issuance",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: The temporary Certificate of Occupancy has not been issued.",
+            "kind": "unknown",
+            "sourceText": "The temporary Certificate of Occupancy has not been issued.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [
+            "The active-topic building is Group R-2. Original user wording: The building is occupancy Group R-2."
+          ],
+          "hypothetical": [],
+          "qualified": [
+            "The temporary Certificate of Occupancy has not been issued."
+          ],
+          "unknown": []
+        }
+      }
+    },
+    {
+      "question": "The occupancy group is unknown.",
+      "before": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: The occupancy group is unknown.",
+            "kind": "unknown",
+            "sourceText": "The occupancy group is unknown.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [],
+          "unknown": [
+            "Qualified user statement; do not infer an unqualified fact: The occupancy group is unknown."
+          ]
+        }
+      },
+      "after": {
+        "established": [],
+        "unknown": [
+          {
+            "id": "occupancy_group",
+            "key": "occupancy_group",
+            "value": "unknown",
+            "statement": "Qualified user statement; do not infer an unqualified fact: The occupancy group is unknown.",
+            "kind": "unknown",
+            "sourceText": "The occupancy group is unknown.",
+            "source": "user"
+          }
+        ],
+        "hypothetical": [],
+        "prompt": {
+          "established": [],
+          "hypothetical": [],
+          "qualified": [],
+          "unknown": [
+            "Qualified user statement; do not infer an unqualified fact: The occupancy group is unknown."
+          ]
+        }
+      }
+    }
+  ]
+}

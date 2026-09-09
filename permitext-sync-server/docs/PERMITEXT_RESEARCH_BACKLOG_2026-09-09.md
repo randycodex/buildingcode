@@ -94,6 +94,12 @@ The [110-question parser audit](../evals/results/research-fact-subject-scope-aud
 
 Validation: `npm run test:research-chat` passed on the final parser source, including the new subject-scope contract and the existing qualified-facts contract. The audit's source hashes and 110 case rows were verified; live execution and result overwrite were rejected. These parser checks made no paid calls. The full local suite log is `/tmp/permitext-fact-subject-research-suite-final-20260909.log`.
 
+Local follow-up repair while additional API approval is pending: the `20260909-occupancy-document-fact-scope-v8` parser separates occupancy classification from Certificate of Occupancy facts. The reproduced failure was a user-supplied Group R-2 being erased by a later statement that the certificate was unavailable or not issued. Availability and issuance now have separate keys, with temporary/final/amended documents kept distinct. Direct corrections update the matching document fact; a source claim or conditional statement cannot establish availability. Explicit uncertainty about the occupancy classification still removes the prior categorical classification.
+
+Legacy qualified records are reclassified by their original document wording only. The parser cannot reconstruct an occupancy classification already erased by an older version. The [110-input comparison and follow-up reproductions](../evals/results/research-occupancy-document-scope-check-2026-09-09.json) uses the current authored HTTP question projections, including scenarios and context. ZR-17, DOBNOW-001, DOBNOW-024 and GAP-14 gain corrected document subjects; 106 storage projections are unchanged, and all 110 single-question fact prompt projections remain unchanged. This is a follow-up state repair, not evidence that the earlier generated-answer omissions are fixed or that those four questions now pass.
+
+Validation: the expanded subject-scope and qualified-fact checks passed, followed by `npm run test:research-chat` (log `/tmp/permitext-occupancy-document-research-suite-20260909.log`). Source and input hashes are retained in the comparison. The repair, comparison and test suite made zero provider or external-network calls. The API ledger and pending approval request are unchanged.
+
 ### R4 — Confirm mapped-location and definition checks accept supported uncertainty
 
 Status: partly-repaired-awaiting-confirmation. Area: Answer verification.

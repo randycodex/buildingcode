@@ -107,4 +107,63 @@ const legacy = resolveResearchConversationFacts({
 assert.equal(value(legacy, "building_status"), undefined);
 assert.equal(legacy.unknownFacts.find((item) => item.key === "building_status")?.qualificationVersion, researchConversationFactsVersion);
 assert.match(researchConversationFactPromptContext(legacy).unknown.join(" "), /requires reconfirmation/);
-console.log("Permitext Research fact subject scope contract passed.");
+const classified = resolve("The building is occupancy Group R-2.");
+for (const statement of [
+  "The Certificate of Occupancy is not available.",
+  "The Certificate of Occupancy is unavailable.",
+  "The building has no Certificate of Occupancy.",
+  "The temporary certificate of occupancy has not been issued.",
+  "The Certificate of Occupancy is unknown.",
+  "The final certificate of occupancy is not yet confirmed."
+]) {
+  const result = resolve(statement, classified);
+  assert.equal(value(result, "occupancy_group"), "R-2", statement);
+  assert.equal(result.unknownFacts.some(fact => fact.key === "occupancy_group"), false, statement);
+  assert.equal(result.unknownFacts.find(fact => fact.key.includes("certificate_of_occupancy_"))?.sourceText, statement);
+  assert.equal(value(resolve("Explain that distinction.", result), "occupancy_group"), "R-2");
+}
+for (const statement of [
+  "The occupancy group is unknown.",
+  "The building is not Group R-2.",
+  "The Certificate of Occupancy is unavailable and the occupancy group is unknown.",
+  "The certificate of occupancy does not confirm Group R-2."
+]) assert.equal(value(resolve(statement, classified), "occupancy_group"), undefined, statement);
+const hypotheticalCO = resolve("Suppose the Certificate of Occupancy is unavailable.", classified);
+assert.equal(value(hypotheticalCO, "occupancy_group"), "R-2");
+assert(hypotheticalCO.hypotheticalFacts.some(fact => fact.key === "certificate_of_occupancy_availability"));
+assert.equal(has(resolve("Is the Certificate of Occupancy available?", classified), "certificate_of_occupancy_status"), false);
+assert.equal(has(resolve("The CO alarm is not working."), "certificate_of_occupancy_status"), false,
+  "Do not infer a document from an ambiguous abbreviation.");
+const unavailableDocument = resolve("The Certificate of Occupancy is unavailable.", classified);
+const issuedDocument = resolve("The Certificate of Occupancy has been issued.", unavailableDocument);
+assert.equal(value(issuedDocument, "certificate_of_occupancy_issuance"), "issued");
+assert(issuedDocument.unknownFacts.some(fact => fact.key === "certificate_of_occupancy_availability"),
+  "Issuance does not establish document availability.");
+const availableDocument = resolve("The Certificate of Occupancy is available.", issuedDocument);
+assert.equal(value(availableDocument, "certificate_of_occupancy_availability"), "available");
+assert.equal(availableDocument.unknownFacts.length, 0, "An explicit correction clears the corresponding document uncertainty.");
+assert.equal(value(availableDocument, "occupancy_group"), "R-2");
+const notIssuedDocument = resolve("The Certificate of Occupancy has not been issued.", classified);
+assert.equal(value(resolve("The Certificate of Occupancy has been issued.", notIssuedDocument), "certificate_of_occupancy_issuance"), "issued");
+const finalUnissued = resolve("The final Certificate of Occupancy has not been issued.", classified);
+const temporaryIssued = resolve("The temporary Certificate of Occupancy has been issued.", finalUnissued);
+assert.equal(value(temporaryIssued, "temporary_certificate_of_occupancy_issuance"), "issued");
+assert(temporaryIssued.unknownFacts.some(fact => fact.key === "final_certificate_of_occupancy_issuance"),
+  "A temporary certificate cannot clear the stated condition of the final certificate.");
+for (const statement of [
+  "The owner says the Certificate of Occupancy is available.",
+  "The Certificate of Occupancy is available if DOB approves the request.",
+  "The Certificate of Occupancy is available after the request is approved."
+]) assert.equal(value(resolve(statement, unavailableDocument), "certificate_of_occupancy_availability"), undefined,
+  "An attributed claim or conditional availability is not established availability.");
+const legacyDocument = resolveResearchConversationFacts({ question: "Explain the requirements.", topicDecision,
+  topicContext: { factTopics: [{ rootTopic, establishedFacts: [], unknownFacts: [{
+    key: "occupancy_group", value: "unknown", qualificationVersion: "20260909-building-and-system-fact-scope-v7",
+    statement: "Qualified user statement; do not infer an unqualified fact: The Certificate of Occupancy is unavailable.",
+    sourceText: "The Certificate of Occupancy is unavailable."
+  }] }] }
+});
+assert.equal(legacyDocument.unknownFacts.some(fact => fact.key === "occupancy_group"), false);
+assert.equal(legacyDocument.unknownFacts[0].key, "certificate_of_occupancy_availability");
+assert.equal(legacyDocument.establishedFacts.length, 0, "Do not invent a classification previously erased by an older parser.");
+console.log("Permitext Research fact subject scope contract passed: building/system and occupancy/document scopes remain separate.");
