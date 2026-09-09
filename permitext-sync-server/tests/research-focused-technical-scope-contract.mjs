@@ -47,7 +47,7 @@ for (const id of ["MC-09", "MC-13", "MC-15", "GAP-03", "GAP-08"]) {
     const environment = { PERMITEXT_RESEARCH_WEB_SUPPORT: "1" };
     const input = { question, enactedEvidence: actual.sources, outsideLibraryRequired: id === "GAP-03",
       pinnedEvidenceCount: 0, contextDependentFollowUp: actual.previousTopicApplied,
-      relevanceComparison: actual.topicDecision?.decision === "relevance_comparison" };
+      relevanceComparison: actual.previousTopicApplied && actual.topicDecision?.decision === "relevance_comparison" };
     assert.equal(researchWebSupportTrigger(input, environment).useWeb, false);
     for (const delta of [
       { enactedEvidence: [] },
@@ -97,7 +97,9 @@ for (const id of ["MC-09", "MC-13", "MC-15", "GAP-03", "GAP-08"]) {
   }
   assert((await simulate({ pins: [{ ...extra, selectedText: extra.text }] })).sources.some((s) => s.sectionID === extra.sectionID && s.origin === "user_pinned"));
   for (const suffix of [" Also explain the structural requirements.", " Calculate the required airflow.", " Check the 2014 edition.", " Consult official guidance."]) {
-    assert((await simulate({ text: question + suffix })).sources.some((s) => s.sectionID === extra.sectionID), `${id}: ${suffix}`);
+    assert.equal(focusedTechnicalResearchScope(question + suffix), null);
+    assert.equal(focusedTechnicalCandidates({ question: question + suffix }, orderedRows, 0), orderedRows,
+      `${id}: broader questions retain ordinary selection, including its existing comparison handling.`);
   }
   results.push({ id, previousSources: before.sources.length, currentSources: actual.sources.length,
     previousCharacters: before.usage.characterCount, currentCharacters: actual.usage.characterCount });

@@ -1,4 +1,4 @@
-export const researchConversationTopicVersion = "20260909-prior-topic-comparison-v4";
+export const researchConversationTopicVersion = "20260902-format-follow-up-v3";
 
 export const researchConversationTopicDecisions = Object.freeze({
   continuation: "continuation",
@@ -199,7 +199,7 @@ function decisionSignals(question, rootTopic, currentTopic) {
 function classification(signals, hasPriorTopic) {
   if (signals.returnToOriginal) return researchConversationTopicDecisions.continuation;
   if (signals.correction) return researchConversationTopicDecisions.correction;
-  if (hasPriorTopic && signals.relevanceComparison) return researchConversationTopicDecisions.relevanceComparison;
+  if (signals.relevanceComparison) return researchConversationTopicDecisions.relevanceComparison;
   if (!hasPriorTopic || signals.explicitSwitch || signals.disjointExplicitReference) {
     return researchConversationTopicDecisions.topicSwitch;
   }

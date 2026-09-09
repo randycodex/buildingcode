@@ -63,7 +63,9 @@ function matchingAnchors(scope, values, { canonical = false } = {}) {
 }
 
 export function focusedTechnicalCandidates(query, candidates, pinnedCount) {
-  if (pinnedCount || query.projectFactsApplied || query.contextDependentFollowUp || query.relevanceComparison) return candidates;
+  const standalone = query.topicDecision && !query.topicDecision.rootTopic?.text && !query.topicDecision.currentTopic?.text;
+  if (pinnedCount || query.projectFactsApplied ||
+      ((query.contextDependentFollowUp || query.relevanceComparison) && !standalone)) return candidates;
   const scope = focusedTechnicalResearchScope(query.question);
   if (!scope || !matchingAnchors(scope, candidates)) return candidates;
   const isAnchor = (value) => value.codePrefix === scope.codePrefix && scope.anchors.some(([number]) => number === value.sectionNumber);

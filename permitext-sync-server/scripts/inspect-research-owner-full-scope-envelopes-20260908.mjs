@@ -103,7 +103,7 @@ for (const { item, original } of cases) {
     enactedEvidence: assembled.sources, pinnedEvidenceCount: input.pinnedEvidence.length,
     contextDependentFollowUp: assembled.previousTopicApplied,
     projectFactsApplied: assembled.projectFactsApplied,
-    relevanceComparison: assembled.topicDecision?.decision === "relevance_comparison",
+    relevanceComparison: assembled.previousTopicApplied && assembled.topicDecision?.decision === "relevance_comparison",
     outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(assembled.discovery) }, { PERMITEXT_RESEARCH_WEB_SUPPORT: "1" }).useWeb;
   const requiredClaims = requiredResearchClaimsFromEvidence(evidence);
   const codeBasis = resolveResearchCodeBasis({ availableCorpora: registry, corpusPlan, resolvedAt: "2026-09-08T12:00:00.000Z" });

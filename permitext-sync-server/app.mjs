@@ -19303,7 +19303,7 @@ async function handleResearchConversationMessage(request, response) {
           pinnedEvidenceCount: evidencePackage.usage?.pinnedCount || 0,
           contextDependentFollowUp: evidencePackage.previousTopicApplied,
           projectFactsApplied: evidencePackage.projectFactsApplied,
-          relevanceComparison: evidencePackage.topicDecision?.decision === "relevance_comparison",
+          relevanceComparison: evidencePackage.previousTopicApplied && evidencePackage.topicDecision?.decision === "relevance_comparison",
           outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(
             evidencePackage.discovery
           )

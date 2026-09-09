@@ -83,7 +83,7 @@ for (const testCase of cases) {
     enactedEvidence: assembled.sources, pinnedEvidenceCount: input.pinnedEvidence.length,
     contextDependentFollowUp: assembled.previousTopicApplied,
     projectFactsApplied: assembled.projectFactsApplied,
-    relevanceComparison: assembled.topicDecision?.decision === "relevance_comparison",
+    relevanceComparison: assembled.previousTopicApplied && assembled.topicDecision?.decision === "relevance_comparison",
     outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(assembled.discovery) }, { PERMITEXT_RESEARCH_WEB_SUPPORT: "1" });
   results.push({ id: item.id, family: item.id.split("-")[0], previouslyProviderAttempted: attempted.has(item.id),
     inputSHA256: hash(JSON.stringify(input)), question: input.question, authoredPinCount: input.pinnedEvidence.length,
