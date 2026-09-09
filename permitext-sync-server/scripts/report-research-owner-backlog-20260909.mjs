@@ -16,7 +16,7 @@ async function read(file, expectedHash) {
   files.set(file, sha256);
   return JSON.parse(bytes);
 }
-const auditFile = "evals/results/research-owner-api-round2-source-resolutions-cost-audit-2026-09-09.json";
+const auditFile = "evals/results/research-owner-api-round2-source-resolution-parts-cost-audit-2026-09-09.json";
 const audit = await read(auditFile);
 const originals = await read("evals/research-reconciled-answer-key.json",
   "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455");
@@ -28,7 +28,7 @@ const ids = new Set(cohort.map((item) => item.id));
 assert.equal(ids.size, 110);
 const firstInventoryFile = "evals/results/research-owner-backlog-2026-09-09.json";
 const firstInventory = await read(firstInventoryFile);
-const priorInventoryFile = "evals/results/research-owner-backlog-v4-2026-09-09.json";
+const priorInventoryFile = "evals/results/research-owner-backlog-v5-2026-09-09.json";
 const priorInventory = await read(priorInventoryFile);
 const supplementalReviewFile = "evals/results/research-owner-unmatched-answer-review-2026-09-09.json";
 const supplementalReview = await read(supplementalReviewFile,
@@ -56,6 +56,12 @@ const sourceResolutionsReview = await read(sourceResolutionsReviewFile,
 assert.deepEqual(sourceResolutionsReview.cases.map((item) => item.id), ["DOBNOW-003", "DOBNOW-004", "DOBNOW-023"]);
 assert.equal(sourceResolutionsReview.summary.reviewProviderCalls, 0);
 assert.equal(sourceResolutionsReview.summary.reviewNetworkCalls, 0);
+const sourceResolutionPartsReviewFile = "evals/results/research-owner-source-resolution-parts-answer-assessment-2026-09-09.json";
+const sourceResolutionPartsReview = await read(sourceResolutionPartsReviewFile,
+  "6fc8b264ff89cb6893c17a92de4971a79aa52e782155bdb5dc8b38487a364b9f");
+assert.deepEqual(sourceResolutionPartsReview.cases.map((item) => item.id), ["DOBNOW-003", "DOBNOW-023"]);
+assert.equal(sourceResolutionPartsReview.summary.reviewProviderCalls, 0);
+assert.equal(sourceResolutionPartsReview.summary.reviewNetworkCalls, 0);
 
 const attempts = [];
 const runRefs = [...audit.historicalLedgerHashes, ...audit.ledgers];
@@ -174,7 +180,7 @@ const cases = cohort.map((item) => {
   let status;
   if (!attempt.delivered) status = "latest_attempt_undelivered";
   else if (!matched.length) status = "latest_answer_review_not_located";
-  else if ([supplementalReviewFile, claimScopeReviewFile, draftFocusReviewFile, sourceResolutionsReviewFile].includes(matched[0].file)) {
+  else if ([supplementalReviewFile, claimScopeReviewFile, draftFocusReviewFile, sourceResolutionsReviewFile, sourceResolutionPartsReviewFile].includes(matched[0].file)) {
     status = matched[0].findings.backlogDisposition;
     assert(["historical_whole_answer_review_pass", "delivered_with_substance_or_scope_gap", "delivered_with_presentation_gap"].includes(status));
     if (status === "historical_whole_answer_review_pass") {
@@ -197,7 +203,7 @@ const cases = cohort.map((item) => {
     status, latestAttempt: attempt, latestReview: matched[0] || null,
     fullCurrentBaselineAcceptance: "unproven", workItemIDs: [] };
 });
-for (const review of [...supplementalReview.cases, ...claimScopeReview.cases, ...draftFocusReview.cases, ...sourceResolutionsReview.cases]) for (const id of review.workItemIDs) {
+for (const review of [...supplementalReview.cases, ...claimScopeReview.cases, ...draftFocusReview.cases, ...sourceResolutionsReview.cases, ...sourceResolutionPartsReview.cases]) for (const id of review.workItemIDs) {
   const item = workItems.find((item) => item.id === id);
   assert(item && id.startsWith("R"), "Supplemental triage must use an existing repair work item.");
   item.cases = [...new Set([...item.cases.split(" ").filter(Boolean), review.id])].join(" ");
