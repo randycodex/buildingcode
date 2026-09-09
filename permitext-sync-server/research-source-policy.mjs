@@ -1,6 +1,7 @@
 import { researchDOBWorkflowRoute } from "./research-dob-workflow-routing.mjs";
+import { hasCompleteEnactedTechnicalScope } from "./research-focused-technical-scope.mjs";
 
-export const researchSourcePolicyVersion = "20260908-supporting-web-v16";
+export const researchSourcePolicyVersion = "20260909-supporting-web-v17";
 
 export const researchOfficialGuidanceAuthorityStatement =
   "Official supporting guidance — noncontrolling and not an enacted-code conclusion.";
@@ -210,6 +211,15 @@ export function researchWebSupportTrigger(input = {}, environment = process.env)
       selectedPassageSummaryPattern.test(question)) &&
     input.guidanceRequested !== true &&
     !explicitExternalLookupPattern.test(question));
+  const completeEnactedScope = !selectedEvidenceBoundaryOnly &&
+    input.guidanceRequested !== true && input.referencedStandardUnavailable !== true &&
+    !["incomplete", "unavailable", "outside_library"].includes(input.corpusCoverage) &&
+    !guidanceRequestPattern.test(question) && !officialPageRequestPattern.test(question) &&
+    !outsideLibraryRequestPattern.test(question) && !explicitExternalLookupPattern.test(question) &&
+    !input.contextDependentFollowUp && !input.relevanceComparison && !input.pinnedEvidenceCount &&
+    !input.projectFactsApplied &&
+    hasCompleteEnactedTechnicalScope(question, input.enactedEvidence);
+  if (completeEnactedScope) return { useWeb: false, reasons: ["complete_enacted_question_scope"], configuration };
   if (selectedEvidenceBoundaryOnly) reasons.push("selected_evidence_boundary");
   const workflow = !selectedEvidenceBoundaryOnly
     ? researchDOBWorkflowRoute(input.retrievalQuery || question)

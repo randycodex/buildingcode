@@ -100,6 +100,10 @@ for (const { item, original } of cases) {
   const conditional = isZoningConditionalExplanation(zoningPlan);
   const blocked = !!prerequisitePlan && (!readiness?.pass || !assembled.zoningSelection?.pass || (prerequisitePlan.disposition !== "ready" && !conditional));
   const webSupportRequested = !conditional && researchWebSupportTrigger({ question: input.question, retrievalQuery: assembled.retrievalQuery,
+    enactedEvidence: assembled.sources, pinnedEvidenceCount: input.pinnedEvidence.length,
+    contextDependentFollowUp: assembled.previousTopicApplied,
+    projectFactsApplied: assembled.projectFactsApplied,
+    relevanceComparison: assembled.topicDecision?.decision === "relevance_comparison",
     outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(assembled.discovery) }, { PERMITEXT_RESEARCH_WEB_SUPPORT: "1" }).useWeb;
   const requiredClaims = requiredResearchClaimsFromEvidence(evidence);
   const codeBasis = resolveResearchCodeBasis({ availableCorpora: registry, corpusPlan, resolvedAt: "2026-09-08T12:00:00.000Z" });
@@ -138,7 +142,7 @@ assert.equal(networkAttempts, 0);
 assert.equal(researchEvaluationSpendStatus().pendingRequestCount, 0);
 assert.equal(researchEvaluationSpendStatus().reservedUSD, 0);
 const sourceFiles = ["app.mjs", "research-config.mjs", "research-cost-usage.mjs", "research-model-routing.mjs", "research-corpus-registry.mjs", "research-code-basis.mjs",
-  "research-source-policy.mjs", "research-evidence-assembly.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-conditional-explanation.mjs",
+  "research-source-policy.mjs", "research-focused-technical-scope.mjs", "research-conversation-topic.mjs", "research-technical-topic-routes.mjs", "evidence-discovery.mjs", "research-evidence-assembly.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-conditional-explanation.mjs",
   "research-required-claim-coverage.mjs", "research-conversation-facts.mjs", "evals/research-owner-scope-input.mjs",
   "evals/research-reconciled-answer-key.json", "evals/results/research-owner-code-source-review-2026-09-08.json",
   "tests/research-request-envelope-preflight.mjs", "scripts/inspect-research-owner-full-scope-envelopes-20260908.mjs"];

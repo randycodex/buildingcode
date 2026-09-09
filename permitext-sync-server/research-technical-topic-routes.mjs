@@ -1,12 +1,14 @@
 // Reviewed source locations for recurring technical and administrative topics.
 // These routes supply enacted evidence, never answers, thresholds or Project
 // facts. The corpus router still owns edition eligibility and selected scope.
+import { focusedTechnicalTopicRoutes } from "./research-focused-technical-scope.mjs";
 const route = (pattern, label, codePrefix, sections, options = {}) => ({
   pattern, label,
   targets: sections.map((sectionPrefix) => ({ codePrefix, sectionPrefix, codeEdition: "2022", ...options }))
 });
 
 export const researchTechnicalTopicRoutes = [
+  ...focusedTechnicalTopicRoutes,
   route(/^(?=[\s\S]*\b(?:gas[- ]fired|gas\s+appliances?|fuel[- ]gas)\b)(?=[\s\S]*\b(?:bathrooms?|toilet\s+rooms?|storage\s+closets?|surgical\s+rooms?)\b)/i,
     "fuel-gas appliance location restrictions and exceptions", "FGC", ["303.3"], { descendantClaimCoverage: false }),
   route(/^(?=[\s\S]*\b(?:gas[- ]fired|gas\s+appliances?|fuel[- ]gas)\b)(?=[\s\S]*\b(?:bedrooms?|sleeping\s+rooms?)\b)/i,

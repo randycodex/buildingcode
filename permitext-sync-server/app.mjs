@@ -19299,6 +19299,11 @@ async function handleResearchConversationMessage(request, response) {
       : researchWebSupportTrigger({
           question,
           retrievalQuery: evidencePackage.retrievalQuery,
+          enactedEvidence: assembledEvidence,
+          pinnedEvidenceCount: evidencePackage.usage?.pinnedCount || 0,
+          contextDependentFollowUp: evidencePackage.previousTopicApplied,
+          projectFactsApplied: evidencePackage.projectFactsApplied,
+          relevanceComparison: evidencePackage.topicDecision?.decision === "relevance_comparison",
           outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(
             evidencePackage.discovery
           )

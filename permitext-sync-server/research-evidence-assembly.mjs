@@ -10,8 +10,9 @@ import {
 import { targetedDefinitionExcerpt } from "./research-definition-excerpts.mjs";
 import { targetedZoningContextExcerpt, isCompleteSectionSelection } from "./research-zoning-context-excerpts.mjs";
 import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./research-topic-dependencies.mjs";
+import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260908-focused-ventilation-v30";
+export const researchEvidenceAssemblyVersion = "20260909-focused-technical-v31";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -812,7 +813,8 @@ export async function assembleResearchEvidence({
         compactText(candidate?.codePrefix).toUpperCase() === "BC"
       )
     : relevanceCandidates;
-  const candidates = focusedVentilationCandidates(query, boundaryCandidates, pinnedEvidence.length);
+  const candidates = focusedTechnicalCandidates(query,
+    focusedVentilationCandidates(query, boundaryCandidates, pinnedEvidence.length), pinnedEvidence.length);
   const nonMaterialCandidateCount = prioritizedCandidates.length - candidates.length;
   await onStage?.("searching_authorized_library", "completed");
   await onStage?.("reviewing_provisions", "active");

@@ -18,6 +18,15 @@ const history = [{
 }];
 const historySnapshot = structuredClone(history);
 
+const standalone = decideResearchConversationTopic({
+  question: "This work is permit-exempt. Does that exemption waive an otherwise applicable zoning requirement?"
+});
+assert.equal(standalone.signals.relevanceComparison, true);
+assert.equal(standalone.decision, researchConversationTopicDecisions.topicSwitch,
+  "Comparison wording cannot refer to an earlier conversation when none exists.");
+assert.equal(standalone.contextPolicy.includeRootTopic, false);
+assert.equal(standalone.contextPolicy.replaceRootTopic, true);
+
 const continuation = decideResearchConversationTopic({
   question: "Explain that in more detail.",
   previousMessages: history

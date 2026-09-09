@@ -80,6 +80,10 @@ for (const testCase of cases) {
     truncated: source.truncated, structuredTable: !!source.richSourceGrids, targetedDefinition: !!source.targetedDefinition,
     ...(source.targetedZoningContext ? { targetedZoningContext: source.targetedZoningContext } : {}) }));
   const web = researchWebSupportTrigger({ question: input.question, retrievalQuery: assembled.retrievalQuery,
+    enactedEvidence: assembled.sources, pinnedEvidenceCount: input.pinnedEvidence.length,
+    contextDependentFollowUp: assembled.previousTopicApplied,
+    projectFactsApplied: assembled.projectFactsApplied,
+    relevanceComparison: assembled.topicDecision?.decision === "relevance_comparison",
     outsideLibraryRequired: researchDiscoveryNeedsAutomaticWebSupport(assembled.discovery) }, { PERMITEXT_RESEARCH_WEB_SUPPORT: "1" });
   results.push({ id: item.id, family: item.id.split("-")[0], previouslyProviderAttempted: attempted.has(item.id),
     inputSHA256: hash(JSON.stringify(input)), question: input.question, authoredPinCount: input.pinnedEvidence.length,
@@ -115,7 +119,7 @@ const report = { schema: "permitext-owner-authored-source-diagnostic-v1", checke
   scope: "All 110 authored question/scenario inputs, Project facts and selected passages/section IDs through production corpus planning and evidence assembly. Zoning planning/selection/readiness and conditional response eligibility run with local diagnostic eligibility. Original property prerequisites remain recorded separately; conditional eligibility does not resolve the determination. Web triggering is inspected separately, but no document is fetched. No answer generation, semantic grading, saved answer, full HTTP dispatch, latency benchmark, public eligibility or professional approval is claimed. Exact reference presence does not prove source or answer completeness.",
   sourceHashes: { ...Object.fromEntries(await Promise.all([
       "app.mjs", "research-zoning-planner.mjs", "research-zoning-temporal-application.mjs", "research-zoning-safety.mjs", "research-corpus-registry.mjs",
-      "research-dob-workflow-routing.mjs", "research-source-policy.mjs",
+      "research-dob-workflow-routing.mjs", "research-source-policy.mjs", "research-focused-technical-scope.mjs", "research-conversation-topic.mjs", "research-technical-topic-routes.mjs", "evidence-discovery.mjs",
       "research-evidence-assembly.mjs", "research-zoning-context-excerpts.mjs",
       "research-topic-dependencies.mjs", "project-foundation-contract.mjs",
       "research-zoning-conditional-explanation.mjs", "research-model-routing.mjs",
