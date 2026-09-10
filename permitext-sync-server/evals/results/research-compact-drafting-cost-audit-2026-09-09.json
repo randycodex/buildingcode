@@ -1,0 +1,163 @@
+{
+  "schema": "permitext.research-compact-drafting-cost-audit.v1",
+  "auditedAt": "2026-09-10T01:08:23.871Z",
+  "authorizationUSD": 8.5,
+  "authorizationAmendment": {
+    "file": "evals/research-owner-api-round2-authorization-20260909.json",
+    "sha256": "bef70aa9e7f1df674904c6d6cd9c550dbeb491e28eb11e5e7038592e95b49f44",
+    "schema": "permitext-owner-api-authorization-amendment-v1",
+    "recordedAt": "2026-09-09T10:56:18.961Z",
+    "approvedOn": "2026-09-09",
+    "roundID": "owner-api-round2-20260908",
+    "previousAuthorizationUSD": 8,
+    "additionalAuthorizationUSD": 0.5,
+    "authorizationUSD": 8.5,
+    "approvalBasis": "The owner replied yes to: May I increase the API testing allowance by $0.50 for the next capped comparison?",
+    "scope": "The next capped comparison of DOBNOW-023 and DOBNOW-003 after the local v10 repair. Historical spending remains recorded. No Project workflow, UI, phone, deployment or price change is authorized by this amendment."
+  },
+  "previousAudit": {
+    "file": "evals/results/research-owner-api-round2-attestation-preparation-cost-audit-2026-09-09.json",
+    "sha256": "d816afc721960c53003f86c6da46588b7c82b7a30b1fca0ba8965fa543c1b22e"
+  },
+  "ledgers": [
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sha256": "f406901dcca5f06398166f4a08bcfbadf6639bf24755777a0c7a9434d8ca7d8f"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sha256": "f991b5d3ce3757dddbea968291341571817c8cf9f3703101766766047c39ba57"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sha256": "6cacf237b64e02d3b388adafea5f0b48865f3c9778e5d15e77b8fc19b8de03ca"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sha256": "485cba41a9c4a277347fa950f590c2ed25ebb6f48fe35b55f5d3e8fdae3bba12"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sha256": "68f098015f6d49060f62a725dc805f76b6f4692203e30f9de45cd3e8282a6cc9"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-lot-history-2026-09-09.json",
+      "sha256": "102534c93f3b63786d3ac946a3b8af1270def90a7693acae633c8a2d921869bb"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-storage-scope-2026-09-09.json",
+      "sha256": "38d20c59f2b62a81f6f8e5a89855708f53124b390e5b075f48b2cec3bfc74eae"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-mapped-review-2026-09-09.json",
+      "sha256": "5aa60daf1e734b9f4ff386d71abff2f4c20b80db96a3c968343c3b873881b7b5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-loft-pdf-2026-09-09.json",
+      "sha256": "f89cce9d535794630a575361d9ad86ec5795b1c6eba825294628af0f4d503042"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-guidance-precision-2026-09-09.json",
+      "sha256": "150a16789728f63b6520ceca8102eb9f1ced85bb20af0f3a9d826b433be8fc31"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-workflow-coverage-v2-2026-09-09.json",
+      "sha256": "2335d7b512ff17f7a76f46fd4fd6a249fe76d4e81484cbcf45a5fcc9757fc0e4"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-qualification-review-2026-09-09.json",
+      "sha256": "c15946fd67a5b6c0b59635ddaea9c6ed61aa384b81ea0997eb503cdf30228a95"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-span-2026-09-09.json",
+      "sha256": "17c9a21fbcbecb476023b7f52a8d6801d5b61b11763e33e1a5167b33e85b3bc2"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-relationships-2026-09-09.json",
+      "sha256": "bd547e03b922ce3131d8c919445e1cffc118321a2a500a18dd02ffb5076ac18e"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-decision-scope-2026-09-09.json",
+      "sha256": "44404c9d63762081603834b505584fcd04dd15f2be87d260664f76da14892896"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-claim-scope-2026-09-09.json",
+      "sha256": "96bf0051c296cc9f7a07b35093b6159093de6b968f2204e649d058369bd14978"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-draft-focus-2026-09-09.json",
+      "sha256": "8d5a6d2721446e9880590741989745c3ad08522e0e97a7e379856cdee4c1940b"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-resolutions-2026-09-09.json",
+      "sha256": "c673e5257eae56cb23587ca69d7be660f12c0eb77de5923a84e7e95e9e2494ed"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-resolution-parts-2026-09-09.json",
+      "sha256": "7cc352badc9e6ed4ac022784ff022ccedbf7d508cc66bac7ef2820302a9a9d7a"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-attestation-preparation-2026-09-09.json",
+      "sha256": "af3e04e457c002d70d9ec0d510cc93fe897b430db782108677fdc34d0854495d"
+    },
+    {
+      "file": "evals/results/research-compact-drafting-live-2026-09-09.json",
+      "sha256": "2d608dd373cc6a05e8bbbbc8b21a3ca4440428527dce5df2c026930207507142",
+      "kind": "isolated-provider-experiment"
+    }
+  ],
+  "summary": {
+    "previousConservativeUSD": 8.351519,
+    "experimentConservativeUSD": 0.040994,
+    "conservativeUSD": 8.392513,
+    "remainingConservativeAuthorizationUSD": 0.107487,
+    "previousUsageEstimateUSD": 4.41906007,
+    "experimentUsageEstimateUSD": 0.0225,
+    "usageEstimateUSD": 4.44156007,
+    "liveProviderCalls": 2,
+    "pendingProviderRequests": 0,
+    "maximumExperimentUSD": 0.148481
+  },
+  "limitations": [
+    "No second additional $0.50 authorization was used. The aggregate remains $8.50.",
+    "These are versioned development ledger estimates and conservative spending bounds; provider balance and invoice were not checked.",
+    "No retry, paid search, third model, app account delivery, Project workflow, push or deployment.",
+    "The old 29-ledger audit remains immutable. This audit adds the single-use experiment as ledger 30."
+  ]
+}

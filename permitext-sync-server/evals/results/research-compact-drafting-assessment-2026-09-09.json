@@ -1,0 +1,111 @@
+{
+  "schema": "permitext.research-compact-drafting-assessment.v1",
+  "reviewedAt": "2026-09-10T01:08:23.870Z",
+  "runFile": "evals/results/research-compact-drafting-live-2026-09-09.json",
+  "runSHA256": "2d608dd373cc6a05e8bbbbc8b21a3ca4440428527dce5df2c026930207507142",
+  "baselineFile": "evals/results/research-owner-api-round2-live-attestation-preparation-2026-09-09.json",
+  "baselineSHA256": "af3e04e457c002d70d9ec0d510cc93fe897b430db782108677fdc34d0854495d",
+  "referenceFile": "evals/research-reconciled-answer-key.json",
+  "referenceSHA256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455",
+  "expectedAnswerSHA256": "e86124c25bcf3bda49f5a5a11bfcca6aa4ac1834c1df639ada5e323e3f4b595e",
+  "decision": "do-not-promote-compact-instructions",
+  "completeAnswerAccepted": false,
+  "comparison": {
+    "instructionBytes": [
+      8532,
+      1379
+    ],
+    "draftRequestBytes": [
+      27437,
+      20284
+    ],
+    "draftInputTokens": [
+      5946,
+      4729
+    ],
+    "providerPhaseMilliseconds": {
+      "baseline": [
+        6500,
+        12834
+      ],
+      "candidate": [
+        6983,
+        10997
+      ],
+      "baselineTotal": 19334,
+      "candidateTotal": 17980
+    },
+    "conservativeUSD": {
+      "baseline": 0.047102,
+      "candidate": 0.040994
+    },
+    "usageEstimateUSD": {
+      "baseline": 0.0255608,
+      "candidate": 0.0225
+    },
+    "baselineVerifierPassed": true,
+    "candidateVerifierPassed": false
+  },
+  "findings": [
+    {
+      "status": "retained",
+      "finding": "Direct No, permitted preparation/data entry, applicant and owner attestation duties, applicant submission, and the conditional Condo/Co-Op Board attestation remain in the main answer.",
+      "paragraphs": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "status": "still-missing",
+      "finding": "The applicant review action remains absent. Paragraph 0 says final signature at preview and attributes review to the owner; that does not state the applicant must review the filing.",
+      "sourceClaimID": "official-passage-2fdbbdf8c6ad0af5f5225a8d",
+      "paragraphs": [
+        0
+      ]
+    },
+    {
+      "status": "improved-binding-only",
+      "finding": "The STEP 6 source/claim is now bound to paragraph 0. Correct source binding alone does not supply the omitted applicant-review action.",
+      "sourceClaimID": "official-passage-2fdbbdf8c6ad0af5f5225a8d",
+      "paragraphs": [
+        0
+      ]
+    },
+    {
+      "status": "presentation-gap",
+      "finding": "The response repeats the submission prohibition and adds an unasked payment capability. Owner Type is restated as both a missing fact and an evidence limitation after the conditional branch is already given.",
+      "paragraphs": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "status": "verifier-disagreement-retained",
+      "finding": "The unchanged verifier disputes the no-substitute-attestation conclusion that appears in the reference and was accepted in the earlier baseline. It also appears to read the verb permit in \"or permit representative submission\" as part of a role name. These are development-review concerns; the negative verdict remains unchanged."
+    },
+    {
+      "status": "verifier-omission",
+      "finding": "The verifier credits STEP 6 as addressed for final signature, without detecting the still-missing applicant review action."
+    }
+  ],
+  "mainText": "No. The filing representative cannot attest for the applicant or owner, or submit this job filing. The applicant must electronically sign the filing, including a final electronic signature at preview, and officially submits the job filing. The owner must complete the Owner’s Attestation to authorize the applicant and acknowledge review of the application; all job filings require that confirmation.\n\nA filing representative may enter and view filing information and make payments on associated jobs, but cannot submit filings or permits. Thus, completed data entry and uploaded documents do not substitute for the applicant’s and owner’s required attestations or permit representative submission.\n\nIf the Owner Type is Condo Unit Owner or Co-Op Tenant-Shareholder, the Board representative is also a required stakeholder and both the owner and Board representative must attest before the filing can proceed.",
+  "rawVerdict": [
+    {
+      "type": "unsupported_requirement",
+      "detail": "The answer states that a filing representative cannot attest for the applicant or owner, but the supplied guidance identifies who must complete the applicant’s and owner’s attestations without expressly stating that a filing representative is prohibited from attesting for them."
+    },
+    {
+      "type": "unsupported_requirement",
+      "detail": "The phrase “permit representative submission” is unsupported and imprecise; the guidance states that a filing representative cannot submit filings or permits, while the filing-submission guidance assigns submission to the applicant."
+    }
+  ],
+  "limitations": [
+    "One historical comparison, not randomized repeated A/B testing. No p50/p90 or reliable speed gain.",
+    "Provider-phase time excludes current source retrieval, account HTTP orchestration and user-visible delivery. Neither compared whole answer earns full acceptance.",
+    "No production prompt, source gate, verifier, answer key or acceptance count changed. This isolated result is separate from the latest app-HTTP cohort ledger.",
+    "The cheaper drafting request does not establish better full-answer quality. Do not adopt the variant or launch repeated prompt tweaks based on this result."
+  ],
+  "nextDecision": "A fresh multi-case end-to-end comparison needs a separately adequate approved allowance. Retain the existing runtime; no further paid call is authorized beyond the remaining aggregate cap."
+}
