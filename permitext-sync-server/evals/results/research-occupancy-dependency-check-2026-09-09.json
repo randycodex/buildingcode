@@ -1,0 +1,988 @@
+{
+  "schema": "permitext.research-occupancy-dependency-check.v1",
+  "checkedAt": "2026-09-10T00:57:35.842Z",
+  "researchTopicDependencyVersion": "20260909-occupancy-dependencies-v3",
+  "researchEvidenceAssemblyVersion": "20260909-occupancy-review-dependencies-v35",
+  "sourceHashes": {
+    "app.mjs": "1b0d9b1c2cafab063ba96464b077798bfc17e868da66e76be7158031d29f01dd",
+    "research-topic-dependencies.mjs": "587965ff867e0c5b96ee8c34811e6b779d6578934720b991f57c94050ae40336",
+    "research-evidence-assembly.mjs": "3a0a8e52bf88c98f195fd1d7a853906337f4578c075c9315ca0c1e36f3db10d0",
+    "evals/research-owner-scope-input.mjs": "03a5cce96d6434fe33ffd9ec120cca2f53be56317b31486d3ce35452eddce78e",
+    "tests/research-occupancy-dependencies-contract.mjs": "7f01fb11256df8dd2c4bfc1640dc57ff7d34cdcec9be3ba87c675f8786776e56",
+    "tests/research-plumbing-source-repairs-http-contract.mjs": "79b09489a7258b8bb5df921a805efaa6deedf3c8e58cccd5f03dbb7b87c4c399",
+    "scripts/check-research-occupancy-dependencies-20260909.mjs": "48f8a138b411cdf4da195282117d9e1bc0699c36f8421db37caeda538b38908f",
+    "package.json": "2261a6f9ab16fe559e8f9dca5e976a1e9b85f40319f42eaeeb85110ba074dfd2",
+    "../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/sections/9195.json": "0ef7120bea48ec1310191ca8180d247acb3a8df7c3c47f0ff79c887c6a4c9714",
+    "../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/sections/9222.json": "3844cfc31c565e0ba3a1516b745ee40f65eb0307ab1094f3955b42de7762b417",
+    "../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/sections/9223.json": "8ed4e1f3ae2085032388645f9ec572fd02be076c8ecefe6a2b9d136c8daa76e0",
+    "../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/sections/9224.json": "3f66fd99fc89c1ad6436496903782137cb5255b6624a00c2f8a9bdd3ee003c47",
+    "../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/sections/9225.json": "77c3b899a43800097fba80a4be45bfdbc6673d9e96156aa1dc3d7cc6ff9fff2a",
+    "../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/sections/9226.json": "6191fcb35d4a7da4c75099b15c3969661d9049a90285a916089a9dce731c5d1d",
+    "../NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes/prepared/sections/9234.json": "3781fc6cfdc2e2cbef856ff1e3e495dd77452824aadd69823b9a92a2ef724c77"
+  },
+  "inputs": [
+    {
+      "file": "evals/research-reconciled-answer-key.json",
+      "sha256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455"
+    },
+    {
+      "file": "evals/research-owner-code-candidates.json",
+      "sha256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7"
+    },
+    {
+      "file": "evals/results/research-occupancy-dependencies-baseline-2026-09-09.json",
+      "sha256": "67722fb0f22ebaf0fce3b1aa25c2443255d7710f72e8db1d4e1a589ee0001d74"
+    }
+  ],
+  "summary": {
+    "questionPredicatesChecked": 110,
+    "matchingQuestionIDs": [
+      "GAP-14"
+    ],
+    "actualRetrievalComparisons": 1,
+    "baselineSources": 17,
+    "preservedSources": 17,
+    "currentSources": 21,
+    "addedCompleteSources": 4,
+    "baselineCharacters": 24161,
+    "currentCharacters": 27546,
+    "newlyGeneratedAnswers": 0,
+    "providerCalls": 0,
+    "networkCalls": 0,
+    "liveAnswerAcceptanceConfirmed": false
+  },
+  "input": {
+    "question": "Construction is complete and the project has passed its inspections, but the required Certificate of Occupancy has not yet been issued. Can the owner occupy the building because the physical work is finished?",
+    "projectCodeVersion": "2022 New York City Construction Codes",
+    "projectFacts": [],
+    "pinnedEvidence": [],
+    "messages": []
+  },
+  "routes": [
+    {
+      "id": "CC-01",
+      "authoredInputSHA256": "a7b341e83c3e8c249bec4cedb328d9cf8321125b7cb7977f4cffe88dd490b5a6",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "CC-02",
+      "authoredInputSHA256": "a906f35bfafb4eeff9f65dba51df3d12e8aca111b47c237a5db9f3b12e9fcbb7",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "CC-03",
+      "authoredInputSHA256": "56ef0828b2ba6640ffff420d755446af5ff45bcacdd993cbe427c8c688c24a82",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "CC-04",
+      "authoredInputSHA256": "ed2e311316574a568977f59616796efea9e513e8bbba045f93ead99d8a4ac003",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "CC-05",
+      "authoredInputSHA256": "fde91613c682799238433de4b23b245cbe60231337591bbc5ef634581a4bc28b",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-01",
+      "authoredInputSHA256": "493cfa89342b223eac2eda1047388956fd667452ddad193abbbce9e1c865fcb0",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-02",
+      "authoredInputSHA256": "3e3869b33fdfbc7593abb68ed8cc0abe24493bf6db0d34c467385d0c240fe9a7",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-03",
+      "authoredInputSHA256": "98b25e17083b1ec7beca9a5d94072cc89db6409f3be51c6ae5612952f8f1770c",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-04",
+      "authoredInputSHA256": "fcac143a86f5cd072ca2a9dcf935e3593360d9539f33cd10597986f068c1a2bc",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-05",
+      "authoredInputSHA256": "f4cb3b9f53534ff845962746c7eade46a3cab446c240106138dc3c447c8d9861",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-06",
+      "authoredInputSHA256": "3fa70b15d9febe7d7d05102c8f7db199350747b8e2788f3801538039284b985f",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-07",
+      "authoredInputSHA256": "5fcc4f363aa30b6b3ee1d496c834ee9271eedaff47b3eecc5ef00f92155e3cdf",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-08",
+      "authoredInputSHA256": "822dbb7b3da8e20d299e63c292de981153eb48bbc04a805861f3894b1b0589c7",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-09",
+      "authoredInputSHA256": "2a988abd132792a81e4104ea4ce3d9c61ea56b1df51c66079d5c317c599a60c4",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-10",
+      "authoredInputSHA256": "8777b3d4e1d6da63f697ae1cd06bdf9bbe589a9e854809d1f5083fe446da5dd6",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-11",
+      "authoredInputSHA256": "5e3bcf4cc7e2e99244b95de2ed4cd101b7798d182f5586cd39e60f39899d08db",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-12",
+      "authoredInputSHA256": "7492e120892a71f4528120959248a148d45755c00bae85ab984aed75d42251d1",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-13",
+      "authoredInputSHA256": "a17cbe13280fa26ce9a3a717d4f32374b528835058fb32f5de58c24194f7b3d3",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-14",
+      "authoredInputSHA256": "f0bed626422e13a0bf8870cf20d35e9afdb94b6a37d5c986506f61869568f9ff",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-15",
+      "authoredInputSHA256": "db55f664247fb1caf7a12d7d7cf1d845a4bda7a2e6cd97e102e4569a399e49d8",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-16",
+      "authoredInputSHA256": "c5278db259385dc8b5aede97d363f05daa1e9d805b635e9d2de56be9b1212351",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-17",
+      "authoredInputSHA256": "d36cee85c04c7abb76a6addb287a2fe5087e46d8b11847635f7e9305e81f33af",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-18",
+      "authoredInputSHA256": "69c3e87b7fbed165b6850c1134ce1cd1c30ec5588a55d561f567c9aa3cd1d737",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-19",
+      "authoredInputSHA256": "cbe137fe86be80a9f03d4eb2bf95f04e45e0eac5b49d3fd27ba7a6a7e1632ce0",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-20",
+      "authoredInputSHA256": "88fcfb02683d0a05b4450b076d775d94bed04a1e54ff18addcb29afb40add985",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "ZR-21",
+      "authoredInputSHA256": "78c1e6d1c6f1fcbd7a5079fc859c00763978859108d85f3166cfa830626afe45",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-001",
+      "authoredInputSHA256": "4cd643ac879632820aa66d55ba8afcd692c2d67d9e9aea087e5d723623515879",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-002",
+      "authoredInputSHA256": "a234fa9933a8cda1d2ea3a5390f170840160a9068abc2eb501e3a6eb74f64acd",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-003",
+      "authoredInputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-004",
+      "authoredInputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-005",
+      "authoredInputSHA256": "6ec0e535ece5afc5a256b75f978ebfe24016aa17a99fce990cf6c070e12a17fa",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-006",
+      "authoredInputSHA256": "30f752164ffaa6cd9862b763c580bf220adafd21651ea9d20f1680ea6aff8698",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-007",
+      "authoredInputSHA256": "fcb231ddb4605d3975d20cc3c4f1d20684a5b6f42eb0da6cf1d41f93628a8b4b",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-008",
+      "authoredInputSHA256": "d33c19c69ab1f6fb5981386eadcf5c1cd65c58f7f5b67258492f365ffe884815",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-009",
+      "authoredInputSHA256": "37fc2427c29161fc419702e0d0b81cc516986f46dc4c1409eae68c29d8837690",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-010",
+      "authoredInputSHA256": "00c7df7639cf812e7df4c94ae0006a28b21175b965d5317863a9d16ad96faeb3",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-011",
+      "authoredInputSHA256": "13fc63df66732233b28a7e0781ca0e5dc12c2a5529145016571469f60491952d",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-012",
+      "authoredInputSHA256": "fdce0b3e6b5040b5b8daca22240582b5e3f0713f736c68505845d230cb6206af",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-013",
+      "authoredInputSHA256": "dd2377f7a8a14f78b23aafbf7037ec97a7adc04efea80db4407e1c462460dd04",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-014",
+      "authoredInputSHA256": "6310c53162c9a125c10cb37bf94a6545c4ca249c69a750a577f9b8b1203df9c9",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-015",
+      "authoredInputSHA256": "1b938d5b2bd20b415df3c20ef1fb533793e471ff46c050f42fcadcc540396385",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-016",
+      "authoredInputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-017",
+      "authoredInputSHA256": "50c015af7367d48909a1f3cda737096511939d4737f658984c4f3c77d6afe347",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-018",
+      "authoredInputSHA256": "d735219b9bb802ca0c7021eaacd1fad207065e59cddaa6f4082fe75b6ffd8243",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-019",
+      "authoredInputSHA256": "208c7d06f30d27f971b1410c69d19a1360efe193ab90fd480f53f3f22a79968e",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-020",
+      "authoredInputSHA256": "bcf9e23c1414c2f06aff5870151d2f1f716074e011da2778eb0d48da75fa7611",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-021",
+      "authoredInputSHA256": "5522267061751e82aef377a93ef8b6b8f5eab50a57a9ed9739e46e010c65c70c",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-022",
+      "authoredInputSHA256": "4052ee13f21021b968d32c00a08095d1114c5a5d8ec780c3b85c9bcaa0fd22fc",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-023",
+      "authoredInputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "DOBNOW-024",
+      "authoredInputSHA256": "02ff4cc071196baa769bc8583ff0b6e4337926e237b2657883525f86014deb8c",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-01",
+      "authoredInputSHA256": "cdca6f41c1a51204276c695e8ca1eb836532b3c4c361ddd77e176e7e691f6e3a",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-02",
+      "authoredInputSHA256": "ea13d1011d30bef9965f1d4c86403310628d5e65d59e84af0dfc506a8e36bbca",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-03",
+      "authoredInputSHA256": "1a795ca445422c512b7418dcfa9a85cace3409d8c987cfb7c009f0026856b42d",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-04",
+      "authoredInputSHA256": "3f6c95861926cfd121b351dacbf64656ee02414f4c7c94391e245e01dcbfab1f",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-05",
+      "authoredInputSHA256": "f3f205b156798ed6f8ff923698de8e5b5b8db367d979ede3728c932cd69fae77",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-06",
+      "authoredInputSHA256": "3c9343a346c3e8bbb2b9b7b4188c29967de1e1c4666deccab644e8b3b6de35be",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-07",
+      "authoredInputSHA256": "c3ed522f6d3aeb2d370cb7f87500862f18109d9248469e8a5735e36bb97cd0b3",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-08",
+      "authoredInputSHA256": "fd956466eb2d9069675160d6bc409b6576b0ca9508bc8e006d4dfdf39146f70d",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-09",
+      "authoredInputSHA256": "4361de1b510c71284a6c768433d2962e4db44cc542e561595ac184569f0796ff",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-10",
+      "authoredInputSHA256": "fdb1f5c00cda0092da8cdcbe882d2b179b1fb33239d060b916504bcd8caa2e00",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-11",
+      "authoredInputSHA256": "038f8307710b6b0324ec6d3e441eb7b4940fa67a097e3a9b4ba8eb17bcef57e5",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-12",
+      "authoredInputSHA256": "cc7180250aa68bf2e29dc8d410d42451b51c2817202e21e6b3f7fe8861b9bbd1",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-13",
+      "authoredInputSHA256": "f1227c268613c1a040060a32480fca3ec7e04823766f4cf49442f34ee5040b0e",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-14",
+      "authoredInputSHA256": "41f5c41f2adb057d5e5c0c8f747a425c9d5fde053a978ca59391de26e5e94092",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "FGC-15",
+      "authoredInputSHA256": "333ec0d5602bc81292fd3be1a40ec1db59a9de95acecdbce63fefb767745bfe6",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-01",
+      "authoredInputSHA256": "d60effb81376608e59a1463704885b1990bec1462d39b39323480702faac7364",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-02",
+      "authoredInputSHA256": "cf5b1458517fda6e7dd7489734e76ce42ad92a549922fa09e7365bc45f327212",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-03",
+      "authoredInputSHA256": "5d00ce658daba0b279fa59590639f3480ce8b60b7656165d4206f77997344dfa",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-04",
+      "authoredInputSHA256": "ea95bb57abc34302382b92bbad81e4884f8b2ae9ffe6a24a3e39d9cec2a2f7a4",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-05",
+      "authoredInputSHA256": "1649561bdf0a9ce39f4c13ba07038abfd2ca62fedf7fed0a05c085dbe248e978",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-06",
+      "authoredInputSHA256": "b9a951cb0fc5bfc249a51131502f8f43b57369f8cc38a671b82e01bf105fc299",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-07",
+      "authoredInputSHA256": "bb718cdd38e1392c6b97eaccc4b5008a0cf934d65efd1ee6b3a7910f543bdffd",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-08",
+      "authoredInputSHA256": "0639df82464201ad460b59d1f78f437cbdeeffc22bb642d2688fc36f6a1a6c0b",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-09",
+      "authoredInputSHA256": "507fe315d964a751d4b9e66008989180582ca797e191a4cd21e4cabbfc54127a",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-10",
+      "authoredInputSHA256": "3e38c1bd791f407bd2e5e6881c0e6c9709b76a215b53a64b43494f9ba9db2381",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-11",
+      "authoredInputSHA256": "3afd0ac4549c292303046c389ca59715d8dd8cfe011ec11d17c3afcb2eafacc7",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-12",
+      "authoredInputSHA256": "f62d445e3e6e037d7e9db8ed19b821f07f497e5cf01a2103c0164cf87f082743",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-13",
+      "authoredInputSHA256": "be185cd980afb23f2dbf1fca8b1268a6a28c96864b9d9848a8943e59100bd1a2",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-14",
+      "authoredInputSHA256": "260d0f2efe9d8933dd20977015891390e013b9c36bdd738d3ca0fa0e9fe24baf",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "MC-15",
+      "authoredInputSHA256": "db058bab439a31cc71a91b6b9fcf8c9936af0ae7b3a952ad11569eca577867b8",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-01",
+      "authoredInputSHA256": "b0550366be3c5cb3cbb61f3175144f6cc4964178a08e516174e05c37230c8477",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-02",
+      "authoredInputSHA256": "eab94c541bdc47c4c56f91ccfbfcaf5b20626c6bd3fc95048fd38e2cfc02c9f5",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-03",
+      "authoredInputSHA256": "786f4d5e5b5fe8d48f636d4e0536511ad7ad67b65769c33e1e48f948f9218497",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-04",
+      "authoredInputSHA256": "7689499faef837d8f2d46436c63c0c6447252309f41a97000774d9b2d78e7cbd",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-05",
+      "authoredInputSHA256": "7f09f11c062f1f19f77415fe2cfc6e46931bc35d446070a26ac7cbf4caa566e8",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-06",
+      "authoredInputSHA256": "0abe1174604be439e088918b89beef2ba039554791e0e3d142f3d01ac41d8ef8",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-07",
+      "authoredInputSHA256": "2e1b755405a232eef0fa33a242e40f3b3c8bfc47bd0c123eff8085f9e5e45b63",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-08",
+      "authoredInputSHA256": "d24e447e97c5d5bc2ff29275dfae6aaad12f7ad75cf073aa48e57a4c50a0da13",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-09",
+      "authoredInputSHA256": "ad6040cb9e0410b4b68980584c0f53a4c2b5d39e5ddf5b4c991a3f70db092c54",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-10",
+      "authoredInputSHA256": "a639f54c09818ffcf49aa53be263e0fdd157a08a8c812e5b53d63c1c4854ce3b",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-11",
+      "authoredInputSHA256": "369bcfe72531397105c16efe03e5f03952d6a45251310bb0c39e3c164a7bd405",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-12",
+      "authoredInputSHA256": "29d4a2885c2353a960a2562f6a698cc2639f45fa42edd795493c1531d9d346c2",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-13",
+      "authoredInputSHA256": "9f7f8dd5f35938934986e1f842ceda8530ac9fa5740e263ba86390bf2f375913",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "GAP-14",
+      "authoredInputSHA256": "701f84751f8f8fb9c4bc7bcf1eed180e1e6f706c19574d67ee4dc53a70eb3d05",
+      "occupancyQuestionPredicateMatches": true
+    },
+    {
+      "id": "GAP-15",
+      "authoredInputSHA256": "9bd1ba44113017fe6fd6c553d295c26a12fbec24a9b6febf8de1f21d6701c272",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-01",
+      "authoredInputSHA256": "f875268eea2e4f073a1c02db0aa01ba1cc02342b1fe4610fbb2b4f48f464151a",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-02",
+      "authoredInputSHA256": "2153718362110e26172d5d3c18ce43160308afd827e83788145df0d5498f89a5",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-03",
+      "authoredInputSHA256": "09c3a6affdb0e5ebb6b0d9d693a0ba75fca0eebb6d8aa285a65b4d1aaea7a783",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-04",
+      "authoredInputSHA256": "9d41ecca4caac0adb046438eafb997bf18f96dedc05f406de96f0b943a7f5e90",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-05",
+      "authoredInputSHA256": "5784d46da5e710f6f9d81ccd3338e3161df26b8831e15c83f9b6a7419c888283",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-06",
+      "authoredInputSHA256": "7ee33157a4fb0c10de807ca2896e47ca76fba736c6b9a1ba001db384f32dc7dd",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-07",
+      "authoredInputSHA256": "0090d9ad56c87640cb8e7ece2d35cfa2b5f5250beb727401744499c0a702e70a",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-08",
+      "authoredInputSHA256": "bb16b2b207c6364df58909c20aabc0a4e8bb10ee09ea9999e52015c774b9932b",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-09",
+      "authoredInputSHA256": "3ee120d8f136881adb3f336a6a12f5b510c67389f9226577225b733e7a7ecebc",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-10",
+      "authoredInputSHA256": "6f54cb02dc567786e865e76a29259f515079ded9d04eef43139cce8ae3b88e0a",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-11",
+      "authoredInputSHA256": "518dda98b208a75a15cb479b02f8e3cc6ade40306c15b612493ff17fba04b595",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-12",
+      "authoredInputSHA256": "8f78216a421ecca46d52ec5b77ac63fdd397dd178e8e748e7fec6267e4f31e6e",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-13",
+      "authoredInputSHA256": "c3c6c16cdd26891ca3c966057480f193eb315aab3c0a5ec8b61256f8d3fa94cf",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-14",
+      "authoredInputSHA256": "1911cae004a21de5487cc2d3f7f5573d4267d1829b07008a9c9d83159e4e6e23",
+      "occupancyQuestionPredicateMatches": false
+    },
+    {
+      "id": "PC-15",
+      "authoredInputSHA256": "09402bbd1356819ce0f340f937d4595c28b0cfe39e9a2360338ad3130ea02c9f",
+      "occupancyQuestionPredicateMatches": false
+    }
+  ],
+  "retainedSources": [
+    {
+      "sectionID": "9195",
+      "reference": "AC 28-118.1",
+      "sourceID": "research-permitext_discovered-id:9195-1",
+      "textSHA256": "f617a3c911c62efcf68ba7e3c39b15cf8b10f28498e2d598e5aebba925227810",
+      "characters": 314
+    },
+    {
+      "sectionID": "9169",
+      "reference": "AC 28-116.2.4.1",
+      "sourceID": "research-permitext_discovered-id:9169-2",
+      "textSHA256": "0be891df5a1b932b2d3bbab50a1b3d2ec214633cd8e1c8a900be81b5ba410785",
+      "characters": 1426
+    },
+    {
+      "sectionID": "9530",
+      "reference": "AC 28-304.6.4.1",
+      "sourceID": "research-permitext_discovered-id:9530-3",
+      "textSHA256": "41b76e2d234fd7358b9f0500eb79a439052736fdcc308215f252e0cae5cd69c6",
+      "characters": 897
+    },
+    {
+      "sectionID": "10189",
+      "reference": "AC 28-507.6.1",
+      "sourceID": "research-permitext_discovered-id:10189-4",
+      "textSHA256": "28124420631c3522c3f3b94ef850dbfc2894748abf08388ae634ec773878f9ad",
+      "characters": 3338
+    },
+    {
+      "sectionID": "8914",
+      "reference": "AC 28-104.2.1.5",
+      "sourceID": "research-permitext_discovered-id:8914-5",
+      "textSHA256": "6fd1189d616c5eeba2cdb60aa38cbafb487e031442a390903d3797a4856a8f55",
+      "characters": 1639
+    },
+    {
+      "sectionID": "9234",
+      "reference": "AC 28-118.20",
+      "sourceID": "research-permitext_discovered-id:9234-6",
+      "textSHA256": "f9a8852384099e5a1aff35f56dc7d2a3363d97603ebe02b4eee64b9edcedb6c2",
+      "characters": 742
+    },
+    {
+      "sectionID": "9224",
+      "reference": "AC 28-118.15.1.1",
+      "sourceID": "research-permitext_discovered-id:9224-7",
+      "textSHA256": "5faa2acf36efd18aae2752e39f90bb0b3a325cd4f5875f00751d05426d23a9ef",
+      "characters": 704
+    },
+    {
+      "sectionID": "9211",
+      "reference": "AC 28-118.5",
+      "sourceID": "research-permitext_discovered-id:9211-8",
+      "textSHA256": "2f9b9a2c71fde17bcc203e93bc5eb158eb5c430f9776e7a9db5696bc4c655fe9",
+      "characters": 991
+    },
+    {
+      "sectionID": "9182",
+      "reference": "AC 28-117.1",
+      "sourceID": "research-permitext_discovered-id:9182-9",
+      "textSHA256": "c2abf111f14e6013a51e98127ba395d71824181a82b413907a1f0405aeba0762",
+      "characters": 1263
+    },
+    {
+      "sectionID": "8786",
+      "reference": "AC 28-101.4.3",
+      "sourceID": "research-permitext_discovered-id:8786-10",
+      "textSHA256": "96b4ae370e40238198565d5938a384ec36590c708930f76918622767a54a1ca3",
+      "characters": 5747
+    },
+    {
+      "sectionID": "8796",
+      "reference": "AC 28-101.5",
+      "sourceID": "research-permitext_discovered-id:8796-13",
+      "textSHA256": "acb382a407313a6ab71a421096e64d95210126a3deedd5dd195e7b0e6e569288",
+      "characters": 1521
+    },
+    {
+      "sectionID": "9212",
+      "reference": "AC 28-118.6",
+      "sourceID": "research-permitext_cross_reference-id:9212-3",
+      "textSHA256": "5da47682397c3ca7f80d478173ae85c3c7f5235e8f27712acf12b93acff119a0",
+      "characters": 1488
+    },
+    {
+      "sectionID": "9232",
+      "reference": "AC 28-118.19",
+      "sourceID": "research-permitext_cross_reference-id:9232-4",
+      "textSHA256": "52e48b780211584a01eb2b7e51069effc8cc121089c8c055e746d654905cf470",
+      "characters": 870
+    },
+    {
+      "sectionID": "9233",
+      "reference": "AC 28-118.19.1",
+      "sourceID": "research-permitext_cross_reference-id:9233-5",
+      "textSHA256": "352602e7227947d112ce48f9ec8b682c5e5ffcd88ff7a5897e87348ff2c8291e",
+      "characters": 597
+    },
+    {
+      "sectionID": "9229",
+      "reference": "AC 28-118.16.2",
+      "sourceID": "research-permitext_cross_reference-id:9229-9",
+      "textSHA256": "458a1ded00769aac2dd13d101ba7658d696000036312720f450defb8c0413870",
+      "characters": 696
+    },
+    {
+      "sectionID": "9221",
+      "reference": "AC 28-118.14",
+      "sourceID": "research-permitext_cross_reference-id:9221-11",
+      "textSHA256": "aceb1390971cf5c7e95f29c1384a6c0f5fc19dd0b7cc75419c7d4e40dddd0ef9",
+      "characters": 465
+    },
+    {
+      "sectionID": "9479",
+      "reference": "AC 28-219.1",
+      "sourceID": "research-permitext_cross_reference-id:9479-12",
+      "textSHA256": "14a78c3c06461435c39397aa5cba16cd2e02e626ac9d89128b06bf7ee4e5e6e0",
+      "characters": 1463
+    }
+  ],
+  "additions": [
+    {
+      "sourceID": "research-permitext_cross_reference-id:9222-1",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Occupancy certificate alternatives: temporary certificate authority, safety condition and validity period",
+      "authorityClass": "enacted",
+      "retrievalReason": "Reviewed edition-matched supporting scope dependency",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20260909-occupancy-dependencies-v3",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20260908-explicit-descendant-scope-v5",
+        "primaryFunction": "supporting_cross_reference",
+        "functions": [
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "supporting cross-reference"
+        ],
+        "reviewedDependencyReason": "Review complete certificate eligibility and validity; do not infer applicability from a certificate name."
+      },
+      "retrievedAt": "2026-09-10T00:57:35.773Z",
+      "sectionID": "9222",
+      "codePrefix": "AC",
+      "sectionNumber": "28-118.15",
+      "title": "§ 28-118.15 Temporary certificates of occupancy.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "text": "28-118.15 § 28-118.15 Temporary certificates of occupancy. Upon application, the commissioner is authorized to issue a temporary certificate of occupancy before the completion of the entire work covered by the permit, provided that the subject portion or portions of the building may be occupied and maintained in a manner that will not endanger public safety, health, or welfare. The commissioner may refuse to issue a temporary certificate of occupancy for a building pending payment of all outstanding fees, fines or civil penalties imposed for violations of this code, the 1968 building code or other laws enforced by the department at the same building. The commissioner shall set a time period during which the temporary certificate of occupancy is valid. The provisions of section 28-118.15.1 apply only to interim certificates of occupancy. Nothing in section 28-118.15.1 is intended to affect, alter or amend the commissioner's power to issue or to set time periods for the expiration of temporary certificates of occupancy that are not interim certificates of occupancy. (Am. L.L. 2021/006, 1/10/2021, eff. 5/10/2021; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 .",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:9223-2",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Occupancy certificate alternatives: interim certificate eligibility and exceptions",
+      "authorityClass": "enacted",
+      "retrievalReason": "Reviewed edition-matched supporting scope dependency",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20260909-occupancy-dependencies-v3",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20260908-explicit-descendant-scope-v5",
+        "primaryFunction": "exception",
+        "functions": [
+          "exception",
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "exception or permitted reduction",
+          "supporting cross-reference"
+        ],
+        "reviewedDependencyReason": "Review complete certificate eligibility and validity; do not infer applicability from a certificate name."
+      },
+      "retrievedAt": "2026-09-10T00:57:35.773Z",
+      "sectionID": "9223",
+      "codePrefix": "AC",
+      "sectionNumber": "28-118.15.1",
+      "title": "§ 28-118.15.1 Interim certificate of occupancy.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "text": "28-118.15.1 § 28-118.15.1 Interim certificate of occupancy. An interim certificate of occupancy may be issued authorizing occupancy of a specific floor or floors of a building prior to the completion of the entire work covered by a permit in accordance with this section and rules of the department, subject to the following conditions: 1. The building is of noncombustible construction and protected with an automatic sprinkler system; 2. Adequate means of egress are provided; 3. There are no outstanding objections relating to or affecting the occupancy of such portion of the building; and 4. Upon inspection, the portion of the building is deemed safe for occupancy without reliance upon temporary measures. Exceptions: Section 28-118.15.1 shall not apply to: 1. Residential buildings with fewer than eight stories or fewer than four dwelling units; or 2. Nonresidential buildings with fewer than five stories; or 3. Mixed-use buildings with fewer than four dwelling units; or 4. Parking structures. (L.L. 2021/006, 1/10/2021, eff. 5/10/2021; Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:9225-4",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Occupancy certificate alternatives: interim certificate duration",
+      "authorityClass": "enacted",
+      "retrievalReason": "Reviewed edition-matched supporting scope dependency",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20260909-occupancy-dependencies-v3",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20260908-explicit-descendant-scope-v5",
+        "primaryFunction": "supporting_cross_reference",
+        "functions": [
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "supporting cross-reference"
+        ],
+        "reviewedDependencyReason": "Review complete certificate eligibility and validity; do not infer applicability from a certificate name."
+      },
+      "retrievedAt": "2026-09-10T00:57:35.773Z",
+      "sectionID": "9225",
+      "codePrefix": "AC",
+      "sectionNumber": "28-118.15.1.2",
+      "title": "§ 28-118.15.1.2 Effective period.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "text": "28-118.15.1.2 § 28-118.15.1.2 Effective period. An interim certificate of occupancy shall remain in effect until the issuance of a certificate of occupancy for the building in accordance with section 28-118.6 . (L.L. 2021/006, 1/10/2021, eff. 5/10/2021)",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    },
+    {
+      "sourceID": "research-permitext_cross_reference-id:9226-5",
+      "origin": "permitext_cross_reference",
+      "sourceType": "enacted_text",
+      "relationship": "Occupancy certificate alternatives: temporary and interim certificate revocation or suspension",
+      "authorityClass": "enacted",
+      "retrievalReason": "Reviewed edition-matched supporting scope dependency",
+      "retrievalRank": null,
+      "retrievalScore": null,
+      "retrievalVersion": "20260909-occupancy-dependencies-v3",
+      "retrievalDepth": 1,
+      "evidencePriority": {
+        "version": "20260908-explicit-descendant-scope-v5",
+        "primaryFunction": "supporting_cross_reference",
+        "functions": [
+          "supporting_cross_reference"
+        ],
+        "materialityRank": 7,
+        "evidenceRole": "supporting",
+        "controllingRoot": null,
+        "controllingTopicRoutes": [],
+        "topicRoutes": [],
+        "topicRouteRelationship": "unrestricted",
+        "pinnedScopeActive": false,
+        "hierarchyDepth": null,
+        "descendantClaimCoverage": true,
+        "claimCoverageRequired": false,
+        "claimCoverageReason": null,
+        "reasons": [
+          "supporting cross-reference"
+        ],
+        "reviewedDependencyReason": "Review complete certificate eligibility and validity; do not infer applicability from a certificate name."
+      },
+      "retrievedAt": "2026-09-10T00:57:35.773Z",
+      "sectionID": "9226",
+      "codePrefix": "AC",
+      "sectionNumber": "28-118.15.2",
+      "title": "§ 28-118.15.2 Revocation and suspension.",
+      "codeEdition": "2022 New York City Construction Codes",
+      "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+      "jurisdiction": "New York City",
+      "corpusID": "nyc-2022-construction-codes",
+      "corpusLabel": "2022 NYC Construction Codes",
+      "applicabilityStatus": "current-enacted-edition",
+      "text": "28-118.15.2 § 28-118.15.2 Revocation and suspension. The commissioner may revoke or suspend a temporary certificate of occupancy, including an interim certificate of occupancy, that was issued in error, or on the basis of incorrect information provided to the department, or based on discontinuance of a nonconforming use pursuant to article V of the New York city zoning resolution, in accordance with the procedures set forth in sections 28-105.10.1 and 28-105.10.2 for the suspension or revocation of a permit. (L.L. 2021/006, 1/10/2021, eff. 5/10/2021; Am. L.L. 2021/126, 11/7/2021, eff. 11/7/2022) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2021/126 .",
+      "canonicalContextResolved": true,
+      "canonicalContextComplete": true,
+      "truncated": false,
+      "targetedDefinition": null
+    }
+  ],
+  "currentUsage": {
+    "pinnedCount": 0,
+    "pinnedCharacterCount": 0,
+    "pinnedCanonicalContextCharacterCount": 0,
+    "pinnedSelectionExactCount": 0,
+    "pinnedSelectionTruncatedCount": 0,
+    "pinnedSelectionExcerptedCount": 0,
+    "structuredPinnedCount": 0,
+    "supplementalCharacterCeiling": 48000,
+    "supplementalCharacterCount": 27546,
+    "candidateCount": 12,
+    "discoveredCount": 10,
+    "targetedDefinitionCount": 1,
+    "crossReferenceCount": 6,
+    "topicDependencyCount": 4,
+    "characterCount": 27546,
+    "resolverFailureCount": 1,
+    "nonMaterialCandidateCount": 0
+  },
+  "currentLimitations": [
+    {
+      "kind": "canonical-section-unavailable",
+      "count": 1,
+      "text": "1 enacted section was not available from the canonical resolver."
+    },
+    {
+      "kind": "targeted-definition-excerpt",
+      "count": 1,
+      "text": "One or more very large canonical definition sections were represented by query-targeted enacted definition entries; the complete section was not included in this bounded evidence package."
+    },
+    {
+      "kind": "cross-reference-limit",
+      "text": "Additional direct cross-references were identified but were not added to this bounded answer package."
+    },
+    {
+      "kind": "retrieval-completeness",
+      "text": "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
+    },
+    {
+      "kind": "referenced-table-review-required",
+      "text": "At least one candidate refers to a table whose complete structured values are not in the proposed passage. That candidate cannot be prepared until the table itself can be reviewed as evidence."
+    }
+  ],
+  "limitations": [
+    "All 110 authored question predicates are checked against one resolved 2022 anchor. Only GAP-14 has an actual before/after retrieval comparison. This does not test 110 answers.",
+    "All 17 baseline source identities, full texts and mandatory-claim flags are preserved. Four complete supporting provisions are added; no alternative is declared applicable or mandatory to discuss.",
+    "The additional evidence increases input size. Cost and latency improvement are not established.",
+    "The separate mocked HTTP regression retains the old draft's missing exception citations and negative verdict. Retrieval completeness does not bind unnamed claims or override verification.",
+    "Prepared repository code text is used for transport and source-integrity checks. No fresh legal-source review, live provider response or professional acceptance is claimed."
+  ]
+}

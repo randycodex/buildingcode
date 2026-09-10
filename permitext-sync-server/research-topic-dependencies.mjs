@@ -5,7 +5,7 @@
 // guard standard. Guard scoping stays present; detailed guard design is separate.
 import { zoningContextExcerptVersion } from "./research-zoning-context-excerpts.mjs";
 
-export const researchTopicDependencyVersion = "20260908-storage-dependencies-v2";
+export const researchTopicDependencyVersion = "20260909-occupancy-dependencies-v3";
 
 const rampDependencies = Object.freeze([
   ["1012.6.1", "landing slope"],
@@ -25,6 +25,35 @@ const rampDependencies = Object.freeze([
 ]);
 
 export function researchTopicDependencyPlan({ question = "", sources = [] } = {}) {
+  // The general issuance rule does not contain temporary/interim eligibility.
+  // Make the complete alternative sources available for review, without
+  // requiring a readiness checklist or asserting that an alternative applies.
+  const occupancyDecision = /\bcertificate\s+of\s+occupancy\b/i.test(question) &&
+    /\b(?:can|may)\b[^?]{0,120}\b(?:occupy|use)\b|\boccupancy\s+(?:allowed|permitted|lawful|legal)\b|\b(?:authoriz\w*|permit\w*)\s+(?:the\s+)?occupancy\b/i.test(question) &&
+    !/\b(?:DOB\s*NOW|portal|selected|pinned)\b/i.test(question);
+  const occupancyAnchors = sources.filter(source => source.codePrefix === "AC" && source.sectionNumber === "28-118.1" &&
+    source.canonicalContextComplete === true && !source.truncated && source.corpusID === "nyc-2022-construction-codes" &&
+    /\b2022\b/.test(source.codeEdition || "") &&
+    ["codeEdition", "codeVersion", "corpusID", "jurisdiction"].every(field => String(source[field] || "").trim()) &&
+    /No building or open lot shall be used or occupied without a certificate of occupancy issued by the commissioner\./i.test(source.text || ""));
+  if (occupancyDecision && occupancyAnchors.length === 1) {
+    const anchor = occupancyAnchors[0];
+    return {
+      id: "nyc-2022-occupancy-certificate-alternatives", version: researchTopicDependencyVersion, anchor,
+      label: "Occupancy certificate alternatives", corpusPrefix: "AC", preserveGenericExpansion: true,
+      coverageReason: "Review complete certificate eligibility and validity; do not infer applicability from a certificate name.",
+      references: [
+        ["28-118.15", "temporary certificate authority, safety condition and validity period"],
+        ["28-118.15.1", "interim certificate eligibility and exceptions"],
+        ["28-118.15.1.1", "interim certificate issuance"],
+        ["28-118.15.1.2", "interim certificate duration"],
+        ["28-118.15.2", "temporary and interim certificate revocation or suspension"],
+        ["28-118.20", "partial certificate scope and conditions"]
+      ].map(([sectionNumber, purpose]) => ({ codePrefix: "AC", sectionNumber, purpose,
+        claimCoverageRequired: false, codeEdition: anchor.codeEdition, codeVersion: anchor.codeVersion,
+        corpusID: anchor.corpusID, jurisdiction: anchor.jurisdiction }))
+    };
+  }
   // ZR 42-191 marks self-service storage with both the limited-applicability
   // and additional-conditions notations. A 42-192 excerpt alone cannot supply
   // that row or the 42-193 performance-standard dependency. This plan is only

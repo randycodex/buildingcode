@@ -13,7 +13,7 @@ import { researchTopicDependencyPlan, sameTopicDependencyCorpus } from "./resear
 import { focusedTechnicalCandidates } from "./research-focused-technical-scope.mjs";
 import { asksForZoningAmendmentHistoryEvents, requestedZoningAmendmentHistory, zoningAmendmentHistoryRecord } from "./research-zoning-metadata.mjs";
 
-export const researchEvidenceAssemblyVersion = "20260909-pinned-table-dependencies-v34";
+export const researchEvidenceAssemblyVersion = "20260909-occupancy-review-dependencies-v35";
 
 export const researchEvidenceAssemblyLimits = Object.freeze({
   maximumCandidates: 12,
@@ -39,6 +39,16 @@ const sourceOrigins = Object.freeze({
 });
 
 const maximumPinnedAncestorContextSections = 3;
+
+function topicDependencyPriority(priority, plan, reference) {
+  // Optional review sources must not become mandatory answer claims. Preserve
+  // any independently established governing status instead of downgrading it.
+  if (reference?.claimCoverageRequired === false) return {
+    ...priority, reviewedDependencyReason: plan.coverageReason
+  };
+  return { ...priority, evidenceRole: "governing", claimCoverageRequired: true,
+    claimCoverageReason: plan.coverageReason };
+}
 
 export const researchEvidenceStrategies = Object.freeze({
   broad: "broad",
@@ -1169,7 +1179,7 @@ export async function assembleResearchEvidence({
   // A reviewed topic plan already reserves its governing dependencies. Keep
   // that package within its established request budget; incidental dictionaries
   // must not consume the space needed for those complete governing provisions.
-  const definitionCandidates = dependencyPlan ? [] : [...candidates, ...prioritizeResearchEvidence(
+  const definitionCandidates = dependencyPlan && !dependencyPlan.preserveGenericExpansion ? [] : [...candidates, ...prioritizeResearchEvidence(
     Array.isArray(discovery?.supplementalDefinitionCandidates) ? discovery.supplementalDefinitionCandidates : [],
     { limit: limits.maximumTargetedDefinitions, pinnedScopeActive: true }
   )];
@@ -1232,12 +1242,7 @@ export async function assembleResearchEvidence({
       source.sectionNumber === reference.sectionNumber && sameTopicDependencyCorpus(source, dependencyPlan.anchor));
     if (existing) {
       if (!existing.canonicalContextComplete) missingTopicDependencies.push(reference.sectionNumber);
-      else existing.evidencePriority = {
-        ...existing.evidencePriority,
-        evidenceRole: "governing",
-        claimCoverageRequired: true,
-        claimCoverageReason: dependencyPlan.coverageReason
-      };
+      else existing.evidencePriority = topicDependencyPriority(existing.evidencePriority, dependencyPlan, reference);
       continue;
     }
     const remainingCharacters = supplementalCharacterCeiling - characterCount;
@@ -1272,15 +1277,13 @@ export async function assembleResearchEvidence({
       relationship: `${dependencyPlan.label}: ${reference.purpose}`,
       characterAllowance: remainingCharacters,
       canonicalResolved: true,
-      retrievalReason: "Reviewed edition-matched governing dependency",
+      retrievalReason: reference.claimCoverageRequired === false
+        ? "Reviewed edition-matched supporting scope dependency" : "Reviewed edition-matched governing dependency",
       retrievalVersion: dependencyPlan.version,
       retrievalDepth: 1,
-      evidencePriority: {
-        ...researchEvidencePriorityMetadata({ ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: 1 }),
-        evidenceRole: "governing",
-        claimCoverageRequired: true,
-        claimCoverageReason: dependencyPlan.coverageReason
-      },
+      evidencePriority: topicDependencyPriority(
+        researchEvidencePriorityMetadata({ ...resolved, origin: sourceOrigins.crossReference, retrievalDepth: 1 }),
+        dependencyPlan, reference),
       retrievedAt
     });
     sources.push(record);
@@ -1345,7 +1348,7 @@ export async function assembleResearchEvidence({
   let crossReferenceCount = 0;
   // The reviewed design dependencies replace most opportunistic expansion;
   // do not append a second broad reference package and crowd out the cost budget.
-  const maximumCrossReferencesForTurn = dependencyPlan
+  const maximumCrossReferencesForTurn = dependencyPlan && !dependencyPlan.preserveGenericExpansion
     ? Math.min(limits.maximumCrossReferences, 2)
     : limits.maximumCrossReferences;
   for (const [index, reference] of crossReferenceQueue.entries()) {
@@ -1433,8 +1436,8 @@ export async function assembleResearchEvidence({
     const recovered = sources.find((source) => source.codePrefix === dependencyPlan.corpusPrefix && source.sectionNumber === sectionNumber &&
       source.canonicalContextComplete && sameTopicDependencyCorpus(source, dependencyPlan.anchor));
     if (!recovered) return true;
-    recovered.evidencePriority = { ...recovered.evidencePriority, evidenceRole: "governing", claimCoverageRequired: true,
-      claimCoverageReason: dependencyPlan.coverageReason };
+    recovered.evidencePriority = topicDependencyPriority(recovered.evidencePriority, dependencyPlan,
+      dependencyPlan.references.find(reference => reference.sectionNumber === sectionNumber));
     return false;
   });
   if (unresolvedTopicDependencies.length) limitations.push({

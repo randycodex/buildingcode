@@ -16,6 +16,9 @@ const cafeDraft = JSON.parse(cafeRun.providerCalls.find((call) => call.caseID ==
 const fanRun = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-attribution-confirmation-2026-09-08.json", import.meta.url)));
 const fanDraft = JSON.parse(fanRun.providerCalls.find(call => call.caseID === "MC-05" && call.phase === "permitext_code_interpretation")
   .output.flatMap(message => message.content || []).find(content => content.type === "output_text").text);
+const occupancyRun = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json", import.meta.url)));
+const occupancyDraft = JSON.parse(occupancyRun.providerCalls.find(call => call.caseID === "GAP-14" && call.phase === "permitext_code_interpretation")
+  .output.flatMap(message => message.content || []).find(content => content.type === "output_text").text);
 const scratch = await mkdtemp(join(tmpdir(), "permitext-plumbing-repairs-"));
 for (const name of Object.keys(process.env)) {
   if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$)/.test(name)) delete process.env[name];
@@ -58,10 +61,23 @@ globalThis.fetch = async (url, options) => {
   const phase = body.text?.format?.name;
   phases.push(phase);
   assert(phases.length <= 4, "Only one bounded revision is permitted.");
+  if (activeID === "GAP-14") {
+    assert.match(body.input, /commissioner shall set a time period/);
+    assert.match(body.input, /Residential buildings with fewer than eight stories or fewer than four dwelling units/);
+    assert.match(body.input, /Parking structures/);
+    assert.match(body.input, /interim certificate of occupancy shall remain in effect until/);
+    assert.match(body.input, /may revoke or suspend a temporary certificate/);
+    assert.match(body.input, /not otherwise required to have a certificate of occupancy/);
+  }
   let output;
   if (phase === "permitext_research_verification") {
     reviewed = JSON.parse(body.input.split("PROPOSED ANSWER JSON\n")[1]);
-    if (activeID === "MC-05") {
+    if (activeID === "GAP-14") {
+      assert.equal(reviewed.answerText, occupancyDraft.answerText);
+      assert.equal(reviewed.citations.length, occupancyDraft.citations.length,
+        "Fetching complete alternatives does not guess citations for unnamed exception claims.");
+      assert.equal(accept, false, "This historical draft still lacks its exception bindings.");
+    } else if (activeID === "MC-05") {
       assert.equal(reviewed.answerText, fanDraft.answerText);
       assert.deepEqual(reviewed.supportedPoints.map(({ heading, explanation, sectionID, sourceIDs }) => ({ heading, explanation, sectionID, sourceIDs })), fanDraft.supportedPoints);
       assert.equal(reviewed.citations.length, fanDraft.citations.length + 1);
@@ -93,7 +109,8 @@ globalThis.fetch = async (url, options) => {
       assert.deepEqual(point.sourceIDs, ["research-permitext_discovered-id:11967-2", "research-permitext_discovered-id:11968-1"]);
     }
     const value = accept ? { pass: true, issues: [] } : {
-      pass: false, issues: [{ type: "unsupported_requirement", detail: "Synthetic final-verifier rejection: repairing a condition or source binding does not approve the answer." }]
+      pass: false, issues: [{ type: activeID === "GAP-14" ? "incorrect_citation" : "unsupported_requirement",
+        detail: activeID === "GAP-14" ? "Synthetic rejection retaining the historical finding: the temporary, interim and partial certificate claims have no supporting citation. Complete retrieval does not bind those claims." : "Synthetic final-verifier rejection: repairing a condition or source binding does not approve the answer." }]
     };
     output = [{ type: "message", role: "assistant", content: [{ type: "output_text", text: JSON.stringify(value) }] }];
   } else {
@@ -118,11 +135,12 @@ try {
   const token = account.backendSessionToken;
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const auth = { accountUserID: account.appUserID };
-  for (const [id, recordedRun] of [["PC-03", run], ["PC-04", run], ["PC-03", recent], ["PC-01", cafeRun], ["MC-05", fanRun]]) for (const accepted of [false, true]) {
+  for (const [id, recordedRun] of [["PC-03", run], ["PC-04", run], ["PC-03", recent], ["PC-01", cafeRun], ["MC-05", fanRun], ["GAP-14", occupancyRun]]) for (const accepted of (id === "GAP-14" ? [false] : [false, true])) {
     activeRun = recordedRun; activeID = id; accept = accepted; phases = []; reviewed = null;
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
-    const response = await request("/research/conversations/message", { auth, conversationID, question: activeRun.cases.find((item) => item.id === id).question, requestID: randomUUID() }, token);
+    const authoredCase = activeRun.cases.find((item) => item.id === id) || activeRun.results.find(item => item.id === id);
+    const response = await request("/research/conversations/message", { auth, conversationID, question: authoredCase.question, requestID: randomUUID() }, token);
     assert.deepEqual(phases, accepted
       ? ["permitext_code_interpretation", "permitext_research_verification"]
       : ["permitext_code_interpretation", "permitext_research_verification", "permitext_code_interpretation", "permitext_research_verification"]);
