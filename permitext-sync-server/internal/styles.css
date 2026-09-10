@@ -63,6 +63,11 @@ main { width: min(1440px, 100%); margin: auto; padding: 28px clamp(20px, 4vw, 56
 .badge.new { color: #f4a340; }
 .badge.reviewing { color: #92c7ff; }
 .badge.evaluation_candidate { color: #d5a6ff; }
+.feedback-case { margin-top: 20px; }
+.feedback-case > label, .feedback-case details > label { display: grid; gap: 6px; margin: 12px 0; }
+.feedback-case textarea, .feedback-case input:not([type="checkbox"]), .feedback-case select { width: 100%; box-sizing: border-box; }
+.feedback-case pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 320px; overflow-y: auto; }
+.feedback-case > button { margin: 8px 8px 8px 0; }
 .badge.resolved { color: #78dba9; }
 .badge.dismissed { color: #aaa69f; }
 
@@ -139,3 +144,6 @@ textarea, input, select { width: 100%; padding: 10px; border: 1px solid #3a3a3a;
   .tabs { flex-wrap: wrap; }
   .console-header { align-items: flex-start; }
 }
+
+.feedback-case label.feedback-source-choice { display: inline-flex; align-items: center; gap: 8px; }
+.feedback-case .feedback-source-choice input { width: auto; }

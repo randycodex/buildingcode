@@ -495,10 +495,11 @@ private struct ResearchSessionView: View {
             }
             .sheet(item: $pendingFeedbackReport) { report in
                 ResearchFeedbackSheet(
+                    existingFeedback: conversation?.messages.first(where: { $0.id == report.messageID })?.feedback,
                     onCancel: { pendingFeedbackReport = nil },
-                    onSubmit: { category, comment in
+                    onSubmit: { category, comment, usefulness, checking, reference in
                         pendingFeedbackReport = nil
-                        Task { await saveFeedback(messageID: report.messageID, category: category, comment: comment) }
+                        Task { await saveFeedback(messageID: report.messageID, category: category, comment: comment, usefulness: usefulness, outsideChecking: checking, supportingReference: reference) }
                     }
                 )
             }
@@ -1487,7 +1488,7 @@ private struct ResearchSessionView: View {
         startQuestionRequest(attempt)
     }
 
-    private func saveFeedback(messageID: String, category: String, comment: String?) async {
+    private func saveFeedback(messageID: String, category: String, comment: String?, usefulness: String? = nil, outsideChecking: String? = nil, supportingReference: String? = nil) async {
         guard let identity = requestIdentity(), identity.conversationID == conversation?.id else { return }
         guard let conversationID = conversation?.id, feedbackMessageID == nil else { return }
         feedbackMessageID = messageID
@@ -1497,7 +1498,10 @@ private struct ResearchSessionView: View {
                 conversationID: conversationID,
                 answerID: messageID,
                 category: category,
-                comment: comment?.trimmingCharacters(in: .whitespacesAndNewlines)
+                comment: comment?.trimmingCharacters(in: .whitespacesAndNewlines),
+                usefulness: usefulness,
+                outsideChecking: outsideChecking,
+                supportingReference: supportingReference
             )
             guard isCurrent(identity) else { return }
             guard conversation?.id == conversationID,
@@ -1858,11 +1862,27 @@ private struct ResearchDisclosureAcknowledgementSheet: View {
 
 private struct ResearchFeedbackSheet: View {
     let onCancel: () -> Void
-    let onSubmit: (String, String?) -> Void
+    let onSubmit: (String, String?, String, String, String) -> Void
     @State private var category = "incorrect_misleading"
     @State private var comment = ""
+    @State private var usefulness = ""
+    @State private var outsideChecking = ""
+    @State private var supportingReference = ""
+
+    init(existingFeedback: ResearchFeedback?, onCancel: @escaping () -> Void, onSubmit: @escaping (String, String?, String, String, String) -> Void) {
+        self.onCancel = onCancel
+        self.onSubmit = onSubmit
+        _category = State(initialValue: existingFeedback?.category ?? "incorrect_misleading")
+        _comment = State(initialValue: existingFeedback?.userComment ?? "")
+        _usefulness = State(initialValue: existingFeedback?.usefulness ?? "")
+        _outsideChecking = State(initialValue: existingFeedback?.outsideChecking ?? "")
+        _supportingReference = State(initialValue: existingFeedback?.supportingReference ?? "")
+    }
 
     private let categories = [
+        ("helpful", "Helpful"),
+        ("too_slow", "Too slow"),
+        ("too_verbose", "Too much explanation"),
         ("incorrect_misleading", "Incorrect or misleading"),
         ("missing_information", "Missing important information"),
         ("citation_problem", "Citation problem"),
@@ -1872,25 +1892,38 @@ private struct ResearchFeedbackSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Picker("Problem", selection: $category) {
+                Picker("Feedback", selection: $category) {
                     ForEach(categories, id: \.0) { value, label in
                         Text(label).tag(value)
                     }
                 }
+                Picker("Could you use this answer?", selection: $usefulness) {
+                    Text("Not rated").tag("")
+                    Text("Yes, as written").tag("usable_as_is")
+                    Text("After corrections").tag("needed_correction")
+                    Text("No").tag("not_usable")
+                }
+                Picker("Outside checking required", selection: $outsideChecking) {
+                    Text("Not rated").tag("")
+                    Text("None").tag("none")
+                    Text("Brief checking").tag("brief")
+                    Text("Substantial checking").tag("substantial")
+                }
+                TextField("Supporting section or official source (optional)", text: $supportingReference)
                 TextField("Optional details", text: $comment, axis: .vertical)
                     .lineLimit(3...8)
                 Text("Reports help Permitext investigate and correct Research quality. Internal review notes are never shown here.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            .navigationTitle("Report a problem")
+            .navigationTitle("Research feedback")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel", action: onCancel) }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Submit") {
                         let normalized = comment.trimmingCharacters(in: .whitespacesAndNewlines)
-                        onSubmit(category, normalized.isEmpty ? nil : normalized)
+                        onSubmit(category, normalized.isEmpty ? nil : normalized, usefulness, outsideChecking, supportingReference)
                     }
                 }
             }

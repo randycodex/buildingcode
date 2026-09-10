@@ -1,3 +1,4 @@
+import { researchFeedbackCategories, researchUsefulnessValues, researchOutsideCheckingValues, feedbackSourceRecords, updateFeedbackCase, feedbackRegressionExport, feedbackQualityReport } from "./research-feedback.mjs";
 import {
   X509Certificate,
   createHash,
@@ -2126,27 +2127,27 @@ export function createFileStoreAdapter() {
       return Object.values(store.researchFeedbackByUserID || {}).flatMap((entries) => entries || []);
     },
     async saveResearchFeedback(userID, feedback) {
-      const store = await this.read();
-      store.researchFeedbackByUserID ||= {};
-      const entries = store.researchFeedbackByUserID[userID] || [];
-      const index = entries.findIndex((item) => item.id === feedback.id);
-      if (index === -1) entries.push(feedback);
-      else entries[index] = feedback;
-      store.researchFeedbackByUserID[userID] = entries;
-      await this.write(store);
-      return feedback;
-    },
-    async updateResearchFeedback(feedbackID, feedback) {
-      const store = await this.read();
-      for (const [userID, entries] of Object.entries(store.researchFeedbackByUserID || {})) {
-        const index = (entries || []).findIndex((item) => item.id === feedbackID);
-        if (index === -1) continue;
-        entries[index] = feedback;
+      return this.withMutation((store) => {
+        store.researchFeedbackByUserID ||= {};
+        const entries = store.researchFeedbackByUserID[userID] || [];
+        if (entries.some(item => item.id === feedback.id || item.answerID === feedback.answerID)) return null;
+        entries.push(feedback);
         store.researchFeedbackByUserID[userID] = entries;
-        await this.write(store);
         return feedback;
-      }
-      return null;
+      });
+    },
+    async updateResearchFeedback(feedbackID, feedback, expectedUpdatedAt = null) {
+      return this.withMutation((store) => {
+        for (const [userID, entries] of Object.entries(store.researchFeedbackByUserID || {})) {
+          const index = (entries || []).findIndex((item) => item.id === feedbackID);
+          if (index === -1) continue;
+          if (expectedUpdatedAt && entries[index].updatedAt !== expectedUpdatedAt) return null;
+          entries[index] = feedback;
+          store.researchFeedbackByUserID[userID] = entries;
+          return feedback;
+        }
+        return null;
+      });
     }
   };
 }
@@ -5632,26 +5633,26 @@ async function createPostgresStoreAdapter() {
     },
     async saveResearchFeedback(userID, feedback) {
       await ensureSchema();
-      await sql`
+      const rows = await sql`
         INSERT INTO permitext_research_feedback (
           id, user_id, conversation_id, answer_id, feedback, created_at, updated_at
         ) VALUES (
           ${feedback.id}, ${userID}, ${feedback.conversationID}, ${feedback.answerID},
           ${JSON.stringify(feedback)}::jsonb, ${feedback.createdAt}::timestamptz, ${feedback.updatedAt}::timestamptz
         )
-        ON CONFLICT (user_id, answer_id) DO UPDATE SET
-          feedback = EXCLUDED.feedback,
-          updated_at = EXCLUDED.updated_at
+        ON CONFLICT (user_id, answer_id) DO NOTHING
+        RETURNING id
       `;
-      return feedback;
+      return rows.length ? feedback : null;
     },
-    async updateResearchFeedback(feedbackID, feedback) {
+    async updateResearchFeedback(feedbackID, feedback, expectedUpdatedAt = null) {
       await ensureSchema();
       const rows = await sql`
         UPDATE permitext_research_feedback
         SET feedback = ${JSON.stringify(feedback)}::jsonb,
             updated_at = ${feedback.updatedAt}::timestamptz
         WHERE id = ${feedbackID}
+          AND (${expectedUpdatedAt}::text IS NULL OR feedback->>'updatedAt' = ${expectedUpdatedAt})
         RETURNING id
       `;
       return rows.length ? feedback : null;
@@ -6726,12 +6727,12 @@ async function listAllStoredResearchFeedback() {
     : [];
 }
 
-async function updateStoredResearchFeedback(feedbackID, feedback) {
+async function updateStoredResearchFeedback(feedbackID, feedback, expectedUpdatedAt = null) {
   const adapter = await storeAdapter();
   if (typeof adapter.updateResearchFeedback !== "function") {
     throw new Error("Research feedback triage storage is unavailable.");
   }
-  return adapter.updateResearchFeedback(feedbackID, feedback);
+  return adapter.updateResearchFeedback(feedbackID, feedback, expectedUpdatedAt);
 }
 
 export function requestBodyLimit(environment = process.env) {
@@ -17935,14 +17936,6 @@ async function handleResearchUsage(request, response) {
   });
 }
 
-const researchFeedbackCategories = new Set([
-  "helpful",
-  "incorrect_misleading",
-  "missing_information",
-  "citation_problem",
-  "other"
-]);
-
 const researchFeedbackProfessionalRoles = new Set([
   "",
   "architect_designer",
@@ -17979,6 +17972,8 @@ function researchFeedbackForClient(feedback) {
     userComment: feedback.userComment,
     professionalRole: feedback.professionalRole || "",
     supportingReference: feedback.supportingReference || "",
+    usefulness: feedback.usefulness || "",
+    outsideChecking: feedback.outsideChecking || "",
     updatedAt: feedback.userUpdatedAt || feedback.updatedAt
   };
 }
@@ -18011,8 +18006,14 @@ async function handleResearchFeedback(request, response) {
   const immutableAnswerRecord = (await listStoredResearchAnswers(context.userID))
     .find((item) => item.id === answerID);
   const existing = (await listStoredResearchFeedback(context.userID)).find((item) => item.answerID === answerID);
-  const now = new Date().toISOString();
+  const usefulness = context.body.usefulness ?? existing?.usefulness ?? "";
+  const outsideChecking = context.body.outsideChecking ?? existing?.outsideChecking ?? "";
+  if (!researchUsefulnessValues.has(usefulness) || !researchOutsideCheckingValues.has(outsideChecking)) {
+    sendError(response, 400, "Choose valid usefulness and outside-checking ratings."); return;
+  }
+  const now = new Date(Math.max(Date.now(), (Date.parse(existing?.updatedAt || "") || 0) + 1)).toISOString();
   const feedback = {
+    ...existing,
     id: existing?.id || randomUUID(),
     status: "candidate",
     conversationID: conversation.id,
@@ -18043,6 +18044,17 @@ async function handleResearchFeedback(request, response) {
     model: immutableAnswerRecord?.model || answerMessage.answer?.model || null,
     promptVersion: answerMessage.answer?.promptVersion || null,
     evidenceVersion: answerMessage.answer?.evidenceVersion || null,
+    usefulness, outsideChecking,
+    answerCreatedAt: existing?.answerCreatedAt || immutableAnswerRecord?.createdAt || answerMessage.createdAt || null,
+    operationID: existing?.operationID || immutableAnswerRecord?.operationID || null,
+    contextSnapshot: existing?.contextSnapshot || {
+      project: immutableAnswerRecord?.projectContextSnapshot || null,
+      conversationFacts: immutableAnswerRecord?.conversationFactSnapshot || null
+    },
+    evidenceSnapshot: existing?.evidenceSnapshot || {
+      enacted: immutableAnswerRecord?.evidence || [],
+      official: immutableAnswerRecord?.officialEvidenceSnapshot || (immutableAnswerRecord?.answer || answerMessage.answer)?.supportingSources || []
+    },
     category,
     userComment: comment,
     professionalRole,
@@ -18053,7 +18065,13 @@ async function handleResearchFeedback(request, response) {
     userUpdatedAt: now,
     updatedAt: now
   };
-  await saveStoredResearchFeedback(context.userID, feedback);
+  if (existing) {
+    if (!await updateStoredResearchFeedback(existing.id, feedback, existing.updatedAt)) {
+      sendError(response, 409, "Feedback changed while saving. Please try again."); return;
+    }
+  } else if (!await saveStoredResearchFeedback(context.userID, feedback)) {
+    sendError(response, 409, "Feedback was already submitted. Reload and try again."); return;
+  }
   const artifactRevisions = await bumpResearchArtifactRevisions(context.userID,
     conversation.primaryProjectID
       ? [{ projectID: conversation.primaryProjectID, domains: ["research"] }]
@@ -18219,7 +18237,9 @@ async function handleInternalEvaluationData(request, response) {
       evaluationRunReviewStatus(run, reviews)
     ])),
     feedbackCandidates: feedbackRecords,
-    feedbackRecords,
+    feedbackRecords: feedbackRecords.map(record => ({ ...record, sourceRecords: feedbackSourceRecords(record),
+      operation: researchSpend.operationMetrics.find(operation => operation.id === record.operationID) || null })),
+    feedbackQuality: feedbackQualityReport(feedbackRecords, researchSpend),
     researchSpend
   });
 }
@@ -18235,10 +18255,6 @@ const researchFeedbackTriageStatuses = new Set([
 async function handleInternalFeedbackTriage(request, response) {
   const context = await authenticatedInternalBody(request, response);
   if (!context) return;
-  if (!internalConsoleHasLocalDevelopmentAccess(request)) {
-    sendError(response, 405, "Feedback triage can currently be changed only from the local owner console.");
-    return;
-  }
   const feedbackID = String(context.body.feedbackID || "").trim();
   const triageStatus = String(context.body.triageStatus || "").trim();
   const notes = normalizedResearchText(context.body.notes, 4_000);
@@ -18252,7 +18268,7 @@ async function handleInternalFeedbackTriage(request, response) {
     sendError(response, 404, "Feedback candidate not found.");
     return;
   }
-  const now = new Date().toISOString();
+  const now = new Date(Math.max(Date.now(), (Date.parse(existing?.updatedAt || "") || 0) + 1)).toISOString();
   const triageEntry = {
     triageStatus,
     notes,
@@ -18269,12 +18285,37 @@ async function handleInternalFeedbackTriage(request, response) {
     triageHistory: [...(existing.triageHistory || []), triageEntry],
     updatedAt: now
   };
-  const saved = await updateStoredResearchFeedback(feedbackID, feedback);
+  const saved = await updateStoredResearchFeedback(feedbackID, feedback, existing.updatedAt);
   if (!saved) {
     sendError(response, 404, "Feedback candidate not found.");
     return;
   }
   sendJSON(response, 200, { feedback });
+}
+
+async function handleInternalFeedbackCase(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  const records = await listAllStoredResearchFeedback();
+  try {
+    if (context.body.action === "export") {
+      const selected = context.body.feedbackID ? records.filter(item => item.id === context.body.feedbackID) : records;
+      sendJSON(response, 200, { dataset: feedbackRegressionExport(selected) }); return;
+    }
+    const existing = records.find(item => item.id === context.body.feedbackID);
+    if (!existing) { sendError(response, 404, "Feedback not found."); return; }
+    const now = new Date(Math.max(Date.now(), (Date.parse(existing?.updatedAt || "") || 0) + 1)).toISOString();
+    const regressionCase = updateFeedbackCase(existing, { ...context.body,
+      targetFeedback: records.find(item => item.id === context.body.targetFeedbackID) }, now);
+    const updated = { ...existing, regressionCase, updatedAt: now, triageStatus: "evaluation_candidate" };
+    if (!await updateStoredResearchFeedback(existing.id, updated, existing.updatedAt)) {
+      sendError(response, 409, "Feedback changed while saving. Reload the report."); return;
+    }
+    sendJSON(response, 200, { regressionCase });
+  } catch (error) {
+    if (error.code !== "INVALID_FEEDBACK_CASE") throw error;
+    sendError(response, 400, error.message);
+  }
 }
 
 async function handleInternalEvaluationReview(request, response) {
@@ -20116,6 +20157,8 @@ async function handleResearchConversationMessage(request, response) {
         ].filter(Boolean).join(":"),
         createdAt: now
       }),
+      operationID: researchOperation.id,
+      officialEvidenceSnapshot: webSupport.sources,
       projectContextSnapshot: {
         projectID: conversation.primaryProjectID || null,
         projectInformation,
@@ -31378,6 +31421,7 @@ const handlers = {
   "internal/evaluations/data": handleInternalEvaluationData,
   "internal/evaluations/review": handleInternalEvaluationReview,
   "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,
+  "internal/evaluations/feedback/case": handleInternalFeedbackCase,
   "internal/lifetime-grants/data": handleInternalLifetimeGrantData,
   "internal/lifetime-grants/lookup": handleInternalLifetimeGrantLookup,
   "internal/lifetime-grants/invite": handleInternalLifetimeGrantInvite,

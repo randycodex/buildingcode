@@ -2563,7 +2563,10 @@ final class CodeLibraryViewModel: ObservableObject {
         conversationID: String,
         answerID: String,
         category: String,
-        comment: String?
+        comment: String?,
+        usefulness: String? = nil,
+        outsideChecking: String? = nil,
+        supportingReference: String? = nil
     ) async throws -> ResearchFeedback {
         try await performPrivateAccountRequest { account in
             try await accountBackendClient.saveResearchFeedback(
@@ -2571,7 +2574,10 @@ final class CodeLibraryViewModel: ObservableObject {
                 conversationID: conversationID,
                 answerID: answerID,
                 category: category,
-                comment: comment
+                comment: comment,
+                usefulness: usefulness,
+                outsideChecking: outsideChecking,
+                supportingReference: supportingReference
             )
         }
     }

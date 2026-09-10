@@ -532,7 +532,10 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         conversationID: String,
         answerID: String,
         category: String,
-        comment: String?
+        comment: String?,
+        usefulness: String? = nil,
+        outsideChecking: String? = nil,
+        supportingReference: String? = nil
     ) async throws -> ResearchFeedback {
         try await transport.researchFeedback(
             ResearchFeedbackRequest(
@@ -540,7 +543,10 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
                 conversationID: conversationID,
                 answerID: answerID,
                 category: category,
-                comment: comment
+                comment: comment,
+                supportingReference: supportingReference,
+                usefulness: usefulness,
+                outsideChecking: outsideChecking
             )
         ).feedback
     }

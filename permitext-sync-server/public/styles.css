@@ -16335,3 +16335,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   .topbar .workspace-actions-button,
   .topbar .topbar-settings-button { min-height: 44px; height: 44px; }
 }
+
+.research-feedback-details > label { display: grid; gap: 6px; }
+.research-feedback-details > label select { width: 100%; }
+.research-feedback-add-details { font-size: 12px; }

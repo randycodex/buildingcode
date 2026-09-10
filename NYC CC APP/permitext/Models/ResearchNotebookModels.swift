@@ -97,6 +97,8 @@ struct ResearchFeedbackRequest: Codable, Hashable, Sendable {
     var comment: String? = nil
     var professionalRole: String? = nil
     var supportingReference: String? = nil
+    var usefulness: String? = nil
+    var outsideChecking: String? = nil
 }
 
 struct ResearchFeedbackResponse: Codable, Hashable, Sendable {
@@ -234,6 +236,8 @@ struct ResearchFeedback: Codable, Hashable, Sendable {
     var userComment: String? = nil
     var professionalRole: String? = nil
     var supportingReference: String? = nil
+    var usefulness: String? = nil
+    var outsideChecking: String? = nil
     var updatedAt: String? = nil
 
     var displayStatus: String {

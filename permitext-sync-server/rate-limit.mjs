@@ -74,6 +74,7 @@ export const rateLimitPolicies = new Map([
   ["internal/evaluations/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/review", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/feedback/triage", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["internal/evaluations/feedback/case", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
   ["sync/checkpoint", { limit: 120, windowMs: 60 * 1000 }],
   ["sync/pull", { limit: 600, windowMs: 60 * 1000 }],
