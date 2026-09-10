@@ -1,4 +1,4 @@
-// Replay actual plumbing omissions with explicit verifier doubles.
+// Replay actual plumbing omissions and an uncited narrative rule with explicit verifier doubles.
 // This verifies the delivery gate, not the legal correctness of the recorded answer.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
@@ -13,6 +13,9 @@ assert.equal(recent.providerCalls.length, 2);
 const cafeRun = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-routing-confirmation-v2-2026-09-08.json", import.meta.url)));
 const cafeDraft = JSON.parse(cafeRun.providerCalls.find((call) => call.caseID === "PC-01" && call.phase === "permitext_code_interpretation")
   .output.flatMap((message) => message.content || []).find((content) => content.type === "output_text").text);
+const fanRun = JSON.parse(await readFile(new URL("../evals/results/research-owner-live-attribution-confirmation-2026-09-08.json", import.meta.url)));
+const fanDraft = JSON.parse(fanRun.providerCalls.find(call => call.caseID === "MC-05" && call.phase === "permitext_code_interpretation")
+  .output.flatMap(message => message.content || []).find(content => content.type === "output_text").text);
 const scratch = await mkdtemp(join(tmpdir(), "permitext-plumbing-repairs-"));
 for (const name of Object.keys(process.env)) {
   if (/^(PERMITEXT_|OPENAI_|VERCEL|DATABASE_URL$|STORAGE_URL$|POSTGRES_URL$|NEON_DATABASE_URL$)/.test(name)) delete process.env[name];
@@ -58,7 +61,19 @@ globalThis.fetch = async (url, options) => {
   let output;
   if (phase === "permitext_research_verification") {
     reviewed = JSON.parse(body.input.split("PROPOSED ANSWER JSON\n")[1]);
-    if (activeID === "PC-01") {
+    if (activeID === "MC-05") {
+      assert.equal(reviewed.answerText, fanDraft.answerText);
+      assert.deepEqual(reviewed.supportedPoints.map(({ heading, explanation, sectionID, sourceIDs }) => ({ heading, explanation, sectionID, sourceIDs })), fanDraft.supportedPoints);
+      assert.equal(reviewed.citations.length, fanDraft.citations.length + 1);
+      const citation = reviewed.citations.at(-1);
+      assert.equal(citation.codePrefix, "MC");
+      assert.equal(citation.sectionNumber, "606.4.2");
+      assert.equal(citation.supportingPassages.length, 1);
+      assert.match(citation.supportingPassages[0].selectedText, /100 percent outdoor air systems/);
+      assert.match(citation.supportingPassages[0].selectedText, /Exceptions:/);
+      assert.match(citation.supportingPassages[0].selectedText, /serving not more than one floor/);
+      assert(citation.codeEdition && citation.codeVersion && citation.corpusID);
+    } else if (activeID === "PC-01") {
       assert.deepEqual(reviewed.supportedPoints[2].sourceIDs, [
         ...cafeDraft.supportedPoints[2].sourceIDs, "research-permitext_cross_reference-id:11923-4"
       ]);
@@ -103,7 +118,7 @@ try {
   const token = account.backendSessionToken;
   await request("/admin/lifetime-grants/grant", { userID: account.appUserID }, process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN);
   const auth = { accountUserID: account.appUserID };
-  for (const [id, recordedRun] of [["PC-03", run], ["PC-04", run], ["PC-03", recent], ["PC-01", cafeRun]]) for (const accepted of [false, true]) {
+  for (const [id, recordedRun] of [["PC-03", run], ["PC-04", run], ["PC-03", recent], ["PC-01", cafeRun], ["MC-05", fanRun]]) for (const accepted of [false, true]) {
     activeRun = recordedRun; activeID = id; accept = accepted; phases = []; reviewed = null;
     const created = await request("/research/conversations/create", { auth }, token);
     const conversationID = created.body.conversation.id;
@@ -128,6 +143,10 @@ try {
       const saved = await request("/research/answers/get", { auth, answerID: message.id }, token);
       assert.equal(saved.body.answer.answer.answerText, reviewed.answerText);
       assert.deepEqual(saved.body.answer.answer.supportedPoints.map((point) => point.sourceIDs), reviewed.supportedPoints.map((point) => point.sourceIDs));
+      if (id === "MC-05") {
+        assert.deepEqual(message.answer.citations, reviewed.citations);
+        assert.deepEqual(saved.body.answer.answer.citations, reviewed.citations);
+      }
     }
   }
   console.log("Plumbing HTTP replay passed: final verifier sees repairs on initial/revised answers; rejection blocks save/charge; accepted reviewed content persists with no extra provider call. All provider responses mocked.");

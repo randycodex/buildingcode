@@ -285,6 +285,7 @@ import {
 import { validateGuidanceQualificationReview } from "./research-guidance-qualification-review.mjs";
 import { materializeGuidanceSourceResolutions, validateGuidanceSourceResolutions } from "./research-guidance-source-resolutions.mjs";
 import { repairGuidanceDeclaredActions } from "./research-guidance-action-repairs.mjs";
+import { bindResearchNarrativeSources } from "./research-narrative-source-bindings.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import { refreshZoningContextEvidence, zoningContextExcerptPrompt } from "./research-zoning-context-excerpts.mjs";
 import { isZoningConditionalExplanation, planZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
@@ -19699,10 +19700,22 @@ async function handleResearchConversationMessage(request, response) {
           );
       const binding = bindExplicitZoningRuleSources({ answer: repairedInterpretation, evidence: assembledEvidence, plan: zoningPlan });
       zoningSourceBindingRepairs.push(...binding.repairs);
+      const narrativeBinding = officialGuidanceOnly
+        ? { answer: binding.answer, repairs: [] }
+        : bindResearchNarrativeSources(binding.answer, assembledEvidence);
+      let boundAnswer = narrativeBinding.answer;
+      if (narrativeBinding.repairs.length) {
+        // Use the ordinary citation validator to retain complete source metadata
+        // and passages. Keep existing prose, points and citations byte-for-byte;
+        // the independent verifier below must review every newly bound rule.
+        const normalized = validateResearchInterpretation(boundAnswer, assembledEvidence, webSupport.sources);
+        boundAnswer = { ...boundAnswer, citations: [...binding.answer.citations,
+          ...normalized.citations.slice(binding.answer.citations.length)] };
+      }
       return {
         ...candidate,
         interpretation: applyResearchOutsideAuthorityStartingPoints(
-          binding.answer,
+          boundAnswer,
           evidencePackage.discovery?.outsideCurrentLibrary,
           { sourcePolicy: webSupportPolicyDecision, question }
         )
