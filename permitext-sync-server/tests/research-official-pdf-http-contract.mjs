@@ -45,6 +45,9 @@ const loftNoticeURL = "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf"
 const companionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-companion-source-fragments-20260909.json", import.meta.url)));
 const stakeholderFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-stakeholder-source-fragments-20260909.json", import.meta.url)));
 const submissionFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-filing-submission-source-20260909.json", import.meta.url)));
+const attestationRun = JSON.parse(await readFile(new URL("../evals/results/research-owner-api-round2-live-attestation-preparation-2026-09-09.json", import.meta.url)));
+const attestationDraftText = JSON.parse(attestationRun.providerCalls[0].output.flatMap(message => message.content || [])
+  .find(content => content.type === "output_text").text).paragraphs[0].parts[0].text;
 const loftFixture = JSON.parse(await readFile(new URL("../evals/fixtures/dob-loft-service-document-20260909.json", import.meta.url)));
 const officialDocuments = JSON.parse(await readFile(new URL("../evals/fixtures/dob-official-document-pages-20260909.json", import.meta.url)));
 const boardUpdate = officialDocuments.documents.find((document) => document.source.id === "dob-build-release-notes")
@@ -257,7 +260,7 @@ const responseDouble = async (url, options) => {
             : portalCase === "DOBNOW-016"
               ? "Answer Yes for work in or affecting the IMD unit. After submitting the job filing, request Loft Board Certification and include a Narrative Statement; the DOB approval hold remains until the required certification is issued."
             : portalCase === "DOBNOW-023"
-              ? "The filing representative may prepare filing information but cannot submit the filing. The required applicant and owner attestations remain outstanding."
+              ? attestationDraftText
             : portalCase === "DOBNOW-014"
               ? "The owner cannot simply answer No without the document confirming zero regulated units and explaining why the DHCR records are inaccurate; otherwise the owner must answer Yes."
             : portalCase === "DOBNOW-017"
@@ -308,6 +311,14 @@ const responseDouble = async (url, options) => {
       validateGuidanceSourceResolutions(input, input.proposedAnswer);
       verificationDoubles += 1;
       assert(input.passages.every((passage) => passage.contentHash?.length === 64));
+      if (portalCase === "DOBNOW-023" && !rejectSummary) {
+        const paragraph = input.proposedAnswer.paragraphs[0];
+        const preview = input.passages.find(passage => passage.heading === "STEP 6: Preview Submission");
+        assert(paragraph.text.startsWith(attestationDraftText.replace("and provide the final electronic signature",
+          "and review the filing and provide the final electronic signature")));
+        assert(paragraph.sourceUses.some(use => use.sourceID === preview.sourceID && use.claimID === preview.claimID),
+          "The independently verified candidate must include the exact preview passage binding.");
+      }
       if (rejectSummary) {
         assert.match(input.proposedAnswer.answerText, /automatically grants/);
         assert(input.passages.some((passage) => /not automatic permit approval|Once the BPP filing is approved/.test(passage.text)));
@@ -427,12 +438,25 @@ try {
     assert.equal(answer.citations.length, 0, "Portal guidance must not acquire irrelevant enacted citations.");
     assert.equal(answer.verification.pass, true);
     assert.equal(providerDoubles - beforePortal, ["DOBNOW-003", "DOBNOW-004", "DOBNOW-008", "DOBNOW-012", "DOBNOW-014", "DOBNOW-017", "DOBNOW-016", "DOBNOW-023"].includes(id) ? 2 : 3, "Known companion sources bypass search; summary and verifier remain required.");
-    const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-014": /cannot simply answer No/, "DOBNOW-017": /required before Final CO/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit the filing/ };
+    const expected = { "DOBNOW-001": /On the stated facts/, "DOBNOW-003": /same job number/, "DOBNOW-004": /Applicant of Record submits a Post Approval Amendment/, "DOBNOW-012": /first project-specific threshold question/, "DOBNOW-014": /cannot simply answer No/, "DOBNOW-017": /required before Final CO/, "DOBNOW-021": /address alone is insufficient/, "DOBNOW-008": /alters 60 percent/, "DOBNOW-016": /Loft Board Certification/, "DOBNOW-023": /cannot submit a job filing/ };
     assert.match(answer.answerText, expected[id]);
-    assert.equal(answer.promptVersion, "20260909-document-summary-v15");
+    assert.equal(answer.promptVersion, "20260909-document-summary-v16");
     assert.equal(answer.officialGuidanceSummary.version, "20260909-document-summary-v2",
       "New summaries retain the required qualification receipt; older v1 records remain readable.");
     assert.doesNotMatch(answer.answerText, /sourceResolutions|relationshipIndex|packetSHA256/);
+    if (id === "DOBNOW-023") {
+      assert.match(answer.answerText, /and review the filing and provide the final electronic signature/);
+      assert(answer.supportingSources.some(source => source.attributedClaims.some(claim => /STEP 6: Preview Submission/.test(claim.text))));
+      const saved = await request("/research/answers/get", { auth, answerID: response.body.conversation.messages.at(-1).id }, account.backendSessionToken);
+      assert.equal(saved.body.answer.answer.answerText, answer.answerText);
+      assert.deepEqual(saved.body.answer.answer.officialGuidanceSummary, answer.officialGuidanceSummary);
+      qualificationFailure = "omitted_condition";
+      const beforeRejected = providerDoubles;
+      const rejected = await ask();
+      assert.equal(rejected.body.code, "RESEARCH_VERIFICATION_FAILED");
+      assert.equal(providerDoubles - beforeRejected, 2, "Action completion cannot override a negative verifier or add another call.");
+      qualificationFailure = null;
+    }
     if (id === "DOBNOW-003") {
       for (const failure of ["missing_plan", "uncarried_statement", "missing_source"]) {
         resolutionFailure = failure;

@@ -283,7 +283,8 @@ import {
   researchOfficialGuidanceSummaryProof
 } from "./research-official-guidance-summary.mjs";
 import { validateGuidanceQualificationReview } from "./research-guidance-qualification-review.mjs";
-import { materializeGuidanceSourceResolutions } from "./research-guidance-source-resolutions.mjs";
+import { materializeGuidanceSourceResolutions, validateGuidanceSourceResolutions } from "./research-guidance-source-resolutions.mjs";
+import { repairGuidanceDeclaredActions } from "./research-guidance-action-repairs.mjs";
 import { resolveResearchCodeBasis } from "./research-code-basis.mjs";
 import { refreshZoningContextEvidence, zoningContextExcerptPrompt } from "./research-zoning-context-excerpts.mjs";
 import { isZoningConditionalExplanation, planZoningConditionalExplanation } from "./research-zoning-conditional-explanation.mjs";
@@ -10109,7 +10110,10 @@ async function openAIResearchOfficialGuidanceSummary(question, userID, options) 
   try {
     const draftRequest = researchOfficialGuidanceSummaryRequest({ ...requestOptions, model: options.model });
     const rawDraft = await call(draftRequest);
-    const draft = { ...rawDraft, value: materializeGuidanceSourceResolutions(JSON.parse(draftRequest.input), rawDraft.value) };
+    const sourceInput = JSON.parse(draftRequest.input);
+    const rendered = materializeGuidanceSourceResolutions(sourceInput, rawDraft.value);
+    const draft = { ...rawDraft, value: repairGuidanceDeclaredActions(sourceInput, rendered).answer };
+    validateGuidanceSourceResolutions(sourceInput, draft.value);
     // Validate paragraph bindings before any semantic verifier call. The
     // immutable full passages remain behind the shorter user-facing prose.
     const interpretation = validateResearchInterpretation(

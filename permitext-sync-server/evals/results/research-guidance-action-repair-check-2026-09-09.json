@@ -1,0 +1,1224 @@
+{
+  "schema": "permitext.research-guidance-action-repair-check.v1",
+  "checkedAt": "2026-09-10T00:18:20.449Z",
+  "inputs": [
+    {
+      "file": "evals/research-reconciled-answer-key.json",
+      "sha256": "64c83744410c3dfa4bff565328d9e31edde3c6c55cf98b79d52c587f1965d455"
+    },
+    {
+      "file": "evals/research-owner-code-candidates.json",
+      "sha256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-resolution-parts-2026-09-09.json",
+      "sha256": "7cc352badc9e6ed4ac022784ff022ccedbf7d508cc66bac7ef2820302a9a9d7a"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-attestation-preparation-2026-09-09.json",
+      "sha256": "af3e04e457c002d70d9ec0d510cc93fe897b430db782108677fdc34d0854495d"
+    }
+  ],
+  "sourceHashes": {
+    "app.mjs": "10b8c708b1f2859799aa5d28a320a98416a091292dd45b2c5469022aa76ecd35",
+    "research-guidance-action-repairs.mjs": "dfb50cfce0ece7a7af83ac1295497d72aa935974f479eb35df4925c0b49518f0",
+    "research-official-guidance-summary.mjs": "790fc5e37287ec882c0195f4fe15eeed128b2837c777f5be8d8ab667a7cf134f",
+    "research-guidance-source-resolutions.mjs": "d80cb9c62475f40d118bd3e6951b9fff88975a9cc8afe941e0ed89a08e640379",
+    "research-guidance-qualification-review.mjs": "078b33463be298a81607edc2764f4bdc27c022a5b24d257b85cf13c302cffc5e",
+    "research-dob-workflow-routing.mjs": "ce8c4f4d5a1bd329c2425806e5c7e2631c9b9fdcd8a68747e46d83e6db818022",
+    "tests/research-guidance-action-repairs-contract.mjs": "f4ab134ddf56b26a34d9af298e3914f32b7c3636944f89ef2ee4dbb6e8fbb475",
+    "tests/research-official-pdf-http-contract.mjs": "84d75984c2ddf8695d350e6f1c6ffd794562f7b6c6c494c452ef877fcd32d301",
+    "package.json": "5df94bc051f6d8e6794afd83a3323e453726cda7ec9bded49931ccb9eb86407c",
+    "scripts/check-research-guidance-action-repairs-20260909.mjs": "f4ad0cf34636805be4c678ad0ab234f841330737b4cdd481d98fe696a48be56c"
+  },
+  "summary": {
+    "numberedSourceRouteChecks": 110,
+    "routesDeclaringPreviewDocument": [
+      "DOBNOW-023"
+    ],
+    "retainedCandidatesCompared": 2,
+    "changedRetainedCandidates": [
+      "DOBNOW-023"
+    ],
+    "constructedRequests": 2,
+    "providerCalls": 0,
+    "networkCalls": 0,
+    "generatedAnswersTested": 0,
+    "liveQualityConfirmed": false
+  },
+  "limitations": [
+    "The 110-case check inspects declared source routes, not generated answers or a complete current-baseline acceptance run.",
+    "Only two retained candidates have the complete packets used in this comparison; other historical guidance drafts are not silently reconstructed from partial citations.",
+    "The retained v14 timing packet is unchanged by this repair and remains incompatible with the later release-history relationship check. Only the v15 attestation packet is used for current request construction.",
+    "The shared v16 instruction reaches all official-guidance drafting and verification requests. Route eligibility does not prove other generated answers will be unchanged.",
+    "Constructed requests preserve full source passages and model settings but are not a fresh HTTP preflight. Identity is redacted; no price, latency or semantic pass is inferred.",
+    "Only the specified positive applicant signature wording is completed. Other phrasings, compound actions, source conflicts and omitted actions still require semantic verification."
+  ],
+  "routes": [
+    {
+      "id": "CC-01",
+      "authoredInputSHA256": "a7b341e83c3e8c249bec4cedb328d9cf8321125b7cb7977f4cffe88dd490b5a6",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "CC-02",
+      "authoredInputSHA256": "a906f35bfafb4eeff9f65dba51df3d12e8aca111b47c237a5db9f3b12e9fcbb7",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "CC-03",
+      "authoredInputSHA256": "56ef0828b2ba6640ffff420d755446af5ff45bcacdd993cbe427c8c688c24a82",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "CC-04",
+      "authoredInputSHA256": "ed2e311316574a568977f59616796efea9e513e8bbba045f93ead99d8a4ac003",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "CC-05",
+      "authoredInputSHA256": "fde91613c682799238433de4b23b245cbe60231337591bbc5ef634581a4bc28b",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-01",
+      "authoredInputSHA256": "493cfa89342b223eac2eda1047388956fd667452ddad193abbbce9e1c865fcb0",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-02",
+      "authoredInputSHA256": "3e3869b33fdfbc7593abb68ed8cc0abe24493bf6db0d34c467385d0c240fe9a7",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-03",
+      "authoredInputSHA256": "98b25e17083b1ec7beca9a5d94072cc89db6409f3be51c6ae5612952f8f1770c",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-04",
+      "authoredInputSHA256": "fcac143a86f5cd072ca2a9dcf935e3593360d9539f33cd10597986f068c1a2bc",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-05",
+      "authoredInputSHA256": "f4cb3b9f53534ff845962746c7eade46a3cab446c240106138dc3c447c8d9861",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-06",
+      "authoredInputSHA256": "3fa70b15d9febe7d7d05102c8f7db199350747b8e2788f3801538039284b985f",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-07",
+      "authoredInputSHA256": "5fcc4f363aa30b6b3ee1d496c834ee9271eedaff47b3eecc5ef00f92155e3cdf",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-08",
+      "authoredInputSHA256": "822dbb7b3da8e20d299e63c292de981153eb48bbc04a805861f3894b1b0589c7",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-09",
+      "authoredInputSHA256": "2a988abd132792a81e4104ea4ce3d9c61ea56b1df51c66079d5c317c599a60c4",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-10",
+      "authoredInputSHA256": "8777b3d4e1d6da63f697ae1cd06bdf9bbe589a9e854809d1f5083fe446da5dd6",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-11",
+      "authoredInputSHA256": "5e3bcf4cc7e2e99244b95de2ed4cd101b7798d182f5586cd39e60f39899d08db",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-12",
+      "authoredInputSHA256": "7492e120892a71f4528120959248a148d45755c00bae85ab984aed75d42251d1",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-13",
+      "authoredInputSHA256": "a17cbe13280fa26ce9a3a717d4f32374b528835058fb32f5de58c24194f7b3d3",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-14",
+      "authoredInputSHA256": "f0bed626422e13a0bf8870cf20d35e9afdb94b6a37d5c986506f61869568f9ff",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-15",
+      "authoredInputSHA256": "db55f664247fb1caf7a12d7d7cf1d845a4bda7a2e6cd97e102e4569a399e49d8",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-16",
+      "authoredInputSHA256": "c5278db259385dc8b5aede97d363f05daa1e9d805b635e9d2de56be9b1212351",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-17",
+      "authoredInputSHA256": "d36cee85c04c7abb76a6addb287a2fe5087e46d8b11847635f7e9305e81f33af",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-18",
+      "authoredInputSHA256": "69c3e87b7fbed165b6850c1134ce1cd1c30ec5588a55d561f567c9aa3cd1d737",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-19",
+      "authoredInputSHA256": "cbe137fe86be80a9f03d4eb2bf95f04e45e0eac5b49d3fd27ba7a6a7e1632ce0",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-20",
+      "authoredInputSHA256": "88fcfb02683d0a05b4450b076d775d94bed04a1e54ff18addcb29afb40add985",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "ZR-21",
+      "authoredInputSHA256": "78c1e6d1c6f1fcbd7a5079fc859c00763978859108d85f3166cfa830626afe45",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-001",
+      "authoredInputSHA256": "4cd643ac879632820aa66d55ba8afcd692c2d67d9e9aea087e5d723623515879",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-002",
+      "authoredInputSHA256": "a234fa9933a8cda1d2ea3a5390f170840160a9068abc2eb501e3a6eb74f64acd",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-003",
+      "authoredInputSHA256": "a52215a3876aeafd84c1b44515ad9a0c243e2f0f356c300ec19e4b7adc195807",
+      "sourceDeclarations": [
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        },
+        {
+          "id": "dob-subsequent-faq",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page"
+        },
+        {
+          "id": "dob-nb-altco-faq",
+          "url": "https://www.nyc.gov/site/buildings/industry/new-building-buildfaqs.page"
+        },
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-004",
+      "authoredInputSHA256": "874f22abd60fe307e05c0a098dbbac44d6d1269e70c8762c9248004d1bf62d92",
+      "sourceDeclarations": [
+        {
+          "id": "dob-paa-process",
+          "url": "https://www.nyc.gov/site/buildings/industry/post-approval-amendment-paa.page"
+        },
+        {
+          "id": "dob-paa-faq",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-005",
+      "authoredInputSHA256": "6ec0e535ece5afc5a256b75f978ebfe24016aa17a99fce990cf6c070e12a17fa",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-006",
+      "authoredInputSHA256": "30f752164ffaa6cd9862b763c580bf220adafd21651ea9d20f1680ea6aff8698",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-007",
+      "authoredInputSHA256": "fcb231ddb4605d3975d20cc3c4f1d20684a5b6f42eb0da6cf1d41f93628a8b4b",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-008",
+      "authoredInputSHA256": "d33c19c69ab1f6fb5981386eadcf5c1cd65c58f7f5b67258492f365ffe884815",
+      "sourceDeclarations": [
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        },
+        {
+          "id": "dob-2022-code-changes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/2022_code_changes_dobnow.pdf"
+        },
+        {
+          "id": "dob-family-site-safety-notice",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/code_site_safety_1-3_family_sn.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-009",
+      "authoredInputSHA256": "37fc2427c29161fc419702e0d0b81cc516986f46dc4c1409eae68c29d8837690",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-010",
+      "authoredInputSHA256": "00c7df7639cf812e7df4c94ae0006a28b21175b965d5317863a9d16ad96faeb3",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-011",
+      "authoredInputSHA256": "13fc63df66732233b28a7e0781ca0e5dc12c2a5529145016571469f60491952d",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-012",
+      "authoredInputSHA256": "fdce0b3e6b5040b5b8daca22240582b5e3f0713f736c68505845d230cb6206af",
+      "sourceDeclarations": [
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        },
+        {
+          "id": "dep-stormwater-permits",
+          "url": "https://www.nyc.gov/site/dep/water/stormwater-permits.page"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-013",
+      "authoredInputSHA256": "dd2377f7a8a14f78b23aafbf7037ec97a7adc04efea80db4407e1c462460dd04",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-014",
+      "authoredInputSHA256": "6310c53162c9a125c10cb37bf94a6545c4ca249c69a750a577f9b8b1203df9c9",
+      "sourceDeclarations": [
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-015",
+      "authoredInputSHA256": "1b938d5b2bd20b415df3c20ef1fb533793e471ff46c050f42fcadcc540396385",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-016",
+      "authoredInputSHA256": "ac981d15f27855b2ac0fadadb30c881eddc97cd53a3e6635a1ee604f359d2ae6",
+      "sourceDeclarations": [
+        {
+          "id": "dob-loft-board-service-notice",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/26_lb_dn-sn.pdf"
+        },
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-017",
+      "authoredInputSHA256": "50c015af7367d48909a1f3cda737096511939d4737f658984c4f3c77d6afe347",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-018",
+      "authoredInputSHA256": "d735219b9bb802ca0c7021eaacd1fad207065e59cddaa6f4082fe75b6ffd8243",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-019",
+      "authoredInputSHA256": "208c7d06f30d27f971b1410c69d19a1360efe193ab90fd480f53f3f22a79968e",
+      "sourceDeclarations": [
+        {
+          "id": "dob-bpp-service-notice",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/bpp_build-sn.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-020",
+      "authoredInputSHA256": "bcf9e23c1414c2f06aff5870151d2f1f716074e011da2778eb0d48da75fa7611",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-021",
+      "authoredInputSHA256": "5522267061751e82aef377a93ef8b6b8f5eab50a57a9ed9739e46e010c65c70c",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-022",
+      "authoredInputSHA256": "4052ee13f21021b968d32c00a08095d1114c5a5d8ec780c3b85c9bcaa0fd22fc",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "DOBNOW-023",
+      "authoredInputSHA256": "9536f4003a16c0cb83f5dc38a955112f846f49491c0af1c687b2ef433b09eaf8",
+      "sourceDeclarations": [
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        },
+        {
+          "id": "dob-stakeholder-faq",
+          "url": "https://www.nyc.gov/site/buildings/industry/dob-now-build-faqs.page"
+        },
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-filing-submission-steps",
+          "url": "https://www.nyc.gov/site/buildings/property-or-business-owner/filing-through-dob-now-build.page"
+        }
+      ],
+      "declaresPreviewDocument": true
+    },
+    {
+      "id": "DOBNOW-024",
+      "authoredInputSHA256": "02ff4cc071196baa769bc8583ff0b6e4337926e237b2657883525f86014deb8c",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-01",
+      "authoredInputSHA256": "cdca6f41c1a51204276c695e8ca1eb836532b3c4c361ddd77e176e7e691f6e3a",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-02",
+      "authoredInputSHA256": "ea13d1011d30bef9965f1d4c86403310628d5e65d59e84af0dfc506a8e36bbca",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-03",
+      "authoredInputSHA256": "1a795ca445422c512b7418dcfa9a85cace3409d8c987cfb7c009f0026856b42d",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-04",
+      "authoredInputSHA256": "3f6c95861926cfd121b351dacbf64656ee02414f4c7c94391e245e01dcbfab1f",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-05",
+      "authoredInputSHA256": "f3f205b156798ed6f8ff923698de8e5b5b8db367d979ede3728c932cd69fae77",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-06",
+      "authoredInputSHA256": "3c9343a346c3e8bbb2b9b7b4188c29967de1e1c4666deccab644e8b3b6de35be",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-07",
+      "authoredInputSHA256": "c3ed522f6d3aeb2d370cb7f87500862f18109d9248469e8a5735e36bb97cd0b3",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-08",
+      "authoredInputSHA256": "fd956466eb2d9069675160d6bc409b6576b0ca9508bc8e006d4dfdf39146f70d",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-09",
+      "authoredInputSHA256": "4361de1b510c71284a6c768433d2962e4db44cc542e561595ac184569f0796ff",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-10",
+      "authoredInputSHA256": "fdb1f5c00cda0092da8cdcbe882d2b179b1fb33239d060b916504bcd8caa2e00",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-11",
+      "authoredInputSHA256": "038f8307710b6b0324ec6d3e441eb7b4940fa67a097e3a9b4ba8eb17bcef57e5",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-12",
+      "authoredInputSHA256": "cc7180250aa68bf2e29dc8d410d42451b51c2817202e21e6b3f7fe8861b9bbd1",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-13",
+      "authoredInputSHA256": "f1227c268613c1a040060a32480fca3ec7e04823766f4cf49442f34ee5040b0e",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-14",
+      "authoredInputSHA256": "41f5c41f2adb057d5e5c0c8f747a425c9d5fde053a978ca59391de26e5e94092",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "FGC-15",
+      "authoredInputSHA256": "333ec0d5602bc81292fd3be1a40ec1db59a9de95acecdbce63fefb767745bfe6",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-01",
+      "authoredInputSHA256": "d60effb81376608e59a1463704885b1990bec1462d39b39323480702faac7364",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-02",
+      "authoredInputSHA256": "cf5b1458517fda6e7dd7489734e76ce42ad92a549922fa09e7365bc45f327212",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-03",
+      "authoredInputSHA256": "5d00ce658daba0b279fa59590639f3480ce8b60b7656165d4206f77997344dfa",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-04",
+      "authoredInputSHA256": "ea95bb57abc34302382b92bbad81e4884f8b2ae9ffe6a24a3e39d9cec2a2f7a4",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-05",
+      "authoredInputSHA256": "1649561bdf0a9ce39f4c13ba07038abfd2ca62fedf7fed0a05c085dbe248e978",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-06",
+      "authoredInputSHA256": "b9a951cb0fc5bfc249a51131502f8f43b57369f8cc38a671b82e01bf105fc299",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-07",
+      "authoredInputSHA256": "bb718cdd38e1392c6b97eaccc4b5008a0cf934d65efd1ee6b3a7910f543bdffd",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-08",
+      "authoredInputSHA256": "0639df82464201ad460b59d1f78f437cbdeeffc22bb642d2688fc36f6a1a6c0b",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-09",
+      "authoredInputSHA256": "507fe315d964a751d4b9e66008989180582ca797e191a4cd21e4cabbfc54127a",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-10",
+      "authoredInputSHA256": "3e38c1bd791f407bd2e5e6881c0e6c9709b76a215b53a64b43494f9ba9db2381",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-11",
+      "authoredInputSHA256": "3afd0ac4549c292303046c389ca59715d8dd8cfe011ec11d17c3afcb2eafacc7",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-12",
+      "authoredInputSHA256": "f62d445e3e6e037d7e9db8ed19b821f07f497e5cf01a2103c0164cf87f082743",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-13",
+      "authoredInputSHA256": "be185cd980afb23f2dbf1fca8b1268a6a28c96864b9d9848a8943e59100bd1a2",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-14",
+      "authoredInputSHA256": "260d0f2efe9d8933dd20977015891390e013b9c36bdd738d3ca0fa0e9fe24baf",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "MC-15",
+      "authoredInputSHA256": "db058bab439a31cc71a91b6b9fcf8c9936af0ae7b3a952ad11569eca577867b8",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-01",
+      "authoredInputSHA256": "b0550366be3c5cb3cbb61f3175144f6cc4964178a08e516174e05c37230c8477",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-02",
+      "authoredInputSHA256": "eab94c541bdc47c4c56f91ccfbfcaf5b20626c6bd3fc95048fd38e2cfc02c9f5",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-03",
+      "authoredInputSHA256": "786f4d5e5b5fe8d48f636d4e0536511ad7ad67b65769c33e1e48f948f9218497",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-04",
+      "authoredInputSHA256": "7689499faef837d8f2d46436c63c0c6447252309f41a97000774d9b2d78e7cbd",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-05",
+      "authoredInputSHA256": "7f09f11c062f1f19f77415fe2cfc6e46931bc35d446070a26ac7cbf4caa566e8",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-06",
+      "authoredInputSHA256": "0abe1174604be439e088918b89beef2ba039554791e0e3d142f3d01ac41d8ef8",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-07",
+      "authoredInputSHA256": "2e1b755405a232eef0fa33a242e40f3b3c8bfc47bd0c123eff8085f9e5e45b63",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-08",
+      "authoredInputSHA256": "d24e447e97c5d5bc2ff29275dfae6aaad12f7ad75cf073aa48e57a4c50a0da13",
+      "sourceDeclarations": [
+        {
+          "id": "dob-build-release-notes",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_build_release_notes.pdf"
+        },
+        {
+          "id": "dob-application-guide",
+          "url": "https://www.nyc.gov/assets/buildings/pdf/dob_now_application_user_guide.pdf"
+        }
+      ],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-09",
+      "authoredInputSHA256": "ad6040cb9e0410b4b68980584c0f53a4c2b5d39e5ddf5b4c991a3f70db092c54",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-10",
+      "authoredInputSHA256": "a639f54c09818ffcf49aa53be263e0fdd157a08a8c812e5b53d63c1c4854ce3b",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-11",
+      "authoredInputSHA256": "369bcfe72531397105c16efe03e5f03952d6a45251310bb0c39e3c164a7bd405",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-12",
+      "authoredInputSHA256": "29d4a2885c2353a960a2562f6a698cc2639f45fa42edd795493c1531d9d346c2",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-13",
+      "authoredInputSHA256": "9f7f8dd5f35938934986e1f842ceda8530ac9fa5740e263ba86390bf2f375913",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-14",
+      "authoredInputSHA256": "701f84751f8f8fb9c4bc7bcf1eed180e1e6f706c19574d67ee4dc53a70eb3d05",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "GAP-15",
+      "authoredInputSHA256": "9bd1ba44113017fe6fd6c553d295c26a12fbec24a9b6febf8de1f21d6701c272",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-01",
+      "authoredInputSHA256": "f875268eea2e4f073a1c02db0aa01ba1cc02342b1fe4610fbb2b4f48f464151a",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-02",
+      "authoredInputSHA256": "2153718362110e26172d5d3c18ce43160308afd827e83788145df0d5498f89a5",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-03",
+      "authoredInputSHA256": "09c3a6affdb0e5ebb6b0d9d693a0ba75fca0eebb6d8aa285a65b4d1aaea7a783",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-04",
+      "authoredInputSHA256": "9d41ecca4caac0adb046438eafb997bf18f96dedc05f406de96f0b943a7f5e90",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-05",
+      "authoredInputSHA256": "5784d46da5e710f6f9d81ccd3338e3161df26b8831e15c83f9b6a7419c888283",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-06",
+      "authoredInputSHA256": "7ee33157a4fb0c10de807ca2896e47ca76fba736c6b9a1ba001db384f32dc7dd",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-07",
+      "authoredInputSHA256": "0090d9ad56c87640cb8e7ece2d35cfa2b5f5250beb727401744499c0a702e70a",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-08",
+      "authoredInputSHA256": "bb16b2b207c6364df58909c20aabc0a4e8bb10ee09ea9999e52015c774b9932b",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-09",
+      "authoredInputSHA256": "3ee120d8f136881adb3f336a6a12f5b510c67389f9226577225b733e7a7ecebc",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-10",
+      "authoredInputSHA256": "6f54cb02dc567786e865e76a29259f515079ded9d04eef43139cce8ae3b88e0a",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-11",
+      "authoredInputSHA256": "518dda98b208a75a15cb479b02f8e3cc6ade40306c15b612493ff17fba04b595",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-12",
+      "authoredInputSHA256": "8f78216a421ecca46d52ec5b77ac63fdd397dd178e8e748e7fec6267e4f31e6e",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-13",
+      "authoredInputSHA256": "c3c6c16cdd26891ca3c966057480f193eb315aab3c0a5ec8b61256f8d3fa94cf",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-14",
+      "authoredInputSHA256": "1911cae004a21de5487cc2d3f7f5573d4267d1829b07008a9c9d83159e4e6e23",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    },
+    {
+      "id": "PC-15",
+      "authoredInputSHA256": "09402bbd1356819ce0f340f937d4595c28b0cfe39e9a2360338ad3130ea02c9f",
+      "sourceDeclarations": [],
+      "declaresPreviewDocument": false
+    }
+  ],
+  "cases": [
+    {
+      "id": "DOBNOW-003",
+      "retainedRunFile": "evals/results/research-owner-api-round2-live-source-resolution-parts-2026-09-09.json",
+      "fullSourcePacketSHA256": "f5a845c107321179fe9f84928d4c76d3ed7bde52fd21bd870ab9c5b49c5c571b",
+      "before": {
+        "sourceResolutions": {
+          "packetSHA256": "b3e4ee76b223b95558c9f9e3b79edc1a4b9c7f490e7f4f4026d517a9c3ba611a",
+          "relationships": [
+            {
+              "relationshipIndex": 0,
+              "outcome": "resolved",
+              "statement": "The FAQ distinguishes creation from filing submission: it says a subsequent filing may be initiated and submitted after the I1 has been submitted (not while it remains pre-filing), while also acknowledging a subsequent filing can exist in pre-filing status and advising completion of as much of the I1 as possible before creating it because I1-populated fields will not update until I1 submission.",
+              "paragraphIndex": 0
+            },
+            {
+              "relationshipIndex": 1,
+              "outcome": "conditional",
+              "statement": "A subsequent filing functions as a separate application. The general guidance says an LOC is requested separately for each initial and subsequent filing, but the specialized NB/Alteration-CO FAQ says no LOC is requested for a subsequent filing and only the I1 changes to CO issued. The initial job type is not provided, so the applicable completion path cannot be selected.",
+              "paragraphIndex": 1
+            }
+          ]
+        },
+        "paragraphs": [
+          {
+            "text": "Use a subsequent filing under the existing job number—not a new unrelated job number—for the later plumbing scope, assuming it is part of the same construction project and property. A subsequent filing may add new scope and work types under the same job number, may have a new applicant, and functions as a separate application; it may also use a different review type. The guide says all filings for the same construction project should share the job number with the appropriate filing extension. The FAQ distinguishes creation from filing submission: it says a subsequent filing may be initiated and submitted after the I1 has been submitted (not while it remains pre-filing), while also acknowledging a subsequent filing can exist in pre-filing status and advising completion of as much of the I1 as possible before creating it because I1-populated fields will not update until I1 submission.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-77183aa15dad687a6565894d"
+              }
+            ]
+          },
+          {
+            "text": "For completion, the subsequent filing is separately processed. A subsequent filing functions as a separate application. The general guidance says an LOC is requested separately for each initial and subsequent filing, but the specialized NB/Alteration-CO FAQ says no LOC is requested for a subsequent filing and only the I1 changes to CO issued. The initial job type is not provided, so the applicable completion path cannot be selected.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-nb-altco-faq",
+                "claimID": "official-passage-42b3262068b7a32078d4c986"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [
+          "Whether the initial GC job is an NB or Alteration-CO filing, which determines the supplied guidance’s LOC treatment for the subsequent filing."
+        ],
+        "evidenceLimitations": []
+      },
+      "after": {
+        "sourceResolutions": {
+          "packetSHA256": "b3e4ee76b223b95558c9f9e3b79edc1a4b9c7f490e7f4f4026d517a9c3ba611a",
+          "relationships": [
+            {
+              "relationshipIndex": 0,
+              "outcome": "resolved",
+              "statement": "The FAQ distinguishes creation from filing submission: it says a subsequent filing may be initiated and submitted after the I1 has been submitted (not while it remains pre-filing), while also acknowledging a subsequent filing can exist in pre-filing status and advising completion of as much of the I1 as possible before creating it because I1-populated fields will not update until I1 submission.",
+              "paragraphIndex": 0
+            },
+            {
+              "relationshipIndex": 1,
+              "outcome": "conditional",
+              "statement": "A subsequent filing functions as a separate application. The general guidance says an LOC is requested separately for each initial and subsequent filing, but the specialized NB/Alteration-CO FAQ says no LOC is requested for a subsequent filing and only the I1 changes to CO issued. The initial job type is not provided, so the applicable completion path cannot be selected.",
+              "paragraphIndex": 1
+            }
+          ]
+        },
+        "paragraphs": [
+          {
+            "text": "Use a subsequent filing under the existing job number—not a new unrelated job number—for the later plumbing scope, assuming it is part of the same construction project and property. A subsequent filing may add new scope and work types under the same job number, may have a new applicant, and functions as a separate application; it may also use a different review type. The guide says all filings for the same construction project should share the job number with the appropriate filing extension. The FAQ distinguishes creation from filing submission: it says a subsequent filing may be initiated and submitted after the I1 has been submitted (not while it remains pre-filing), while also acknowledging a subsequent filing can exist in pre-filing status and advising completion of as much of the I1 as possible before creating it because I1-populated fields will not update until I1 submission.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-subsequent-faq",
+                "claimID": "official-passage-77183aa15dad687a6565894d"
+              }
+            ]
+          },
+          {
+            "text": "For completion, the subsequent filing is separately processed. A subsequent filing functions as a separate application. The general guidance says an LOC is requested separately for each initial and subsequent filing, but the specialized NB/Alteration-CO FAQ says no LOC is requested for a subsequent filing and only the I1 changes to CO issued. The initial job type is not provided, so the applicable completion path cannot be selected.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-789cc7ccd439eb8374132031"
+              },
+              {
+                "sourceID": "dob-nb-altco-faq",
+                "claimID": "official-passage-42b3262068b7a32078d4c986"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [
+          "Whether the initial GC job is an NB or Alteration-CO filing, which determines the supplied guidance’s LOC treatment for the subsequent filing."
+        ],
+        "evidenceLimitations": []
+      },
+      "repairs": [],
+      "requestComparisons": [],
+      "legacySourceResolutionPacketCompatible": false
+    },
+    {
+      "id": "DOBNOW-023",
+      "retainedRunFile": "evals/results/research-owner-api-round2-live-attestation-preparation-2026-09-09.json",
+      "fullSourcePacketSHA256": "a0c50bbf29d7b71dd81e968c382eec1e7e752048823c6ce42fdee22d697fd9d4",
+      "before": {
+        "sourceResolutions": {
+          "packetSHA256": "bb2b95282dcb8777e02bcb3d6e4e58859b7e9bee3ed54de656502687fc5b8d45",
+          "relationships": [
+            {
+              "relationshipIndex": 0,
+              "outcome": "conditional",
+              "statement": "If the Owner Type is Condo Unit Owner or Co-Op Tenant-Shareholder, the Condo/Co-Op Board representative must also log in and attest, and both the owner’s and Board representative’s attestations must be completed before the filing can proceed; the stated facts do not identify the Owner Type.",
+              "paragraphIndex": 1
+            }
+          ]
+        },
+        "paragraphs": [
+          {
+            "text": "No. A filing representative may perform data entry, but cannot submit a job filing or attest in place of the applicant or owner. The applicant must complete the Applicant of Record’s attestation and provide the final electronic signature; the owner must complete the Owner’s Attestation confirming authorization for the applicant to submit and acknowledging review of the application. Accordingly, the applicant and owner must complete their own attestations before the applicant officially submits the job filing to the Department.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-14224abff07118e8caab44b5"
+              },
+              {
+                "sourceID": "dob-stakeholder-faq",
+                "claimID": "official-passage-6f613a120d538b21c820a0d4"
+              },
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-2df747213ed0eabb932169bb"
+              },
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-0387989b82775986275b0764"
+              }
+            ]
+          },
+          {
+            "text": "If the Owner Type is Condo Unit Owner or Co-Op Tenant-Shareholder, the Condo/Co-Op Board representative must also log in and attest, and both the owner’s and Board representative’s attestations must be completed before the filing can proceed; the stated facts do not identify the Owner Type.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-build-release-notes",
+                "claimID": "official-passage-2e6a1d190b996cb029e2e04a"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [
+          "The Owner Type is unknown; it determines whether a Condo/Co-Op Board representative’s attestation is also required before the filing can proceed."
+        ],
+        "evidenceLimitations": []
+      },
+      "after": {
+        "sourceResolutions": {
+          "packetSHA256": "bb2b95282dcb8777e02bcb3d6e4e58859b7e9bee3ed54de656502687fc5b8d45",
+          "relationships": [
+            {
+              "relationshipIndex": 0,
+              "outcome": "conditional",
+              "statement": "If the Owner Type is Condo Unit Owner or Co-Op Tenant-Shareholder, the Condo/Co-Op Board representative must also log in and attest, and both the owner’s and Board representative’s attestations must be completed before the filing can proceed; the stated facts do not identify the Owner Type.",
+              "paragraphIndex": 1
+            }
+          ]
+        },
+        "paragraphs": [
+          {
+            "text": "No. A filing representative may perform data entry, but cannot submit a job filing or attest in place of the applicant or owner. The applicant must complete the Applicant of Record’s attestation and review the filing and provide the final electronic signature; the owner must complete the Owner’s Attestation confirming authorization for the applicant to submit and acknowledging review of the application. Accordingly, the applicant and owner must complete their own attestations before the applicant officially submits the job filing to the Department.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-application-guide",
+                "claimID": "official-passage-14224abff07118e8caab44b5"
+              },
+              {
+                "sourceID": "dob-stakeholder-faq",
+                "claimID": "official-passage-6f613a120d538b21c820a0d4"
+              },
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-2df747213ed0eabb932169bb"
+              },
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-0387989b82775986275b0764"
+              },
+              {
+                "sourceID": "dob-filing-submission-steps",
+                "claimID": "official-passage-2fdbbdf8c6ad0af5f5225a8d"
+              }
+            ]
+          },
+          {
+            "text": "If the Owner Type is Condo Unit Owner or Co-Op Tenant-Shareholder, the Condo/Co-Op Board representative must also log in and attest, and both the owner’s and Board representative’s attestations must be completed before the filing can proceed; the stated facts do not identify the Owner Type.",
+            "sourceUses": [
+              {
+                "sourceID": "dob-build-release-notes",
+                "claimID": "official-passage-2e6a1d190b996cb029e2e04a"
+              }
+            ]
+          }
+        ],
+        "missingFacts": [
+          "The Owner Type is unknown; it determines whether a Condo/Co-Op Board representative’s attestation is also required before the filing can proceed."
+        ],
+        "evidenceLimitations": []
+      },
+      "repairs": [
+        {
+          "paragraphIndex": 0,
+          "sourceID": "dob-filing-submission-steps",
+          "claimID": "official-passage-2fdbbdf8c6ad0af5f5225a8d",
+          "sourceContentHash": "82331aeed0fbbcc1376125bffe7ed7fa25744221fc1166534cee0281e73b34c3",
+          "sourceText": "Filing through DOB NOW: Build > STEP 6: Preview Submission — • Applicant must review the filing and provide a final electronic signature.",
+          "replacements": [
+            {
+              "offset": 127,
+              "before": ". The applicant must complete the Applicant of Record’s attestation and provide the final electronic signature",
+              "after": ". The applicant must complete the Applicant of Record’s attestation and review the filing and provide the final electronic signature"
+            }
+          ],
+          "addedSourceUse": true
+        }
+      ],
+      "requestComparisons": [
+        {
+          "phase": "draft",
+          "beforeBytesWithRedactedIdentity": 27389,
+          "afterBytesWithRedactedIdentity": 27695,
+          "beforeRequestSHA256": "5b73605af3863ad21ff8ede9eaf4a922fffb2d9b9f41dd586224247ccb6bc86c",
+          "afterRequestSHA256": "6b446be57e8646d53e544d0c744a008b07952765d253e1ad1e457c1a51eef01c",
+          "fullPassagesPreserved": true,
+          "factsPreserved": true,
+          "modelAndOutputBudgetPreserved": true
+        },
+        {
+          "phase": "verification",
+          "beforeBytesWithRedactedIdentity": 46527,
+          "afterBytesWithRedactedIdentity": 46982,
+          "beforeRequestSHA256": "c073750cae4c3a3bf4b3c186acc77e2ca2fdc732d9289714f6bd9d9ee9c64cff",
+          "afterRequestSHA256": "257ef6fada693aae0fa97d992dd897396c8420e5a9190d7e37adea8369fe10d3",
+          "fullPassagesPreserved": true,
+          "factsPreserved": true,
+          "modelAndOutputBudgetPreserved": true
+        }
+      ],
+      "historicalReceiptCannotApproveModifiedCandidate": true
+    }
+  ]
+}
