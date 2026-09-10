@@ -15,5 +15,5 @@ docs/
 permitext-sync-server/node_modules/
 permitext-sync-server/data/
 permitext-sync-server/tests/
-permitext-sync-server/evals/
+permitext-sync-server/evals/results/
 permitext-sync-server/.vercel/
