@@ -1,0 +1,609 @@
+{
+  "schema": "permitext.research-narrative-live-budget-check.v1",
+  "checkedAt": "2026-09-10T00:40:21.767Z",
+  "sourceCommit": "705037f1b46e75b13c05933ff9c58c5d6c7a94a7",
+  "sourceHashes": {
+    "app.mjs": "1b0d9b1c2cafab063ba96464b077798bfc17e868da66e76be7158031d29f01dd",
+    "research-narrative-source-bindings.mjs": "306ef02acf54660f4a0e4e98358a4f5da71b56de8855bff9ce5d39a3ca45d936",
+    "research-answer-quality.mjs": "deef135ca9641b5c294fa8ec8b977325cd98345236f0ada58febd78ed2c80d21",
+    "research-config.mjs": "877e06b7ebbc3245ac6aa6d26049b10bc94df5d7b86f207f3a5df35d139915cb",
+    "research-provider-client.mjs": "d18671f901c0d7eb6f518f9974b7fafe0383630534eddc1225f84d54a6a40ab1",
+    "research-cost-usage.mjs": "53d4dc69b5049e044566e4283ffcb4e2819634087a162a11e409c67760879be3",
+    "research-evidence-assembly.mjs": "a79b90be6c7ebee41e1ecb5156fddd47bfe41f00067640cddde625aec228967b",
+    "evidence-discovery.mjs": "47f76c9ba11ea1d5c05edc996eebe110fd4f467bccffe05c4fc1b2e6b6e2d714",
+    "research-model-routing.mjs": "2831cd83b4611b1ed063a4f3a2827518f118afeb6117cb1ba41f9e0431a29254",
+    "research-corpus-registry.mjs": "7c78c531b97fe73e4fd5fb72dc62956c5f947bc56676eef2b31aa4e1f8c9328c",
+    "research-source-policy.mjs": "0f569a60606aaace85c6cfde2dd179720717603da47ca7d898b1c66630d63980",
+    "research-conversation-facts.mjs": "8f9852590135b01db95136b5a70e81d766c2f0221727dae746aad20112996cd1",
+    "research-conversation-topic.mjs": "77baee9c8db51501fca1bfee6ea192869f8e6fd8a7c35b48eb8d5a7f848f7858",
+    "research-focused-technical-scope.mjs": "4c7f8ff22bc4bd11bf87a55417b8795b164443e0a704d9e64ebc33f27fc27f49",
+    "research-technical-topic-routes.mjs": "319075fb7223e387a70ee4038b62cab0c1df839c68de374317277d4548c8ef62",
+    "research-answer-presentation.mjs": "eba771b56d1265b9b0a8d56917194e53c378df231b7d4190c426d794cac2655f",
+    "research-claim-scope.mjs": "2c8435c8676c077e2f782cf9cf56afa0f0fb94af48004d1e3dae8e032296c6e0",
+    "evals/research-owner-scope-input.mjs": "03a5cce96d6434fe33ffd9ec120cca2f53be56317b31486d3ce35452eddce78e",
+    "evals/research-owner-http-request-binding.mjs": "3cc8d2eb1c7f5d0a85d9d362da08f29a194e3cc68855fa881a4915b311de51e9",
+    "evals/research-owner-code-review.mjs": "b02c57d324d33bd157fa148d3418e66c94288d87a40e8e40bd0b0696bc197854",
+    "scripts/check-research-narrative-live-budget-20260909.mjs": "f00d96d2c6c341c120f82b9b2d099e3ebdd08597b368c2be6e7151fec34471e1"
+  },
+  "inputs": [
+    {
+      "file": "evals/results/research-owner-api-round2-attestation-preparation-cost-audit-2026-09-09.json",
+      "sha256": "d816afc721960c53003f86c6da46588b7c82b7a30b1fca0ba8965fa543c1b22e"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-confirmation-2026-09-08.json",
+      "sha256": "1a642bea3fca22d7cf52c2e445bf06ccee1dffce70b3501fea1491e7906ee87d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-repair-confirmation-2026-09-08.json",
+      "sha256": "367810c40c58703468ff9bfc1c91a21a35d529c4495cdb873ce5d8a5ec3c4d09"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-code-coverage-2026-09-08.json",
+      "sha256": "1121f5632e301fecfe8979532df688e1dbde38989d9c1dcaa9a6bd56fd38e264"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-work-premise-2026-09-08.json",
+      "sha256": "68ce9a0fcdf7692a83517f366e1af28c7d206ae0ca8ae066d8f81234932e27f5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-remaining-code-2026-09-08.json",
+      "sha256": "40291ceccc23bfa603c530fb2c53b17d5ea4cab11816ec26d9fda6d2aa0218b1"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-focused-technical-2026-09-09.json",
+      "sha256": "5843e5088f5b4991ba2a8c2d6faa5fe419c3255b2b65b34a454c22206e47719d"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-percentage-scope-2026-09-09.json",
+      "sha256": "bcbada7dcbf39648d809eff1a4bc47167cba06336d4d42bdb2980d17e19419c5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-original-code-2026-09-09.json",
+      "sha256": "f406901dcca5f06398166f4a08bcfbadf6639bf24755777a0c7a9434d8ca7d8f"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-source-repair-v2-2026-09-09.json",
+      "sha256": "f991b5d3ce3757dddbea968291341571817c8cf9f3703101766766047c39ba57"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-zoning-repair-preservation-2026-09-09.json",
+      "sha256": "6cacf237b64e02d3b388adafea5f0b48865f3c9778e5d15e77b8fc19b8de03ca"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-source-coverage-2026-09-09.json",
+      "sha256": "485cba41a9c4a277347fa950f590c2ed25ebb6f48fe35b55f5d3e8fdae3bba12"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-safety-confirmation-2026-09-09.json",
+      "sha256": "68f098015f6d49060f62a725dc805f76b6f4692203e30f9de45cd3e8282a6cc9"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-dob-companion-confirmation-2026-09-09.json",
+      "sha256": "6eda9e8ac01a49c8a03960a4b937e92cb52e6c10ff70a4e1f9aa133ac8d7bbd3"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-section-reference-2026-09-09.json",
+      "sha256": "64dce861bd2c95a42aedffbee0b9be636ddf194b385c389c15b76638d1bab5c0"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-lot-history-2026-09-09.json",
+      "sha256": "102534c93f3b63786d3ac946a3b8af1270def90a7693acae633c8a2d921869bb"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-storage-scope-2026-09-09.json",
+      "sha256": "38d20c59f2b62a81f6f8e5a89855708f53124b390e5b075f48b2cec3bfc74eae"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-mapped-review-2026-09-09.json",
+      "sha256": "5aa60daf1e734b9f4ff386d71abff2f4c20b80db96a3c968343c3b873881b7b5"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-loft-pdf-2026-09-09.json",
+      "sha256": "f89cce9d535794630a575361d9ad86ec5795b1c6eba825294628af0f4d503042"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-guidance-precision-2026-09-09.json",
+      "sha256": "150a16789728f63b6520ceca8102eb9f1ced85bb20af0f3a9d826b433be8fc31"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-workflow-coverage-v2-2026-09-09.json",
+      "sha256": "2335d7b512ff17f7a76f46fd4fd6a249fe76d4e81484cbcf45a5fcc9757fc0e4"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-qualification-review-2026-09-09.json",
+      "sha256": "c15946fd67a5b6c0b59635ddaea9c6ed61aa384b81ea0997eb503cdf30228a95"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-span-2026-09-09.json",
+      "sha256": "17c9a21fbcbecb476023b7f52a8d6801d5b61b11763e33e1a5167b33e85b3bc2"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-relationships-2026-09-09.json",
+      "sha256": "bd547e03b922ce3131d8c919445e1cffc118321a2a500a18dd02ffb5076ac18e"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-decision-scope-2026-09-09.json",
+      "sha256": "44404c9d63762081603834b505584fcd04dd15f2be87d260664f76da14892896"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-claim-scope-2026-09-09.json",
+      "sha256": "96bf0051c296cc9f7a07b35093b6159093de6b968f2204e649d058369bd14978"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-draft-focus-2026-09-09.json",
+      "sha256": "8d5a6d2721446e9880590741989745c3ad08522e0e97a7e379856cdee4c1940b"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-resolutions-2026-09-09.json",
+      "sha256": "c673e5257eae56cb23587ca69d7be660f12c0eb77de5923a84e7e95e9e2494ed"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-source-resolution-parts-2026-09-09.json",
+      "sha256": "7cc352badc9e6ed4ac022784ff022ccedbf7d508cc66bac7ef2820302a9a9d7a"
+    },
+    {
+      "file": "evals/results/research-owner-api-round2-live-attestation-preparation-2026-09-09.json",
+      "sha256": "af3e04e457c002d70d9ec0d510cc93fe897b430db782108677fdc34d0854495d"
+    },
+    {
+      "file": "evals/research-owner-api-round2-authorization-20260909.json",
+      "sha256": "bef70aa9e7f1df674904c6d6cd9c550dbeb491e28eb11e5e7038592e95b49f44"
+    },
+    {
+      "file": "evals/research-owner-code-candidates.json",
+      "sha256": "461b47898980aeaa29cf65a728b548fe3a1de70105beb0dd34a16c4e182adbe7"
+    },
+    {
+      "file": "evals/results/research-owner-live-attribution-confirmation-2026-09-08.json",
+      "sha256": "5921e41d84f84949d971ccfb0ec6d9f0727bacd48ded8fbc3099ac807a405499"
+    }
+  ],
+  "authoredInput": {
+    "question": "The only way to stop a building’s supply and return fans in an emergency is to operate the electrical disconnect at each fan. Does that satisfy the Mechanical Code’s manual ventilation-control requirement?",
+    "projectCodeVersion": "2022 New York City Construction Codes",
+    "projectFacts": [],
+    "pinnedEvidence": [],
+    "messages": []
+  },
+  "authoredInputSHA256": "1649561bdf0a9ce39f4c13ba07038abfd2ca62fedf7fed0a05c085dbe248e978",
+  "summary": {
+    "id": "MC-05",
+    "authorizationUSD": 8.5,
+    "conservativeSpentUSD": 8.351519,
+    "remainingConservativeAuthorizationUSD": 0.148481,
+    "initialRequestMaximumUSD": 0.29083,
+    "retainedCandidateVerifierMaximumUSD": 0.028704,
+    "initialRequestFitsRemainingAllowance": false,
+    "liveProviderCalls": 0,
+    "externalNetworkCalls": 0,
+    "mockedProviderResponses": 2,
+    "liveAnswerQualityConfirmed": false
+  },
+  "limitations": [
+    "The $1 ceiling is confined to a process with intercepted provider calls and no credentials; it is not live spending authorization.",
+    "The second actual HTTP request uses the approved remaining allowance and stops before any provider dispatch. No model, source packet, output budget or live spending guard was reduced to fit.",
+    "The verifier request is constructed from a retained historical draft and the current citation repair. Its mocked passing response is not a new quality review or professional acceptance.",
+    "Request maxima are conservative reservations using configured rates, not actual charges or a quote for typical Research. Current provider balance/invoice was not checked.",
+    "All 110 authored questions remain in scope. This one-case request-sizing check does not establish current full-cohort quality, cost or latency."
+  ],
+  "attempts": [
+    {
+      "stage": "sizing",
+      "maximumTurnUSD": 1,
+      "httpStatus": 200,
+      "responseCode": null,
+      "interceptedRequests": 2,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "23b37ad8-248a-4df7-bd1a-8415e1ab23e7",
+          "createdAt": "2026-09-10T00:40:19.583Z",
+          "status": "completed",
+          "mode": "openai",
+          "charged": true,
+          "fundingSource": "included",
+          "model": "gpt-5.6-terra",
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [
+            "gpt-5.6-terra",
+            "gpt-5.6-luna"
+          ],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 1,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 2,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": 0,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 1343,
+          "failureCode": null,
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": "openai-standard-20260908-luna+openai-standard-20260908-terra"
+        }
+      ],
+      "syntheticDelivery": true
+    },
+    {
+      "stage": "remaining-allowance",
+      "maximumTurnUSD": 0.148481,
+      "httpStatus": 503,
+      "responseCode": "RESEARCH_SPEND_CAP",
+      "interceptedRequests": 0,
+      "operations": [
+        {
+          "schemaVersion": 1,
+          "id": "4c8bd849-4fcf-40b4-ba07-c261c7043c2b",
+          "createdAt": "2026-09-10T00:40:21.255Z",
+          "status": "failed",
+          "mode": "openai",
+          "charged": false,
+          "fundingSource": "included",
+          "model": null,
+          "requestedModel": "gpt-5.6-terra",
+          "modelUsage": [],
+          "routingVersion": "20260901-luna-terra-hybrid-zoning-compiler-v6",
+          "routingMode": "hybrid",
+          "answerTier": "accurate",
+          "escalated": false,
+          "escalationStages": [],
+          "verificationAttemptCount": 0,
+          "structuredResponseRetryCount": 0,
+          "structuredAttemptFailureCount": 0,
+          "structuredAttemptFailureStages": [],
+          "verificationIssueTypes": [],
+          "verificationAttemptDiagnostics": [],
+          "providerRequestCount": 0,
+          "pendingProviderRequestCount": 0,
+          "inputTokens": 0,
+          "cachedInputTokens": 0,
+          "cacheWriteInputTokens": 0,
+          "outputTokens": 0,
+          "totalTokens": 0,
+          "estimatedCostUSD": null,
+          "actualProviderCostUSD": 0,
+          "conservativeProviderCostUSD": 0,
+          "durationMilliseconds": 447,
+          "failureCode": "RESEARCH_SPEND_CAP",
+          "failureStage": null,
+          "providerIncompleteReason": null,
+          "webSupportRequested": false,
+          "webSupportSearched": false,
+          "pricingVersion": null
+        }
+      ],
+      "syntheticDelivery": false
+    }
+  ],
+  "captures": [
+    {
+      "phase": "permitext_code_interpretation",
+      "model": "gpt-5.6-terra",
+      "maxOutputTokens": 3000,
+      "requestBytes": 46342,
+      "safetyIdentifierLength": 64,
+      "requestSHA256": "02f47265ef441b20e7247ff0e03c5944f8156394dd63d46b32255ca9254b5587",
+      "retainedRequestBody": {
+        "model": "gpt-5.6-terra",
+        "store": false,
+        "reasoning": {
+          "effort": "low"
+        },
+        "max_output_tokens": 3000,
+        "safety_identifier": "isolated-account",
+        "instructions": "You are a building-code research assistant, not an authority having jurisdiction.   Make governing code conclusions only from the authorized enacted evidence supplied in the request.  Evidence marked user_pinned must be considered, but Permitext-discovered enacted evidence may identify a different controlling provision. Supporting web context may explain or contextualize an answer but is noncontrolling and must never create or override an enacted requirement. Never use web support to guess the identity of an unexplained acronym, agency, or program, or to substitute a similarly named authority. Request the exact authority when its identity is unresolved. Examine only attached official images; cite each exact visual source through its PASSAGE_ID. Never infer an unselected map or image. Treat maps and figures as evidence that can be misread. State any illegible label, uncertain boundary, missing lot location, or other visual ambiguity explicitly instead of guessing. Do not use pretrained or uncited outside knowledge as legal authority and do not invent requirements. Use current-question and established active-topic Project/conversation facts as factual context, never as cited code authority. Treat unsupplied occupancy, construction type, location, existing conditions, height and occupant load as unknown. Accept facts supplied in the current question or established by the user earlier in the active topic as premises. Do not list them as missing or request reconfirmation. Distinguish later professional document verification from whether a fact is established for this discussion. Project facts labeled as an owner claim, owner position, applicant assertion, or representation are not independently verified facts. Use them as the stated premise for discussion, but preserve professional verification of each material representation in missingFacts and keep any conclusion that depends on it conditional. Preserve the factual content of an established user shorthand such as fully sprinklered. If a code benefit separately depends on compliance with a named installation standard, request records establishing that standard without asking again whether the building is fully sprinklered or the system is installed throughout. Apply current-turn hypothetical facts only to the current hypothetical. They do not replace established facts. User-stated unknowns remain unknown. Never promote an earlier assistant conclusion into a user-established fact. Use the supplied structured evidence analysis as an organizational map, but resolve any conflict in favor of the raw enacted evidence. Treat unresolvedProjectFacts in the structured evidence analysis as user-declared unknowns, not assumptions or established facts. Carry each one into missingFacts only when it can materially affect the requested conclusion. Before finalizing, identify separately each unresolved input that can change or authorize the result: the approved-record basis (current or partial certificate of occupancy, approved plans or loads, prior approval); quantities, rates, capacities, dimensions, locations and system design; and cited or expressly implicated technical, agency or approval conditions. Name material details such as detector quantities, airflow, filing status, electrical or emergency-power provisions, testing, monitoring and Fire Department conditions. Put material unknown facts in missingFacts; do not collapse them into full design, additional evidence, other requirements or applicable approvals. Do not add unrelated checklists or claim that an unsupplied authority imposes a requirement. Governing evidence may establish the answer; supporting evidence supports only its supplied rule. Contextual evidence may enter a supportedPoint only to explain its limited, non-governing relationship, never to establish the result. Never cite irrelevant evidence. With user-selected enacted passages, automatically discovered supporting evidence is optional; cite or discuss it only when materially necessary to answer the exact question or qualify the selected-source conclusion. Evidence labeled historical, prior-edition case-specific, or future-effective is available only because the user explicitly selected that edition or evidence. State that applicability status before relying on the provision, and never present it as the ordinary current code basis without supplied enacted applicability evidence. For the 2014 Construction Codes, identify the prior edition and say that applicability is project-specific and may depend on the application filing date. When the question names a code edition or year, use only evidence from that exact edition for legal claims and human-readable section references. Never borrow a similarly numbered current-edition provision or silently substitute another edition. If the requested edition is unavailable, identify that boundary and do not present current text as the historical rule. Evidence labeled with a collateral topic route was retrieved only because a supplied project fact matched another code topic. Review it internally, but do not create a supportedPoint or citation for it unless verifier feedback specifically establishes that the user asked that separate legal topic. For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not replace it with, or import a sibling table row, exception, or rule from, broader section context. Honor governing-ancestor RELATIONSHIP scope when its enacted applicability category or condition is needed to interpret a pinned descendant. Do not add generic headings or redundant parent restatements. Identify unresolved material ancestor applicability without weakening an independently supported conclusion. supportedPoints are exclusively for rules established by the assembled enacted evidence. Never put a bulletin, agency-guidance, or other supporting-web claim in supportedPoints, and never attach an enacted SECTION_ID or PASSAGE_ID to such a claim. Do not return a guidance-only answer without enacted bindings. Supporting web material may supplement an enacted answer but cannot replace its required supportedPoints and citations. Write answerText as the shortest complete, reliable user-facing answer. Do not target a fixed number of paragraphs or sentences. QUESTION-SPECIFIC ANSWER PRESENTATION CONTRACT\n{\"version\":\"20260909-claim-adjacent-conditions-v13\",\"mode\":\"direct-answer\",\"preferredStructure\":\"one or two concise paragraphs\",\"directAnswerFirst\":true,\"answerSequence\":[\"Direct answer\",\"Governing rule with citation\",\"Application or calculation\",\"Material exceptions or missing facts\"],\"requiredElements\":[\"Resolve the stated proposal with Yes, No, or the material condition in the first sentence.\",\"Follow with the cited rule and its application, including arithmetic when useful.\",\"Mentioning a requirement or retrieving many sources does not make a yes/no question a request for a requirements table.\",\"Include only qualifications that can change or explain this result.\"],\"universalRules\":[\"Lead with the supported result, a conditional result, or the specific reason the result cannot yet be determined.\",\"Follow with the governing rule and adjacent citation, apply it to the supplied facts or show the calculation, then state only material exceptions or missing facts.\",\"Keep any condition that changes a Yes or No in the opening answer; do not defer it to a closing disclaimer.\",\"The answer sequence is a reasoning order, not four mandatory headings; omit steps that do not apply.\",\"Never fill gaps in the question from an expected answer, an example scenario, or an unstated assumption.\",\"Place each material code citation next to the claim it supports.\",\"Separate governing enacted requirements from outside guidance or unsupplied standards.\",\"Keep material conditions and unresolved facts in answerText, attached to the correct object; expandable details alone are insufficient.\",\"Resolve each retained claim against all supplied source qualifications before writing or approving it. Keep the qualifying subject, branch, exception and operative event with that claim in the main answer. A later caveat, missing-fact question or evidence limitation cannot cure an earlier categorical claim. If a material source relationship remains unresolved, state that uncertainty at the affected claim instead of asserting one side and qualifying it elsewhere. Do not convert a conditional documentation requirement into an unsupported sequence or deadline: a document required if a response is selected does not by itself establish when that response can be selected. Omit secondary claims that neither answer the question nor materially qualify its result. If retained, they need their own complete conditions and supporting citations, including conditions on alternatives. Before returning the answer, check that its main text and all other fields make the same bounded claims.\",\"Establish each alternative rule's applicability independently; an unresolved condition does not establish another path. Preserve the stated subject, such as a building or nonaccessory tenant space, without generalizing to any room.\",\"Keep the opening, calculation and closing consistent. State a failed applicable limit directly; a scope note must not imply compliance. Broader compliance remains unevaluated.\",\"Use stipulated quantities and applicability unless contradicted; verify them when asked. Include secondary rules only when material to the result, retaining conditions for the proposed substitution.\",\"For every question, put a fact in missingFacts or followUpQuestions only if it can change or determine the requested result. Once the supplied evidence and facts establish that result, details needed solely to design a compliant replacement or apply an optional downstream exception are not missing facts for that decision. This applies to both Yes and No answers and to non-numeric questions. Such details may be labeled as optional design context without making the answer depend on them. Retain unresolved applicability or exception facts that could change the result, and design or calculation inputs when the user requests that design or calculation.\",\"Use headings, tables, lists, calculations and follow-ups only when useful. State each material point once; avoid repeating prose in a table or checklist or restating the conclusion.\"]} Follow the question-specific presentation contract unless a material safety, applicability, or evidence qualification requires a clearer structure. The contract controls presentation only; it never permits an unsupported claim or omission. Adapt the presentation to the question instead of forcing a fixed report template. Lead with a direct plain-language answer. For several parallel requirements, use a compact hyphen-led checklist; for a genuine side-by-side comparison with at least three shared features, a concise Markdown table is permitted; use a short descriptive heading only when it makes a longer answer easier to scan. Use Markdown bold sparingly for the controlling result, key dimensions, or short labels. Place a compact human-readable code reference such as (BC § 1012.2) next to the sentence, bullet, or table value it supports, using only section numbers present in the supplied enacted evidence. The structured sourceIDs remain the binding citation map. Place a supported calculation, design implication, correction or drawing note after the governing rule and label it. Do not introduce outside requirements. Honor an expressly short request unless a material qualification requires more room. Never omit a material qualification, applicability issue, conflicting provision or evidence limitation for brevity. If describing the consequences of a permission, preserve the supplied exceptions to those consequences. Do not lengthen a complete answer for visual consistency. Separate natural paragraphs in answerText with a blank line. Use headings or lists only when they make the reasoning clearer. For this ordinary Research conversation, write in direct plain language. Avoid report boilerplate, process narration, repeated question text, and phrases such as a project-specific answer requires reading. Keep the tone professional but conversational. Do not print SECTION_ID or PASSAGE_ID markers in answerText or supported-point prose; those identifiers belong only in the structured mapping fields. Break the material rules established by the assembled enacted evidence into ordered supportedPoints. Give each point a short plain-language heading, a complete explanation, and the exact supplied sectionID and sourceIDs that support it. Examples, consequences, code categories and practical requirements must be grounded in assembled evidence or supplied Project facts. When a point derives a classification from a definition, bind the definition passage to that same point as well as the operative rule. Label illustrations hypothetical; never use them to introduce unsupported law. Stay within the current question. For a narrow yes/no trigger, omit optional downstream design rates and collateral permissions unless needed to resolve or qualify that decision. Silence about an existing component does not establish permission to retain it. Discuss or cite another code topic only if it materially qualifies the requested conclusion or the user requests it; a fact merely mattering elsewhere is insufficient. State every material conclusion directly supported by the enacted evidence before discussing unresolved matters. For an open-ended request for design requirements, when the assembled evidence supplies multiple directly responsive dimensional or configuration rules, summarize those usable baseline rules before asking for project facts. Do not let a narrow exception, a specialized ramp or equipment type, or an unavailable referenced standard erase responsive requirements that the supplied enacted evidence does establish. For every required selected passage, preserve each material qualifier contained in that exact passage—including a proviso, exception, deeming rule, definition, second-sentence clarification, or stated limit. Merely citing the passage or summarizing a broader rule is not enough. Quote specialized, unusual or awkward enacted phrases exactly before paraphrasing; never silently correct or normalize them. For design, control-sequence, installation or project compliance, distinguish the selected rule from missing material compliance inputs, including quantities, rates, capacities, locations, assemblies and approvals; name each precisely. Do not infer a room's legal function from furniture or users alone. If occupant load, occupancy or classification depends on actual use, keep unsupplied activities or function unresolved. For a numeric limit or table comparison, compare the stated project value with every directly applicable supplied limit. If the value complies with a stricter baseline limit, state that direct conclusion and do not make it conditional on qualifying for a more generous allowance. When enacted text states a percentage of an overall total and separately requires a minimum for each type, preserve those as two distinct rules in answerText and supportedPoints. In particular, never restate 10 percent of the total seating and standing spaces plus at least one of each dining-surface type as 10 percent of each type. Preserve cumulative and alternative conditions exactly. When enacted text requires A and B, never restate it as A or B; when it permits alternatives, do not turn or into and. When the same supplied table row places the user's stated category beside a materially different conditional category, briefly identify the alternate value and its qualifying condition when that contrast explains the result. Never apply the alternate value without the qualifying fact.    A missing fact belongs in missingFacts or followUpQuestions only when it can change the requested conclusion. A fact that merely confirms an already-supported, more conservative result may be identified as a professional validation item, but it must not weaken or condition that result.         Treat a corpus or evidence limitation as a boundary on what Permitext evaluated, not as proof that another provision imposes a requirement. Do not say an outside or unsupplied provision requires verification or might change the result unless supplied enacted evidence establishes that consequence. Every passage marked REQUIRED_CLAIM_COVERAGE must be cited with that exact PASSAGE_ID and its material rule or limitation addressed in answerText. Use a supportedPoint when the passage establishes an affirmative rule; a passage cited solely to explain that it does not establish the requested proposition need not be duplicated as a positive supportedPoint. Separate the supported answer, missing project facts, evidence limitations, and additional evidence needed. evidenceLimitations must contain at least one non-empty statement describing the boundary of the supplied evidence; never return an empty array or blank item. evidenceLimitations must state only the material legal-evidence boundary, never internal retrieval diagnostics, corpus routing, shortened-section or omitted-cross-reference notices. Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional. Use the assembled document structure, including exception headings, when it is supplied. If an exception and its conditions are present, state the conditional result instead of demanding additional text merely to acknowledge that conditional rule. When a needed category, table row, shared-facility condition or calculation input is unresolved, name it specifically. Select use categories from the actual use; explain what the supplied evidence establishes instead of merely saying a table or category must be checked. When assembled evidence supplies a calculation procedure, briefly explain every material step and exception in that procedure even when missing inputs prevent a final numeric result. If the question attributes a requirement to an agency, funding program, or other authority not represented in the assembled evidence, explicitly request that authority's applicable design standard, funding or program requirements, or official guidance. Do not substitute additional Building Code text for the missing outside authority. If the question cannot be answered from the assembled enacted evidence, say so directly. Generate only the minimum high-value followUpQuestions needed to materially advance the answer; do not ask for facts that cannot change the result. Every major code conclusion and every supportedPoint must be covered by enacted citations using the supplied SECTION_ID and PASSAGE_ID values. For every material web-guidance statement, select only the exact supplied WEB_SOURCE_ID and WEB_CLAIM_ID pair from SOURCE-SPECIFIC ATTRIBUTED CLAIMS in supportingSourceUses; never write a new claim for that pair. In answerText label it noncontrolling and separate it from enacted rules. Leave supportingSourceUses empty when no web source materially improves the answer. Show any WEB SUPPORT LIMITATION in evidenceLimitations; never infer the unavailable document's contents.",
+        "input": "QUESTION\nThe only way to stop a building’s supply and return fans in an emergency is to operate the electrical disconnect at each fan. Does that satisfy the Mechanical Code’s manual ventilation-control requirement?\n\nRESEARCH CODE BASIS\nJURISDICTION: New York City\nRETRIEVAL_SCOPE: routed-multi-corpus\nSEARCHED_CORPORA: [{\"id\":\"nyc-2022-construction-codes\",\"label\":\"2022 NYC Construction Codes\",\"codeEdition\":\"2022 New York City Construction Codes\",\"codeVersion\":\"CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\",\"codeYear\":2022,\"applicabilityStatus\":\"current-enacted-edition\",\"routeReason\":\"construction-code cue\",\"blockedReason\":null,\"codePrefixes\":[\"AC\",\"BC\",\"FGC\",\"MC\",\"PC\"]}]\nEXPLICITLY_PINNED_CORPORA: []\nUNAVAILABLE_CORPORA: []\nTreat each evidence record's corpus and edition as its source boundary. When the question names a code edition or year, verify every legal claim and human-readable section reference against evidence from that exact edition. Never borrow similarly numbered text from another edition or silently substitute the current edition. If the requested edition is unavailable, say so and do not present current text as historical. Do not imply that an unavailable or unsearched corpus was retrieved. Ordinary internal corpus exclusions are not user-facing evidence limitations; mention another corpus only when the question requested it and LIMITATION explains why it was unavailable.\n\nAUTHORIZED ENACTED EVIDENCE\nPASSAGE_ID: research-permitext_discovered-id:10446-1\nSECTION_ID: 10446\nCODE: MC\nSECTION: 405.2\nTITLE: 405.2 Manual control.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: candidate\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “stop”, “supply”, “return”, “fan”, “emergency”.\nRETRIEVAL_REASON: It matches “stop”, “supply”, “return”, “fan”, “emergency”.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 405.2 405.2 Manual control. Each air distribution system shall be provided with not less than one manual control to stop the operation of the supply, return, and exhaust fan(s) in an emergency. The manual control shall be provided at an approved location. A disconnect switch shall not be considered a manual control.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10447-2\nSECTION_ID: 10447\nCODE: MC\nSECTION: 405.2.1\nTITLE: 405.2.1 Office buildings.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: candidate\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “building”, “supply”, “return”, “fan”, “manual”.\nRETRIEVAL_REASON: It matches “building”, “supply”, “return”, “fan”, “manual”.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 405.2.1 405.2.1 Office buildings. Any building where the main use or dominant occupancy is classified in occupancy group B having occupied floors located more than 75 feet (22 860 mm) above the lowest level of fire department vehicle access, where a system serves a floor or floors other than the floor on which the equipment is located, shall be provided with the following controls, in addition to the controls required by this chapter: 1. Manual controls for operating individually each air supply and each exhaust or return fan in the system located as follows: 1.1. At the Fire Command Center, and 1.2. In the room containing the affected air-handling fans. 2. Manual controls for operating individually or in groups each remote control reversible fire shutter, when such shutters are provided in accordance with the provisions of the New York City Building Code, or each smoke damper provided in accordance with the provisions of the New York City Building Code. Such controls shall be located at the Fire Command Center. Section MC 406: Ventilation of Uninhabited Spaces\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10839-3\nSECTION_ID: 10839\nCODE: MC\nSECTION: 606.5\nTITLE: 606.5 Manual control.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: candidate\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “fans”, “fan”, “manual”, “control”, “air”. The proposed passage includes a cross-reference that may require additional evidence.\nRETRIEVAL_REASON: It matches “fans”, “fan”, “manual”, “control”, “air”. The proposed passage includes a cross-reference that may require additional evidence.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 606.5 606.5 Manual control. Manual controls of fans shall be provided in accordance with Section 405.2. Section MC 607: Ducts and Air Transfer Openings\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:11265-4\nSECTION_ID: 11265\nCODE: MC\nSECTION: 1105.6.3\nTITLE: 1105.6.3 Ventilation rate.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: candidate\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “fans”, “fan”, “emergency”, “mechanical”, “ventilation”.\nRETRIEVAL_REASON: It matches “fans”, “fan”, “emergency”, “mechanical”, “ventilation”.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 1105.6.3 1105.6.3 Ventilation rate. For other than ammonia systems, the mechanical ventilation systems shall be capable of exhausting the minimum quantity of air both at normal operating and emergency conditions, as required by Sections 1105.6.3.1 and 1105.6.3.2. The minimum required ventilation rate for ammonia shall be 30 air changes per hour in accordance with IIAR2. Multiple fans or multispeed fans shall be allowed to produce the emergency ventilation rate and to obtain a reduced airflow for normal ventilation.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10415-5\nSECTION_ID: 10415\nCODE: MC\nSECTION: 403.1\nTITLE: 403.1 Ventilation system.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: candidate\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “building”, “supply”, “return”, “mechanical”, “code”. The proposed passage includes a cross-reference that may require additional evidence.\nRETRIEVAL_REASON: It matches “building”, “supply”, “return”, “mechanical”, “code”. The proposed passage includes a cross-reference that may require additional evidence.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 403.1 403.1 Ventilation system. Mechanical ventilation shall be provided by a method of supply air and return or exhaust air. The amount of supply air shall be approximately equal to the amount of return and exhaust air. The system shall not be prohibited from producing negative or positive pressure; such pressures shall not result in door opening forces in excess of those indicated in the New York City Building Code and shall not prevent doors from closing as required by the New York City Building Code . The method to convey ventilation air shall be designed and installed in accordance with Chapter 6.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10445-6\nSECTION_ID: 10445\nCODE: MC\nSECTION: 405.1\nTITLE: 405.1 General.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: candidate\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “supply”, “operate”, “mechanical”, “manual”, “ventilation”.\nRETRIEVAL_REASON: It matches “supply”, “operate”, “mechanical”, “manual”, “ventilation”.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 405.1 405.1 General. Mechanical ventilation systems shall be provided with manual or automatic controls that will operate such systems whenever the spaces are occupied. Air-conditioning systems that supply required ventilation air shall be provided with controls designed to automatically maintain the required outdoor air supply rate during occupancy.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10837-7\nSECTION_ID: 10837\nCODE: MC\nSECTION: 606.4.2\nTITLE: 606.4.2 Fan shutdown for recirculating air systems.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: exception\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “stop”, “building”, “fans”, “fan”, “manual”. The proposed passage includes a cross-reference that may require additional evidence.\nRETRIEVAL_REASON: It matches “stop”, “building”, “fans”, “fan”, “manual”. The proposed passage includes a cross-reference that may require additional evidence.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 606.4.2 606.4.2 Fan shutdown for recirculating air systems. When any building or floor is provided with an air system designed to use recirculated air and is protected by an automatic sprinkler system or an automatic fire alarm system, the fans recirculating air serving the affected area shall automatically stop when sprinkler water flow or a fire condition is detected in the area. For the purposes of this section, 100 percent outdoor air systems shall not be considered recirculating systems. Exceptions: 1. Activation of a manual pull station shall not be required to automatically stop the fans. 2. Systems having a capacity of 2,000 cfm (0.9 m 3 /s) or less or serving not more than one floor. 3. In Group R-2 and R-3 occupancies with energy recovery systems complying with Section 514.4 and not serving public corridors.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:11289-8\nSECTION_ID: 11289\nCODE: MC\nSECTION: 1106.5.2\nTITLE: 1106.5.2 Ventilation system.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: candidate\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “only”, “fans”, “fan”, “ventilation”, “control”.\nRETRIEVAL_REASON: It matches “only”, “fans”, “fan”, “ventilation”, “control”.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 1106.5.2 1106.5.2 Ventilation system. A clearly identified switch of the break-glass type or an approved tamper-resistant switch shall provide on-only control of the machinery room ventilation fans.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10474-9\nSECTION_ID: 10474\nCODE: MC\nSECTION: 501.4\nTITLE: 501.4 Pressure equalization.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: candidate\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “only”, “building”, “supply”, “operate”, “satisfy”.\nRETRIEVAL_REASON: It matches “only”, “building”, “supply”, “operate”, “satisfy”.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 501.4 501.4 Pressure equalization. Mechanical exhaust systems shall be sized to remove the quantity of air required by this chapter to be exhausted. The system shall operate when air is required to be exhausted. Where mechanical exhaust is required in a room or space in other than occupancies in R-3, such space shall be maintained with a neutral or negative pressure. If a greater quantity of air is supplied by a mechanical ventilating supply system than is removed by a mechanical exhaust for a room, adequate means shall be provided for the natural or mechanical exhaust of the excess air supplied. If only a mechanical exhaust system is installed for a room or if a greater quantity of air is removed by a mechanical exhaust system than is supplied by a mechanical ventilating supply system for a room, adequate makeup air consisting of supply air, transfer air or outdoor air shall be provided to satisfy the deficiency. The calculated building infiltration rate and openable area shall not be used to satisfy the requirements of this section.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:11341-10\nSECTION_ID: 11341\nCODE: MC\nSECTION: 1109.1\nTITLE: 1109.1 Testing required.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: candidate\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “fans”, “fan”, “emergency”, “operate”, “ventilation”.\nRETRIEVAL_REASON: It matches “fans”, “fan”, “emergency”, “operate”, “ventilation”.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 1109.1 1109.1 Testing required. The following emergency devices and systems shall be periodically tested and the results logged in accordance with the manufacturer's instructions and as required by the Commissioner of the Fire Department: 1. Treatment and flaring systems. 2. Valves and appurtenances necessary to the operation of emergency refrigeration control boxes. 3. Fans and associated equipment intended to operate emergency purge ventilation systems. 4. Detection and alarm systems.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:113-13\nSECTION_ID: 113\nCODE: BC\nSECTION: 202\nTITLE: SECTION 202: Definitions\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_discovered\nEVIDENCE_FUNCTION: definition\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “only”, “way”, “building”, “supply”, “emergency”.\nRETRIEVAL_REASON: It matches “only”, “way”, “building”, “supply”, “emergency”.\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: AUTOMATIC. As applied to fire protection devices, a device or system providing an emergency function without the necessity for human intervention and activated as a result of a predetermined temperature rise, rate of temperature rise and/or the presence of combustion products.\n\nAUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is heated to its thermal rating or above, allowing water to discharge over a specified area.\n\nCORRIDOR. An enclosed exit access component that defines and provides a path of egress travel to an exit. Corridors shall be either interior or public.\nCorridor, interior. A corridor that serves only one tenant. In Group E occupancies, corridors serving only one institution shall be deemed as serving a single tenant.\nCorridor, public. A corridor that serves more than one tenant.\n\nEQUIPMENT. Tools, machinery, or other implements used to facilitate construction or demolition work.\n\nSMOKE. Air-borne solid and liquid particulates and gases evolved when a material undergoes pyrolysis or combustion, including the quality of air that is entrained or otherwise mixed into the mass.\n\nSMOKE CONTROL SYSTEM, MECHANICAL. An engineered system that includes all methods that can be used singly or in combination to modify smoke movement.\n\nSMOKE DAMPER. See \"Dampers, Types of.\"\n\nVENTILATION. The natural or mechanical process of supplying conditioned or unconditioned air to, or removing such air from, any space.\n\n---\n\nPASSAGE_ID: research-permitext_cross_reference-id:11266-1\nSECTION_ID: 11266\nCODE: MC\nSECTION: 1105.6.3.1\nTITLE: 1105.6.3.1 Quantity-normal ventilation.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_cross_reference\nEVIDENCE_FUNCTION: supporting_cross_reference\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: Direct enacted-text cross-reference from this answer's primary evidence\nRETRIEVAL_REASON: Direct cross-reference to MC 1105.6.3.1\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 1105.6.3.1 1105.6.3.1 Quantity-normal ventilation. During occupied conditions, the mechanical ventilation system shall exhaust the larger of the following: 1. Not less than 0.5 cfm per square foot (0.0025 m 3 /s × m 2 ) of machinery room area or 20 cfm (0.009 m 3 /s) per person. 2. A volume required to limit the room temperature rise to18°F (-7.8°C) taking into account the ambient heating effect of all machinery in the room but not above a maximum temperature of 122°F (50°C). (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .\n\n---\n\nPASSAGE_ID: research-permitext_cross_reference-id:11267-2\nSECTION_ID: 11267\nCODE: MC\nSECTION: 1105.6.3.2\nTITLE: 1105.6.3.2 Quantity-emergency conditions.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_cross_reference\nEVIDENCE_FUNCTION: supporting_cross_reference\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: Direct enacted-text cross-reference from this answer's primary evidence\nRETRIEVAL_REASON: Direct cross-reference to MC 1105.6.3.2\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 1105.6.3.2 1105.6.3.2 Quantity-emergency conditions. Upon actuation of the refrigerant detector required in Section 1105.3, the mechanical ventilation system shall exhaust air from the machinery room in the following quantity: Q = 100 x √ G (Equation 11-2) For SI: Q = 0.07 x √ G Where: Q = The airflow in cubic feet per minute (m 3 /s). G = The design mass of refrigerant in pounds (kg) in the largest system, any part of which is located in the machinery room\n\n---\n\nPASSAGE_ID: research-permitext_cross_reference-id:10744-7\nSECTION_ID: 10744\nCODE: MC\nSECTION: 514.4\nTITLE: 514.4 Recirculated air.\nCORPUS: 2022 NYC Construction Codes\nAPPLICABILITY_STATUS: current-enacted-edition\nCODE_EDITION: 2022 New York City Construction Codes\nCODE_VERSION: CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\nPASSAGE_TEXT_SHA256: unavailable\nEVIDENCE_ORIGIN: permitext_cross_reference\nEVIDENCE_FUNCTION: supporting_cross_reference\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: Direct enacted-text cross-reference from this answer's primary evidence\nRETRIEVAL_REASON: Direct cross-reference to MC 514.4\nREQUIRED_CLAIM_COVERAGE: no\nENACTED_TEXT: 514.4 514.4 Recirculated air. Class 1 or Class 2 air as described in ASHRAE 62.1 that is conveyed within energy recovery systems shall not be considered as recirculated air where the energy recovery ventilation system is constructed to limit cross-leakage between air streams to less than 10 percent of the total airflow design capacity.\n\nSTRUCTURED EVIDENCE ANALYSIS — INTERNAL RESEARCH MAP\n{\"schemaVersion\":1,\"controllingProvisions\":[],\"generalRules\":[],\"exceptions\":[{\"label\":\"MC 606.4.2\",\"summary\":\"MC 606.4.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.\",\"sourceIDs\":[\"research-permitext_discovered-id:10837-7\"]}],\"conditions\":[],\"limitations\":[],\"definitions\":[{\"label\":\"BC 202\",\"summary\":\"BC 202 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.\",\"sourceIDs\":[\"research-permitext_discovered-id:113-13\"]}],\"crossReferences\":[{\"label\":\"MC 1105.6.3.1\",\"summary\":\"MC 1105.6.3.1 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.\",\"sourceIDs\":[\"research-permitext_cross_reference-id:11266-1\"]},{\"label\":\"MC 1105.6.3.2\",\"summary\":\"MC 1105.6.3.2 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.\",\"sourceIDs\":[\"research-permitext_cross_reference-id:11267-2\"]},{\"label\":\"MC 514.4\",\"summary\":\"MC 514.4 is supporting enacted evidence on the unrestricted topic route; apply only its exact supplied text.\",\"sourceIDs\":[\"research-permitext_cross_reference-id:10744-7\"]}],\"tables\":[],\"userPinnedEvidence\":[],\"permitextDiscoveredEvidence\":[\"research-permitext_discovered-id:10446-1\",\"research-permitext_discovered-id:10447-2\",\"research-permitext_discovered-id:10839-3\",\"research-permitext_discovered-id:11265-4\",\"research-permitext_discovered-id:10415-5\",\"research-permitext_discovered-id:10445-6\",\"research-permitext_discovered-id:10837-7\",\"research-permitext_discovered-id:11289-8\",\"research-permitext_discovered-id:10474-9\",\"research-permitext_discovered-id:11341-10\",\"research-permitext_discovered-id:113-13\",\"research-permitext_cross_reference-id:11266-1\",\"research-permitext_cross_reference-id:11267-2\",\"research-permitext_cross_reference-id:10744-7\"],\"projectFactsUsed\":[],\"unresolvedProjectFacts\":[],\"evidenceLimitations\":[\"Permitext limited this answer to the enacted evidence assembled for the current question.\"],\"highValueFollowUpQuestions\":[]}",
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "name": "permitext_code_interpretation",
+            "strict": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "answerText": {
+                  "type": "string"
+                },
+                "supportedPoints": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 12,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "heading": {
+                        "type": "string"
+                      },
+                      "explanation": {
+                        "type": "string"
+                      },
+                      "sectionID": {
+                        "type": "string",
+                        "enum": [
+                          "10446",
+                          "10447",
+                          "10839",
+                          "11265",
+                          "10415",
+                          "10445",
+                          "10837",
+                          "11289",
+                          "10474",
+                          "11341",
+                          "113",
+                          "11266",
+                          "11267",
+                          "10744"
+                        ]
+                      },
+                      "sourceIDs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "research-permitext_discovered-id:10446-1",
+                            "research-permitext_discovered-id:10447-2",
+                            "research-permitext_discovered-id:10839-3",
+                            "research-permitext_discovered-id:11265-4",
+                            "research-permitext_discovered-id:10415-5",
+                            "research-permitext_discovered-id:10445-6",
+                            "research-permitext_discovered-id:10837-7",
+                            "research-permitext_discovered-id:11289-8",
+                            "research-permitext_discovered-id:10474-9",
+                            "research-permitext_discovered-id:11341-10",
+                            "research-permitext_discovered-id:113-13",
+                            "research-permitext_cross_reference-id:11266-1",
+                            "research-permitext_cross_reference-id:11267-2",
+                            "research-permitext_cross_reference-id:10744-7"
+                          ]
+                        },
+                        "minItems": 1
+                      }
+                    },
+                    "required": [
+                      "heading",
+                      "explanation",
+                      "sectionID",
+                      "sourceIDs"
+                    ]
+                  }
+                },
+                "assumptions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "missingFacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "followUpQuestions": {
+                  "type": "array",
+                  "maxItems": 8,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "evidenceLimitations": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalEvidenceNeeded": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "supportingSourceUses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "sourceID": {
+                        "type": "string"
+                      },
+                      "claimID": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "sourceID",
+                      "claimID"
+                    ]
+                  }
+                },
+                "citations": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "sectionID": {
+                        "type": "string",
+                        "enum": [
+                          "10446",
+                          "10447",
+                          "10839",
+                          "11265",
+                          "10415",
+                          "10445",
+                          "10837",
+                          "11289",
+                          "10474",
+                          "11341",
+                          "113",
+                          "11266",
+                          "11267",
+                          "10744"
+                        ]
+                      },
+                      "sourceIDs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "research-permitext_discovered-id:10446-1",
+                            "research-permitext_discovered-id:10447-2",
+                            "research-permitext_discovered-id:10839-3",
+                            "research-permitext_discovered-id:11265-4",
+                            "research-permitext_discovered-id:10415-5",
+                            "research-permitext_discovered-id:10445-6",
+                            "research-permitext_discovered-id:10837-7",
+                            "research-permitext_discovered-id:11289-8",
+                            "research-permitext_discovered-id:10474-9",
+                            "research-permitext_discovered-id:11341-10",
+                            "research-permitext_discovered-id:113-13",
+                            "research-permitext_cross_reference-id:11266-1",
+                            "research-permitext_cross_reference-id:11267-2",
+                            "research-permitext_cross_reference-id:10744-7"
+                          ]
+                        },
+                        "minItems": 1
+                      },
+                      "relevance": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "sectionID",
+                      "sourceIDs",
+                      "relevance"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "answerText",
+                "supportedPoints",
+                "assumptions",
+                "missingFacts",
+                "followUpQuestions",
+                "evidenceLimitations",
+                "additionalEvidenceNeeded",
+                "supportingSourceUses",
+                "citations"
+              ]
+            }
+          }
+        },
+        "service_tier": "default"
+      },
+      "retainedRequestSHA256": "02f47265ef441b20e7247ff0e03c5944f8156394dd63d46b32255ca9254b5587",
+      "maximumRequestUSD": 0.29083
+    },
+    {
+      "phase": "permitext_research_verification",
+      "model": "gpt-5.6-luna",
+      "maxOutputTokens": 4000,
+      "requestBytes": 41983,
+      "safetyIdentifierLength": 64,
+      "requestSHA256": "cdb39dfc5a2e10530d6ccaff9a5eb45c730a068ffb707981d36eb517226549ad",
+      "retainedRequestBody": {
+        "model": "gpt-5.6-luna",
+        "store": false,
+        "reasoning": {
+          "effort": "low"
+        },
+        "max_output_tokens": 4000,
+        "safety_identifier": "isolated-account",
+        "instructions": "Verify a proposed building-code research answer only against the supplied enacted evidence and stated project facts.  For each supported point, evaluate every passage in its sourceIDs array. Its sectionID identifies the primary section, not the exclusive source. The supported-point binding lookup resolves these IDs but does not establish substantive support. Fail with incorrect_citation if a claim lacks support in that point's bound passages, even when a supporting passage appears elsewhere in the answer's citations or supplied evidence. Never infer a missing binding from a shared topic or section number. Distinguish an enacted rule from its application to supplied facts. Accept a conclusion strictly deduced from the bound rule and those facts without requiring the code to repeat the question's wording. In particular, an additional stated feature does not itself create an exception to an unqualified applicable mandatory requirement; a separate sentence naming the user's proposed omission is not needed to conclude that omission fails that requirement. Keep the conclusion within that rule's scope. Reject deductions that depend on an unstated factual premise, classification, equivalence, exception or external legal rule.   Treat answerText as the complete user-facing narrative. Any conclusion or explanation fields are compatibility summaries derived from that narrative and must not be evaluated as separate required paragraphs. Presentation must fit the question: accept a concise direct paragraph for a simple or expressly short request, a compact checklist for parallel requirements, and a Markdown table only for a real side-by-side comparison. Fail with missed_material_conclusion if formatting hides the governing result or material qualification. Fail with unsupported_requirement if a bold statement, practical note, calculation, drawing note, or human-readable inline code reference is not supported by the supplied enacted evidence and structured citation map. Supporting web material may verify only clearly labeled explanatory context; fail any answer that treats it as controlling or lets it override enacted text. Do not accept a guidance-only answer without enacted supportedPoints and citations; the user did not expressly request official guidance. Fail with wrong_attribution when a bulletin or other web-derived claim appears in supportedPoints, including a paraphrase that omits the words bulletin or guidance, or is tied only to an enacted citation. Such a claim must instead use supportingSourceUses with the exact WEB_SOURCE_ID and WEB_CLAIM_ID pair whose source-specific attributed claim supports it. A web page may repeat or paraphrase enacted code. Shared wording alone does not make a claim web-derived. For each lexical overlap flagged below, compare the entire supported point with its cited enacted passages. Accept independently established enacted rules; fail with wrong_attribution for any web-only clause presented as enacted. Do not infer independent support merely from a shared topic, code label, or citation ID. When the question expressly requests a retrieved named official document, fail with missed_material_conclusion if the answer omits its material source-supported clarification or drops its supportingSourceUse during revision. Fail an answer that uses contextual evidence as a governing supported point, or cites irrelevant evidence. Contextual evidence may be cited only to explain its limited relationship to the governing question. Fail the answer if it misstates a provision, attributes a condition to the wrong exception, omits a material supported conclusion, adds an unsupported requirement, confuses missing facts with missing evidence, falsely says present evidence is missing, overstates compliance, fails to correct a contradicted user premise, attaches a citation to the wrong claim, or withholds the strongest supported conclusion. For an open-ended design-requirements question, fail with missed_material_conclusion when the supplied enacted evidence contains multiple directly responsive dimensional or configuration rules but the answer withholds those usable baseline rules, lets a narrow exception or specialized type dominate the answer, or says those requirements are unavailable merely because a referenced standard is not supplied. Fail with missed_material_conclusion if cited historical, prior-edition case-specific, or future-effective evidence is not expressly identified with its applicability status, or if the answer silently presents it as ordinary current law. A 2014 Construction Codes answer must identify the prior edition and state that applicability is project-specific and may depend on the application filing date. When the question names a code edition or year, fail with wrong_attribution if any legal claim or human-readable section reference is taken from another edition, if a similarly numbered current provision is presented as historical text, or if the answer silently substitutes a different edition. If the requested edition is unavailable, require the answer to say so instead of reconstructing the historical rule from current evidence. Fail an answer that introduces a collateral code example or citation that does not materially qualify the requested conclusion and was not requested by the user. Fail with irrelevant_citation when the answer cites evidence labeled with a collateral topic route merely because a supplied project fact matched that separate code topic. Such evidence may be reviewed internally without appearing in the answer. For user-pinned evidence, USER_SELECTED_TEXT is the exact model-visible focus and citation target. Do not validate a sibling table row, exception, or rule that is absent from that selected text merely because it belongs to the same section. A source whose RELATIONSHIP identifies it as governing ancestor scope for pinned evidence is material only when its enacted text establishes an applicability category or condition needed to interpret the pinned descendant. Do not classify such material scope as collateral merely because the ancestor is broader, but do not require or cite a generic ancestor heading or redundant parent restatement merely because it was supplied. Preserve any genuinely unresolved applicability fact without weakening an independently supported conclusion. Fail with unnecessary_qualification when the answer leads with Potentially, may, or similar caution even though the enacted evidence and established facts support a direct conclusion and the stated unresolved matters cannot change that conclusion. For every question, put a fact in missingFacts or followUpQuestions only if it can change or determine the requested result. Once the supplied evidence and facts establish that result, details needed solely to design a compliant replacement or apply an optional downstream exception are not missing facts for that decision. This applies to both Yes and No answers and to non-numeric questions. Such details may be labeled as optional design context without making the answer depend on them. Retain unresolved applicability or exception facts that could change the result, and design or calculation inputs when the user requests that design or calculation. Resolve each retained claim against all supplied source qualifications before writing or approving it. Keep the qualifying subject, branch, exception and operative event with that claim in the main answer. A later caveat, missing-fact question or evidence limitation cannot cure an earlier categorical claim. If a material source relationship remains unresolved, state that uncertainty at the affected claim instead of asserting one side and qualifying it elsewhere. Do not convert a conditional documentation requirement into an unsupported sequence or deadline: a document required if a response is selected does not by itself establish when that response can be selected. Omit secondary claims that neither answer the question nor materially qualify its result. If retained, they need their own complete conditions and supporting citations, including conditions on alternatives. Before returning the answer, check that its main text and all other fields make the same bounded claims. Fail with unnecessary_qualification if missingFacts or followUpQuestions treats optional downstream design details as facts needed for the requested decision, even when the opening gives the correct direct answer. Do not fail for clearly labeled optional design context outside those fields. When rejecting an answer solely for unnecessary missingFacts entries, return their zero-based array indices in unnecessaryMissingFactIndices. Select an entry only when its entire content is unnecessary for the requested decision; never select an entry containing a material applicability or exception fact. Return an empty index array for other failures or a passing answer. These indices propose a limited edit; the edited answer must still pass a new full verification. Fail with repeated_established_fact when the answer asks the user to establish or reconfirm a fact already supplied for the active topic. Independent professional verification of documents or measurements is different and may still be identified when material. When the user has established that a building is fully sprinklered, treat installed throughout as established factual context. The answer may request documentation of compliance with a named installation standard when material, but must not return fully sprinklered or installed throughout as a missing fact or follow-up question. For a numeric limit or table comparison, fail with weakest_supported_conclusion when the stated value satisfies a stricter directly applicable supplied limit but the answer makes compliance conditional on qualifying for a more generous allowance. For every numeric comparison, check the opening result, arithmetic and closing scope statement together. Fail with overstated_compliance if any sentence says or implies that a failed applicable limit is satisfied, even if the opening correctly says No. A statement limiting the review to one requirement must preserve whether that requirement passed or failed. Fail with misstated_provision when enacted text applies 10 percent to the overall total seating and standing spaces but the answer applies 10 percent to each dining-surface type. The separate per-type condition is a minimum of one accessible space, not a separate 10-percent calculation. Fail with misstated_provision when the answer changes a cumulative enacted condition into an alternative or an enacted alternative into a cumulative condition. In particular, A and B must not be restated as A or B. Fail with overstated_compliance when the answer treats alternative applicability paths as exhaustive without evidence: an unresolved accessory relationship does not establish that a room is a nonaccessory tenant space, and a rule expressly limited to a building or nonaccessory tenant space must not be generalized to every room. Each path needs its own supplied factual basis or an explicit condition. Fail with missed_material_conclusion when a table answer omits a materially different conditional category supplied beside the user's category in the same row and that omission could mislead the user about why the stated value fails or passes. Do not demand unrelated rows or categories. For an accessory assembly-room fixture question, fail with wrong_attribution if the answer uses PC 403.1's separate permission as authority for that accessory room without stating that the selected PC sentence is limited to a building or nonaccessory tenant assembly space. BC 303.1.3 is the direct authority for the accessory-room Assembly fixture option.  Fail with overstated_compliance when an answer treats a room as legally accessory merely because residents use it or it serves a principal occupancy. If the user did not establish the accessory relationship, BC 303.1.3 classification must be conditional and the relationship must remain a missing project fact. Fail with missed_material_conclusion when supplied PC 403.1.1 multiple-occupancy text is material but the answer omits that the fractional requirements calculated for each occupancy are added before the total is rounded up. Fail with misstated_provision when supplied PC 403.1 states that the Building Code determines occupancy classification and occupant load but the answer attributes those determinations to Table 403.1. Table 403.1 supplies fixture minimums. For a plumbing-fixture calculation involving proposed or unresolved shared facilities, fail with missed_material_conclusion when no supplied passage governs sharing and the answer does not explicitly state that the selected evidence cannot establish whether the shared arrangement is permitted. When BC 901.9.3 and a separate building- or occupancy-wide Chapter 9 trigger are supplied, fail with missed_material_conclusion if the answer discusses only the enlarged portion and does not make clear that the separate qualifying trigger cannot automatically be confined to that enlarged portion. For a Type B+NYC provision, fail with missed_material_conclusion when the user did not establish that the subject unit and bathroom are within that scope and the answer neither makes applicability conditional nor identifies it as a missing project fact. When supplied BC 1101.3 ancestor text limits BC 1101.3.1 to changes of use or occupancy in prior-code buildings, fail with overstated_compliance if the answer applies the accessibility consequence categorically while prior-code-building status is represented or unresolved. The answer must condition the consequence on confirming the prior-code-building and alteration/change context and retain that applicability fact in missingFacts. For an HCR vanity question, fail with misstated_provision if the answer joins lavatory and vanity with a slash, parentheses, or other shorthand implying interchangeability. The answer must state separately what the enacted Building Code text establishes about a lavatory and what it does not establish about a vanity. Fail with unsupported_requirement when the answer turns an evidence or corpus boundary into an asserted outside legal requirement, or says unsupplied law requires verification or could change the result without enacted support. Require each mandatory passage in supported points and citations. Check substantive coverage of every proviso, exception, definition or limit that can change or explain the requested result under the stated facts; a source ID alone is insufficient. For a calculation or substitution question, accept an explicitly stipulated required quantity or applicability as the premise unless supplied facts or evidence contradict it. Do not demand exemptions that would replace that premise, product-standard lists unrelated to the requested comparison, or alternatives not proposed. Preserve conditions governing the proposed substitution and any unresolved exception that could change its result. If the question asks whether the premise itself is correct, verify it instead. Check material conditions for a proposed substitution or alternative in answerText itself and attached to the correct object. Mentioning a condition only for a retained component does not establish it for the replacement component. Expandable supporting points or limitations cannot fill that gap. Do not require unknown subgroup quantities when a combined total establishes the same threshold result for every possible subgroup. For a selected-provision compliance question, fail with weakest_supported_conclusion when the answer does not clearly distinguish what the selected text establishes from material quantities, rates, capacities, locations, assemblies, approvals, or other compliance inputs it cannot establish. Fail with missed_material_conclusion when the answer replaces material unresolved inputs with a generic phrase such as full design, additional evidence, other requirements, or applicable approvals. Require the answer to name distinct approved-record bases, quantities, rates, capacities, dimensions, locations, system-design inputs, and expressly implicated technical or agency conditions only when they can change or authorize the requested conclusion. Do not fail merely because the answer omits an unrelated permit, agency, or record. The completeness review is limited to inputs material to the question, a relied-on existing legal condition, a supplied provision, or an express cross-reference in the authorized evidence. Treat established active-topic facts as supplied user facts. Fail an answer that calls one of them missing, makes the conclusion conditional solely because it came from an earlier turn, or asks the user to reconfirm it without a contradiction. Do not treat prior assistant conclusions as established facts. Treat every item in STRUCTURED UNRESOLVED PROJECT FACTS as unresolved. Fail with missed_material_conclusion if a material item is omitted from missingFacts, and fail with overstated_compliance if the answer relies on an owner/applicant claim, position, assertion, or representation as independently proven. Apply current-turn hypothetical facts only to the current question, and keep user-stated unknowns unresolved. Do not demand a final yes-or-no result when project facts genuinely remain unresolved. Return a compact structured result.",
+        "input": "QUESTION\nThe only way to stop a building’s supply and return fans in an emergency is to operate the electrical disconnect at each fan. Does that satisfy the Mechanical Code’s manual ventilation-control requirement?\n\nRESEARCH CODE BASIS — DO NOT CLAIM ANOTHER EDITION WAS RETRIEVED\n{\"schemaVersion\":2,\"registryVersion\":\"20260908-zoning-history-context-v7\",\"jurisdiction\":\"New York City\",\"codeYear\":2022,\"codeEdition\":\"2022 New York City Construction Codes\",\"codeVersion\":\"CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\",\"retrievalScope\":\"routed-multi-corpus\",\"routingMode\":\"question-and-conversation-topic\",\"basisSource\":\"permitext-router\",\"projectID\":null,\"projectCodeVersion\":null,\"projectCodeVersionRecognized\":null,\"projectCodeVersionSupported\":null,\"projectCodeVersionRetrieved\":null,\"searchedCorpora\":[{\"id\":\"nyc-2022-construction-codes\",\"label\":\"2022 NYC Construction Codes\",\"codeEdition\":\"2022 New York City Construction Codes\",\"codeVersion\":\"CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\",\"codeYear\":2022,\"applicabilityStatus\":\"current-enacted-edition\",\"routeReason\":\"construction-code cue\",\"blockedReason\":null,\"codePrefixes\":[\"AC\",\"BC\",\"FGC\",\"MC\",\"PC\"]}],\"pinnedCorpora\":[],\"unavailableCorpora\":[],\"excludedCorpora\":[{\"id\":\"nyc-existing-building-code-2027\",\"label\":\"NYC Existing Building Code\",\"codeEdition\":\"NYC Existing Building Code — effective July 17, 2027\",\"codeVersion\":\"CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1\",\"codeYear\":2026,\"applicabilityStatus\":\"future-effective\",\"routeReason\":\"excluded from ordinary Research\",\"blockedReason\":\"This enacted code is not effective until July 17, 2027 and is excluded from ordinary current-code Research.\",\"codePrefixes\":[\"EBC\"]},{\"id\":\"nyc-1968-building-code\",\"label\":\"1968 NYC Building Code\",\"codeEdition\":\"1968 NYC Building Code — historical\",\"codeVersion\":\"CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1\",\"codeYear\":1968,\"applicabilityStatus\":\"historical\",\"routeReason\":\"excluded from ordinary Research\",\"blockedReason\":\"Historical and prior-code material requires an explicit applicability path and is excluded from ordinary current-code Research.\",\"codePrefixes\":[\"BC68\"]}],\"disclosure\":\"Sources searched: 2022 NYC Construction Codes\",\"limitation\":null,\"resolvedAt\":\"2026-09-10T00:40:19.658Z\"}\n\nAUTHORIZED ENACTED EVIDENCE\nPASSAGE_ID: research-permitext_discovered-id:10446-1\nSECTION_ID: 10446\nSECTION: MC 405.2\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “stop”, “supply”, “return”, “fan”, “emergency”.\nRETRIEVAL_REASON: It matches “stop”, “supply”, “return”, “fan”, “emergency”.\n\n\nTEXT: 405.2 405.2 Manual control. Each air distribution system shall be provided with not less than one manual control to stop the operation of the supply, return, and exhaust fan(s) in an emergency. The manual control shall be provided at an approved location. A disconnect switch shall not be considered a manual control.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10447-2\nSECTION_ID: 10447\nSECTION: MC 405.2.1\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “building”, “supply”, “return”, “fan”, “manual”.\nRETRIEVAL_REASON: It matches “building”, “supply”, “return”, “fan”, “manual”.\n\n\nTEXT: 405.2.1 405.2.1 Office buildings. Any building where the main use or dominant occupancy is classified in occupancy group B having occupied floors located more than 75 feet (22 860 mm) above the lowest level of fire department vehicle access, where a system serves a floor or floors other than the floor on which the equipment is located, shall be provided with the following controls, in addition to the controls required by this chapter: 1. Manual controls for operating individually each air supply and each exhaust or return fan in the system located as follows: 1.1. At the Fire Command Center, and 1.2. In the room containing the affected air-handling fans. 2. Manual controls for operating individually or in groups each remote control reversible fire shutter, when such shutters are provided in accordance with the provisions of the New York City Building Code, or each smoke damper provided in accordance with the provisions of the New York City Building Code. Such controls shall be located at the Fire Command Center. Section MC 406: Ventilation of Uninhabited Spaces\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10839-3\nSECTION_ID: 10839\nSECTION: MC 606.5\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “fans”, “fan”, “manual”, “control”, “air”. The proposed passage includes a cross-reference that may require additional evidence.\nRETRIEVAL_REASON: It matches “fans”, “fan”, “manual”, “control”, “air”. The proposed passage includes a cross-reference that may require additional evidence.\n\n\nTEXT: 606.5 606.5 Manual control. Manual controls of fans shall be provided in accordance with Section 405.2. Section MC 607: Ducts and Air Transfer Openings\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:11265-4\nSECTION_ID: 11265\nSECTION: MC 1105.6.3\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “fans”, “fan”, “emergency”, “mechanical”, “ventilation”.\nRETRIEVAL_REASON: It matches “fans”, “fan”, “emergency”, “mechanical”, “ventilation”.\n\n\nTEXT: 1105.6.3 1105.6.3 Ventilation rate. For other than ammonia systems, the mechanical ventilation systems shall be capable of exhausting the minimum quantity of air both at normal operating and emergency conditions, as required by Sections 1105.6.3.1 and 1105.6.3.2. The minimum required ventilation rate for ammonia shall be 30 air changes per hour in accordance with IIAR2. Multiple fans or multispeed fans shall be allowed to produce the emergency ventilation rate and to obtain a reduced airflow for normal ventilation.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10415-5\nSECTION_ID: 10415\nSECTION: MC 403.1\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “building”, “supply”, “return”, “mechanical”, “code”. The proposed passage includes a cross-reference that may require additional evidence.\nRETRIEVAL_REASON: It matches “building”, “supply”, “return”, “mechanical”, “code”. The proposed passage includes a cross-reference that may require additional evidence.\n\n\nTEXT: 403.1 403.1 Ventilation system. Mechanical ventilation shall be provided by a method of supply air and return or exhaust air. The amount of supply air shall be approximately equal to the amount of return and exhaust air. The system shall not be prohibited from producing negative or positive pressure; such pressures shall not result in door opening forces in excess of those indicated in the New York City Building Code and shall not prevent doors from closing as required by the New York City Building Code . The method to convey ventilation air shall be designed and installed in accordance with Chapter 6.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10445-6\nSECTION_ID: 10445\nSECTION: MC 405.1\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “supply”, “operate”, “mechanical”, “manual”, “ventilation”.\nRETRIEVAL_REASON: It matches “supply”, “operate”, “mechanical”, “manual”, “ventilation”.\n\n\nTEXT: 405.1 405.1 General. Mechanical ventilation systems shall be provided with manual or automatic controls that will operate such systems whenever the spaces are occupied. Air-conditioning systems that supply required ventilation air shall be provided with controls designed to automatically maintain the required outdoor air supply rate during occupancy.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10837-7\nSECTION_ID: 10837\nSECTION: MC 606.4.2\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “stop”, “building”, “fans”, “fan”, “manual”. The proposed passage includes a cross-reference that may require additional evidence.\nRETRIEVAL_REASON: It matches “stop”, “building”, “fans”, “fan”, “manual”. The proposed passage includes a cross-reference that may require additional evidence.\n\n\nTEXT: 606.4.2 606.4.2 Fan shutdown for recirculating air systems. When any building or floor is provided with an air system designed to use recirculated air and is protected by an automatic sprinkler system or an automatic fire alarm system, the fans recirculating air serving the affected area shall automatically stop when sprinkler water flow or a fire condition is detected in the area. For the purposes of this section, 100 percent outdoor air systems shall not be considered recirculating systems. Exceptions: 1. Activation of a manual pull station shall not be required to automatically stop the fans. 2. Systems having a capacity of 2,000 cfm (0.9 m 3 /s) or less or serving not more than one floor. 3. In Group R-2 and R-3 occupancies with energy recovery systems complying with Section 514.4 and not serving public corridors.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:11289-8\nSECTION_ID: 11289\nSECTION: MC 1106.5.2\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “only”, “fans”, “fan”, “ventilation”, “control”.\nRETRIEVAL_REASON: It matches “only”, “fans”, “fan”, “ventilation”, “control”.\n\n\nTEXT: 1106.5.2 1106.5.2 Ventilation system. A clearly identified switch of the break-glass type or an approved tamper-resistant switch shall provide on-only control of the machinery room ventilation fans.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:10474-9\nSECTION_ID: 10474\nSECTION: MC 501.4\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “only”, “building”, “supply”, “operate”, “satisfy”.\nRETRIEVAL_REASON: It matches “only”, “building”, “supply”, “operate”, “satisfy”.\n\n\nTEXT: 501.4 501.4 Pressure equalization. Mechanical exhaust systems shall be sized to remove the quantity of air required by this chapter to be exhausted. The system shall operate when air is required to be exhausted. Where mechanical exhaust is required in a room or space in other than occupancies in R-3, such space shall be maintained with a neutral or negative pressure. If a greater quantity of air is supplied by a mechanical ventilating supply system than is removed by a mechanical exhaust for a room, adequate means shall be provided for the natural or mechanical exhaust of the excess air supplied. If only a mechanical exhaust system is installed for a room or if a greater quantity of air is removed by a mechanical exhaust system than is supplied by a mechanical ventilating supply system for a room, adequate makeup air consisting of supply air, transfer air or outdoor air shall be provided to satisfy the deficiency. The calculated building infiltration rate and openable area shall not be used to satisfy the requirements of this section.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:11341-10\nSECTION_ID: 11341\nSECTION: MC 1109.1\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “fans”, “fan”, “emergency”, “operate”, “ventilation”.\nRETRIEVAL_REASON: It matches “fans”, “fan”, “emergency”, “operate”, “ventilation”.\n\n\nTEXT: 1109.1 1109.1 Testing required. The following emergency devices and systems shall be periodically tested and the results logged in accordance with the manufacturer's instructions and as required by the Commissioner of the Fire Department: 1. Treatment and flaring systems. 2. Valves and appurtenances necessary to the operation of emergency refrigeration control boxes. 3. Fans and associated equipment intended to operate emergency purge ventilation systems. 4. Detection and alarm systems.\n\n---\n\nPASSAGE_ID: research-permitext_discovered-id:113-13\nSECTION_ID: 113\nSECTION: BC 202\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: It matches “only”, “way”, “building”, “supply”, “emergency”.\nRETRIEVAL_REASON: It matches “only”, “way”, “building”, “supply”, “emergency”.\n\n\nTEXT: AUTOMATIC. As applied to fire protection devices, a device or system providing an emergency function without the necessity for human intervention and activated as a result of a predetermined temperature rise, rate of temperature rise and/or the presence of combustion products.\n\nAUTOMATIC SPRINKLER SYSTEM. A fire suppression or control device that operates automatically when its heat-activated element is heated to its thermal rating or above, allowing water to discharge over a specified area.\n\nCORRIDOR. An enclosed exit access component that defines and provides a path of egress travel to an exit. Corridors shall be either interior or public.\nCorridor, interior. A corridor that serves only one tenant. In Group E occupancies, corridors serving only one institution shall be deemed as serving a single tenant.\nCorridor, public. A corridor that serves more than one tenant.\n\nEQUIPMENT. Tools, machinery, or other implements used to facilitate construction or demolition work.\n\nSMOKE. Air-borne solid and liquid particulates and gases evolved when a material undergoes pyrolysis or combustion, including the quality of air that is entrained or otherwise mixed into the mass.\n\nSMOKE CONTROL SYSTEM, MECHANICAL. An engineered system that includes all methods that can be used singly or in combination to modify smoke movement.\n\nSMOKE DAMPER. See \"Dampers, Types of.\"\n\nVENTILATION. The natural or mechanical process of supplying conditioned or unconditioned air to, or removing such air from, any space.\n\n---\n\nPASSAGE_ID: research-permitext_cross_reference-id:11266-1\nSECTION_ID: 11266\nSECTION: MC 1105.6.3.1\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: Direct enacted-text cross-reference from this answer's primary evidence\nRETRIEVAL_REASON: Direct cross-reference to MC 1105.6.3.1\n\n\nTEXT: 1105.6.3.1 1105.6.3.1 Quantity-normal ventilation. During occupied conditions, the mechanical ventilation system shall exhaust the larger of the following: 1. Not less than 0.5 cfm per square foot (0.0025 m 3 /s × m 2 ) of machinery room area or 20 cfm (0.009 m 3 /s) per person. 2. A volume required to limit the room temperature rise to18°F (-7.8°C) taking into account the ambient heating effect of all machinery in the room but not above a maximum temperature of 122°F (50°C). (Am. L.L. 2023/077, 6/11/2023, eff. 6/11/2023) Editor's note: For related unconsolidated provisions, see Appendix A at L.L. 2023/077 .\n\n---\n\nPASSAGE_ID: research-permitext_cross_reference-id:11267-2\nSECTION_ID: 11267\nSECTION: MC 1105.6.3.2\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: Direct enacted-text cross-reference from this answer's primary evidence\nRETRIEVAL_REASON: Direct cross-reference to MC 1105.6.3.2\n\n\nTEXT: 1105.6.3.2 1105.6.3.2 Quantity-emergency conditions. Upon actuation of the refrigerant detector required in Section 1105.3, the mechanical ventilation system shall exhaust air from the machinery room in the following quantity: Q = 100 x √ G (Equation 11-2) For SI: Q = 0.07 x √ G Where: Q = The airflow in cubic feet per minute (m 3 /s). G = The design mass of refrigerant in pounds (kg) in the largest system, any part of which is located in the machinery room\n\n---\n\nPASSAGE_ID: research-permitext_cross_reference-id:10744-7\nSECTION_ID: 10744\nSECTION: MC 514.4\n\nEVIDENCE_ROLE: supporting\nTOPIC_ROUTE_RELATIONSHIP: unrestricted\nRELATIONSHIP: Direct enacted-text cross-reference from this answer's primary evidence\nRETRIEVAL_REASON: Direct cross-reference to MC 514.4\n\n\nTEXT: 514.4 514.4 Recirculated air. Class 1 or Class 2 air as described in ASHRAE 62.1 that is conveyed within energy recovery systems shall not be considered as recirculated air where the energy recovery ventilation system is constructed to limit cross-leakage between air streams to less than 10 percent of the total airflow design capacity.\n\nSUPPORTED-POINT BINDING LOOKUP — STRUCTURAL METADATA ONLY\n[{\"pointIndex\":0,\"primarySectionID\":\"10446\",\"boundPassages\":[{\"sourceID\":\"research-permitext_discovered-id:10446-1\",\"sectionID\":\"10446\",\"section\":\"MC 405.2\"}]},{\"pointIndex\":1,\"primarySectionID\":\"10839\",\"boundPassages\":[{\"sourceID\":\"research-permitext_discovered-id:10839-3\",\"sectionID\":\"10839\",\"section\":\"MC 606.5\"}]}]\n\nLEXICAL WEB OVERLAPS FOR SOURCE COMPARISON — HEURISTIC, NOT AN ATTRIBUTION FINDING\n[]\n\nPROPOSED ANSWER JSON\n{\"answerText\":\"**No.** A fan’s electrical disconnect does not satisfy the required emergency manual ventilation control. MC § 405.2 requires each air-distribution system to have at least one manual control, at an approved location, to stop its supply, return, and exhaust fan(s) in an emergency—and expressly states: “A disconnect switch shall not be considered a manual control.” MC § 606.5 applies that same requirement to manual fan controls.\\n\\nA separate manual emergency-stop control is therefore required; fan-mounted disconnects alone are insufficient. This answers only the manual-control requirement. If the system is a recirculating-air system subject to MC § 606.4.2, separate automatic fan-shutdown requirements may also apply.\",\"conclusion\":\"**No.** A fan’s electrical disconnect does not satisfy the required emergency manual ventilation control. MC § 405.2 requires each air-distribution system to have at least one manual control, at an approved location, to stop its supply, return, and exhaust fan(s) in an emergency—and expressly states: “A disconnect switch shall not be considered a manual control.” MC § 606.5 applies that same requirement to manual fan controls.\",\"supportedPoints\":[{\"heading\":\"Emergency manual control cannot be a disconnect switch\",\"explanation\":\"Each air-distribution system must have at least one manual control to stop supply, return, and exhaust fans in an emergency, located at an approved location. The section expressly provides that a disconnect switch is not a manual control.\",\"sectionID\":\"10446\",\"sourceIDs\":[\"research-permitext_discovered-id:10446-1\"],\"evidenceRole\":\"supporting\"},{\"heading\":\"Fan manual controls follow the air-distribution-system rule\",\"explanation\":\"Manual controls of fans must be provided in accordance with MC 405.2.\",\"sectionID\":\"10839\",\"sourceIDs\":[\"research-permitext_discovered-id:10839-3\"],\"evidenceRole\":\"supporting\"}],\"explanation\":\"A separate manual emergency-stop control is therefore required; fan-mounted disconnects alone are insufficient. This answers only the manual-control requirement. If the system is a recirculating-air system subject to MC § 606.4.2, separate automatic fan-shutdown requirements may also apply.\",\"assumptions\":[],\"missingFacts\":[],\"followUpQuestions\":[],\"evidenceLimitations\":[\"Permitext limited this answer to the enacted evidence assembled for the current question.\"],\"additionalEvidenceNeeded\":[],\"supportingSourceUses\":[],\"supportingSources\":[],\"citations\":[{\"sectionID\":\"10446\",\"sectionNumber\":\"405.2\",\"title\":\"405.2 Manual control.\",\"codePrefix\":\"MC\",\"codeVersion\":\"CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\",\"codeEdition\":\"2022 New York City Construction Codes\",\"corpusID\":\"nyc-2022-construction-codes\",\"corpusLabel\":\"2022 NYC Construction Codes\",\"applicabilityStatus\":\"current-enacted-edition\",\"sourceIDs\":[\"research-permitext_discovered-id:10446-1\"],\"supportingPassages\":[{\"sourceID\":\"research-permitext_discovered-id:10446-1\",\"selectedText\":\"405.2 405.2 Manual control. Each air distribution system shall be provided with not less than one manual control to stop the operation of the supply, return, and exhaust fan(s) in an emergency. The manual control shall be provided at an approved location. A disconnect switch shall not be considered a manual control.\",\"visualSources\":[]}],\"evidenceRole\":\"supporting\",\"relevance\":\"MC § 405.2 directly requires an emergency manual control and expressly excludes a disconnect switch.\"},{\"sectionID\":\"10839\",\"sectionNumber\":\"606.5\",\"title\":\"606.5 Manual control.\",\"codePrefix\":\"MC\",\"codeVersion\":\"CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\",\"codeEdition\":\"2022 New York City Construction Codes\",\"corpusID\":\"nyc-2022-construction-codes\",\"corpusLabel\":\"2022 NYC Construction Codes\",\"applicabilityStatus\":\"current-enacted-edition\",\"sourceIDs\":[\"research-permitext_discovered-id:10839-3\"],\"supportingPassages\":[{\"sourceID\":\"research-permitext_discovered-id:10839-3\",\"selectedText\":\"606.5 606.5 Manual control. Manual controls of fans shall be provided in accordance with Section 405.2. Section MC 607: Ducts and Air Transfer Openings\",\"visualSources\":[]}],\"evidenceRole\":\"supporting\",\"relevance\":\"MC § 606.5 directs that fan manual controls comply with MC § 405.2.\"},{\"sectionID\":\"10837\",\"sectionNumber\":\"606.4.2\",\"title\":\"606.4.2 Fan shutdown for recirculating air systems.\",\"codePrefix\":\"MC\",\"codeVersion\":\"CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1\",\"codeEdition\":\"2022 New York City Construction Codes\",\"corpusID\":\"nyc-2022-construction-codes\",\"corpusLabel\":\"2022 NYC Construction Codes\",\"applicabilityStatus\":\"current-enacted-edition\",\"sourceIDs\":[\"research-permitext_discovered-id:10837-7\"],\"supportingPassages\":[{\"sourceID\":\"research-permitext_discovered-id:10837-7\",\"selectedText\":\"606.4.2 606.4.2 Fan shutdown for recirculating air systems. When any building or floor is provided with an air system designed to use recirculated air and is protected by an automatic sprinkler system or an automatic fire alarm system, the fans recirculating air serving the affected area shall automatically stop when sprinkler water flow or a fire condition is detected in the area. For the purposes of this section, 100 percent outdoor air systems shall not be considered recirculating systems. Exceptions: 1. Activation of a manual pull station shall not be required to automatically stop the fans. 2. Systems having a capacity of 2,000 cfm (0.9 m 3 /s) or less or serving not more than one floor. 3. In Group R-2 and R-3 occupancies with energy recovery systems complying with Section 514.4 and not serving public corridors.\",\"visualSources\":[]}],\"evidenceRole\":\"supporting\",\"relevance\":\"Provides the MC 606.4.2 rule referenced in the answer.\"}]}",
+        "text": {
+          "format": {
+            "type": "json_schema",
+            "name": "permitext_research_verification",
+            "strict": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "pass": {
+                  "type": "boolean"
+                },
+                "issues": {
+                  "type": "array",
+                  "maxItems": 12,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "misstated_provision",
+                          "wrong_attribution",
+                          "missed_material_conclusion",
+                          "unsupported_requirement",
+                          "fact_evidence_confusion",
+                          "false_evidence_limitation",
+                          "overstated_compliance",
+                          "missed_premise_contradiction",
+                          "incorrect_citation",
+                          "weakest_supported_conclusion",
+                          "irrelevant_citation",
+                          "unnecessary_qualification",
+                          "repeated_established_fact"
+                        ]
+                      },
+                      "detail": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "detail"
+                    ]
+                  }
+                },
+                "unnecessaryMissingFactIndices": {
+                  "type": "array",
+                  "maxItems": 12,
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              },
+              "required": [
+                "pass",
+                "issues",
+                "unnecessaryMissingFactIndices"
+              ]
+            }
+          }
+        },
+        "service_tier": "default"
+      },
+      "retainedRequestSHA256": "cdb39dfc5a2e10530d6ccaff9a5eb45c730a068ffb707981d36eb517226549ad",
+      "maximumRequestUSD": 0.028704
+    }
+  ]
+}
