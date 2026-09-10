@@ -568,7 +568,7 @@ function renderFeedbackItem(feedback) {
   }
   item.append(
     element("h3", { text: "Immutable generated answer" }),
-    element("div", { className: "answer evidence", text: [
+    element("div", { className: "answer evidence", text: feedback.answer?.answerText || [
       feedback.answer?.conclusion,
       ...(feedback.answer?.supportedPoints || []).map((point, index) =>
         `${index + 1}. ${point.heading}: ${point.explanation}`
@@ -576,6 +576,8 @@ function renderFeedbackItem(feedback) {
       feedback.answer?.explanation
     ].filter(Boolean).join("\n\n") || "Answer unavailable." })
   );
+  item.append(element("p", { className: "meta", text: `Usefulness: ${feedback.usefulness?.replaceAll("_", " ") || "Not rated"} · Outside checking: ${feedback.outsideChecking || "Not rated"}` }));
+  if (feedback.operation) item.append(element("p", { className: "meta", text: `Response: ${(feedback.operation.durationMilliseconds / 1000).toFixed(1)} seconds · Estimated API cost: ${feedback.operation.estimatedCostUSD == null ? "Unavailable" : `$${feedback.operation.estimatedCostUSD.toFixed(6)}`}` }));
   appendList(
     item,
     "Returned citations",
@@ -633,7 +635,92 @@ function renderFeedbackItem(feedback) {
     formStatus
   );
   item.append(form);
+  item.append(feedbackCaseForm(feedback));
   return item;
+}
+
+function feedbackCaseForm(feedback) {
+  const panel = element("details", { className: "feedback-case" });
+  const saved = feedback.regressionCase;
+  panel.append(element("summary", { text: saved ? `Regression case · ${saved.status} · revision ${saved.revision}` : "Create a regression case" }));
+  panel.append(element("p", { className: "meta", text: "Write the expected answer after checking its sources. Edit the question and facts to remove identifying details before export. Saving a draft does not approve it or change Research." }));
+  const fields = {};
+  const field = (key, label, value, rows = 3) => {
+    const wrapper = element("label", { text: label });
+    const input = element("textarea"); input.rows = rows; input.value = value || ""; input.setAttribute("aria-label", label);
+    fields[key] = input; wrapper.append(input); panel.append(wrapper); return input;
+  };
+  field("question", "Regression question", saved?.question || feedback.question);
+  field("facts", "Facts and assumptions for this test", saved?.facts || "");
+  const capturedContext = element("details"); capturedContext.append(element("summary", { text: "Captured research context" }), element("pre", { text: JSON.stringify(feedback.contextSnapshot || {}, null, 2) })); panel.append(capturedContext);
+  field("expectedAnswer", "Expected answer", saved?.expectedAnswer, 5);
+  field("requiredConcepts", "Required points (one per line)", saved?.requiredConcepts?.join("\n"));
+  field("forbiddenClaims", "Claims the answer must not make (one per line)", saved?.forbiddenClaims?.join("\n"));
+  const selected = [];
+  panel.append(element("h3", { text: "Evidence supporting the expected answer" }));
+  const sources = saved?.sources || feedback.sourceRecords || [];
+  for (const source of sources) {
+    const row = element("details"); const summary = element("summary"); const label = element("label", { className: "feedback-source-choice" });
+    const checkbox = element("input"); checkbox.type = "checkbox"; checkbox.checked = saved?.requiredSourceKeys?.includes(source.key) || false;
+    checkbox.setAttribute("aria-label", `Require ${source.reference}`); selected.push({ key: source.key, checkbox });
+    label.append(checkbox, document.createTextNode(` ${source.reference} · ${source.codeEdition || source.sourceVersion || "Recorded source"}`));
+    summary.append(label); row.append(summary, element("pre", { className: "evidence", text: source.text }));
+    if (source.snapshotOrigin) row.append(element("p", { className: "meta", text: source.snapshotOrigin }));
+    if (source.url) { const link = element("a", { text: "Open source" }); try { const url = new URL(source.url); if (url.protocol === "https:") { link.href = url.href; link.target = "_blank"; link.rel = "noopener noreferrer"; row.append(link); } } catch {} }
+    panel.append(row);
+  }
+  const extra = element("details"); extra.append(element("summary", { text: "Add a missing official source" }), element("p", { className: "meta", text: "Enter an exact excerpt you checked. Save the draft, then select that source above. Added excerpts are labeled as reviewer-supplied." }));
+  const extraFields = {};
+  for (const [key, label] of [["reference", "Source reference"], ["url", "Official source URL"], ["codeEdition", "Source edition or date"], ["text", "Exact source passage"]]) {
+    const wrapper = element("label", { text: label }), input = element(key === "text" ? "textarea" : "input");
+    input.setAttribute("aria-label", label); extraFields[key] = input; wrapper.append(input); extra.append(wrapper);
+  }
+  panel.append(extra);
+  const reviewer = field("reviewer", "Case reviewer", saved?.reviewer || feedback.triagedBy || "", 1);
+  const notes = field("notes", "Source review or comparison notes", saved?.reviewNotes || "");
+  const status = element("p", { className: "meta" }); status.setAttribute("role", "status");
+  const actions = element("div", { className: "actions" });
+  const perform = async (action, extraValues = {}) => {
+    status.textContent = "Saving…";
+    panel.querySelectorAll("button").forEach(button => button.disabled = true);
+    try {
+      const additionalSources = [...(saved?.additionalSources || [])];
+      if (action === "save" && Object.values(extraFields).some(input => input.value.trim())) additionalSources.push(Object.fromEntries(Object.entries(extraFields).map(([key, input]) => [key, input.value])));
+      await internalRequest("/internal/evaluations/feedback/case", { feedbackID: feedback.id, action,
+        revision: saved?.revision || 0, reviewer: reviewer.value, notes: notes.value,
+        case: { question: fields.question.value, facts: fields.facts.value, expectedAnswer: fields.expectedAnswer.value,
+          requiredConcepts: fields.requiredConcepts.value, forbiddenClaims: fields.forbiddenClaims.value,
+          requiredSourceKeys: selected.filter(item => item.checkbox.checked).map(item => item.key), additionalSources }, ...extraValues });
+      await loadData();
+    } catch (error) { status.textContent = error.message; panel.querySelectorAll("button").forEach(button => button.disabled = false); }
+  };
+  for (const [action, label] of [["save", "Save draft"], ["approve", "Approve saved revision"], ["reject", "Reject saved revision"]]) {
+    const button = element("button", { text: label }); button.disabled = action !== "save" && !saved;
+    button.addEventListener("click", () => perform(action)); actions.append(button);
+  }
+  panel.append(element("p", { className: "meta", text: "Approval applies to the saved revision. Save any edits first. A knowledgeable reviewer must check the expected answer against every selected source." }), actions, status);
+  if (saved?.status === "approved") {
+    const compare = element("select"); compare.setAttribute("aria-label", "Reported answer to compare");
+    for (const target of data.feedbackRecords || []) { const option = element("option", { text: `${target.question} · ${target.createdAt}` }); option.value = target.id; compare.append(option); }
+    panel.append(element("h3", { text: "Record a regression comparison" }), element("p", { className: "meta", text: "Choose a reported answer, compare its question and facts with this reference, and record a human pass or fail in the notes above. No API test is started." }), compare);
+    const comparisonPreview = element("details");
+    comparisonPreview.append(element("summary", { text: "Answer and context being compared" }));
+    const comparisonBody = element("pre"); comparisonPreview.append(comparisonBody); panel.append(comparisonPreview);
+    const showComparison = () => {
+      const target = (data.feedbackRecords || []).find(item => item.id === compare.value);
+      comparisonBody.textContent = JSON.stringify({ question: target?.question, answer: target?.answer, context: target?.contextSnapshot, citations: target?.citations }, null, 2);
+    };
+    compare.addEventListener("change", showComparison); showComparison();
+    for (const decision of ["pass", "fail"]) { const button = element("button", { text: `Record ${decision}` }); button.addEventListener("click", () => perform("record_result", { targetFeedbackID: compare.value, decision })); panel.append(button); }
+    const download = element("button", { text: "Export approved test case" }); download.addEventListener("click", async () => {
+      try { const result = await internalRequest("/internal/evaluations/feedback/case", { action: "export", feedbackID: feedback.id });
+        const url = URL.createObjectURL(new Blob([JSON.stringify(result.dataset, null, 2)], { type: "application/json" }));
+        const link = element("a"); link.href = url; link.download = `${saved.id}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (error) { status.textContent = error.message; }
+    }); panel.append(download);
+  }
+  appendList(panel, "Recorded comparisons", (saved?.comparisons || []).map(result => `${result.decision.toUpperCase()} · reference revision ${result.caseRevision} · ${result.reviewer} · ${result.reviewedAt} · ${result.notes}`));
+  return panel;
 }
 
 function renderFeedback() {
@@ -643,6 +730,16 @@ function renderFeedback() {
     element("p", { className: "meta", text: "User reports are review signals, not proof that an answer is right or wrong. Triage never promotes a case or changes production behavior automatically." })
   );
   const records = data.feedbackRecords || data.feedbackCandidates || [];
+  const quality = data.feedbackQuality;
+  if (quality) {
+    const report = element("section", { className: "card" });
+    report.append(element("h3", { text: "Tester outcomes this month" }), element("p", { text: `${quality.ratedAnswers} rated answers: ${quality.usableAsIs} usable as written, ${quality.neededCorrection} needing correction, ${quality.notUsable} not usable.` }),
+      element("p", { text: `Outside checking: ${quality.outsideChecking.none} none, ${quality.outsideChecking.brief} brief, ${quality.outsideChecking.substantial} substantial.` }),
+      element("p", { text: `Rating coverage: ${quality.ratedCompletedTurns}/${quality.completedTurns} completed live turns. Failed or cancelled turns: ${quality.failedTurns}.` }),
+      element("p", { text: `Estimated API cost per usable answer: ${quality.estimatedCostPerUsableAnswerUSD == null ? "Not established — incomplete ratings or cost data" : `$${quality.estimatedCostPerUsableAnswerUSD.toFixed(4)}`}` }),
+      element("p", { className: "meta", text: quality.costMetricLimitation }));
+    section.append(report);
+  }
   const controls = element("div", { className: "feedback-controls" });
   const statusFilter = element("select");
   [

@@ -3643,6 +3643,8 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 userComment: request.comment,
                 professionalRole: request.professionalRole,
                 supportingReference: request.supportingReference,
+                usefulness: request.usefulness,
+                outsideChecking: request.outsideChecking,
                 updatedAt: phase3ResearchTimestamp(adding: 180)
             )
             conversation.messages[messageIndex].feedback = feedback
@@ -5162,7 +5164,10 @@ protocol AccountBackendClient {
         conversationID: String,
         answerID: String,
         category: String,
-        comment: String?
+        comment: String?,
+        usefulness: String?,
+        outsideChecking: String?,
+        supportingReference: String?
     ) async throws -> ResearchFeedback
     func renameResearchConversation(
         account: SignedInAccount,

@@ -16389,7 +16389,11 @@ function renderResearchFeedback(container, message, conversationID) {
   status.className = "research-feedback-status";
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
-  compact.append(helpfulButton, problemButton, status);
+  const detailsButton = document.createElement("button");
+  detailsButton.type = "button";
+  detailsButton.className = "ghost-button research-feedback-add-details";
+  detailsButton.textContent = "Add feedback details";
+  compact.append(helpfulButton, problemButton, detailsButton, status);
 
   const details = document.createElement("section");
   details.className = "research-feedback-details";
@@ -16400,6 +16404,9 @@ function renderResearchFeedback(container, message, conversationID) {
   const choices = document.createElement("div");
   choices.className = "research-feedback-choices";
   const categories = [
+    ["helpful", "Helpful"],
+    ["too_slow", "Too slow"],
+    ["too_verbose", "Too much explanation"],
     ["incorrect_misleading", "Incorrect or misleading"],
     ["missing_information", "Missing information"],
     ["citation_problem", "Citation problem"],
@@ -16453,12 +16460,30 @@ function renderResearchFeedback(container, message, conversationID) {
     professionalRole.append(option);
   });
   professionalRole.value = message.feedback?.professionalRole || "";
-  optionalContext.append(optionalSummary, professionalRole, comment);
+  const ratingSelect = (label, field, options) => {
+    const wrapper = document.createElement("label");
+    wrapper.textContent = label;
+    const select = document.createElement("select");
+    select.setAttribute("aria-label", label);
+    options.forEach(([value, text]) => { const option = document.createElement("option"); option.value = value; option.textContent = text; select.append(option); });
+    select.value = message.feedback?.[field] || "";
+    wrapper.append(select);
+    return { wrapper, select };
+  };
+  const usefulness = ratingSelect("Could you use this answer?", "usefulness", [["", "Not rated"], ["usable_as_is", "Yes, as written"], ["needed_correction", "After corrections"], ["not_usable", "No"]]);
+  const checking = ratingSelect("Outside checking required", "outsideChecking", [["", "Not rated"], ["none", "None"], ["brief", "Brief checking"], ["substantial", "Substantial checking"]]);
+  const reference = document.createElement("input");
+  reference.placeholder = "Supporting section or official source (optional)";
+  reference.setAttribute("aria-label", "Supporting section or official source");
+  reference.maxLength = 500;
+  reference.value = message.feedback?.supportingReference || "";
+  optionalContext.append(optionalSummary, professionalRole, reference, comment);
+
   const submit = document.createElement("button");
   submit.type = "submit";
   submit.className = "ghost-button";
   submit.textContent = message.feedback ? "Update feedback" : "Send feedback";
-  submit.disabled = !selectedCategory || selectedCategory === "helpful";
+  submit.disabled = !selectedCategory;
   const cancel = document.createElement("button");
   cancel.type = "button";
   cancel.className = "ghost-button research-feedback-cancel";
@@ -16469,6 +16494,7 @@ function renderResearchFeedback(container, message, conversationID) {
   const setDetailsOpen = (open) => {
     details.hidden = !open;
     problemButton.setAttribute("aria-expanded", String(open));
+    detailsButton.setAttribute("aria-expanded", String(open));
   };
   const syncCompactState = () => {
     helpfulButton.setAttribute("aria-pressed", String(selectedCategory === "helpful"));
@@ -16478,7 +16504,7 @@ function renderResearchFeedback(container, message, conversationID) {
   const setBusy = (busy) => {
     helpfulButton.disabled = busy;
     problemButton.disabled = busy;
-    submit.disabled = busy || !selectedCategory || selectedCategory === "helpful";
+    submit.disabled = busy || !selectedCategory;
     cancel.disabled = busy;
   };
   const saveFeedback = async (category, fields = {}) => {
@@ -16490,7 +16516,10 @@ function renderResearchFeedback(container, message, conversationID) {
         answerID: message.id,
         category,
         comment: fields.comment ?? comment.value,
-        professionalRole: fields.professionalRole ?? professionalRole.value
+        professionalRole: fields.professionalRole ?? professionalRole.value,
+        supportingReference: reference.value,
+        usefulness: usefulness.select.value,
+        outsideChecking: checking.select.value
       });
       message.feedback = payload.feedback;
       selectedCategory = payload.feedback.category;
@@ -16509,16 +16538,17 @@ function renderResearchFeedback(container, message, conversationID) {
     professionalRole._syncCustomSelect?.();
     void saveFeedback("helpful", { comment: "", professionalRole: "" });
   });
+  detailsButton.addEventListener("click", () => setDetailsOpen(details.hidden));
   problemButton.addEventListener("click", () => {
     setDetailsOpen(details.hidden);
   });
   cancel.addEventListener("click", () => setDetailsOpen(false));
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!selectedCategory || selectedCategory === "helpful") return;
+    if (!selectedCategory) return;
     await saveFeedback(selectedCategory);
   });
-  details.append(choices, optionalContext, actions);
+  details.append(choices, usefulness.wrapper, checking.wrapper, optionalContext, actions);
   const evidenceReviewed = container.lastElementChild?.querySelector(":scope > .research-evidence-reviewed");
   if (evidenceReviewed) {
     const reviewRow = document.createElement("div");
