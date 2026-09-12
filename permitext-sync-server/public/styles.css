@@ -12706,8 +12706,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .settings-panel .settings-scroll > .settings-disclaimer:not(.settings-footer-links) {
   width: 100%;
-  text-align: justify;
-  text-align-last: justify;
+  text-align: center;
 }
 
 .settings-panel .settings-footer-links {
