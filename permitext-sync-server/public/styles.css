@@ -16198,3 +16198,27 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .settings-offline-status:empty { display: none; }
 
 .notebook-draft-status:empty { display: none; }
+
+.report-draft-panel :is(.report-draft-blocks, .report-source-group, .report-output-section).project-section-motion {
+  overflow: hidden;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--menu-subtle-surface);
+}
+
+.report-draft-panel :is(.report-draft-blocks-heading, .report-source-group-heading, .report-output-heading) {
+  height: 40px;
+  min-height: 40px;
+  margin-top: 0;
+}
+
+.report-draft-panel .project-section-motion.is-open > .project-section-motion-body {
+  padding-bottom: var(--space-3);
+}
+
+.report-draft-panel .project-collapsible-heading .project-section-toggle-chevron {
+  width: 40px;
+  height: 40px;
+  flex-basis: 40px;
+  background: transparent;
+}
