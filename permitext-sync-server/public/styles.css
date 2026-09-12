@@ -13280,11 +13280,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background-image: none;
 }
 
-.code-filter-menu.notebook-card-menu.is-open .notebook-card-list {
-  max-height: none;
-  overflow: visible;
-  padding-bottom: var(--space-2);
-}
+
 
 .notebook-card-list-empty {
   grid-column: 1 / -1;
@@ -16262,4 +16258,23 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   line-height: 1.45;
   overflow: hidden;
   resize: none;
+}
+
+.notebook-card-rail.notebook-card-menu {
+  border-radius: var(--radius-control);
+}
+.notebook-card-menu .notebook-card-menu-toggle {
+  border-radius: 0;
+}
+.notebook-card-menu.project-section-motion > .notebook-card-list {
+  max-height: 0;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+.notebook-card-menu.project-section-motion.is-open > .notebook-card-list {
+  max-height: var(--project-section-body-height, 0px);
+  padding-bottom: var(--space-2);
+}
+.notebook-card-menu.project-section-motion.is-open.is-settled > .notebook-card-list {
+  max-height: none;
 }

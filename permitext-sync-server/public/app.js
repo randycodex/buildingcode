@@ -22512,12 +22512,15 @@ async function renderProjectNotebook(project) {
     const cardMenuState = {
       cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false
     };
-    const cardMenuOptions = {
-      stateKey: "cardsMenuOpen",
-      menuName: "Project notes",
-      label: () => showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes"
+    const updateNotesMenu = () => {
+      railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";
+      railToggle.setAttribute("aria-label", `${cardMenuState.cardsMenuOpen ? "Collapse" : "Expand"} Project notes`);
     };
-    wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
+    const setNotesExpanded = wireProjectSectionMotion(rail, cardList, [railToggle], "Project notes",
+      cardMenuState.cardsMenuOpen, { onChange(expanded) {
+        cardMenuState.cardsMenuOpen = expanded;
+        updateNotesMenu();
+      } });
     railToggle.addEventListener("click", () => {
       notebookCardMenuOpenByProject.set(projectID, cardMenuState.cardsMenuOpen);
       if (!cardMenuState.cardsMenuOpen && showingArchivedCards) {
@@ -22924,7 +22927,8 @@ async function renderProjectNotebook(project) {
     function renderCardList() {
       cardList.replaceChildren();
       if (!cards.length) {
-        updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
+        setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
+      updateNotesMenu();
         updateNotebookCardManagement();
         return;
       }
@@ -22936,7 +22940,8 @@ async function renderProjectNotebook(project) {
           empty.textContent = "No archived notes.";
           cardList.append(empty);
         }
-        updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
+        setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
+      updateNotesMenu();
         updateNotebookCardManagement();
         return;
       }
@@ -22965,7 +22970,8 @@ async function renderProjectNotebook(project) {
         row.append(button);
         cardList.append(row);
       });
-      updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
+      setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
+      updateNotesMenu();
       updateNotebookCardManagement();
     }
 
