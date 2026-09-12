@@ -16502,4 +16502,11 @@ html body *:has(:focus-visible) {
 }
 .research-list-panel.research-clean-start .research-composer-status:empty { display: none; }
 .research-list-panel.research-clean-start .research-history-toggle,
-.research-list-panel.research-clean-start .research-new-chat { font-size: 12px; padding: 4px 6px; border: 0; box-shadow: none; }
+.research-list-panel.research-clean-start .research-new-chat {
+  font-size: 12px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 6px;
+  border: 0;
+  box-shadow: none;
+}
