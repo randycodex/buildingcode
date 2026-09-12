@@ -19530,7 +19530,11 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   const verificationNote = document.createElement("p");
   verificationNote.className = "research-verification-note";
   verificationNote.textContent = "AI-assisted. Verify against cited code.";
-  input.placeholder = currentProject?.name ? `Ask about ${currentProject.name}…` : "Ask a research question…";
+  if (researchEnabled) {
+    input.placeholder = currentProject?.name
+      ? `Start a new question about ${currentProject.name}…`
+      : "Start a new research question…";
+  }
   form.append(composerTools, composerBox, status, verificationNote);
   container.append(form);
   requestAnimationFrame(resizeComposer);
@@ -21371,7 +21375,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   const starterAnalysisQuestion = conversation.messages.length === 0
     ? conversation.starterQuestion || ""
     : "";
-  input.placeholder = researchChatPlaceholder;
+  input.placeholder = "Ask a follow-up…";
   input.value = ownerInstance ? ownerInstance.draft : researchQuestionDraft && researchQuestionDraft !== starterAnalysisQuestion
     ? researchQuestionDraft
     : "";
