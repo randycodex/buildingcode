@@ -13092,7 +13092,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   grid-template-rows: auto auto;
   gap: 0;
   min-width: 0;
-  margin: var(--space-3) var(--panel-padding) var(--space-3);
+  margin: var(--space-3) var(--space-4) var(--space-3);
   padding: 0;
   overflow: hidden;
   border-radius: var(--radius-card);

@@ -1686,7 +1686,7 @@ async function main() {
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
-        workspaceStyles.text.includes("margin: var(--space-3) var(--panel-padding) var(--space-3);") &&
+        workspaceStyles.text.includes("margin: var(--space-3) var(--space-4) var(--space-3);") &&
         workspaceStyles.text.includes(".notebook-toolbar .notebook-reference-option {") &&
         workspaceStyles.text.includes(".notebook-reference-list {\n  display: block;") &&
         workspaceStyles.text.includes("border-bottom: 1px solid color-mix(in srgb, var(--text-tertiary) 24%, transparent);") &&
