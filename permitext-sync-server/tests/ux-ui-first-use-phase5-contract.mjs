@@ -90,12 +90,9 @@ assert.equal(readPendingResearchIntent(storage, {
 
 assert.match(appSource, /NYC code research you can verify\./);
 assert.match(appSource, /Read enacted code, save the sections that matter, and ask cited Research questions\./);
-assert.match(appSource, /Explore the Codes/);
-assert.match(appSource, /See How Research Works/);
-assert.match(appSource, /Illustrative Research example/);
-assert.match(appSource, /Static example — no question is submitted\./);
-assert.match(appSource, /sectionID: 113[\s\S]*?sectionNumber: "202"[\s\S]*?SECTION 202: Definitions/);
-assert.match(appSource, /aria-label", "Open enacted source BC 202 Definitions in Reader"/);
+assert.doesNotMatch(appSource, /Explore the Codes/);
+assert.doesNotMatch(appSource, /See How Research Works/);
+assert.doesNotMatch(appSource, /Illustrative Research example/);
 assert.match(appSource, /firstUseWelcomeSeenKey[\s\S]*?completeFirstUseWelcome\(\)/);
 assert.doesNotMatch(appSource, /new URLSearchParams\(window\.location\.search\)\.size/);
 assert.match(appSource, /"checkout"[\s\S]*?"appleSignIn"[\s\S]*?"organizationInvite"/);
@@ -117,9 +114,6 @@ assert.match(serverSource, /creationRequestID: _creationRequestID/);
 assert.match(serverSource, /creationRequestFingerprint: _creationRequestFingerprint/);
 assert.match(serverSource, /withResearchConversationCreateLock/);
 
-assert.match(stylesSource, /\.first-use-primary\s*\{[\s\S]*?color: #0d0d0f;[\s\S]*?background: var\(--accent-building\)/);
-assert.match(stylesSource, /\.first-use-actions button,[\s\S]*?border: 0;/);
-assert.match(stylesSource, /\.first-use-actions button:focus-visible,[\s\S]*?outline: 3px solid/);
 assert.match(indexSource, /app\.js\?v=[^"']+/);
 assert.match(serviceWorkerSource, /research-intent-state\.js\?v=[^"']+/);
 

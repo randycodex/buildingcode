@@ -83,7 +83,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260912-welcome-preview-v66";
+} from "./offline-storage.js?v=20260912-welcome-simplified-v67";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -118,7 +118,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260912-welcome-preview-v66";
+} from "./research-intent-state.js?v=20260912-welcome-simplified-v67";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33095,96 +33095,7 @@ function renderFirstUseWelcome() {
   supporting.className = "first-use-supporting";
   supporting.textContent = "Read enacted code, save the sections that matter, and ask cited Research questions.";
 
-  const actions = document.createElement("div");
-  actions.className = "first-use-actions";
-  const exploreButton = document.createElement("button");
-  exploreButton.type = "button";
-  exploreButton.className = "first-use-primary";
-  exploreButton.textContent = "Explore the Codes";
-  const exampleButton = document.createElement("button");
-  exampleButton.type = "button";
-  exampleButton.className = "first-use-secondary";
-  exampleButton.textContent = "See How Research Works";
-  const exampleID = `first-use-example-${crypto.randomUUID()}`;
-  exampleButton.setAttribute("aria-controls", exampleID);
-  exampleButton.setAttribute("aria-expanded", "false");
-  const signInButton = document.createElement("button");
-  signInButton.type = "button";
-  signInButton.className = "first-use-tertiary";
-  signInButton.textContent = "Sign In";
-  actions.append(exploreButton, exampleButton, signInButton);
-
-  const example = document.createElement("article");
-  example.id = exampleID;
-  example.className = "first-use-research-example";
-  example.hidden = true;
-  const exampleLabel = document.createElement("p");
-  exampleLabel.className = "first-use-example-label";
-  exampleLabel.textContent = "Illustrative Research example";
-  const question = document.createElement("h2");
-  question.tabIndex = -1;
-  question.textContent = "What does the Building Code mean by a story?";
-  const answer = document.createElement("p");
-  answer.textContent = "BC 202 defines a story as the part of a building between the upper surface of a floor and the upper surface of the floor or roof above. Basement and mezzanine provisions can affect how a level is classified.";
-  const citation = document.createElement("button");
-  citation.type = "button";
-  citation.className = "first-use-citation";
-  citation.textContent = "BC 202 — Definitions";
-  citation.setAttribute("aria-label", "Open enacted source BC 202 Definitions in Reader");
-  const trust = document.createElement("p");
-  trust.className = "first-use-trust";
-  trust.textContent = "Static example — no question is submitted. Research is AI-assisted, not an official interpretation. Verify decisions against the enacted source.";
-  example.append(exampleLabel, question, answer, citation, trust);
-
-  exploreButton.addEventListener("click", async () => {
-    exploreButton.disabled = true;
-    completeFirstUseWelcome();
-    const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
-    state.readers.push(reader);
-    saveWorkspaceState();
-    await transitionWorkspace("utility");
-    scrollPaneIntoView(paneIDForReader(reader));
-  });
-  exampleButton.addEventListener("click", () => {
-    const expanded = exampleButton.getAttribute("aria-expanded") === "true";
-    if (!expanded) completeFirstUseWelcome();
-    exampleButton.setAttribute("aria-expanded", String(!expanded));
-    exampleButton.textContent = expanded ? "See How Research Works" : "Hide Research Example";
-    example.hidden = expanded;
-    if (!expanded) question.focus({ preventScroll: true });
-  });
-  example.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
-    event.preventDefault();
-    example.hidden = true;
-    exampleButton.setAttribute("aria-expanded", "false");
-    exampleButton.textContent = "See How Research Works";
-    exampleButton.focus({ preventScroll: true });
-  });
-  signInButton.addEventListener("click", async () => {
-    signInButton.disabled = true;
-    completeFirstUseWelcome();
-    await focusUtility("settings");
-  });
-  citation.addEventListener("click", async () => {
-    citation.disabled = true;
-    completeFirstUseWelcome();
-    try {
-      await openSourceInReader({
-        sectionID: 113,
-        id: 113,
-        codePrefix: "BC",
-        chapterID: 2,
-        chapterNumber: "2",
-        sectionNumber: "202",
-        title: "SECTION 202: Definitions"
-      }, "", { sourceSurface: "welcome" });
-    } finally {
-      citation.disabled = false;
-    }
-  });
-
-  content.append(heading, supporting, actions, example);
+  content.append(heading, supporting);
   welcome.append(content);
   return welcome;
 }
@@ -33193,6 +33104,7 @@ function appendPaneSequence(panes) {
   closeActiveCustomSelect();
   const orderedPanes = localWelcomePreviewPending ? [] : orderPanes(panes);
   localWelcomePreviewPending = false;
+  if (orderedPanes.length && firstUseWelcomeActive) completeFirstUseWelcome();
   orderedPanes.forEach(ensureWorkspacePanelAccessibleName);
   const previousScrollLeft = track.scrollLeft;
   const nodes = [];
