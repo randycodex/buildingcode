@@ -4453,8 +4453,17 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
       }
     });
   };
-  const applyExpandedHeight = () => {
-    section.style.setProperty("--project-section-body-height", `${body.scrollHeight}px`);
+  const applyExpandedHeight = (height = body.scrollHeight) => {
+    section.style.setProperty("--project-section-body-height", `${Math.max(0, height)}px`);
+  };
+  const measureExpandedHeight = () => {
+    section.classList.add("is-restoring", "is-open", "is-settled");
+    const height = body.getBoundingClientRect().height;
+    applyExpandedHeight(height);
+    section.classList.remove("is-open", "is-settled");
+    void body.offsetHeight;
+    section.classList.remove("is-restoring");
+    return height;
   };
   const settleExpandedBody = () => {
     if (expanded && section.classList.contains("is-open")) {
@@ -4484,7 +4493,7 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
         requestAnimationFrame(() => requestAnimationFrame(() => section.classList.remove("is-restoring")));
       } else if (!section.classList.contains("is-open")) {
         section.classList.remove("is-settled");
-        applyExpandedHeight();
+        measureExpandedHeight();
         requestAnimationFrame(() => {
           if (!expanded) return;
           section.classList.add("is-open");
@@ -4499,10 +4508,9 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
       body.hidden = true;
       return;
     }
-    applyExpandedHeight();
+    applyExpandedHeight(body.getBoundingClientRect().height);
     section.classList.remove("is-settled");
     void body.offsetHeight;
-    section.classList.remove("is-open");
     const hideBody = (event) => {
       if (event && (event.target !== body || event.propertyName !== "max-height")) return;
       if (!expanded) body.hidden = true;
@@ -4510,6 +4518,9 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
     };
     body.addEventListener("transitionend", hideBody);
     hideTimer = window.setTimeout(hideBody, 500);
+    requestAnimationFrame(() => {
+      if (!expanded) section.classList.remove("is-open");
+    });
   };
 
   toggles.forEach((control) => control.addEventListener("click", () => {
