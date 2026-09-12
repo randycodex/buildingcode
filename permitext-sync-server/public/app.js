@@ -428,6 +428,7 @@ const sharedWorkspaceStateKeys = [
   "syncOutbox",
   "syncConflicts",
   "archivedProjectIDs",
+  "projectArchiveNoticeSeen",
   "sectionNotes",
   "localSavedSectionIDs",
   "continuityAppliedAt"
@@ -667,6 +668,10 @@ function loadWorkspaceState(accountOverride) {
       syncOutbox: Array.isArray(saved.syncOutbox) ? saved.syncOutbox.filter((item) => item?.mutation && item?.accountUserID) : [],
       syncConflicts: Array.isArray(saved.syncConflicts) ? saved.syncConflicts.filter((item) => item?.mutation) : [],
       archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
+      projectArchiveNoticeSeen: Boolean(
+        saved.projectArchiveNoticeSeen ||
+        (Array.isArray(saved.archivedProjectIDs) && saved.archivedProjectIDs.length > 0)
+      ),
       searchResultReader: null,
       sectionDetail: null,
       // Source Detail was retired from the ordinary workflow. Preserve enacted
@@ -777,6 +782,7 @@ function loadWorkspaceState(accountOverride) {
       syncOutbox: [],
       syncConflicts: [],
       archivedProjectIDs: [],
+      projectArchiveNoticeSeen: false,
       searchResultReader: null,
       sectionDetail: null,
       sectionDetails: {},
@@ -1632,7 +1638,11 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
         if (!(await archiveProject(project))) return;
         const main = workspaceRegistry.workspaces.find((item) => !item.projectID);
         if (main) await switchWorkspace(main.id, { focus: false });
-        await showWebNotice("Project archived", "Restore it from Account → Archived Projects.");
+        if (!state.projectArchiveNoticeSeen) {
+          state.projectArchiveNoticeSeen = true;
+          saveWorkspaceState();
+          await showWebNotice("Project archived", "Restore it from Account → Archived Projects.");
+        }
       }
     } }] : [
       { label: "Duplicate workspace", run: () => void duplicateNamedWorkspace(workspaceID) },

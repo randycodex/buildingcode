@@ -1099,6 +1099,11 @@ async function main() {
       projectMutationSource.includes("archivedAt: project.archivedAt || null") &&
         projectArchiveSource.includes("await pushMutation(projectMutationForRecord(project, account))") &&
         projectArchiveSource.includes("archivedAt: null") &&
+        workspaceScript.text.includes('"projectArchiveNoticeSeen",') &&
+        workspaceScript.text.includes("saved.projectArchiveNoticeSeen ||") &&
+        workspaceScript.text.includes("Array.isArray(saved.archivedProjectIDs) && saved.archivedProjectIDs.length > 0") &&
+        workspaceScript.text.includes("if (!state.projectArchiveNoticeSeen)") &&
+        workspaceScript.text.includes("state.projectArchiveNoticeSeen = true") &&
         workspaceScript.text.includes("async function migrateLegacyArchivedProjects()") &&
         workspaceScript.text.includes("if (await migrateLegacyArchivedProjects())"),
       "Project archive and restore state no longer syncs or migrates from legacy browser storage."
