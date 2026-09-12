@@ -22515,7 +22515,7 @@ async function renderProjectNotebook(project) {
     const cardMenuOptions = {
       stateKey: "cardsMenuOpen",
       menuName: "Project notes",
-      label: () => showingArchivedCards ? "Archive" : "Notes"
+      label: () => showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes"
     };
     wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
     railToggle.addEventListener("click", () => {
@@ -22893,7 +22893,7 @@ async function renderProjectNotebook(project) {
       railHeader.hidden = visibleCards.length === 0;
       rail.classList.toggle("is-selecting-cards", selectingCards);
       rail.classList.toggle("is-showing-archived-cards", showingArchivedCards);
-      railLabel.textContent = showingArchivedCards ? "Archive" : "Notes";
+      railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";
       selectButton.setAttribute("aria-pressed", String(selectingCards));
       archiveButton.setAttribute("aria-pressed", String(showingArchivedCards));
       archiveButton.title = showingArchivedCards ? "Show active notes" : "Show archived notes";
