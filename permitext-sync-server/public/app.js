@@ -17626,9 +17626,10 @@ async function openResearchConversation(conversationID, options = {}) {
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
   if (options.instance) {
-    const instance = options.instance;
+    const instanceID = options.instance.id;
     const conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
-    if (!(state.utilityInstances || []).includes(instance)) return null;
+    const instance = (state.utilityInstances || []).find((item) => item.key === "analysis" && item.id === instanceID);
+    if (!instance) return null;
     instance.conversationID = normalizedConversationID;
     instance.historyShowing = false;
     supplementalResearchConversations.set(normalizedConversationID, conversation);
@@ -17704,7 +17705,7 @@ async function openResearchConversation(conversationID, options = {}) {
       );
     }
   }
-  const previousConversationPaneID = paneIDForResearchConversation();
+  const previousConversationPaneID = "utility:analysis";
   const previousConversationWidth = previousConversationPaneID
     ? state.paneWeights[previousConversationPaneID]
     : null;
@@ -17716,19 +17717,14 @@ async function openResearchConversation(conversationID, options = {}) {
       placePaneAfter(options.anchorPaneID, "utility:analysis");
     }
   }
-  const conversationPaneID = paneIDForResearchConversation(normalizedConversationID);
+  const conversationPaneID = "utility:analysis";
   if (previousConversationPaneID && previousConversationPaneID !== conversationPaneID) {
     delete state.paneWeights[previousConversationPaneID];
   }
   state.paneWeights[conversationPaneID] = Number.isFinite(Number(previousConversationWidth))
     ? Number(previousConversationWidth)
     : defaultPaneWidthForID(conversationPaneID);
-  const nextPaneOrder = (state.paneOrder || []).filter((id) => id !== previousConversationPaneID);
-  const researchIndex = nextPaneOrder.indexOf("utility:analysis");
-  const savedIndex = nextPaneOrder.indexOf(primarySavedPaneID());
-  const anchorIndex = showResearchList ? researchIndex : savedIndex;
-  nextPaneOrder.splice(anchorIndex === -1 ? nextPaneOrder.length : anchorIndex + 1, 0, conversationPaneID);
-  state.paneOrder = nextPaneOrder;
+  appendPaneIfMissing(conversationPaneID);
   saveWorkspaceState();
   const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   await transitionWorkspace("utility", {
@@ -19608,7 +19604,7 @@ async function renderResearch(paneID = "utility:analysis") {
     panelActions?.prepend(historyButton);
     panel.classList.add("has-inline-conversation");
     content.remove();
-    panel.append(await renderResearchConversation(instance?.conversationID || state.researchConversationID, { embedded: true, supplemental: Boolean(instance) }));
+    panel.append(await renderResearchConversation(instance?.conversationID || state.researchConversationID, { embedded: true, supplemental: Boolean(instance), ownerInstance: instance, paneID }));
     return panel;
   }
   if (historyShowing) {
@@ -19905,7 +19901,7 @@ async function renderResearch(paneID = "utility:analysis") {
           toggleConversationSelection(conversation.id);
           return;
         }
-        researchConversationPaneOpened = true;
+        if (!instance) researchConversationPaneOpened = true;
         void openResearchConversation(conversation.id, { instance });
       });
       if (!releaseSurfaceVisibility.researchHistoryManagement) {
@@ -21044,10 +21040,12 @@ function bindResearchEvidenceDivider(layout, divider, conversationID) {
 }
 
 async function renderResearchConversation(conversationID, options = {}) {
-  const ownerInstance = (state.utilityInstances || []).find((item) => item.key === "analysis" && item.conversationID === conversationID);
+  const ownerInstance = Object.hasOwn(options, "ownerInstance")
+    ? options.ownerInstance
+    : (state.utilityInstances || []).find((item) => item.key === "analysis" && item.conversationID === conversationID);
   const embedded = options.embedded === true;
   const supplemental = options.supplemental === true;
-  const paneID = paneIDForResearchConversation(conversationID);
+  const paneID = options.paneID || (ownerInstance ? paneIDForUtilityInstance(ownerInstance) : paneIDForResearchConversation(conversationID));
   const renderingAccount = activeAccount();
   const renderingContext = {
     generation: researchOpenGeneration,
