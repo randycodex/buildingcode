@@ -1246,7 +1246,7 @@ textarea:focus-visible {
 }
 
 .workspace-first-use {
-  align-items: start;
+  align-items: center;
   padding: clamp(2.5rem, 8vh, 6.5rem) clamp(1.5rem, 6vw, 6rem);
   color: var(--text-primary);
   text-align: center;

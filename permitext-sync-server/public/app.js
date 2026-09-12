@@ -83,7 +83,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260912-welcome-simplified-v67";
+} from "./offline-storage.js?v=20260912-welcome-centered-v68";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -118,7 +118,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260912-welcome-simplified-v67";
+} from "./research-intent-state.js?v=20260912-welcome-centered-v68";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
