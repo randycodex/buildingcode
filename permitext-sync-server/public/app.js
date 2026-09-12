@@ -28311,7 +28311,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     renderStructuredFacts();
     customList.querySelector(".saved-project-structured-fact.is-custom:last-child .saved-project-structured-fact-label-input")?.focus();
   });
-  body.append(address, description);
+  body.append(description);
   factsSection.append(heading, body);
   container.append(factsSection, structuredSection);
   wireProjectSectionMotion(
