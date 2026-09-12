@@ -14458,6 +14458,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   --report-menu-gap: calc(var(--space-2) + var(--space-3));
   --report-content-edge: var(--space-3);
   display: grid;
+  grid-auto-rows: max-content;
   align-content: start;
   gap: var(--report-menu-gap);
   min-height: 0;
