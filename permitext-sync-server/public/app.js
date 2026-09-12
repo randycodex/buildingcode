@@ -22195,10 +22195,7 @@ async function renderProjectNotebook(project) {
   heading.className = "notebook-heading";
   const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Notebook";
-  const projectOwnership = document.createElement("p");
-  projectOwnership.className = "project-ownership-label";
-  projectOwnership.textContent = `Project: ${identity.name}`;
-  heading.append(headingTitle, projectOwnership);
+  heading.append(headingTitle);
   const dragHandle = createProjectToolDragHandle(identity);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close notebook-close";
@@ -23927,10 +23924,7 @@ async function renderProjectReportDraft(project) {
   heading.className = "report-heading";
   const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Report";
-  const projectOwnership = document.createElement("p");
-  projectOwnership.className = "project-ownership-label";
-  projectOwnership.textContent = `Project: ${identity.name}`;
-  heading.append(headingTitle, projectOwnership);
+  heading.append(headingTitle);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close report-draft-close";
   closeButton.type = "button";
