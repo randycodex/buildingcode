@@ -22440,7 +22440,7 @@ async function renderProjectNotebook(project) {
     railToggle.type = "button";
     const railLabel = document.createElement("span");
     railLabel.className = "code-filter-menu-label";
-    railLabel.textContent = "";
+    railLabel.textContent = "Notes";
     const railIcon = document.createElement("span");
     railIcon.className = "code-filter-menu-icon";
     railIcon.setAttribute("aria-hidden", "true");
@@ -22513,9 +22513,9 @@ async function renderProjectNotebook(project) {
     cardListResizeHandle.setAttribute("aria-label", "Resize Project notes list");
     cardListResizeHandle.setAttribute("aria-orientation", "horizontal");
     cardListResizeHandle.tabIndex = 0;
-    const minimumCardListHeight = 156;
+    const minimumCardListHeight = 96;
     const resizeCardListTo = (height, userInitiated = true) => {
-      const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
+      const maximumHeight = Math.max(minimumCardListHeight, Math.min(shell.clientHeight - 360, 440));
       const minimumHeight = Math.min(minimumCardListHeight, maximumHeight);
       const nextHeight = Math.max(minimumHeight, Math.min(maximumHeight, height));
       rail.style.setProperty("--notebook-card-list-height", `${nextHeight}px`);
@@ -22558,7 +22558,7 @@ async function renderProjectNotebook(project) {
     const cardMenuOptions = {
       stateKey: "cardsMenuOpen",
       menuName: "Project notes",
-      label: () => showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes"
+      label: () => showingArchivedCards ? "Archive" : "Notes"
     };
     wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
     railToggle.addEventListener("click", () => {
@@ -22936,7 +22936,7 @@ async function renderProjectNotebook(project) {
       railHeader.hidden = visibleCards.length === 0;
       rail.classList.toggle("is-selecting-cards", selectingCards);
       rail.classList.toggle("is-showing-archived-cards", showingArchivedCards);
-      railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";
+      railLabel.textContent = showingArchivedCards ? "Archive" : "Notes";
       selectButton.setAttribute("aria-pressed", String(selectingCards));
       archiveButton.setAttribute("aria-pressed", String(showingArchivedCards));
       archiveButton.title = showingArchivedCards ? "Show active notes" : "Show archived notes";
@@ -32195,7 +32195,10 @@ function renderSettings() {
         const title = row.querySelector("strong");
         const summary = row.querySelector("span:not(.settings-feature-icon)");
         if (title) title.textContent = activePlanCopy.title;
-        if (summary) summary.textContent = activePlanCopy.summary;
+        if (summary) {
+          summary.textContent = source === "lifetimeGrant" ? "" : activePlanCopy.summary;
+          summary.hidden = source === "lifetimeGrant";
+        }
       }
     });
     const policyAcceptanceReady = Boolean(

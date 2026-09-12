@@ -13151,12 +13151,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .notebook-shell {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   width: calc(100% + (2 * var(--panel-padding)));
   min-height: 0;
   margin-inline: calc(-1 * var(--panel-padding));
-  overflow: hidden;
+  overflow-y: auto;
   border-radius: 0;
   background: var(--surface-raised);
 }
@@ -13170,6 +13170,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .notebook-card-rail {
   display: grid;
+  flex: 0 0 auto;
+  align-content: start;
+  grid-template-rows: auto auto auto;
   gap: 0;
   min-width: 0;
   margin: var(--space-3) var(--panel-padding) var(--space-3);
@@ -13430,6 +13433,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .notebook-focus {
+  flex: 1 0 360px;
   display: grid;
   grid-template-rows: auto auto minmax(220px, 1fr) auto;
   min-width: 0;
@@ -13863,8 +13867,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 @container (max-width: 620px) {
   .notebook-shell {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(360px, 1fr);
     overflow-y: auto;
   }
 
