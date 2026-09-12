@@ -10002,10 +10002,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-primary);
 }
 
-.saved-project-structured-custom-group {
-  margin-top: var(--space-2);
-}
-
 .saved-project-structured-facts-help,
 .saved-project-structured-facts-empty {
   margin: 0;
@@ -10033,10 +10029,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: transparent;
 }
 
-.saved-project-structured-fact.is-custom {
-  grid-template-columns: minmax(92px, 0.85fr) minmax(100px, 1.15fr) auto;
-}
-
 .saved-project-structured-fact + .saved-project-structured-fact::before,
 .saved-folder-context.is-project .saved-project-evidence-body .saved-code-group .saved-row::after {
   position: absolute;
@@ -10062,8 +10054,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   white-space: nowrap;
 }
 
-.saved-project-structured-fact-value,
-.saved-project-structured-fact-label-input {
+.saved-project-structured-fact-value {
   min-width: 0;
   margin: 0;
   border: 0;
@@ -10083,44 +10074,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   text-align: right;
 }
 
-.saved-project-structured-fact-value:focus-visible,
-.saved-project-structured-fact-label-input:focus-visible {
+.saved-project-structured-fact-value:focus-visible {
   box-shadow: none;
-}
-
-.saved-project-structured-fact-label-input {
-  color: var(--text-secondary);
-  font-size: 0.8em;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.saved-project-structured-fact-add,
-.saved-project-structured-fact-remove {
-  border: 0;
-  color: var(--text-secondary);
-  font: inherit;
-  cursor: pointer;
-}
-
-.saved-project-structured-fact-add {
-  justify-self: start;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--project-color, var(--accent)) 14%, var(--surface-muted));
-  font-size: 0.82em;
-}
-
-.saved-project-structured-fact-remove {
-  padding: 0 var(--space-1);
-  background: transparent;
-  font-size: 1.25em;
-  line-height: 1;
-}
-
-.saved-project-structured-fact-add:hover,
-.saved-project-structured-fact-remove:hover {
-  color: var(--text-primary);
 }
 
 @media (max-width: 720px) {
@@ -10132,13 +10087,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
     grid-column: auto;
   }
 
-  .saved-project-structured-fact.is-custom {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .saved-project-structured-fact.is-custom .saved-project-structured-fact-label-input {
-    grid-column: 1 / -1;
-  }
 }
 
 .saved-folder-context.is-project .saved-project-tool-controls {

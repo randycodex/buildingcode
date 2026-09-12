@@ -717,9 +717,8 @@ assert.doesNotMatch(structuredFactGroupsSource, /Travel Distance|Exit Separation
 assert.match(appSource, /\["stories", \["stories-above-grade", "Stories Above Grade"\]\]/);
 assert.match(appSource, /\["sprinkler-status", \["sprinkler-protection", "Sprinkler Protection"\]\]/);
 assert.match(appSource, /\["work-type", \["work-filing-type", "Work \/ Filing Type"\]\]/);
-assert.match(projectFactEditorSource, /structuredFacts\.filter\(\(fact\) => fact\.key !== "floor-affected" && !fixedFactKeys\.has\(fact\.key\)\)/);
 assert.match(projectFactEditorSource, /projectSectionExpanded\(identity, `structuredFacts:\$\{group\.key\}`, groupIndex === 0\)/);
-assert.match(projectFactEditorSource, /addFact\.textContent = "Add another fact"/);
+assert.doesNotMatch(projectFactEditorSource, /saved-project-structured-custom-group|Add another fact|Additional fact name/);
 assert.doesNotMatch(appSource, /function extractedProjectStructuredFacts/);
 assert.doesNotMatch(projectFactEditorSource, /Proposed from the narrative|saved-project-structured-fact-status/);
 assert.doesNotMatch(projectFactEditorSource, /Research may use as user-provided context/);

@@ -28088,38 +28088,9 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   structuredBody.className = "saved-project-structured-facts";
   const structuredGroups = document.createElement("div");
   structuredGroups.className = "saved-project-structured-groups";
-  const customSection = document.createElement("section");
-  customSection.className = "saved-project-structured-group saved-project-structured-custom-group";
-  const customHeading = document.createElement("div");
-  customHeading.className = "saved-project-structured-group-heading";
-  const customToggle = document.createElement("button");
-  customToggle.type = "button";
-  customToggle.className = "saved-project-structured-group-toggle section-label";
-  customToggle.textContent = "Custom";
-  const customChevron = document.createElement("button");
-  customChevron.type = "button";
-  customChevron.className = "project-section-toggle-chevron saved-project-structured-group-chevron";
-  customChevron.innerHTML = researchChevronIconsSVG();
-  customHeading.append(customToggle, customChevron);
-  const customBody = document.createElement("section");
-  customBody.className = "saved-project-structured-group-body";
-  const customList = document.createElement("div");
-  customList.className = "saved-project-structured-facts-list saved-project-structured-custom-list";
-  const addFact = document.createElement("button");
-  addFact.type = "button";
-  addFact.className = "saved-project-structured-fact-add";
-  addFact.textContent = "Add another fact";
-  customBody.append(customList, addFact);
-  customSection.append(customHeading, customBody);
-  structuredBody.append(structuredGroups, customSection);
+  structuredBody.append(structuredGroups);
   structuredSection.append(structuredHeading, structuredBody);
 
-  const factKey = (label) => String(label || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-  const fixedFactKeys = new Set(projectStructuredFactGroups.flatMap((group) => group.fields.map((field) => field.key)));
   const replaceFact = (key, label, value, id = `project-fact:${key}`) => {
     structuredFacts = structuredFacts.filter((fact) => fact.key !== key);
     const normalized = normalizeProjectStructuredFact({
@@ -28195,69 +28166,11 @@ function appendSavedProjectFactEditor(container, folder, identity) {
       }
     );
   });
-  wireProjectSectionMotion(
-    customSection,
-    customBody,
-    [customToggle, customChevron],
-    "Custom",
-    projectSectionExpanded(identity, "structuredFacts:custom", true),
-    {
-      onChange(expanded) {
-        persistProjectSectionExpansion(identity, "structuredFacts:custom", expanded);
-      }
-    }
-  );
-
   const renderStructuredFacts = () => {
     groupLists.forEach((list) => clear(list));
-    clear(customList);
     const factsByKey = new Map(structuredFacts.map((fact) => [fact.key, fact]));
     projectStructuredFactGroups.forEach((group) => {
       group.fields.forEach((field) => appendDefaultFactField(groupLists.get(group.key), field, factsByKey));
-    });
-    structuredFacts.filter((fact) => fact.key !== "floor-affected" && !fixedFactKeys.has(fact.key)).forEach((fact) => {
-      const row = document.createElement("article");
-      row.className = "saved-project-structured-fact is-custom";
-      const label = document.createElement("input");
-      label.type = "text";
-      label.className = "saved-project-structured-fact-label-input";
-      label.value = fact.label;
-      label.placeholder = "Fact name";
-      label.setAttribute("aria-label", "Additional fact name");
-      const value = document.createElement("input");
-      value.type = "text";
-      value.className = "saved-project-structured-fact-value";
-      value.value = fact.value;
-      value.setAttribute("aria-label", `${fact.label || "Additional fact"} value`);
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "saved-project-structured-fact-remove";
-      remove.setAttribute("aria-label", `Remove ${fact.label || "additional fact"}`);
-      remove.textContent = "×";
-      const updateDraft = () => {
-        const nextLabel = label.value.trim();
-        fact.key = factKey(nextLabel) || fact.key;
-        fact.label = nextLabel;
-        fact.value = value.value.trim();
-        fact.updatedAt = new Date().toISOString();
-        if (fact.label && fact.value) scheduleStructuredSave();
-      };
-      const commit = () => {
-        updateDraft();
-        if (fact.label && fact.value) void save();
-      };
-      label.addEventListener("input", updateDraft);
-      value.addEventListener("input", updateDraft);
-      label.addEventListener("blur", commit);
-      value.addEventListener("blur", commit);
-      remove.addEventListener("click", () => {
-        structuredFacts = structuredFacts.filter((candidate) => candidate.id !== fact.id);
-        renderStructuredFacts();
-        void save();
-      });
-      if (identity.sharedOnly) label.disabled = value.disabled = remove.disabled = true;
-      row.append(label, value, remove);
-      customList.append(row);
     });
   };
   renderStructuredFacts();
@@ -28302,13 +28215,6 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     description.disabled = true;
     address.title = description.title = "Project context is read-only in this shared Project";
   }
-  addFact.disabled = identity.sharedOnly;
-  addFact.addEventListener("click", () => {
-    const id = `project-fact:custom:${globalThis.crypto?.randomUUID?.() || Date.now()}`;
-    structuredFacts.push({ id, key: id, label: "", value: "", status: "stated", source: "user", sourceText: "", updatedAt: null });
-    renderStructuredFacts();
-    customList.querySelector(".saved-project-structured-fact.is-custom:last-child .saved-project-structured-fact-label-input")?.focus();
-  });
   body.append(description);
   factsSection.append(heading, body);
   container.append(factsSection, structuredSection);
