@@ -22236,7 +22236,7 @@ async function renderProjectNotebook(project) {
   draftStatus.setAttribute("role", "status");
   header.after(draftStatus);
   const showDraftStatus = (message) => {
-    if (isCurrentAccountRequest(requestIdentity)) draftStatus.textContent = message;
+    if (isCurrentAccountRequest(requestIdentity)) draftStatus.textContent = message === "Synced" ? "" : message;
   };
   function showNotebookRecoveryConflict(draft) {
     if (!draft?.recoveryConflict) return false;

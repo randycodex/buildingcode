@@ -16271,3 +16271,5 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .settings-archived-projects-status:empty { display: none; }
 
 .settings-offline-status:empty { display: none; }
+
+.notebook-draft-status:empty { display: none; }
