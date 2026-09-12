@@ -16432,3 +16432,63 @@ html body :is(input, textarea, select, button, [tabindex], [contenteditable], [r
 html body *:has(:focus-visible) {
   outline: none !important;
 }
+
+.research-list-panel:not(.research-clean-start) > .research-chat-welcome {
+  display: none;
+}
+.research-list-panel.research-clean-start:has(.research-progress-card) > .analysis-content {
+  display: block;
+}
+.research-list-panel.research-clean-start:has(.research-progress-card) > .research-chat-welcome {
+  display: none;
+}
+.research-list-panel.research-clean-start > .research-chat-welcome {
+  grid-row: 2;
+  align-self: center;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 18px;
+}
+.research-list-panel.research-clean-start > .analysis-content { grid-row: 2; }
+.research-list-panel.research-clean-start > .research-composer { grid-row: 3; }
+.research-list-panel.research-clean-start:not(.is-history-open) > .analysis-content,
+.research-list-panel.research-clean-start.is-history-open > .research-chat-welcome,
+.research-list-panel.research-clean-start .research-usage,
+.research-list-panel.research-clean-start:not(.is-history-open) .research-history-select-button {
+  display: none;
+}
+.research-list-panel.research-clean-start .research-composer-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: relative;
+}
+.research-list-panel.research-clean-start .research-start-project { min-width: 0; max-width: 75%; }
+.research-composer-information summary {
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 12px;
+  list-style: none;
+}
+.research-composer-information summary::-webkit-details-marker { display: none; }
+.research-composer-information[open] {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 3;
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--menu-subtle-surface);
+}
+.research-composer-information[open] summary { text-align: right; margin-bottom: 10px; }
+.research-verification-note {
+  margin: 4px 0 0;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+.research-list-panel.research-clean-start .research-composer-status:empty { display: none; }
+.research-list-panel.research-clean-start .research-history-toggle,
+.research-list-panel.research-clean-start .research-new-chat { font-size: 12px; padding: 4px 6px; border: 0; box-shadow: none; }

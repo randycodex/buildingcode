@@ -18254,7 +18254,7 @@ function renderEvidenceDiscovery(container) {
   const projectSelect = createResearchProjectSelect({
     value: scopedProjectID || activeEvidenceDiscovery?.projectID || preferredResearchProjectID(),
     includeUnassigned: !scopedProjectID,
-    unassignedLabel: "Unassigned — no Project context",
+    unassignedLabel: "General",
     ariaLabel: "Project for candidate evidence"
   });
   const findButton = document.createElement("button");
@@ -19427,7 +19427,7 @@ function renderNewResearchComposer(container, researchEnabled) {
   projectLabel.textContent = "Project context";
   const projectSelect = createResearchProjectSelect({
     value: initialProjectID,
-    unassignedLabel: "Unassigned — no Project context",
+    unassignedLabel: "General",
     ariaLabel: "Project context for new Research"
   });
   const projectPreview = researchProjectContextPreview(initialProjectID);
@@ -19435,7 +19435,7 @@ function renderNewResearchComposer(container, researchEnabled) {
     initialProjectID = projectSelect.value;
     projectPreview.updateResearchProject(initialProjectID);
   });
-  projectField.append(projectLabel, projectSelect, projectPreview);
+  projectField.append(projectSelect);
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
@@ -19516,7 +19516,20 @@ function renderNewResearchComposer(container, researchEnabled) {
     }
   });
   composerBox.append(input, sendButton);
-  form.append(projectField, researchComposerDisclosure(), composerBox, status);
+  const information = document.createElement("details");
+  information.className = "research-composer-information";
+  const informationToggle = document.createElement("summary");
+  informationToggle.textContent = "Info";
+  informationToggle.setAttribute("aria-label", "Research context and privacy information");
+  information.append(informationToggle, projectPreview, researchComposerDisclosure());
+  const composerTools = document.createElement("div");
+  composerTools.className = "research-composer-tools";
+  composerTools.append(projectField, information);
+  const verificationNote = document.createElement("p");
+  verificationNote.className = "research-verification-note";
+  verificationNote.textContent = "AI-assisted. Verify against cited code.";
+  input.placeholder = "Ask a question…";
+  form.append(composerTools, composerBox, status, verificationNote);
   container.append(form);
 }
 
@@ -19558,6 +19571,31 @@ async function renderResearch(paneID = "utility:analysis") {
   deleteSelectedButton.hidden = true;
   panelActions?.prepend(cancelSelectionButton, selectAllButton, deleteSelectedButton, selectHistoryButton);
   const content = panel.querySelector(".analysis-content");
+
+  const welcome = document.createElement("p");
+  panel.classList.toggle("research-clean-start", Boolean(activeAccount()) && hasCapability("research"));
+  welcome.className = "research-chat-welcome";
+  welcome.textContent = "What would you like to research?";
+  content.before(welcome);
+  const historyButton = document.createElement("button");
+  historyButton.type = "button";
+  historyButton.className = "ghost-button research-history-toggle";
+  historyButton.textContent = "History";
+  historyButton.setAttribute("aria-expanded", "false");
+  historyButton.addEventListener("click", () => {
+    const expanded = panel.classList.toggle("is-history-open");
+    historyButton.setAttribute("aria-expanded", String(expanded));
+  });
+  const newChatButton = document.createElement("button");
+  newChatButton.type = "button";
+  newChatButton.className = "ghost-button research-new-chat";
+  newChatButton.textContent = "New chat";
+  newChatButton.addEventListener("click", () => {
+    panel.classList.remove("is-history-open");
+    historyButton.setAttribute("aria-expanded", "false");
+    panel.querySelector(".research-question-input")?.focus();
+  });
+  panelActions?.prepend(newChatButton, historyButton);
 
   const updateConversationSelection = () => {
     panel.classList.toggle("is-research-history-selecting", selectingConversations);
