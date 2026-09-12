@@ -950,7 +950,7 @@ async function main() {
         !workspaceScript.text.includes('report.presentation?.template?.name,\n        report.author?.displayName') &&
         !workspaceScript.text.includes("Generated reports will appear here as dated, immutable versions.") &&
         workspaceScript.text.includes('dragHandle.className = "report-draft-block-drag-handle"') &&
-        workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], label, initiallyExpanded') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title], label, initiallyExpanded') &&
         workspaceScript.text.includes('appendOutputDisclosure(') &&
         !workspaceScript.text.includes('"Permitext Project Report",\n      preview,') &&
         workspaceScript.text.includes('"Report history"') &&

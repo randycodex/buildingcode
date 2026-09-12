@@ -24244,12 +24244,7 @@ async function renderProjectReportDraft(project) {
       title.type = "button";
       title.className = "project-section-toggle-label section-label report-source-group-toggle";
       title.textContent = label;
-      const toggle = document.createElement("button");
-      toggle.type = "button";
-      toggle.className = "project-section-toggle-chevron report-source-group-chevron";
-      toggle.innerHTML = researchChevronIconsSVG();
       heading.append(title);
-      heading.append(toggle);
       const body = document.createElement("div");
       body.className = "report-source-group-body";
       if (description) {
@@ -24262,7 +24257,7 @@ async function renderProjectReportDraft(project) {
       section.append(heading, body);
       container.append(section);
       const initiallyExpanded = reportSectionExpanded(label);
-      wireProjectSectionMotion(section, body, [title, toggle], label, initiallyExpanded, {
+      wireProjectSectionMotion(section, body, [title], label, initiallyExpanded, {
         onChange(expanded) {
           persistReportSectionExpanded(label, expanded);
         }
@@ -24576,16 +24571,12 @@ async function renderProjectReportDraft(project) {
       activeDraft.introduction = introduction.value;
       setDirty();
     });
-    const introductionToggle = document.createElement("button");
-    introductionToggle.type = "button";
-    introductionToggle.className = "project-section-toggle-chevron";
-    introductionToggle.innerHTML = researchChevronIconsSVG();
     const introductionBody = document.createElement("div");
     introductionBody.append(introduction);
-    introductionHeading.append(introductionLabel, introductionToggle);
+    introductionHeading.append(introductionLabel);
     introductionSection.append(introductionHeading, introductionBody);
     wireProjectSectionMotion(introductionSection, introductionBody,
-      [introductionLabel, introductionToggle], "Report introduction",
+      [introductionLabel], "Report introduction",
       reportSectionExpanded("Report introduction"),
       { onChange(expanded) { persistReportSectionExpanded("Report introduction", expanded); } });
     metadata.append(introductionSection);
@@ -24621,12 +24612,7 @@ async function renderProjectReportDraft(project) {
     blocksTitle.type = "button";
     blocksTitle.className = "project-section-toggle-label section-label report-draft-blocks-toggle";
     blocksTitle.textContent = "Report content";
-    const blocksToggle = document.createElement("button");
-    blocksToggle.type = "button";
-    blocksToggle.className = "project-section-toggle-chevron report-draft-blocks-chevron";
-    blocksToggle.innerHTML = researchChevronIconsSVG();
     blocksHeading.append(blocksTitle);
-    blocksHeading.append(blocksToggle);
     const blocksBody = document.createElement("div");
     blocksBody.className = "report-draft-blocks-body";
     renderBlockEditor(blocksBody);
@@ -24635,7 +24621,7 @@ async function renderProjectReportDraft(project) {
     wireProjectSectionMotion(
       blocks,
       blocksBody,
-      [blocksTitle, blocksToggle],
+      [blocksTitle],
       "Report content",
       blocksExpanded,
       {
@@ -24690,18 +24676,13 @@ async function renderProjectReportDraft(project) {
       title.type = "button";
       title.className = "project-section-toggle-label section-label report-output-toggle";
       title.textContent = label;
-      const toggle = document.createElement("button");
-      toggle.type = "button";
-      toggle.className = "project-section-toggle-chevron report-output-chevron";
-      toggle.innerHTML = researchChevronIconsSVG();
       heading.append(title);
-      heading.append(toggle);
       const disclosureBody = document.createElement("div");
       disclosureBody.className = "report-output-body";
       disclosureBody.append(body);
       section.append(heading, disclosureBody);
       const initiallyExpanded = reportSectionExpanded(stateKey);
-      wireProjectSectionMotion(section, disclosureBody, [title, toggle], label, initiallyExpanded, {
+      wireProjectSectionMotion(section, disclosureBody, [title], label, initiallyExpanded, {
         onChange(expanded) {
           persistReportSectionExpanded(stateKey, expanded);
         }
