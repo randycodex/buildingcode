@@ -16472,9 +16472,15 @@ html body *:has(:focus-visible) {
   list-style: none;
 }
 .research-composer-information summary::-webkit-details-marker { display: none; }
-.research-composer-information[open] {
+.research-composer-information summary {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+}
+.research-composer-information[open] .research-information-popover {
   position: absolute;
-  bottom: 0;
+  bottom: 100%;
   right: 0;
   z-index: 3;
   width: 100%;
@@ -16482,7 +16488,6 @@ html body *:has(:focus-visible) {
   border-radius: 12px;
   background: var(--menu-subtle-surface);
 }
-.research-composer-information[open] summary { text-align: right; margin-bottom: 10px; }
 .research-verification-note {
   margin: 4px 0 0;
   text-align: center;

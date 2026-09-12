@@ -19506,9 +19506,31 @@ function renderNewResearchComposer(container, researchEnabled) {
   const information = document.createElement("details");
   information.className = "research-composer-information";
   const informationToggle = document.createElement("summary");
-  informationToggle.textContent = "Info";
+  informationToggle.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><circle cx="12" cy="7.5" r=".8" fill="currentColor" stroke="none"/></svg>';
   informationToggle.setAttribute("aria-label", "Research context and privacy information");
-  information.append(informationToggle, projectPreview, researchComposerDisclosure());
+  const informationBody = document.createElement("div");
+  informationBody.className = "research-information-popover";
+  informationBody.append(projectPreview, researchComposerDisclosure());
+  information.append(informationToggle, informationBody);
+  let informationHoverTimer;
+  information.addEventListener("pointerenter", (event) => {
+    if (event.pointerType === "touch") return;
+    clearTimeout(informationHoverTimer);
+    informationHoverTimer = setTimeout(() => {
+      if (information.isConnected) information.open = true;
+    }, 1000);
+  });
+  information.addEventListener("pointerleave", () => {
+    clearTimeout(informationHoverTimer);
+    if (!information.contains(document.activeElement)) information.open = false;
+  });
+  information.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      clearTimeout(informationHoverTimer);
+      information.open = false;
+      informationToggle.focus();
+    }
+  });
   const composerTools = document.createElement("div");
   composerTools.className = "research-composer-tools";
   composerTools.append(information);
