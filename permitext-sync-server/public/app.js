@@ -28544,7 +28544,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders, o
     projectRecordID(item) === String(savedInstance.selectedFolderID || "")
   ) || null;
   const projectsSection = panel.querySelector(".saved-projects-section");
-  projectsSection.hidden = Boolean(workspaceProject());
+  projectsSection.hidden = true;
   if (!folder) {
     inlineFilters.hidden = !savedInstance.organizeUnassigned;
     savedContent.hidden = !savedInstance.organizeUnassigned;
