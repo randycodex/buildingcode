@@ -4515,6 +4515,10 @@ body .reader-internal-search-input:focus-visible {
   background: color-mix(in srgb, var(--text-tertiary) 24%, transparent);
 }
 
+.search-code-filter-menu .code-filter-menu-toggle {
+  background: var(--surface-muted);
+}
+
 .search-code-filter-menu .code-filter-menu-toggle:focus-visible {
   outline: 0;
   outline-offset: 0;
