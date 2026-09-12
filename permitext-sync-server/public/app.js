@@ -113,7 +113,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260912-project-workspaces-v4";
+} from "./workspace-state.js?v=20260912-project-workspaces-v5";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -33197,7 +33197,7 @@ function workspaceHasPriorUse() {
   return Boolean(
     activeAccount() ||
     (workspaceRegistry?.workspaces || []).length > 1 ||
-    (activeWorkspace?.name && activeWorkspace.name !== "Main") ||
+    (activeWorkspace?.name && activeWorkspace.name !== "General") ||
     (state.localProjects || []).length ||
     (state.localSavedItems || []).length ||
     (state.localAnnotations || []).length ||

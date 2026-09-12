@@ -21,11 +21,11 @@ const options = {
   now: "2026-07-31T12:00:00.000Z"
 };
 
-assert.equal(workspaceRegistrySchemaVersion(), 2);
+assert.equal(workspaceRegistrySchemaVersion(), 3);
 
 const blankRegistry = normalizeWorkspaceRegistry(null, options);
 assert.equal(blankRegistry.workspaces.length, 1);
-assert.equal(blankRegistry.workspaces[0].name, "Main");
+assert.equal(blankRegistry.workspaces[0].name, "General");
 assert.equal(blankRegistry.activeWorkspaceID, blankRegistry.workspaces[0].id);
 assert.deepEqual(emptyWorkspaceLayout().readers, []);
 assert.equal(emptyWorkspaceLayout().projectHostPaneID, "");
@@ -279,7 +279,7 @@ const oneRegistry = normalizeWorkspaceRegistry({
 const lastDeletion = deleteWorkspace(oneRegistry, "only", options);
 assert.equal(lastDeletion.deletedWorkspaceID, "");
 assert.equal(lastDeletion.registry.workspaces.length, 1);
-assert.equal(lastDeletion.registry.workspaces[0].name, "Main");
+assert.equal(lastDeletion.registry.workspaces[0].name, "General");
 assert.equal(workspaceLayoutHasVisiblePanes(lastDeletion.replacementLayout), false);
 
 console.log("workspace state contract tests passed");

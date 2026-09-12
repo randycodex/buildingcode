@@ -1,5 +1,5 @@
-const workspaceRegistryVersion = 2;
-const defaultWorkspaceName = "Main";
+const workspaceRegistryVersion = 3;
+const defaultWorkspaceName = "General";
 const maximumWorkspaceNameLength = 40;
 
 export const workspaceLayoutStateKeys = Object.freeze([
@@ -414,6 +414,10 @@ export function normalizeWorkspaceRegistry(value, options = {}) {
     });
   if (!workspaces.length) {
     workspaces.push(workspaceRecord({ name: defaultWorkspaceName }, { makeID, now }));
+  }
+  if (Number(source.version || 0) < 3) {
+    const legacyDefault = workspaces.find((item) => !item.projectID && item.name === "Main");
+    if (legacyDefault) legacyDefault.name = defaultWorkspaceName;
   }
   const requestedActiveID = String(options.activeWorkspaceID || source.activeWorkspaceID || "");
   return {
