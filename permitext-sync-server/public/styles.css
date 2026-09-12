@@ -10151,13 +10151,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-structured-fact-label {
-  overflow: hidden;
+  min-width: 0;
   color: var(--text-secondary);
   font-size: 0.8em;
   letter-spacing: 0;
-  text-overflow: ellipsis;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
   text-transform: none;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .saved-project-structured-fact-value {
