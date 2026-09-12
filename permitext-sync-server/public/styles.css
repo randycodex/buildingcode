@@ -990,17 +990,6 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
-.workspace-actions-button svg {
-  width: 14px;
-  height: 14px;
-  flex: 0 0 auto;
-  transition: transform 140ms ease;
-}
-
-.workspace-actions-button[aria-expanded="true"] svg {
-  transform: rotate(180deg);
-}
-
 .topbar-settings-button {
   display: inline-flex;
   width: auto;
