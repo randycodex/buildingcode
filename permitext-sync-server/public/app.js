@@ -28031,38 +28031,6 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   description.placeholder = "Add existing conditions, proposed work, relevant dates, constraints, assumptions, and other Project context";
   description.rows = 2;
   description.setAttribute("aria-label", "Project context");
-  const descriptionResizeHandle = document.createElement("div");
-  descriptionResizeHandle.className = "saved-project-fact-resize-handle";
-  descriptionResizeHandle.setAttribute("role", "separator");
-  descriptionResizeHandle.setAttribute("aria-label", "Resize Project context");
-  descriptionResizeHandle.setAttribute("aria-orientation", "horizontal");
-  descriptionResizeHandle.tabIndex = 0;
-  const resizeDescriptionTo = (height) => {
-    const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
-    description.style.height = `${Math.max(72, Math.min(maximumHeight, height))}px`;
-  };
-  descriptionResizeHandle.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    const startY = event.clientY;
-    const startHeight = description.getBoundingClientRect().height;
-    descriptionResizeHandle.setPointerCapture(event.pointerId);
-    const resize = (moveEvent) => resizeDescriptionTo(startHeight + moveEvent.clientY - startY);
-    const finish = () => {
-      window.removeEventListener("pointermove", resize);
-      window.removeEventListener("pointerup", finish);
-      window.removeEventListener("pointercancel", finish);
-    };
-    window.addEventListener("pointermove", resize);
-    window.addEventListener("pointerup", finish);
-    window.addEventListener("pointercancel", finish);
-  });
-  descriptionResizeHandle.addEventListener("keydown", (event) => {
-    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
-    event.preventDefault();
-    const direction = event.key === "ArrowDown" ? 1 : -1;
-    resizeDescriptionTo(description.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
-  });
-
   const storedStructuredFacts = projectStructuredFacts(folder);
   const legacyAddressFact = storedStructuredFacts.find((fact) => fact.key === "address");
   if (!address.value.trim() && legacyAddressFact?.value) address.value = legacyAddressFact.value;
@@ -28343,7 +28311,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
     renderStructuredFacts();
     customList.querySelector(".saved-project-structured-fact.is-custom:last-child .saved-project-structured-fact-label-input")?.focus();
   });
-  body.append(address, description, descriptionResizeHandle);
+  body.append(address, description);
   factsSection.append(heading, body);
   container.append(factsSection, structuredSection);
   wireProjectSectionMotion(

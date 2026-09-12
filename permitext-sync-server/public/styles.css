@@ -9934,32 +9934,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .saved-project-fact-description {
-  height: 112px;
-  min-height: 72px;
-  max-height: min(70vh, 760px);
-  overflow-y: auto;
+  field-sizing: content;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: hidden;
   resize: none;
-}
-
-.saved-project-fact-resize-handle {
-  position: relative;
-  height: 14px;
-  margin-top: -14px;
-  cursor: row-resize;
-  touch-action: none;
-}
-
-.saved-project-fact-resize-handle::after {
-  position: absolute;
-  bottom: 3px;
-  left: 50%;
-  width: 36px;
-  height: 2px;
-  border-radius: var(--radius-pill);
-  background: var(--text-secondary);
-  content: "";
-  opacity: 0.7;
-  transform: translateX(-50%);
 }
 
 .saved-project-structured-facts {
