@@ -24495,9 +24495,7 @@ async function renderProjectReportDraft(project) {
         setDirty();
       }
       titleButton.textContent = activeDraft.title || "Untitled Report";
-      currentOption.textContent = activeDraft.id
-        ? `${activeDraft.title} · revision ${activeDraft.version}`
-        : activeDraft.title || "Current Report";
+      currentOption.textContent = `${activeDraft.title || "Untitled Report"} · Revision ${activeDraft.version || 1} · Current`;
       titleEditor.hidden = true;
       titleButton.hidden = false;
       if (!cancel) titleButton.focus();
@@ -24520,9 +24518,7 @@ async function renderProjectReportDraft(project) {
     select.dataset.customTriggerLabel = "Switch or create Report";
     const currentOption = document.createElement("option");
     currentOption.value = activeDraft.id || "";
-    currentOption.textContent = activeDraft.id
-      ? `${activeDraft.title} · revision ${activeDraft.version}`
-      : "Current Report";
+    currentOption.textContent = `${activeDraft.title || "Untitled Report"} · Revision ${activeDraft.version || 1} · Current`;
     select.append(currentOption);
     drafts.filter((draft) => draft.id !== activeDraft.id).forEach((draft) => {
       const option = document.createElement("option");
