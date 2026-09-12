@@ -29169,7 +29169,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         ? "Try another search or code book, or add evidence to this destination."
         : "Try another code book.");
     } else {
-      appendMutedRow(content, "No saved sections", "Bookmarks and paragraph notes will appear here.");
+      appendMutedRow(content, "No saved sections", "");
     }
     if (hasMore) {
       const footer = document.createElement("section");
@@ -30499,7 +30499,8 @@ function appendMutedRow(container, title, message) {
   heading.textContent = title;
   const body = document.createElement("span");
   body.textContent = message;
-  row.append(heading, body);
+  row.append(heading);
+  if (message) row.append(body);
   container.append(row);
 }
 

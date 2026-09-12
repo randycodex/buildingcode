@@ -9568,6 +9568,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   scrollbar-gutter: auto;
 }
 
+.saved-panel .saved-content > .saved-row {
+  background: var(--menu-subtle-surface);
+}
+
 .saved-panel .saved-content[hidden] {
   display: none;
 }
