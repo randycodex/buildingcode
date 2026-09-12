@@ -744,7 +744,9 @@ assert.match(indexSource, /id="workspace-actions"[^>]*aria-label="Open workspace
 assert.doesNotMatch(indexSource, /id="add-workspace"/);
 assert.match(stylesSource, /\.workspace-add-button,[\s\S]*?\.workspace-actions-button \{[\s\S]*?display: inline-flex;[\s\S]*?padding: 0 11px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-notebook-button,[\s\S]*?\.project-report-draft-button \{[^}]*height: 40px;[^}]*min-height: 40px;/);
-assert.match(stylesSource, /\.report-draft-shell \{[^}]*grid-auto-rows: max-content;/, "Expanded Report sources must scroll instead of collapsing Report Content.");
+assert.match(stylesSource, /\.report-draft-shell \{[^}]*display: flex;[^}]*flex-direction: column;/, "Report sections must use a vertical flow that can animate without overlapping.");
+assert.match(stylesSource, /\.report-draft-shell > \* \{[^}]*flex: 0 0 auto;/, "Expanded Report sources must scroll instead of collapsing earlier Report sections.");
+assert.match(stylesSource, /\.report-draft-panel :is\([^}]*\.project-section-motion \{[^}]*gap: 0;/, "Collapsed Report sections must not retain a grid gap that jumps away after motion settles.");
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading,[\s\S]*?\.saved-project-research-answers > \.project-studio-section-heading \{[^}]*height: 40px;[^}]*min-height: 40px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading[\s\S]*?\.saved-project-research-toggle \{[^}]*height: 40px;[^}]*min-height: 40px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-section-motion >[^}]*\.project-section-toggle-chevron \{[^}]*width: 40px;[^}]*height: 40px;[^}]*flex-basis: 40px;/);

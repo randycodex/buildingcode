@@ -14458,15 +14458,18 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .report-draft-shell {
   --report-menu-gap: calc(var(--space-2) + var(--space-3));
   --report-content-edge: var(--space-3);
-  display: grid;
-  grid-auto-rows: max-content;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: var(--report-menu-gap);
   min-height: 0;
   overflow-y: auto;
   padding: var(--report-content-edge);
   border-radius: calc(var(--radius-card) + 4px);
   background: color-mix(in srgb, var(--surface) 78%, transparent);
+}
+
+.report-draft-shell > * {
+  flex: 0 0 auto;
 }
 
 .report-draft-status,
@@ -16345,6 +16348,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 
 .report-draft-panel :is(.report-draft-blocks, .report-source-group, .report-output-section).project-section-motion {
   overflow: hidden;
+  gap: 0;
   padding: 0 var(--space-3);
   border-radius: var(--radius-control);
   background: var(--menu-subtle-surface);
