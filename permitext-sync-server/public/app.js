@@ -27942,25 +27942,18 @@ function createSavedEvidenceHeading() {
   cancel.className = "saved-evidence-cancel-selection";
   cancel.textContent = "Cancel";
   cancel.hidden = true;
-  const toggle = document.createElement("button");
-  toggle.type = "button";
-  toggle.className = "project-section-toggle-chevron saved-evidence-collapse-toggle";
-  toggle.setAttribute("aria-label", "Collapse Saved evidence");
-  toggle.setAttribute("aria-expanded", "true");
-  toggle.innerHTML = researchChevronIconsSVG();
-  actions.append(search, select, remove, cancel, toggle);
+  actions.append(search, select, remove, cancel);
   heading.append(title, actions);
-  return { heading, title, toggle, search, select };
+  return { heading, title, search, select };
 }
 
 function populateSavedEvidenceSection(section, savedInstance, folder, ...children) {
   const folderID = projectRecordID(folder);
-  const { heading, title, toggle, search, select } = createSavedEvidenceHeading();
+  const { heading, title, search, select } = createSavedEvidenceHeading();
   const body = document.createElement("div");
   body.className = "saved-project-evidence-body";
   body.id = `saved-evidence-${safeAnnotationIDPart(folderID)}-${safeAnnotationIDPart(savedInstance.id)}`;
   title.setAttribute("aria-controls", body.id);
-  toggle.setAttribute("aria-controls", body.id);
   body.append(...children);
   section.append(heading, body);
   const collapsedFolderIDs = new Set(savedInstance.collapsedEvidenceFolderIDs);
@@ -27973,7 +27966,7 @@ function populateSavedEvidenceSection(section, savedInstance, folder, ...childre
   const setExpanded = wireProjectSectionMotion(
     section,
     body,
-    [title, toggle],
+    [title],
     "Saved evidence",
     projectSectionExpanded(folder, "savedEvidence", !collapsedFolderIDs.has(folderID)),
     {
@@ -28070,11 +28063,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   structuredToggle.type = "button";
   structuredToggle.className = "saved-project-facts-toggle section-label";
   structuredToggle.textContent = "Structured facts";
-  const structuredChevron = document.createElement("button");
-  structuredChevron.type = "button";
-  structuredChevron.className = "project-section-toggle-chevron saved-project-structured-chevron";
-  structuredChevron.innerHTML = researchChevronIconsSVG();
-  structuredHeading.append(structuredToggle, structuredChevron);
+  structuredHeading.append(structuredToggle);
   const structuredBody = document.createElement("section");
   structuredBody.className = "saved-project-structured-facts";
   const structuredGroups = document.createElement("div");
@@ -28224,7 +28213,7 @@ function appendSavedProjectFactEditor(container, folder, identity) {
   wireProjectSectionMotion(
     structuredSection,
     structuredBody,
-    [structuredToggle, structuredChevron],
+    [structuredToggle],
     "Structured facts",
     projectSectionExpanded(identity, "structuredFacts", false),
     {

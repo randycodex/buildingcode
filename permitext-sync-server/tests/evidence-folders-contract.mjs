@@ -311,8 +311,9 @@ assert.doesNotMatch(savedFolderContextSource, /Blocknotes|appendProjectNotes|app
 assert.doesNotMatch(savedFolderContextSource, /appendProjectActivity|Recent Activities/);
 const savedEvidenceHeadingSource = functionSource(appSource, "createSavedEvidenceHeading");
 const savedEvidenceSectionSource = functionSource(appSource, "populateSavedEvidenceSection");
-assert.match(savedEvidenceHeadingSource, /saved-evidence-section-toggle section-label[\s\S]*?project-section-toggle-chevron saved-evidence-collapse-toggle/);
-assert.match(savedEvidenceSectionSource, /aria-controls[\s\S]*?collapsedEvidenceFolderIDs[\s\S]*?wireProjectSectionMotion[\s\S]*?onChange: recordExpandedState/);
+assert.match(savedEvidenceHeadingSource, /saved-evidence-section-toggle section-label/);
+assert.doesNotMatch(savedEvidenceHeadingSource, /saved-evidence-collapse-toggle|researchChevronIconsSVG/);
+assert.match(savedEvidenceSectionSource, /aria-controls[\s\S]*?collapsedEvidenceFolderIDs[\s\S]*?wireProjectSectionMotion[\s\S]*?\[title\][\s\S]*?onChange: recordExpandedState/);
 assert.match(savedEvidenceSectionSource, /\[search, select\][\s\S]*?setExpanded\(true\)[\s\S]*?recordExpandedState\(true\)/);
 assert.match(appSource, /instance\.collapsedEvidenceFolderIDs = Array\.from\(new Set/);
 [
@@ -791,7 +792,7 @@ assert.match(appSource, /function projectHasOpenCodeDecisions[\s\S]*?return inde
 assert.match(appSource, /function clearProjectSpecificResearch[\s\S]*?state\.researchConversationID = ""[\s\S]*?id\.startsWith\("research:conversation:"\)/);
 assert.doesNotMatch(functionSource(appSource, "clearProjectSpecificResearch"), /state\.utilities\.analysis = false|id !== "utility:analysis"/, "Selecting a different Project folder still closes Research.");
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls button \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;[\s\S]*?font-weight: 400;/);
-assert.match(stylesSource, /\.saved-evidence-collapse-toggle\[aria-expanded="true"\] \.research-chevron-up,[\s\S]*?\.saved-evidence-collapse-toggle\[aria-expanded="false"\] \.research-chevron-down \{[\s\S]*?display: block;/);
+assert.doesNotMatch(stylesSource, /saved-evidence-collapse-toggle/);
 const projectToolControlsRule = stylesSource.match(/\.saved-folder-context\.is-project \.saved-project-tool-controls \{([\s\S]*?)\n\}/)?.[1] || "";
 const projectSectionRule = stylesSource.match(/\.saved-folder-context\.is-project > \.project-studio-section,\n\.saved-folder-context\.is-project > \.saved-project-overview-warning \{([\s\S]*?)\n\}/)?.[1] || "";
 assert.doesNotMatch(projectToolControlsRule, /border-top/);

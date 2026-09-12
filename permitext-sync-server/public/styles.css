@@ -10144,20 +10144,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   gap: var(--space-1);
 }
 
-.saved-evidence-heading-actions .saved-evidence-collapse-toggle {
-  width: var(--panel-title-control-size);
-  height: var(--panel-title-control-size);
-  flex-basis: var(--panel-title-control-size);
-}
-
 .saved-project-evidence-section.project-section-motion:not(.is-open) .saved-evidence-search-toggle,
 .saved-project-evidence-section.project-section-motion:not(.is-open) .saved-evidence-select-toggle {
   display: none;
-}
-
-.saved-evidence-collapse-toggle[aria-expanded="true"] .research-chevron-up,
-.saved-evidence-collapse-toggle[aria-expanded="false"] .research-chevron-down {
-  display: block;
 }
 
 .saved-project-evidence-body {
