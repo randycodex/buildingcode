@@ -6926,7 +6926,7 @@ function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}
       "default-src 'self'",
       `script-src ${scriptPolicy}`,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data:",
+      "img-src 'self' blob: data:",
       "connect-src 'self' https://*.clerk.accounts.dev https://clerk.permitext.com",
       "object-src 'none'",
       "base-uri 'none'",

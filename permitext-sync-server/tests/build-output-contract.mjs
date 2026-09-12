@@ -16,6 +16,12 @@ const appServer = await readFile(new URL("../app.mjs", import.meta.url), "utf8")
 const webClient = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const packageManifest = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
+assert.match(
+  appServer,
+  /"img-src 'self' blob: data:"/,
+  "The web CSP must allow the private blob URLs used to preview Notebook images."
+);
+
 // Build-time gates must ship even though private test fixtures do not.
 const vercelIgnore = await readFile(new URL("../.vercelignore", import.meta.url), "utf8");
 assert.match(vercelIgnore, /^tests\/$/m, "Keep test fixtures excluded from deployment.");
