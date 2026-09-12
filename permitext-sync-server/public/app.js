@@ -83,7 +83,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260912-status-position-v69";
+} from "./offline-storage.js?v=20260912-empty-workspace-v70";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -118,7 +118,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260912-status-position-v69";
+} from "./research-intent-state.js?v=20260912-empty-workspace-v70";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33139,40 +33139,8 @@ function appendPaneSequence(panes) {
     const edgeResizer = existingDividers.get(dividerKey(lastPaneID, "")) || createDivider(lastPaneID, "");
     nodes.push(edgeResizer);
   }
-  if (!orderedPanes.length && !detachedProjectWindow) {
-    if (shouldShowFirstUseWelcome()) {
-      nodes.push(renderFirstUseWelcome());
-    } else {
-      const emptyState = track.querySelector(
-        ":scope > .workspace-empty-state:not(.workspace-first-use)"
-      ) || document.createElement("section");
-      emptyState.className = "workspace-empty-state";
-      emptyState.setAttribute("aria-label", "Empty workspace");
-      if (!emptyState.firstElementChild) {
-        const content = document.createElement("div");
-        content.className = "workspace-returning-content";
-        const heading = document.createElement("h1");
-        heading.textContent = "Your workspace";
-        const message = document.createElement("p");
-        message.textContent = "Open a Reader, Search, Saved, or a Project to begin.";
-        const actions = document.createElement("div");
-        actions.className = "workspace-returning-actions";
-        for (const [label, control] of [
-          ["Open Reader", addReaderButton],
-          ["Search codes", toggleSearchButton],
-          ["Saved & Projects", toggleSavedButton]
-        ]) {
-          const button = document.createElement("button");
-          button.type = "button";
-          button.textContent = label;
-          button.addEventListener("click", () => control?.click());
-          actions.append(button);
-        }
-        content.append(heading, message, actions);
-        emptyState.append(content);
-      }
-      nodes.push(emptyState);
-    }
+  if (!orderedPanes.length && !detachedProjectWindow && shouldShowFirstUseWelcome()) {
+    nodes.push(renderFirstUseWelcome());
   }
   const desiredNodes = new Set(nodes);
   Array.from(track.children).forEach((node) => {

@@ -1235,45 +1235,6 @@ textarea:focus-visible {
   font-size: calc(var(--chrome-font-size) * 0.94);
 }
 
-.workspace-returning-content {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-4);
-  max-width: 40rem;
-}
-
-.workspace-returning-content h1 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: calc(var(--chrome-font-size) * 1.5);
-}
-
-.workspace-returning-actions {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.workspace-returning-actions button {
-  min-height: 44px;
-  padding: var(--space-2) var(--space-4);
-  border: 0;
-  border-radius: var(--radius-control);
-  color: var(--text-primary);
-  background: color-mix(in srgb, var(--text-primary) 8%, var(--surface-raised));
-  cursor: pointer;
-}
-
-.workspace-returning-actions button:hover {
-  background: color-mix(in srgb, var(--text-primary) 12%, var(--surface-raised));
-}
-
-.workspace-returning-actions button:focus-visible {
-  outline: 2px solid var(--code-accent);
-  outline-offset: 3px;
-}
-
 .workspace-first-use {
   align-items: center;
   padding: clamp(2.5rem, 8vh, 6.5rem) clamp(1.5rem, 6vw, 6rem);
