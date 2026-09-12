@@ -262,12 +262,13 @@ export function mountPermitextNotebookEditor(element, options = {}) {
     },
     insertReference(reference) {
       const editor = controllerRef.current;
-      if (!editor) return;
+      if (!editor) return false;
       editor.focus();
       editor.insertInlineContent([
         { type: "permitextReference", props: normalizedReference(reference) },
         " "
       ]);
+      return true;
     },
     replaceAssetURL(fromURL, toURL) {
       const editor = controllerRef.current;

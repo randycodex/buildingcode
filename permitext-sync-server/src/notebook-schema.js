@@ -6,6 +6,7 @@ export const notebookReferenceKinds = Object.freeze([
   "canonicalSection",
   "selectedPassage",
   "researchAnswer",
+  "notebookCard",
   "attachment"
 ]);
 

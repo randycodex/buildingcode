@@ -286,7 +286,7 @@ const genericWorkboardIdentity = Object.freeze({
 });
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
-const notebookClientVersion = "20260903-tiptap-security-v14";
+const notebookClientVersion = "20260912-notebook-reference-v16";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -22184,10 +22184,12 @@ async function notebookReferenceCandidates(project, foundation, cards) {
     });
   });
   cards.forEach((card) => {
+    const referenceID = String(card.id || "").trim();
     references.push({
       referenceKind: "notebookCard",
-      referenceID: card.id,
-      label: `Notebook: ${card.title}`
+      referenceID,
+      label: `Notebook: ${card.title}`,
+      disabledReason: referenceID ? "" : "Finish syncing this Note before linking it."
     });
   });
   return references
@@ -22835,7 +22837,13 @@ async function renderProjectNotebook(project) {
             dirty = true;
           }
           const summary = notebookSummaryForCard(activeCard, payload.card);
-          cards = [summary, ...cards.filter((card) => card.id !== summary.id)];
+          const provisionalCardID = String(cardAtStart.id || "").trim();
+          cards = [summary, ...cards.filter((card) =>
+            card.id !== summary.id &&
+            (provisionalCardID
+              ? card.id !== provisionalCardID
+              : Boolean(String(card.id || "").trim()))
+          )];
           foundation.artifacts = [
             ...(foundation.artifacts || []).filter((artifact) => artifact.envelope?.id !== payload.card.id),
             { envelope: { id: payload.card.id, type: "notebookCard" }, payload: payload.card }
@@ -23308,7 +23316,8 @@ async function renderProjectNotebook(project) {
         const option = document.createElement("button");
         option.className = "notebook-reference-option";
         option.type = "button";
-        option.title = reference.label;
+        option.disabled = Boolean(reference.disabledReason);
+        option.title = reference.disabledReason || reference.label;
         option.dataset.referenceIndex = String(index);
         if (reference.displayTitle) {
           const optionTitle = document.createElement("strong");
@@ -23319,6 +23328,12 @@ async function renderProjectNotebook(project) {
             optionMeta.textContent = reference.displayMeta;
             option.append(optionMeta);
           }
+        } else if (reference.disabledReason) {
+          const optionTitle = document.createElement("strong");
+          optionTitle.textContent = reference.label;
+          const optionMeta = document.createElement("small");
+          optionMeta.textContent = reference.disabledReason;
+          option.append(optionTitle, optionMeta);
         } else {
           option.textContent = reference.label;
         }
@@ -23386,8 +23401,15 @@ async function renderProjectNotebook(project) {
         referenceList.querySelectorAll(".notebook-reference-option").forEach((option) => {
           option.addEventListener("click", () => {
             const reference = candidates[Number(option.dataset.referenceIndex)];
-            if (!reference) return;
-            editorMount?.insertReference(reference);
+            if (!reference || reference.disabledReason) return;
+            try {
+              if (editorMount?.insertReference(reference) === false) {
+                throw new Error("The Notebook editor is still loading. Try again.");
+              }
+            } catch (error) {
+              void showWebNotice("Reference not inserted", error.message);
+              return;
+            }
             referenceMenuState.referenceMenuOpen = false;
             updateCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
           });

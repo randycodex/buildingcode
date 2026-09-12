@@ -48,6 +48,22 @@ assert.match(html, /data-reference-kind="canonicalSection"/);
 assert.match(html, /AC § 28-103\.30\.2/);
 assert.match(html, /<strong>Verify <\/strong>/);
 
+const linkedNoteDocument = {
+  ...emptyNotebookDocument(),
+  document: [{
+    type: "paragraph",
+    content: [{
+      type: "permitextReference",
+      props: {
+        referenceKind: "notebookCard",
+        referenceID: "note-2",
+        label: "Notebook: NOTE 2"
+      }
+    }]
+  }]
+};
+assert.equal(validateNotebookDocument(linkedNoteDocument).references[0].referenceKind, "notebookCard");
+
 assert.throws(
   () => validateNotebookDocument({
     ...emptyNotebookDocument(),

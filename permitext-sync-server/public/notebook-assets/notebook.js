@@ -45340,6 +45340,7 @@ var oW = "permitext-notebook-card", sW = "blocknote-json", cW = Object.freeze([
 	"canonicalSection",
 	"selectedPassage",
 	"researchAnswer",
+	"notebookCard",
 	"attachment"
 ]), lW = Object.freeze([
 	"paragraph",
@@ -45569,10 +45570,10 @@ function kW(e, t = {}) {
 		},
 		insertReference(e) {
 			let t = n.current;
-			t && (t.focus(), t.insertInlineContent([{
+			return t ? (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
 				props: TW(e)
-			}, " "]));
+			}, " "]), !0) : !1;
 		},
 		replaceAssetURL(e, t) {
 			let r = n.current;

@@ -13689,6 +13689,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-primary);
 }
 
+.notebook-toolbar .notebook-reference-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.notebook-toolbar .notebook-reference-option:disabled strong {
+  color: var(--text-secondary);
+}
+
 .notebook-reference-empty {
   grid-column: 1 / -1;
   margin: 0;

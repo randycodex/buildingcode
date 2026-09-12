@@ -66,7 +66,7 @@ assert(
 assert(
   webClient.includes('uploadNotebookAsset(projectID, file, cardID = "", requestIdentity = captureAccountRequest())') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL, requestIdentity = captureAccountRequest())") &&
-    webClient.includes('notebookClientVersion = "20260903-tiptap-security-v14"'),
+    webClient.includes('notebookClientVersion = "20260912-notebook-reference-v16"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 
