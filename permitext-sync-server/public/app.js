@@ -22574,8 +22574,6 @@ async function renderProjectNotebook(project) {
     function markNotebookDirty() {
       dirty = true;
       notebookRevision += 1;
-      const addToReport = panel.querySelector(".notebook-add-to-report");
-      if (addToReport) addToReport.disabled = true;
       void persistFocusedDraft().catch((error) => showDraftStatus(`Device save failed: ${error.message}. Keep this Note open and copy your work.`));
       scheduleNotebookAutosave();
     }
@@ -22661,8 +22659,6 @@ async function renderProjectNotebook(project) {
           if (disposed) return true;
           showDraftStatus(dirty ? "Saved on this device · newer edits waiting to sync" : "Synced");
           renderCardList();
-          const addToReport = panel.querySelector(".notebook-add-to-report");
-          if (addToReport) addToReport.disabled = notebookReadOnly || dirty || !activeCard?.id;
           if (dirty) scheduleNotebookAutosave(180);
           void reportDraftMounts.get(projectID)?.refreshSources?.().catch(() => false);
           return !dirty;
@@ -23257,44 +23253,6 @@ async function renderProjectNotebook(project) {
       researchButton.textContent = "Start Research";
       researchButton.title = "Use this card as the starting point for a new evidence-selected Research question";
       researchButton.hidden = true;
-      const reportButton = document.createElement("button");
-      reportButton.className = "notebook-secondary-action notebook-add-to-report";
-      reportButton.type = "button";
-      const existingReportBlock = await notebookCardReportBlock(identity, activeCard.id).catch(() => null);
-      if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      const applyReportStatus = (reportBlock) => {
-        reportButton.classList.toggle("is-in-report", Boolean(reportBlock));
-        reportButton.textContent = reportBlock ? "Update in Report" : "Add to Report";
-        reportButton.title = reportBlock
-          ? "Update this Note's existing Report item with a new independent snapshot"
-          : "Copy this Note into the Project Report as an independent editable snapshot";
-      };
-      applyReportStatus(existingReportBlock);
-      reportButton.disabled = notebookReadOnly || !activeCard.id;
-      refreshNotebookReportStatus = async () => {
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
-        const reportBlock = await notebookCardReportBlock(identity, focusedCardID).catch(() => null);
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
-        applyReportStatus(reportBlock);
-        return true;
-      };
-      reportButton.addEventListener("click", async () => {
-        reportButton.disabled = true;
-        try {
-          if (!(await flushNotebookAutosave())) return;
-          if (dirty) throw new Error("This Note is saved on this device and must finish syncing before it can be added to the Report.");
-          requireCurrentAccountRequest(requestIdentity);
-          await promoteNotebookCardToReport(identity, activeCard);
-          reportButton.classList.add("is-in-report");
-          reportButton.textContent = "Update in Report";
-          reportButton.title = "Update this Note's existing Report item with a new independent snapshot";
-        } catch (error) {
-          if (disposed || !isCurrentAccountRequest(requestIdentity)) return;
-          await showWebNotice(existingReportBlock ? "Report item not updated" : "Note not added to Report", error.message);
-        } finally {
-          reportButton.disabled = notebookReadOnly || !activeCard?.id;
-        }
-      });
       const coordinateButton = document.createElement("button");
       coordinateButton.className = "notebook-secondary-action";
       coordinateButton.type = "button";
@@ -23314,11 +23272,13 @@ async function renderProjectNotebook(project) {
           snapshot: { label: `Notebook: ${activeCard.title || "Untitled card"}` }
         });
       });
-      footerActions.append(reportButton, researchButton, coordinateButton);
+      footerActions.append(researchButton, coordinateButton);
       footer.append(footerActions);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      replaceFocusedContent(fields, toolbar, editorElement, footer);
+      const focusedContent = [fields, toolbar, editorElement];
+      if (!researchButton.hidden || !coordinateButton.hidden) focusedContent.push(footer);
+      replaceFocusedContent(...focusedContent);
 
       titleInput.addEventListener("input", () => {
         if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence) return;
