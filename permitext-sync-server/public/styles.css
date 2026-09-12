@@ -2524,7 +2524,6 @@ label {
 
 .reader-code-select-menu,
 .reader-chapter-select-menu,
-.report-draft-select-menu,
 .research-project-select-menu {
   box-sizing: border-box;
   padding: clamp(14px, 2vw, 20px);
@@ -2615,35 +2614,36 @@ label {
   font-weight: 650;
 }
 
-.report-draft-picker .custom-select {
-  flex: 0 0 auto;
-  width: auto;
-  min-height: 28px;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
+.report-draft-picker,
+.report-draft-version-list {
+  display: grid;
+  gap: var(--space-2);
 }
 
-.report-draft-picker .custom-select-trigger {
-  min-width: 24px;
-  min-height: 28px;
-  padding: 0;
+.report-draft-version-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--toolbar-active);
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.report-draft-version-option small {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
   font-weight: 400;
 }
 
-.report-draft-picker .custom-select-trigger.is-icon-only {
+.report-draft-version-option.is-create {
   justify-content: center;
   color: var(--text-secondary);
-  font-size: 13px;
-}
-
-.report-draft-picker .custom-select-trigger.is-compact-label {
-  min-width: 0;
-  padding: 4px 0;
-  color: var(--text-secondary);
-  font-size: 10px;
-  font-weight: 400;
-  white-space: nowrap;
 }
 
 .report-title-control {
@@ -2691,20 +2691,6 @@ label {
   color: var(--text-secondary);
   font-size: 10px;
   white-space: nowrap;
-}
-
-.report-draft-select-menu .custom-select-option {
-  min-height: 34px;
-  padding: 7px var(--space-2);
-  border-radius: var(--radius-control);
-  color: var(--text-secondary);
-  line-height: 1.25;
-}
-
-.report-draft-select-menu .custom-select-option[aria-selected="true"] {
-  background: color-mix(in srgb, var(--project-color) 14%, transparent);
-  color: var(--text-primary);
-  font-weight: 650;
 }
 
 .reader-code-select-menu .custom-select-group-label {
@@ -14379,7 +14365,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   line-height: 1.45;
 }
 
-.report-draft-picker select,
 .report-draft-metadata input,
 .report-draft-metadata textarea,
 .report-draft-block input,
@@ -14393,7 +14378,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-primary);
 }
 
-.report-draft-picker select,
 .report-draft-metadata input:first-child {
   font-weight: 700;
 }
@@ -15009,7 +14993,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .report-draft-close:focus-visible,
 .report-title-text:focus-visible,
 .report-title-editor:focus-visible,
-.report-draft-picker select:focus-visible,
 .report-draft-metadata input:focus-visible,
 .report-draft-metadata textarea:focus-visible,
 .report-draft-block input:focus-visible,

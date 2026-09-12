@@ -6210,16 +6210,13 @@ function enhanceSelect(select) {
   menu.id = `custom-select-menu-${crypto.randomUUID()}`;
   const readerCodeMenu = select.classList.contains("code-select");
   const readerChapterMenu = select.classList.contains("chapter-select");
-  const reportDraftMenu = select.classList.contains("report-draft-select");
   const researchProjectMenu = select.classList.contains("research-conversation-header-project");
   const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select");
   const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
-  const compactLabelTrigger = select.dataset.customTrigger === "compact-label";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
   menu.classList.toggle("reader-chapter-select-menu", readerChapterMenu);
-  menu.classList.toggle("report-draft-select-menu", reportDraftMenu);
   menu.classList.toggle("research-project-select-menu", researchProjectMenu);
   menu.classList.toggle("research-feedback-role-select-menu", researchFeedbackRoleMenu);
   custom.classList.toggle("research-project-custom-select", researchProjectMenu);
@@ -6248,17 +6245,9 @@ function enhanceSelect(select) {
 
   const syncTrigger = () => {
     const selectedLabel = select.options[select.selectedIndex]?.textContent || "";
-    trigger.textContent = iconOnlyTrigger
-      ? "⌄"
-      : compactLabelTrigger
-        ? select.dataset.customTriggerText || selectedLabel
-        : selectedLabel;
+    trigger.textContent = iconOnlyTrigger ? "⌄" : selectedLabel;
     if (iconOnlyTrigger) {
       trigger.classList.add("is-icon-only");
-      trigger.setAttribute("aria-label", select.dataset.customTriggerLabel || selectedLabel);
-      trigger.title = select.dataset.customTriggerLabel || selectedLabel;
-    } else if (compactLabelTrigger) {
-      trigger.classList.add("is-compact-label");
       trigger.setAttribute("aria-label", select.dataset.customTriggerLabel || selectedLabel);
       trigger.title = select.dataset.customTriggerLabel || selectedLabel;
     } else {
@@ -24510,6 +24499,9 @@ async function renderProjectReportDraft(project) {
     titleEditor.value = activeDraft.title || "";
     titleEditor.setAttribute("aria-label", "Edit Report title");
     titleEditor.hidden = true;
+    const revisionLabel = document.createElement("span");
+    revisionLabel.className = "report-title-revision";
+    revisionLabel.textContent = `Revision ${activeDraft.version || 1}`;
     const beginTitleEditing = () => {
       titleEditor.value = activeDraft.title || "";
       titleButton.hidden = true;
@@ -24526,7 +24518,6 @@ async function renderProjectReportDraft(project) {
         setDirty();
       }
       titleButton.textContent = activeDraft.title || "Untitled Report";
-      currentOption.textContent = `${activeDraft.title || "Untitled Report"} · Revision ${activeDraft.version || 1} · Current`;
       titleEditor.hidden = true;
       titleButton.hidden = false;
       if (!cancel) titleButton.focus();
@@ -24542,44 +24533,42 @@ async function renderProjectReportDraft(project) {
       }
     });
     titleEditor.addEventListener("blur", () => finishTitleEditing());
-    const select = document.createElement("select");
-    select.className = "report-draft-select";
-    select.setAttribute("aria-label", "Switch or create Report");
-    select.dataset.customTrigger = "compact-label";
-    select.dataset.customTriggerText = `Revision ${activeDraft.version || 1}`;
-    select.dataset.customTriggerLabel = "Switch or create Report";
-    const currentOption = document.createElement("option");
-    currentOption.value = activeDraft.id || "";
-    currentOption.textContent = `${activeDraft.title || "Untitled Report"} · Revision ${activeDraft.version || 1} · Current`;
-    select.append(currentOption);
-    drafts.filter((draft) => draft.id !== activeDraft.id).forEach((draft) => {
-      const option = document.createElement("option");
-      option.value = draft.id;
-      option.textContent = `${draft.title} · revision ${draft.version}`;
-      select.append(option);
-    });
-    if (activeDraft.id) {
-      const newOption = document.createElement("option");
-      newOption.value = "__new__";
-      newOption.textContent = "Create new Report…";
-      select.append(newOption);
-    }
-    select.addEventListener("change", async () => {
-      if (dirty && !(await mountState.confirmDiscardIfNeeded())) {
-        select.value = activeDraft.id || "";
-        return;
-      }
-      activeDraft = select.value === "__new__"
+    const versionList = document.createElement("div");
+    versionList.className = "report-draft-version-list";
+    const switchDraft = async (draftID) => {
+      if (dirty && !(await mountState.confirmDiscardIfNeeded())) return;
+      activeDraft = draftID === "__new__"
         ? emptyProjectReportDraft(identity)
         : structuredClone(
-            drafts.find((draft) => draft.id === select.value) || emptyProjectReportDraft(identity)
+            drafts.find((draft) => draft.id === draftID) || emptyProjectReportDraft(identity)
           );
       dirty = false;
       clearStatus();
       renderWorkspaceContent();
+    };
+    drafts.filter((draft) => draft.id !== activeDraft.id).forEach((draft) => {
+      const choice = document.createElement("button");
+      choice.type = "button";
+      choice.className = "report-draft-version-option";
+      const choiceTitle = document.createElement("span");
+      choiceTitle.textContent = draft.title || "Untitled Report";
+      const choiceRevision = document.createElement("small");
+      choiceRevision.textContent = `Revision ${draft.version || 1}`;
+      choice.append(choiceTitle, choiceRevision);
+      choice.addEventListener("click", () => void switchDraft(draft.id));
+      versionList.append(choice);
     });
-    titleControl.append(titleButton, titleEditor, select);
-    draftPicker.append(titleControl);
+    if (activeDraft.id) {
+      const createNew = document.createElement("button");
+      createNew.type = "button";
+      createNew.className = "report-draft-version-option is-create";
+      createNew.textContent = "Create new Report";
+      createNew.addEventListener("click", () => void switchDraft("__new__"));
+      versionList.append(createNew);
+    }
+    versionList.hidden = !versionList.childElementCount;
+    titleControl.append(titleButton, titleEditor, revisionLabel);
+    draftPicker.append(titleControl, versionList);
 
     const metadata = document.createElement("div");
     metadata.className = "report-draft-metadata";
@@ -24752,7 +24741,6 @@ async function renderProjectReportDraft(project) {
       primaryActions,
       historySection
     );
-    enhanceSelect(select);
   }
 
   refreshReportSources = async () => {
