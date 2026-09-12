@@ -16588,8 +16588,6 @@ html body *:has(:focus-visible) {
 .research-list-panel.is-research-history-selecting .research-conversation-row {
   background: var(--surface-muted);
   border-radius: 8px;
-  margin-bottom: 6px;
-  padding-inline: 10px;
 }
 .research-list-panel.is-research-history-selecting .research-conversation-row.is-selected {
   background: color-mix(in srgb, var(--accent-building) 22%, var(--surface-muted));
