@@ -28244,7 +28244,7 @@ function createSavedEvidenceHeading() {
   const title = document.createElement("button");
   title.type = "button";
   title.className = "saved-evidence-section-toggle section-label";
-  title.textContent = "Saved Evidence";
+  title.textContent = "Saved evidence";
   title.setAttribute("aria-expanded", "true");
   const search = document.createElement("button");
   search.type = "button";
