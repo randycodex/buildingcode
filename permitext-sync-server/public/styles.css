@@ -13286,10 +13286,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: var(--menu-surface);
 }
 
-.notebook-card-menu-toggle .code-filter-menu-label {
-  text-transform: uppercase;
-}
-
 .notebook-card-menu-toggle:hover,
 .notebook-card-menu-toggle:focus-visible {
   background: var(--menu-surface);
