@@ -24884,11 +24884,11 @@ async function renderProjectReportDraft(project) {
       "Report history"
     );
     shell.append(
+      primaryActions,
       metadata,
       addControls,
       blocks,
       sourcePalette,
-      primaryActions,
       historySection
     );
   }

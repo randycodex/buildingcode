@@ -15022,14 +15022,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .report-draft-primary-actions {
   position: sticky;
   z-index: 2;
-  bottom: 0;
+  top: 0;
   padding: 0;
   border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(12px);
 }
 
-.report-draft-primary-actions button:last-child {
+.report-draft-primary-actions button:first-child {
   background: color-mix(in srgb, var(--project-color) 68%, var(--surface));
 }
 
