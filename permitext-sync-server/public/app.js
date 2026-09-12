@@ -19420,22 +19420,9 @@ function researchFailureMessage(error) {
 function renderNewResearchComposer(container, researchEnabled) {
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
-  let initialProjectID = preferredResearchProjectID();
-  const projectField = document.createElement("label");
-  projectField.className = "research-start-project";
-  const projectLabel = document.createElement("span");
-  projectLabel.textContent = "Project context";
-  const projectSelect = createResearchProjectSelect({
-    value: initialProjectID,
-    unassignedLabel: "General",
-    ariaLabel: "Project context for new Research"
-  });
+  const currentProject = workspaceProject();
+  const initialProjectID = currentProject ? projectDetailKey(currentProject) : "";
   const projectPreview = researchProjectContextPreview(initialProjectID);
-  projectSelect.addEventListener("change", () => {
-    initialProjectID = projectSelect.value;
-    projectPreview.updateResearchProject(initialProjectID);
-  });
-  projectField.append(projectSelect);
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
@@ -19524,7 +19511,7 @@ function renderNewResearchComposer(container, researchEnabled) {
   information.append(informationToggle, projectPreview, researchComposerDisclosure());
   const composerTools = document.createElement("div");
   composerTools.className = "research-composer-tools";
-  composerTools.append(projectField, information);
+  composerTools.append(information);
   const verificationNote = document.createElement("p");
   verificationNote.className = "research-verification-note";
   verificationNote.textContent = "AI-assisted. Verify against cited code.";

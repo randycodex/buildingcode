@@ -16460,7 +16460,7 @@ html body *:has(:focus-visible) {
 .research-list-panel.research-clean-start .research-composer-tools {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   position: relative;
 }
