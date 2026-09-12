@@ -4811,7 +4811,7 @@ async function postJSON(path, body, options = {}) {
       body: JSON.stringify(body)
     });
     requireCurrentAccountRequest(identity);
-    serverReachable = response.status < 500;
+    serverReachable = true;
   } catch (error) {
     requireCurrentAccountRequest(identity);
     serverReachable = false;
