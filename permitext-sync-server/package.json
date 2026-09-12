@@ -183,7 +183,7 @@
     "@neondatabase/serverless": "^1.0.0",
     "@vercel/blob": "^2.6.1",
     "pdfjs-dist": "5.4.149",
-    "pdfkit": "^0.17.1",
+    "pdfkit": "^0.20.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
