@@ -4414,9 +4414,24 @@ body .reader-internal-search-input:focus-visible {
 .search-code-filter {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-2);
+  gap: var(--space-4);
   margin: 0;
   padding: 0;
+}
+
+.search-code-filter-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-1);
+}
+
+.search-code-filter-group-title {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  color: var(--text-primary);
+  font-size: 11px !important;
+  font-weight: 700;
+  line-height: 1.25;
 }
 
 .code-filter-menu {
@@ -4561,7 +4576,7 @@ body .reader-internal-search-input:focus-visible {
 }
 
 .search-code-filter-menu.is-open .search-code-filter {
-  max-height: min(var(--code-filter-menu-height, 264px), 264px);
+  max-height: min(var(--code-filter-menu-height, 420px), 52vh, 420px);
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;

@@ -4234,11 +4234,16 @@ function searchCodeFilterPresentation(option = {}) {
     ? rawLabel.slice(0, parenthetical.index).trim()
     : rawLabel;
   const [primary, ...secondaryParts] = withoutParenthetical.split(" — ");
-  const secondary = [secondaryParts.join(" — ").trim(), parenthetical?.[1]?.trim()]
+  const inferredEdition = option.group === "2022 Construction Codes" && !parenthetical
+    ? "2022"
+    : option.prefix === "FC"
+      ? "2022"
+      : "";
+  const secondary = [secondaryParts.join(" — ").trim(), parenthetical?.[1]?.trim(), inferredEdition]
     .filter(Boolean)
     .join(" · ");
   return {
-    label: option.prefix === "AC" ? "Gen Administrative Code" : primary,
+    label: option.prefix === "AC" ? "General Administrative Code" : primary,
     detail: secondary
   };
 }
@@ -15263,7 +15268,7 @@ function renderSearchCodeFilter(filterRail, panel, instance) {
   if (searchInstance.codeFilters.length !== normalizedFilters.length) {
     saveWorkspaceState();
   }
-  options.forEach((option) => {
+  const appendChip = (option, parent) => {
     const chip = document.createElement("button");
     chip.type = "button";
     chip.className = "search-filter-chip";
@@ -15303,7 +15308,25 @@ function renderSearchCodeFilter(filterRail, panel, instance) {
       updateSearchDock(panel, searchInstance);
       renderSearchResults(panel, searchInstance);
     });
-    filterRail.append(chip);
+    parent.append(chip);
+  };
+
+  appendChip(options[0], filterRail);
+  const groupedOptions = new Map();
+  options.slice(1).forEach((option) => {
+    const groupName = option.group || "Other Codes";
+    if (!groupedOptions.has(groupName)) groupedOptions.set(groupName, []);
+    groupedOptions.get(groupName).push(option);
+  });
+  groupedOptions.forEach((groupOptions, groupName) => {
+    const group = document.createElement("section");
+    group.className = "search-code-filter-group";
+    const heading = document.createElement("h3");
+    heading.className = "search-code-filter-group-title";
+    heading.textContent = groupName;
+    group.append(heading);
+    groupOptions.forEach((option) => appendChip(option, group));
+    filterRail.append(group);
   });
 }
 

@@ -2633,7 +2633,7 @@ async function main() {
       "Energy and Electrical Code subsection titles should be separated and emphasized like the established construction-code hierarchy."
     );
     assert(
-      workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
+      workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?gap: var\(--space-4\);/) &&
         workspaceStyles.text.match(/\.code-filter-menu \.search-code-filter,[\s\S]*?max-height: 0;[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\),[\s\S]*?opacity 260ms ease,/) &&
         workspaceStyles.text.match(/\.code-filter-menu\.is-open \.search-code-filter,[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
         workspaceStyles.text.match(/\.code-filter-menu-toggle \{[\s\S]*?justify-content: space-between;[\s\S]*?border-radius: var\(--radius-pill\);/) &&
@@ -2644,7 +2644,11 @@ async function main() {
         workspaceStyles.text.match(/\.search-panel \.search-box:has\(\.search-input:focus-visible\) \{[\s\S]*?outline: 2px solid/) &&
         workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 40px;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-control\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: left;/) &&
-        workspaceStyles.text.match(/\.search-code-filter-menu\.is-open \.search-code-filter \{[\s\S]*?max-height: min\(var\(--code-filter-menu-height, 264px\), 264px\);[\s\S]*?overflow-y: auto;/) &&
+        workspaceStyles.text.match(/\.search-code-filter-menu\.is-open \.search-code-filter \{[\s\S]*?max-height: min\(var\(--code-filter-menu-height, 420px\), 52vh, 420px\);[\s\S]*?overflow-y: auto;/) &&
+        workspaceStyles.text.match(/\.search-code-filter-group \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.search-code-filter-group-title \{[\s\S]*?font-size: 11px !important;[\s\S]*?font-weight: 700;/) &&
+        workspaceScript.text.includes('group.className = "search-code-filter-group"') &&
+        workspaceScript.text.includes('heading.className = "search-code-filter-group-title"') &&
         workspaceScript.text.includes('chipTitle.className = "search-filter-chip-title"') &&
         workspaceScript.text.includes('chipDetail.className = "search-filter-chip-detail"') &&
         workspaceStyles.text.match(/\.search-filter-chip \{[\s\S]*?background: color-mix\(in srgb, var\(--text-tertiary\) 16%, transparent\);/) &&
@@ -2655,7 +2659,7 @@ async function main() {
         workspaceScript.text.includes("resizeObserver.observe(toggle.closest(\".code-filter-menu\"))") &&
         workspaceScript.text.includes("window.setTimeout(hideFilterRail, 500)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),
-      "Search code filters should expand from a single summary pill into two equal-width columns."
+      "Search code filters should expand into a readable, grouped, vertically scrollable list."
     );
     assert(
       workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?overflow: visible;[\s\S]*?background-image: none;/) &&
