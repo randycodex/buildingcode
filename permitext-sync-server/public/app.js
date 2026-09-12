@@ -14868,7 +14868,7 @@ function searchHistoryIconSVG(kind) {
   return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l3 2"></path></svg>`;
 }
 
-function updateSearchDock(panel, instance, resultCount = null) {
+function updateSearchDock(panel, instance, resultCount = null, options = {}) {
   const query = String(instance?.query || "").trim();
   const selectedPrefixes = normalizeSearchCodeFilters(instance?.codeFilters);
   const filterRail = panel.querySelector(".search-code-filter");
@@ -14889,7 +14889,10 @@ function updateSearchDock(panel, instance, resultCount = null) {
     summaryCopy.textContent = `Searching in ${scope}`;
     return;
   }
-  const countLabel = `${resultCount.toLocaleString()} shown in ${scope}`;
+  const matchLabel = resultCount === 1 ? "match" : "matches";
+  const countLabel = resultCount === 0
+    ? `No matches · ${scope}`
+    : `${options.hasMore === false ? "Showing all" : "Showing first"} ${resultCount.toLocaleString()} ${matchLabel} · ${scope}`;
   summaryCopy.textContent = countLabel;
 }
 
@@ -15394,7 +15397,7 @@ async function renderSearchResults(panel, instance) {
   );
 
   if (filteredResults.length === 0) {
-    updateSearchDock(panel, searchInstance, 0);
+    updateSearchDock(panel, searchInstance, 0, { hasMore: false });
     const scope = selectedPrefixes.length ? selectedPrefixes.join(", ") : "all codes";
     const terms = [...new Set(query.match(/[\p{L}\p{N}][\p{L}\p{N}.-]*/gu) || [])]
       .filter((term) => term.length >= 2 && !/^(a|an|and|are|as|at|be|by|for|from|in|is|it|of|on|or|the|to|with)$/i.test(term))
@@ -15438,7 +15441,7 @@ async function renderSearchResults(panel, instance) {
 
   const resultCount = filteredResults.length;
   const totalResults = Number(payload.totalResults) || resultCount;
-  updateSearchDock(panel, searchInstance, resultCount);
+  updateSearchDock(panel, searchInstance, resultCount, { hasMore: Boolean(payload.hasMore) });
   appendSearchResultGroups(results, filteredResults, query, searchInstance);
   appendSearchLoadMore(results, {
     query,
@@ -15599,15 +15602,14 @@ function appendSearchLoadMore(results, options) {
   const footer = document.createElement("section");
   footer.className = "search-load-more";
   const status = document.createElement("p");
-  const visibleCount = results.querySelectorAll(".result-row").length;
-  status.textContent = `${visibleCount.toLocaleString()} shown`;
+  status.hidden = true;
   const button = document.createElement("button");
   button.type = "button";
   button.className = "search-load-more-button";
-  button.textContent = "Show more";
+  button.textContent = "Load more matches";
   button.addEventListener("click", async () => {
     button.disabled = true;
-    button.textContent = "Loading…";
+    button.textContent = "Loading matches…";
     const codeQuery = options.selectedPrefixes.length
       ? `&code=${encodeURIComponent(options.selectedPrefixes.join(","))}`
       : "";
@@ -15631,7 +15633,9 @@ function appendSearchLoadMore(results, options) {
       appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
       const nextVisibleCount = results.querySelectorAll(".result-row").length;
       const totalResults = Number(payload.totalResults) || options.totalResults;
-      updateSearchDock(options.panel, options.searchInstance, nextVisibleCount);
+      updateSearchDock(options.panel, options.searchInstance, nextVisibleCount, {
+        hasMore: Boolean(payload.hasMore)
+      });
       appendSearchLoadMore(results, {
         ...options,
         nextOffset: Number(payload.nextOffset) || (options.nextOffset + (payload.results || []).length),
@@ -15642,6 +15646,7 @@ function appendSearchLoadMore(results, options) {
     } catch {
       button.disabled = false;
       button.textContent = "Try again";
+      status.hidden = false;
       status.textContent = "More results could not be loaded.";
     }
   });
