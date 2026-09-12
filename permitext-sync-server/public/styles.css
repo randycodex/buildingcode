@@ -14463,7 +14463,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   gap: var(--report-menu-gap);
   min-height: 0;
   overflow-y: auto;
-  padding: var(--report-content-edge);
+  padding: var(--report-content-edge) 0;
   border-radius: calc(var(--radius-card) + 4px);
   background: color-mix(in srgb, var(--surface) 78%, transparent);
 }
