@@ -16502,6 +16502,10 @@ html body *:has(:focus-visible) {
   font-size: 11px;
 }
 
+.research-compact-composer .research-composer-box {
+  border-radius: var(--radius-pill);
+}
+
 .research-compact-composer .research-question-input {
   min-height: 48px;
   max-height: 180px;
