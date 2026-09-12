@@ -4426,6 +4426,10 @@ body .reader-internal-search-input:focus-visible {
   background: var(--menu-subtle-surface);
 }
 
+.search-code-filter-menu {
+  background: transparent;
+}
+
 .code-filter-menu .search-code-filter,
 .code-filter-menu .saved-code-filter,
 .code-filter-menu .saved-project-list,
