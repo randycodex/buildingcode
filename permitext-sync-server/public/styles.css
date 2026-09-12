@@ -16513,6 +16513,9 @@ html body *:has(:focus-visible) {
 .research-compact-composer .research-send-button {
   min-height: 32px;
   height: 32px;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
 }
 .research-list-panel .research-conversation-row {
   background: transparent;
