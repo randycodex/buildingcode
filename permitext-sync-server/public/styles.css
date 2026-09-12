@@ -4567,17 +4567,6 @@ body .reader-internal-search-input:focus-visible {
   scrollbar-gutter: stable;
 }
 
-.search-code-filter .search-filter-chip[data-prefix="ALL"] {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: color-mix(in srgb, var(--text-tertiary) 16%, var(--surface-raised));
-}
-
-.search-code-filter .search-filter-chip[data-prefix="ALL"][aria-pressed="true"] {
-  background: color-mix(in srgb, var(--text-primary) 60%, var(--surface-raised));
-}
-
 .search-filter-chip {
   flex: 0 0 auto;
   min-height: 32px;
