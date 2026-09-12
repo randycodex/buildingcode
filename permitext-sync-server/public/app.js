@@ -19600,8 +19600,8 @@ async function renderResearch(paneID = "utility:analysis") {
     const expanded = panel.classList.toggle("is-history-open");
     historyButton.setAttribute("aria-expanded", String(expanded));
   });
-  panelActions?.prepend(historyButton);
   if (conversationOpen && !historyShowing) {
+    panelActions?.prepend(historyButton);
     panel.classList.add("has-inline-conversation");
     content.remove();
     panel.append(await renderResearchConversation(instance?.conversationID || state.researchConversationID, { embedded: true, supplemental: Boolean(instance) }));
