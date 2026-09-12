@@ -14549,9 +14549,15 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .report-draft-primary-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: var(--space-2);
+}
+
+.report-draft-primary-actions button {
+  min-width: 0;
+  width: 100%;
 }
 
 .report-draft-blocks,
