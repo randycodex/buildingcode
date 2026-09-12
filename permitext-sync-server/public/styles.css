@@ -16572,6 +16572,18 @@ html body *:has(:focus-visible) {
   font-size: 12px;
 }
 .research-list-panel.is-history-open .research-new-chat { display: none; }
+.research-list-panel.is-history-open .research-history-toggle { display: none; }
+.research-list-panel.research-clean-start .research-history-toggle,
+.research-list-panel.research-clean-start .research-history-toggle:hover {
+  height: 28px;
+  min-height: 28px;
+  padding: 0 6px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--text-secondary);
+  box-shadow: none;
+}
 .research-list-panel.is-research-history-selecting .research-conversation-row {
   background: var(--surface-muted);
   border-radius: 8px;
@@ -16583,7 +16595,6 @@ html body *:has(:focus-visible) {
   box-shadow: none;
 }
 .research-list-panel.research-clean-start .research-composer-status:empty { display: none; }
-.research-list-panel.research-clean-start .research-history-toggle,
 .research-list-panel.research-clean-start .research-new-chat {
   font-size: 12px;
   height: 28px;
