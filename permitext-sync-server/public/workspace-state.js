@@ -394,6 +394,7 @@ function workspaceRecord(value, options = {}) {
   return {
     id: String(value?.id || options.makeID?.() || crypto.randomUUID()),
     name: cleanWorkspaceName(value?.name, options.fallbackName || defaultWorkspaceName),
+    projectID: String(value?.projectID || ""),
     createdAt: String(value?.createdAt || now),
     updatedAt: String(value?.updatedAt || now)
   };

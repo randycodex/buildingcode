@@ -113,7 +113,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260811-research-columns-v3";
+} from "./workspace-state.js?v=20260912-project-workspaces-v4";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -1259,6 +1259,13 @@ async function switchWorkspace(workspaceID, options = {}) {
   activeWorkspaceID = workspaceID;
   workspaceRegistry = { ...workspaceRegistry, activeWorkspaceID };
   applyStoredWorkspaceLayout(nextLayout);
+  if (!target.projectID) {
+    setOpenProjectDetails([]);
+    state.notebooks = [];
+    state.reportDrafts = [];
+    state.coordinations = [];
+    state.coordinationThreads = [];
+  }
   persistWorkspaceRegistry();
   renderWorkspaceTransitionState(target.name);
   if (options.focus !== false) focusActiveWorkspaceTab();
@@ -1275,28 +1282,78 @@ async function switchWorkspace(workspaceID, options = {}) {
   return true;
 }
 
-async function createNewWorkspace() {
-  if (!(await confirmWorkspaceTransition())) return;
-  saveWorkspaceState();
-  const creation = createWorkspace(workspaceRegistry);
-  workspaceRegistry = creation.registry;
-  activeWorkspaceID = creation.workspace.id;
-  localStorage.setItem(
-    workspaceSnapshotKey(activeWorkspaceID),
-    JSON.stringify(workspaceLayoutWithoutCodeQuestionData(creation.layout))
-  );
-  applyStoredWorkspaceLayout(creation.layout);
-  persistWorkspaceRegistry();
-  suppressReaderScrollRestore = true;
-  try {
-    await renderWorkspace();
-  } finally {
-    suppressReaderScrollRestore = false;
+function workspaceProject() {
+  const id = activeWorkspaceRecord()?.projectID;
+  return id ? activeFolderRecords(mergeProjectsWithOrganizationAccess(currentContentSummary().projects || []))
+    .find((project) => projectRecordID(project) === id) || null : null;
+}
+
+function reconcileProjectWorkspaces() {
+  if (!workspaceRegistry || detachedProjectWindow) return;
+  const projects = activeFolderRecords(mergeProjectsWithOrganizationAccess(currentContentSummary().projects || []))
+    .filter(folderIsProject);
+  let changed = false;
+  for (const project of projects) {
+    const projectID = projectRecordID(project);
+    const existing = workspaceRegistry.workspaces.find((workspace) => workspace.projectID === projectID);
+    if (existing) {
+      if (existing.name !== project.name) { existing.name = project.name; changed = true; }
+      continue;
+    }
+    const id = `project:${projectID}`;
+    const legacyLayout = workspaceRegistry.workspaces.filter((item) => !item.projectID)
+      .map((item) => item.id === activeWorkspaceID ? captureWorkspaceLayout(state) : loadWorkspaceSnapshot(item.id))
+      .find((layout) => layout && (layout.projectDetails || []).some((detail) => projectDetailMatches(detail, project)));
+    const layout = legacyLayout || emptyWorkspaceLayout();
+    const saved = newUtilityInstance("saved", { selectedFolderID: projectID });
+    layout.utilityInstances = [...(layout.utilityInstances || []).filter((item) => item.key !== "saved"), saved];
+    layout.projectDetails = [projectIdentity(project)];
+    layout.projectDetail = projectIdentity(project);
+    layout.projectHostPaneID = paneIDForUtilityInstance(saved);
+    // Write the layout before registering it; interrupted migration can safely retry.
+    if (!localStorage.getItem(workspaceSnapshotKey(id))) {
+      localStorage.setItem(workspaceSnapshotKey(id), JSON.stringify(workspaceLayoutWithoutCodeQuestionData(layout)));
+    }
+    workspaceRegistry.workspaces.push({ id, projectID, name: project.name,
+      createdAt: project.createdAt || new Date().toISOString(), updatedAt: project.updatedAt || new Date().toISOString() });
+    if (!activeWorkspaceRecord()?.projectID && (state.projectDetails || []).some((detail) => projectDetailMatches(detail, project))) {
+      activeWorkspaceID = id;
+      workspaceRegistry.activeWorkspaceID = id;
+    }
+    changed = true;
   }
-  beginWorkspaceRename(activeWorkspaceID);
+  if (changed) persistWorkspaceRegistry();
+}
+
+function scopeSavedInstanceToWorkspace(instance) {
+  const project = workspaceProject();
+  if (project) instance.selectedFolderID = projectRecordID(project);
+  else if (!activeFolderRecords(currentContentSummary().projects || []).some((folder) =>
+    !folderIsProject(folder) && projectRecordID(folder) === instance.selectedFolderID)) instance.selectedFolderID = "";
+  instance.organizeUnassigned = !instance.selectedFolderID;
+  instance.showAllSaved = false;
+  return instance;
+}
+
+async function createNewWorkspace() {
+  closeWorkspaceContextMenu();
+  if (!(await confirmWorkspaceTransition())) return;
+  showProjectCreateSheet(track, null, { folderType: "project", workspaceProject: true,
+    onCreated: async (project) => {
+      reconcileProjectWorkspaces();
+      const syncedProject = activeFolderRecords(currentContentSummary().projects || []).find((item) => projectDetailMatches(item, project)) || project;
+      const linked = workspaceRegistry.workspaces.find((item) => item.projectID === projectRecordID(syncedProject));
+      if (linked) await switchWorkspace(linked.id, { focus: false });
+    }
+  });
 }
 
 function commitWorkspaceRename(workspaceID, name) {
+  const linked = workspaceRegistry.workspaces.find((item) => item.id === workspaceID);
+  if (linked?.projectID) {
+    const project = activeFolderRecords(currentContentSummary().projects || []).find((item) => projectRecordID(item) === linked.projectID);
+    if (project) void updateProjectFolder(project, { name }).then(() => renderWorkspace()).catch((error) => presentWorkspaceIssue(error.message || "Could not rename this Project."));
+  }
   workspaceRegistry = renameWorkspace(workspaceRegistry, workspaceID, name);
   persistWorkspaceRegistry();
   renderWorkspaceTabs();
@@ -1320,6 +1377,7 @@ function beginWorkspaceRename(workspaceID) {
 }
 
 async function duplicateNamedWorkspace(workspaceID) {
+  if (workspaceRegistry.workspaces.find((item) => item.id === workspaceID)?.projectID) return;
   const requestIdentity = captureAccountRequest();
   if (!(await confirmWorkspaceTransition())) return;
   if (!isCurrentAccountRequest(requestIdentity)) return;
@@ -1484,7 +1542,7 @@ function openMobileMoreSheet() {
       { current: workspace.id === activeWorkspaceID }
     ));
   });
-  workspaceList.append(mobileMoreAction("Create workspace", () => void createNewWorkspace()));
+  workspaceList.append(mobileMoreAction("New Project", () => void createNewWorkspace()));
   workspaceSection.append(workspaceLabel, workspaceList);
 
   const activeWorkspace = activeWorkspaceRecord();
@@ -1531,7 +1589,8 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   closeWorkspaceContextMenu();
   const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
   if (!workspace) return;
-  const workspaces = workspaceRegistry.workspaces;
+  const availableIDs = new Set(activeFolderRecords(mergeProjectsWithOrganizationAccess(currentContentSummary().projects || [])).map(projectRecordID));
+  const workspaces = workspaceRegistry.workspaces.filter((item) => !item.projectID || availableIDs.has(item.projectID));
   const index = workspaces.findIndex((item) => item.id === workspaceID);
   const menu = document.createElement("div");
   menu.className = "workspace-context-menu";
@@ -1559,14 +1618,37 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     });
     menu.append(button);
   });
+  archivedProjectRecords(currentContentSummary().projects || []).filter(folderIsProject).forEach((project) => {
+    const restore = document.createElement("button");
+    restore.type = "button";
+    restore.setAttribute("role", "menuitem");
+    restore.textContent = `Restore ${project.name}`;
+    restore.addEventListener("click", async () => {
+      closeWorkspaceContextMenu();
+      await restoreArchivedProject(project);
+      reconcileProjectWorkspaces();
+      const linked = workspaceRegistry.workspaces.find((item) => item.projectID === projectRecordID(project));
+      if (linked) await switchWorkspace(linked.id, { focus: false });
+    });
+    menu.append(restore);
+  });
   const divider = document.createElement("div");
   divider.className = "workspace-context-divider";
   menu.append(divider);
   const actions = [
-    { label: "New workspace", run: () => void createNewWorkspace() },
-    { label: "Rename workspace", run: () => beginWorkspaceRename(workspaceID) },
-    { label: "Duplicate workspace", run: () => void duplicateNamedWorkspace(workspaceID) },
-    { label: "Delete workspace", danger: true, separated: true, run: () => void removeNamedWorkspace(workspaceID) }
+    { label: "New Project", run: () => void createNewWorkspace() },
+    { label: workspace.projectID ? "Rename Project" : "Rename workspace", run: () => beginWorkspaceRename(workspaceID) },
+    ...(workspace.projectID ? [{ label: "Archive Project", danger: true, separated: true, run: async () => {
+      const project = workspaceProject();
+      if (project) {
+        await archiveProject(project);
+        const main = workspaceRegistry.workspaces.find((item) => !item.projectID);
+        if (main) await switchWorkspace(main.id, { focus: false });
+      }
+    } }] : [
+      { label: "Duplicate workspace", run: () => void duplicateNamedWorkspace(workspaceID) },
+      { label: "Delete workspace", danger: true, separated: true, run: () => void removeNamedWorkspace(workspaceID) }
+    ])
   ];
   actions.forEach((action) => {
     if (action.separated) {
@@ -7060,7 +7142,7 @@ async function linkResearchConversationToActiveCodeDecision(conversation) {
 }
 
 function activeProjectIDForCodeQuestions() {
-  const detail = openProjectDetails()[0] || null;
+  const detail = workspaceProject() || openProjectDetails()[0] || null;
   return detail ? String(projectDetailKey(detail) || "").trim() : "";
 }
 
@@ -11745,6 +11827,9 @@ async function updateProjectFolder(project, details = {}) {
 }
 
 function isSectionSaved(section, codeVersion = "") {
+  const project = workspaceProject();
+  if (project) return (currentContentSummary().projectSections || []).some((item) =>
+    savedEvidenceKey(item) === savedEvidenceKey(section, codeVersion) && projectSectionBelongsToProject(item, project));
   return Boolean(savedSectionRecord(section, codeVersion));
 }
 
@@ -11790,7 +11875,14 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   requirePrivateWorkspaceWritable();
   const requestIdentity = captureAccountRequest();
   const account = activeAccount();
+  const targetProject = workspaceProject();
   const existingRecord = savedItemForSection(sectionPayload);
+  if (!saved && targetProject) {
+    const links = (currentContentSummary().projectSections || []).filter((item) =>
+      savedEvidenceKey(item) === savedEvidenceKey(sectionPayload) && projectSectionBelongsToProject(item, targetProject));
+    for (const link of links) await removeSectionFromProject(targetProject, link);
+    return true;
+  }
   if (
     saved &&
     !isSectionSaved(sectionPayload) &&
@@ -11832,6 +11924,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     });
     requireCurrentAccountRequest(requestIdentity);
   }
+  if (saved && targetProject) await persistSectionInProject(targetProject, sectionPayload);
   if (options.refreshSavedPanes !== false) await refreshOpenSavedPanes();
   requireCurrentAccountRequest(requestIdentity);
   if (!account) return true;
@@ -13452,6 +13545,10 @@ function closeSectionSaveProjectSheet(panel, focusTarget = null) {
 
 function showSectionProjectAssignment(panel, sectionPayload, focusTarget = null) {
   if (!panel || !sectionPayload?.sectionID) return;
+  if (workspaceProject()) {
+    void persistSectionInProject(workspaceProject(), sectionPayload);
+    return;
+  }
   closeSectionSaveProjectSheet(panel);
   const sheet = document.createElement("section");
   sheet.className = "section-save-project-sheet";
@@ -17618,6 +17715,7 @@ function applyProjectDerivedPaneTheme(panel, projectID) {
 }
 
 function preferredResearchProjectID(conversation = activeResearchConversation) {
+  if (workspaceProject()) return projectDetailKey(workspaceProject());
   if (conversation?.primaryProjectID) return conversation.primaryProjectID;
   const projects = researchProjects();
   const openProjectIDs = openProjectDetails().map((detail) => projectDetailKey(detail));
@@ -17673,7 +17771,11 @@ function createResearchProjectSelect({
   const select = document.createElement("select");
   select.className = "research-project-select";
   select.setAttribute("aria-label", ariaLabel);
-  const choices = researchProjectChoices({ value, includeUnassigned, unassignedLabel });
+  const activeProject = workspaceProject();
+  const choices = activeProject
+    ? [{ value: projectDetailKey(activeProject), label: activeProject.name }]
+    : researchProjectChoices({ value, includeUnassigned, unassignedLabel });
+  if (activeProject) value = projectDetailKey(activeProject);
   choices.forEach((choice) => {
     const option = document.createElement("option");
     option.value = choice.value;
@@ -19578,7 +19680,7 @@ async function renderResearch(paneID = "utility:analysis") {
 
   const list = document.createElement("section");
   list.className = "research-conversation-list";
-  researchConversationHistoryGroups(researchConversationList).forEach((historyGroup) => {
+  researchConversationHistoryGroups(researchConversationList.filter((conversation) => String(conversation.primaryProjectID || "") === String(workspaceProject() ? projectDetailKey(workspaceProject()) : ""))).forEach((historyGroup) => {
     const group = document.createElement("section");
     group.className = "research-history-group";
     group.dataset.historyGroup = historyGroup.id;
@@ -21710,6 +21812,11 @@ function selectProjectInSaved(project, preferredPaneID = "") {
 }
 
 async function openProjectDetail(project, options = {}) {
+  if (!detachedProjectWindow && folderIsProject(project)) {
+    reconcileProjectWorkspaces();
+    const linked = workspaceRegistry.workspaces.find((item) => item.projectID === projectRecordID(project));
+    if (linked && linked.id !== activeWorkspaceID && !(await switchWorkspace(linked.id, { focus: false }))) return;
+  }
   if (!detachedProjectWindow && projectHasDetachedWorkboard(project)) {
     openDetachedWindow(project);
     return;
@@ -27629,6 +27736,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   overlay.append(sheet);
   panel.append(overlay);
   syncFolderTypeControls();
+  if (options.workspaceProject) { typeGroup.remove(); overlay.setAttribute("aria-label", "New Project"); }
   nameInput.focus();
 }
 
@@ -28456,7 +28564,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders, o
     projectRecordID(item) === String(savedInstance.selectedFolderID || "")
   ) || null;
   const projectsSection = panel.querySelector(".saved-projects-section");
-  projectsSection.hidden = false;
+  projectsSection.hidden = Boolean(workspaceProject());
   if (!folder) {
     inlineFilters.hidden = !savedInstance.organizeUnassigned;
     savedContent.hidden = !savedInstance.organizeUnassigned;
@@ -29434,7 +29542,7 @@ function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 
 }
 
 async function renderSaved(instance) {
-  const savedInstance = normalizeSavedInstance(instance);
+  const savedInstance = scopeSavedInstanceToWorkspace(normalizeSavedInstance(instance));
   const paneID = paneIDForUtilityInstance(savedInstance);
   const panel = renderTemplate(savedTemplate);
   panel.classList.add("saved-panel");
@@ -29459,6 +29567,11 @@ async function renderSaved(instance) {
 }
 
 function renderSavedProjects(panel, instance, paneID, projects, projectSections, savedItems = []) {
+  if (workspaceProject()) {
+    panel.querySelector(".saved-projects-section").hidden = true;
+    return;
+  }
+  projects = projects.filter((project) => !folderIsProject(project));
   const list = panel.querySelector(".saved-project-list");
   const section = panel.querySelector(".saved-projects-section");
   const selectButton = panel.querySelector(".saved-projects-select-button");
@@ -36526,6 +36639,8 @@ async function renderWorkspace(options = {}) {
   const renderGeneration = ++workspaceRenderGeneration;
   const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
   await ensureSyncedContentForRender();
+  reconcileProjectWorkspaces();
+  (state.utilityInstances || []).filter((item) => item.key === "saved").forEach(scopeSavedInstanceToWorkspace);
   enforceReaderPlanLimit();
   updateReaderPlanControls();
   renderWorkspaceTabs();
