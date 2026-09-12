@@ -37077,7 +37077,11 @@ async function closeAllColumns() {
   });
   state.utilityInstances = [];
   state.researchConversationID = "";
+  researchConversationPaneOpened = false;
+  researchHistoryShowing = false;
   activeResearchConversation = null;
+  supplementalResearchConversationIDs.length = 0;
+  supplementalResearchConversations.clear();
   setCodeQuestionWorkspaceState(
     closeCodeDecisionContext(codeQuestionWorkspaceState()),
     { activeProjectID: "", syncDeepLink: true }
