@@ -2638,6 +2638,7 @@ async function main() {
         workspaceStyles.text.match(/\.code-filter-menu\.is-open \.search-code-filter,[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
         workspaceStyles.text.match(/\.code-filter-menu-toggle \{[\s\S]*?justify-content: space-between;[\s\S]*?border-radius: var\(--radius-pill\);/) &&
         workspaceStyles.text.includes(".search-code-filter-menu {\n  background: transparent;") &&
+        workspaceStyles.text.match(/\.settings-panel \.settings-purchase-consent \{[\s\S]*?text-transform: none;/) &&
         workspaceStyles.text.match(/\.code-filter-menu-toggle\[aria-expanded="true"\] \.code-filter-chevron-up \{[\s\S]*?display: block;/) &&
         workspaceStyles.text.match(/\.search-panel \.search-box \{[\s\S]*?border: 0;/) &&
         workspaceStyles.text.match(/\.search-panel \.search-box:has\(\.search-input:focus-visible\) \{[\s\S]*?outline: 2px solid/) &&

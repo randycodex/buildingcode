@@ -12504,6 +12504,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   color: var(--text-secondary);
   font-size: 8.75pt !important;
   line-height: 1.35;
+  text-transform: none;
 }
 
 .settings-panel .settings-purchase-consent input {
