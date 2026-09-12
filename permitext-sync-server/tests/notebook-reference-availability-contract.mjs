@@ -31,6 +31,21 @@ assert.match(
   "A successfully synchronized Note must replace its provisional empty-ID summary."
 );
 assert.match(
+  clientSource,
+  /function notebookDocumentWithCurrentCardLabels\(document, cards\)[\s\S]*?value\.props\?\.referenceKind === "notebookCard"[\s\S]*?value\.props\.label = nextLabel/,
+  "Linked Note labels must resolve from the current Note title by stable Note ID."
+);
+assert.match(
+  clientSource,
+  /const currentCardLabels = notebookDocumentWithCurrentCardLabels\(reconciledDocument, cards\)[\s\S]*?dirty = useLocalDraft \|\| currentCardLabels\.changed[\s\S]*?"Updated linked Note title · waiting to sync"/,
+  "Opening a Note must refresh and persist renamed linked-Note labels."
+);
+assert.match(
+  clientSource,
+  /cards = nextCards;[\s\S]*?notebookDocumentWithCurrentCardLabels\(draftDocument, cards\)[\s\S]*?editorMount\?\.setDocument\(draftDocument\)/,
+  "A visible Note must refresh linked-Note labels when its Project Note summaries change."
+);
+assert.match(
   editorSource,
   /insertReference\(reference\) \{[\s\S]*?if \(!editor\) return false;[\s\S]*?return true;/,
   "The editor reference API must report whether insertion was accepted."

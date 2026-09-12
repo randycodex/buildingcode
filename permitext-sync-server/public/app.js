@@ -22202,6 +22202,34 @@ async function notebookReferenceCandidates(project, foundation, cards) {
     .sort(compareNotebookReferences);
 }
 
+function notebookDocumentWithCurrentCardLabels(document, cards) {
+  const labelsByCardID = new Map(
+    (cards || [])
+      .map((card) => [String(card.id || "").trim(), String(card.title || "").trim()])
+      .filter(([cardID, title]) => cardID && title)
+      .map(([cardID, title]) => [cardID, `Notebook: ${title}`])
+  );
+  if (!labelsByCardID.size) return { document, changed: false };
+  const nextDocument = structuredClone(document);
+  let changed = false;
+  const visit = (value) => {
+    if (!value || typeof value !== "object") return;
+    if (
+      value.type === "permitextReference" &&
+      value.props?.referenceKind === "notebookCard"
+    ) {
+      const nextLabel = labelsByCardID.get(String(value.props.referenceID || "").trim());
+      if (nextLabel && value.props.label !== nextLabel) {
+        value.props.label = nextLabel;
+        changed = true;
+      }
+    }
+    Object.values(value).forEach(visit);
+  };
+  visit(nextDocument);
+  return changed ? { document: nextDocument, changed } : { document, changed };
+}
+
 async function openNotebookReference(project, foundation, reference, selectCard, anchorPaneID, projectID) {
   if (reference.referenceKind === "selectedPassage") {
     const evidenceLink = reference.evidenceLink;
@@ -22951,20 +22979,31 @@ async function renderProjectNotebook(project) {
       const localDraft = await loadNotebookDraft(accountUserID, projectID, cardID).catch(() => null);
       requireCurrentAccountRequest(requestIdentity);
       const useLocalDraft = Boolean(localDraft);
-      draftDocument = await reconcileNotebookDocumentAssets(useLocalDraft ? localDraft.document : activeCard.document, projectID, requestIdentity);
+      const reconciledDocument = await reconcileNotebookDocumentAssets(
+        useLocalDraft ? localDraft.document : activeCard.document,
+        projectID,
+        requestIdentity
+      );
+      const currentCardLabels = notebookDocumentWithCurrentCardLabels(reconciledDocument, cards);
+      draftDocument = currentCardLabels.document;
       if (useLocalDraft) {
         activeCard.version = localDraft.baseVersion;
         activeCard.title = localDraft.title || "";
         activeCard.evidenceLinks = localDraft.evidenceLinks || activeCard.evidenceLinks || [];
       }
-      dirty = useLocalDraft;
+      dirty = useLocalDraft || currentCardLabels.changed;
       persistedDraft = localDraft || null;
       persistedCardID = activeCard.id || "";
       persistedRevision = localDraft ? notebookRevision : -1;
-      if (!showNotebookRecoveryConflict(localDraft)) showDraftStatus(useLocalDraft ? "Recovered device draft · waiting to sync" : "Synced");
+      if (currentCardLabels.changed) notebookRevision += 1;
+      if (!showNotebookRecoveryConflict(localDraft)) {
+        showDraftStatus(currentCardLabels.changed
+          ? "Updated linked Note title · waiting to sync"
+          : useLocalDraft ? "Recovered device draft · waiting to sync" : "Synced");
+      }
       renderCardList();
       await renderFocusedCard();
-      if (useLocalDraft) scheduleNotebookAutosave();
+      if (dirty) scheduleNotebookAutosave();
     }
 
     function scheduleIdleNotebookPrefetch() {
@@ -23242,6 +23281,17 @@ async function renderProjectNotebook(project) {
           : [localSummary, ...nextCards];
       }
       cards = nextCards;
+      if (activeCard) {
+        const currentCardLabels = notebookDocumentWithCurrentCardLabels(draftDocument, cards);
+        if (currentCardLabels.changed) {
+          draftDocument = currentCardLabels.document;
+          dirty = true;
+          notebookRevision += 1;
+          showDraftStatus("Updated linked Note title · waiting to sync");
+          editorMount?.setDocument(draftDocument);
+          scheduleNotebookAutosave();
+        }
+      }
       renderCardList();
       await saveNotebookProjectSnapshot({
         accountUserID: accountUserID,
