@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v925";
+const shellCacheName = "permitext-pro-shell-v926";
 const offlineAssetVersion = "20260901-2014-code-assets-v15";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -9,7 +9,7 @@ const shellURLs = [
   "/web/styles.css?v=20260912-project-manager-v186",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260912-project-manager-v186",
+  "/web/app.js?v=20260912-project-manager-v187",
   "/web/settings-copy.js?v=20260830-stripe-tax-copy-v4",
   "/web/project-artifact-checkpoints.js?v=20260817-research-live-sync-v3",
   "/web/research-progress.js?v=20260826-research-request-recovery-v121",

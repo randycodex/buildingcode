@@ -19843,7 +19843,7 @@ async function renderResearch(paneID = "utility:analysis") {
 
   const list = document.createElement("section");
   list.className = "research-conversation-list";
-  researchConversationHistoryGroups(researchConversationList.filter((conversation) => String(conversation.primaryProjectID || "") === String(workspaceProject() ? projectDetailKey(workspaceProject()) : ""))).forEach((historyGroup) => {
+  researchConversationHistoryGroups(researchConversationList).forEach((historyGroup) => {
     const group = document.createElement("section");
     group.className = "research-history-group";
     group.dataset.historyGroup = historyGroup.id;
