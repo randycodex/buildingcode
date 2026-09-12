@@ -4685,13 +4685,10 @@ function feedbackURL(releaseID = "unknown") {
 
 function wireOperationalSupport(panel) {
   const feedbackLink = panel.querySelector(".settings-feedback-link");
-  const releaseLabel = panel.querySelector(".settings-release-id");
-  if (!feedbackLink || !releaseLabel) return;
+  if (!feedbackLink) return;
   void loadReleaseIdentity().then((release) => {
     const releaseID = release?.releaseID || "unknown";
     feedbackLink.href = feedbackURL(releaseID);
-    releaseLabel.textContent = `Release: ${releaseID}`;
-    if (release?.gitCommit) releaseLabel.title = `Git commit ${release.gitCommit}`;
   });
 }
 

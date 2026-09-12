@@ -12710,7 +12710,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   line-height: 1.35;
 }
 
-.settings-panel .settings-scroll > .settings-disclaimer:not(.settings-footer-links):not(.settings-release-id) {
+.settings-panel .settings-scroll > .settings-disclaimer:not(.settings-footer-links) {
   width: 100%;
   text-align: justify;
   text-align-last: justify;
@@ -12721,12 +12721,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   flex-wrap: wrap;
   justify-content: center;
   gap: 4px 8px;
-  text-align: center;
-}
-
-.settings-panel .settings-release-id {
-  color: var(--text-secondary);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   text-align: center;
 }
 
