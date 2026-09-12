@@ -2656,6 +2656,10 @@ label {
   background: var(--surface-muted);
 }
 
+.report-history-section .report-title-control {
+  background: transparent;
+}
+
 .report-title-text,
 .report-title-editor {
   min-width: 0;
@@ -14907,7 +14911,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   position: sticky;
   z-index: 2;
   bottom: 0;
-  padding: var(--space-2);
+  padding: 0;
   border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(12px);
