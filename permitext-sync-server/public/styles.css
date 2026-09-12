@@ -1249,24 +1249,16 @@ textarea:focus-visible {
   align-items: start;
   padding: clamp(2.5rem, 8vh, 6.5rem) clamp(1.5rem, 6vw, 6rem);
   color: var(--text-primary);
-  text-align: left;
+  text-align: center;
 }
 
 .first-use-content {
-  width: min(100%, 55rem);
-}
-
-.first-use-eyebrow {
-  color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.8);
-  font-weight: 750;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  width: min(100%, 90rem);
 }
 
 .first-use-content h1 {
-  max-width: 48rem;
-  margin: var(--space-3) 0 0;
+  max-width: none;
+  margin: 0;
   color: var(--text-primary);
   font-size: clamp(2.35rem, 5vw, 4.9rem);
   font-weight: 760;
@@ -1275,8 +1267,8 @@ textarea:focus-visible {
 }
 
 .workspace-empty-state .first-use-supporting {
-  max-width: 42rem;
-  margin-top: var(--space-4);
+  max-width: none;
+  margin: var(--space-4) auto 0;
   color: var(--text-secondary);
   font-size: clamp(1rem, 1.5vw, 1.2rem);
   line-height: 1.55;
@@ -1284,6 +1276,7 @@ textarea:focus-visible {
 
 .first-use-actions {
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: var(--space-2);
   margin-top: var(--space-5);

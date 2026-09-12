@@ -83,7 +83,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260912-workspace-restore-v64";
+} from "./offline-storage.js?v=20260912-centered-welcome-v65";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -118,7 +118,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260912-workspace-restore-v64";
+} from "./research-intent-state.js?v=20260912-centered-welcome-v65";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -33086,9 +33086,6 @@ function renderFirstUseWelcome() {
 
   const content = document.createElement("div");
   content.className = "first-use-content";
-  const eyebrow = document.createElement("p");
-  eyebrow.className = "first-use-eyebrow";
-  eyebrow.textContent = "permitext";
   const heading = document.createElement("h1");
   heading.id = headingID;
   heading.textContent = "NYC code research you can verify.";
@@ -33185,7 +33182,7 @@ function renderFirstUseWelcome() {
     }
   });
 
-  content.append(eyebrow, heading, supporting, actions, example);
+  content.append(heading, supporting, actions, example);
   welcome.append(content);
   return welcome;
 }
