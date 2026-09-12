@@ -172,7 +172,7 @@
     "eval:feedback:validate": "node scripts/validate-feedback-regressions.mjs"
   },
   "dependencies": {
-    "@blocknote/core": "^0.52.1",
+    "@blocknote/core": "^0.54.0",
     "@blocknote/mantine": "^0.52.1",
     "@blocknote/react": "^0.52.1",
     "@clerk/backend": "^3.16.10",
