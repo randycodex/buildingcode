@@ -22195,6 +22195,7 @@ async function renderProjectNotebook(project) {
   heading.className = "notebook-heading";
   const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Notebook";
+  headingTitle.className = "eyebrow panel-kind";
   heading.append(headingTitle);
   const dragHandle = createProjectToolDragHandle(identity);
   const closeButton = document.createElement("button");
@@ -23924,6 +23925,7 @@ async function renderProjectReportDraft(project) {
   heading.className = "report-heading";
   const headingTitle = document.createElement("h2");
   headingTitle.textContent = "Report";
+  headingTitle.className = "eyebrow panel-kind";
   heading.append(headingTitle);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close report-draft-close";

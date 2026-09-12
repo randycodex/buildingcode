@@ -13061,9 +13061,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   background: var(--surface-raised);
 }
 
-.project-detail-panel::before,
-.notebook-panel::before,
-.report-draft-panel::before {
+.project-detail-panel::before {
   position: absolute;
   inset: 0 0 auto;
   z-index: 0;
@@ -13117,13 +13115,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin-right: auto;
 }
 
-.notebook-heading h2 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+
 
 .project-ownership-label {
   margin: 2px 0 0;
@@ -14409,17 +14401,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin-right: auto;
 }
 
-.report-heading h2 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
 
-.report-draft-header h2 {
-  margin: 0;
-}
+
 
 .report-draft-eyebrow {
   display: block;
