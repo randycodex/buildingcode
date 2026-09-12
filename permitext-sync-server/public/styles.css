@@ -9965,6 +9965,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   min-height: 40px;
 }
 
+.saved-folder-context.is-project :is(.saved-project-facts-heading, .saved-evidence-heading, .project-studio-section-heading) > .section-label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
 .saved-folder-context.is-project .saved-project-facts-section > .saved-project-facts-heading > .saved-project-facts-toggle,
 .saved-folder-context.is-project .saved-project-structured-section > .saved-project-facts-heading > .saved-project-facts-toggle,
 .saved-folder-context.is-project .saved-project-research-answers > .project-studio-section-heading > .saved-project-research-toggle {
