@@ -24366,13 +24366,7 @@ async function renderProjectReportDraft(project) {
 
     const projectFactsSources = sources.filter((source) => source.kind === "projectFacts");
     appendSourceGroup("Project facts", "", (groupBody) => {
-      if (!projectFactsSources.length) {
-        const empty = document.createElement("p");
-        empty.className = "report-draft-empty";
-        empty.textContent = "Add Project facts in the Projects column before adding them to this Report.";
-        groupBody.append(empty);
-        return;
-      }
+
       projectFactsSources.forEach((source) => appendSourceCard(groupBody, source));
     });
 
@@ -24394,12 +24388,7 @@ async function renderProjectReportDraft(project) {
         warning.append(warningTitle, warningCopy, warningList);
         groupBody.append(warning);
       }
-      if (!evidenceSources.length && !sourceWarnings.length) {
-        const empty = document.createElement("p");
-        empty.className = "report-draft-empty";
-        empty.textContent = "No Saved Evidence is linked to this Project.";
-        groupBody.append(empty);
-      }
+
       const codeOrder = new Map(codeOptions.map((option, index) => [option.prefix, index]));
       const groupedEvidence = Array.from(
         evidenceSources.reduce((groups, source) => {
@@ -24457,12 +24446,7 @@ async function renderProjectReportDraft(project) {
 
     const researchSources = sources.filter((source) => source.kind === "researchAnswer");
     appendSourceGroup("Research", "", (groupBody) => {
-      if (!researchSources.length) {
-        const empty = document.createElement("p");
-        empty.className = "report-draft-empty";
-        empty.textContent = "No Research conversation is assigned to this Project.";
-        groupBody.append(empty);
-      }
+
       researchSources.forEach((source) => appendSourceCard(groupBody, source));
     });
 
