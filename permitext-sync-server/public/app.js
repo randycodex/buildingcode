@@ -23272,8 +23272,6 @@ async function renderProjectNotebook(project) {
       if (!activeCard) {
         const welcome = document.createElement("div");
         welcome.className = "notebook-welcome";
-        const welcomeTitle = document.createElement("h3");
-        welcomeTitle.textContent = "Write your professional analysis";
         const welcomeCopy = document.createElement("p");
         welcomeCopy.textContent = "Develop your reasoning in a Note, link enacted evidence or Research when useful, and add the finished analysis to the Report.";
         const welcomeAction = document.createElement("button");
@@ -23281,7 +23279,7 @@ async function renderProjectNotebook(project) {
         welcomeAction.type = "button";
         welcomeAction.textContent = "Create first Note";
         welcomeAction.addEventListener("click", () => newButton.click());
-        welcome.append(welcomeTitle, welcomeCopy, welcomeAction);
+        welcome.append(welcomeCopy, welcomeAction);
         replaceFocusedContent(welcome);
         return;
       }
