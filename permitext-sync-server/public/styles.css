@@ -13400,6 +13400,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   column-gap: var(--space-3);
   min-height: 28px;
   padding: var(--space-1) 0;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--project-color) 30%, var(--menu-surface));
 }
 
 .notebook-card-row.is-active-title small {
