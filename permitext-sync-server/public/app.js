@@ -23967,34 +23967,6 @@ async function renderProjectReportDraft(project) {
   let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
   const reportSourceGroupExpanded = new Map();
-  const reportHeaderHelp = Object.freeze({
-    "Report introduction": "Briefly explain what this Report addresses, the relevant Project condition, and any important limitations.",
-    "Report content": "Review and reorder the authored text and Project sources included in this Report.",
-    "Project facts": "Add the current Project address and facts when they are relevant to this Report.",
-    "Saved evidence": "Add enacted passages saved to this Project as supporting evidence.",
-    Research: "Add the original question and supported conclusion from a Project Research conversation.",
-    "Notebook notes": "Add selected Project notes that provide useful context for the Report.",
-    "Report history": "Open or download previously generated, dated Report versions."
-  });
-  const createReportHeaderHelp = (label) => {
-    const help = reportHeaderHelp[label];
-    if (!help) return null;
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "report-header-info";
-    button.dataset.reportHelp = help;
-    button.setAttribute("aria-label", `About ${label}`);
-    button.setAttribute("aria-description", help);
-    button.innerHTML = `
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="10"></circle>
-        <path d="M12 16v-4"></path>
-        <path d="M12 8h.01"></path>
-      </svg>
-    `;
-    return button;
-  };
-
   const mountState = {
     panel,
     hasUnsavedChanges: () => dirty,
@@ -24300,14 +24272,12 @@ async function renderProjectReportDraft(project) {
       title.type = "button";
       title.className = "project-section-toggle-label section-label report-source-group-toggle";
       title.textContent = label;
-      const info = createReportHeaderHelp(label);
       const toggle = document.createElement("button");
       toggle.type = "button";
       toggle.className = "project-section-toggle-chevron report-source-group-chevron";
       toggle.innerHTML = researchChevronIconsSVG();
       heading.append(title);
       heading.append(toggle);
-      if (info) heading.append(info);
       const body = document.createElement("div");
       body.className = "report-source-group-body";
       if (description) {
@@ -24630,7 +24600,6 @@ async function renderProjectReportDraft(project) {
     const introductionLabel = document.createElement("label");
     introductionLabel.className = "section-label report-introduction-label";
     introductionLabel.textContent = "Report introduction";
-    const introductionInfo = createReportHeaderHelp("Report introduction");
     const introduction = document.createElement("textarea");
     introduction.id = `report-introduction-${activeDraft.id || projectID}`;
     introduction.value = activeDraft.introduction || "";
@@ -24675,7 +24644,6 @@ async function renderProjectReportDraft(project) {
       );
     });
     introductionHeading.append(introductionLabel);
-    if (introductionInfo) introductionHeading.append(introductionInfo);
     introductionSection.append(introductionHeading, introduction, introductionResizeHandle);
     metadata.append(introductionSection);
 
@@ -24710,14 +24678,12 @@ async function renderProjectReportDraft(project) {
     blocksTitle.type = "button";
     blocksTitle.className = "project-section-toggle-label section-label report-draft-blocks-toggle";
     blocksTitle.textContent = "Report content";
-    const blocksInfo = createReportHeaderHelp("Report content");
     const blocksToggle = document.createElement("button");
     blocksToggle.type = "button";
     blocksToggle.className = "project-section-toggle-chevron report-draft-blocks-chevron";
     blocksToggle.innerHTML = researchChevronIconsSVG();
     blocksHeading.append(blocksTitle);
     blocksHeading.append(blocksToggle);
-    if (blocksInfo) blocksHeading.append(blocksInfo);
     const blocksBody = document.createElement("div");
     blocksBody.className = "report-draft-blocks-body";
     renderBlockEditor(blocksBody);
@@ -24781,14 +24747,12 @@ async function renderProjectReportDraft(project) {
       title.type = "button";
       title.className = "project-section-toggle-label section-label report-output-toggle";
       title.textContent = label;
-      const info = createReportHeaderHelp(label);
       const toggle = document.createElement("button");
       toggle.type = "button";
       toggle.className = "project-section-toggle-chevron report-output-chevron";
       toggle.innerHTML = researchChevronIconsSVG();
       heading.append(title);
       heading.append(toggle);
-      if (info) heading.append(info);
       const disclosureBody = document.createElement("div");
       disclosureBody.className = "report-output-body";
       disclosureBody.append(body);
