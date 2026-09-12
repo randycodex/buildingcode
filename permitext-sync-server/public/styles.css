@@ -2617,7 +2617,7 @@ label {
 
 .report-draft-picker .custom-select {
   flex: 0 0 auto;
-  width: 24px;
+  width: auto;
   min-height: 28px;
   padding: 0;
   border-radius: 0;
@@ -2635,6 +2635,15 @@ label {
   justify-content: center;
   color: var(--text-secondary);
   font-size: 13px;
+}
+
+.report-draft-picker .custom-select-trigger.is-compact-label {
+  min-width: 0;
+  padding: 4px 0;
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
 .report-title-control {

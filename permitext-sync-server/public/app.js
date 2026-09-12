@@ -6203,6 +6203,7 @@ function enhanceSelect(select) {
   const researchProjectMenu = select.classList.contains("research-conversation-header-project");
   const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select");
   const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
+  const compactLabelTrigger = select.dataset.customTrigger === "compact-label";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
@@ -6236,9 +6237,17 @@ function enhanceSelect(select) {
 
   const syncTrigger = () => {
     const selectedLabel = select.options[select.selectedIndex]?.textContent || "";
-    trigger.textContent = iconOnlyTrigger ? "⌄" : selectedLabel;
+    trigger.textContent = iconOnlyTrigger
+      ? "⌄"
+      : compactLabelTrigger
+        ? select.dataset.customTriggerText || selectedLabel
+        : selectedLabel;
     if (iconOnlyTrigger) {
       trigger.classList.add("is-icon-only");
+      trigger.setAttribute("aria-label", select.dataset.customTriggerLabel || selectedLabel);
+      trigger.title = select.dataset.customTriggerLabel || selectedLabel;
+    } else if (compactLabelTrigger) {
+      trigger.classList.add("is-compact-label");
       trigger.setAttribute("aria-label", select.dataset.customTriggerLabel || selectedLabel);
       trigger.title = select.dataset.customTriggerLabel || selectedLabel;
     } else {
@@ -24486,9 +24495,6 @@ async function renderProjectReportDraft(project) {
     titleEditor.value = activeDraft.title || "";
     titleEditor.setAttribute("aria-label", "Edit Report title");
     titleEditor.hidden = true;
-    const revisionLabel = document.createElement("span");
-    revisionLabel.className = "report-title-revision";
-    revisionLabel.textContent = `Revision ${activeDraft.version || 1}`;
     const beginTitleEditing = () => {
       titleEditor.value = activeDraft.title || "";
       titleButton.hidden = true;
@@ -24524,7 +24530,8 @@ async function renderProjectReportDraft(project) {
     const select = document.createElement("select");
     select.className = "report-draft-select";
     select.setAttribute("aria-label", "Switch or create Report");
-    select.dataset.customTrigger = "icon-only";
+    select.dataset.customTrigger = "compact-label";
+    select.dataset.customTriggerText = `Revision ${activeDraft.version || 1}`;
     select.dataset.customTriggerLabel = "Switch or create Report";
     const currentOption = document.createElement("option");
     currentOption.value = activeDraft.id || "";
@@ -24556,7 +24563,7 @@ async function renderProjectReportDraft(project) {
       clearStatus();
       renderWorkspaceContent();
     });
-    titleControl.append(titleButton, titleEditor, revisionLabel, select);
+    titleControl.append(titleButton, titleEditor, select);
     draftPicker.append(titleControl);
 
     const metadata = document.createElement("div");
