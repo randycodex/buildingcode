@@ -22447,14 +22447,7 @@ async function renderProjectNotebook(project) {
     const railLabel = document.createElement("span");
     railLabel.className = "code-filter-menu-label";
     railLabel.textContent = "Notes";
-    const railIcon = document.createElement("span");
-    railIcon.className = "code-filter-menu-icon";
-    railIcon.setAttribute("aria-hidden", "true");
-    railIcon.innerHTML = `
-      <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
-      <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
-    `;
-    railToggle.append(railLabel, railIcon);
+    railToggle.append(railLabel);
     const newButton = document.createElement("button");
     newButton.className = "notebook-card-add-action";
     newButton.type = "button";
@@ -23106,14 +23099,7 @@ async function renderProjectNotebook(project) {
       const referenceLabel = document.createElement("span");
       referenceLabel.className = "code-filter-menu-label";
       referenceLabel.textContent = "Insert evidence or Research";
-      const referenceIcon = document.createElement("span");
-      referenceIcon.className = "code-filter-menu-icon";
-      referenceIcon.setAttribute("aria-hidden", "true");
-      referenceIcon.innerHTML = `
-        <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
-        <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
-      `;
-      referenceToggle.append(referenceLabel, referenceIcon);
+      referenceToggle.append(referenceLabel);
       const referenceList = document.createElement("div");
       referenceList.className = "notebook-reference-list";
       let candidates = (await notebookReferenceCandidates(identity, foundation, cards))

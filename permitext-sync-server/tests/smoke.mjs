@@ -991,6 +991,10 @@ async function main() {
         workspaceScript.text.includes('selectButton.innerHTML = selectionModeIconSVG()') &&
         !workspaceScript.text.includes('deleteButton.className = "notebook-danger-action"') &&
         workspaceScript.text.includes('referenceToggle.className = "code-filter-menu-toggle notebook-reference-menu-toggle"') &&
+        workspaceScript.text.includes("railToggle.append(railLabel)") &&
+        workspaceScript.text.includes("referenceToggle.append(referenceLabel)") &&
+        !workspaceScript.text.includes("const railIcon = document.createElement") &&
+        !workspaceScript.text.includes("const referenceIcon = document.createElement") &&
         workspaceScript.text.includes('referenceList.className = "notebook-reference-list"') &&
         workspaceScript.text.includes('option.className = "notebook-reference-option"') &&
         workspaceScript.text.includes('label: "Insert evidence or Research"') &&
@@ -1639,7 +1643,6 @@ async function main() {
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-rail-actions {") &&
         workspaceScript.text.includes('rail.className = "notebook-card-rail code-filter-menu notebook-card-menu"') &&
-        workspaceScript.text.includes('railLabel.textContent = ""') &&
         workspaceScript.text.includes('label: () => showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes"') &&
         workspaceScript.text.includes('railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";') &&
         workspaceScript.text.includes('if (!cardMenuState.cardsMenuOpen && showingArchivedCards)') &&
