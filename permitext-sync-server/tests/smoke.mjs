@@ -2649,8 +2649,15 @@ async function main() {
         workspaceStyles.text.match(/\.search-code-filter-group-title \{[\s\S]*?font-size: 11px !important;[\s\S]*?font-weight: 700;/) &&
         workspaceScript.text.includes('group.className = "search-code-filter-group"') &&
         workspaceScript.text.includes('heading.className = "search-code-filter-group-title"') &&
+        workspaceScript.text.includes('instance.collapsedResultCodePrefixes = normalizeSearchCodeFilters') &&
+        workspaceScript.text.includes('const resultGroupsAreCollapsible = normalizeSearchCodeFilters(searchInstance?.codeFilters).length > 1') &&
+        workspaceScript.text.includes('label.classList.add("search-result-group-toggle")') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(group, groupBody, [label]') &&
+        workspaceScript.text.includes('const countLabel = `${resultCount.toLocaleString()} shown in ${scope}`') &&
         workspaceScript.text.includes('chipTitle.className = "search-filter-chip-title"') &&
         workspaceScript.text.includes('chipDetail.className = "search-filter-chip-detail"') &&
+        workspaceStyles.text.match(/\.search-result-group-toggle \{[\s\S]*?display: flex;[\s\S]*?justify-content: space-between;[\s\S]*?width: 100%;/) &&
+        workspaceStyles.text.match(/\.search-result-group\.project-section-motion\.is-open > \.search-result-group-body \{[\s\S]*?padding-top: 0;/) &&
         workspaceStyles.text.match(/\.search-filter-chip \{[\s\S]*?background: color-mix\(in srgb, var\(--text-tertiary\) 16%, transparent\);/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
         workspaceScript.text.includes('menu.classList.add("is-open")') &&

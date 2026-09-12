@@ -971,6 +971,7 @@ function newUtilityInstance(key, overrides = {}) {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
     instance.historySplitRatio = normalizeSearchHistorySplitRatio(overrides.historySplitRatio);
+    instance.collapsedResultCodePrefixes = normalizeSearchCodeFilters(overrides.collapsedResultCodePrefixes);
   } else if (key === "saved") {
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
     instance.sortMode = normalizeSavedSortMode(overrides.sortMode);
@@ -1006,6 +1007,7 @@ function normalizeUtilityInstances(saved = {}) {
       query: typeof pane?.query === "string" ? pane.query : "",
       codeFilters: pane?.codeFilters,
       historySplitRatio: pane?.historySplitRatio,
+      collapsedResultCodePrefixes: pane?.collapsedResultCodePrefixes,
       sortMode: pane?.sortMode,
       projectsMenuOpen: pane?.projectsMenuOpen,
       projectsArchiveMode: pane?.projectsArchiveMode,
@@ -2545,9 +2547,12 @@ function normalizeSavedInstance(instance) {
 }
 
 function normalizeSearchInstance(instance) {
-  if (!instance || typeof instance !== "object") return { query: "", codeFilters: [] };
+  if (!instance || typeof instance !== "object") {
+    return { query: "", codeFilters: [], collapsedResultCodePrefixes: [] };
+  }
   instance.query = typeof instance.query === "string" ? instance.query : "";
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
+  instance.collapsedResultCodePrefixes = normalizeSearchCodeFilters(instance.collapsedResultCodePrefixes);
   return instance;
 }
 
@@ -14884,7 +14889,7 @@ function updateSearchDock(panel, instance, resultCount = null) {
     summaryCopy.textContent = `Searching in ${scope}`;
     return;
   }
-  const countLabel = `${resultCount.toLocaleString()} ${resultCount === 1 ? "result" : "results"} in ${scope}`;
+  const countLabel = `${resultCount.toLocaleString()} shown in ${scope}`;
   summaryCopy.textContent = countLabel;
 }
 
@@ -15449,6 +15454,7 @@ async function renderSearchResults(panel, instance) {
 
 function appendSearchResultGroups(results, searchResults, query, searchInstance) {
   const groups = new Map();
+  const resultGroupsAreCollapsible = normalizeSearchCodeFilters(searchInstance?.codeFilters).length > 1;
   searchResults.forEach((result) => {
     const prefix = result.codePrefix || "BC";
     if (!groups.has(prefix)) groups.set(prefix, []);
@@ -15464,12 +15470,51 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       group.className = "search-result-group";
       group.classList.add(`code-theme-${codeTheme(prefix)}`);
       group.dataset.codePrefix = prefix;
-      const label = document.createElement("p");
+      const groupBody = document.createElement("div");
+      groupBody.className = "search-result-group-body";
+      groupBody.id = `search-result-group-${crypto.randomUUID()}`;
+      const label = document.createElement(resultGroupsAreCollapsible ? "button" : "p");
       label.className = "section-label search-group-label";
-      label.textContent = codeDisplayLabel(prefix);
-      group.append(label);
+      const labelText = document.createElement("span");
+      labelText.className = "search-group-label-text";
+      labelText.textContent = codeDisplayLabel(prefix);
+      label.append(labelText);
+      if (resultGroupsAreCollapsible) {
+        label.type = "button";
+        label.classList.add("search-result-group-toggle");
+        label.setAttribute("aria-controls", groupBody.id);
+        const meta = document.createElement("span");
+        meta.className = "search-result-group-meta";
+        const count = document.createElement("span");
+        count.className = "search-result-group-count";
+        const indicator = document.createElement("span");
+        indicator.className = "search-result-group-indicator";
+        indicator.setAttribute("aria-hidden", "true");
+        meta.append(count, indicator);
+        label.append(meta);
+        const normalizedPrefix = String(prefix || "BC").toUpperCase();
+        const initiallyCollapsed = normalizeSearchCodeFilters(searchInstance.collapsedResultCodePrefixes)
+          .includes(normalizedPrefix);
+        const syncToggleLabel = (expanded) => {
+          label.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} ${codeDisplayLabel(prefix)} results`);
+          indicator.textContent = expanded ? "−" : "+";
+        };
+        syncToggleLabel(!initiallyCollapsed);
+        wireProjectSectionMotion(group, groupBody, [label], codeDisplayLabel(prefix), !initiallyCollapsed, {
+          onChange: (expanded) => {
+            const collapsed = new Set(normalizeSearchCodeFilters(searchInstance.collapsedResultCodePrefixes));
+            if (expanded) collapsed.delete(normalizedPrefix);
+            else collapsed.add(normalizedPrefix);
+            searchInstance.collapsedResultCodePrefixes = Array.from(collapsed);
+            syncToggleLabel(expanded);
+            saveWorkspaceState();
+          }
+        });
+      }
+      group.append(label, groupBody);
       results.append(group);
     }
+    const groupBody = group.querySelector(".search-result-group-body") || group;
     groupResults.forEach((result) => {
       const detail = searchResultDetail(result);
       const row = document.createElement("article");
@@ -15540,8 +15585,11 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
       });
 
       row.append(mainButton, saveButton);
-      group.append(row);
+      groupBody.append(row);
     });
+    const loadedGroupCount = groupBody.querySelectorAll(".result-row").length;
+    const count = group.querySelector(".search-result-group-count");
+    if (count) count.textContent = loadedGroupCount.toLocaleString();
   });
 }
 
