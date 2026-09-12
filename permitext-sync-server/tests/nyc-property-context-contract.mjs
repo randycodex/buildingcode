@@ -104,6 +104,38 @@ assert.match(result.warnings.join(" "), /tax lot is not proof of zoning-lot comp
 assert.equal(fetchCalls.length, 3);
 assert.match(fetchCalls[1].searchParams.get("q") || "", /p\.bbl = '2028500003'/);
 
+const fallbackCalls = [];
+const fallbackResult = await lookupNYCPropertyContext("1760 Jerome Avenue, Bronx", {
+  fetchImpl: async (input) => {
+    const url = new URL(String(input));
+    fallbackCalls.push(url);
+    if (url.hostname === "search-api-production.herokuapp.com") {
+      return { ok: true, json: async () => [{
+        label: "1760 JEROME AVENUE, Bronx, NY, USA", bbl: "2028500003", type: "lot"
+      }] };
+    }
+    if (url.hostname === "carto.nycplanningdigital.com") throw new TypeError("fetch failed");
+    if (url.hostname === "data.cityofnewyork.us") {
+      return { ok: true, json: async () => [{
+        address: "1760 JEROME AVENUE", bbl: "2028500003.00000000", borough: "BX", borocode: "2",
+        block: "2850", lot: "3", zipcode: "10453", zonedist1: "R8A", spdist1: "J",
+        lotarea: "14000", numfloors: "14", transitzone: "Inner Transit Zone"
+      }] };
+    }
+    throw new Error(`Unexpected fallback request: ${url}`);
+  },
+  now: () => new Date(retrievedAt)
+});
+assert.equal(fallbackResult.bbl, "2028500003");
+assert.equal(fallbackResult.normalizedAddress, "1760 JEROME AVENUE, Bronx, NY 10453");
+assert.equal(fallbackResult.structuredFacts.find((fact) => fact.key === "zoning-districts")?.value, "R8A");
+assert.equal(fallbackResult.structuredFacts.find((fact) => fact.key === "transit-zone")?.value, "Inner Transit Zone");
+assert.equal(fallbackResult.structuredFacts.some((fact) => fact.key === "mih-area-options"), false,
+  "The fallback must omit unavailable mapped facts instead of asserting a false negative.");
+assert.deepEqual(fallbackResult.source.datasets, ["NYC Planning address search", "NYC Open Data PLUTO"]);
+assert.match(fallbackResult.warnings.join(" "), /mapped-area facts were unavailable/i);
+assert.equal(fallbackCalls.at(-1).searchParams.get("bbl"), "2028500003");
+
 const [serverSource, clientSource] = await Promise.all([
   readFile(new URL("../app.mjs", import.meta.url), "utf8"),
   readFile(new URL("../public/app.js", import.meta.url), "utf8")
