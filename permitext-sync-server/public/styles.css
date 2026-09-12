@@ -13762,12 +13762,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   gap: var(--space-1);
 }
 
-.notebook-report-status {
-  margin-right: auto;
-  color: var(--text-secondary);
-  font-size: 11px;
-}
-
 .notebook-research-draft {
   background: color-mix(in srgb, var(--accent-building) 12%, var(--surface));
 }
