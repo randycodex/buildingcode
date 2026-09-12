@@ -83,7 +83,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260912-centered-welcome-v65";
+} from "./offline-storage.js?v=20260912-welcome-preview-v66";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -118,7 +118,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260912-centered-welcome-v65";
+} from "./research-intent-state.js?v=20260912-welcome-preview-v66";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -569,7 +569,9 @@ let activeWorkspaceIssueAction = null;
 let activeWorkspaceIssueDismiss = null;
 let pendingResearchIntentResumePromise = null;
 let pendingResearchIntentInFlightID = "";
-let firstUseWelcomeActive = false;
+let localWelcomePreviewPending = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname)
+  && new URLSearchParams(window.location.search).get("preview") === "welcome";
+let firstUseWelcomeActive = localWelcomePreviewPending;
 
 applyReaderSettings();
 
@@ -33189,7 +33191,8 @@ function renderFirstUseWelcome() {
 
 function appendPaneSequence(panes) {
   closeActiveCustomSelect();
-  const orderedPanes = orderPanes(panes);
+  const orderedPanes = localWelcomePreviewPending ? [] : orderPanes(panes);
+  localWelcomePreviewPending = false;
   orderedPanes.forEach(ensureWorkspacePanelAccessibleName);
   const previousScrollLeft = track.scrollLeft;
   const nodes = [];
