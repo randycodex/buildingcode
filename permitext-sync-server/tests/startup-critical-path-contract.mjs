@@ -68,9 +68,7 @@ assert.equal(failed.finalState.codeTrustProfilesStatus, "unavailable");
 assert.equal(failed.finalState.startupCatalogPromise, null, "Failed metadata can be explicitly retried.");
 const quarantined = await sample(actualStart, { quarantined: true });
 assert.deepEqual(quarantined.events, ["bind", "auth-start", "auth-complete", "workspace"]);
-assert.equal(quarantined.issues.length, 1);
-assert.match(quarantined.issues[0], /Review recovery in Account → Data & Storage/);
-assert.match(quarantined.issues[0], /current workspace is available/);
+assert.equal(quarantined.issues.length, 0, "Retained data alone must not prompt at startup; recovery follows verified account sync.");
 const dismissedLegacy = await sample(actualStart, { quarantined: true, dismissed: true });
 assert.equal(dismissedLegacy.issues.length, 0, "Dismissed legacy notices must not reappear at startup.");
 

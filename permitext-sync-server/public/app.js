@@ -1,3 +1,4 @@
+import { planLegacyWorkspaceRestore, commitLegacyWorkspaceRestore, legacyWorkspaceRestoreReceipt } from "./legacy-workspace-restore.js?v=20260912-restore-v1";
 import {
   accountContextChangedError,
   accountRequestIdentity,
@@ -6,15 +7,13 @@ import {
   confirmedAccountLinkRecovery,
   migrateLegacyPrivateWorkspace,
   privateWorkspaceMigrationStatus,
-  legacyWorkspaceNoticeDismissed,
-  dismissLegacyWorkspaceNotice,
   legacyWorkspaceRecoveryReview,
   legacyWorkspaceRecoveryBundle,
   privateWorkspaceKeys,
   privateWorkspaceRecoverySnapshot,
   recordConfirmedAccountLinkRecovery,
   removePrivateWorkspace
-} from "./private-workspace-state.js?v=20260908-account-recovery-v7";
+} from "./private-workspace-state.js?v=20260912-account-recovery-v8";
 import {
   inlineCodeReferencePhrases,
   parseCodeJumpAnchor,
@@ -84,7 +83,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260912-integrated-workspace-v63";
+} from "./offline-storage.js?v=20260912-workspace-restore-v64";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -119,7 +118,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260912-integrated-workspace-v63";
+} from "./research-intent-state.js?v=20260912-workspace-restore-v64";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -8331,6 +8330,54 @@ async function accountLocalRecoveryBundle(sourceUserID, identity = captureAccoun
   };
 }
 
+function recoverVerifiedLegacyWorkspace(identity, latestSummary) {
+  if (!identity?.userID || !isCurrentAccountRequest(identity) || workspaceRestoreError || workspaceMigrationError) return;
+  try {
+    if (privateWorkspaceMigrationStatus(localStorage).status !== "quarantined") return;
+    if (!legacyWorkspaceRecoveryReview(localStorage, identity.userID).ownershipVerified) return;
+    if (legacyWorkspaceRestoreReceipt(localStorage, identity.userID)) return;
+    requirePrivateWorkspaceWritable();
+    saveWorkspaceState();
+    const clearRecords = [...currentBulkClearRecords(), ...(latestSummary.codeVersionClears || [])];
+    const plan = planLegacyWorkspaceRestore(localStorage, identity.userID, {
+      summary: latestSummary,
+      recordKey: (field, item) => field === "localSavedItems" ? savedEvidenceKey(item) :
+        field === "localProjects" ? projectRecordID(item) : String(item.id || ""),
+      allowLegacyNotes: !(clearRecords.length || Object.keys(state.sectionNotes || {}).length ||
+        state.localAnnotations?.length || latestSummary.annotations?.length),
+      acceptRecord: (field, item) => recordSurvivesBulkClear(item, clearRecords,
+        field === "localProjects" ? ["folders"] : field === "localAnnotations" ? ["notes", "tags", "highlights"] : ["bookmarks", "folders"])
+    });
+    requireCurrentAccountRequest(identity);
+    const restored = commitLegacyWorkspaceRestore(localStorage, plan);
+    if (!plan.alreadyRestored) {
+      Object.assign(state, plan.shared);
+      workspaceRegistry = plan.registry;
+      const hasOpenWork = workspaceLayoutHasVisiblePanes({ ...state,
+        utilities: { ...state.utilities, settings: false },
+        utilityInstances: (state.utilityInstances || []).filter(item => item.key !== "settings")
+      });
+      // Preserve an existing workspace; show recovered work automatically only
+      // when the account has no open work to displace.
+      if (!hasOpenWork) {
+        const layout = loadWorkspaceSnapshot(restored.workspaceIDs[0]);
+        if (layout) {
+          activeWorkspaceID = restored.workspaceIDs[0];
+          applyStoredWorkspaceLayout(layout);
+          persistWorkspaceRegistry();
+        }
+      }
+      renderWorkspaceTabs();
+    }
+  } catch {
+    // A recovery failure must not make a successful server sync look offline.
+    // Originals remain available and the next successful sync retries.
+    if (isCurrentAccountRequest(identity)) {
+      presentWorkspaceIssue("Some older work could not be recovered automatically. Your current account is available. Review older workspace data in Account → Data & Storage; avoid clearing site data.");
+    }
+  }
+}
+
 function appendLegacyWorkspaceRecoveryControls(container, identity = captureAccountRequest()) {
   if (privateWorkspaceMigrationStatus(localStorage).status !== "quarantined") return;
   const region = document.createElement("div");
@@ -8361,10 +8408,49 @@ function appendLegacyWorkspaceRecoveryControls(container, identity = captureAcco
         : `${review.retainedEntries} older browser storage records remain preserved. ` +
           (review.unreadableEntries ? `${review.unreadableEntries} could not be read; recovery may be partial. ` : "") +
           (review.ownershipVerified
-            ? "Their recorded owner matches this account. Download a recovery copy for review; it does not replace or sync your current workspace. External images and server-only data are not included."
+            ? "Their recorded owner matches this account. Compatible work is recovered automatically after syncing. Current content takes priority. Conflicting records, older queued edits and unsupported content stay preserved for review; external images and server-only data are not included."
             : "Ownership could not be verified for this account. Sign in to the original account and review again, or contact support. Contents remain isolated. Avoid clearing site data.");
       details.append(summary);
+      if (!review.signedIn && review.retainedEntries) {
+        const signIn = document.createElement("button");
+        signIn.type = "button";
+        signIn.className = "settings-secondary-button";
+        signIn.textContent = "Sign in to recover";
+        signIn.addEventListener("click", async () => {
+          if (!isCurrentAccountRequest(identity)) return;
+          signIn.disabled = true;
+          try {
+            await signInCurrentBrowser();
+            organizationWorkspace = null;
+            organizationLoadPromise = null;
+            await renderWorkspace();
+            await focusUtility("settings", ".legacy-workspace-review");
+            const reviewControl = document.querySelector(".legacy-workspace-review");
+            if (reviewControl?.getAttribute("aria-expanded") === "false") reviewControl.click();
+            startForegroundSyncLoop({ immediate: true });
+          } catch (error) { status.textContent = error.message; }
+          finally { signIn.disabled = false; }
+        });
+        details.append(signIn);
+      }
       if (review.recovery === "export-available") {
+        const restored = legacyWorkspaceRestoreReceipt(localStorage, identity.userID);
+        if (restored) {
+          status.textContent = `Automatically recovered ${restored.workspaceIDs.length} workspace(s) and ${restored.restoredRecords} saved record(s) in this browser. Current work was preserved. Any conflicting or unsupported records remain in the recovery copy.`;
+          const open = document.createElement("button");
+          open.type = "button";
+          open.className = "settings-secondary-button";
+          open.textContent = "Open recovered workspace";
+          open.addEventListener("click", async () => {
+            if (!isCurrentAccountRequest(identity)) return;
+            try {
+              if (!(await switchWorkspace(restored.workspaceIDs[0]))) status.textContent = "The recovered workspace is no longer available in the workspace menu. The original recovery copy is still preserved.";
+            } catch (error) { status.textContent = error.message; }
+          });
+          details.append(open);
+        } else {
+          status.textContent = "Recovery runs automatically after your account finishes syncing. If you are offline, it will retry when you reconnect.";
+        }
         const download = document.createElement("button");
         download.type = "button";
         download.className = "settings-secondary-button";
@@ -8821,6 +8907,7 @@ async function loadSyncedContent(options = {}) {
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       await applyRemoteContinuityIfNewer();
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
+      recoverVerifiedLegacyWorkspace(identity, syncedContent.summary);
       await saveOfflineSyncSnapshot(account.userID, syncedContent).catch(() => {});
       if (!isCurrentAccountRequest(identity) || syncLoadPromise !== request) return syncedContent;
       foregroundSyncLastFullPullAt = Date.now();
@@ -37377,20 +37464,8 @@ async function start() {
   }
   if (workspaceMigrationError && activeAccount()?.userID === initialPersistedAccount?.userID) {
     void showWebNotice("Saved workspace recovery needed", "This browser could not finish moving your existing workspace into account-specific storage. The original saved data is still present. Free browser storage, then reload to retry; avoid clearing site data.");
-  } else if (!workspaceRestoreError && privateWorkspaceMigrationStatus(localStorage).status === "quarantined" && !legacyWorkspaceNoticeDismissed(localStorage)) {
-    presentWorkspaceIssue("Older workspace data is preserved separately. Review recovery in Account → Data & Storage. Your current workspace is available.", {
-      actionLabel: "Review",
-      onAction: async () => {
-        await focusUtility("settings", ".legacy-workspace-review");
-        const button = document.querySelector(".legacy-workspace-review");
-        const cardToggle = button?.closest(".settings-card")?.querySelector(".settings-card-toggle");
-        if (cardToggle?.getAttribute("aria-expanded") === "false") cardToggle.click();
-        if (button?.getAttribute("aria-expanded") === "false") button.click();
-        requestAnimationFrame(() => button?.scrollIntoView({ block: "center" }));
-      },
-      onDismiss: () => dismissLegacyWorkspaceNotice(localStorage)
-    });
   }
+
   track.scrollLeft = Math.min(
     Number(state.trackScrollLeft) || 0,
     Math.max(0, track.scrollWidth - track.clientWidth)
