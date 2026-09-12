@@ -3475,7 +3475,11 @@ function activePaneIDs() {
     !isProjectWorkboardPaneID(id) &&
     !isCodeQuestionPaneID(id)
   );
-  const conversationPaneIDs = openResearchConversationPaneIDs();
+  // Unified Research columns keep their position when switching from History
+  // to a conversation. Only legacy standalone conversation panes are paired.
+  const conversationPaneIDs = openResearchConversationPaneIDs().filter((id) =>
+    id.startsWith("research:conversation:")
+  );
   if (conversationPaneIDs.length) {
     conversationPaneIDs.forEach((conversationPaneID) => {
       const existingConversationIndex = paired.indexOf(conversationPaneID);
