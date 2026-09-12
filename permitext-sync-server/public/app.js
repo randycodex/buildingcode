@@ -19600,35 +19600,7 @@ async function renderResearch(paneID = "utility:analysis") {
     const expanded = panel.classList.toggle("is-history-open");
     historyButton.setAttribute("aria-expanded", String(expanded));
   });
-  const newChatButton = document.createElement("button");
-  newChatButton.type = "button";
-  newChatButton.className = "ghost-button research-new-chat";
-  newChatButton.textContent = "New chat";
-  newChatButton.hidden = !conversationOpen || historyShowing;
-  newChatButton.addEventListener("click", () => {
-    if (instance) {
-      const oldIndex = supplementalResearchConversationIDs.indexOf(instance.conversationID);
-      if (oldIndex >= 0) supplementalResearchConversationIDs.splice(oldIndex, 1);
-      instance.conversationID = "";
-      instance.historyShowing = false;
-      saveWorkspaceState();
-      void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-      return;
-    }
-    if (researchConversationPaneIsOpen()) {
-      researchConversationPaneOpened = false;
-      researchHistoryShowing = false;
-      state.researchConversationID = "";
-      activeResearchConversation = null;
-      saveWorkspaceState();
-      void transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
-      return;
-    }
-    panel.classList.remove("is-history-open");
-    historyButton.setAttribute("aria-expanded", "false");
-    panel.querySelector(".research-question-input")?.focus();
-  });
-  panelActions?.prepend(newChatButton, historyButton);
+  panelActions?.prepend(historyButton);
   if (conversationOpen && !historyShowing) {
     panel.classList.add("has-inline-conversation");
     content.remove();
