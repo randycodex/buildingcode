@@ -16217,7 +16217,28 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 
 .settings-offline-status:empty { display: none; }
 
+.notebook-draft-status {
+  position: absolute;
+  z-index: 4;
+  left: var(--space-4);
+  bottom: calc(var(--panel-padding) + var(--space-4));
+  max-width: calc(100% - 190px);
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.22);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
 .notebook-draft-status:empty { display: none; }
+
+.notebook-draft-status button {
+  min-height: 28px;
+  margin-left: var(--space-2);
+  padding: 4px 8px;
+}
 
 .report-draft-panel :is(.report-draft-blocks, .report-source-group, .report-output-section).project-section-motion {
   overflow: hidden;

@@ -22243,7 +22243,7 @@ async function renderProjectNotebook(project) {
   const draftStatus = document.createElement("p");
   draftStatus.className = "notebook-status notebook-draft-status";
   draftStatus.setAttribute("role", "status");
-  header.after(draftStatus);
+  panel.append(draftStatus);
   const showDraftStatus = (message) => {
     if (isCurrentAccountRequest(requestIdentity)) draftStatus.textContent = message === "Synced" ? "" : message;
   };
