@@ -3259,7 +3259,7 @@ function defaultPaneWidthForID(paneID) {
   if (isProjectCoordinationPaneID(paneID)) return defaultCoordinationPaneWidth;
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
   if (paneID === "utility:saved" || paneID.startsWith("utility:saved:")) return defaultSavedPaneWidth;
-  if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultResearchPaneWidth;
+  if (paneID === "utility:analysis" || paneID.startsWith("utility:analysis:") || paneID.startsWith("research:conversation:")) return defaultResearchPaneWidth;
   if (paneID === "utility:settings") return defaultSettingsPaneWidth;
   if (paneID === "utility:search" || paneID.startsWith("utility:search:")) return defaultSearchPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
@@ -3272,6 +3272,7 @@ function defaultPaneWidthForID(paneID) {
 }
 
 function migrateLegacyPaneWidth(paneID, value) {
+  if (paneID.startsWith("utility:analysis:") && value === defaultUtilityPaneWidth) return defaultResearchPaneWidth;
   if ((paneID === "utility:saved" || paneID.startsWith("utility:saved:")) && value === defaultUtilityPaneWidth) {
     return defaultSavedPaneWidth;
   }
