@@ -19420,6 +19420,7 @@ function researchFailureMessage(error) {
 function renderNewResearchComposer(container, researchEnabled) {
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
+  form.classList.add("research-compact-composer");
   const currentProject = workspaceProject();
   const initialProjectID = currentProject ? projectDetailKey(currentProject) : "";
   const projectPreview = researchProjectContextPreview(initialProjectID);
@@ -19427,7 +19428,7 @@ function renderNewResearchComposer(container, researchEnabled) {
   composerBox.className = "research-composer-box";
   const input = document.createElement("textarea");
   input.className = "research-question-input";
-  input.rows = 3;
+  input.rows = 1;
   input.maxLength = 2000;
   input.placeholder = researchChatPlaceholder;
   input.value = researchQuestionDraft;
@@ -19444,8 +19445,14 @@ function renderNewResearchComposer(container, researchEnabled) {
   };
   input.addEventListener("input", () => {
     researchQuestionDraft = input.value;
+    resizeComposer();
     updateSendState();
   });
+  const resizeComposer = () => {
+    input.style.height = "auto";
+    input.style.height = `${Math.min(180, Math.max(48, input.scrollHeight))}px`;
+    input.style.overflowY = input.scrollHeight > 180 ? "auto" : "hidden";
+  };
   bindResearchSendShortcut(input, form);
   if (!researchEnabled) {
     input.disabled = true;
@@ -19537,9 +19544,10 @@ function renderNewResearchComposer(container, researchEnabled) {
   const verificationNote = document.createElement("p");
   verificationNote.className = "research-verification-note";
   verificationNote.textContent = "AI-assisted. Verify against cited code.";
-  input.placeholder = "Ask a question…";
+  input.placeholder = currentProject?.name ? `Ask about ${currentProject.name}…` : "Ask a research question…";
   form.append(composerTools, composerBox, status, verificationNote);
   container.append(form);
+  requestAnimationFrame(resizeComposer);
 }
 
 async function renderResearch(paneID = "utility:analysis") {
@@ -19873,7 +19881,7 @@ async function renderResearch(paneID = "utility:analysis") {
       metaRow.className = "research-conversation-meta";
       const meta = document.createElement("span");
       meta.className = "research-conversation-date";
-      meta.textContent = researchConversationDate(conversation.createdAt);
+      meta.textContent = researchConversationDate(conversation.updatedAt || conversation.createdAt);
       const projectPill = document.createElement("span");
       projectPill.className = "research-conversation-project-pill";
       projectPill.textContent = conversation.primaryProjectID
@@ -19885,8 +19893,11 @@ async function renderResearch(paneID = "utility:analysis") {
       if (conversationProject) {
         projectPill.style.setProperty("--project-color", projectColor(conversationProject));
       }
-      metaRow.append(meta, projectPill);
-      openButton.append(title, metaRow);
+      const preview = document.createElement("span");
+      preview.className = "research-conversation-preview";
+      preview.textContent = String(conversation.starterQuestion || "").replace(/\s+/g, " ").trim();
+      preview.hidden = !preview.textContent || preview.textContent === title.textContent;
+      openButton.append(title, meta, preview);
       openButton.addEventListener("click", () => {
         if (selectingConversations) {
           toggleConversationSelection(conversation.id);

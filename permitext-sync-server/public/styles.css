@@ -16500,6 +16500,48 @@ html body *:has(:focus-visible) {
   color: var(--text-tertiary);
   font-size: 11px;
 }
+
+.research-compact-composer .research-question-input {
+  min-height: 48px;
+  max-height: 180px;
+  padding: 14px 76px 14px 16px;
+  line-height: 20px;
+  background: transparent;
+  box-sizing: border-box;
+}
+.research-compact-composer .research-send-button {
+  min-height: 32px;
+  height: 32px;
+}
+.research-list-panel .research-conversation-row {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+}
+.research-list-panel .research-conversation-open {
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 12px;
+  padding: 16px 0;
+}
+.research-list-panel .research-conversation-open strong {
+  grid-column: 1;
+  white-space: nowrap;
+}
+.research-list-panel .research-conversation-date {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+.research-conversation-preview {
+  grid-column: 1;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
 .research-list-panel.research-clean-start .research-composer-status:empty { display: none; }
 .research-list-panel.research-clean-start .research-history-toggle,
 .research-list-panel.research-clean-start .research-new-chat {
