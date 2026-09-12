@@ -19589,11 +19589,7 @@ async function renderResearch(paneID = "utility:analysis") {
   panelActions?.prepend(cancelSelectionButton, selectAllButton, deleteSelectedButton, selectHistoryButton);
   const content = panel.querySelector(".analysis-content");
 
-  const welcome = document.createElement("p");
   panel.classList.toggle("research-clean-start", Boolean(activeAccount()) && hasCapability("research"));
-  welcome.className = "research-chat-welcome";
-  welcome.textContent = "What would you like to research?";
-  content.before(welcome);
   const historyButton = document.createElement("button");
   historyButton.type = "button";
   historyButton.className = "ghost-button research-history-toggle";

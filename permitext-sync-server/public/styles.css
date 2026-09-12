@@ -16556,7 +16556,11 @@ html body *:has(:focus-visible) {
   font-size: 12px;
   height: 28px;
   min-height: 28px;
-  padding: 0 6px;
+  padding: 3px 7px;
   border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--code-accent, var(--accent-building)) 12%, transparent);
+  color: var(--code-accent, var(--accent-building));
+  font-weight: 400;
   box-shadow: none;
 }
