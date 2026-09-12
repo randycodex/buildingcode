@@ -29038,9 +29038,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         renderSavedItemsByCode(content, orderedItems, paneID, commonRenderOptions);
       }
     } else if (selectedFolder && resolvedItems.length === 0 && !searchActive) {
-      appendEmptySaved(content, "No saved evidence yet", folderIsProject(selectedFolder)
-        ? "Save a passage from Reader or Search, then add it to this Project."
-        : "Save a passage from Reader or Search, then add it to this Reference.");
+      // Keep an empty destination blank beneath its Saved Evidence heading.
     } else if (combinedItems.length > 0) {
       appendEmptySaved(content, "No saved items match", selectedFolder
         ? "Try another search or code book, or add evidence to this destination."
