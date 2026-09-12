@@ -32221,12 +32221,12 @@ function renderSettings() {
     policyAcceptance.disabled = pro || !account || !currentPolicyConfiguration?.configured;
     planSecondaryButton.hidden = !account || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
-    accountCopy.hidden = false;
+    accountCopy.hidden = Boolean(account);
     signOutButton.hidden = !account;
     deleteAccountButton.hidden = !account;
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
-    accountCopy.textContent = settingsAccountSummary(account ? state.account : null);
+    accountCopy.textContent = account ? "" : settingsAccountSummary(null);
     renderSyncConflictReview();
     renderPlanUsageRows(planUsage);
     renderResearchPacks();
