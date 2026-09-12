@@ -1631,7 +1631,12 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
   menu.append(divider);
   const actions = [
     { label: "New Project", run: () => void createNewWorkspace() },
-    { label: workspace.projectID ? "Rename Project" : "Rename workspace", run: () => beginWorkspaceRename(workspaceID) },
+    { label: workspace.projectID ? "Edit Project" : "Rename workspace", run: () => {
+      if (!workspace.projectID) return beginWorkspaceRename(workspaceID);
+      const project = workspaceProject();
+      if (project) showProjectCreateSheet(track, project);
+    } },
+    { label: "Manage Projects…", run: () => openProjectManager() },
     ...(workspace.projectID ? [{ label: "Archive Project", danger: true, separated: true, run: async () => {
       const project = workspaceProject();
       if (project) {
@@ -25084,9 +25089,12 @@ async function deleteArchivedProjects(projects, options = {}) {
   if (!eligibleProjects.length) return false;
   const count = eligibleProjects.length;
   const recordLabel = folderRecordCountLabel(eligibleProjects);
+  const names = options.includeNames
+    ? `\n\n${eligibleProjects.map((project) => project.name || project.title || "Project").join("\n")}\n\nSaved bookmarks will remain.`
+    : "";
   const confirmed = await confirmWebWarning(
     `Delete ${recordLabel}`,
-    `This will permanently delete ${recordLabel}. This cannot be undone.`,
+    `This will permanently delete ${recordLabel}. This cannot be undone.${names}`,
     { confirmLabel: "Delete" }
   );
   requireCurrentAccountRequest(requestIdentity);
@@ -27419,6 +27427,161 @@ async function openProjectSavedSection(project, item) {
   alignReaderSectionAfterLayout(reader);
 }
 
+function openProjectManager() {
+  document.querySelector(".project-manager-backdrop")?.remove();
+  const requestIdentity = captureAccountRequest();
+  const backdrop = document.createElement("div");
+  backdrop.className = "project-manager-backdrop";
+  const dialog = document.createElement("section");
+  dialog.className = "project-manager";
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-label", "Manage Projects");
+  backdrop.append(dialog);
+  document.body.append(backdrop);
+  let archived = false;
+  let selecting = false;
+  let busy = false;
+  const selected = new Set();
+  const close = () => {
+    if (busy) return;
+    backdrop.remove();
+    document.querySelector("#workspace-actions")?.focus();
+  };
+  backdrop.addEventListener("keydown", (event) => {
+    if (backdrop.querySelector(".project-sheet-overlay")) return;
+    if (event.key === "Escape") { event.preventDefault(); close(); }
+    else trapWebModalFocus(dialog, event);
+  });
+  const render = () => {
+    if (!isCurrentAccountRequest(requestIdentity)) { backdrop.remove(); return; }
+    const records = visibleProjectRecords(currentContentSummary().projects || [])
+      .filter((project) => folderIsProject(project) && !project.sharedOnly && projectIsArchived(project) === archived);
+    const ids = new Set(records.map(projectRecordID));
+    selected.forEach((id) => { if (!ids.has(id)) selected.delete(id); });
+    dialog.replaceChildren();
+    const button = (label, action, parent, disabled = false) => {
+      const control = document.createElement("button");
+      control.type = "button";
+      control.textContent = label;
+      control.disabled = busy || disabled;
+      control.addEventListener("click", action);
+      parent.append(control);
+      return control;
+    };
+    const header = document.createElement("header");
+    const title = document.createElement("h2");
+    title.textContent = "Manage Projects";
+    header.append(title);
+    button("Close", close, header);
+    const tabs = document.createElement("nav");
+    tabs.setAttribute("aria-label", "Project status");
+    [false, true].forEach((value) => {
+      const tab = button(value ? "Archived" : "Active", () => {
+        archived = value; selected.clear(); render();
+      }, tabs);
+      tab.setAttribute("aria-pressed", String(archived === value));
+    });
+    const toolbar = document.createElement("div");
+    toolbar.className = "project-manager-toolbar";
+    button(selecting ? "Done" : "Select", () => {
+      selecting = !selecting; selected.clear(); render();
+    }, toolbar, !records.length && !selecting);
+    if (selecting) {
+      button(selected.size === records.length && records.length ? "Deselect All" : "Select All", () => {
+        if (selected.size === records.length) selected.clear();
+        else records.forEach((project) => selected.add(projectRecordID(project)));
+        render();
+      }, toolbar, !records.length);
+      const count = document.createElement("span");
+      count.textContent = `${selected.size} selected`;
+      count.setAttribute("role", "status");
+      toolbar.append(count);
+    }
+    const list = document.createElement("div");
+    list.className = "project-manager-list";
+    if (!records.length) {
+      const empty = document.createElement("p");
+      empty.textContent = archived ? "No archived projects." : "No active projects.";
+      list.append(empty);
+    }
+    records.forEach((project) => {
+      const row = document.createElement("div");
+      row.className = "project-manager-row";
+      const name = project.name || project.title || "Project";
+      const copy = document.createElement("label");
+      if (selecting) {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = selected.has(projectRecordID(project));
+        checkbox.disabled = busy;
+        checkbox.setAttribute("aria-label", `Select ${name}`);
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) selected.add(projectRecordID(project));
+          else selected.delete(projectRecordID(project));
+          render();
+          listFocus(projectRecordID(project));
+        });
+        checkbox.dataset.projectId = projectRecordID(project);
+        copy.append(checkbox);
+      }
+      const text = document.createElement("span");
+      const heading = document.createElement("strong");
+      heading.textContent = name;
+      text.append(heading);
+      if (project.address) {
+        const address = document.createElement("small");
+        address.textContent = project.address;
+        text.append(address);
+      }
+      copy.append(text);
+      row.append(copy);
+      button("Edit", () => showProjectCreateSheet(backdrop, project, { onSaved: render }), row)
+        .setAttribute("aria-label", `Edit ${name}`);
+      list.append(row);
+    });
+    const actions = document.createElement("footer");
+    const run = async (kind) => {
+      const chosen = records.filter((project) => selected.has(projectRecordID(project)));
+      if (!chosen.length || busy) return;
+      busy = true; render();
+      try {
+        if (kind === "delete") {
+          if (!(await deleteArchivedProjects(chosen, { includeNames: true }))) return;
+        } else if (archived) {
+          for (const project of chosen) {
+            requireCurrentAccountRequest(requestIdentity);
+            await restoreArchivedProject(project);
+          }
+        } else {
+          await archiveProjects(chosen);
+        }
+        requireCurrentAccountRequest(requestIdentity);
+        if (activeWorkspaceRecord()?.projectID && !workspaceProject()) {
+          const main = workspaceRegistry.workspaces.find((workspace) => !workspace.projectID);
+          if (main) await switchWorkspace(main.id, { focus: false });
+        }
+        selected.clear();
+      } catch (error) {
+        if (isCurrentAccountRequest(requestIdentity)) await showWebNotice("Could not update projects", error.message);
+      } finally {
+        busy = false; render();
+        dialog.querySelector("header button")?.focus();
+      }
+    };
+    if (selecting) {
+      button(archived ? "Restore Selected" : "Archive Selected", () => void run("archive"), actions, !selected.size);
+      button("Delete Selected", () => void run("delete"), actions, !selected.size).className = "is-danger";
+    }
+    dialog.append(header, tabs, toolbar, list, actions);
+  };
+  const listFocus = (id) => {
+    [...dialog.querySelectorAll("input[data-project-id]")].find((input) => input.dataset.projectId === id)?.focus();
+  };
+  render();
+  dialog.querySelector("header button")?.focus();
+}
+
 function showProjectCreateSheet(panel, project = null, options = {}) {
   panel.querySelector(".project-sheet-overlay")?.remove();
   const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -27631,6 +27794,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   overlay.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       event.preventDefault();
+      event.stopPropagation();
       closeSheet();
       return;
     }
@@ -27676,6 +27840,8 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
       });
       refreshOpenAnnotationProjectEditors();
       restoreSheetFocus();
+      options.onSaved?.();
+      if (options.onSaved) panel.querySelector(".project-manager header button")?.focus();
     } catch (error) {
       saveButton.disabled = false;
       const content = panel.querySelector(".projects-content, .saved-project-list");

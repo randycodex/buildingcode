@@ -10819,6 +10819,60 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   overflow: hidden;
 }
 
+.project-manager-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.54);
+}
+
+.project-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(560px, 100%);
+  max-height: calc(100dvh - 40px);
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.project-manager header,
+.project-manager nav,
+.project-manager-toolbar,
+.project-manager footer,
+.project-manager-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.project-manager header { justify-content: space-between; }
+.project-manager h2 { margin: 0; font-size: 18px; }
+.project-manager button {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--text-primary));
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.project-manager button:disabled { opacity: 0.4; cursor: default; }
+.project-manager button[aria-pressed="true"] { background: #414141; }
+.project-manager button.is-danger { color: #f16e72; }
+.project-manager-list { overflow-y: auto; min-height: 80px; }
+.project-manager-row { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.project-manager-row label { display: flex; flex: 1; min-width: 0; gap: 12px; align-items: center; font-size: 14px; text-transform: none; color: var(--text-primary); }
+.project-manager-row input[type="checkbox"] { width: 16px; height: 16px; flex: 0 0 16px; }
+.project-manager-row strong,
+.project-manager-row small { display: block; overflow-wrap: anywhere; }
+.project-manager-row small { margin-top: 4px; color: var(--text-secondary); }
+.project-manager footer { flex-wrap: wrap; }
+
 .project-sheet-overlay {
   position: absolute;
   inset: 0;
