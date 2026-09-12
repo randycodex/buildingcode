@@ -13400,8 +13400,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   column-gap: var(--space-3);
   min-height: 28px;
   padding: var(--space-1) 0;
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--project-color) 30%, var(--menu-surface));
 }
 
 .notebook-card-row.is-active-title small {
@@ -13420,7 +13418,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   border-radius: 0;
   outline: 0;
   background: transparent;
-  color: color-mix(in srgb, var(--project-color) 35%, var(--text-primary));
+  color: color-mix(in srgb, var(--project-color) 72%, #fff);
   font: inherit;
   font-weight: 400;
 }
@@ -13451,9 +13449,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .notebook-card-tile:hover strong,
-.notebook-card-tile[aria-pressed="true"] strong,
-.notebook-card-row.is-selected .notebook-card-tile strong {
+.notebook-card-tile[aria-pressed="true"] strong {
   color: color-mix(in srgb, var(--project-color) 35%, var(--text-primary));
+}
+
+.notebook-card-row.is-selected .notebook-card-tile strong {
+  color: color-mix(in srgb, var(--project-color) 72%, #fff);
 }
 
 .notebook-card-tile small {
