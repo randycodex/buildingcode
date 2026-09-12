@@ -22895,7 +22895,8 @@ async function renderProjectNotebook(project) {
 
     const updateNotebookCardManagement = () => {
       const visibleCards = cards.filter((card) => Boolean(card.archivedAt) === showingArchivedCards);
-      railHeader.hidden = visibleCards.length === 0;
+      const hasUnsavedActiveCard = !showingArchivedCards && Boolean(activeCard && !activeCard.id);
+      railHeader.hidden = visibleCards.length === 0 && !hasUnsavedActiveCard;
       rail.classList.toggle("is-selecting-cards", selectingCards);
       rail.classList.toggle("is-showing-archived-cards", showingArchivedCards);
       railLabel.textContent = showingArchivedCards ? "Archive" : cardMenuState.cardsMenuOpen ? "" : "Notes";
@@ -22927,14 +22928,23 @@ async function renderProjectNotebook(project) {
     };
 
     function renderCardList() {
+      const focusedTitleEditor = document.activeElement?.classList.contains("notebook-card-list-title-editor")
+        ? {
+            cardID: document.activeElement.dataset.cardId || "",
+            selectionStart: document.activeElement.selectionStart,
+            selectionEnd: document.activeElement.selectionEnd
+          }
+        : null;
       cardList.replaceChildren();
-      if (!cards.length) {
+      const unsavedActiveCard = !showingArchivedCards && activeCard && !activeCard.id ? activeCard : null;
+      if (!cards.length && !unsavedActiveCard) {
         setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
       updateNotesMenu();
         updateNotebookCardManagement();
         return;
       }
       const visibleCards = cards.filter((card) => Boolean(card.archivedAt) === showingArchivedCards);
+      if (unsavedActiveCard) visibleCards.unshift(unsavedActiveCard);
       if (!visibleCards.length) {
         if (showingArchivedCards) {
           const empty = document.createElement("p");
@@ -22951,6 +22961,37 @@ async function renderProjectNotebook(project) {
         const row = document.createElement("article");
         row.className = "notebook-card-row";
         row.dataset.cardId = card.id;
+        const isActiveCard = activeCard === card || (Boolean(card.id) && activeCard?.id === card.id);
+        if (isActiveCard && !selectingCards && !showingArchivedCards) {
+          row.classList.add("is-active-title");
+          const titleEditor = document.createElement("input");
+          titleEditor.className = "notebook-card-list-title-editor";
+          titleEditor.type = "text";
+          titleEditor.maxLength = 300;
+          titleEditor.placeholder = "Note title";
+          titleEditor.value = card.title || "";
+          titleEditor.dataset.cardId = card.id || "";
+          titleEditor.setAttribute("aria-label", "Edit Note title");
+          titleEditor.disabled = notebookReadOnly;
+          const meta = document.createElement("small");
+          meta.textContent = card.id
+            ? `${card.referenceCount || 0} linked · ${researchRelativeDate(card.updatedAt)}`
+            : "New note";
+          titleEditor.addEventListener("input", () => {
+            if (disposed || !isCurrentAccountRequest(requestIdentity) || activeCard !== card && activeCard?.id !== card.id) return;
+            card.title = titleEditor.value;
+            activeCard.title = titleEditor.value;
+            markNotebookDirty();
+          });
+          titleEditor.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter") return;
+            event.preventDefault();
+            titleEditor.blur();
+          });
+          row.append(titleEditor, meta);
+          cardList.append(row);
+          return;
+        }
         const button = document.createElement("button");
         button.className = "notebook-card-tile";
         button.type = "button";
@@ -22975,6 +23016,14 @@ async function renderProjectNotebook(project) {
       setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
       updateNotesMenu();
       updateNotebookCardManagement();
+      if (focusedTitleEditor) {
+        const titleEditor = Array.from(cardList.querySelectorAll(".notebook-card-list-title-editor"))
+          .find((input) => input.dataset.cardId === focusedTitleEditor.cardID);
+        if (titleEditor) {
+          titleEditor.focus({ preventScroll: true });
+          titleEditor.setSelectionRange(focusedTitleEditor.selectionStart, focusedTitleEditor.selectionEnd);
+        }
+      }
     }
 
     refreshNotebookCards = async () => {
@@ -23047,18 +23096,6 @@ async function renderProjectNotebook(project) {
         return;
       }
       const focusedCardID = activeCard.id;
-
-      const fields = document.createElement("div");
-      fields.className = "notebook-card-fields";
-      const titleInput = document.createElement("input");
-      titleInput.className = "notebook-card-title";
-      titleInput.type = "text";
-      titleInput.maxLength = 300;
-      titleInput.placeholder = "Analysis title";
-      titleInput.setAttribute("aria-label", "Notebook Note title");
-      titleInput.value = activeCard.title;
-      titleInput.disabled = notebookReadOnly;
-      fields.append(titleInput);
 
       const toolbar = document.createElement("div");
       toolbar.className = "notebook-toolbar code-filter-menu notebook-reference-menu";
@@ -23273,19 +23310,13 @@ async function renderProjectNotebook(project) {
       footer.append(footerActions);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      const focusedContent = [fields, toolbar, editorElement];
+      const focusedContent = [toolbar, editorElement];
       if (!researchButton.hidden || !coordinateButton.hidden) focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 
-      titleInput.addEventListener("input", () => {
-        if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence) return;
-        activeCard.title = titleInput.value;
-        markNotebookDirty();
-      });
-
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
-        autofocus: !notebookReadOnly && !activeCard.id,
+        autofocus: false,
         editable: !notebookReadOnly,
         uploadFile: (file) => uploadNotebookAsset(projectID, file, activeCard.id, requestIdentity).catch((error) => {
           void showWebNotice("Image not added", error.message);
@@ -23303,6 +23334,9 @@ async function renderProjectNotebook(project) {
         },
         onOpenReference: null
       });
+      if (!notebookReadOnly && !activeCard.id) {
+        cardList.querySelector(".notebook-card-list-title-editor")?.focus({ preventScroll: true });
+      }
       researchButton.addEventListener("click", async () => {
         const bodyText = String(editorElement.innerText || activeCard.plainText || "").trim();
         researchQuestionDraft = bodyText || activeCard.title;

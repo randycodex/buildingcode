@@ -1558,7 +1558,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-projects-archive-button[hidden]") &&
         !workspaceScript.text.includes('selectionCount.className = "saved-projects-bulk-count"') &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        workspaceStyles.text.includes(".notebook-card-title {\n  display: block;\n  width: 100%;") &&
+        workspaceStyles.text.includes(".notebook-card-list-title-editor {\n  width: 100%;") &&
         workspaceStyles.text.includes(".reader-code-heading {\n  position: relative;\n  z-index: 30;\n  display: flex;") &&
         workspaceStyles.text.includes(".reader-code-heading .reader-code-picker .custom-select,\n.reader-code-heading .reader-code-picker .custom-select-trigger {\n  width: max-content;") &&
         workspaceScript.text.includes('menu.classList.toggle("reader-code-select-menu", readerCodeMenu)') &&
