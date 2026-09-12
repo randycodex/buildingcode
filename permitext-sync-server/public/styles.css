@@ -12710,6 +12710,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   line-height: 1.35;
 }
 
+.settings-panel .settings-scroll > .settings-disclaimer:not(.settings-footer-links):not(.settings-release-id) {
+  width: 100%;
+  text-align: justify;
+  text-align-last: justify;
+}
+
 .settings-panel .settings-footer-links {
   display: flex;
   flex-wrap: wrap;
