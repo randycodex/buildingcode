@@ -16571,6 +16571,21 @@ html body *:has(:focus-visible) {
   white-space: nowrap;
   font-size: 12px;
 }
+.research-list-panel.is-history-open .research-new-chat { display: none; }
+.research-list-panel.is-research-history-selecting .research-conversation-row {
+  background: var(--surface-muted);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  padding-inline: 10px;
+}
+.research-list-panel.is-research-history-selecting .research-conversation-row.is-selected {
+  background: color-mix(in srgb, var(--accent-building) 22%, var(--surface-muted));
+  box-shadow: inset 3px 0 var(--accent-building);
+}
+.research-list-panel.is-research-history-selecting .research-conversation-row.is-selected strong::before {
+  content: "✓ ";
+  color: var(--accent-building);
+}
 .research-list-panel.research-clean-start .research-composer-status:empty { display: none; }
 .research-list-panel.research-clean-start .research-history-toggle,
 .research-list-panel.research-clean-start .research-new-chat {
