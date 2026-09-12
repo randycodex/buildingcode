@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test:notebook-historical-references": "node tests/notebook-historical-reference-http.mjs",
     "test:property-context": "node --check nyc-property-context.mjs && node --check tests/nyc-property-context-contract.mjs && node tests/nyc-property-context-contract.mjs",
     "test:project-context-research": "node --check tests/research-project-context-summary-contract.mjs && node tests/research-project-context-summary-contract.mjs",
     "prestart": "npm run build:clients",

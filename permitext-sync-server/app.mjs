@@ -12390,7 +12390,9 @@ async function ownedProjectTargetExists(userID, targetKind, targetID) {
   const normalizedTargetID = String(targetID || "").trim();
   if (targetKind === "canonicalSection") {
     try {
-      return (await researchEvidenceForSectionIDs([normalizedTargetID])).length === 1;
+      // A saved reference is an explicit selection, including historical and
+      // future-effective codes. Ordinary Research eligibility is unchanged.
+      return (await researchEvidenceForSectionIDs([normalizedTargetID], { allowOptInCorpora: true })).length === 1;
     } catch {
       return false;
     }
@@ -15758,10 +15760,17 @@ async function preparedReportEvidence(link, charactersPerSection) {
   } catch (error) {
     if (error.code !== "ENOENT") throw error;
   }
-  const chapter = (manifest.chapters || []).find((candidate) =>
-    String(candidate.chapterID || "") === String(section.chapterID || "") ||
-    String(candidate.chapterNumber || "") === String(section.chapterNumber || "")
-  );
+  const chapters = manifest.chapters || [];
+  const chapterID = String(section.chapterID || catalogSummary?.chapterID || "");
+  const chapterNumber = String(section.chapterNumber || catalogSummary?.chapterNumber || "");
+  // Chapter numbers repeat across codes in the administrative-code package.
+  // Resolve the stable chapter ID first; never guess among number collisions.
+  const numberedChapters = chapterNumber
+    ? chapters.filter((candidate) => String(candidate.chapterNumber || "") === chapterNumber)
+    : [];
+  const chapter = (chapterID
+    ? chapters.find((candidate) => String(candidate.chapterID || "") === chapterID)
+    : null) || (!chapterID && numberedChapters.length === 1 ? numberedChapters[0] : null);
   const codePrefix = String(section.codePrefix || catalogSummary?.codePrefix || chapter?.codePrefix || "");
   const sectionNumber = String(section.sectionNumber || catalogSummary?.sectionNumber || "");
   const title = String(section.title || catalogSummary?.title || "Section");
