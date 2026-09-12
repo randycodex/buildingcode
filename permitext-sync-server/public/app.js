@@ -19301,48 +19301,6 @@ function researchComposerDisclosure() {
   return disclosure;
 }
 
-function researchDisclosureAcknowledgmentKey() {
-  const accountID = String(activeAccount()?.userID || "signed-out").trim() || "signed-out";
-  return `${researchDisclosureAcknowledgmentKeyPrefix}${researchDisclosureAcknowledgmentVersion}:${accountID}`;
-}
-
-function researchDisclosureIsAcknowledged() {
-  const key = researchDisclosureAcknowledgmentKey();
-  if (researchDisclosureAcknowledgedAccounts.has(key)) return true;
-  try {
-    if (localStorage.getItem(key) === researchDisclosureAcknowledgmentVersion) {
-      researchDisclosureAcknowledgedAccounts.add(key);
-      return true;
-    }
-  } catch {
-    // A confirmed acknowledgment remains valid for this page session when storage is unavailable.
-  }
-  return false;
-}
-
-async function ensureResearchDisclosureAcknowledged(container) {
-  const requestIdentity = captureAccountRequest();
-  if (researchDisclosureIsAcknowledged()) return true;
-  const confirmed = await confirmWebWarning(
-    "Before your first Research question",
-    "Permitext sends your question, recent chat, selected or retrieved evidence, and assigned Project facts to OpenAI. Private notes are not included. Research is AI-assisted and is not an official interpretation. Verify cited text, source status, and Project facts before relying on an answer for filing, design, permitting, or construction.",
-    {
-      confirmLabel: "I understand",
-      cancelLabel: "Not now",
-      container
-    }
-  );
-  if (!isCurrentAccountRequest(requestIdentity) || !confirmed) return false;
-  const key = researchDisclosureAcknowledgmentKey();
-  researchDisclosureAcknowledgedAccounts.add(key);
-  try {
-    localStorage.setItem(key, researchDisclosureAcknowledgmentVersion);
-  } catch {
-    // The in-memory acknowledgment still prevents another prompt during this page session.
-  }
-  return true;
-}
-
 function researchProjectContextPreview(projectID, projectInformation = null) {
   const preview = document.createElement("p");
   preview.className = "research-project-context-preview";
@@ -19463,10 +19421,6 @@ function renderNewResearchComposer(container, researchEnabled) {
     event.preventDefault();
     const question = input.value.replace(/\s+/g, " ").trim();
     if (question.length < 3 || sendButton.disabled) return;
-    if (!(await ensureResearchDisclosureAcknowledged(form))) {
-      input.focus({ preventScroll: true });
-      return;
-    }
     input.disabled = true;
     sendButton.disabled = true;
     status.textContent = "";
@@ -21414,10 +21368,6 @@ async function renderResearchConversation(conversationID, options = {}) {
     event.preventDefault();
     const question = input.value.trim() || starterAnalysisQuestion;
     if (question.length < 3 || sendButton.disabled) return;
-    if (!(await ensureResearchDisclosureAcknowledged(composer))) {
-      input.focus({ preventScroll: true });
-      return;
-    }
     input.disabled = true;
     sendButton.disabled = true;
     status.textContent = "";

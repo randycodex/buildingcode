@@ -122,13 +122,7 @@ assert.match(
 );
 assert.match(web, /AI-assisted—not an official interpretation/);
 assert.match(web, /const researchDisclosureAcknowledgmentVersion = "2026-08-27-v1"/);
-assert.match(web, /async function ensureResearchDisclosureAcknowledged\(container\)/);
-assert.match(web, /confirmLabel: "I understand"/);
-assert.equal(
-  (web.match(/if \(!\(await ensureResearchDisclosureAcknowledged\((?:form|composer)\)\)\)/g) || []).length,
-  2,
-  "Both new and follow-up Research submissions must acknowledge the disclosure before network work begins."
-);
+assert.doesNotMatch(web, /ensureResearchDisclosureAcknowledged|Before your first Research question/);
 assert.match(web, /Unassigned: no saved Project facts will be sent\. Private notes are not included\./);
 assert.match(web, /Project context sent:/);
 assert.match(web, /function researchAnswerCopyText\(result\)/);
