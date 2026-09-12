@@ -14755,6 +14755,16 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   text-align: left;
 }
 
+.report-draft-panel :is(
+  .report-introduction-label,
+  .report-draft-blocks-toggle,
+  .report-source-group-toggle,
+  .report-output-toggle
+) {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .report-source-group-body {
   display: grid;
   gap: var(--space-2);
