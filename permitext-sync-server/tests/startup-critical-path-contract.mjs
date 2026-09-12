@@ -16,7 +16,7 @@ const priorStart = actualStart.replace("void loadStartupCatalogs();", priorBlock
 assert.notEqual(priorStart, actualStart, "The shipped startup must launch optional catalog work without awaiting it.");
 function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 function node() { return { dataset: {}, scrollLeft: 0, scrollWidth: 100, clientWidth: 100, addEventListener() {}, querySelectorAll: () => [] }; }
-async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, quarantined = false } = {}) {
+async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = false, quarantined = false, dismissed = false } = {}) {
   const events = [];
   const issues = [];
   let firstWorkspaceAt;
@@ -39,6 +39,7 @@ async function sample(start, { chapterMs = 120, trustMs = 200, failCatalogs = fa
     deepLinkedSectionIDFromLocation: () => "", organizationInvitationTokenFromURL: () => "",
     activeAccount: () => null,
     privateWorkspaceMigrationStatus: () => ({ status: quarantined ? "quarantined" : "complete" }),
+    legacyWorkspaceNoticeDismissed: () => dismissed,
     presentWorkspaceIssue: (message) => issues.push(message),
     flushPendingSyncAndRender: async () => {}, flushCodeQuestionOutbox: async () => {},
     refreshNotebookPendingStatus: async () => {}, refreshEntitlementAfterCheckoutReturn: async () => {}, resumePendingResearchIntent: async () => {}
@@ -68,8 +69,10 @@ assert.equal(failed.finalState.startupCatalogPromise, null, "Failed metadata can
 const quarantined = await sample(actualStart, { quarantined: true });
 assert.deepEqual(quarantined.events, ["bind", "auth-start", "auth-complete", "workspace"]);
 assert.equal(quarantined.issues.length, 1);
-assert.match(quarantined.issues[0], /ownership could not be verified/);
+assert.match(quarantined.issues[0], /Review recovery in Account → Data & Storage/);
 assert.match(quarantined.issues[0], /current workspace is available/);
+const dismissedLegacy = await sample(actualStart, { quarantined: true, dismissed: true });
+assert.equal(dismissedLegacy.issues.length, 0, "Dismissed legacy notices must not reappear at startup.");
 
 // Verify actual neutral Reader trust rendering, including the retry affordance.
 const trustFunction = between("function renderReaderTrust(", "function codeFilterLabel(");
