@@ -28180,6 +28180,15 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     saveWorkspaceState();
   };
   searchForm.onsubmit = (event) => event.preventDefault();
+  searchForm.onfocusout = (event) => {
+    if (searchForm.contains(event.relatedTarget) || event.relatedTarget === searchToggle) return;
+    requestAnimationFrame(() => {
+      if (instance.evidenceSearchOpen && !searchInput.value.trim() &&
+          !searchForm.contains(document.activeElement) && document.activeElement !== searchToggle) {
+        closeEvidenceSearch();
+      }
+    });
+  };
   searchInput.oninput = () => {
     instance.folderQuery = searchInput.value;
     onChange();
