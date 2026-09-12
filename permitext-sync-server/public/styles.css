@@ -16506,6 +16506,27 @@ html body *:has(:focus-visible) {
   border-radius: var(--radius-pill);
 }
 
+.research-list-panel.has-inline-conversation {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.has-inline-conversation > .research-conversation-embedded {
+  display: grid;
+  min-height: 0;
+  overflow: hidden;
+}
+.has-inline-conversation .research-conversation-content {
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  height: 100%;
+}
+.has-inline-conversation .research-dialogue-pane {
+  grid-row: 2 !important;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+.has-inline-conversation .research-composer { padding-bottom: var(--space-3); }
+.has-inline-conversation .research-composer-status:empty { display: none; }
+
 .research-compact-composer .research-question-input {
   min-height: 48px;
   max-height: 180px;

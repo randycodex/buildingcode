@@ -553,6 +553,7 @@ let activeResearchConversation = null;
 // resolve a conversation ID, but only an explicit Research action mounts its
 // column in the current tab.
 let researchConversationPaneOpened = false;
+let researchHistoryShowing = false;
 // Project Research can open alongside the primary Research list/conversation
 // pair. These additional drill-ins are deliberately session-only.
 const supplementalResearchConversationIDs = [];
@@ -2885,6 +2886,7 @@ function paneIDForUtilityInstance(instance) {
 }
 
 function paneIDForResearchConversation(conversationID = state.researchConversationID) {
+  if (conversationID && conversationID === state.researchConversationID) return "utility:analysis";
   return conversationID ? `research:conversation:${conversationID}` : "";
 }
 
@@ -17637,6 +17639,7 @@ async function openResearchConversation(conversationID, options = {}) {
   // conversation. Setting only its ID loads History but leaves the answer hidden.
   researchConversationPaneOpened = true;
   activeResearchConversation = conversation;
+  researchHistoryShowing = false;
   const codeQuestionProjectID = openingContext.projectID;
   const linkedQuestionID = String(conversation.linkedCodeDecisionID || "").trim();
   const sameProject = Boolean(
@@ -19550,6 +19553,11 @@ async function renderResearch(paneID = "utility:analysis") {
   historyButton.textContent = "History";
   historyButton.setAttribute("aria-expanded", "false");
   historyButton.addEventListener("click", () => {
+    if (researchConversationPaneIsOpen()) {
+      researchHistoryShowing = !researchHistoryShowing;
+      void transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+      return;
+    }
     const expanded = panel.classList.toggle("is-history-open");
     historyButton.setAttribute("aria-expanded", String(expanded));
   });
@@ -19558,11 +19566,30 @@ async function renderResearch(paneID = "utility:analysis") {
   newChatButton.className = "ghost-button research-new-chat";
   newChatButton.textContent = "New chat";
   newChatButton.addEventListener("click", () => {
+    if (researchConversationPaneIsOpen()) {
+      researchConversationPaneOpened = false;
+      researchHistoryShowing = false;
+      state.researchConversationID = "";
+      activeResearchConversation = null;
+      saveWorkspaceState();
+      void transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+      return;
+    }
     panel.classList.remove("is-history-open");
     historyButton.setAttribute("aria-expanded", "false");
     panel.querySelector(".research-question-input")?.focus();
   });
   panelActions?.prepend(newChatButton, historyButton);
+  if (researchConversationPaneIsOpen() && !researchHistoryShowing) {
+    panel.classList.add("has-inline-conversation");
+    content.remove();
+    panel.append(await renderResearchConversation(state.researchConversationID, { embedded: true }));
+    return panel;
+  }
+  if (researchHistoryShowing) {
+    panel.classList.add("is-history-open");
+    historyButton.setAttribute("aria-expanded", "true");
+  }
 
   const updateConversationSelection = () => {
     panel.classList.toggle("is-research-history-selecting", selectingConversations);
@@ -21307,7 +21334,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   dialoguePane.append(thread);
 
   const composer = document.createElement("form");
-  composer.className = "research-composer";
+  composer.className = "research-composer research-compact-composer";
   const projectPreview = researchProjectContextPreview(
     conversation.primaryProjectID,
     conversation.projectInformation
@@ -21352,7 +21379,8 @@ async function renderResearchConversation(conversationID, options = {}) {
   }
   const resizeComposerInput = () => {
     input.style.height = "auto";
-    input.style.height = `${input.scrollHeight}px`;
+    input.style.height = `${Math.min(180, Math.max(48, input.scrollHeight))}px`;
+    input.style.overflowY = input.scrollHeight > 180 ? "auto" : "hidden";
   };
   input.addEventListener("input", () => {
     resizeComposerInput();
@@ -21388,7 +21416,26 @@ async function renderResearchConversation(conversationID, options = {}) {
     await runResearchProgressSession(progress, recoveredResearchProgressCallbacks(conversationID, { supplemental }));
   });
   composerBox.append(input, sendButton);
-  composer.append(projectPreview, researchComposerDisclosure(), composerBox, status);
+  input.rows = 1;
+  const info = document.createElement("details");
+  info.className = "research-composer-information";
+  const summary = document.createElement("summary");
+  summary.textContent = "ⓘ";
+  summary.setAttribute("aria-label", "Research context and privacy information");
+  const infoBody = document.createElement("div");
+  infoBody.className = "research-information-popover";
+  infoBody.append(projectPreview, researchComposerDisclosure());
+  info.append(summary, infoBody);
+  let hoverTimer;
+  info.addEventListener("pointerenter", () => { hoverTimer = setTimeout(() => { if (info.isConnected) info.open = true; }, 1000); });
+  info.addEventListener("pointerleave", () => { clearTimeout(hoverTimer); if (!info.contains(document.activeElement)) info.open = false; });
+  const tools = document.createElement("div");
+  tools.className = "research-composer-tools";
+  tools.append(info);
+  const note = document.createElement("p");
+  note.className = "research-verification-note";
+  note.textContent = "AI-assisted. Verify against cited code.";
+  composer.append(tools, composerBox, status, note);
   dialoguePane.append(composer);
   if (!embedded && releaseSurfaceVisibility.researchConversationEvidencePane) {
     bindResearchEvidenceDivider(content, divider, conversation.id);
@@ -36732,11 +36779,8 @@ async function renderWorkspace(options = {}) {
       if (detail) panes.push(await renderSectionDetail(instance.id, detail));
     }
   }
-  if (state.utilities.analysis) {
+  if (state.utilities.analysis || researchConversationPaneIsOpen()) {
     panes.push(await renderResearch());
-  }
-  if (researchConversationPaneIsOpen()) {
-    panes.push(await renderResearchConversation(state.researchConversationID));
   }
   for (const conversationID of supplementalResearchConversationIDs) {
     panes.push(await renderResearchConversation(conversationID, { supplemental: true }));
@@ -36832,17 +36876,8 @@ async function renderUtilityWorkspace(options = {}) {
       }
     }
   }
-  if (state.utilities.analysis) {
+  if (state.utilities.analysis || researchConversationPaneIsOpen()) {
     panes.push(await reuseOrRenderPane("utility:analysis", renderResearch));
-  }
-  const conversationPaneID = researchConversationPaneIsOpen()
-    ? paneIDForResearchConversation()
-    : "";
-  if (conversationPaneID) {
-    panes.push(await reuseOrRenderPane(
-      conversationPaneID,
-      () => renderResearchConversation(state.researchConversationID)
-    ));
   }
   for (const conversationID of supplementalResearchConversationIDs) {
     const supplementalPaneID = paneIDForResearchConversation(conversationID);
