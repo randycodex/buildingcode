@@ -23127,6 +23127,7 @@ async function renderProjectNotebook(project) {
         : null;
       cardList.replaceChildren();
       const unsavedActiveCard = !showingArchivedCards && activeCard && !activeCard.id ? activeCard : null;
+      rail.hidden = cards.length === 0 && !unsavedActiveCard;
       if (!cards.length && !unsavedActiveCard) {
         setNotesExpanded(cardMenuState.cardsMenuOpen, { instant: true });
       updateNotesMenu();
