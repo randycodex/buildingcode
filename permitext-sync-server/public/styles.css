@@ -16580,11 +16580,7 @@ html body *:has(:focus-visible) {
 }
 .research-list-panel.is-research-history-selecting .research-conversation-row.is-selected {
   background: color-mix(in srgb, var(--accent-building) 22%, var(--surface-muted));
-  box-shadow: inset 3px 0 var(--accent-building);
-}
-.research-list-panel.is-research-history-selecting .research-conversation-row.is-selected strong::before {
-  content: "✓ ";
-  color: var(--accent-building);
+  box-shadow: none;
 }
 .research-list-panel.research-clean-start .research-composer-status:empty { display: none; }
 .research-list-panel.research-clean-start .research-history-toggle,
