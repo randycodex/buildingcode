@@ -24552,55 +24552,32 @@ async function renderProjectReportDraft(project) {
     const introductionSection = document.createElement("section");
     introductionSection.className = "report-introduction-section";
     const introductionHeading = document.createElement("div");
-    introductionHeading.className = "report-introduction-heading";
-    const introductionLabel = document.createElement("label");
-    introductionLabel.className = "section-label report-introduction-label";
+    introductionHeading.className = "report-introduction-heading project-collapsible-heading";
+    const introductionLabel = document.createElement("button");
+    introductionLabel.type = "button";
+    introductionLabel.className = "project-section-toggle-label section-label report-introduction-label";
     introductionLabel.textContent = "Report introduction";
     const introduction = document.createElement("textarea");
     introduction.id = `report-introduction-${activeDraft.id || projectID}`;
     introduction.value = activeDraft.introduction || "";
     introduction.placeholder = "Write the Report introduction";
     introduction.setAttribute("aria-label", "Report introduction");
-    introductionLabel.htmlFor = introduction.id;
     introduction.addEventListener("input", () => {
       activeDraft.introduction = introduction.value;
       setDirty();
     });
-    const introductionResizeHandle = document.createElement("div");
-    introductionResizeHandle.className = "report-introduction-resize-handle";
-    introductionResizeHandle.setAttribute("role", "separator");
-    introductionResizeHandle.setAttribute("aria-label", "Resize Report introduction");
-    introductionResizeHandle.setAttribute("aria-orientation", "horizontal");
-    introductionResizeHandle.tabIndex = 0;
-    const resizeIntroductionTo = (height) => {
-      const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
-      introduction.style.height = `${Math.max(82, Math.min(maximumHeight, height))}px`;
-    };
-    introductionResizeHandle.addEventListener("pointerdown", (event) => {
-      event.preventDefault();
-      const startY = event.clientY;
-      const startHeight = introduction.getBoundingClientRect().height;
-      introductionResizeHandle.setPointerCapture(event.pointerId);
-      const resize = (moveEvent) => resizeIntroductionTo(startHeight + moveEvent.clientY - startY);
-      const finish = () => {
-        window.removeEventListener("pointermove", resize);
-        window.removeEventListener("pointerup", finish);
-        window.removeEventListener("pointercancel", finish);
-      };
-      window.addEventListener("pointermove", resize);
-      window.addEventListener("pointerup", finish);
-      window.addEventListener("pointercancel", finish);
-    });
-    introductionResizeHandle.addEventListener("keydown", (event) => {
-      if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
-      event.preventDefault();
-      const direction = event.key === "ArrowDown" ? 1 : -1;
-      resizeIntroductionTo(
-        introduction.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16)
-      );
-    });
-    introductionHeading.append(introductionLabel);
-    introductionSection.append(introductionHeading, introduction, introductionResizeHandle);
+    const introductionToggle = document.createElement("button");
+    introductionToggle.type = "button";
+    introductionToggle.className = "project-section-toggle-chevron";
+    introductionToggle.innerHTML = researchChevronIconsSVG();
+    const introductionBody = document.createElement("div");
+    introductionBody.append(introduction);
+    introductionHeading.append(introductionLabel, introductionToggle);
+    introductionSection.append(introductionHeading, introductionBody);
+    wireProjectSectionMotion(introductionSection, introductionBody,
+      [introductionLabel, introductionToggle], "Report introduction",
+      reportSourceGroupExpanded.get("Report introduction") ?? true,
+      { onChange(expanded) { reportSourceGroupExpanded.set("Report introduction", expanded); } });
     metadata.append(introductionSection);
 
     const addControls = document.createElement("div");

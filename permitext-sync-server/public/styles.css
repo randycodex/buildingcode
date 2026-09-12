@@ -16237,3 +16237,29 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .report-source-palette {
   gap: var(--report-menu-gap);
 }
+
+.report-introduction-section {
+  overflow: hidden;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--menu-subtle-surface);
+  gap: 0;
+}
+.report-introduction-section .report-introduction-heading {
+  height: 40px;
+  min-height: 40px;
+}
+.report-introduction-section textarea {
+  field-sizing: content;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  padding: var(--space-1) 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  line-height: 1.45;
+  overflow: hidden;
+  resize: none;
+}
