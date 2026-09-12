@@ -4413,10 +4413,9 @@ body .reader-internal-search-input:focus-visible {
 
 .search-code-filter {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
   margin: 0;
-  overflow: visible;
   padding: 0;
 }
 
@@ -4531,16 +4530,52 @@ body .reader-internal-search-input:focus-visible {
 }
 
 .search-code-filter .search-filter-chip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   width: 100%;
-  min-height: 28px;
+  min-height: 40px;
+  align-items: center;
+  gap: var(--space-3);
   justify-self: stretch;
-  padding: 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-control);
   font-size: 12px !important;
   font-weight: 400;
-  text-align: center;
+  text-align: left;
   white-space: normal;
+}
+
+.search-filter-chip-title {
+  min-width: 0;
+  color: inherit;
+  line-height: 1.25;
+}
+
+.search-filter-chip-detail {
+  color: inherit;
+  font-size: 10px;
+  line-height: 1.2;
+  opacity: 0.72;
+  text-align: right;
+}
+
+.search-code-filter-menu.is-open .search-code-filter {
+  max-height: min(var(--code-filter-menu-height, 264px), 264px);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+
+.search-code-filter .search-filter-chip[data-prefix="ALL"] {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: color-mix(in srgb, var(--text-tertiary) 16%, var(--surface-raised));
+}
+
+.search-code-filter .search-filter-chip[data-prefix="ALL"][aria-pressed="true"] {
+  background: color-mix(in srgb, var(--text-primary) 60%, var(--surface-raised));
 }
 
 .search-filter-chip {

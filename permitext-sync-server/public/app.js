@@ -4227,21 +4227,33 @@ function renderReaderTrust(panel, reader) {
   }
 }
 
-function codeFilterLabel(option) {
-  return option.prefix === "AC" ? "Gen Administrative Code" : option.label;
+function searchCodeFilterPresentation(option = {}) {
+  const rawLabel = String(option.label || option.prefix || "Code").trim();
+  const parenthetical = rawLabel.match(/\s*\(([^()]*)\)\s*$/);
+  const withoutParenthetical = parenthetical
+    ? rawLabel.slice(0, parenthetical.index).trim()
+    : rawLabel;
+  const [primary, ...secondaryParts] = withoutParenthetical.split(" — ");
+  const secondary = [secondaryParts.join(" — ").trim(), parenthetical?.[1]?.trim()]
+    .filter(Boolean)
+    .join(" · ");
+  return {
+    label: option.prefix === "AC" ? "Gen Administrative Code" : primary,
+    detail: secondary
+  };
 }
 
 function searchCodeFilterOptions() {
   const dynamicPrefixes = new Set(chapters.map((chapter) => chapter.codePrefix).filter(Boolean));
-  const options = [{ prefix: "ALL", label: "All Codes" }];
+  const options = [{ prefix: "ALL", label: "All Codes", detail: "" }];
   codeOptions.forEach((option) => {
     if (dynamicPrefixes.size === 0 || dynamicPrefixes.has(option.prefix)) {
-      options.push({ ...option, label: codeFilterLabel(option) });
+      options.push({ ...option, ...searchCodeFilterPresentation(option) });
       dynamicPrefixes.delete(option.prefix);
     }
   });
   dynamicPrefixes.forEach((prefix) => {
-    options.push({ prefix, label: prefix });
+    options.push({ prefix, label: prefix, detail: "" });
   });
   return options;
 }
@@ -15255,7 +15267,17 @@ function renderSearchCodeFilter(filterRail, panel, instance) {
     const chip = document.createElement("button");
     chip.type = "button";
     chip.className = "search-filter-chip";
-    chip.textContent = option.label;
+    chip.title = [option.label, option.detail].filter(Boolean).join(" · ");
+    const chipTitle = document.createElement("span");
+    chipTitle.className = "search-filter-chip-title";
+    chipTitle.textContent = option.label;
+    chip.append(chipTitle);
+    if (option.detail) {
+      const chipDetail = document.createElement("small");
+      chipDetail.className = "search-filter-chip-detail";
+      chipDetail.textContent = option.detail;
+      chip.append(chipDetail);
+    }
     chip.dataset.prefix = option.prefix;
     if (option.prefix !== "ALL") {
       chip.classList.add(`code-theme-${codeTheme(option.prefix)}`);

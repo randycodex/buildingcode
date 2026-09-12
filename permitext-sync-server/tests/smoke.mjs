@@ -2642,7 +2642,11 @@ async function main() {
         workspaceStyles.text.match(/\.code-filter-menu-toggle\[aria-expanded="true"\] \.code-filter-chevron-up \{[\s\S]*?display: block;/) &&
         workspaceStyles.text.match(/\.search-panel \.search-box \{[\s\S]*?border: 0;/) &&
         workspaceStyles.text.match(/\.search-panel \.search-box:has\(\.search-input:focus-visible\) \{[\s\S]*?outline: 2px solid/) &&
-        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: center;/) &&
+        workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 40px;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-control\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: left;/) &&
+        workspaceStyles.text.match(/\.search-code-filter-menu\.is-open \.search-code-filter \{[\s\S]*?max-height: min\(var\(--code-filter-menu-height, 264px\), 264px\);[\s\S]*?overflow-y: auto;/) &&
+        workspaceScript.text.includes('chipTitle.className = "search-filter-chip-title"') &&
+        workspaceScript.text.includes('chipDetail.className = "search-filter-chip-detail"') &&
         workspaceStyles.text.match(/\.search-filter-chip \{[\s\S]*?background: color-mix\(in srgb, var\(--text-tertiary\) 16%, transparent\);/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
         workspaceScript.text.includes('menu.classList.add("is-open")') &&
