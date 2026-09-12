@@ -4405,7 +4405,8 @@ body .reader-internal-search-input:focus-visible {
 }
 
 @media (prefers-color-scheme: dark) {
-  .search-box {
+  .search-box,
+  .research-composer .research-composer-box {
     background: rgb(246 244 241 / 10%);
   }
 }
