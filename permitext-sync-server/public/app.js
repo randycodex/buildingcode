@@ -1618,20 +1618,6 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     });
     menu.append(button);
   });
-  archivedProjectRecords(currentContentSummary().projects || []).filter(folderIsProject).forEach((project) => {
-    const restore = document.createElement("button");
-    restore.type = "button";
-    restore.setAttribute("role", "menuitem");
-    restore.textContent = `Restore ${project.name}`;
-    restore.addEventListener("click", async () => {
-      closeWorkspaceContextMenu();
-      await restoreArchivedProject(project);
-      reconcileProjectWorkspaces();
-      const linked = workspaceRegistry.workspaces.find((item) => item.projectID === projectRecordID(project));
-      if (linked) await switchWorkspace(linked.id, { focus: false });
-    });
-    menu.append(restore);
-  });
   const divider = document.createElement("div");
   divider.className = "workspace-context-divider";
   menu.append(divider);
@@ -1641,9 +1627,10 @@ function openWorkspaceContextMenu(workspaceID, anchor) {
     ...(workspace.projectID ? [{ label: "Archive Project", danger: true, separated: true, run: async () => {
       const project = workspaceProject();
       if (project) {
-        await archiveProject(project);
+        if (!(await archiveProject(project))) return;
         const main = workspaceRegistry.workspaces.find((item) => !item.projectID);
         if (main) await switchWorkspace(main.id, { focus: false });
+        await showWebNotice("Project archived", "Restore it from Account → Archived Projects.");
       }
     } }] : [
       { label: "Duplicate workspace", run: () => void duplicateNamedWorkspace(workspaceID) },
@@ -31825,10 +31812,66 @@ function wireSettingsCardCollapsing(panel) {
   });
 }
 
+function renderAccountArchivedProjects(panel, requestIdentity) {
+  const list = panel.querySelector(".settings-archived-projects-list");
+  const projects = archivedProjectRecords(currentContentSummary().projects || []).filter(folderIsProject);
+  clear(list);
+  if (!projects.length) {
+    const empty = document.createElement("p");
+    empty.className = "settings-archived-projects-empty";
+    empty.textContent = "No archived projects.";
+    list.append(empty);
+    return;
+  }
+  projects.forEach((project) => {
+    const row = document.createElement("div");
+    row.className = "settings-project-row settings-archived-project-row";
+    row.style.setProperty("--project-color", projectColor(project));
+    const copy = document.createElement("span");
+    copy.className = "settings-project-copy";
+    const name = document.createElement("strong");
+    name.textContent = readableProjectName(project);
+    const date = document.createElement("span");
+    const archivedAt = new Date(project.archivedAt);
+    date.textContent = project.archivedAt && Number.isFinite(archivedAt.getTime())
+      ? `Archived ${archivedAt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}`
+      : "Archived";
+    copy.append(name, date);
+    const restore = document.createElement("button");
+    restore.type = "button";
+    restore.className = "settings-link-button";
+    restore.textContent = "Restore";
+    restore.setAttribute("aria-label", `Restore ${project.name}`);
+    const status = panel.querySelector(".settings-archived-projects-status");
+    restore.addEventListener("click", async () => {
+      if (!isCurrentAccountRequest(requestIdentity)) return;
+      restore.disabled = true;
+      try {
+        await restoreArchivedProject(project);
+        if (!isCurrentAccountRequest(requestIdentity)) return;
+        reconcileProjectWorkspaces();
+        renderWorkspaceTabs();
+        const livePanel = panel.isConnected ? panel : track.querySelector('.settings-archived-projects-card')?.closest('.workspace-panel');
+        if (livePanel) {
+          renderAccountArchivedProjects(livePanel, requestIdentity);
+          livePanel.querySelector('.settings-archived-projects-status').textContent = `${project.name} restored. Open it from the workspace picker.`;
+        }
+      } catch (error) {
+        if (!isCurrentAccountRequest(requestIdentity)) return;
+        restore.disabled = false;
+        status.textContent = error.message || "Could not restore this Project. Try again.";
+      }
+    });
+    row.append(copy, restore);
+    list.append(row);
+  });
+}
+
 function renderSettings() {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
+  renderAccountArchivedProjects(panel, settingsIdentity);
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   const accountCopy = panel.querySelector(".account-status-copy");
   appendLinkedAccountRecoveryControls(accountCopy.closest(".settings-card"), settingsIdentity);
