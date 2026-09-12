@@ -13329,10 +13329,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-card-tile small {
   color: var(--text-secondary);
   font-size: 10px;
-  font-weight: 650;
+  font-weight: 400;
 }
 
 .notebook-card-tile strong {
+  font-weight: 400;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
