@@ -24683,7 +24683,7 @@ async function renderProjectReportDraft(project) {
     });
     primaryActions.append(save, generate, coordinate);
 
-    const appendOutputDisclosure = (label, body, className) => {
+    const appendOutputDisclosure = (label, body, className, stateKey = label) => {
       const section = document.createElement("section");
       section.className = `report-output-section ${className}`;
       const heading = document.createElement("div");
@@ -24702,10 +24702,10 @@ async function renderProjectReportDraft(project) {
       disclosureBody.className = "report-output-body";
       disclosureBody.append(body);
       section.append(heading, disclosureBody);
-      const initiallyExpanded = reportSectionExpanded(label);
+      const initiallyExpanded = reportSectionExpanded(stateKey);
       wireProjectSectionMotion(section, disclosureBody, [title, toggle], label, initiallyExpanded, {
         onChange(expanded) {
-          persistReportSectionExpanded(label, expanded);
+          persistReportSectionExpanded(stateKey, expanded);
         }
       });
       return section;
@@ -24717,9 +24717,10 @@ async function renderProjectReportDraft(project) {
     renderHistory(historyBody);
     historyContent.append(draftPicker, historyBody);
     const historySection = appendOutputDisclosure(
-      "Report history",
+      "Reports & versions",
       historyContent,
-      "report-history-section"
+      "report-history-section",
+      "Report history"
     );
     shell.append(
       metadata,
