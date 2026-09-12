@@ -679,13 +679,38 @@ textarea:focus-visible {
   align-items: center;
   height: 30px;
   min-height: 30px;
-  padding: 0 12px;
+  width: 0;
+  flex: 0 0 auto;
+  padding: 0;
+  overflow: hidden;
+  margin-right: var(--space-3);
+  transition: width 220ms ease, opacity 180ms ease, margin-right 220ms ease,
+    color 180ms ease, background-color 180ms ease;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 7%, transparent);
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 650;
   white-space: nowrap;
+}
+
+.connection-status-label {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  width: max-content;
+  height: 100%;
+  padding: 0 12px;
+}
+
+.connection-status[data-state="clean"] {
+  opacity: 0;
+  margin-right: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connection-status { transition: none; }
 }
 
 .connection-status.is-offline {
@@ -843,8 +868,12 @@ textarea:focus-visible {
   flex: 0 1 auto;
   align-items: center;
   min-width: 0;
-  max-width: min(220px, 24vw);
+  max-width: none;
   margin-left: auto;
+}
+
+.topbar-workspaces > .workspace-actions-button {
+  max-width: min(220px, 24vw);
 }
 
 .topbar-workspaces[hidden] {
@@ -12934,8 +12963,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   }
 
   .topbar-workspaces {
-    display: none;
+    display: contents;
   }
+
+  .topbar-workspaces > .workspace-actions-button { display: none; }
 
   .topbar-layout-actions {
     display: none;
@@ -16267,7 +16298,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   .topbar-layout-actions { grid-column: 2; grid-row: 2; justify-self: start; }
   .topbar-settings-button { grid-column: 3; grid-row: 2; }
   .topbar-account-state { display: contents; }
-  .topbar .connection-status { grid-column: 4; grid-row: 2; }
+  .topbar-workspaces .connection-status { max-width: 40vw; }
   .topbar-brand {
     left: auto;
     right: 16px;
@@ -16297,3 +16328,5 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .legacy-workspace-recovery [role="status"]:empty {
   display: none;
 }
+
+.topbar-account-state:has(> .topbar-brand:only-child) { display: contents; }

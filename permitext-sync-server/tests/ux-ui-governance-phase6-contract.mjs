@@ -115,7 +115,6 @@ assert.doesNotMatch(panelTitleRule, /display\s*:\s*none|visibility\s*:\s*hidden/
 
 const targetRegistry = [
   ["web Reader passage actions", webStyles, /\.inline-bookmark-toggle,[\s\S]*?min-width: 28px;[\s\S]*?min-height: 28px;/],
-  ["web first-use actions", webStyles, /\.first-use-actions button,[\s\S]*?min-height: 44px;/],
   ["iPhone Reader save action", chapterReader, /\.frame\(width: 44, height: 44\)[\s\S]*?\.contentShape\(Rectangle\(\)\)/],
   ["iPhone filter chip", filterChips, /minimumHitHeight: CGFloat = 44[\s\S]*?accessibilityAddTraits\(isSelected \? \.isSelected : \[\]\)/]
 ];

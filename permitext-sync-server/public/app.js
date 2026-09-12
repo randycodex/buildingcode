@@ -83,7 +83,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260912-welcome-centered-v68";
+} from "./offline-storage.js?v=20260912-status-position-v69";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -118,7 +118,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260912-welcome-centered-v68";
+} from "./research-intent-state.js?v=20260912-status-position-v69";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -6569,7 +6569,8 @@ function updateConnectionStatus() {
   connectionStatus.classList.toggle("has-pending", pending > 0 || conflicts > 0);
   connectionStatus.dataset.state = statusKind;
   connectionStatus.hidden = false;
-  connectionStatus.textContent = offline
+  const statusLabel = connectionStatus.querySelector(".connection-status-label") || connectionStatus;
+  statusLabel.textContent = offline
     ? conflicts > 0 ? `Offline · ${conflictLabel}`
       : pending > 0 ? `Offline · ${pendingLabel}`
         : "Offline"
@@ -6577,6 +6578,8 @@ function updateConnectionStatus() {
       : syncFlushPromise || foregroundSyncPromise ? "Syncing"
         : pending > 0 ? `Changes pending · ${pending}`
           : account ? "Synced" : "Online";
+  connectionStatus.style.width = statusKind === "clean" ? "0px" : `${statusLabel.scrollWidth}px`;
+  connectionStatus.setAttribute("aria-hidden", String(statusKind === "clean"));
   const conflictActionAvailable = statusKind === "conflict";
   connectionStatus.classList.toggle("is-actionable", conflictActionAvailable);
   connectionStatus.setAttribute("role", conflictActionAvailable ? "button" : "status");

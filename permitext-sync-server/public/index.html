@@ -8,7 +8,7 @@
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260901-2014-code-assets-v15">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/web/styles.css?v=20260912-welcome-centered-v68">
+    <link rel="stylesheet" href="/web/styles.css?v=20260912-status-position-v69">
   </head>
   <body>
     <main class="mobile-web-message" aria-labelledby="mobile-web-message-title">
@@ -65,6 +65,7 @@
           </button>
         </nav>
         <div class="topbar-workspaces" aria-label="Workspaces">
+          <span class="connection-status" id="connection-status" role="status" aria-live="polite" data-state="clean"><span class="connection-status-label">Online</span></span>
           <button class="workspace-actions-button" id="workspace-actions" type="button" aria-label="Open workspace menu" title="Workspaces" aria-haspopup="menu" aria-expanded="false">
             <span class="workspace-current-name">Main</span>
             <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
@@ -78,7 +79,6 @@
         </div>
         <button class="topbar-settings-button" id="toggle-settings" type="button" aria-label="Account" title="Account" aria-pressed="false">Account</button>
         <div class="topbar-account-state">
-          <span class="connection-status" id="connection-status" role="status" aria-live="polite">Online</span>
           <div class="topbar-brand" aria-label="permitext">
             <span class="topbar-brand-name">permitext</span>
             <strong class="topbar-brand-plan" hidden></strong>
@@ -548,6 +548,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260912-welcome-centered-v68" type="module"></script>
+    <script src="/web/app.js?v=20260912-status-position-v69" type="module"></script>
   </body>
 </html>
