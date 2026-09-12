@@ -16267,3 +16267,5 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .settings-panel .settings-archived-project-row { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
 .settings-archived-project-row .settings-project-copy { flex: 1; }
 .settings-archived-projects-status:empty { display: none; }
+
+.settings-offline-status:empty { display: none; }

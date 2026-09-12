@@ -32155,7 +32155,7 @@ function renderSettings() {
       return;
     }
     if (!library.available) {
-      offlineStatus.textContent = navigator.onLine ? "Not downloaded on this device." : "Connect to the internet to download.";
+      offlineStatus.textContent = navigator.onLine ? "" : "Connect to the internet to download.";
       offlineDownload.textContent = "Download for Offline Use";
       offlineDownload.disabled = navigator.onLine === false;
       return;
@@ -32171,13 +32171,9 @@ function renderSettings() {
       offlineDownload.disabled = navigator.onLine === false;
       return;
     }
-    const downloaded = new Date(library.downloadedAt);
-    const dateLabel = Number.isNaN(downloaded.getTime())
-      ? "downloaded"
-      : `downloaded ${downloaded.toLocaleDateString()}`;
-    offlineStatus.textContent = `${library.chapterCount || 0} chapters available offline · ${dateLabel}.`;
-    offlineDownload.textContent = "Update Offline Codes";
-    offlineDownload.disabled = navigator.onLine === false;
+    offlineStatus.textContent = "";
+    offlineDownload.textContent = "Downloaded for Offline Use";
+    offlineDownload.disabled = true;
   };
 
   const syncAccountState = () => {
