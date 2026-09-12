@@ -24710,16 +24710,18 @@ async function renderProjectReportDraft(project) {
       });
       return section;
     };
+    const historyContent = document.createElement("div");
+    historyContent.className = "report-history-content";
     const historyBody = document.createElement("div");
     historyBody.className = "report-history";
     renderHistory(historyBody);
+    historyContent.append(draftPicker, historyBody);
     const historySection = appendOutputDisclosure(
       "Report history",
-      historyBody,
+      historyContent,
       "report-history-section"
     );
     shell.append(
-      draftPicker,
       metadata,
       addControls,
       blocks,
