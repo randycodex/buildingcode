@@ -976,7 +976,7 @@ function newUtilityInstance(key, overrides = {}) {
   };
   if (key === "analysis") {
     instance.conversationID = String(overrides.conversationID || "");
-    instance.historyShowing = Boolean(overrides.historyShowing);
+    instance.historyShowing = overrides.historyShowing ?? !instance.conversationID;
     instance.draft = String(overrides.draft || "");
   } else if (key === "search") {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
@@ -19543,7 +19543,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
 async function renderResearch(paneID = "utility:analysis") {
   const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID) || null;
   const conversationOpen = instance ? Boolean(instance.conversationID) : researchConversationPaneIsOpen();
-  const historyShowing = instance ? instance.historyShowing : researchHistoryShowing;
+  const historyShowing = !conversationOpen || (instance ? instance.historyShowing : researchHistoryShowing);
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-list-panel", "has-research-composer");
   const projectScopedResearch = Boolean(activeProjectIDForCodeQuestions());
