@@ -23040,11 +23040,13 @@ async function renderProjectNotebook(project) {
       const renderSequence = editorRenderSequence;
       refreshNotebookReferenceSources = async () => false;
       refreshNotebookReportStatus = async () => false;
-      editorMount?.destroy?.();
-      editorMount = null;
-      notebookObjectURLs.forEach((url) => URL.revokeObjectURL(url));
-      notebookObjectURLs.clear();
-      focus.replaceChildren();
+      const replaceFocusedContent = (...children) => {
+        editorMount?.destroy?.();
+        editorMount = null;
+        notebookObjectURLs.forEach((url) => URL.revokeObjectURL(url));
+        notebookObjectURLs.clear();
+        focus.replaceChildren(...children);
+      };
 
       if (!activeCard) {
         const welcome = document.createElement("div");
@@ -23059,9 +23061,10 @@ async function renderProjectNotebook(project) {
         welcomeAction.textContent = "Create first Note";
         welcomeAction.addEventListener("click", () => newButton.click());
         welcome.append(welcomeTitle, welcomeCopy, welcomeAction);
-        focus.append(welcome);
+        replaceFocusedContent(welcome);
         return;
       }
+      const focusedCardID = activeCard.id;
 
       const fields = document.createElement("div");
       fields.className = "notebook-card-fields";
@@ -23099,6 +23102,7 @@ async function renderProjectNotebook(project) {
           reference.referenceKind !== "notebookCard" ||
           reference.referenceID !== activeCard.id
         );
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
       const appendReferenceOption = (reference, index, parent) => {
         const option = document.createElement("button");
         option.className = "notebook-reference-option";
@@ -23208,7 +23212,6 @@ async function renderProjectNotebook(project) {
           control.disabled = true;
         });
       }
-      const focusedCardID = activeCard.id;
       refreshNotebookReferenceSources = async ({ refreshFoundation = false } = {}) => {
         if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return false;
         if (refreshFoundation) {
@@ -23269,6 +23272,7 @@ async function renderProjectNotebook(project) {
       reportButton.className = "notebook-secondary-action notebook-add-to-report";
       reportButton.type = "button";
       const existingReportBlock = await notebookCardReportBlock(identity, activeCard.id).catch(() => null);
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
       const reportStatus = document.createElement("span");
       reportStatus.className = "notebook-report-status";
       const applyReportStatus = (reportBlock) => {
@@ -23327,7 +23331,9 @@ async function renderProjectNotebook(project) {
       });
       footerActions.append(reportButton, researchButton, coordinateButton);
       footer.append(reportStatus, footerActions);
-      focus.append(fields, toolbar, editorElement, footer);
+      const module = await loadNotebookModule();
+      if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
+      replaceFocusedContent(fields, toolbar, editorElement, footer);
 
       titleInput.addEventListener("input", () => {
         if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence) return;
@@ -23335,8 +23341,6 @@ async function renderProjectNotebook(project) {
         markNotebookDirty();
       });
 
-      const module = await loadNotebookModule();
-      if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence) return;
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
         autofocus: !notebookReadOnly && !activeCard.id,
