@@ -23929,6 +23929,16 @@ async function renderProjectReportDraft(project) {
   let refreshReportArtifacts = async () => false;
   let draggedReportBlock = null;
   const reportSourceGroupExpanded = new Map();
+  const reportSectionExpanded = (sectionName, fallback = true) => {
+    const currentSessionValue = reportSourceGroupExpanded.get(sectionName);
+    return typeof currentSessionValue === "boolean"
+      ? currentSessionValue
+      : projectSectionExpanded(identity, `Report:${sectionName}`, fallback);
+  };
+  const persistReportSectionExpanded = (sectionName, expanded) => {
+    reportSourceGroupExpanded.set(sectionName, Boolean(expanded));
+    persistProjectSectionExpansion(identity, `Report:${sectionName}`, expanded);
+  };
   const mountState = {
     panel,
     hasUnsavedChanges: () => dirty,
@@ -24251,10 +24261,10 @@ async function renderProjectReportDraft(project) {
       renderBody(body);
       section.append(heading, body);
       container.append(section);
-      const initiallyExpanded = reportSourceGroupExpanded.get(label) ?? true;
+      const initiallyExpanded = reportSectionExpanded(label);
       wireProjectSectionMotion(section, body, [title, toggle], label, initiallyExpanded, {
         onChange(expanded) {
-          reportSourceGroupExpanded.set(label, expanded);
+          persistReportSectionExpanded(label, expanded);
         }
       });
     };
@@ -24360,7 +24370,7 @@ async function renderProjectReportDraft(project) {
         codeGroup.append(codeHeading, codeBody);
         groupBody.append(codeGroup);
         const groupKey = `Saved evidence:${prefix}`;
-        const initiallyExpanded = reportSourceGroupExpanded.get(groupKey) ?? true;
+        const initiallyExpanded = reportSectionExpanded(groupKey);
         wireProjectSectionMotion(
           codeGroup,
           codeBody,
@@ -24369,7 +24379,7 @@ async function renderProjectReportDraft(project) {
           initiallyExpanded,
           {
             onChange(expanded) {
-              reportSourceGroupExpanded.set(groupKey, expanded);
+              persistReportSectionExpanded(groupKey, expanded);
             }
           }
         );
@@ -24578,8 +24588,8 @@ async function renderProjectReportDraft(project) {
     introductionSection.append(introductionHeading, introductionBody);
     wireProjectSectionMotion(introductionSection, introductionBody,
       [introductionLabel, introductionToggle], "Report introduction",
-      reportSourceGroupExpanded.get("Report introduction") ?? true,
-      { onChange(expanded) { reportSourceGroupExpanded.set("Report introduction", expanded); } });
+      reportSectionExpanded("Report introduction"),
+      { onChange(expanded) { persistReportSectionExpanded("Report introduction", expanded); } });
     metadata.append(introductionSection);
 
     const addControls = document.createElement("div");
@@ -24623,7 +24633,7 @@ async function renderProjectReportDraft(project) {
     blocksBody.className = "report-draft-blocks-body";
     renderBlockEditor(blocksBody);
     blocks.append(blocksHeading, blocksBody);
-    const blocksExpanded = reportSourceGroupExpanded.get("Report content") ?? true;
+    const blocksExpanded = reportSectionExpanded("Report content");
     wireProjectSectionMotion(
       blocks,
       blocksBody,
@@ -24632,7 +24642,7 @@ async function renderProjectReportDraft(project) {
       blocksExpanded,
       {
         onChange(expanded) {
-          reportSourceGroupExpanded.set("Report content", expanded);
+          persistReportSectionExpanded("Report content", expanded);
         }
       }
     );
@@ -24692,10 +24702,10 @@ async function renderProjectReportDraft(project) {
       disclosureBody.className = "report-output-body";
       disclosureBody.append(body);
       section.append(heading, disclosureBody);
-      const initiallyExpanded = reportSourceGroupExpanded.get(label) ?? true;
+      const initiallyExpanded = reportSectionExpanded(label);
       wireProjectSectionMotion(section, disclosureBody, [title, toggle], label, initiallyExpanded, {
         onChange(expanded) {
-          reportSourceGroupExpanded.set(label, expanded);
+          persistReportSectionExpanded(label, expanded);
         }
       });
       return section;
