@@ -13500,8 +13500,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .notebook-welcome {
   align-self: center;
   justify-self: center;
-  max-width: 460px;
+  width: 100%;
+  max-width: 552px;
   padding: var(--space-5);
+  box-sizing: border-box;
   text-align: center;
 }
 
