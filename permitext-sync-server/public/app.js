@@ -27594,7 +27594,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   overlay.className = "project-sheet-overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
-  overlay.setAttribute("aria-label", isEditing ? `Edit ${folderTypeLabel(project)}` : "New Project or saved collection");
+  overlay.setAttribute("aria-label", isEditing ? `Edit ${folderTypeLabel(project)}` : selectedFolderType === "reference" ? "New saved collection" : "New Project");
 
   const sheet = document.createElement("form");
   sheet.className = "project-create-sheet";
@@ -27849,7 +27849,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     }
   });
 
-  sheet.append(header, typeGroup, nameLabel, addressLabel, descriptionLabel, colorGroup);
+  sheet.append(header, nameLabel, addressLabel, descriptionLabel, colorGroup);
   overlay.append(sheet);
   panel.append(overlay);
   syncFolderTypeControls();
