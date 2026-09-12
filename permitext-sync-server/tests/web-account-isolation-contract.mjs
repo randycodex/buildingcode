@@ -8,6 +8,8 @@ import {
   migrateLegacyPrivateWorkspace,
   privateWorkspaceKeys,
   privateWorkspaceMigrationStatus,
+  legacyWorkspaceNoticeDismissed, dismissLegacyWorkspaceNotice,
+  legacyWorkspaceRecoveryReview, legacyWorkspaceRecoveryBundle,
   privateWorkspacePrefix,
   removePrivateWorkspace
 } from "../public/private-workspace-state.js";
@@ -344,3 +346,73 @@ for (const completion of ["success", "401", "network-failure"]) {
 }
 
 console.log("Permitext web account isolation contract passed (in-memory storage and deferred extracted application functions).");
+
+const retained = new MemoryStorage({
+  "permitext:webWorkspace:v1": JSON.stringify({ account: { userID: accountA.userID, sessionToken: "secret" }, notes: [{ text: "private passage", accessToken: "secret" }] }),
+  "permitext:webWorkspaces:v2": JSON.stringify({ active: "main" }),
+  [keysA.baseWorkspaceKey]: "current workspace"
+});
+migrateLegacyPrivateWorkspace(retained, accountB.userID);
+const originalRetained = JSON.stringify(retained);
+assert.equal(legacyWorkspaceRecoveryReview(retained, accountA.userID).recovery, "export-available");
+for (const viewer of ["", accountB.userID]) {
+  const report = legacyWorkspaceRecoveryReview(retained, viewer);
+  assert.equal(report.recovery, "ownership-review-required");
+  assert.ok(!JSON.stringify(report).includes("private passage"));
+  assert.ok(!JSON.stringify(report).includes(accountA.userID));
+  assert.throws(() => legacyWorkspaceRecoveryBundle(retained, viewer));
+}
+const recovered = JSON.stringify(legacyWorkspaceRecoveryBundle(retained, accountA.userID));
+assert.ok(recovered.includes("private passage"));
+assert.ok(!recovered.includes("secret"));
+assert.equal(JSON.stringify(retained), originalRetained);
+assert.equal(legacyWorkspaceNoticeDismissed(retained), false);
+dismissLegacyWorkspaceNotice(retained);
+migrateLegacyPrivateWorkspace(retained, accountA.userID);
+assert.equal(legacyWorkspaceNoticeDismissed(retained), true);
+assert.equal(retained.getItem(keysA.baseWorkspaceKey), "current workspace");
+assert.equal(privateWorkspaceMigrationStatus(retained).status, "quarantined");
+retained.setItem("permitext:webWorkspace:v2:broken", "{broken");
+assert.equal(legacyWorkspaceRecoveryReview(retained, accountA.userID).unreadableEntries, 1);
+assert.throws(() => legacyWorkspaceRecoveryBundle(retained, accountA.userID));
+assert.equal(legacyWorkspaceRecoveryReview(new MemoryStorage(), accountA.userID).recovery, "missing");
+for (const value of [{ notes: ["unknown owner"] }, { account: accountA, notes: [{ ownerUserID: accountB.userID }] }]) {
+  assert.throws(() => legacyWorkspaceRecoveryBundle(new MemoryStorage({ "permitext:webWorkspace:v1": JSON.stringify(value) }), accountA.userID));
+}
+const quota = new MemoryStorage();
+quota.failWritesTo("permitext:legacyWorkspaceNoticeDismissed:v1");
+assert.throws(() => dismissLegacyWorkspaceNotice(quota));
+assert.equal(legacyWorkspaceNoticeDismissed(quota), false);
+console.log("Legacy recovery ownership, redaction, preservation, diagnostics and dismissal contracts passed.");
+
+const noticeSandbox = {
+  workspaceIssue: { hidden: true }, workspaceIssueCopy: { textContent: "" },
+  workspaceIssueAction: { addEventListener() {} }, workspaceIssueDismiss: { addEventListener() {} },
+  activeWorkspaceIssueAction: null, activeWorkspaceIssueDismiss: null
+};
+vm.createContext(noticeSandbox);
+vm.runInContext(["presentWorkspaceIssue", "dismissWorkspaceIssue"].map(functionSource).join("\n"), noticeSandbox);
+let dismissalWrites = 0;
+noticeSandbox.presentWorkspaceIssue("Older work", { onDismiss: () => { dismissalWrites += 1; } });
+noticeSandbox.dismissWorkspaceIssue();
+assert.equal(dismissalWrites, 1);
+assert.equal(noticeSandbox.workspaceIssue.hidden, true);
+noticeSandbox.presentWorkspaceIssue("Unrelated issue");
+noticeSandbox.dismissWorkspaceIssue();
+assert.equal(dismissalWrites, 1, "Other notices must not persist a legacy dismissal.");
+noticeSandbox.presentWorkspaceIssue("Older work", { onDismiss: () => { throw new Error("quota"); } });
+noticeSandbox.dismissWorkspaceIssue();
+assert.equal(noticeSandbox.workspaceIssue.hidden, false);
+assert.match(noticeSandbox.workspaceIssueCopy.textContent, /Dismissal could not be saved/);
+console.log("Actual workspace notice dismissal and storage-failure behavior passed.");
+
+const changingStorage = new MemoryStorage({ "permitext:webWorkspace:v1": "placeholder" });
+let legacyReads = 0;
+changingStorage.getItem = function(key) {
+  if (key !== "permitext:webWorkspace:v1") return null;
+  legacyReads += 1;
+  return JSON.stringify({ account: legacyReads === 1 ? accountA : accountB });
+};
+const stableExport = legacyWorkspaceRecoveryBundle(changingStorage, accountA.userID);
+assert.equal(legacyReads, 1, "Export must validate the exact snapshot it exports, without rereading mutable storage.");
+assert.equal(stableExport.workspaces["permitext:webWorkspace:v1"].account.userID, accountA.userID);

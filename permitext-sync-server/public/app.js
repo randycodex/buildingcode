@@ -6,11 +6,15 @@ import {
   confirmedAccountLinkRecovery,
   migrateLegacyPrivateWorkspace,
   privateWorkspaceMigrationStatus,
+  legacyWorkspaceNoticeDismissed,
+  dismissLegacyWorkspaceNotice,
+  legacyWorkspaceRecoveryReview,
+  legacyWorkspaceRecoveryBundle,
   privateWorkspaceKeys,
   privateWorkspaceRecoverySnapshot,
   recordConfirmedAccountLinkRecovery,
   removePrivateWorkspace
-} from "./private-workspace-state.js?v=20260904-account-isolation-v5";
+} from "./private-workspace-state.js?v=20260908-account-recovery-v7";
 import {
   inlineCodeReferencePhrases,
   parseCodeJumpAnchor,
@@ -80,7 +84,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260907-shell-revalidation-v55";
+} from "./offline-storage.js?v=20260912-integrated-workspace-v63";
 import {
   accountArtifactRevisionKey,
   normalizeAccountArtifactRevisionEnvelope,
@@ -115,7 +119,7 @@ import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
   writePendingResearchIntent
-} from "./research-intent-state.js?v=20260907-shell-revalidation-v55";
+} from "./research-intent-state.js?v=20260912-integrated-workspace-v63";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -563,6 +567,7 @@ const codeDecisionResearchNoticesByQuestion = new Map();
 let activeWebWarningClose = null;
 const webWarningPositionCleanups = new WeakMap();
 let activeWorkspaceIssueAction = null;
+let activeWorkspaceIssueDismiss = null;
 let pendingResearchIntentResumePromise = null;
 let pendingResearchIntentInFlightID = "";
 let firstUseWelcomeActive = false;
@@ -3196,19 +3201,7 @@ function isFixedWidthPaneID(paneID) {
 }
 
 function isFlexibleReaderPaneID(paneID) {
-  if (!paneID?.startsWith("reader:")) return false;
-  if (isProAccount()) return true;
-  return (state.readers || []).length === 2;
-}
-
-function isFixedWidthReaderPaneID(paneID) {
-  if (!paneID?.startsWith("reader:")) return false;
-  if (isFlexibleReaderPaneID(paneID)) return false;
-  if (activePaneIDs().length >= 4) return true;
-  const readerCount = (state.readers || []).length;
-  if (readerCount > 3) return true;
-  const hasSideColumns = activePaneIDs().some((id) => !id.startsWith("reader:"));
-  return readerCount >= 2 && hasSideColumns;
+  return Boolean(paneID?.startsWith("reader:"));
 }
 
 function linkedReaderPaneIDForSearch(searchID) {
@@ -3998,8 +3991,6 @@ function applyPaneWeight(panel, paneID) {
   if (value !== storedValue) state.paneWeights[paneID] = value;
   const hasManyColumns = activePaneIDs().length >= 4;
   const flexibleReader = isFlexibleReaderPaneID(paneID);
-  const sourceLinkedReader = paneID?.startsWith("reader:") &&
-    (state.readers || []).some((reader) => `reader:${reader.id}` === paneID && reader.savedSourcePaneID);
   const explicitlyResizedReader = flexibleReader &&
     Number.isFinite(value) &&
     value > defaultWidth + 0.5;
@@ -4010,16 +4001,16 @@ function applyPaneWeight(panel, paneID) {
     "--pane-resized-min-width",
     `${flexibleReader && !explicitlyResizedReader ? defaultWidth : width}px`
   );
-  panel.style.setProperty("--pane-default-min-width", hasManyColumns ? `${defaultWidth}px` : "0px");
+  panel.style.setProperty("--pane-default-min-width", flexibleReader || hasManyColumns ? `${defaultWidth}px` : "0px");
   if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
     panel.style.flex = `1 1 ${width}px`;
     return;
   }
-  if (sourceLinkedReader) {
-    panel.style.flex = `0 0 ${width}px`;
+  if (flexibleReader && activePaneIDs().length === 1) {
+    panel.style.flex = `1 1 ${defaultWidth}px`;
     return;
   }
-  if (isFixedWidthPaneID(paneID) || isFixedWidthReaderPaneID(paneID)) {
+  if (isFixedWidthPaneID(paneID)) {
     panel.style.flex = `0 0 ${width}px`;
     return;
   }
@@ -7880,6 +7871,7 @@ function refreshVisiblePlanUsage() {
 function presentWorkspaceIssue(message, options = {}) {
   if (!workspaceIssue || !workspaceIssueCopy || !message) return;
   workspaceIssueCopy.textContent = message;
+  activeWorkspaceIssueDismiss = options.onDismiss || null;
   activeWorkspaceIssueAction = typeof options.onAction === "function" ? options.onAction : null;
   if (workspaceIssueAction) {
     workspaceIssueAction.hidden = !activeWorkspaceIssueAction;
@@ -7890,8 +7882,14 @@ function presentWorkspaceIssue(message, options = {}) {
 
 function dismissWorkspaceIssue() {
   if (!workspaceIssue) return;
+  try { activeWorkspaceIssueDismiss?.(); }
+  catch {
+    workspaceIssueCopy.textContent = "Dismissal could not be saved. Free browser storage and try again; older workspace data remains preserved.";
+    return;
+  }
   workspaceIssue.hidden = true;
   activeWorkspaceIssueAction = null;
+  activeWorkspaceIssueDismiss = null;
 }
 
 workspaceIssueAction?.addEventListener("click", () => {
@@ -8331,6 +8329,82 @@ async function accountLocalRecoveryBundle(sourceUserID, identity = captureAccoun
     codeQuestions: readCodeQuestionAccountState(localStorage, sourceUserID),
     offline: { ...offline, images }
   };
+}
+
+function appendLegacyWorkspaceRecoveryControls(container, identity = captureAccountRequest()) {
+  if (privateWorkspaceMigrationStatus(localStorage).status !== "quarantined") return;
+  const region = document.createElement("div");
+  region.className = "settings-data-subsection legacy-workspace-recovery";
+  const reviewButton = document.createElement("button");
+  reviewButton.type = "button";
+  reviewButton.className = "settings-secondary-button legacy-workspace-review";
+  reviewButton.textContent = "Review older workspace data";
+  reviewButton.setAttribute("aria-expanded", "false");
+  const details = document.createElement("div");
+  details.id = "legacy-workspace-recovery-details";
+  details.hidden = true;
+  reviewButton.setAttribute("aria-controls", details.id);
+  reviewButton.addEventListener("click", () => {
+    if (!isCurrentAccountRequest(identity)) return;
+    details.hidden = !details.hidden;
+    reviewButton.setAttribute("aria-expanded", String(!details.hidden));
+    if (details.hidden) return;
+    clear(details);
+    const summary = document.createElement("p");
+    summary.className = "settings-card-copy";
+    const status = document.createElement("p");
+    status.setAttribute("role", "status");
+    try {
+      const review = legacyWorkspaceRecoveryReview(localStorage, identity.userID);
+      summary.textContent = !review.retainedEntries
+        ? "The older records are no longer present in this browser. Recovery availability is unverified; support can review the diagnostic report."
+        : `${review.retainedEntries} older browser storage records remain preserved. ` +
+          (review.unreadableEntries ? `${review.unreadableEntries} could not be read; recovery may be partial. ` : "") +
+          (review.ownershipVerified
+            ? "Their recorded owner matches this account. Download a recovery copy for review; it does not replace or sync your current workspace. External images and server-only data are not included."
+            : "Ownership could not be verified for this account. Sign in to the original account and review again, or contact support. Contents remain isolated. Avoid clearing site data.");
+      details.append(summary);
+      if (review.recovery === "export-available") {
+        const download = document.createElement("button");
+        download.type = "button";
+        download.className = "settings-secondary-button";
+        download.textContent = "Download recovery copy";
+        download.addEventListener("click", () => {
+          try {
+            requireCurrentAccountRequest(identity);
+            const bundle = legacyWorkspaceRecoveryBundle(localStorage, identity.userID);
+            downloadCodeMemoBlob(new Blob([JSON.stringify(bundle, null, 2)], { type: "application/json" }), "permitext-older-workspace-recovery.json");
+            status.textContent = "Recovery copy downloaded. The original records and your current workspace are unchanged.";
+          } catch (error) { status.textContent = error.message; }
+        });
+        details.append(download);
+      }
+      const diagnostic = document.createElement("button");
+      diagnostic.type = "button";
+      diagnostic.className = "settings-secondary-button";
+      diagnostic.textContent = "Download diagnostic report";
+      diagnostic.addEventListener("click", () => {
+        try {
+          requireCurrentAccountRequest(identity);
+          const report = legacyWorkspaceRecoveryReview(localStorage, identity.userID);
+          downloadCodeMemoBlob(new Blob([JSON.stringify(report, null, 2)], { type: "application/json" }), "permitext-workspace-recovery-diagnostic.json");
+          status.textContent = "Diagnostic report downloaded. It contains no saved content or account identifiers. You can attach it when contacting support.";
+        } catch (error) { status.textContent = error.message; }
+      });
+      const support = document.createElement("a");
+      support.className = "settings-link-button";
+      support.href = "/support";
+      support.target = "_blank";
+      support.rel = "noopener noreferrer";
+      support.textContent = "Contact support about recovery";
+      details.append(diagnostic, support, status);
+    } catch {
+      summary.textContent = "Browser storage could not be read. Recovery is unverified. Avoid clearing site data and contact support.";
+      details.append(summary);
+    }
+  });
+  region.append(reviewButton, details);
+  container?.insertBefore(region, container.querySelector(".settings-danger-zone"));
 }
 
 function appendLinkedAccountRecoveryControls(container, identity = captureAccountRequest()) {
@@ -28908,6 +28982,10 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
       } else {
         renderSavedItemsByCode(content, orderedItems, paneID, commonRenderOptions);
       }
+    } else if (selectedFolder && resolvedItems.length === 0 && !searchActive) {
+      appendEmptySaved(content, "No saved evidence yet", folderIsProject(selectedFolder)
+        ? "Save a passage from Reader or Search, then add it to this Project."
+        : "Save a passage from Reader or Search, then add it to this Reference.");
     } else if (combinedItems.length > 0) {
       appendEmptySaved(content, "No saved items match", selectedFolder
         ? "Try another search or code book, or add evidence to this destination."
@@ -31549,6 +31627,7 @@ function renderSettings() {
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   const accountCopy = panel.querySelector(".account-status-copy");
   appendLinkedAccountRecoveryControls(accountCopy.closest(".settings-card"), settingsIdentity);
+  appendLegacyWorkspaceRecoveryControls(panel.querySelector(".settings-data-card"), settingsIdentity);
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const planUsage = panel.querySelector(".settings-plan-usage");
   const researchPacks = panel.querySelector(".settings-research-packs");
@@ -33068,9 +33147,27 @@ function appendPaneSequence(panes) {
       emptyState.className = "workspace-empty-state";
       emptyState.setAttribute("aria-label", "Empty workspace");
       if (!emptyState.firstElementChild) {
+        const content = document.createElement("div");
+        content.className = "workspace-returning-content";
+        const heading = document.createElement("h1");
+        heading.textContent = "Your workspace";
         const message = document.createElement("p");
         message.textContent = "Open a Reader, Search, Saved, or a Project to begin.";
-        emptyState.append(message);
+        const actions = document.createElement("div");
+        actions.className = "workspace-returning-actions";
+        for (const [label, control] of [
+          ["Open Reader", addReaderButton],
+          ["Search codes", toggleSearchButton],
+          ["Saved & Projects", toggleSavedButton]
+        ]) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = label;
+          button.addEventListener("click", () => control?.click());
+          actions.append(button);
+        }
+        content.append(heading, message, actions);
+        emptyState.append(content);
       }
       nodes.push(emptyState);
     }
@@ -37280,8 +37377,19 @@ async function start() {
   }
   if (workspaceMigrationError && activeAccount()?.userID === initialPersistedAccount?.userID) {
     void showWebNotice("Saved workspace recovery needed", "This browser could not finish moving your existing workspace into account-specific storage. The original saved data is still present. Free browser storage, then reload to retry; avoid clearing site data.");
-  } else if (!workspaceRestoreError && privateWorkspaceMigrationStatus(localStorage).status === "quarantined") {
-    presentWorkspaceIssue("Older browser workspace data was kept separately because its account ownership could not be verified. Your current workspace is available. Contact support to review recovery; avoid clearing site data.");
+  } else if (!workspaceRestoreError && privateWorkspaceMigrationStatus(localStorage).status === "quarantined" && !legacyWorkspaceNoticeDismissed(localStorage)) {
+    presentWorkspaceIssue("Older workspace data is preserved separately. Review recovery in Account → Data & Storage. Your current workspace is available.", {
+      actionLabel: "Review",
+      onAction: async () => {
+        await focusUtility("settings", ".legacy-workspace-review");
+        const button = document.querySelector(".legacy-workspace-review");
+        const cardToggle = button?.closest(".settings-card")?.querySelector(".settings-card-toggle");
+        if (cardToggle?.getAttribute("aria-expanded") === "false") cardToggle.click();
+        if (button?.getAttribute("aria-expanded") === "false") button.click();
+        requestAnimationFrame(() => button?.scrollIntoView({ block: "center" }));
+      },
+      onDismiss: () => dismissLegacyWorkspaceNotice(localStorage)
+    });
   }
   track.scrollLeft = Math.min(
     Number(state.trackScrollLeft) || 0,

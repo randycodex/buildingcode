@@ -99,7 +99,7 @@ assert.match(sectionReader, /isBookmarked \? "Remove from Saved" : "Save passage
 assert.match(settingsView, /Clear All Saved Passages/);
 assert.doesNotMatch(settingsView, /Clear All Bookmarks/);
 assert.match(organizationHub, /projectSection\(title: "Reports"/);
-assert.match(bookmarksView, /projectHubMetric\([^\n]*label: "Reports"\)/);
+assert.match(bookmarksView, /projectHubSection\(title: "Reports"/);
 assert.match(bookmarksView, /Export & Save iOS PDF/);
 
 const userFacingSources = [webClient, permitextApp, chapterReader, sectionReader];
