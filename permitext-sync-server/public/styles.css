@@ -16421,3 +16421,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .saved-folder-context.is-project {
   --saved-project-row-gap: var(--column-content-top-gap);
 }
+
+/* Keep focused controls free of decorative rings throughout the workspace. */
+html body :is(input, textarea, select, button, [tabindex], [contenteditable], [role]):focus,
+html body :is(input, textarea, select, button, [tabindex], [contenteditable], [role]):focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+html body *:has(:focus-visible) {
+  outline: none !important;
+}
