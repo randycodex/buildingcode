@@ -115,7 +115,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260913-custom-column-groups-v7";
+} from "./workspace-state.js?v=20260913-saved-column-groups-v8";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -558,6 +558,7 @@ let researchConversationPaneOpened = false;
 let researchHistoryShowing = false;
 const researchDraftPaneIDs = new Set();
 const researchNewChatDrafts = new Map();
+const pendingGroupReaderPositions = new Map();
 // Project Research can open alongside the primary Research list/conversation
 // pair. These additional drill-ins are deliberately session-only.
 const supplementalResearchConversationIDs = [];
@@ -696,7 +697,7 @@ function loadWorkspaceState(accountOverride) {
         archive: Boolean(saved.utilities?.archive),
         search: false,
         saved: false,
-        analysis: Boolean(saved.utilities?.analysis || (saved.utilityInstances || []).some((item) => item?.key === "analysis")),
+        analysis: Boolean(saved.utilities?.analysis),
         settings: Boolean(saved.utilities?.settings)
       },
       account: accountOverride === undefined ? loadPersistedAccount(saved.account) : accountOverride,
@@ -1091,6 +1092,7 @@ function saveWorkspaceState() {
   if (workspaceRestoreError) return;
   if (!detachedProjectWindow) {
     persistCodeQuestionAccountState();
+    captureColumnGroupContents();
     const layout = captureWorkspaceLayout(state, {
       trackScrollLeft: track?.scrollLeft ?? state.trackScrollLeft ?? 0
     });
@@ -14714,6 +14716,8 @@ function isHeaderLikeTableRow(row) {
 }
 
 async function renderReader(reader, options = {}) {
+  options = { ...options, scrollPosition: options.scrollPosition || pendingGroupReaderPositions.get(reader.id) };
+  pendingGroupReaderPositions.delete(reader.id);
   const panel = readerTemplate.content.firstElementChild.cloneNode(true);
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
@@ -33074,6 +33078,130 @@ function resetDividerPanes(previousPaneID, nextPaneID) {
   });
 }
 
+function captureColumnGroupContents() {
+  if (!(state.columnGroups || []).length) return;
+  const active = new Set(defaultActivePaneIDs());
+  const positions = captureReaderScrollPositions();
+  const projectTypes = [
+    ['notebooks', paneIDForProjectNotebook], ['reportDrafts', paneIDForProjectReportDraft],
+    ['coordinations', paneIDForProjectCoordination], ['workboards', paneIDForProjectWorkboard]
+  ];
+  for (const group of state.columnGroups) {
+    group.columns ||= {};
+    for (const id of group.paneIDs.filter((id) => active.has(id))) {
+      const reader = state.readers.find((item) => paneIDForReader(item) === id);
+      const instance = state.utilityInstances.find((item) => paneIDForUtilityInstance(item) === id);
+      let column = null;
+      if (reader) column = { kind: 'reader', value: reader, position: positions.get(id) || group.columns[id]?.position };
+      else if (instance) column = { kind: 'utility', value: instance, draft: researchNewChatDrafts.get(id), draftShowing: researchDraftPaneIDs.has(id) };
+      else if (id === 'utility:analysis' || id.startsWith('research:conversation:')) {
+        column = { kind: 'research', value: { conversationID: id === 'utility:analysis' ? state.researchConversationID : id.slice('research:conversation:'.length), historyShowing: id === 'utility:analysis' && researchHistoryShowing }, draft: researchNewChatDrafts.get(id), draftShowing: researchDraftPaneIDs.has(id) };
+      } else {
+        for (const [key, paneID] of projectTypes) {
+          const detail = openProjectDetails().find((item) => paneID(item) === id);
+          if (detail) column = { kind: 'project', key, value: detail, host: state.projectHostPaneID };
+        }
+        if (!column && ['utility:settings', 'utility:archive'].includes(id)) column = { kind: 'singleton', key: id.slice(8) };
+      }
+      if (!column) continue;
+      group.columns[id] = JSON.parse(JSON.stringify({ ...column, width: state.paneWeights[id] || defaultPaneWidthForID(id), collapsed: (state.collapsedPaneIDs || []).includes(id) }));
+    }
+  }
+}
+
+async function restoreSavedColumnGroup(groupID) {
+  captureColumnGroupContents();
+  const group = (state.columnGroups || []).find((item) => item.id === groupID);
+  if (!group) return;
+  const active = new Set(defaultActivePaneIDs());
+  const missing = group.paneIDs.filter((id) => !active.has(id));
+  if (!missing.length) {
+    const first = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(group.paneIDs[0])}"]`);
+    if (first) track.scrollTo({ left: track.scrollLeft + first.getBoundingClientRect().left - track.getBoundingClientRect().left, behavior: 'smooth' });
+    return;
+  }
+  if (missing.some((id) => !group.columns?.[id])) {
+    showWebNotice('Group unavailable', 'Some columns were closed before their contents could be saved. Edit the group to remove those columns.');
+    return;
+  }
+  const collapsed = new Set(state.collapsedPaneIDs || []);
+  for (const oldID of missing) {
+    const column = JSON.parse(JSON.stringify(group.columns[oldID]));
+    let id = oldID;
+    if (column.kind === 'reader') {
+      state.readers.push(column.value);
+      if (column.position) pendingGroupReaderPositions.set(column.value.id, column.position);
+    } else if (column.kind === 'utility' || column.kind === 'research') {
+      // Legacy singleton Research becomes an owned instance, never the current ungrouped Research.
+      const instance = column.kind === 'research' ? newUtilityInstance('analysis', column.value) : column.value;
+      state.utilityInstances.push(instance);
+      id = paneIDForUtilityInstance(instance);
+      if (column.draft !== undefined) researchNewChatDrafts.set(id, column.draft);
+      if (column.draftShowing) researchDraftPaneIDs.add(id);
+      if (id !== oldID) {
+        group.paneIDs = group.paneIDs.map((member) => member === oldID ? id : member);
+        group.columns[id] = { ...column, kind: 'utility', value: instance };
+        delete group.columns[oldID];
+      }
+    } else if (column.kind === 'project') {
+      setOpenProjectDetails([...openProjectDetails(), column.value]);
+      const records = state[column.key] || [];
+      if (!records.some((item) => projectDetailKey(item) === projectDetailKey(column.value))) records.push(column.value);
+      state[column.key] = records;
+      if (!state.projectHostPaneID) state.projectHostPaneID = column.host || '';
+    } else if (column.kind === 'singleton') state.utilities[column.key] = true;
+    state.paneWeights[id] = column.width || defaultPaneWidthForID(id);
+    if (column.collapsed) collapsed.add(id); else collapsed.delete(id);
+  }
+  state.collapsedPaneIDs = [...collapsed];
+  state.paneOrder = [...(state.paneOrder || []).filter((id) => !group.paneIDs.includes(id)), ...group.paneIDs];
+  saveWorkspaceState();
+  await transitionWorkspace('utility');
+  const first = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(group.paneIDs[0])}"]`);
+  if (first) track.scrollTo({ left: track.scrollLeft + first.getBoundingClientRect().left - track.getBoundingClientRect().left, behavior: 'smooth' });
+}
+
+function openSavedColumnGroupsMenu() {
+  document.querySelector('.column-group-menu')?._close?.();
+  const anchor = document.querySelector('#open-column-groups');
+  const menu = document.createElement('div');
+  menu.className = 'column-group-menu saved-column-groups-menu';
+  menu.setAttribute('role', 'menu');
+  menu.setAttribute('aria-label', 'Saved column groups');
+  const controller = new AbortController();
+  const close = () => { controller.abort(); menu.remove(); anchor.focus({ preventScroll: true }); };
+  menu._close = close;
+  const active = new Set(defaultActivePaneIDs());
+  for (const group of state.columnGroups || []) {
+    const button = document.createElement('button');
+    button.type = 'button'; button.setAttribute('role', 'menuitem');
+    const opened = group.paneIDs.every((id) => active.has(id));
+    button.textContent = `${group.name} · ${group.paneIDs.length} columns${opened ? ' · Open' : ''}`;
+    button.addEventListener('click', () => { close(); void restoreSavedColumnGroup(group.id); });
+    menu.append(button);
+  }
+  if (!menu.children.length) {
+    const empty = document.createElement('p');
+    empty.textContent = 'No groups yet. Use a column’s menu to create one.';
+    menu.append(empty);
+  }
+  document.body.append(menu);
+  const rect = anchor.getBoundingClientRect();
+  menu.style.left = `${Math.max(8, rect.right - menu.offsetWidth)}px`;
+  menu.style.top = `${rect.bottom + 6}px`;
+  menu.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') { event.preventDefault(); close(); }
+    if (event.key === 'Tab') close();
+    const buttons = [...menu.querySelectorAll('button')];
+    if (buttons.length && ['ArrowDown', 'ArrowUp'].includes(event.key)) {
+      event.preventDefault();
+      buttons[(buttons.indexOf(document.activeElement) + (event.key === 'ArrowDown' ? 1 : buttons.length - 1)) % buttons.length].focus();
+    }
+  });
+  document.addEventListener('pointerdown', (event) => { if (!menu.contains(event.target) && event.target !== anchor) close(); }, { signal: controller.signal });
+  menu.querySelector('button')?.focus();
+}
+
 function columnGroupForPane(paneID) {
   return (state.columnGroups || []).find((group) => group.paneIDs.includes(paneID)) || null;
 }
@@ -33081,8 +33209,18 @@ function columnGroupForPane(paneID) {
 function reconcileColumnGroups(paneIDs) {
   const active = new Set(paneIDs);
   state.columnGroups = normalizeColumnGroups((state.columnGroups || []).map((group) => {
-    const members = new Set(group.paneIDs.filter((id) => active.has(id)));
-    for (const id of [...members]) basePaneGroupForMove(id, paneIDs).forEach((member) => members.add(member));
+    // Retire a closed legacy Research singleton's ID before an ungrouped Research can reuse it.
+    group.paneIDs = group.paneIDs.map((id) => {
+      const column = group.columns?.[id];
+      if (active.has(id) || column?.kind !== 'research') return id;
+      const instance = newUtilityInstance('analysis', column.value);
+      const ownedID = paneIDForUtilityInstance(instance);
+      group.columns[ownedID] = { ...column, kind: 'utility', value: instance };
+      delete group.columns[id];
+      return ownedID;
+    });
+    const members = new Set(group.paneIDs);
+    for (const id of [...members].filter((id) => active.has(id))) basePaneGroupForMove(id, paneIDs).forEach((member) => members.add(member));
     return { ...group, paneIDs: groupSavedProjectColumns([...members]) };
   }));
 }
@@ -33592,7 +33730,7 @@ function refreshColumnGroupPresentation() {
   panels.forEach(preparePaneCollapse);
   const hidden = new Set();
   for (const group of state.columnGroups || []) {
-    if (group.collapsed) group.paneIDs.slice(1).forEach((id) => hidden.add(id));
+    if (group.collapsed) group.paneIDs.filter((id) => panels.some((panel) => panel.dataset.paneId === id)).slice(1).forEach((id) => hidden.add(id));
   }
   panels.forEach((panel) => panel.classList.toggle('is-group-hidden', hidden.has(panel.dataset.paneId)));
   track.querySelectorAll(':scope > .pane-divider').forEach((divider) => {
@@ -33644,6 +33782,9 @@ function setColumnGroupCollapsed(group, collapsed) {
 function prepareColumnGroupControls(panel, header, group) {
   let menuButton = header.querySelector('.column-group-menu-button');
   if (!menuButton) {
+    header.addEventListener('click', (event) => {
+      if (event.target.closest('button[class*="close"]')) captureColumnGroupContents();
+    }, { capture: true });
     menuButton = document.createElement('button');
     menuButton.type = 'button';
     menuButton.className = 'column-group-menu-button';
@@ -33786,7 +33927,7 @@ function openColumnGroupEditor(panel, existing = null) {
       dialog.querySelector('.column-group-editor-error').textContent = existing ? 'Enter a name and select at least one column.' : 'Enter a name and select at least two columns.';
       return;
     }
-    const group = { id: existing?.id || crypto.randomUUID(), name: name.value.trim(), paneIDs: ids.filter((id) => members.has(id)), collapsed: existing?.collapsed || false };
+    const group = { id: existing?.id || crypto.randomUUID(), name: name.value.trim(), paneIDs: ids.filter((id) => members.has(id)), collapsed: existing?.collapsed || false, columns: existing?.columns || {} };
     state.columnGroups = normalizeColumnGroups([...(state.columnGroups || []).filter((item) => item.id !== group.id), group]);
     close();
     appendPaneSequence([...track.querySelectorAll(':scope > .workspace-panel')]);
@@ -37668,6 +37809,9 @@ async function toggleUtilityPane(key) {
 }
 
 async function resetVisibleColumnWidths() {
+  for (const group of state.columnGroups || []) {
+    for (const [id, column] of Object.entries(group.columns || {})) column.width = defaultPaneWidthForID(id);
+  }
   track.querySelectorAll(":scope > .workspace-panel").forEach((panel) => {
     panel._collapseAnimation?.cancel();
     panel._restoreCollapseChildWidths?.();
@@ -37687,6 +37831,7 @@ async function resetVisibleColumnWidths() {
 
 async function closeAllColumns() {
   if (!(await confirmWorkspaceTransition())) return false;
+  captureColumnGroupContents();
   projectStudioTransitionGeneration += 1;
   researchOpenGeneration += 1;
   state.readers = [];
@@ -37720,7 +37865,6 @@ async function closeAllColumns() {
   );
   document.querySelector(".code-decision-context-bar")?.remove();
   state.paneOrder = [];
-  state.columnGroups = [];
   state.paneWeights = {};
   state.collapsedPaneIDs = [];
   state.trackScrollLeft = 0;
@@ -38203,6 +38347,7 @@ async function start() {
   window.matchMedia("(max-width: 760px)").addEventListener("change", (event) => {
     if (!event.matches) closeMobileMoreSheet({ restoreFocus: false });
   });
+  document.querySelector("#open-column-groups")?.addEventListener("click", openSavedColumnGroupsMenu);
   fitColumnsButton.addEventListener("click", () => {
     resetVisibleColumnWidths();
   });

@@ -17034,3 +17034,6 @@ html body *:has(:focus-visible) {
 .column-menu-control-row > span { flex: 1; min-width: 86px; font-size: 13px; color: var(--text-secondary); }
 .column-group-menu .column-menu-control-row button { width: 34px; height: 30px; padding: 0; text-align: center; background: rgba(128,128,128,.14); }
 .column-group-menu .column-menu-control-row button:disabled { opacity: .35; cursor: default; }
+
+.saved-column-groups-menu { max-width: min(360px, calc(100vw - 16px)); max-height: calc(100vh - 80px); overflow-y: auto; }
+.saved-column-groups-menu p { margin: 8px; max-width: 240px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; }

@@ -169,9 +169,9 @@ for (const member of ['reader:one', savedID, notebookID, reportID]) {
 const persisted = normalizeWorkspaceLayout(orderState);
 assert.deepEqual(persisted.columnGroups, JSON.parse(JSON.stringify(orderState.columnGroups)));
 orderContext.reconcileColumnGroups(['reader:one']);
-assert.deepEqual(Array.from(orderState.columnGroups[0].paneIDs), ['reader:one']);
+assert.deepEqual(Array.from(orderState.columnGroups[0].paneIDs), ['reader:one', savedID, notebookID, reportID]);
 orderContext.reconcileColumnGroups([]);
-assert.equal(orderState.columnGroups.length, 0);
+assert.equal(orderState.columnGroups.length, 1);
 assert.deepEqual(normalizeColumnGroups([{ id:'a', paneIDs:['x','x'], name:' A ' }, { id:'b', paneIDs:['x','y'] }]).map(g => g.paneIDs), [['x'],['y']]);
 assert.deepEqual(orderColumnGroups(['a','b','c','d'], [{paneIDs:['a','c']}]), ['a','c','b','d']);
 state.columnGroups = [{ id:'a', paneIDs:['reader'], collapsed:true }];
@@ -179,7 +179,7 @@ assert.equal(context.paneIsCollapsed('reader'), true);
 state.columnGroups[0].collapsed = false;
 assert.equal(context.paneIsCollapsed('reader'), false);
 assert.deepEqual(state.collapsedPaneIDs, ['collapsed']);
-console.log('Mixed groups reconcile project membership, persist layout, clean up closed panes, and preserve individual collapse.');
+console.log('Mixed groups reconcile project membership, persist layout, retain closed panes, and preserve individual collapse.');
 
 // Reset updates the future expanded widths without changing visibility or group membership.
 const resetState = { paneWeights: { a: 950, b: 820 }, collapsedPaneIDs: ['a'], columnGroups: [{ id: 'g', paneIDs: ['b'], collapsed: true }] };
@@ -194,3 +194,36 @@ assert.deepEqual(JSON.parse(JSON.stringify(resetState.paneWeights)), { a: 600, b
 assert.deepEqual(resetState.collapsedPaneIDs, ['a']);
 assert.equal(resetState.columnGroups[0].collapsed, true);
 console.log('Reset restores default widths while preserving collapsed columns and groups.');
+
+// Reopening a saved group restores its own identities, alongside ungrouped columns of the same kinds.
+const reopenState = {
+  readers: [{ id: 'outside-reader' }],
+  utilityInstances: [{ id: 'outside-search', key: 'search', query: 'outside' }, { id: 'outside-research', key: 'analysis' }],
+  paneWeights: {}, paneOrder: ['reader:outside-reader'], collapsedPaneIDs: [],
+  columnGroups: [{ id: 'saved-group', paneIDs: ['reader:owned', 'utility:search:owned-search', 'utility:analysis:owned-research'], columns: {
+    'reader:owned': { kind: 'reader', value: {id:'owned', chapterID: 4}, width: 850, collapsed: true },
+    'utility:search:owned-search': { kind:'utility', value:{id:'owned-search',key:'search',query:'fire'},width:600 },
+    'utility:analysis:owned-research': { kind:'utility', value:{id:'owned-research',key:'analysis',conversationID:'conversation'},width:700 }
+  }}]
+};
+const reopenContext = vm.createContext({state:reopenState, CSS:{escape:x=>x}, captureColumnGroupContents(){},
+  defaultActivePaneIDs:()=>[...reopenState.readers.map(r=>'reader:'+r.id),...reopenState.utilityInstances.map(i=>'utility:'+i.key+':'+i.id)],
+  track:{querySelector:()=>null}, pendingGroupReaderPositions:new Map(), researchNewChatDrafts:new Map(), researchDraftPaneIDs:new Set(),
+  paneIDForUtilityInstance:i=>'utility:'+i.key+':'+i.id, defaultPaneWidthForID:()=>600, saveWorkspaceState(){}, async transitionWorkspace(){}, showWebNotice(){throw Error('Unexpected missing snapshot');}
+});
+vm.runInContext('async '+actual('restoreSavedColumnGroup'), reopenContext);
+await reopenContext.restoreSavedColumnGroup('saved-group');
+assert.equal(reopenState.readers.length,2);
+assert.equal(reopenState.utilityInstances.length,4);
+assert.equal(reopenState.utilityInstances[0].query,'outside');
+assert.equal(reopenState.utilityInstances[2].query,'fire');
+assert.equal(reopenState.paneWeights['reader:owned'],850);
+assert.ok(reopenState.collapsedPaneIDs.includes('reader:owned'));
+const restoredOrder=[...reopenState.paneOrder];
+await reopenContext.restoreSavedColumnGroup('saved-group');
+assert.equal(reopenState.readers.length,2);
+assert.equal(reopenState.utilityInstances.length,4);
+assert.deepEqual([...reopenState.paneOrder],restoredOrder);
+const roundTrip=normalizeWorkspaceLayout(JSON.parse(JSON.stringify(reopenState)));
+assert.equal(roundTrip.columnGroups[0].columns['utility:search:owned-search'].value.query,'fire');
+console.log('Saved group reopening restores owned Reader/Search/Research identities, widths and state without duplicates or taking over ungrouped columns.');

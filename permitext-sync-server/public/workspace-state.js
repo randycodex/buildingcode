@@ -39,7 +39,9 @@ export function normalizeColumnGroups(value) {
     if (!paneIDs.length) return [];
     ids.add(group.id);
     paneIDs.forEach((id) => claimed.add(id));
-    return [{ id: group.id, name: String(group.name || "Group").trim().slice(0, 40) || "Group", paneIDs, collapsed: group.collapsed === true }];
+    const columns = Object.fromEntries(paneIDs.filter((id) => group.columns?.[id] && typeof group.columns[id] === "object")
+      .map((id) => [id, copy(group.columns[id])]));
+    return [{ id: group.id, name: String(group.name || "Group").trim().slice(0, 40) || "Group", paneIDs, collapsed: group.collapsed === true, columns }];
   });
 }
 
