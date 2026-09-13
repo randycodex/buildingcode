@@ -30,12 +30,16 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "codeQuestionWorkspace"
 ]);
 
+export function canGroupColumn(id) {
+  return typeof id === "string" && !/^(?:utility:saved(?::|$)|project:notebook:|project:report-draft:)/.test(id);
+}
+
 export function normalizeColumnGroups(value) {
   const claimed = new Set(), ids = new Set();
   return (Array.isArray(value) ? value : []).flatMap((group) => {
     if (!group || typeof group.id !== "string" || !group.id || ids.has(group.id)) return [];
     const paneIDs = [...new Set(Array.isArray(group.paneIDs) ? group.paneIDs : [])]
-      .filter((id) => typeof id === "string" && id && !claimed.has(id));
+      .filter((id) => canGroupColumn(id) && id && !claimed.has(id));
     if (!paneIDs.length) return [];
     ids.add(group.id);
     paneIDs.forEach((id) => claimed.add(id));

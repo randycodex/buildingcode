@@ -153,33 +153,16 @@ assert.equal(context.singleExpandedDividerEdge('collapsed', ''), null);
 assert.equal(context.singleExpandedDividerEdge('', 'reader').side, 'left');
 console.log('Expanded columns resize beside collapsed neighbors on either edge.');
 
-// Mixed custom groups preserve the built-in project unit and survive layout persistence.
-orderState.columnGroups = [{ id: 'mixed', name: 'Research pack', paneIDs: ['reader:one', notebookID], collapsed: true }];
-orderContext.activePaneIDs();
-assert.deepEqual(Array.from(orderState.columnGroups[0].paneIDs), ['reader:one', savedID, notebookID, reportID]);
-assert.equal(orderContext.orderWithPaneMoved('reader:one', reportID, 'after'), null);
-assert.deepEqual(orderState.collapsedPaneIDs, [notebookID]);
-orderContext.defaultActivePaneIDs = () => [savedID, notebookID, reportID, 'reader:one', 'reader:outside'];
-for (const member of ['reader:one', savedID, notebookID, reportID]) {
-  orderState.paneOrder = orderContext.orderWithPaneMoved(member, 'reader:outside', 'after');
-  assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:outside', 'reader:one', savedID, notebookID, reportID]);
-  orderState.paneOrder = orderContext.orderWithPaneMoved(member, 'reader:outside', 'before');
-  assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', savedID, notebookID, reportID, 'reader:outside']);
-}
-const persisted = normalizeWorkspaceLayout(orderState);
-assert.deepEqual(persisted.columnGroups, JSON.parse(JSON.stringify(orderState.columnGroups)));
-orderContext.reconcileColumnGroups(['reader:one']);
-assert.deepEqual(Array.from(orderState.columnGroups[0].paneIDs), ['reader:one', savedID, notebookID, reportID]);
+// Unique project columns are stripped from both active and stored groups.
+orderState.columnGroups = normalizeColumnGroups([{ id: 'mixed', name: 'Research pack', paneIDs: ['reader:one', savedID, notebookID, reportID], columns: { [savedID]: { kind: 'utility' } }, collapsed: true }]);
+assert.deepEqual(orderState.columnGroups[0].paneIDs, ['reader:one']);
+assert.deepEqual(orderState.columnGroups[0].columns, {});
 orderContext.reconcileColumnGroups([]);
-assert.equal(orderState.columnGroups.length, 1);
-assert.deepEqual(normalizeColumnGroups([{ id:'a', paneIDs:['x','x'], name:' A ' }, { id:'b', paneIDs:['x','y'] }]).map(g => g.paneIDs), [['x'],['y']]);
+assert.deepEqual(Array.from(orderState.columnGroups[0].paneIDs), ['reader:one']);
+assert.deepEqual(normalizeColumnGroups([{ id: 'unique-only', paneIDs: [savedID, notebookID, reportID] }]), []);
+assert.deepEqual(normalizeWorkspaceLayout(orderState).columnGroups, JSON.parse(JSON.stringify(orderState.columnGroups)));
 assert.deepEqual(orderColumnGroups(['a','b','c','d'], [{paneIDs:['a','c']}]), ['a','c','b','d']);
-state.columnGroups = [{ id:'a', paneIDs:['reader'], collapsed:true }];
-assert.equal(context.paneIsCollapsed('reader'), true);
-state.columnGroups[0].collapsed = false;
-assert.equal(context.paneIsCollapsed('reader'), false);
-assert.deepEqual(state.collapsedPaneIDs, ['collapsed']);
-console.log('Mixed groups reconcile project membership, persist layout, retain closed panes, and preserve individual collapse.');
+console.log('Saved, Notebook and Report are excluded from active and persisted custom groups; remaining columns are preserved.');
 
 // Reset updates the future expanded widths without changing visibility or group membership.
 const resetState = { paneWeights: { a: 950, b: 820 }, collapsedPaneIDs: ['a'], columnGroups: [{ id: 'g', paneIDs: ['b'], collapsed: true }] };

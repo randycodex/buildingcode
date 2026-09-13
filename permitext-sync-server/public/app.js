@@ -110,12 +110,13 @@ import {
   emptyWorkspaceLayout,
   normalizeWorkspaceLayout,
   normalizeColumnGroups,
+  canGroupColumn,
   orderColumnGroups,
   normalizeWorkspaceRegistry,
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260913-saved-column-groups-v8";
+} from "./workspace-state.js?v=20260913-unique-column-groups-v9";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -33780,6 +33781,12 @@ function setColumnGroupCollapsed(group, collapsed) {
 }
 
 function prepareColumnGroupControls(panel, header, group) {
+  if (!canGroupColumn(panel.dataset.paneId)) {
+    header.querySelector('.column-group-menu-button')?.remove();
+    panel.querySelector('.column-group-collapsed-menu')?.remove();
+    panel.classList.remove('has-column-group');
+    return;
+  }
   let menuButton = header.querySelector('.column-group-menu-button');
   if (!menuButton) {
     header.addEventListener('click', (event) => {
@@ -33887,7 +33894,7 @@ function openColumnGroupEditor(panel, existing = null) {
   dialog.setAttribute('aria-labelledby', 'column-group-editor-title');
   dialog.innerHTML = `<form><h2 id="column-group-editor-title">${existing ? 'Edit group' : 'Group columns'}</h2>
     <label class="column-group-name-label">Group name<input name="groupName" maxlength="40" required autocomplete="off" placeholder="e.g. Fire safety"></label>
-    <p class="column-group-editor-hint">Choose columns to keep together. Saved, Notebook and Report stay together.</p>
+    <p class="column-group-editor-hint">Choose columns to keep together. Saved, Notebook and Report cannot be grouped.</p>
     <div class="column-group-choices"></div><p class="column-group-editor-error" role="status"></p>
     <div class="column-group-editor-actions"><button type="button" data-cancel>Cancel</button><button type="submit">${existing ? 'Save group' : 'Create group'}</button></div></form>`;
   const ids = activePaneIDs();
@@ -33895,8 +33902,8 @@ function openColumnGroupEditor(panel, existing = null) {
   const seen = new Set();
   const choices = [];
   for (const id of ids) {
-    if (seen.has(id)) continue;
-    const unit = basePaneGroupForMove(id, ids);
+    if (!canGroupColumn(id) || seen.has(id)) continue;
+    const unit = basePaneGroupForMove(id, ids).filter(canGroupColumn);
     unit.forEach((member) => seen.add(member));
     const other = unit.map(columnGroupForPane).find((group) => group && group.id !== existing?.id);
     const label = document.createElement('label');
