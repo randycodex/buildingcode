@@ -17093,9 +17093,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   display: grid;
   min-width: 140px;
   padding: 6px;
-  border: 1px solid var(--border-color, #303030);
+  border: 0;
   border-radius: 10px;
-  background: var(--surface, #000);
+  background: var(--menu-surface);
+  box-shadow: var(--shadow-panel);
 }
 .topbar-layout-menu-items button {
   padding: 8px 10px;
