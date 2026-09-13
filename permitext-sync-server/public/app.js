@@ -2627,13 +2627,8 @@ function applyReaderTextSize(panel, reader) {
 
 function changeReaderTextSize(panel, reader, delta) {
   const nextSize = clampNumber(readerTextSizeValue(reader) + delta, 14, 26, 16.5);
-  (state.readers || []).forEach((openReader) => {
-    openReader.textSize = nextSize;
-    const openPanel = track.querySelector(
-      `.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(openReader))}"]`
-    );
-    if (openPanel) applyReaderTextSize(openPanel, openReader);
-  });
+  reader.textSize = nextSize;
+  applyReaderTextSize(panel, reader);
   saveWorkspaceState();
   requestAnimationFrame(() => {
     track.querySelectorAll(".reader-panel").forEach((openPanel) => {
@@ -2671,13 +2666,8 @@ function applyReaderSpacing(panel, reader) {
 
 function changeReaderSpacing(panel, reader, delta) {
   const nextSpacing = Math.round((readerSpacingValue(reader) + delta) * 10) / 10;
-  (state.readers || []).forEach((openReader) => {
-    openReader.lineSpacing = nextSpacing;
-    const openPanel = track.querySelector(
-      `.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(openReader))}"]`
-    );
-    if (openPanel) applyReaderSpacing(openPanel, openReader);
-  });
+  reader.lineSpacing = clampNumber(nextSpacing, 1, 1.8, 1.2);
+  applyReaderSpacing(panel, reader);
   saveWorkspaceState();
 }
 
@@ -14729,12 +14719,6 @@ async function renderReader(reader, options = {}) {
   const closeButton = panel.querySelector(".reader-close");
   const dragHandle = panel.querySelector(".pane-drag-handle");
   const referenceSourceButton = panel.querySelector(".reader-reference-source");
-  const decreaseTextButton = panel.querySelector(".reader-text-decrease");
-  const increaseTextButton = panel.querySelector(".reader-text-increase");
-  const decreaseSpacingButton = panel.querySelector(".reader-spacing-decrease");
-  const increaseSpacingButton = panel.querySelector(".reader-spacing-increase");
-  const typographyToggle = panel.querySelector(".reader-typography-toggle");
-  const typographyTools = panel.querySelector(".reader-typography-tools");
   const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
@@ -14803,7 +14787,6 @@ async function renderReader(reader, options = {}) {
         ?.focus({ preventScroll: true });
     });
   }
-  typographyToggle.closest(".reader-typography-menu").hidden = isRecentlyViewedLinkedReader;
   internalSearchButton.hidden = isRecentlyViewedLinkedReader;
   dragHandle.hidden = isRecentlyViewedLinkedReader;
   internalSearchBox.hidden = true;
@@ -14816,17 +14799,6 @@ async function renderReader(reader, options = {}) {
   }
 
   populateCodeSelect(panel, reader);
-  decreaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, -1));
-  increaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, 1));
-  decreaseSpacingButton?.addEventListener("click", () => changeReaderSpacing(panel, reader, -0.1));
-  increaseSpacingButton?.addEventListener("click", () => changeReaderSpacing(panel, reader, 0.1));
-  typographyToggle?.addEventListener("click", () => {
-    const willOpen = typographyTools.hidden;
-    typographyTools.hidden = !willOpen;
-    typographyToggle.setAttribute("aria-expanded", String(willOpen));
-    typographyToggle.title = willOpen ? "Hide text and spacing controls" : "Show text and spacing controls";
-    typographyToggle.setAttribute("aria-label", typographyToggle.title);
-  });
   codeSelect.addEventListener("change", async () => {
     const selectedCode = codeOptions.find((option) => codeOptionValue(option) === codeSelect.value) || codeOptions[0];
     await changeReaderCode(panel, reader, selectedCode);
@@ -33695,6 +33667,26 @@ function prepareColumnGroupControls(panel, header, group) {
   panel.classList.toggle('has-column-group', Boolean(group));
 }
 
+function appendReaderMenuControls(menu, panel) {
+  const reader = (state.readers || []).find((item) => item.id === panel.dataset.readerId);
+  if (!reader) return;
+  const tools = document.createElement("div");
+  tools.className = "column-menu-typography";
+  tools.innerHTML = `<div class="column-menu-control-row" role="group" aria-label="Reader text size">
+    <span>Text size</span><button type="button" role="menuitem" class="reader-text-decrease" aria-label="Decrease Reader text size">A−</button><button type="button" role="menuitem" class="reader-text-increase" aria-label="Increase Reader text size">A+</button>
+    </div><div class="column-menu-control-row" role="group" aria-label="Reader line spacing">
+    <span>Spacing</span><button type="button" role="menuitem" class="reader-spacing-decrease" aria-label="Decrease Reader line spacing">−</button><button type="button" role="menuitem" class="reader-spacing-increase" aria-label="Increase Reader line spacing">+</button></div>`;
+  const sync = () => { syncReaderTextSizeControls(tools, reader); syncReaderSpacingControls(tools, reader); };
+  for (const [selector, change] of [
+    [".reader-text-decrease", () => changeReaderTextSize(panel, reader, -1)],
+    [".reader-text-increase", () => changeReaderTextSize(panel, reader, 1)],
+    [".reader-spacing-decrease", () => changeReaderSpacing(panel, reader, -0.1)],
+    [".reader-spacing-increase", () => changeReaderSpacing(panel, reader, 0.1)]
+  ]) tools.querySelector(selector).addEventListener("click", () => { change(); sync(); });
+  sync();
+  menu.append(tools);
+}
+
 function openColumnGroupMenu(panel, anchor) {
   document.querySelector('.column-group-menu')?._close?.();
   const group = columnGroupForPane(panel.dataset.paneId);
@@ -33704,6 +33696,7 @@ function openColumnGroupMenu(panel, anchor) {
   const controller = new AbortController();
   const close = () => { controller.abort(); menu.remove(); anchor.focus({ preventScroll: true }); };
   menu._close = close;
+  appendReaderMenuControls(menu, panel);
   const add = (label, action) => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -33729,7 +33722,7 @@ function openColumnGroupMenu(panel, anchor) {
   menu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8))}px`;
   menu.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') { event.preventDefault(); close(); }
-    const items = [...menu.querySelectorAll('button')];
+    const items = [...menu.querySelectorAll('button:not(:disabled)')];
     if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
       event.preventDefault();
       items[(items.indexOf(document.activeElement) + (event.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
@@ -33737,7 +33730,7 @@ function openColumnGroupMenu(panel, anchor) {
     if (event.key === 'Tab') close();
   });
   document.addEventListener('pointerdown', (event) => { if (!menu.contains(event.target) && event.target !== anchor) close(); }, { signal: controller.signal });
-  menu.querySelector('button')?.focus();
+  menu.querySelector('button:not(:disabled)')?.focus();
 }
 
 function openColumnGroupEditor(panel, existing = null) {

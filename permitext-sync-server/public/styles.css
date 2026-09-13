@@ -17027,3 +17027,9 @@ html body *:has(:focus-visible) {
 .column-group-editor-actions { display: flex; justify-content: end; gap: 8px; }
 .column-group-editor-actions button { padding: 10px 16px; border: 0; border-radius: 8px; background: rgba(128,128,128,.16); color: inherit; box-shadow: none; cursor: pointer; }
 .column-group-editor-actions button[type="submit"] { background: #39756e; color: white; }
+
+.column-menu-typography { padding: 4px 6px 10px; }
+.column-menu-control-row { display: flex; align-items: center; gap: 6px; padding: 4px 0; }
+.column-menu-control-row > span { flex: 1; min-width: 86px; font-size: 13px; color: var(--text-secondary); }
+.column-group-menu .column-menu-control-row button { width: 34px; height: 30px; padding: 0; text-align: center; background: rgba(128,128,128,.14); }
+.column-group-menu .column-menu-control-row button:disabled { opacity: .35; cursor: default; }

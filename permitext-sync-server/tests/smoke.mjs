@@ -502,13 +502,8 @@ async function main() {
     );
     assert(!settingsTemplateSource.includes('class="preview-font-family-select"'));
     assert(
-      webRoot.text.includes('class="reader-spacing-controls"') &&
-        webRoot.text.includes('class="reader-typography-toggle"') &&
-        webRoot.text.includes('class="reader-typography-tools" hidden') &&
-        webRoot.text.includes('aria-label="Decrease Reader line spacing"') &&
-        webRoot.text.includes('aria-label="Increase Reader line spacing"') &&
-        boxedChevronSVGs.length === 0,
-      "Reader headers omitted their line-spacing controls or restored boxed chevrons."
+      !webRoot.text.includes('class="reader-typography-toggle"') && boxedChevronSVGs.length === 0,
+      "Reader headers restored the retired typography toggle or boxed chevrons."
     );
     assert(
       webRoot.text.includes('class="reader-internal-search search-box"') &&
@@ -2367,11 +2362,10 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("changeReaderTextSize(panel, reader, -1)") &&
-        workspaceScript.text.includes("(state.readers || []).forEach((openReader)") &&
-        workspaceScript.text.includes("if (openPanel) applyReaderTextSize(openPanel, openReader)") &&
-        workspaceScript.text.includes('panel.style.setProperty("--reader-font-size"') &&
-        webRoot.text.includes('aria-label="Reader text size"'),
-      "Reader text resize controls no longer update every open Reader."
+        workspaceScript.text.includes("appendReaderMenuControls(menu, panel)") &&
+        workspaceScript.text.includes("reader.textSize = nextSize") &&
+        workspaceScript.text.includes('aria-label="Reader text size"'),
+      "Reader column menu omitted its per-reader typography controls."
     );
     assert(
       workspaceScript.text.includes("function stabilizeReaderSectionAtHeader") &&
