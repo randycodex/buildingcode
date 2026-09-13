@@ -11431,21 +11431,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 
 .saved-note-preview {
   display: block;
-  margin-top: 10px;
+  margin-top: 20px;
   padding: 9px 11px;
   border-radius: 8px;
   background: rgba(128,128,128,.1);
   color: var(--text-primary);
   font-size: calc(var(--saved-font-size) * 0.814) !important;
   line-height: 1.4;
-}
-.saved-note-label {
-  display: block;
-  margin-bottom: 4px;
-  color: var(--text-secondary);
-  font-size: .9em;
-  font-weight: 600;
-  text-transform: none;
 }
 .saved-note-text {
   display: -webkit-box;
