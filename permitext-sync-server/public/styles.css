@@ -3218,8 +3218,9 @@ select option:checked {
 
 .section-detail-note-box textarea {
   width: 100%;
-  height: clamp(118px, 24vh, 210px);
-  min-height: 118px;
+  height: auto;
+  min-height: 48px;
+  field-sizing: content;
   max-height: min(70vh, 760px);
   overflow-y: auto;
   resize: none;
@@ -17140,3 +17141,5 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .section-detail-panel {
   background: color-mix(in srgb, #67b7ff 8%, var(--background));
 }
+
+.section-detail-note-box .section-detail-note-resize-handle { display: none; }
