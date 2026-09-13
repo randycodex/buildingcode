@@ -445,11 +445,7 @@ assert.match(functionSource(appSource, "closeAllColumns"), /state\.coordinations
 assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordinationFilters = \{\}/);
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
 const pinnedWorkflowSource = functionSource(appSource, "pinCriticalWorkflowPanesToLeft");
-assert.match(pinnedWorkflowSource, /new Set\(savedPaneIDs\(\)\)/);
-assert.match(pinnedWorkflowSource, /openProjectDetails\(\)\.flatMap\(projectWorkspacePaneIDs\)/);
-assert.match(pinnedWorkflowSource, /settingsPaneID = state\.utilities\.settings \? "utility:settings" : ""/);
-assert.match(pinnedWorkflowSource, /return \[[\s\S]*?paneID === settingsPaneID[\s\S]*?projectsPaneIDs\.has\(paneID\)[\s\S]*?projectOwnedPaneIDs\.has\(paneID\)/, "Settings must be the only pane pinned to the left of Projects, followed by Project-owned work.");
-assert.match(pinnedWorkflowSource, /paneID !== settingsPaneID[\s\S]*?!projectsPaneIDs\.has\(paneID\)[\s\S]*?!projectOwnedPaneIDs\.has\(paneID\)/, "Pinned panes must not be duplicated in the ordinary pane sequence.");
+assert.doesNotMatch(pinnedWorkflowSource, /savedPaneIDs|openProjectDetails/, "Saved and project tools must not be pinned as a group.");
 const pinCriticalWorkflowPanesToLeft = new Function(
   "state",
   "savedPaneIDs",
@@ -473,13 +469,13 @@ assert.deepEqual(
   ]),
   [
     "utility:settings",
-    "utility:saved:projects",
-    "project:notebook:project-1",
     "reader:one",
     "utility:analysis",
+    "project:notebook:project-1",
+    "utility:saved:projects",
     "utility:search:one"
   ],
-  "Settings must remain left of Projects while every ordinary pane remains to the right."
+  "Only Account is pinned; Saved retains its position among the other columns."
 );
 const toggleUtilityPaneSource = functionSource(appSource, "toggleUtilityPane");
 assert.match(

@@ -3452,17 +3452,10 @@ function isProjectToolPaneID(paneID) {
 
 function pinCriticalWorkflowPanesToLeft(paneIDs) {
   const settingsPaneID = state.utilities.settings ? "utility:settings" : "";
-  const projectsPaneIDs = new Set(savedPaneIDs());
-  const projectOwnedPaneIDs = new Set(openProjectDetails().flatMap(projectWorkspacePaneIDs));
+  // Saved and its project tools retain the user's chosen positions.
   return [
     ...paneIDs.filter((paneID) => paneID === settingsPaneID),
-    ...paneIDs.filter((paneID) => projectsPaneIDs.has(paneID)),
-    ...paneIDs.filter((paneID) => projectOwnedPaneIDs.has(paneID)),
-    ...paneIDs.filter((paneID) =>
-      paneID !== settingsPaneID &&
-      !projectsPaneIDs.has(paneID) &&
-      !projectOwnedPaneIDs.has(paneID)
-    )
+    ...paneIDs.filter((paneID) => paneID !== settingsPaneID)
   ];
 }
 
@@ -3474,14 +3467,7 @@ function activePaneIDs() {
     if (!ordered.includes(id)) ordered.push(id);
   });
   const paired = ordered.filter((id) =>
-    !id.startsWith("section:detail:") &&
-    !isProjectDetailPaneID(id) &&
-    !isProjectNotebookPaneID(id) &&
-    !isProjectReportDraftPaneID(id) &&
-    !isProjectCoordinationPaneID(id) &&
-    !isProjectCoordinationThreadPaneID(id) &&
-    !isProjectWorkboardPaneID(id) &&
-    !isCodeQuestionPaneID(id)
+    !id.startsWith("section:detail:") && !isCodeQuestionPaneID(id)
   );
   // Unified Research columns keep their position when switching from History
   // to a conversation. Only legacy standalone conversation panes are paired.
@@ -3497,20 +3483,6 @@ function activePaneIDs() {
     const savedIndex = paired.indexOf(primarySavedPaneID());
     const anchorIndex = researchIndex === -1 ? savedIndex : researchIndex;
     paired.splice(anchorIndex === -1 ? paired.length : anchorIndex + 1, 0, ...conversationPaneIDs);
-  }
-  if (openProjectDetails().length) {
-    const detailIDs = openProjectDetails().flatMap(projectWorkspacePaneIDs);
-    const firstDetailIndex = ordered.findIndex((id) => detailIDs.includes(id));
-    const orderedAnchorID = firstDetailIndex > 0 ? ordered[firstDetailIndex - 1] : "";
-    const projectAnchorID = paired.includes(orderedAnchorID)
-      ? orderedAnchorID
-      : primarySavedPaneID();
-    const projectAnchorIndex = paired.indexOf(projectAnchorID);
-    if (projectAnchorIndex === -1) {
-      paired.push(...detailIDs);
-    } else {
-      paired.splice(projectAnchorIndex + 1, 0, ...detailIDs);
-    }
   }
   // Code Decisions follow Projects/Saved; the existing persisted Research
   // workspace remains the primary working surface between the index and record.
@@ -33106,10 +33078,8 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) {
     return ["utility:analysis", paneIDForResearchConversation()].filter((id) => id && active.has(id));
   }
-  if (
-    paneID === primarySavedPaneID() ||
-    isProjectDetailPaneID(paneID)
-  ) {
+  if (savedPaneIDs().includes(paneID)) return active.has(paneID) ? [paneID] : [];
+  if (isProjectDetailPaneID(paneID)) {
     return [
       primarySavedPaneID(),
       ...openProjectDetails().flatMap(projectWorkspacePaneIDs),
@@ -33146,7 +33116,8 @@ function orderWithPaneMoved(draggedPaneID, targetPaneID, position) {
   const currentOrder = activePaneIDs();
   const draggedProject = projectForToolPaneID(draggedPaneID);
   const targetProject = projectForToolPaneID(targetPaneID);
-  if (draggedProject || targetProject) {
+  const involvesSaved = savedPaneIDs().includes(draggedPaneID) || savedPaneIDs().includes(targetPaneID);
+  if (!involvesSaved && (draggedProject || targetProject)) {
     if (!draggedProject || !targetProject || !projectDetailMatches(draggedProject, targetProject)) return null;
   }
   const draggedGroup = paneGroupForMove(draggedPaneID, currentOrder);

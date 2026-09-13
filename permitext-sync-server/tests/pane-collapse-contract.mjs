@@ -113,3 +113,30 @@ grip.emit('pointerdown', { target: { closest: () => null } });
 grip.emit('dragstart', { dataTransfer: { setData: (_type, id) => { transfer = id; } } });
 assert.equal(transfer, 'reader:drag', 'Empty header space initiates the same column drag');
 console.log('Header dragging excludes title buttons and other interactive controls.');
+
+// Saved moves independently, including across its own Notebook and Report.
+const savedID = 'utility:saved:one', notebookID = 'project:notebook:p', reportID = 'project:report-draft:p';
+const orderState = { utilities: {}, utilityInstances: [], paneOrder: [savedID, notebookID, reportID, 'reader:one'], collapsedPaneIDs: [savedID] };
+const orderContext = vm.createContext({
+  state: orderState, Set,
+  defaultActivePaneIDs: () => [savedID, notebookID, reportID, 'reader:one'],
+  savedPaneIDs: () => [savedID], primarySavedPaneID: () => savedID,
+  isCodeQuestionPaneID: () => false, openResearchConversationPaneIDs: () => [], openCodeQuestionPaneIDs: () => [],
+  isProjectDetailPaneID: () => false,
+  isProjectToolPaneID: id => id === notebookID || id === reportID,
+  projectForToolPaneID: id => id === notebookID || id === reportID ? { id: 'p' } : null,
+  paneIDForProjectCoordination: () => '', openCoordinationThreadForProject: () => null,
+  searchIDForLinkedReaderPane: () => ''
+});
+vm.runInContext(['pinCriticalWorkflowPanesToLeft', 'activePaneIDs', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
+for (const [target, position, expected] of [
+  ['reader:one', 'after', [notebookID, reportID, 'reader:one', savedID]],
+  [reportID, 'before', [notebookID, savedID, reportID, 'reader:one']],
+  [notebookID, 'before', [savedID, notebookID, reportID, 'reader:one']]
+]) {
+  orderState.paneOrder = orderContext.orderWithPaneMoved(savedID, target, position);
+  assert.deepEqual(Array.from(orderContext.activePaneIDs()), expected);
+  assert.deepEqual(Array.from(orderContext.activePaneIDs()), expected, 'Rerender must not pull Saved back to the left');
+}
+assert.deepEqual(orderState.collapsedPaneIDs, [savedID]);
+console.log('Saved moves independently before, between and after project tools, without repinning on render.');
