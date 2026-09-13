@@ -22799,7 +22799,8 @@ async function renderProjectNotebook(project) {
     foundation = foundationPayload;
     cards = cardPayload.cards || [];
     notebookReadOnly = cardPayload.access?.readOnly === true;
-    shell.replaceChildren(draftStatus);
+    shell.replaceChildren();
+    panel.append(draftStatus);
     if (identity.sharedOrganizationID) {
       const accessNote = document.createElement("p");
       accessNote.className = "notebook-access-note";
@@ -22904,7 +22905,8 @@ async function renderProjectNotebook(project) {
 
     const focus = document.createElement("section");
     focus.className = "notebook-focus";
-    shell.append(rail, focus, draftStatus);
+    shell.append(rail, focus);
+    panel.append(draftStatus);
 
     let notebookAutosaveTask = null;
     let selectingCards = false;
