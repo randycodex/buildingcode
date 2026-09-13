@@ -15175,7 +15175,10 @@ async function renderSearchHistory(panel, instance, options = {}) {
           sourceSurface: "search", forceNewReader: true
         });
       });
-      tile.append(openButton, openNewButton);
+      const actions = document.createElement("div");
+      actions.className = "saved-row-actions search-row-actions";
+      actions.append(openNewButton);
+      tile.append(openButton, actions);
       list.append(tile);
     });
     section.append(label, list);
@@ -15687,7 +15690,10 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
           sourceSurface: "search", forceNewReader: true
         });
       });
-      row.append(mainButton, saveButton, openNewButton);
+      const actions = document.createElement("div");
+      actions.className = "saved-row-actions search-row-actions";
+      actions.append(openNewButton);
+      row.append(mainButton, saveButton, actions);
       groupBody.append(row);
     });
     const loadedGroupCount = groupBody.querySelectorAll(".result-row").length;

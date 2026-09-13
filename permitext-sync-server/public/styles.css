@@ -16746,15 +16746,16 @@ html body *:has(:focus-visible) {
   margin-top: 0;
 }
 
-.search-open-new-reader {
-  min-height: 24px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--text-secondary);
+.search-row-actions {
+  --saved-font-size: var(--reader-font-size);
   grid-column: 1 / -1;
-  justify-self: start;
-  font-size: 12px;
+  width: 100%;
+}
+.result-row:hover .search-row-actions button,
+.result-row:focus-within .search-row-actions button,
+.search-jump-tile:hover .search-row-actions button,
+.search-jump-tile:focus-within .search-row-actions button {
+  opacity: 1;
 }
 .reader-keep-open {
   white-space: nowrap;
