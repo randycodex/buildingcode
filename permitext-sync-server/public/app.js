@@ -33911,8 +33911,8 @@ function openColumnGroupEditor(panel, existing = null) {
   document.querySelector('.column-group-dialog')?.remove();
   const dialog = document.createElement('dialog');
   dialog.className = 'column-group-dialog';
-  dialog.setAttribute('aria-labelledby', 'column-group-editor-title');
-  dialog.innerHTML = `<form><h2 id="column-group-editor-title">${existing ? 'Edit group' : 'Group columns'}</h2>
+  dialog.setAttribute('aria-label', existing ? 'Edit group' : 'Group columns');
+  dialog.innerHTML = `<form>
     <label class="column-group-name-label">Group name<input name="groupName" maxlength="40" required autocomplete="off" placeholder="e.g. Fire safety"></label>
     <p class="column-group-editor-hint">Choose columns to keep together. Saved, Notebook and Report cannot be grouped.</p>
     <div class="column-group-choices"></div><p class="column-group-editor-error" role="status"></p>
