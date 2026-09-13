@@ -33917,14 +33917,6 @@ function openColumnGroupEditor(panel, existing = null) {
     <p class="column-group-editor-hint">Choose columns to keep together. Saved, Notebook and Report cannot be grouped.</p>
     <div class="column-group-choices"></div><p class="column-group-editor-error" role="status"></p>
     <div class="column-group-editor-actions"><button type="button" data-cancel>Cancel</button><button type="submit">${existing ? 'Save group' : 'Create group'}</button></div></form>`;
-  const choiceStrip = dialog.querySelector('.column-group-choices');
-  choiceStrip.addEventListener('wheel', (event) => {
-    if (event.ctrlKey || Math.abs(event.deltaX) >= Math.abs(event.deltaY)
-      || choiceStrip.scrollWidth <= choiceStrip.clientWidth) return;
-    const scale = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? choiceStrip.clientWidth : 1;
-    choiceStrip.scrollLeft += event.deltaY * scale;
-    event.preventDefault();
-  }, { passive: false });
   const ids = activePaneIDs();
   const selected = new Set(existing?.paneIDs || (panel ? basePaneGroupForMove(panel.dataset.paneId, ids) : []));
   const seen = new Set();
