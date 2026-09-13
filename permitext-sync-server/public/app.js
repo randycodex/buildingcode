@@ -554,6 +554,8 @@ let activeResearchConversation = null;
 // column in the current tab.
 let researchConversationPaneOpened = false;
 let researchHistoryShowing = false;
+const researchDraftPaneIDs = new Set();
+const researchNewChatDrafts = new Map();
 // Project Research can open alongside the primary Research list/conversation
 // pair. These additional drill-ins are deliberately session-only.
 const supplementalResearchConversationIDs = [];
@@ -1174,6 +1176,8 @@ function clearWorkspaceTransientRuntime() {
   searchTimers.clear();
   readerSearchTimers.clear();
   activeResearchConversation = null;
+  researchDraftPaneIDs.clear();
+  researchNewChatDrafts.clear();
   researchQuestionDraft = "";
   activeEvidenceDiscovery = null;
   closeActiveCustomSelect();
@@ -3059,6 +3063,8 @@ function clearProjectSpecificReaders(project) {
 function clearProjectSpecificResearch(project) {
   const projectID = projectDetailKey(project);
   researchOpenGeneration += 1;
+  researchDraftPaneIDs.clear();
+  researchNewChatDrafts.clear();
   researchQuestionDraft = "";
   if (
     !activeEvidenceDiscovery?.projectID ||
@@ -6899,6 +6905,8 @@ function clearResearchAccountRuntime() {
   clearActiveResearchConversation();
   researchConversationList = [];
   researchUsage = null;
+  researchDraftPaneIDs.clear();
+  researchNewChatDrafts.clear();
   researchQuestionDraft = "";
   activeEvidenceDiscovery = null;
   dismissedLinkedResearchDecisionKeys.clear();
@@ -13062,6 +13070,9 @@ function readerSectionResearchSelection(sectionWrapper) {
 }
 
 function researchConversationTitle(conversation, fallback = "New Research") {
+  const title = String(conversation?.title || "").trim();
+  const question = String(conversation?.starterQuestion || "").replace(/\s+/g, " ").trim();
+  if (question && /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},\s+\d{4}\s*·/.test(title)) return question;
   return String(conversation?.title || conversation?.starterQuestion || fallback).trim() || fallback;
 }
 
@@ -17629,6 +17640,7 @@ async function openSupplementalResearchConversation(conversationID) {
 async function openResearchConversation(conversationID, options = {}) {
   const normalizedConversationID = String(conversationID || "").trim();
   if (!normalizedConversationID) return null;
+  researchDraftPaneIDs.delete(options.instance ? paneIDForUtilityInstance(options.instance) : "utility:analysis");
   if (options.instance) {
     const instanceID = options.instance.id;
     const conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
@@ -19405,6 +19417,7 @@ function researchFailureMessage(error) {
 }
 
 function renderNewResearchComposer(container, researchEnabled, instance = null) {
+  const draftKey = instance ? paneIDForUtilityInstance(instance) : "utility:analysis";
   const form = document.createElement("form");
   form.className = "research-composer research-start-composer";
   form.classList.add("research-compact-composer");
@@ -19418,7 +19431,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
   input.rows = 1;
   input.maxLength = 2000;
   input.placeholder = researchChatPlaceholder;
-  input.value = instance ? instance.draft : researchQuestionDraft;
+  input.value = researchNewChatDrafts.get(draftKey) || "";
   const sendButton = document.createElement("button");
   sendButton.className = "ghost-button research-send-button";
   sendButton.type = "submit";
@@ -19431,8 +19444,7 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
     sendButton.disabled = !researchEnabled || input.disabled || input.value.trim().length < 3;
   };
   input.addEventListener("input", () => {
-    if (instance) { instance.draft = input.value; saveWorkspaceState(); }
-    else researchQuestionDraft = input.value;
+    researchNewChatDrafts.set(draftKey, input.value);
     resizeComposer();
     updateSendState();
   });
@@ -19469,7 +19481,8 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
         researchConversationPaneOpened = true;
         activeResearchConversation = conversation;
         state.researchConversationID = conversationID;
-      } else instance.draft = "";
+      }
+      researchNewChatDrafts.delete(draftKey);
       progress.conversationID = conversationID;
       activeResearchProgress.set(conversationID, progress);
       researchQuestionDraft = "";
@@ -19543,9 +19556,10 @@ function renderNewResearchComposer(container, researchEnabled, instance = null) 
 async function renderResearch(paneID = "utility:analysis") {
   const instance = (state.utilityInstances || []).find((item) => paneIDForUtilityInstance(item) === paneID) || null;
   const conversationOpen = instance ? Boolean(instance.conversationID) : researchConversationPaneIsOpen();
-  const historyShowing = !conversationOpen || (instance ? instance.historyShowing : researchHistoryShowing);
+  const draftShowing = researchDraftPaneIDs.has(paneID);
+  const historyShowing = !draftShowing && (!conversationOpen || (instance ? instance.historyShowing : researchHistoryShowing));
   const panel = renderUtility(analysisTemplate, paneID);
-  panel.classList.add("analysis-panel", "research-list-panel", "has-research-composer");
+  panel.classList.add("analysis-panel", "research-list-panel");
   const projectScopedResearch = Boolean(activeProjectIDForCodeQuestions());
   panel.classList.toggle("is-project-scoped", projectScopedResearch);
   if (!instance) panel.querySelector(".utility-close")?.addEventListener("click", closeResearchWorkspace);
@@ -19590,20 +19604,27 @@ async function renderResearch(paneID = "utility:analysis") {
   historyButton.setAttribute("aria-label", "Back to history");
   historyButton.setAttribute("aria-expanded", "false");
   historyButton.addEventListener("click", () => {
-    if (instance) {
-      instance.historyShowing = !instance.historyShowing;
-      saveWorkspaceState();
-      void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-      return;
-    }
-    if (researchConversationPaneIsOpen()) {
-      researchHistoryShowing = !researchHistoryShowing;
-      void transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
-      return;
-    }
-    const expanded = panel.classList.toggle("is-history-open");
-    historyButton.setAttribute("aria-expanded", String(expanded));
+    researchDraftPaneIDs.delete(paneID);
+    if (instance) instance.historyShowing = true;
+    else researchHistoryShowing = true;
+    saveWorkspaceState();
+    void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
   });
+  if (draftShowing && activeAccount() && hasCapability("research")) {
+    panelActions?.prepend(historyButton);
+    panel.classList.add("has-research-composer", "is-new-research-chat");
+    const welcome = document.createElement("div");
+    welcome.className = "research-chat-welcome";
+    const heading = document.createElement("h3");
+    heading.textContent = "New chat";
+    const context = document.createElement("p");
+    context.textContent = workspaceProject()?.name || "Unassigned Research";
+    welcome.append(heading, context);
+    panel.append(welcome);
+    renderNewResearchComposer(panel, true, instance);
+    requestAnimationFrame(() => panel.querySelector(".research-question-input")?.focus({ preventScroll: true }));
+    return panel;
+  }
   if (conversationOpen && !historyShowing) {
     panelActions?.prepend(historyButton);
     panel.classList.add("has-inline-conversation");
@@ -19831,7 +19852,17 @@ async function renderResearch(paneID = "utility:analysis") {
     content.append(decisionResearch);
   }
 
-  renderNewResearchComposer(panel, researchEnabled, instance);
+  if (researchEnabled) {
+    const newChatButton = document.createElement("button");
+    newChatButton.type = "button";
+    newChatButton.className = "ghost-button research-new-chat";
+    newChatButton.textContent = "+ New chat";
+    newChatButton.addEventListener("click", () => {
+      researchDraftPaneIDs.add(paneID);
+      void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+    });
+    content.prepend(newChatButton);
+  }
 
   if (!researchConversationList.length) {
     const empty = document.createElement("div");
@@ -21415,7 +21446,12 @@ async function renderResearchConversation(conversationID, options = {}) {
   };
   input.addEventListener("input", () => {
     resizeComposerInput();
-    if (ownerInstance) { ownerInstance.draft = input.value; saveWorkspaceState(); }
+    if (ownerInstance) {
+      const currentInstance = state.utilityInstances.find((item) => item.id === ownerInstance.id);
+      if (currentInstance) currentInstance.draft = input.value;
+      ownerInstance.draft = input.value;
+      saveWorkspaceState();
+    }
     else researchQuestionDraft = input.value;
     sendButton.disabled = !researchEnabled ||
       researchRequestActive ||
@@ -37158,6 +37194,8 @@ async function closeAllColumns() {
   state.researchConversationID = "";
   researchConversationPaneOpened = false;
   researchHistoryShowing = false;
+  researchDraftPaneIDs.clear();
+  researchNewChatDrafts.clear();
   activeResearchConversation = null;
   supplementalResearchConversationIDs.length = 0;
   supplementalResearchConversations.clear();
