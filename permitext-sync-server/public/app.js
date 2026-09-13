@@ -3342,7 +3342,10 @@ function linkedReaderPaneIDForSearch(searchID) {
 
 function keepDerivedReader(reader) {
   for (const [sourceID, readerID] of Object.entries(searchLinkedReadersBySearch())) {
-    if (readerID === reader.id) delete state.searchLinkedReaders[sourceID];
+    if (readerID === reader.id) {
+      reader.pinnedDetailSourceID = sourceID;
+      delete state.searchLinkedReaders[sourceID];
+    }
   }
   reader.searchPreviewPaneID = "";
   reader.recentlyViewedSourceSearchID = "";
@@ -14816,11 +14819,11 @@ async function renderReader(reader, options = {}) {
   );
   const referenceSourceReader = state.readers.find((item) => item.id === reader.referenceSourceReaderID);
 
-  if (reader.searchPreviewPaneID || reader.pinnedSearchPaneID || searchIDForLinkedReaderPane(`reader:${reader.id}`)) {
+  if (reader.searchPreviewPaneID || reader.pinnedSearchPaneID || reader.pinnedDetailSourceID || searchIDForLinkedReaderPane(`reader:${reader.id}`)) {
     const keepButton = document.createElement("button");
     keepButton.type = "button";
     keepButton.className = "icon-button reader-keep-open";
-    const pinned = Boolean(reader.pinnedSearchPaneID);
+    const pinned = Boolean(reader.pinnedSearchPaneID || reader.pinnedDetailSourceID);
     keepButton.title = pinned ? "Unpin this reader" : "Keep this reader open";
     keepButton.setAttribute("aria-label", keepButton.title);
     keepButton.setAttribute("aria-pressed", String(pinned));
@@ -14831,6 +14834,17 @@ async function renderReader(reader, options = {}) {
       const refreshPaneIDs = [paneIDForReader(current)];
       if (searchIDForLinkedReaderPane(`reader:${current.id}`)) {
         keepDerivedReader(current);
+      } else if (current.pinnedDetailSourceID) {
+        const sourceID = current.pinnedDetailSourceID;
+        if (!sectionDetailsBySearch()[sourceID] || columnGroupForPane(paneIDForReader(current))) return;
+        const previousID = searchLinkedReadersBySearch()[sourceID];
+        const previous = state.readers.find((item) => item.id === previousID);
+        if (previous && previous.id !== current.id) {
+          keepDerivedReader(previous);
+          refreshPaneIDs.push(paneIDForReader(previous));
+        }
+        state.searchLinkedReaders[sourceID] = current.id;
+        current.pinnedDetailSourceID = "";
       } else if (current.pinnedSearchPaneID) {
         const searchPaneID = current.pinnedSearchPaneID;
         const previous = reusableSearchReader(state.readers, searchPaneID);
@@ -14855,11 +14869,11 @@ async function renderReader(reader, options = {}) {
         livePanel.classList.toggle("is-recently-viewed-linked-reader", Boolean(liveReader.recentlyViewedSourceSearchID && linked));
         const pin = livePanel.querySelector(".reader-keep-open");
         if (pin) {
-          const canToggle = Boolean(liveReader.searchPreviewPaneID || liveReader.pinnedSearchPaneID || linked);
+          const canToggle = Boolean(liveReader.searchPreviewPaneID || liveReader.pinnedSearchPaneID || liveReader.pinnedDetailSourceID || linked);
           pin.hidden = !canToggle;
-          pin.title = liveReader.pinnedSearchPaneID ? "Unpin this reader" : "Keep this reader open";
+          pin.title = (liveReader.pinnedSearchPaneID || liveReader.pinnedDetailSourceID) ? "Unpin this reader" : "Keep this reader open";
           pin.setAttribute("aria-label", pin.title);
-          pin.setAttribute("aria-pressed", String(Boolean(liveReader.pinnedSearchPaneID)));
+          pin.setAttribute("aria-pressed", String(Boolean(liveReader.pinnedSearchPaneID || liveReader.pinnedDetailSourceID)));
         }
         if (!linked) {
           livePanel.querySelector(".reader-internal-search-toggle")?.removeAttribute("hidden");
