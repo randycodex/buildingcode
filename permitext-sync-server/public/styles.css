@@ -16962,7 +16962,8 @@ html body *:has(:focus-visible) {
   font-size: 11px;
   background: rgba(128,128,128,.12);
 }
-.column-group-menu-button:hover, .column-group-collapsed-menu:hover { background: rgba(128,128,128,.18); }
+.column-group-menu-button:hover, .column-group-collapsed-menu:hover { background: transparent; }
+.column-group-menu-button.has-group:hover { background: rgba(128,128,128,.12); }
 .column-group-collapsed-menu { display: none; }
 .workspace-panel.is-collapsed > .column-group-collapsed-menu {
   display: block !important;
