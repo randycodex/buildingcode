@@ -33188,7 +33188,7 @@ function openSavedColumnGroupsMenu() {
   }
   document.body.append(menu);
   const rect = anchor.getBoundingClientRect();
-  menu.style.left = `${Math.max(8, rect.right - menu.offsetWidth)}px`;
+  menu.style.left = `${Math.max(8, Math.min(rect.left + (rect.width - menu.offsetWidth) / 2, window.innerWidth - menu.offsetWidth - 8))}px`;
   menu.style.top = `${rect.bottom + 6}px`;
   menu.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') { event.preventDefault(); close(); }
