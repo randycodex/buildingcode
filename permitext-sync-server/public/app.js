@@ -3682,7 +3682,7 @@ function updateLinkedReaderForSearch(searchID, detail, overrides = {}) {
   const linkedReaders = searchLinkedReadersBySearch();
   const readerID = linkedReaders[searchID];
   const reader = (state.readers || []).find((item) => item.id === readerID);
-  if (!reader || !readerMatchesSource(reader, detail)) return null;
+  if (!reader) return null;
   Object.assign(reader, readerFieldsForSectionDetail(detail, overrides));
   placeLinkedReaderAfterSectionDetail(searchID, reader.id);
   return reader;
