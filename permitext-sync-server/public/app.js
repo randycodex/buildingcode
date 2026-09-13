@@ -16364,14 +16364,7 @@ async function renderSectionDetail(searchID, detail) {
     resizeNoteTo(textarea.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
   });
   textareaWrap.append(textarea, noteResizeHandle);
-  const projectsHost = document.createElement("section");
-  projectsHost.className = "section-detail-projects";
-  renderAnnotationProjectEditor(projectsHost, sectionTarget, sectionPayload, {
-    onChange: () => {
-      saveState.textContent = "Saved locally";
-    }
-  });
-  notes.append(notesHeader, textareaWrap, projectsHost);
+  notes.append(notesHeader, textareaWrap);
   panel.__annotationTarget = sectionTarget;
   panel.__sectionPayload = sectionPayload;
   notes.addEventListener("permitext-folder-save", (event) => {
