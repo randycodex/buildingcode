@@ -37663,10 +37663,10 @@ async function toggleUtilityPane(key) {
 }
 
 async function resetVisibleColumnWidths() {
-  (state.columnGroups || []).forEach((group) => { group.collapsed = false; });
-  track.querySelectorAll(".is-group-hidden").forEach((node) => node.classList.remove("is-group-hidden"));
-  state.collapsedPaneIDs = [];
-  track.querySelectorAll(".workspace-panel.is-collapsed").forEach(applyPaneCollapsedState);
+  track.querySelectorAll(":scope > .workspace-panel").forEach((panel) => {
+    panel._collapseAnimation?.cancel();
+    panel._restoreCollapseChildWidths?.();
+  });
   const currentLeft = track.scrollLeft;
   const paneIDs = activePaneIDs();
   state.paneWeights = paneIDs.reduce((weights, paneID) => {

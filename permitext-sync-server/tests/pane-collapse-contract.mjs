@@ -180,3 +180,17 @@ state.columnGroups[0].collapsed = false;
 assert.equal(context.paneIsCollapsed('reader'), false);
 assert.deepEqual(state.collapsedPaneIDs, ['collapsed']);
 console.log('Mixed groups reconcile project membership, persist layout, clean up closed panes, and preserve individual collapse.');
+
+// Reset updates the future expanded widths without changing visibility or group membership.
+const resetState = { paneWeights: { a: 950, b: 820 }, collapsedPaneIDs: ['a'], columnGroups: [{ id: 'g', paneIDs: ['b'], collapsed: true }] };
+const resetContext = vm.createContext({
+  state: resetState, track: { scrollLeft: 0, scrollWidth: 1200, clientWidth: 1000, querySelectorAll: () => [] },
+  activePaneIDs: () => ['a', 'b'], defaultPaneWidthForID: () => 600,
+  saveWorkspaceState() {}, async transitionWorkspace() {}, requestAnimationFrame: fn => fn()
+});
+vm.runInContext('async ' + actual('resetVisibleColumnWidths'), resetContext);
+await resetContext.resetVisibleColumnWidths();
+assert.deepEqual(JSON.parse(JSON.stringify(resetState.paneWeights)), { a: 600, b: 600 });
+assert.deepEqual(resetState.collapsedPaneIDs, ['a']);
+assert.equal(resetState.columnGroups[0].collapsed, true);
+console.log('Reset restores default widths while preserving collapsed columns and groups.');
