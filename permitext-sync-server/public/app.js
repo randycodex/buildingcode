@@ -30646,7 +30646,13 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
         if (notePreview) {
           const note = document.createElement("span");
           note.className = "saved-note-preview";
-          note.textContent = notePreview;
+          const noteLabel = document.createElement("span");
+          noteLabel.className = "saved-note-label";
+          noteLabel.textContent = "Your note";
+          const noteText = document.createElement("span");
+          noteText.className = "saved-note-text";
+          noteText.textContent = notePreview;
+          note.append(noteLabel, noteText);
           openButton.append(note);
         }
         if (options.showProjectContext !== false) {
