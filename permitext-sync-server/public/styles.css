@@ -2966,7 +2966,7 @@ select option:checked {
 }
 
 .reader-panel .reader-content {
-  margin-right: calc(0px - var(--panel-padding));
+  margin-right: 0;
   padding-right: calc(var(--panel-padding) + var(--space-4));
   scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
   scrollbar-width: thin;
@@ -3872,6 +3872,7 @@ select option:checked {
 
 .reader-panel .reader-body {
   grid-row: 1;
+  margin-right: calc(0px - var(--panel-padding) + 4px);
   margin-bottom: var(--space-3);
 }
 
