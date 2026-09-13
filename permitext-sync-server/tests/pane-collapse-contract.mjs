@@ -114,29 +114,30 @@ grip.emit('dragstart', { dataTransfer: { setData: (_type, id) => { transfer = id
 assert.equal(transfer, 'reader:drag', 'Empty header space initiates the same column drag');
 console.log('Header dragging excludes title buttons and other interactive controls.');
 
-// Saved moves independently, including across its own Notebook and Report.
+// Project columns move as a unit without changing individual collapsed state.
 const savedID = 'utility:saved:one', notebookID = 'project:notebook:p', reportID = 'project:report-draft:p';
-const orderState = { utilities: {}, utilityInstances: [], paneOrder: [savedID, notebookID, reportID, 'reader:one'], collapsedPaneIDs: [savedID] };
+const orderState = { utilities: {}, utilityInstances: [], paneOrder: ['reader:one', notebookID, savedID, reportID], collapsedPaneIDs: [notebookID] };
 const orderContext = vm.createContext({
   state: orderState, Set,
   defaultActivePaneIDs: () => [savedID, notebookID, reportID, 'reader:one'],
   savedPaneIDs: () => [savedID], primarySavedPaneID: () => savedID,
+  openProjectDetails: () => [{ id: 'p' }],
+  paneIDForProjectNotebook: () => notebookID, paneIDForProjectReportDraft: () => reportID,
   isCodeQuestionPaneID: () => false, openResearchConversationPaneIDs: () => [], openCodeQuestionPaneIDs: () => [],
-  isProjectDetailPaneID: () => false,
-  isProjectToolPaneID: id => id === notebookID || id === reportID,
-  projectForToolPaneID: id => id === notebookID || id === reportID ? { id: 'p' } : null,
-  paneIDForProjectCoordination: () => '', openCoordinationThreadForProject: () => null,
+  isProjectDetailPaneID: () => false, isProjectToolPaneID: () => false,
   searchIDForLinkedReaderPane: () => ''
 });
-vm.runInContext(['pinCriticalWorkflowPanesToLeft', 'activePaneIDs', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
-for (const [target, position, expected] of [
-  ['reader:one', 'after', [notebookID, reportID, 'reader:one', savedID]],
-  [reportID, 'before', [notebookID, savedID, reportID, 'reader:one']],
-  [notebookID, 'before', [savedID, notebookID, reportID, 'reader:one']]
-]) {
-  orderState.paneOrder = orderContext.orderWithPaneMoved(savedID, target, position);
-  assert.deepEqual(Array.from(orderContext.activePaneIDs()), expected);
-  assert.deepEqual(Array.from(orderContext.activePaneIDs()), expected, 'Rerender must not pull Saved back to the left');
+vm.runInContext(['savedProjectColumnGroup', 'groupSavedProjectColumns', 'pinCriticalWorkflowPanesToLeft', 'activePaneIDs', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
+assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', savedID, notebookID, reportID]);
+for (const member of [savedID, notebookID, reportID]) {
+  orderState.paneOrder = orderContext.orderWithPaneMoved(member, 'reader:one', 'before');
+  assert.deepEqual(Array.from(orderContext.activePaneIDs()), [savedID, notebookID, reportID, 'reader:one']);
+  orderState.paneOrder = orderContext.orderWithPaneMoved(member, 'reader:one', 'after');
+  assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', savedID, notebookID, reportID]);
 }
-assert.deepEqual(orderState.collapsedPaneIDs, [savedID]);
-console.log('Saved moves independently before, between and after project tools, without repinning on render.');
+assert.equal(orderContext.orderWithPaneMoved(notebookID, reportID, 'after'), null);
+orderState.paneOrder = orderContext.orderWithPaneMoved('reader:one', notebookID, 'after');
+assert.deepEqual(Array.from(orderContext.activePaneIDs()), [savedID, notebookID, reportID, 'reader:one']);
+assert.deepEqual(orderState.collapsedPaneIDs, [notebookID]);
+assert.deepEqual(Array.from(orderContext.savedProjectColumnGroup([savedID, reportID])), [savedID, reportID]);
+console.log('Saved, Notebook and Report move together from any member; internal order and individual collapse state are preserved.');

@@ -3450,6 +3450,25 @@ function isProjectToolPaneID(paneID) {
   return Boolean(projectForToolPaneID(paneID));
 }
 
+function savedProjectColumnGroup(paneIDs) {
+  const active = new Set(paneIDs);
+  return [primarySavedPaneID(), ...openProjectDetails().flatMap((detail) => [
+    paneIDForProjectNotebook(detail), paneIDForProjectReportDraft(detail)
+  ])].filter((id) => active.has(id));
+}
+
+function groupSavedProjectColumns(paneIDs) {
+  const group = savedProjectColumnGroup(paneIDs);
+  if (group.length < 2) return paneIDs;
+  // Saved anchors a previously scattered group; a group without Saved keeps
+  // the position of its first remaining tool.
+  const anchor = paneIDs.includes(primarySavedPaneID()) ? primarySavedPaneID() : group[0];
+  const result = paneIDs.filter((id) => !group.includes(id));
+  const index = paneIDs.slice(0, paneIDs.indexOf(anchor)).filter((id) => !group.includes(id)).length;
+  result.splice(index, 0, ...group);
+  return result;
+}
+
 function pinCriticalWorkflowPanesToLeft(paneIDs) {
   const settingsPaneID = state.utilities.settings ? "utility:settings" : "";
   // Saved and its project tools retain the user's chosen positions.
@@ -3531,6 +3550,7 @@ function activePaneIDs() {
       paired.splice(anchorIndex + 1, 0, detailID);
     }
   });
+  paired.splice(0, paired.length, ...groupSavedProjectColumns(paired));
   const criticalWorkflowFirst = pinCriticalWorkflowPanesToLeft(paired);
   state.paneOrder = criticalWorkflowFirst;
   return criticalWorkflowFirst;
@@ -33067,6 +33087,8 @@ function resetDividerPanes(previousPaneID, nextPaneID) {
 function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (!paneID) return [];
   const active = new Set(orderedIDs);
+  const projectGroup = savedProjectColumnGroup(orderedIDs);
+  if (projectGroup.includes(paneID)) return projectGroup;
   if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) {
     return ["utility:analysis", paneIDForResearchConversation()].filter((id) => id && active.has(id));
   }
@@ -33106,12 +33128,6 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
 function orderWithPaneMoved(draggedPaneID, targetPaneID, position) {
   if (!draggedPaneID || !targetPaneID || draggedPaneID === targetPaneID) return null;
   const currentOrder = activePaneIDs();
-  const draggedProject = projectForToolPaneID(draggedPaneID);
-  const targetProject = projectForToolPaneID(targetPaneID);
-  const involvesSaved = savedPaneIDs().includes(draggedPaneID) || savedPaneIDs().includes(targetPaneID);
-  if (!involvesSaved && (draggedProject || targetProject)) {
-    if (!draggedProject || !targetProject || !projectDetailMatches(draggedProject, targetProject)) return null;
-  }
   const draggedGroup = paneGroupForMove(draggedPaneID, currentOrder);
   const targetGroup = paneGroupForMove(targetPaneID, currentOrder);
   if (!draggedGroup.length || !targetGroup.length) return null;
