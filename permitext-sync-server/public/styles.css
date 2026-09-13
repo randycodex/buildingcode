@@ -1624,7 +1624,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   grid-template-rows: minmax(0, 1fr);
 }
 
-.reader-panel::before {
+.reader-panel:not(.is-collapsed)::before {
   position: absolute;
   top: 0;
   right: calc(var(--panel-padding) + var(--reader-scrollbar-rail-width));
@@ -1638,7 +1638,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   backdrop-filter: none;
 }
 
-.reader-panel.has-open-reader-menu::after {
+.reader-panel:not(.is-collapsed).has-open-reader-menu::after {
   position: absolute;
   inset: 0;
   z-index: 20;
@@ -1844,7 +1844,7 @@ body.is-detached-workboard-window .project-tool-pane-drag-handle {
   background: var(--recently-viewed-reader-background);
 }
 
-.reader-panel.is-recently-viewed-linked-reader::before {
+.reader-panel:not(.is-collapsed).is-recently-viewed-linked-reader::before {
   right: 0;
   background: var(--recently-viewed-reader-background);
 }
@@ -16334,7 +16334,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .reader-panel:has(.reader-internal-search:not([hidden])) .reader-content {
   padding-top: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
 }
-.reader-panel:has(.reader-internal-search:not([hidden]))::before {
+.reader-panel:not(.is-collapsed):has(.reader-internal-search:not([hidden]))::before {
   height: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
 }
 
