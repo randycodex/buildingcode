@@ -23327,6 +23327,9 @@ async function renderProjectNotebook(project) {
         notebookObjectURLs.clear();
         focus.replaceChildren(...children);
       };
+      const focusControls = document.createElement("div");
+      focusControls.className = "notebook-focus-controls";
+      focusControls.append(draftStatus);
 
       if (!activeCard) {
         const welcome = document.createElement("div");
@@ -23339,7 +23342,7 @@ async function renderProjectNotebook(project) {
         welcomeAction.textContent = "Create first Note";
         welcomeAction.addEventListener("click", () => newButton.click());
         welcome.append(welcomeCopy, welcomeAction);
-        replaceFocusedContent(welcome);
+        replaceFocusedContent(focusControls, welcome);
         return;
       }
       const focusedCardID = activeCard.id;
@@ -23564,7 +23567,8 @@ async function renderProjectNotebook(project) {
       footer.append(footerActions);
       const module = await loadNotebookModule();
       if (disposed || !isCurrentAccountRequest(requestIdentity) || renderSequence !== editorRenderSequence || activeCard?.id !== focusedCardID) return;
-      const focusedContent = [toolbar, editorElement];
+      focusControls.prepend(toolbar);
+      const focusedContent = [focusControls, editorElement];
       if (!researchButton.hidden || !coordinateButton.hidden) focusedContent.push(footer);
       replaceFocusedContent(...focusedContent);
 

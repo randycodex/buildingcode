@@ -13527,6 +13527,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   margin-bottom: 0;
 }
 
+.notebook-focus-controls {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
 .notebook-reference-menu {
   display: grid;
   gap: 0;
@@ -16351,16 +16357,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .settings-offline-status:empty { display: none; }
 
 .notebook-draft-status {
-  position: absolute;
-  z-index: 4;
-  left: var(--space-4);
-  bottom: calc(var(--panel-padding) + var(--space-4));
-  max-width: calc(100% - 190px);
+  max-width: 100%;
   margin: 0;
-  padding: 6px 10px;
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  box-shadow: 0 4px 18px rgb(0 0 0 / 0.22);
+  padding: 0 var(--space-1);
   font-size: 11px;
   line-height: 1.35;
 }
