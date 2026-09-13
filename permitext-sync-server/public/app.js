@@ -32301,13 +32301,18 @@ function toggleAccountDialog() {
   if (existing) { existing.close(); return; }
   const dialog = document.createElement("dialog");
   dialog.className = "account-dialog";
+  let closedWithKeyboard = false;
+  dialog.addEventListener("cancel", () => { closedWithKeyboard = true; });
+  dialog.addEventListener("keydown", () => { closedWithKeyboard = true; });
+  dialog.addEventListener("pointerdown", () => { closedWithKeyboard = false; });
   dialog.setAttribute("aria-label", "Account");
   const panel = renderSettings();
   dialog.append(panel);
   dialog.addEventListener("close", () => {
     dialog.remove();
     toggleSettingsButton.setAttribute("aria-pressed", "false");
-    toggleSettingsButton.focus({ preventScroll: true });
+    if (closedWithKeyboard) toggleSettingsButton.focus({ preventScroll: true });
+    else toggleSettingsButton.blur();
   });
   dialog.addEventListener("click", (event) => {
     if (event.target !== dialog) return;
