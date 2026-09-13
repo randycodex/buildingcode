@@ -109,11 +109,13 @@ import {
   duplicateWorkspace,
   emptyWorkspaceLayout,
   normalizeWorkspaceLayout,
+  normalizeColumnGroups,
+  orderColumnGroups,
   normalizeWorkspaceRegistry,
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260913-collapsible-columns-v6";
+} from "./workspace-state.js?v=20260913-custom-column-groups-v7";
 import {
   clearPendingResearchIntent,
   readPendingResearchIntent,
@@ -700,6 +702,7 @@ function loadWorkspaceState(accountOverride) {
       account: accountOverride === undefined ? loadPersistedAccount(saved.account) : accountOverride,
       browserCredentialID: typeof saved.browserCredentialID === "string" ? saved.browserCredentialID : "",
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
+      columnGroups: normalizeColumnGroups(saved.columnGroups),
       collapsedPaneIDs: Array.isArray(saved.collapsedPaneIDs) ? saved.collapsedPaneIDs.filter((id) => typeof id === "string") : [],
       paneOrder: Array.isArray(saved.paneOrder) ? saved.paneOrder.filter((id) => typeof id === "string") : [],
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
@@ -804,6 +807,7 @@ function loadWorkspaceState(accountOverride) {
       paneWeights: {},
       paneOrder: [],
       collapsedPaneIDs: [],
+      columnGroups: [],
       recentChaptersByCode: {},
       continuityAppliedAt: null,
       readerSettings: { ...defaultReaderSettings },
@@ -3470,7 +3474,8 @@ function groupSavedProjectColumns(paneIDs) {
 }
 
 function pinCriticalWorkflowPanesToLeft(paneIDs) {
-  const settingsPaneID = state.utilities.settings ? "utility:settings" : "";
+  const settingsIsGrouped = (state.columnGroups || []).some((group) => group.paneIDs.includes("utility:settings"));
+  const settingsPaneID = state.utilities.settings && !settingsIsGrouped ? "utility:settings" : "";
   // Saved and its project tools retain the user's chosen positions.
   return [
     ...paneIDs.filter((paneID) => paneID === settingsPaneID),
@@ -3551,6 +3556,8 @@ function activePaneIDs() {
     }
   });
   paired.splice(0, paired.length, ...groupSavedProjectColumns(paired));
+  reconcileColumnGroups(paired);
+  paired.splice(0, paired.length, ...orderColumnGroups(paired, state.columnGroups));
   const criticalWorkflowFirst = pinCriticalWorkflowPanesToLeft(paired);
   state.paneOrder = criticalWorkflowFirst;
   return criticalWorkflowFirst;
@@ -33095,7 +33102,25 @@ function resetDividerPanes(previousPaneID, nextPaneID) {
   });
 }
 
+function columnGroupForPane(paneID) {
+  return (state.columnGroups || []).find((group) => group.paneIDs.includes(paneID)) || null;
+}
+
+function reconcileColumnGroups(paneIDs) {
+  const active = new Set(paneIDs);
+  state.columnGroups = normalizeColumnGroups((state.columnGroups || []).map((group) => {
+    const members = new Set(group.paneIDs.filter((id) => active.has(id)));
+    for (const id of [...members]) basePaneGroupForMove(id, paneIDs).forEach((member) => members.add(member));
+    return { ...group, paneIDs: groupSavedProjectColumns([...members]) };
+  }));
+}
+
 function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
+  const group = columnGroupForPane(paneID);
+  return group ? group.paneIDs.filter((id) => orderedIDs.includes(id)) : basePaneGroupForMove(paneID, orderedIDs);
+}
+
+function basePaneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (!paneID) return [];
   const active = new Set(orderedIDs);
   const projectGroup = savedProjectColumnGroup(orderedIDs);
@@ -33582,9 +33607,201 @@ function renderFirstUseWelcome() {
   return welcome;
 }
 
+function columnPaneLabel(panel) {
+  const code = panel.querySelector('.code-select')?.selectedOptions?.[0]?.textContent;
+  const chapter = panel.querySelector('.chapter-select')?.selectedOptions?.[0]?.textContent;
+  return code ? [code, chapter].filter(Boolean).join(' · ')
+    : panel.querySelector(':scope > header .panel-kind, :scope > header h2')?.textContent?.trim() || 'Column';
+}
+
+function refreshColumnGroupPresentation() {
+  const panels = [...track.querySelectorAll(':scope > .workspace-panel')];
+  panels.forEach((panel) => panel.classList.remove('is-group-hidden'));
+  panels.forEach(preparePaneCollapse);
+  const hidden = new Set();
+  for (const group of state.columnGroups || []) {
+    if (group.collapsed) group.paneIDs.slice(1).forEach((id) => hidden.add(id));
+  }
+  panels.forEach((panel) => panel.classList.toggle('is-group-hidden', hidden.has(panel.dataset.paneId)));
+  track.querySelectorAll(':scope > .pane-divider').forEach((divider) => {
+    divider.classList.toggle('is-group-hidden', hidden.has(divider.dataset.nextPaneId));
+  });
+  updateCollapsedPaneDividers();
+}
+
+function setColumnGroupCollapsed(group, collapsed) {
+  const panels = [...track.querySelectorAll(':scope > .workspace-panel')]
+    .filter((panel) => group.paneIDs.includes(panel.dataset.paneId));
+  panels.forEach((panel) => {
+    panel._collapseAnimation?.cancel();
+    panel._restoreCollapseChildWidths?.();
+  });
+  const transition = Symbol();
+  group._transition = transition;
+  const totalWidth = panels.reduce((sum, panel) => sum + panel.getBoundingClientRect().width, 0);
+  const scrolls = panels.flatMap((panel) => panel._collapsedScrollPositions || []);
+  const readerPositions = new Map(panels.filter((panel) => panel._collapsedReaderPosition)
+    .map((panel) => [panel.dataset.paneId, panel._collapsedReaderPosition]));
+  group.collapsed = collapsed;
+  refreshColumnGroupPresentation();
+  saveWorkspaceState();
+  notifyWorkspaceLayoutChange();
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const animations = panels.filter((panel) => !panel.classList.contains('is-group-hidden')).map((panel, index) => {
+      panel._collapseAnimation?.cancel();
+      const width = panel.getBoundingClientRect().width;
+      const from = collapsed ? totalWidth : index === 0 ? 48 : 0;
+      const animation = panel.animate([
+        { flex: `0 0 ${from}px`, minWidth: `${from}px`, maxWidth: `${from}px`, paddingInline: '0px' },
+        { flex: `0 0 ${width}px`, minWidth: `${width}px`, maxWidth: `${width}px`, paddingInline: getComputedStyle(panel).paddingInline }
+      ], { duration: 240, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+      panel._collapseAnimation = animation;
+      return animation.finished.catch(() => {});
+    });
+    Promise.all(animations).then(() => {
+      if (group.collapsed !== collapsed || group._transition !== transition) return;
+      if (!collapsed) {
+        scrolls.forEach(({ node, top, left }) => { node.scrollTop = top; node.scrollLeft = left; });
+        restoreReaderScrollPositions(readerPositions);
+      }
+      notifyWorkspaceLayoutChange();
+    });
+  }
+}
+
+function prepareColumnGroupControls(panel, header, group) {
+  let menuButton = header.querySelector('.column-group-menu-button');
+  if (!menuButton) {
+    menuButton = document.createElement('button');
+    menuButton.type = 'button';
+    menuButton.className = 'column-group-menu-button';
+    menuButton.setAttribute('aria-haspopup', 'menu');
+    const actions = header.querySelector('.panel-actions') || header;
+    actions.insertBefore(menuButton, actions.querySelector('[class*="close"]'));
+    menuButton.addEventListener('click', () => openColumnGroupMenu(panel, menuButton));
+    const collapsedMenu = document.createElement('button');
+    collapsedMenu.type = 'button';
+    collapsedMenu.className = 'column-group-collapsed-menu';
+    collapsedMenu.textContent = '⋯';
+    collapsedMenu.setAttribute('aria-label', 'Column options');
+    collapsedMenu.setAttribute('aria-haspopup', 'menu');
+    collapsedMenu.addEventListener('click', () => openColumnGroupMenu(panel, collapsedMenu));
+    panel.append(collapsedMenu);
+  }
+  menuButton.textContent = group ? group.name : '⋯';
+  menuButton.classList.toggle('has-group', Boolean(group));
+  menuButton.title = group ? `${group.name} · ${group.paneIDs.length} columns` : 'Column options';
+  menuButton.setAttribute('aria-label', group ? `Group options: ${group.name}` : 'Column options');
+  panel.classList.toggle('has-column-group', Boolean(group));
+}
+
+function openColumnGroupMenu(panel, anchor) {
+  document.querySelector('.column-group-menu')?._close?.();
+  const group = columnGroupForPane(panel.dataset.paneId);
+  const menu = document.createElement('div');
+  menu.className = 'column-group-menu';
+  menu.setAttribute('role', 'menu');
+  const controller = new AbortController();
+  const close = () => { controller.abort(); menu.remove(); anchor.focus({ preventScroll: true }); };
+  menu._close = close;
+  const add = (label, action) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.setAttribute('role', 'menuitem');
+    button.textContent = label;
+    button.addEventListener('click', () => { close(); action(); });
+    menu.append(button);
+  };
+  if (group) {
+    add(group.collapsed ? 'Expand group' : 'Collapse group', () => setColumnGroupCollapsed(group, !group.collapsed));
+    add('Edit group…', () => openColumnGroupEditor(panel, group));
+    add('Ungroup', () => {
+      state.columnGroups = state.columnGroups.filter((item) => item.id !== group.id);
+      refreshColumnGroupPresentation();
+      saveWorkspaceState();
+    });
+  } else {
+    add('Group columns…', () => openColumnGroupEditor(panel));
+  }
+  document.body.append(menu);
+  const rect = anchor.getBoundingClientRect();
+  menu.style.left = `${Math.max(8, Math.min(rect.left, window.innerWidth - menu.offsetWidth - 8))}px`;
+  menu.style.top = `${Math.max(8, Math.min(rect.bottom + 6, window.innerHeight - menu.offsetHeight - 8))}px`;
+  menu.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') { event.preventDefault(); close(); }
+    const items = [...menu.querySelectorAll('button')];
+    if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
+      event.preventDefault();
+      items[(items.indexOf(document.activeElement) + (event.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
+    }
+    if (event.key === 'Tab') close();
+  });
+  document.addEventListener('pointerdown', (event) => { if (!menu.contains(event.target) && event.target !== anchor) close(); }, { signal: controller.signal });
+  menu.querySelector('button')?.focus();
+}
+
+function openColumnGroupEditor(panel, existing = null) {
+  const workspaceID = activeWorkspaceID;
+  document.querySelector('.column-group-dialog')?.remove();
+  const dialog = document.createElement('dialog');
+  dialog.className = 'column-group-dialog';
+  dialog.setAttribute('aria-labelledby', 'column-group-editor-title');
+  dialog.innerHTML = `<form><h2 id="column-group-editor-title">${existing ? 'Edit group' : 'Group columns'}</h2>
+    <label class="column-group-name-label">Group name<input name="groupName" maxlength="40" required autocomplete="off" placeholder="e.g. Fire safety"></label>
+    <p class="column-group-editor-hint">Choose columns to keep together. Saved, Notebook and Report stay together.</p>
+    <div class="column-group-choices"></div><p class="column-group-editor-error" role="status"></p>
+    <div class="column-group-editor-actions"><button type="button" data-cancel>Cancel</button><button type="submit">${existing ? 'Save group' : 'Create group'}</button></div></form>`;
+  const ids = activePaneIDs();
+  const selected = new Set(existing?.paneIDs || basePaneGroupForMove(panel.dataset.paneId, ids));
+  const seen = new Set();
+  const choices = [];
+  for (const id of ids) {
+    if (seen.has(id)) continue;
+    const unit = basePaneGroupForMove(id, ids);
+    unit.forEach((member) => seen.add(member));
+    const other = unit.map(columnGroupForPane).find((group) => group && group.id !== existing?.id);
+    const label = document.createElement('label');
+    label.className = 'column-group-choice';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.checked = !other && unit.some((member) => selected.has(member));
+    input.disabled = Boolean(other);
+    const text = document.createElement('span');
+    text.textContent = unit.map((member) => {
+      const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(member)}"]`);
+      return pane ? columnPaneLabel(pane) : 'Column';
+    }).join(' + ') + (other ? ` — in ${other.name}` : '');
+    label.append(input, text);
+    dialog.querySelector('.column-group-choices').append(label);
+    choices.push({ input, unit });
+  }
+  const name = dialog.querySelector('[name="groupName"]');
+  name.value = existing?.name || '';
+  const close = () => { dialog.close(); dialog.remove(); };
+  dialog.querySelector('[data-cancel]').addEventListener('click', close);
+  dialog.addEventListener('cancel', () => dialog.remove());
+  dialog.querySelector('form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (workspaceID !== activeWorkspaceID) { close(); return; }
+    const members = new Set(choices.filter(({ input }) => input.checked).flatMap(({ unit }) => unit));
+    if (members.size < (existing ? 1 : 2) || !name.value.trim()) {
+      dialog.querySelector('.column-group-editor-error').textContent = existing ? 'Enter a name and select at least one column.' : 'Enter a name and select at least two columns.';
+      return;
+    }
+    const group = { id: existing?.id || crypto.randomUUID(), name: name.value.trim(), paneIDs: ids.filter((id) => members.has(id)), collapsed: existing?.collapsed || false };
+    state.columnGroups = normalizeColumnGroups([...(state.columnGroups || []).filter((item) => item.id !== group.id), group]);
+    close();
+    appendPaneSequence([...track.querySelectorAll(':scope > .workspace-panel')]);
+    saveWorkspaceState();
+  });
+  document.body.append(dialog);
+  dialog.showModal();
+  name.focus();
+}
+
 // Collapse keeps the live column DOM (including unsaved editors) in place.
 function paneIsCollapsed(paneID) {
-  return (state.collapsedPaneIDs || []).includes(paneID);
+  return Boolean(columnGroupForPane(paneID)?.collapsed) || (state.collapsedPaneIDs || []).includes(paneID);
 }
 
 function applyPaneCollapsedState(panel) {
@@ -33617,6 +33834,8 @@ function applyPaneCollapsedState(panel) {
 
 function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
   const paneID = panel.dataset.paneId;
+  const group = columnGroupForPane(paneID);
+  if (!collapsed && group?.collapsed) setColumnGroupCollapsed(group, false);
   const startWidth = panel.getBoundingClientRect().width;
   const startPadding = getComputedStyle(panel).paddingInline;
   panel._collapseAnimation?.cancel();
@@ -33709,14 +33928,24 @@ function preparePaneCollapse(panel) {
     rail.setAttribute("aria-expanded", "false");
     rail.addEventListener("click", (event) => {
       if (event.detail !== 0 && Date.now() < (rail._suppressExpandUntil || 0)) return;
-      setPaneCollapsed(panel, false, { focus: true });
-      scrollPaneIntoView(panel.dataset.paneId);
+      const group = columnGroupForPane(panel.dataset.paneId);
+      if (group?.collapsed) setColumnGroupCollapsed(group, false);
+      else {
+        setPaneCollapsed(panel, false, { focus: true });
+        scrollPaneIntoView(panel.dataset.paneId);
+      }
     });
     panel.append(rail);
   }
   rail.title = `Expand ${label}`;
   rail.setAttribute("aria-label", rail.title);
-  rail.querySelector("span").textContent = label;
+  const group = columnGroupForPane(panel.dataset.paneId);
+  if (group?.collapsed) {
+    rail.title = `Expand group ${group.name}`;
+    rail.setAttribute("aria-label", rail.title);
+  }
+  rail.querySelector("span").textContent = group?.collapsed ? `${group.name} · ${group.paneIDs.length}` : label;
+  prepareColumnGroupControls(panel, header, group);
   applyPaneCollapsedState(panel);
 }
 
@@ -33737,7 +33966,7 @@ function appendPaneSequence(panes) {
   const activeIDs = new Set(orderedPanes.map((pane) => pane.dataset.paneId));
   state.collapsedPaneIDs = (state.collapsedPaneIDs || []).filter((id) => activeIDs.has(id));
   orderedPanes.forEach(ensureWorkspacePanelAccessibleName);
-  orderedPanes.forEach(preparePaneCollapse);
+  orderedPanes.forEach((pane) => { pane.classList.remove("is-group-hidden"); preparePaneCollapse(pane); });
   const previousScrollLeft = track.scrollLeft;
   const nodes = [];
   const dividerKey = (previousPaneID, nextPaneID) => `${previousPaneID}\u0000${nextPaneID}`;
@@ -33779,7 +34008,7 @@ function appendPaneSequence(panes) {
     const currentNode = track.children[index] || null;
     if (currentNode !== node) track.insertBefore(node, currentNode);
   });
-  updateCollapsedPaneDividers();
+  refreshColumnGroupPresentation();
   const leftEdgeResizer = track.querySelector(":scope > .pane-left-edge-resizer");
   const rightEdgeResizer = track.querySelector(":scope > .pane-right-edge-resizer");
   const firstPane = orderedPanes[0];
@@ -37441,6 +37670,8 @@ async function toggleUtilityPane(key) {
 }
 
 async function resetVisibleColumnWidths() {
+  (state.columnGroups || []).forEach((group) => { group.collapsed = false; });
+  track.querySelectorAll(".is-group-hidden").forEach((node) => node.classList.remove("is-group-hidden"));
   state.collapsedPaneIDs = [];
   track.querySelectorAll(".workspace-panel.is-collapsed").forEach(applyPaneCollapsedState);
   const currentLeft = track.scrollLeft;
@@ -37491,6 +37722,7 @@ async function closeAllColumns() {
   );
   document.querySelector(".code-decision-context-bar")?.remove();
   state.paneOrder = [];
+  state.columnGroups = [];
   state.paneWeights = {};
   state.collapsedPaneIDs = [];
   state.trackScrollLeft = 0;

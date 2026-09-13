@@ -16939,3 +16939,91 @@ html body *:has(:focus-visible) {
 .pane-header-drag-area .pane-drag-handle {
   display: none;
 }
+
+/* Named column groups preserve their mounted content while folded away. */
+.panel-track > .is-group-hidden { display: none !important; }
+.column-group-menu-button, .column-group-collapsed-menu {
+  border: 0;
+  box-shadow: none;
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  height: var(--panel-title-control-size);
+  min-width: var(--panel-title-control-size);
+  padding: 0 6px;
+  border-radius: 6px;
+  font: inherit;
+}
+.column-group-menu-button.has-group {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  background: rgba(128,128,128,.12);
+}
+.column-group-menu-button:hover, .column-group-collapsed-menu:hover { background: rgba(128,128,128,.18); }
+.column-group-collapsed-menu { display: none; }
+.workspace-panel.is-collapsed > .column-group-collapsed-menu {
+  display: block !important;
+  position: absolute;
+  bottom: 14px;
+  left: 6px;
+  width: 36px;
+}
+.workspace-panel.is-collapsed .pane-collapsed-tab { padding-bottom: 56px; }
+.column-group-menu {
+  position: fixed;
+  z-index: 2000;
+  min-width: 180px;
+  padding: 6px;
+  border-radius: 10px;
+  background: var(--surface-raised);
+  box-shadow: 0 8px 32px rgba(0,0,0,.3);
+}
+.column-group-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  box-shadow: none;
+  text-align: left;
+  cursor: pointer;
+}
+.column-group-menu button:hover, .column-group-menu button:focus-visible { background: rgba(128,128,128,.16); }
+.column-group-dialog {
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 24px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font-family: var(--chrome-font-family);
+}
+.column-group-dialog::backdrop { background: rgba(0,0,0,.6); }
+.column-group-dialog h2 { margin: 0 0 20px; font-size: 18px; }
+.column-group-name-label { display: grid; gap: 8px; font-size: 13px; }
+.column-group-name-label input {
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: rgba(128,128,128,.14);
+  color: inherit;
+  font: inherit;
+}
+.column-group-editor-hint { font-size: 12px; line-height: 1.5; color: var(--text-secondary); }
+.column-group-choices { display: grid; gap: 8px; max-height: 45vh; overflow: auto; }
+.column-group-choice { display: flex; align-items: start; gap: 10px; padding: 12px; border-radius: 8px; background: rgba(128,128,128,.08); cursor: pointer; font-size: 13px; }
+.column-group-choice input { flex: 0 0 16px; width: 16px; height: 16px; min-width: 16px; padding: 0; margin: 2px 0 0; }
+.column-group-choice span { flex: 1; min-width: 0; text-transform: none; color: var(--text-primary); }
+.column-group-choice:has(input:disabled) { opacity: .45; cursor: default; }
+.column-group-editor-error { min-height: 1em; font-size: 12px; }
+.column-group-editor-actions { display: flex; justify-content: end; gap: 8px; }
+.column-group-editor-actions button { padding: 10px 16px; border: 0; border-radius: 8px; background: rgba(128,128,128,.16); color: inherit; box-shadow: none; cursor: pointer; }
+.column-group-editor-actions button[type="submit"] { background: #39756e; color: white; }

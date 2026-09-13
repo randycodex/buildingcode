@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
+import { normalizeColumnGroups, orderColumnGroups, normalizeWorkspaceLayout } from '../public/workspace-state.js';
 
 const source = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
 const actual = name => {
@@ -31,6 +32,7 @@ let reducedMotion = false;
 let saves = 0;
 const context = vm.createContext({
   state, Set, Map, Array, Object,
+  columnGroupForPane: id => state.columnGroups?.find(group => group.paneIDs.includes(id)),
   track: { querySelectorAll: () => [] },
   window: { matchMedia: () => ({ matches: reducedMotion }) },
   getComputedStyle: () => ({ paddingInline: '24px' }),
@@ -118,7 +120,7 @@ console.log('Header dragging excludes title buttons and other interactive contro
 const savedID = 'utility:saved:one', notebookID = 'project:notebook:p', reportID = 'project:report-draft:p';
 const orderState = { utilities: {}, utilityInstances: [], paneOrder: ['reader:one', notebookID, savedID, reportID], collapsedPaneIDs: [notebookID] };
 const orderContext = vm.createContext({
-  state: orderState, Set,
+  state: orderState, Set, normalizeColumnGroups, orderColumnGroups,
   defaultActivePaneIDs: () => [savedID, notebookID, reportID, 'reader:one'],
   savedPaneIDs: () => [savedID], primarySavedPaneID: () => savedID,
   openProjectDetails: () => [{ id: 'p' }],
@@ -127,7 +129,7 @@ const orderContext = vm.createContext({
   isProjectDetailPaneID: () => false, isProjectToolPaneID: () => false,
   searchIDForLinkedReaderPane: () => ''
 });
-vm.runInContext(['savedProjectColumnGroup', 'groupSavedProjectColumns', 'pinCriticalWorkflowPanesToLeft', 'activePaneIDs', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
+vm.runInContext(['savedProjectColumnGroup', 'groupSavedProjectColumns', 'pinCriticalWorkflowPanesToLeft', 'activePaneIDs', 'columnGroupForPane', 'reconcileColumnGroups', 'basePaneGroupForMove', 'paneGroupForMove', 'orderWithPaneMoved'].map(actual).join('\n'), orderContext);
 assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', savedID, notebookID, reportID]);
 for (const member of [savedID, notebookID, reportID]) {
   orderState.paneOrder = orderContext.orderWithPaneMoved(member, 'reader:one', 'before');
@@ -150,3 +152,31 @@ assert.equal(context.singleExpandedDividerEdge('reader', 'other-reader'), null);
 assert.equal(context.singleExpandedDividerEdge('collapsed', ''), null);
 assert.equal(context.singleExpandedDividerEdge('', 'reader').side, 'left');
 console.log('Expanded columns resize beside collapsed neighbors on either edge.');
+
+// Mixed custom groups preserve the built-in project unit and survive layout persistence.
+orderState.columnGroups = [{ id: 'mixed', name: 'Research pack', paneIDs: ['reader:one', notebookID], collapsed: true }];
+orderContext.activePaneIDs();
+assert.deepEqual(Array.from(orderState.columnGroups[0].paneIDs), ['reader:one', savedID, notebookID, reportID]);
+assert.equal(orderContext.orderWithPaneMoved('reader:one', reportID, 'after'), null);
+assert.deepEqual(orderState.collapsedPaneIDs, [notebookID]);
+orderContext.defaultActivePaneIDs = () => [savedID, notebookID, reportID, 'reader:one', 'reader:outside'];
+for (const member of ['reader:one', savedID, notebookID, reportID]) {
+  orderState.paneOrder = orderContext.orderWithPaneMoved(member, 'reader:outside', 'after');
+  assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:outside', 'reader:one', savedID, notebookID, reportID]);
+  orderState.paneOrder = orderContext.orderWithPaneMoved(member, 'reader:outside', 'before');
+  assert.deepEqual(Array.from(orderContext.activePaneIDs()), ['reader:one', savedID, notebookID, reportID, 'reader:outside']);
+}
+const persisted = normalizeWorkspaceLayout(orderState);
+assert.deepEqual(persisted.columnGroups, JSON.parse(JSON.stringify(orderState.columnGroups)));
+orderContext.reconcileColumnGroups(['reader:one']);
+assert.deepEqual(Array.from(orderState.columnGroups[0].paneIDs), ['reader:one']);
+orderContext.reconcileColumnGroups([]);
+assert.equal(orderState.columnGroups.length, 0);
+assert.deepEqual(normalizeColumnGroups([{ id:'a', paneIDs:['x','x'], name:' A ' }, { id:'b', paneIDs:['x','y'] }]).map(g => g.paneIDs), [['x'],['y']]);
+assert.deepEqual(orderColumnGroups(['a','b','c','d'], [{paneIDs:['a','c']}]), ['a','c','b','d']);
+state.columnGroups = [{ id:'a', paneIDs:['reader'], collapsed:true }];
+assert.equal(context.paneIsCollapsed('reader'), true);
+state.columnGroups[0].collapsed = false;
+assert.equal(context.paneIsCollapsed('reader'), false);
+assert.deepEqual(state.collapsedPaneIDs, ['collapsed']);
+console.log('Mixed groups reconcile project membership, persist layout, clean up closed panes, and preserve individual collapse.');

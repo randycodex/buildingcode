@@ -18,6 +18,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "paneWeights",
   "paneOrder",
   "collapsedPaneIDs",
+  "columnGroups",
   "researchConversationID",
   "workboards",
   "notebooks",
@@ -28,6 +29,31 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "trackScrollLeft",
   "codeQuestionWorkspace"
 ]);
+
+export function normalizeColumnGroups(value) {
+  const claimed = new Set(), ids = new Set();
+  return (Array.isArray(value) ? value : []).flatMap((group) => {
+    if (!group || typeof group.id !== "string" || !group.id || ids.has(group.id)) return [];
+    const paneIDs = [...new Set(Array.isArray(group.paneIDs) ? group.paneIDs : [])]
+      .filter((id) => typeof id === "string" && id && !claimed.has(id));
+    if (!paneIDs.length) return [];
+    ids.add(group.id);
+    paneIDs.forEach((id) => claimed.add(id));
+    return [{ id: group.id, name: String(group.name || "Group").trim().slice(0, 40) || "Group", paneIDs, collapsed: group.collapsed === true }];
+  });
+}
+
+export function orderColumnGroups(paneIDs, groups) {
+  let result = [...paneIDs];
+  for (const group of groups) {
+    const members = group.paneIDs.filter((id) => result.includes(id));
+    if (!members.length) continue;
+    const index = result.findIndex((id) => members.includes(id));
+    result = result.filter((id) => !members.includes(id));
+    result.splice(index, 0, ...members);
+  }
+  return result;
+}
 
 function copy(value) {
   if (value === undefined) return undefined;
@@ -210,6 +236,7 @@ export function emptyWorkspaceLayout() {
     paneWeights: {},
     paneOrder: [],
     collapsedPaneIDs: [],
+    columnGroups: [],
     researchConversationID: "",
     workboards: [],
     notebooks: [],
@@ -280,6 +307,7 @@ export function normalizeWorkspaceLayout(value = {}) {
   if (priorPaneWidthDefaultsVersion < 4 && layout.paneWeights["utility:settings"] === 400) {
     layout.paneWeights["utility:settings"] = 600;
   }
+  layout.columnGroups = normalizeColumnGroups(source.columnGroups);
   layout.collapsedPaneIDs = Array.isArray(source.collapsedPaneIDs)
     ? [...new Set(source.collapsedPaneIDs.filter((id) => typeof id === "string" && !id.startsWith("section:detail:")))]
     : [];
