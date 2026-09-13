@@ -17039,3 +17039,13 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .bookmark-undo-notice { justify-self: center; border: 0; padding: 8px 10px; animation: bookmark-undo-fade 10s linear forwards; }
 @keyframes bookmark-undo-fade { 0%, 45% { opacity: 1; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .bookmark-undo-notice { animation: none; } }
+
+/* Keep Saved tools fixed; evidence owns the remaining scrollable space. */
+.saved-panel > .saved-column-scroll { display: flex; flex-direction: column; overflow: hidden; }
+.saved-panel > .saved-column-scroll > * { flex-shrink: 0; }
+.saved-panel > .saved-column-scroll > .saved-folder-context.is-project { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; padding-bottom: 0; }
+.saved-panel .saved-folder-context.is-project > * { flex-shrink: 0; }
+.saved-panel .saved-folder-context.is-project > .saved-project-evidence-section { display: flex; flex-direction: column; min-height: 0; }
+.saved-panel .saved-folder-context.is-project > .saved-project-evidence-section.is-open { flex: 1 1 auto; }
+.saved-panel .saved-project-evidence-section > .saved-evidence-heading { flex-shrink: 0; }
+.saved-panel .saved-project-evidence-section.is-open > .saved-project-evidence-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; }
