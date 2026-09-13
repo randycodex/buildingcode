@@ -29340,10 +29340,11 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
         savedEvidenceKey(link) === savedEvidenceKey(item) &&
         projectSectionBelongsToProject(link, selectedFolder)
       ))
-    : [];
+    : !workspaceProject() ? combinedItems : [];
   const selectionController = removableSavedItems.length
     ? createSavedBulkSelectionController(panel, removableSavedItems, {
-        removeAction: (item) => unlinkEvidenceFromFolder(
+        allowProjectAssignment: !workspaceProject(),
+        removeAction: (item) => selectedFolder ? unlinkEvidenceFromFolder(
           selectedFolder,
           (summary.projectSections || []).find((link) =>
             savedEvidenceKey(link) === savedEvidenceKey(item) &&
@@ -29351,7 +29352,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID, options 
           ) || item,
           panel,
           { refreshPanes: false }
-        )
+        ) : persistSectionBookmark(item, false, { refreshSavedPanes: false })
       })
     : null;
   const savedEvidenceSelectToggle = panel.querySelector(".saved-evidence-select-toggle");
@@ -30443,11 +30444,39 @@ function createSavedBulkSelectionController(panel, savedItems, options = {}) {
   const removeButton = panel.querySelector(".saved-evidence-delete-selection");
   const cancelButton = panel.querySelector(".saved-evidence-cancel-selection");
   if (!selectButton || !removeButton || !cancelButton) return null;
+  const projectPicker = document.createElement("select");
+  projectPicker.setAttribute("aria-label", "Add selected evidence to project");
+  projectPicker.hidden = true;
+  const placeholder = new Option("Add to project", "");
+  projectPicker.append(placeholder);
+  const assignmentProjects = activeFolderRecords(currentContentSummary().projects || [])
+    .filter((project) => folderIsProject(project) && !project.sharedOnly);
+  assignmentProjects.forEach((project) => projectPicker.append(new Option(project.name || project.title, projectRecordID(project))));
+  if (options.allowProjectAssignment) cancelButton.before(projectPicker);
+  projectPicker.addEventListener("change", async () => {
+    const project = assignmentProjects.find((item) => projectRecordID(item) === projectPicker.value);
+    if (!project || busy || !selectedIDs.size || workspaceProject()) return;
+    busy = true;
+    update();
+    try {
+      for (const id of selectedIDs) await persistSectionInProject(project, recordByID.get(id));
+      setActive(false);
+      await refreshOpenSavedPanes();
+    } catch (error) {
+      await showWebNotice("Could not add evidence to project", error.message || "Please try again.");
+    } finally {
+      busy = false;
+      projectPicker.value = "";
+      update();
+    }
+  });
 
   const update = () => {
     panel.classList.toggle("is-saved-selecting", active);
     selectButton.setAttribute("aria-pressed", String(active));
     const selectedCount = selectedIDs.size;
+    projectPicker.hidden = !options.allowProjectAssignment || selectedCount === 0;
+    projectPicker.disabled = busy || !assignmentProjects.length;
     removeButton.hidden = selectedCount === 0;
     removeButton.title = selectedCount === 1 ? "Delete selected evidence" : `Delete ${selectedCount} selected items`;
     removeButton.setAttribute("aria-label", removeButton.title);
