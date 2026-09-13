@@ -678,12 +678,14 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes('row.classList.toggle("is-active", active)') &&
+        workspaceScript.text.includes('checkoutButton.hidden = pro && source === "lifetimeGrant"') &&
         workspaceScript.text.includes('checkoutButton.classList.toggle("is-pro-active", pro)') &&
         !workspaceScript.text.includes('"Research Included"') &&
         workspaceScript.text.includes('checkoutButton.textContent = pro') &&
-        workspaceScript.text.includes('? "Pro Active" : "Manage Subscription"') &&
+        workspaceScript.text.includes('? "Manage Subscription"') &&
+        !workspaceScript.text.includes('? "Pro Active"') &&
         workspaceScript.text.includes(': "Upgrade to Pro - $20.00/month"'),
-      "Web Settings no longer distinguishes active Free and Pro plan actions."
+      "Web Settings must hide the redundant Lifetime Pro action while retaining paid subscription management and Free upgrade actions."
     );
     assert(
       !webRoot.text.includes('id="add-zoning-reader"') &&

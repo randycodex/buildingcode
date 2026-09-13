@@ -32437,9 +32437,10 @@ function renderSettings() {
     checkoutButton.disabled = !account ||
       (pro && source === "lifetimeGrant") ||
       (!pro && !policyAcceptanceReady);
+    checkoutButton.hidden = pro && source === "lifetimeGrant";
     checkoutButton.classList.toggle("is-pro-active", pro);
     checkoutButton.textContent = pro
-      ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
+      ? "Manage Subscription"
       : "Upgrade to Pro - $20.00/month";
     planDetails.hidden = pro;
     stripeTaxDisclosure.hidden = pro;
