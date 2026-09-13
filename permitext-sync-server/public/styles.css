@@ -16967,3 +16967,16 @@ html body *:has(:focus-visible) {
 .pane-collapsed-tab[draggable="true"]:active {
   cursor: grabbing;
 }
+
+/* Reorder from the empty title band; controls keep their own interactions. */
+.pane-header-drag-area {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+.pane-header-drag-area:active {
+  cursor: grabbing;
+}
+.pane-header-drag-area .pane-drag-handle {
+  display: none;
+}

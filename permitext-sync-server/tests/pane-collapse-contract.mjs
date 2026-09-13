@@ -76,6 +76,8 @@ function eventNode() {
 const grip = eventNode(), collapsedTab = eventNode(), dragPane = eventNode();
 dragPane.dataset.paneId = 'reader:drag';
 dragPane.classList = { add() {}, remove() {} };
+dragPane.querySelector = () => grip;
+grip.classList = { add() {} };
 dragPane.querySelectorAll = () => [grip, collapsedTab];
 const dragState = { collapsedPaneIDs: ['reader:drag'], paneOrder: ['reader:drag', 'reader:target'] };
 const dragContext = vm.createContext({
@@ -101,3 +103,13 @@ assert.deepEqual(dragState.paneOrder, ['reader:target', 'reader:drag']);
 assert.deepEqual(dragState.collapsedPaneIDs, ['reader:drag'], 'Dragging must not expand the column');
 assert.ok(collapsedTab._suppressExpandUntil > Date.now(), 'Drop-generated clicks cannot immediately expand the tab');
 console.log('Collapsed and expanded drag handles share reorder logic without duplicate listeners or expanding on drop.');
+
+// Header controls must remain clickable and cannot initiate a column drag.
+let preventedHeaderDrag = false;
+grip.emit('pointerdown', { target: { closest: () => ({ tagName: 'BUTTON' }) } });
+grip.emit('dragstart', { preventDefault: () => { preventedHeaderDrag = true; } });
+assert.equal(preventedHeaderDrag, true);
+grip.emit('pointerdown', { target: { closest: () => null } });
+grip.emit('dragstart', { dataTransfer: { setData: (_type, id) => { transfer = id; } } });
+assert.equal(transfer, 'reader:drag', 'Empty header space initiates the same column drag');
+console.log('Header dragging excludes title buttons and other interactive controls.');

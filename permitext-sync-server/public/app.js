@@ -33205,12 +33205,28 @@ function clearDragPreviewOrder() {
 
 function bindPaneDragging(panes) {
   panes.forEach((pane) => {
-    pane.querySelectorAll(".pane-drag-handle, .pane-collapsed-tab").forEach((handle) => {
+    const header = pane.querySelector(":scope > header");
+    if (header) {
+      header.classList.add("pane-header-drag-area");
+      header.title = "Drag column";
+    }
+    pane.querySelectorAll(".pane-header-drag-area, .pane-collapsed-tab, :scope > .pane-drag-handle").forEach((handle) => {
       if (handle.dataset.dragBound === "true") return;
       handle.dataset.dragBound = "true";
       handle.draggable = true;
+      if (handle === header) {
+        // Native dragstart targets the draggable ancestor, so remember where
+        // the pointer actually started before allowing a header drag.
+        handle.addEventListener("pointerdown", (event) => {
+          handle._dragFromControl = Boolean(event.target.closest("button, a, input, select, textarea, summary, [contenteditable], [role='button']"));
+        }, true);
+      }
 
       handle.addEventListener("dragstart", (event) => {
+        if (handle === header && handle._dragFromControl) {
+          event.preventDefault();
+          return;
+        }
         pane.classList.add("is-dragging");
         draggedPaneID = pane.dataset.paneId || "";
         event.dataTransfer.effectAllowed = "move";
