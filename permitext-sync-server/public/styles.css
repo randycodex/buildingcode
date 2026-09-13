@@ -17152,3 +17152,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .reader-nav-section-group > .reader-nav-section {
   padding-left: calc(var(--space-2) + 44px);
 }
+
+.topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button) {
+  background: transparent;
+}
+.topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button):is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
+}
