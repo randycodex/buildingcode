@@ -38498,3 +38498,18 @@ start().catch((error) => {
   reportClientError("startup", error);
   renderWorkspaceLoadError(error);
 });
+
+// Dismiss the Layout popover after an action, outside click, or Escape.
+const layoutMenu = document.querySelector(".topbar-layout-menu");
+layoutMenu.addEventListener("click", (event) => {
+  if (event.target.closest("button")) layoutMenu.open = false;
+});
+document.addEventListener("click", (event) => {
+  if (!layoutMenu.contains(event.target)) layoutMenu.open = false;
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && layoutMenu.open) {
+    layoutMenu.open = false;
+    layoutMenu.querySelector("summary").focus();
+  }
+});

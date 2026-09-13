@@ -17090,3 +17090,29 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   padding: 0 var(--panel-padding);
   background: transparent;
 }
+
+.topbar-layout-menu { position: relative; }
+.topbar-layout-menu > summary { list-style: none; cursor: pointer; }
+.topbar-layout-menu > summary::-webkit-details-marker { display: none; }
+.topbar-layout-menu-items {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 100;
+  display: grid;
+  min-width: 140px;
+  padding: 6px;
+  border: 1px solid var(--border-color, #303030);
+  border-radius: 10px;
+  background: var(--surface, #000);
+}
+.topbar-layout-menu-items button {
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.topbar-workspaces .connection-status { background: transparent; border: 0; box-shadow: none; }
