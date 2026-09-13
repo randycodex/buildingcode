@@ -16901,6 +16901,7 @@ html body *:has(:focus-visible) {
 
 .pane-collapsed-tab span {
   writing-mode: vertical-rl;
+  transform: rotate(180deg);
   max-height: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
