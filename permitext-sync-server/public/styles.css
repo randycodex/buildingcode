@@ -11429,7 +11429,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
   -webkit-line-clamp: 2;
 }
 
-.saved-note-preview {
+.saved-row .saved-note-preview {
   display: block;
   margin-top: 20px;
   padding: 9px 11px;
