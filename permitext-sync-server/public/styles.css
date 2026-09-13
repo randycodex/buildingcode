@@ -17107,3 +17107,13 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
   cursor: pointer;
 }
 .topbar-workspaces .connection-status { background: transparent; border: 0; box-shadow: none; }
+
+.saved-folder-context.is-project .saved-project-tool-controls :is(.project-notebook-button, .project-report-draft-button) {
+  background: color-mix(in srgb, var(--project-color) 68%, var(--surface));
+}
+
+.saved-column-groups-menu {
+  background: var(--menu-surface);
+  border: 0;
+  box-shadow: var(--shadow-panel);
+}
