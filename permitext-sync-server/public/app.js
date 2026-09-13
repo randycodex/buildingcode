@@ -15131,11 +15131,11 @@ async function hydrateSearchRecentlyViewedEntries(entries, options = {}) {
         sectionNumber,
         title: sectionTitle || "Section",
         isNestedListParagraph,
-        previewText: snippetWithoutDuplicateTitle({
+        previewText: (isNestedListParagraph ? previewSource : snippetWithoutDuplicateTitle({
           sectionNumber,
           title: sectionTitle,
           snippet: previewSource
-        }).replace(/\s+/g, " ").trim().slice(0, 360)
+        })).replace(/\s+/g, " ").trim().slice(0, 360)
       };
       options.onEntry?.(hydratedEntry);
       return hydratedEntry;
