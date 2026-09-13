@@ -33024,6 +33024,14 @@ function renderSettings() {
   return panel;
 }
 
+function singleExpandedDividerEdge(previousPaneID, nextPaneID) {
+  const previousOpen = previousPaneID && !paneIsCollapsed(previousPaneID);
+  const nextOpen = nextPaneID && !paneIsCollapsed(nextPaneID);
+  if (previousOpen && !nextOpen) return { paneID: previousPaneID, side: "right" };
+  if (nextOpen && !previousOpen) return { paneID: nextPaneID, side: "left" };
+  return null;
+}
+
 function createDivider(previousPaneID, nextPaneID) {
   const isLeftEdge = !previousPaneID && Boolean(nextPaneID);
   const isRightEdge = Boolean(previousPaneID) && !nextPaneID;
@@ -33051,17 +33059,20 @@ function createDivider(previousPaneID, nextPaneID) {
   );
   if (isLeftEdge || isRightEdge) {
     divider.setAttribute("aria-valuemin", String(Math.round(defaultPaneWidthForID(edgePaneID))));
-    divider.addEventListener("keydown", (event) => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-      event.preventDefault();
-      const step = event.shiftKey ? 80 : 24;
-      const growsPane = isLeftEdge ? event.key === "ArrowLeft" : event.key === "ArrowRight";
-      resizePaneEdgeBy(edgePaneID, growsPane ? step : -step, divider);
-    });
   }
+  divider.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID);
+    if (!edge) return;
+    event.preventDefault();
+    const step = event.shiftKey ? 80 : 24;
+    const growsPane = edge.side === "left" ? event.key === "ArrowLeft" : event.key === "ArrowRight";
+    resizePaneEdgeBy(edge.paneID, growsPane ? step : -step, divider);
+  });
   divider.addEventListener("pointerdown", (event) => {
-    if (previousPaneID && nextPaneID) startPaneResize(event, previousPaneID, nextPaneID);
-    else startPaneEdgeResize(event, edgePaneID, isLeftEdge ? "left" : "right");
+    const edge = singleExpandedDividerEdge(previousPaneID, nextPaneID);
+    if (edge) startPaneEdgeResize(event, edge.paneID, edge.side);
+    else if (previousPaneID && nextPaneID) startPaneResize(event, previousPaneID, nextPaneID);
   });
   divider.addEventListener("dblclick", () => {
     if (isLeftEdge || isRightEdge) resetDividerPanes(edgePaneID, null);
@@ -33711,7 +33722,7 @@ function preparePaneCollapse(panel) {
 
 function updateCollapsedPaneDividers() {
   track.querySelectorAll(":scope > .pane-divider").forEach((divider) => {
-    const disabled = [divider.dataset.previousPaneId, divider.dataset.nextPaneId].some(paneIsCollapsed);
+    const disabled = [divider.dataset.previousPaneId, divider.dataset.nextPaneId].filter(Boolean).every(paneIsCollapsed);
     divider.classList.toggle("is-collapse-disabled", disabled);
     divider.setAttribute("aria-disabled", String(disabled));
     divider.tabIndex = disabled ? -1 : 0;

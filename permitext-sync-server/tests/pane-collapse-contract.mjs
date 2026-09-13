@@ -141,3 +141,12 @@ assert.deepEqual(Array.from(orderContext.activePaneIDs()), [savedID, notebookID,
 assert.deepEqual(orderState.collapsedPaneIDs, [notebookID]);
 assert.deepEqual(Array.from(orderContext.savedProjectColumnGroup([savedID, reportID])), [savedID, reportID]);
 console.log('Saved, Notebook and Report move together from any member; internal order and individual collapse state are preserved.');
+
+vm.runInContext(actual('singleExpandedDividerEdge'), context);
+state.collapsedPaneIDs = ['collapsed'];
+assert.equal(context.singleExpandedDividerEdge('reader', 'collapsed').side, 'right');
+assert.equal(context.singleExpandedDividerEdge('collapsed', 'reader').side, 'left');
+assert.equal(context.singleExpandedDividerEdge('reader', 'other-reader'), null);
+assert.equal(context.singleExpandedDividerEdge('collapsed', ''), null);
+assert.equal(context.singleExpandedDividerEdge('', 'reader').side, 'left');
+console.log('Expanded columns resize beside collapsed neighbors on either edge.');
