@@ -3747,6 +3747,16 @@ async function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {
 }
 
 function closeLinkedReaderForSearch(searchID) {
+  const source = (state.utilityInstances || []).find((item) => item.id === searchID);
+  const sourcePaneID = source ? paneIDForUtilityInstance(source) : "";
+  for (const reader of state.readers || []) {
+    if (reader.pinnedDetailSourceID === searchID || (sourcePaneID && reader.pinnedSearchPaneID === sourcePaneID)) {
+      reader.pinnedDetailSourceID = "";
+      reader.pinnedSearchPaneID = "";
+      const panel = [...track.querySelectorAll(".reader-panel")].find((item) => item.dataset.readerId === reader.id);
+      panel?.querySelector(".reader-keep-open")?.remove();
+    }
+  }
   state.searchLinkedReaders = state.searchLinkedReaders && typeof state.searchLinkedReaders === "object"
     ? state.searchLinkedReaders
     : {};
