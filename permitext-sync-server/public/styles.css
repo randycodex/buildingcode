@@ -3872,7 +3872,7 @@ select option:checked {
 
 .reader-panel .reader-body {
   grid-row: 1;
-  margin-right: calc(0px - var(--panel-padding) + 4px);
+  margin-right: -16px;
   margin-bottom: var(--space-3);
 }
 
