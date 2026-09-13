@@ -5253,7 +5253,7 @@ body.is-resizing-search-history * {
 
 .search-jump-list {
   display: grid;
-  gap: 0;
+  gap: var(--space-1);
   padding-right: 0;
 }
 
