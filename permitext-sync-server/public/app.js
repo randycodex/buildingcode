@@ -15833,11 +15833,16 @@ async function openSectionDetail(searchID, section, options = {}) {
   scheduleContinuitySync(newReaderState(readerFieldsForSectionDetail(details[searchID])));
   placeSectionDetailAfterPane(searchID, anchors[searchID] || paneIDForUtilityInstance({ key: "search", id: searchID }));
   const linkedReader = updateLinkedReaderForSearch(searchID, details[searchID]);
+  const liveContent = linkedReader && track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(linkedReader))}"] .reader-content`);
+  const canReuseReader = Boolean(liveContent && liveContent.querySelector(
+    `.chapter-section[data-section-id="${CSS.escape(sectionID)}"][data-code-version="${CSS.escape(details[searchID].codeVersion)}"]`
+  ));
+  if (canReuseReader) linkedReader.shouldSmoothScrollToSection = false;
   saveWorkspaceState();
   await transitionWorkspace("utility", {
     refreshPaneIDs: [
       paneIDForSectionDetail(searchID),
-      ...(linkedReader ? [paneIDForReader(linkedReader)] : [])
+      ...(linkedReader && !canReuseReader ? [paneIDForReader(linkedReader)] : [])
     ]
   });
   if (linkedReader) revealReaderSourceTarget(linkedReader, details[searchID], options.evidenceAnchor);
@@ -30899,8 +30904,11 @@ async function confirmSearchReaderReplacement(reader, detail, anchorPaneID = "")
 
 function revealReaderSourceTarget(reader, item, evidenceAnchor = null) {
   const paneID = paneIDForReader(reader);
+  const revealToken = crypto.randomUUID();
+  reader.sourceRevealToken = revealToken;
   [0, 90, 240].forEach((delay) => {
     window.setTimeout(() => {
+      if (reader.sourceRevealToken !== revealToken) return;
       const panel = track.querySelector(`.reader-panel[data-pane-id="${CSS.escape(paneID)}"]`);
       const content = panel?.querySelector(".reader-content");
       const target = savedReaderTarget(content, item);
@@ -30909,6 +30917,7 @@ function revealReaderSourceTarget(reader, item, evidenceAnchor = null) {
         candidate.classList.remove("is-source-target");
       });
       target.classList.add("is-source-target");
+      reader.sourceRevealToken = null;
       if (evidenceAnchor?.passages?.length) {
         revealNotebookEvidencePassages(target, evidenceAnchor);
       }
