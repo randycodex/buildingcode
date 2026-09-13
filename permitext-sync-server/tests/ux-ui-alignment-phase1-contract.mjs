@@ -52,6 +52,7 @@ assert.match(stylesSource, /\.workspace-panel:not\(\.reader-panel\),[\s\S]*?scro
 assert.doesNotMatch(stylesSource, /\.reader-content[^}]*scrollbar-width: none;/);
 assert.match(stylesSource, /\.reader-panel \.reader-content \{[\s\S]*?margin-right: calc\(0px - var\(--panel-padding\)\);[\s\S]*?padding-right: calc\(var\(--panel-padding\) \+ var\(--space-4\)\);/);
 assert.match(stylesSource, /\.reader-panel \.reader-content::\-webkit-scrollbar-track \{[\s\S]*?margin-top: calc\(var\(--reader-scrollbar-track-top\) - var\(--panel-padding\)\);/);
+assert.match(stylesSource, /\.reader-panel \.reader-body \{[^}]*grid-row: 1;[^}]*margin-bottom: var\(--space-3\);/, "Reader content must stop at the shared column bottom baseline.");
 assert.match(clientSource, /function confirmAccountDeletion\([\s\S]*?Type DELETE to confirm[\s\S]*?confirmButton\.disabled = true/);
 assert.match(clientSource, /I understand that deleting Permitext does not cancel App Store billing\./);
 assert.match(clientSource, /Permitext will delete[\s\S]*?Permitext will not delete/);

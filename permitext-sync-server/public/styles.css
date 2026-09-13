@@ -3900,6 +3900,7 @@ select option:checked {
 
 .reader-panel .reader-body {
   grid-row: 1;
+  margin-bottom: var(--space-3);
 }
 
 .reader-content {
