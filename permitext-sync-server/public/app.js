@@ -6810,12 +6810,15 @@ function isProAccount() {
 
 function updateReaderPlanControls() {
   const limitReached = !isProAccount() && state.readers.length >= 2;
+  const readerLabel = state.readers.length > 0 ? "+ Reader" : "Reader";
+  addReaderButton.querySelector("span").textContent = readerLabel;
+  addReaderButton.dataset.mobileLabel = readerLabel;
   addReaderButton.hidden = false;
   addReaderButton.disabled = limitReached;
-  addReaderButton.title = limitReached ? "Two Reader limit reached" : "New Reader";
+  addReaderButton.title = limitReached ? "Two Reader limit reached" : readerLabel;
   addReaderButton.setAttribute(
     "aria-label",
-    limitReached ? "New Reader. Two Reader limit reached." : "New Reader"
+    limitReached ? `${readerLabel}. Two Reader limit reached.` : readerLabel
   );
   collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
