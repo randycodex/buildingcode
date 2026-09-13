@@ -33886,6 +33886,23 @@ function openColumnGroupMenu(panel, anchor) {
   menu.querySelector('button:not(:disabled)')?.focus();
 }
 
+function columnGroupChoiceDetails(pane, position, index) {
+  const lines = [];
+  if (pane?.classList.contains('reader-panel')) {
+    const code = pane.querySelector('.code-select')?.selectedOptions?.[0]?.textContent?.trim();
+    const chapter = pane.querySelector('.chapter-select')?.selectedOptions?.[0]?.textContent?.trim();
+    if (code) lines.push(code);
+    if (chapter) lines.push(chapter);
+    const section = position?.sectionID
+      ? pane.querySelector(`.chapter-section[data-section-id="${CSS.escape(position.sectionID)}"]`)
+      : pane.querySelector(".chapter-section[data-section-id]");
+    const title = section?.querySelector('.reader-section-title')?.textContent?.trim();
+    lines.push(title ? `At § ${title}` : 'Reading position unavailable');
+  } else lines.push(pane ? columnPaneLabel(pane) : 'Column');
+  lines.push(`Column ${index + 1} · left to right`);
+  return lines;
+}
+
 function openColumnGroupEditor(panel, existing = null) {
   const workspaceID = activeWorkspaceID;
   document.querySelector('.column-group-dialog')?.remove();
@@ -33901,6 +33918,9 @@ function openColumnGroupEditor(panel, existing = null) {
   const selected = new Set(existing?.paneIDs || basePaneGroupForMove(panel.dataset.paneId, ids));
   const seen = new Set();
   const choices = [];
+  const positions = captureReaderScrollPositions();
+  const clearHighlight = () => track.querySelectorAll('.is-group-choice-highlight').forEach((pane) => pane.classList.remove('is-group-choice-highlight'));
+  dialog.addEventListener('close', clearHighlight);
   for (const id of ids) {
     if (!canGroupColumn(id) || seen.has(id)) continue;
     const unit = basePaneGroupForMove(id, ids).filter(canGroupColumn);
@@ -33913,19 +33933,37 @@ function openColumnGroupEditor(panel, existing = null) {
     input.checked = !other && unit.some((member) => selected.has(member));
     input.disabled = Boolean(other);
     const text = document.createElement('span');
-    text.textContent = unit.map((member) => {
-      const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(member)}"]`);
-      return pane ? columnPaneLabel(pane) : 'Column';
-    }).join(' + ') + (other ? ` — in ${other.name}` : '');
+    text.className = 'column-group-choice-details';
+    const panes = unit.map((member) => track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(member)}"]`));
+    unit.forEach((member, index) => {
+      columnGroupChoiceDetails(panes[index], positions.get(member), ids.indexOf(member)).forEach((line, lineIndex) => {
+        const detail = document.createElement(lineIndex === 0 ? 'strong' : 'small');
+        detail.textContent = line;
+        text.append(detail);
+      });
+    });
+    if (other) {
+      const membership = document.createElement('small');
+      membership.textContent = `In ${other.name}`;
+      text.append(membership);
+    }
+    const highlight = () => {
+      clearHighlight();
+      panes.filter(Boolean).forEach((pane) => pane.classList.add('is-group-choice-highlight'));
+    };
+    label.addEventListener('pointerenter', highlight);
+    label.addEventListener('pointerleave', clearHighlight);
+    label.addEventListener('focusin', highlight);
+    label.addEventListener('focusout', clearHighlight);
     label.append(input, text);
     dialog.querySelector('.column-group-choices').append(label);
     choices.push({ input, unit });
   }
   const name = dialog.querySelector('[name="groupName"]');
   name.value = existing?.name || '';
-  const close = () => { dialog.close(); dialog.remove(); };
+  const close = () => { clearHighlight(); dialog.close(); dialog.remove(); };
   dialog.querySelector('[data-cancel]').addEventListener('click', close);
-  dialog.addEventListener('cancel', () => dialog.remove());
+  dialog.addEventListener('cancel', () => { clearHighlight(); dialog.remove(); });
   dialog.querySelector('form').addEventListener('submit', (event) => {
     event.preventDefault();
     if (workspaceID !== activeWorkspaceID) { close(); return; }
