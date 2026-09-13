@@ -14843,7 +14843,26 @@ async function renderReader(reader, options = {}) {
         current.searchPreviewPaneID = "";
       }
       saveWorkspaceState();
-      void transitionWorkspace("utility", { refreshPaneIDs });
+      for (const paneID of refreshPaneIDs) {
+        const livePanel = [...track.querySelectorAll(".reader-panel")].find((node) => node.dataset.paneId === paneID);
+        const liveReader = state.readers.find((item) => paneIDForReader(item) === paneID);
+        if (!livePanel || !liveReader) continue;
+        const linked = Boolean(searchIDForLinkedReaderPane(paneID));
+        livePanel.classList.toggle("is-search-derived-reader", Boolean(liveReader.searchPreviewPaneID || linked));
+        livePanel.classList.toggle("is-recently-viewed-linked-reader", Boolean(liveReader.recentlyViewedSourceSearchID && linked));
+        const pin = livePanel.querySelector(".reader-keep-open");
+        if (pin) {
+          const canToggle = Boolean(liveReader.searchPreviewPaneID || liveReader.pinnedSearchPaneID || linked);
+          pin.hidden = !canToggle;
+          pin.title = liveReader.pinnedSearchPaneID ? "Unpin this reader" : "Keep this reader open";
+          pin.setAttribute("aria-label", pin.title);
+          pin.setAttribute("aria-pressed", String(Boolean(liveReader.pinnedSearchPaneID)));
+        }
+        if (!linked) {
+          livePanel.querySelector(".reader-internal-search-toggle")?.removeAttribute("hidden");
+          livePanel.querySelector(".pane-drag-handle")?.removeAttribute("hidden");
+        }
+      }
     });
     closeButton.before(keepButton);
   }
