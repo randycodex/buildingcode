@@ -681,12 +681,9 @@ function loadWorkspaceState(accountOverride) {
       ),
       searchResultReader: null,
       sectionDetail: null,
-      // Source Detail was retired from the ordinary workflow. Preserve enacted
-      // Readers from older layouts, but do not restore their obsolete detail
-      // panes or Search-owned coupling.
-      sectionDetails: {},
-      sectionDetailAnchors: {},
-      searchLinkedReaders: {},
+      sectionDetails: saved.sectionDetails && typeof saved.sectionDetails === "object" ? saved.sectionDetails : {},
+      sectionDetailAnchors: saved.sectionDetailAnchors && typeof saved.sectionDetailAnchors === "object" ? saved.sectionDetailAnchors : {},
+      searchLinkedReaders: saved.searchLinkedReaders && typeof saved.searchLinkedReaders === "object" ? saved.searchLinkedReaders : {},
       projectDetail: activeProjectDetail,
       projectDetails,
       projectHostPaneID: typeof saved.projectHostPaneID === "string" ? saved.projectHostPaneID : "",
@@ -1123,13 +1120,7 @@ function saveWorkspaceState() {
   const persistableState = {
     ...state,
     searchResultReader: null,
-    sectionDetail: null,
-    sectionDetails: {},
-    sectionDetailAnchors: {},
-    paneOrder: (state.paneOrder || []).filter((paneID) => !paneID.startsWith("section:detail:")),
-    paneWeights: Object.fromEntries(
-      Object.entries(state.paneWeights || {}).filter(([paneID]) => !paneID.startsWith("section:detail:"))
-    )
+    sectionDetail: null
   };
   const {
     account: _account,
