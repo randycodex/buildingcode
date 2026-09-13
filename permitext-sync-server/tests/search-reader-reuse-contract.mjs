@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+const source=readFileSync(new URL('../public/app.js', import.meta.url),'utf8');
+const code=source.slice(source.indexOf('function reusableSearchReader('),source.indexOf('\nfunction removeSectionDetail(',source.indexOf('function reusableSearchReader(')));
+let serial=0;
+const state={readers:[{id:'manual',sectionID:'1'}],paneWeights:{}};
+const context={state,resolveReaderSource:async x=>x,searchResultDetail:x=>x,readerFieldsForSectionDetail:(x,o)=>({...x,...o}),normalizeAnnotationBlockID:x=>x,readerMatchesSource:(r,d)=>r.sectionID===d.sectionID,readerIsClearlyAvailable:()=>false,isProAccount:()=>true,newReaderState:x=>({id:`new-${++serial}`,...x}),paneIDForReader:r=>r.id,defaultPaneWidthForID:()=>600,placePaneAfter(){},appendPaneIfMissing(){},updateBrowserSectionURL(){},scheduleContinuitySync(){},saveWorkspaceState(){},transitionWorkspace:async()=>{},revealReaderSourceTarget(){},scrollPaneIntoView(){}};
+vm.createContext(context);vm.runInContext(code,context);
+const open=(sectionID,extra={})=>context.openSourceInReader({sectionID},'search-a',{sourceSurface:'search',...extra});
+const first=await open('2');const second=await open('3');assert.equal(first.id,second.id);assert.equal(state.readers.length,2);assert.equal(state.readers[0].sectionID,'1');
+second.searchPreviewPaneID='';const third=await open('4');assert.notEqual(third.id,second.id);assert.equal(second.sectionID,'3');
+const explicit=await open('5',{forceNewReader:true});assert.notEqual(explicit.id,third.id);assert.equal(explicit.searchPreviewPaneID,'');
+assert.equal((await open('6')).id,third.id);
+const other=await context.openSourceInReader({sectionID:'7'},'search-b',{sourceSurface:'search'});assert.notEqual(other.id,third.id);
+console.log('Search reuse, Keep open, explicit new reader, separate searches, and manual-reader preservation passed.');

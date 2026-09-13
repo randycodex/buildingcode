@@ -14737,6 +14737,22 @@ async function renderReader(reader, options = {}) {
   );
   const referenceSourceReader = state.readers.find((item) => item.id === reader.referenceSourceReaderID);
 
+  if (reader.searchPreviewPaneID) {
+    const keepButton = document.createElement("button");
+    keepButton.type = "button";
+    keepButton.className = "ghost-button reader-keep-open";
+    keepButton.textContent = "Keep open";
+    keepButton.title = "Keep this Reader; the next Search result opens another Reader";
+    keepButton.addEventListener("click", () => {
+      const current = state.readers.find((candidate) => candidate.id === reader.id);
+      if (!current) return;
+      current.searchPreviewPaneID = "";
+      saveWorkspaceState();
+      void transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(current)] });
+    });
+    closeButton.before(keepButton);
+  }
+
   panel.dataset.readerId = reader.id;
   panel.classList.toggle("is-recently-viewed-linked-reader", isRecentlyViewedLinkedReader);
   reader.codePrefix = reader.codePrefix || "BC";
@@ -15150,7 +15166,16 @@ async function renderSearchHistory(panel, instance, options = {}) {
         if (window.getSelection && String(window.getSelection()).trim()) return;
         void openRecentlyViewedInReader(instance, entry);
       });
-      tile.append(openButton);
+      const openNewButton = document.createElement("button");
+      openNewButton.type = "button";
+      openNewButton.className = "ghost-button search-open-new-reader";
+      openNewButton.textContent = "Open in new reader";
+      openNewButton.addEventListener("click", () => {
+        void openSourceInReader(searchResultDetail(entry), paneIDForUtilityInstance(instance), {
+          sourceSurface: "search", forceNewReader: true
+        });
+      });
+      tile.append(openButton, openNewButton);
       list.append(tile);
     });
     section.append(label, list);
@@ -15652,7 +15677,17 @@ function appendSearchResultGroups(results, searchResults, query, searchInstance)
         }
       });
 
-      row.append(mainButton, saveButton);
+      const openNewButton = document.createElement("button");
+      openNewButton.type = "button";
+      openNewButton.className = "ghost-button search-open-new-reader";
+      openNewButton.textContent = "Open in new reader";
+      openNewButton.addEventListener("click", () => {
+        recordRecentSearch(query);
+        void openSourceInReader(detail, paneIDForUtilityInstance(searchInstance), {
+          sourceSurface: "search", forceNewReader: true
+        });
+      });
+      row.append(mainButton, saveButton, openNewButton);
       groupBody.append(row);
     });
     const loadedGroupCount = groupBody.querySelectorAll(".result-row").length;
@@ -30882,6 +30917,11 @@ async function resolveReaderSource(item) {
   };
 }
 
+function reusableSearchReader(readers, anchorPaneID, forceNewReader = false) {
+  if (forceNewReader || !anchorPaneID) return null;
+  return readers.find((reader) => reader.searchPreviewPaneID === anchorPaneID) || null;
+}
+
 async function openSourceInReader(item, anchorPaneID = "", options = {}) {
   let navigationItem;
   try {
@@ -30897,8 +30937,11 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     sourceProjectID: String(options.projectID || ""),
     sourceBlockID: normalizeAnnotationBlockID(detail.blockID)
   });
-  let reader = (state.readers || []).find((candidate) => readerMatchesSource(candidate, detail));
-  if (!reader) {
+  const fromSearch = options.sourceSurface === "search";
+  let reader = fromSearch
+    ? reusableSearchReader(state.readers || [], anchorPaneID, options.forceNewReader)
+    : (state.readers || []).find((candidate) => readerMatchesSource(candidate, detail));
+  if (!reader && !fromSearch) {
     reader = (state.readers || []).find(readerIsClearlyAvailable) || null;
   }
   if (!reader && anchorPaneID && options.sourceSurface !== "search") {
@@ -30918,6 +30961,7 @@ async function openSourceInReader(item, anchorPaneID = "", options = {}) {
     }
   }
   Object.assign(reader, sourceFields);
+  if (fromSearch) reader.searchPreviewPaneID = options.forceNewReader ? "" : anchorPaneID;
   const paneID = paneIDForReader(reader);
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
   if (anchorPaneID && anchorPaneID !== paneID) placePaneAfter(anchorPaneID, paneID);
