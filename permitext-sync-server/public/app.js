@@ -32296,6 +32296,29 @@ function renderAccountArchivedProjects(panel, requestIdentity) {
   });
 }
 
+function toggleAccountDialog() {
+  const existing = document.querySelector(".account-dialog");
+  if (existing) { existing.close(); return; }
+  const dialog = document.createElement("dialog");
+  dialog.className = "account-dialog";
+  dialog.setAttribute("aria-label", "Account");
+  const panel = renderSettings();
+  dialog.append(panel);
+  dialog.addEventListener("close", () => {
+    dialog.remove();
+    toggleSettingsButton.setAttribute("aria-pressed", "false");
+    toggleSettingsButton.focus({ preventScroll: true });
+  });
+  dialog.addEventListener("click", (event) => {
+    if (event.target !== dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+  });
+  document.body.append(dialog);
+  toggleSettingsButton.setAttribute("aria-pressed", "true");
+  dialog.showModal();
+}
+
 function renderSettings() {
   const settingsIdentity = captureAccountRequest();
   const panel = renderTemplate(settingsTemplate);
@@ -37789,9 +37812,7 @@ async function renderWorkspace(options = {}) {
     if ((state.utilityInstances || []).some((item) => item.conversationID === conversationID)) continue;
     panes.push(await renderResearchConversation(conversationID, { supplemental: true }));
   }
-  if (state.utilities.settings) {
-    panes.push(renderSettings());
-  }
+  if (state.utilities.settings) state.utilities.settings = false;
   for (const reader of state.readers) {
     panes.push(await renderReader(reader, { scrollPosition: readerScrollPositions.get(paneIDForReader(reader)) }));
   }
@@ -37934,6 +37955,7 @@ async function transitionWorkspace(mode = "default", options = {}) {
 }
 
 async function toggleUtilityPane(key) {
+  if (key === "settings") { toggleAccountDialog(); return; }
   if (key === "analysis" && state.utilities.analysis) {
     await closeResearchWorkspace();
     return;

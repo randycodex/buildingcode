@@ -17159,3 +17159,27 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .topbar :is(.toolbar-button, .workspace-actions-button, .topbar-settings-button):is(:hover, :focus-visible) {
   background: color-mix(in srgb, var(--text-primary) 16%, transparent);
 }
+
+.account-dialog {
+  width: min(560px, calc(100vw - 32px));
+  height: min(820px, calc(100dvh - 64px));
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: var(--menu-surface);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+.account-dialog::backdrop { background: rgb(0 0 0 / 50%); }
+.account-dialog > .settings-panel {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none;
+  height: 100%;
+  box-sizing: border-box;
+  border: 0;
+  background: transparent;
+}
+.account-dialog .settings-scroll { flex: 1; min-height: 0; overflow-y: auto; }
