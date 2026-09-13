@@ -33810,6 +33810,9 @@ function prepareColumnGroupControls(panel, header, group) {
     collapsedMenu.addEventListener('click', () => openColumnGroupMenu(panel, collapsedMenu));
     panel.append(collapsedMenu);
   }
+  const hasMenuOptions = Boolean(group) || panel.classList.contains('reader-panel');
+  menuButton.hidden = !hasMenuOptions;
+  panel.querySelector('.column-group-collapsed-menu').hidden = !hasMenuOptions;
   menuButton.textContent = group ? group.name : '⋯';
   menuButton.classList.toggle('has-group', Boolean(group));
   menuButton.title = group ? `${group.name} · ${group.paneIDs.length} columns` : 'Column options';
@@ -33863,8 +33866,6 @@ function openColumnGroupMenu(panel, anchor) {
       refreshColumnGroupPresentation();
       saveWorkspaceState();
     });
-  } else {
-    add('Group columns…', () => openColumnGroupEditor(panel));
   }
   document.body.append(menu);
   const rect = anchor.getBoundingClientRect();
