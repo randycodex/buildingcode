@@ -16957,3 +16957,13 @@ html body *:has(:focus-visible) {
   cursor: default;
   pointer-events: none;
 }
+
+/* The collapsed title is also the column's drag handle. */
+.pane-collapsed-tab[draggable="true"] {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.pane-collapsed-tab[draggable="true"]:active {
+  cursor: grabbing;
+}

@@ -65,3 +65,39 @@ context.setPaneCollapsed(panel, false);
 assert.equal(animations.length, 2);
 assert.equal(saves, 4);
 console.log('Column collapse preserves live drafts, scroll, widths and order; animation and reduced motion passed.');
+
+// Expanded handles and collapsed title tabs share the same reorder behavior.
+function eventNode() {
+  const listeners = {};
+  return { dataset: {}, listeners, addEventListener(type, callback) {
+    (listeners[type] ||= []).push(callback);
+  }, emit(type, event = {}) { for (const callback of listeners[type] || []) callback(event); } };
+}
+const grip = eventNode(), collapsedTab = eventNode(), dragPane = eventNode();
+dragPane.dataset.paneId = 'reader:drag';
+dragPane.classList = { add() {}, remove() {} };
+dragPane.querySelectorAll = () => [grip, collapsedTab];
+const dragState = { collapsedPaneIDs: ['reader:drag'], paneOrder: ['reader:drag', 'reader:target'] };
+const dragContext = vm.createContext({
+  state: dragState, Date, draggedPaneID: '', dragPreviewOrder: [],
+  track: { querySelectorAll: () => [] }, saveWorkspaceState() {},
+  transitionWorkspace() {},
+  clearDragPreviewOrder() { dragContext.dragPreviewOrder = []; }
+});
+vm.runInContext(actual('bindPaneDragging'), dragContext);
+dragContext.bindPaneDragging([dragPane]);
+dragContext.bindPaneDragging([dragPane]);
+for (const handle of [grip, collapsedTab]) {
+  assert.equal(handle.draggable, true);
+  assert.equal(handle.listeners.dragstart.length, 1, 'Reusing a pane cannot duplicate drag listeners');
+}
+assert.equal(dragPane.listeners.drop.length, 1);
+let transfer;
+collapsedTab.emit('dragstart', { dataTransfer: { setData: (type, id) => { transfer = [type, id]; } } });
+assert.deepEqual(transfer, ['text/plain', 'reader:drag']);
+dragContext.dragPreviewOrder = ['reader:target', 'reader:drag'];
+collapsedTab.emit('dragend');
+assert.deepEqual(dragState.paneOrder, ['reader:target', 'reader:drag']);
+assert.deepEqual(dragState.collapsedPaneIDs, ['reader:drag'], 'Dragging must not expand the column');
+assert.ok(collapsedTab._suppressExpandUntil > Date.now(), 'Drop-generated clicks cannot immediately expand the tab');
+console.log('Collapsed and expanded drag handles share reorder logic without duplicate listeners or expanding on drop.');

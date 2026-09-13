@@ -33205,34 +33205,39 @@ function clearDragPreviewOrder() {
 
 function bindPaneDragging(panes) {
   panes.forEach((pane) => {
-    const handle = pane.querySelector(".pane-drag-handle");
-    if (!handle || pane.dataset.dragBound === "true") return;
-    pane.dataset.dragBound = "true";
-    handle.draggable = true;
+    pane.querySelectorAll(".pane-drag-handle, .pane-collapsed-tab").forEach((handle) => {
+      if (handle.dataset.dragBound === "true") return;
+      handle.dataset.dragBound = "true";
+      handle.draggable = true;
 
-    handle.addEventListener("dragstart", (event) => {
-      pane.classList.add("is-dragging");
-      draggedPaneID = pane.dataset.paneId || "";
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", draggedPaneID);
-    });
-
-    handle.addEventListener("dragend", () => {
-      const finalOrder = dragPreviewOrder.length ? dragPreviewOrder.slice() : null;
-      draggedPaneID = "";
-      pane.classList.remove("is-dragging");
-      track.querySelectorAll(".workspace-panel.is-drop-before, .workspace-panel.is-drop-after").forEach((panel) => {
-        panel.classList.remove("is-drop-before", "is-drop-after");
+      handle.addEventListener("dragstart", (event) => {
+        pane.classList.add("is-dragging");
+        draggedPaneID = pane.dataset.paneId || "";
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", draggedPaneID);
       });
-      if (finalOrder?.length) {
-        state.paneOrder = finalOrder;
-        saveWorkspaceState();
-        clearDragPreviewOrder();
-        void transitionWorkspace("utility");
-      } else {
-        clearDragPreviewOrder();
-      }
+
+      handle.addEventListener("dragend", () => {
+        handle._suppressExpandUntil = Date.now() + 250;
+        const finalOrder = dragPreviewOrder.length ? dragPreviewOrder.slice() : null;
+        draggedPaneID = "";
+        pane.classList.remove("is-dragging");
+        track.querySelectorAll(".workspace-panel.is-drop-before, .workspace-panel.is-drop-after").forEach((panel) => {
+          panel.classList.remove("is-drop-before", "is-drop-after");
+        });
+        if (finalOrder?.length) {
+          state.paneOrder = finalOrder;
+          saveWorkspaceState();
+          clearDragPreviewOrder();
+          void transitionWorkspace("utility");
+        } else {
+          clearDragPreviewOrder();
+        }
+      });
+
     });
+    if (pane.dataset.dragBound === "true") return;
+    pane.dataset.dragBound = "true";
 
     pane.addEventListener("dragover", (event) => {
       const activeDraggedPaneID = draggedPaneID || event.dataTransfer.getData("text/plain");
@@ -33704,7 +33709,8 @@ function preparePaneCollapse(panel) {
     rail.hidden = true;
     rail.innerHTML = '<span></span>';
     rail.setAttribute("aria-expanded", "false");
-    rail.addEventListener("click", () => {
+    rail.addEventListener("click", (event) => {
+      if (event.detail !== 0 && Date.now() < (rail._suppressExpandUntil || 0)) return;
       setPaneCollapsed(panel, false, { focus: true });
       scrollPaneIntoView(panel.dataset.paneId);
     });
