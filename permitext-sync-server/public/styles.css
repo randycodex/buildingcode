@@ -16694,3 +16694,41 @@ html body *:has(:focus-visible) {
 .notebook-panel .notebook-focus {
   padding-bottom: 0;
 }
+
+/* Keep Account utilities anchored to the Project columns' bottom baseline. */
+.settings-panel > .settings-scroll {
+  padding-bottom: var(--space-3);
+  border-radius: var(--radius-control);
+}
+.settings-panel > .settings-footer {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 10px;
+  margin: var(--space-3) 0 var(--space-3);
+  padding: 14px;
+  border-radius: var(--radius-control);
+  background: var(--menu-surface);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.settings-panel .settings-footer-links {
+  justify-content: flex-start;
+  text-align: left;
+  gap: 6px 14px;
+}
+.settings-footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.settings-footer a:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+.settings-footer > .settings-feedback-link {
+  color: var(--text-primary);
+}
+.settings-panel .settings-footer .settings-disclaimer {
+  padding: 0;
+  text-align: left;
+}
