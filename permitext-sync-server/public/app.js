@@ -33181,11 +33181,6 @@ function openSavedColumnGroupsMenu() {
     button.addEventListener('click', () => { close(); void restoreSavedColumnGroup(group.id); });
     menu.append(button);
   }
-  if (!menu.children.length) {
-    const empty = document.createElement('p');
-    empty.textContent = 'No groups yet.';
-    menu.append(empty);
-  }
   const create = document.createElement('button');
   create.type = 'button';
   create.setAttribute('role', 'menuitem');
