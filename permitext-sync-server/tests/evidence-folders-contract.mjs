@@ -511,6 +511,11 @@ assert.match(functionSource(appSource, "readerSectionResearchSelection"), /origi
   );
 });
 assert.match(functionSource(appSource, "activePaneIDs"), /pinCriticalWorkflowPanesToLeft\(paired\)/);
+const projectToolControlOrderSource = functionSource(appSource, "placeProjectToolPaneInControlOrder");
+assert.match(projectToolControlOrderSource, /paneIDForProjectNotebook\(detail\)[\s\S]*?paneIDForProjectReportDraft\(detail\)/, "Project tool placement must follow the Notebook then Report button order.");
+assert.match(projectToolControlOrderSource, /ordered\.splice\([\s\S]*?projectAnchorIndex \+ 1[\s\S]*?\.\.\.controlPaneIDs/, "Notebook and Report must open immediately after their Saved project host.");
+assert.match(functionSource(appSource, "openProjectNotebook"), /if \(!wasOpen\) placeProjectToolPaneInControlOrder\(identity\)/);
+assert.match(functionSource(appSource, "openProjectReportDraft"), /if \(!wasOpen\) placeProjectToolPaneInControlOrder\(identity\)/);
 assert.match(functionSource(appSource, "orderWithPaneMoved"), /pinCriticalWorkflowPanesToLeft\(order\)/);
 assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
 assert.match(savedFolderContextSource, /if \(!folder\)[\s\S]*?inlineFilters\.hidden = !savedInstance\.organizeUnassigned;[\s\S]*?savedContent\.hidden = !savedInstance\.organizeUnassigned;/);

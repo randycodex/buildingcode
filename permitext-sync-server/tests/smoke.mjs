@@ -3058,12 +3058,14 @@ async function main() {
 
     assert(
       workspaceScript.text.includes("function placeProjectToolPaneLast(detail, paneID)") &&
+        workspaceScript.text.includes("function placeProjectToolPaneInControlOrder(detail)") &&
+        workspaceScript.text.includes("if (!wasOpen) placeProjectToolPaneInControlOrder(identity)") &&
         workspaceScript.text.includes("if (!wasOpen) placeProjectToolPaneLast(identity, coordinationID)") &&
         workspaceScript.text.includes("function projectForToolPaneID(paneID)") &&
         workspaceScript.text.includes("projectDetailMatches(draggedProject, targetProject)") &&
         workspaceScript.text.includes("createProjectToolDragHandle(identity)") &&
         workspaceStyles.text.includes(".workboard-panel > .project-tool-pane-drag-handle"),
-      "Project tools should append in opening order and only drag within their own Project group."
+      "Notebook and Report should follow their control order while other Project tools only drag within their own Project group."
     );
     assert(
       workspaceScript.text.includes("coordination: false") &&

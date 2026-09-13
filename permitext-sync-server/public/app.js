@@ -2087,7 +2087,7 @@ async function openProjectNotebook(project) {
   ];
   const notebookID = paneIDForProjectNotebook(identity);
   state.paneWeights[notebookID] ||= defaultNotebookPaneWidth;
-  if (!wasOpen) placeProjectToolPaneLast(identity, notebookID);
+  if (!wasOpen) placeProjectToolPaneInControlOrder(identity);
   syncProjectToolButtonStates(identity);
   saveWorkspaceState();
   await transitionWorkspace("utility");
@@ -2121,7 +2121,7 @@ async function openProjectReportDraft(project) {
   ];
   const reportDraftID = paneIDForProjectReportDraft(identity);
   state.paneWeights[reportDraftID] ||= defaultReportDraftPaneWidth;
-  if (!wasOpen) placeProjectToolPaneLast(identity, reportDraftID);
+  if (!wasOpen) placeProjectToolPaneInControlOrder(identity);
   syncProjectToolButtonStates(identity);
   saveWorkspaceState();
   await transitionWorkspace("utility");
@@ -3604,6 +3604,29 @@ function placeProjectToolPaneLast(detail, paneID) {
     ? Math.max(...siblingIndexes) + 1
     : projectAnchorIndex === -1 ? ordered.length : projectAnchorIndex + 1;
   ordered.splice(insertIndex, 0, paneID);
+  state.paneOrder = ordered;
+}
+
+function placeProjectToolPaneInControlOrder(detail) {
+  const activeIDs = defaultActivePaneIDs();
+  const active = new Set(activeIDs);
+  const controlPaneIDs = [
+    paneIDForProjectNotebook(detail),
+    paneIDForProjectReportDraft(detail)
+  ].filter((paneID) => active.has(paneID));
+  const controls = new Set(controlPaneIDs);
+  const ordered = (state.paneOrder || []).filter((paneID) =>
+    active.has(paneID) && !controls.has(paneID)
+  );
+  activeIDs.forEach((paneID) => {
+    if (!controls.has(paneID) && !ordered.includes(paneID)) ordered.push(paneID);
+  });
+  const projectAnchorIndex = ordered.indexOf(primarySavedPaneID());
+  ordered.splice(
+    projectAnchorIndex === -1 ? ordered.length : projectAnchorIndex + 1,
+    0,
+    ...controlPaneIDs
+  );
   state.paneOrder = ordered;
 }
 
