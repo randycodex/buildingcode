@@ -17037,3 +17037,8 @@ html body *:has(:focus-visible) {
 
 .saved-column-groups-menu { max-width: min(360px, calc(100vw - 16px)); max-height: calc(100vh - 80px); overflow-y: auto; }
 .saved-column-groups-menu p { margin: 8px; max-width: 240px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+/* Keep named group controls at the Reader size across all panel types. */
+body .panel-track > article.workspace-panel .column-group-menu-button.has-group {
+  font-size: 11px !important;
+}
