@@ -33676,20 +33676,13 @@ function preparePaneCollapse(panel) {
   const heading = header.querySelector(".panel-kind, .panel-title, h2");
   const title = codeLabel || heading?.textContent?.trim() || "Column";
   const label = codeLabel ? [codeLabel, chapterLabel].filter(Boolean).join(" · ") : title;
-  header.tabIndex = 0;
+  header.tabIndex = -1;
   header.setAttribute("role", "group");
-  header.setAttribute("aria-label", `${label} column header. Press Enter to collapse.`);
-  header.setAttribute("aria-keyshortcuts", "Enter Space");
+  header.setAttribute("aria-label", `${label} column header`);
   if (header.dataset.collapseBound !== "true") {
     header.dataset.collapseBound = "true";
     header.addEventListener("dblclick", (event) => {
       if (event.target.closest("button, a, input, select, textarea, summary, [contenteditable], [role='button'], .panel-kind, .panel-title, h2")) return;
-      event.preventDefault();
-      preparePaneCollapse(panel);
-      setPaneCollapsed(panel, true, { focus: true });
-    });
-    header.addEventListener("keydown", (event) => {
-      if (event.target !== header || !["Enter", " "].includes(event.key)) return;
       event.preventDefault();
       preparePaneCollapse(panel);
       setPaneCollapsed(panel, true, { focus: true });
