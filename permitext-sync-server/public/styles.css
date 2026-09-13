@@ -4372,6 +4372,8 @@ select option:checked {
 }
 
 .search-panel .search-box {
+  height: 48px;
+  min-height: 48px;
   border: 0;
   border-radius: var(--radius-pill);
 }
@@ -14725,6 +14727,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .report-draft-add-controls button {
   min-width: 0;
   width: 100%;
+  height: 40px;
+  min-height: 40px;
 }
 
 .report-draft-primary-actions {
@@ -14737,6 +14741,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 .report-draft-primary-actions button {
   min-width: 0;
   width: 100%;
+  height: 40px;
+  min-height: 40px;
 }
 
 .report-draft-blocks,

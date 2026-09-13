@@ -53,6 +53,9 @@ assert.doesNotMatch(stylesSource, /\.reader-content[^}]*scrollbar-width: none;/)
 assert.match(stylesSource, /\.reader-panel \.reader-content \{[\s\S]*?margin-right: calc\(0px - var\(--panel-padding\)\);[\s\S]*?padding-right: calc\(var\(--panel-padding\) \+ var\(--space-4\)\);/);
 assert.match(stylesSource, /\.reader-panel \.reader-content::\-webkit-scrollbar-track \{[\s\S]*?margin-top: calc\(var\(--reader-scrollbar-track-top\) - var\(--panel-padding\)\);/);
 assert.match(stylesSource, /\.reader-panel \.reader-body \{[^}]*grid-row: 1;[^}]*margin-bottom: var\(--space-3\);/, "Reader content must stop at the shared column bottom baseline.");
+assert.match(stylesSource, /\.search-panel \.search-box \{[^}]*height: 48px;[^}]*min-height: 48px;[^}]*border: 0;[^}]*border-radius: var\(--radius-pill\);/, "The main Search field must be 48 pixels high.");
+assert.match(stylesSource, /\.report-draft-add-controls button \{[^}]*width: 100%;[^}]*height: 40px;[^}]*min-height: 40px;/, "The Report add controls must be 40 pixels high.");
+assert.match(stylesSource, /\.report-draft-primary-actions button \{[^}]*width: 100%;[^}]*height: 40px;[^}]*min-height: 40px;/, "The Save Report and Export Report controls must be 40 pixels high.");
 assert.match(clientSource, /function confirmAccountDeletion\([\s\S]*?Type DELETE to confirm[\s\S]*?confirmButton\.disabled = true/);
 assert.match(clientSource, /I understand that deleting Permitext does not cancel App Store billing\./);
 assert.match(clientSource, /Permitext will delete[\s\S]*?Permitext will not delete/);
