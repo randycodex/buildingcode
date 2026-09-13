@@ -746,6 +746,7 @@ assert.match(stylesSource, /\.workspace-add-button,[\s\S]*?\.workspace-actions-b
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-notebook-button,[\s\S]*?\.project-report-draft-button \{[^}]*height: 40px;[^}]*min-height: 40px;/);
 assert.match(stylesSource, /\.report-draft-shell \{[^}]*display: flex;[^}]*flex-direction: column;/, "Report sections must use a vertical flow that can animate without overlapping.");
 assert.match(stylesSource, /\.report-draft-shell > \* \{[^}]*flex: 0 0 auto;/, "Expanded Report sources must scroll instead of collapsing earlier Report sections.");
+assert.match(stylesSource, /\.report-draft-primary-actions \{[^}]*position: sticky;[^}]*z-index: 2;[^}]*top: 0;/, "Save Report and Export Report must remain fixed at the top of the scrolling Report content.");
 assert.match(stylesSource, /\.report-draft-panel :is\([^}]*\.project-section-motion \{[^}]*gap: 0;/, "Collapsed Report sections must not retain a grid gap that jumps away after motion settles.");
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading,[\s\S]*?\.saved-project-research-answers > \.project-studio-section-heading \{[^}]*height: 40px;[^}]*min-height: 40px;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-facts-section > \.saved-project-facts-heading[\s\S]*?\.saved-project-research-toggle \{[^}]*height: 40px;[^}]*min-height: 40px;/);

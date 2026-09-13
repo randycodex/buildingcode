@@ -16654,9 +16654,21 @@ html body *:has(:focus-visible) {
 .research-list-panel.research-clean-start .research-composer-status:empty { display: none; }
 
 /* History is a destination; writing begins in a dedicated chat view. */
+.research-list-panel.has-research-history-footer {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
 .research-new-chat {
   display: block;
-  margin: 0 0 20px;
+  width: 100%;
+  min-height: 48px;
+  height: 48px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: rgb(246 244 241 / 10%);
+  color: var(--text-primary);
+  box-shadow: none;
 }
 .research-list-panel.is-new-research-chat .research-chat-welcome h3 {
   margin: 0 0 8px;

@@ -19861,7 +19861,8 @@ async function renderResearch(paneID = "utility:analysis") {
       researchDraftPaneIDs.add(paneID);
       void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
     });
-    content.prepend(newChatButton);
+    panel.classList.add("has-research-history-footer");
+    panel.append(newChatButton);
   }
 
   if (!researchConversationList.length) {
