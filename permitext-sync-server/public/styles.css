@@ -17030,7 +17030,23 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .column-group-choice:has(input:checked) { background: rgba(57,117,110,.22); }
 .column-group-choice:focus-within { outline: 1px solid var(--text-secondary); outline-offset: -1px; }
 
-.reader-section-heading-row .reader-section-saved-marker { opacity: 1; position: static; border: 0; background: transparent; box-shadow: none; cursor: pointer; }
+.reader-section-heading-row .reader-section-saved-marker {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+  position: static;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.reader-section-heading-row:hover .reader-section-saved-marker,
+.reader-section-heading-row:focus-within .reader-section-saved-marker {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 .bookmark-undo-tray { position: absolute; bottom: 16px; left: 16px; right: 16px; z-index: 20; display: grid; gap: 8px; max-height: 35vh; overflow: auto; }
 .bookmark-undo-notice { display: flex; align-items: center; gap: 18px; padding: 12px 16px; border: 1px solid rgba(128,128,128,.35); border-radius: 12px; background: var(--surface-raised); color: var(--text-primary); font: 13px var(--chrome-font-family); }
