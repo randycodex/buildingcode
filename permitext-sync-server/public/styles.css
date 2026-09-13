@@ -16850,41 +16850,11 @@ html body *:has(:focus-visible) {
   fill: currentColor;
 }
 
-/* Put a column aside by its title without closing its live content. */
-.pane-collapse-button {
-  display: block;
-  min-width: 0;
-  max-width: 100%;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  box-shadow: none;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  letter-spacing: inherit;
-  text-transform: inherit;
-  text-align: start;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
-}
-
-.pane-collapse-button:hover { opacity: 0.7; }
-.pane-collapse-button:focus-visible {
+/* Put a column aside from its header without closing its live content. */
+.pane-header-drag-area:focus-visible {
   outline: 2px solid var(--code-accent);
   outline-offset: 3px;
-}
-
-.reader-collapse-action {
-  flex: 0 0 auto;
-  min-height: var(--panel-title-control-size);
-  color: var(--text-secondary);
-  font-size: var(--chrome-font-size);
-  font-weight: 500;
-  letter-spacing: normal;
-  text-transform: none;
+  border-radius: 4px;
 }
 
 .pane-collapsed-tab[hidden] { display: none; }

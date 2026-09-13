@@ -33171,7 +33171,7 @@ function bindPaneDragging(panes) {
     const header = pane.querySelector(":scope > header");
     if (header) {
       header.classList.add("pane-header-drag-area");
-      header.title = "Drag column";
+      header.title = "Drag to move · Double-click to collapse";
     }
     pane.querySelectorAll(".pane-header-drag-area, .pane-collapsed-tab, :scope > .pane-drag-handle").forEach((handle) => {
       if (handle.dataset.dragBound === "true") return;
@@ -33573,7 +33573,7 @@ function applyPaneCollapsedState(panel) {
   applyPaneWeight(panel, panel.dataset.paneId);
   const rail = panel.querySelector(":scope > .pane-collapsed-tab");
   if (rail) rail.hidden = !collapsed;
-  panel.querySelector(".pane-collapse-button")?.setAttribute("aria-expanded", String(!collapsed));
+
   if (!collapsed && wasCollapsed) {
     // Restore after the expanded column has its original layout again.
     for (const { node, top, left } of panel._collapsedScrollPositions || []) {
@@ -33605,7 +33605,7 @@ function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
   updateCollapsedPaneDividers();
   saveWorkspaceState();
   notifyWorkspaceLayoutChange();
-  if (focus) panel.querySelector(collapsed ? ".pane-collapsed-tab" : ".pane-collapse-button")?.focus({ preventScroll: true });
+  if (focus) panel.querySelector(collapsed ? ".pane-collapsed-tab" : ":scope > header")?.focus({ preventScroll: true });
   if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     const endWidth = panel.getBoundingClientRect().width;
     const endPadding = getComputedStyle(panel).paddingInline;
@@ -33633,7 +33633,7 @@ function setPaneCollapsed(panel, collapsed, { focus = false } = {}) {
       { flex: `0 0 ${endWidth}px`, minWidth: `${endWidth}px`, maxWidth: `${endWidth}px`, paddingInline: endPadding }
     ], { duration: 240, easing: "cubic-bezier(0.22, 1, 0.36, 1)" });
     panel._collapseAnimation = animation;
-    const title = panel.querySelector(collapsed ? ".pane-collapsed-tab" : ".pane-collapse-button");
+    const title = panel.querySelector(collapsed ? ".pane-collapsed-tab" : ":scope > header");
     title?.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, delay: 60, fill: "backwards" });
     animation.finished.then(() => {
       if (panel._collapseAnimation !== animation) return;
@@ -33660,28 +33660,25 @@ function preparePaneCollapse(panel) {
   const heading = header.querySelector(".panel-kind, .panel-title, h2");
   const title = codeLabel || heading?.textContent?.trim() || "Column";
   const label = codeLabel ? [codeLabel, chapterLabel].filter(Boolean).join(" · ") : title;
-  let button = header.querySelector(".pane-collapse-button");
-  if (!button) {
-    button = document.createElement("button");
-    button.type = "button";
-    button.className = "pane-collapse-button";
-    if (codeSelect) {
-      button.classList.add("reader-collapse-action");
-      const actions = header.querySelector(".panel-actions");
-      actions.insertBefore(button, actions.querySelector(".reader-close"));
-    } else if (heading) {
-      heading.replaceChildren(button);
-    } else {
-      return;
-    }
-    button.addEventListener("click", () => {
+  header.tabIndex = 0;
+  header.setAttribute("role", "group");
+  header.setAttribute("aria-label", `${label} column header. Press Enter to collapse.`);
+  header.setAttribute("aria-keyshortcuts", "Enter Space");
+  if (header.dataset.collapseBound !== "true") {
+    header.dataset.collapseBound = "true";
+    header.addEventListener("dblclick", (event) => {
+      if (event.target.closest("button, a, input, select, textarea, summary, [contenteditable], [role='button'], .panel-kind, .panel-title, h2")) return;
+      event.preventDefault();
+      preparePaneCollapse(panel);
+      setPaneCollapsed(panel, true, { focus: true });
+    });
+    header.addEventListener("keydown", (event) => {
+      if (event.target !== header || !["Enter", " "].includes(event.key)) return;
+      event.preventDefault();
       preparePaneCollapse(panel);
       setPaneCollapsed(panel, true, { focus: true });
     });
   }
-  button.textContent = codeSelect ? "Collapse" : title;
-  button.title = `Collapse ${label}`;
-  button.setAttribute("aria-label", button.title);
   let rail = panel.querySelector(":scope > .pane-collapsed-tab");
   if (!rail) {
     rail = document.createElement("button");
