@@ -17143,3 +17143,8 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 }
 
 .section-detail-note-box .section-detail-note-resize-handle { display: none; }
+
+.saved-section-row .saved-section-title {
+  display: block;
+  padding-block: 4px;
+}
