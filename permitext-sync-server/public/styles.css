@@ -15039,9 +15039,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .research-progres
 }
 
 .report-draft-primary-actions {
-  position: sticky;
-  z-index: 2;
-  top: 0;
+  position: static;
   padding: 0;
   border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
