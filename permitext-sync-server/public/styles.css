@@ -17065,3 +17065,10 @@ body .panel-track > article.workspace-panel .column-group-menu-button.has-group 
 .saved-panel .saved-folder-context.is-project > .saved-project-evidence-section.is-open { flex: 1 1 auto; }
 .saved-panel .saved-project-evidence-section > .saved-evidence-heading { flex-shrink: 0; }
 .saved-panel .saved-project-evidence-section.is-open > .saved-project-evidence-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; }
+
+/* Put the evidence scrollbar in the card's right inset, clear of its rows. */
+.saved-panel .saved-project-evidence-section.is-open > .saved-project-evidence-body {
+  margin-right: calc(-1 * var(--space-3));
+  padding-right: var(--space-3);
+  scrollbar-gutter: stable;
+}
