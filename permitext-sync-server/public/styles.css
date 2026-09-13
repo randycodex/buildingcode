@@ -16695,16 +16695,17 @@ html body *:has(:focus-visible) {
   padding-bottom: 0;
 }
 
-/* Keep Account utilities anchored to the Project columns' bottom baseline. */
+/* Scroll Account content together within the shared bottom baseline. */
 .settings-panel > .settings-scroll {
-  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding-bottom: 0;
   border-radius: var(--radius-control);
 }
-.settings-panel > .settings-footer {
+.settings-panel .settings-footer {
   flex: 0 0 auto;
   display: grid;
   gap: 10px;
-  margin: var(--space-3) 0 var(--space-3);
+  margin: auto 0 0;
   padding: 14px;
   border-radius: var(--radius-control);
   background: var(--menu-surface);
