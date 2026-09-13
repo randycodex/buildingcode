@@ -6269,7 +6269,7 @@ function enhanceSelect(select) {
   const readerChapterMenu = select.classList.contains("chapter-select");
   const researchProjectMenu = select.classList.contains("research-conversation-header-project");
   const researchFeedbackRoleMenu = select.classList.contains("research-feedback-role-select");
-  const iconOnlyTrigger = readerCodeMenu || select.dataset.customTrigger === "icon-only";
+  const iconOnlyTrigger = select.dataset.customTrigger === "icon-only";
   const readerTopMenu = readerCodeMenu || readerChapterMenu;
   const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
@@ -6303,18 +6303,10 @@ function enhanceSelect(select) {
   const syncTrigger = () => {
     const selectedLabel = select.options[select.selectedIndex]?.textContent || "";
     trigger.textContent = iconOnlyTrigger ? "⌄" : selectedLabel;
-    if (readerCodeMenu) {
-      const title = selectPanel?.querySelector(".reader-code-heading > .pane-collapse-button");
-      if (title) {
-        title.textContent = selectedLabel;
-        title.title = `Collapse ${selectedLabel}`;
-        title.setAttribute("aria-label", title.title);
-      }
-    }
     if (iconOnlyTrigger) {
       trigger.classList.add("is-icon-only");
-      trigger.setAttribute("aria-label", readerCodeMenu ? `Choose code: ${selectedLabel}` : select.dataset.customTriggerLabel || selectedLabel);
-      trigger.title = readerCodeMenu ? `Choose code: ${selectedLabel}` : select.dataset.customTriggerLabel || selectedLabel;
+      trigger.setAttribute("aria-label", select.dataset.customTriggerLabel || selectedLabel);
+      trigger.title = select.dataset.customTriggerLabel || selectedLabel;
     } else {
       trigger.setAttribute("aria-label", `${fieldLabel}: ${selectedLabel}`);
     }
@@ -33674,7 +33666,9 @@ function preparePaneCollapse(panel) {
     button.type = "button";
     button.className = "pane-collapse-button";
     if (codeSelect) {
-      header.querySelector(".reader-code-heading").prepend(button);
+      button.classList.add("reader-collapse-action");
+      const actions = header.querySelector(".panel-actions");
+      actions.insertBefore(button, actions.querySelector(".reader-close"));
     } else if (heading) {
       heading.replaceChildren(button);
     } else {
@@ -33685,7 +33679,7 @@ function preparePaneCollapse(panel) {
       setPaneCollapsed(panel, true, { focus: true });
     });
   }
-  button.textContent = title;
+  button.textContent = codeSelect ? "Collapse" : title;
   button.title = `Collapse ${label}`;
   button.setAttribute("aria-label", button.title);
   let rail = panel.querySelector(":scope > .pane-collapsed-tab");

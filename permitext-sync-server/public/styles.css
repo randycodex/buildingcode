@@ -16877,26 +16877,14 @@ html body *:has(:focus-visible) {
   outline-offset: 3px;
 }
 
-.reader-code-heading > .pane-collapse-button {
-  flex: 0 1 auto;
-  color: var(--code-accent);
-  font-size: calc(var(--chrome-font-size) * var(--code-title-scale));
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.reader-code-heading:has(> .pane-collapse-button) .reader-code-picker,
-.reader-code-heading:has(> .pane-collapse-button) .reader-code-picker .custom-select,
-.reader-code-heading:has(> .pane-collapse-button) .reader-code-picker .custom-select-trigger {
-  flex: 0 0 var(--panel-title-control-size);
-  width: var(--panel-title-control-size);
-  max-width: var(--panel-title-control-size);
-}
-
-.reader-code-heading:has(> .pane-collapse-button) .custom-select-trigger {
-  text-align: center;
-  padding: 0;
+.reader-collapse-action {
+  flex: 0 0 auto;
+  min-height: var(--panel-title-control-size);
+  color: var(--text-secondary);
+  font-size: var(--chrome-font-size);
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .pane-collapsed-tab[hidden] { display: none; }
