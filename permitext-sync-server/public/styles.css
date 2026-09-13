@@ -16692,8 +16692,12 @@ html body *:has(:focus-visible) {
   border-radius: 8px;
 }
 .research-list-panel.is-research-history-selecting .research-conversation-row.is-selected {
-  background: color-mix(in srgb, var(--accent-building) 22%, var(--surface-muted));
+  background: transparent;
   box-shadow: none;
+}
+.research-list-panel.is-research-history-selecting .research-conversation-row.is-selected,
+.research-list-panel.is-research-history-selecting .research-conversation-row.is-selected :is(button, span, strong, time, p) {
+  color: var(--accent-building);
 }
 .research-list-panel.research-clean-start .research-composer-status:empty { display: none; }
 
