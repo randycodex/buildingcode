@@ -33183,9 +33183,15 @@ function openSavedColumnGroupsMenu() {
   }
   if (!menu.children.length) {
     const empty = document.createElement('p');
-    empty.textContent = 'No groups yet. Use a column’s menu to create one.';
+    empty.textContent = 'No groups yet.';
     menu.append(empty);
   }
+  const create = document.createElement('button');
+  create.type = 'button';
+  create.setAttribute('role', 'menuitem');
+  create.textContent = 'Create group…';
+  create.addEventListener('click', () => { close(); openColumnGroupEditor(null); });
+  menu.append(create);
   document.body.append(menu);
   const rect = anchor.getBoundingClientRect();
   menu.style.left = `${Math.max(8, Math.min(rect.left + (rect.width - menu.offsetWidth) / 2, window.innerWidth - menu.offsetWidth - 8))}px`;
@@ -33915,7 +33921,7 @@ function openColumnGroupEditor(panel, existing = null) {
     <div class="column-group-choices"></div><p class="column-group-editor-error" role="status"></p>
     <div class="column-group-editor-actions"><button type="button" data-cancel>Cancel</button><button type="submit">${existing ? 'Save group' : 'Create group'}</button></div></form>`;
   const ids = activePaneIDs();
-  const selected = new Set(existing?.paneIDs || basePaneGroupForMove(panel.dataset.paneId, ids));
+  const selected = new Set(existing?.paneIDs || (panel ? basePaneGroupForMove(panel.dataset.paneId, ids) : []));
   const seen = new Set();
   const choices = [];
   const positions = captureReaderScrollPositions();
@@ -33948,6 +33954,9 @@ function openColumnGroupEditor(panel, existing = null) {
     label.append(input, text);
     dialog.querySelector('.column-group-choices').append(label);
     choices.push({ input, unit });
+  }
+  if (!choices.some(({ input }) => !input.disabled)) {
+    dialog.querySelector('.column-group-editor-error').textContent = 'Open Reader, Search or Research columns to create a group.';
   }
   const name = dialog.querySelector('[name="groupName"]');
   name.value = existing?.name || '';
